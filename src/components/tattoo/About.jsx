@@ -1,4 +1,4 @@
-import aboutBg from '../assets/about/about-bg.png'
+import aboutBg from '../../assets/about/about-bg.png'
 
 export default function About() {
   return (

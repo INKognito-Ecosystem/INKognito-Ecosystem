@@ -1,6 +1,6 @@
-import heroBg from '../assets/hero/hero-bg.png'
+import heroBg from '../../assets/hero/hero-bg.png'
 import { Link } from 'react-router-dom'
-import imgmifoto from '../assets/mifoto/josefoto.jpg'
+import imgmifoto from '../../assets/mifoto/josefoto.jpg'
 
 export default function Hero() {
   return (

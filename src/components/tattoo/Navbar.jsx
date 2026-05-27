@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import milogo from '../assets/milogo/milogo.png'
+import milogo from '../../assets/milogo/milogo.png'
 
 export default function Navbar() {
   return (

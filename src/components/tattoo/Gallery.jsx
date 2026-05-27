@@ -1,14 +1,14 @@
 import React from 'react';
 // IMPORTA CADA IMAGEN AQUÍ ABAJO:
-import imgPoseidon from '../assets/portafolio/poseidon.jpg';
-import imgPoseidon2 from '../assets/portafolio/poseidon2.jpg';
-import imgAguila from '../assets/portafolio/aguila.jpg';
-import imgAngelCaido from '../assets/portafolio/angel caido.jpg'; 
-import imgColibri from '../assets/portafolio/colibri.jpg';
-import Ojoyfiligrana from '../assets/portafolio/ojoyfiligrana.jpg';
-import imgLineafina from '../assets/portafolio/lineafina.jpg';
-import milogo from '../assets/milogo/milogo.png';
-import imgmifoto from '../assets/mifoto/josefoto.jpg';
+import imgPoseidon from '../../assets/portafolio/poseidon.jpg';
+import imgPoseidon2 from '../../assets/portafolio/poseidon2.jpg';
+import imgAguila from '../../assets/portafolio/aguila.jpg';
+import imgAngelCaido from '../../assets/portafolio/angel caido.jpg'; 
+import imgColibri from '../../assets/portafolio/colibri.jpg';
+import Ojoyfiligrana from '../../assets/portafolio/ojoyfiligrana.jpg';
+import imgLineafina from '../../assets/portafolio/lineafina.jpg';
+import milogo from '../../assets/milogo/milogo.png';
+import imgmifoto from '../../assets/mifoto/josefoto.jpg';
 
 const GALLERY_ITEMS = [
   { id: 1, title: 'Sombras', img: imgPoseidon, category: 'Realismo' },

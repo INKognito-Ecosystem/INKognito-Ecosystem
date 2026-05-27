@@ -1,15 +1,15 @@
 import SupplyPage from './components/supply/SupplyPage'
-import InkognitoHome from './components/InkognitoHome'
+import InkognitoHome from './components/ecosystem/InkognitoHome'
 import reservaBg from './assets/reserva/reserva-bg.png'
 import React, { useState } from 'react'
 import { Routes, Route, Link } from 'react-router-dom'
 
-import Navbar from './components/Navbar'
-import Hero from './components/Hero'
-import About from './components/About'
-import Gallery from './components/Gallery'
-import Testimonials from './components/Testimonials'
-import Footer from './components/Footer'
+import Navbar from './components/tattoo/Navbar'
+import Hero from './components/tattoo/Hero'
+import About from './components/tattoo/About'
+import Gallery from './components/tattoo/Gallery'
+import Testimonials from './components/tattoo/Testimonials'
+import Footer from './components/tattoo/Footer'
 
 import milogo from './assets/milogo/milogo.png'
 

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import ecosystemBg from '../assets/ecosystem/ecosystem-bg.jpg'
+import ecosystemBg from '../../assets/ecosystem/ecosystem-bg.jpg'
 
 export default function InkognitoHome() {
 

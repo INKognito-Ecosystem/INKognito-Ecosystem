@@ -1,4 +1,4 @@
-import footerBg from '../assets/footer/footer-bg.png'
+import footerBg from '../../assets/footer/footer-bg.png'
 
 import {
   FaInstagram,
