@@ -136,7 +136,7 @@ export default function Footer() {
         <div className="border-t border-white/10 pt-8 flex flex-col items-center text-gray-500 text-xs gap-4">
 
           <p>
-            © 2026 INKOGNITO STUDIO TATTOO. TODOS LOS DERECHOS RESERVADOS.
+            © 2026 INKOGNITO. TODOS LOS DERECHOS RESERVADOS.
           </p>
 
           <div className="flex space-x-6">
