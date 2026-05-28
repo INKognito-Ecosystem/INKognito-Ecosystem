@@ -9,15 +9,15 @@ export default function SupplyPage() {
 
   return (
 
-    <main className="bg-black text-white overflow-hidden">
+    <main className="bg-black text-white">
     
     <NavbarSupply />  
 
       <HeroSupply />
+      
+      <FeaturedProductssupply />
 
       <CategoriesSupply />
-
-      <FeaturedProductssupply />
 
     <BrandsSupply />
 

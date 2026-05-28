@@ -24,7 +24,7 @@ export default function FeaturedProducts() {
     
 
       <section
-      id="destacados"
+      id="productos"
       className="py-28 px-6 bg-black"
     >
 

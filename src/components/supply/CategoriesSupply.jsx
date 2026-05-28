@@ -16,7 +16,7 @@ export default function CategoriesSupply() {
   return (
     
 
-    <section className="py-24 px-6 bg-black">
+    <section id="categorias" className="py-24 px-6 bg-black">
 
       <div className="max-w-7xl mx-auto">
 
