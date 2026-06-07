@@ -2,8 +2,7 @@ import aboutBg from '../../assets/about/about-bg.png'
 
 export default function About() {
   return (
-
-    <section className="relative py-24 px-4 overflow-hidden border-t border-white/5">
+    <section id="acerca" className="relative py-24 px-4 overflow-hidden border-t border-white/5">
 
       {/* IMAGEN DE FONDO */}
       <img
@@ -14,6 +13,7 @@ export default function About() {
 
       {/* CAPA OSCURA */}
       <div className="absolute inset-0 bg-black/25"></div>
+
       {/* CONTENIDO */}
       <div className="relative z-10 max-w-4xl mx-auto text-center">
 
@@ -44,7 +44,7 @@ export default function About() {
           </p>
 
           <p className="text-white text-xl italic font-semibold pt-4">
-            “Hago arte para no morir. Desafío cuerpo y mente.”
+            "Hago arte para no morir. Desafío cuerpo y mente."
           </p>
 
         </div>
