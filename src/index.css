@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+:root {
+
+--color-tattoo-dark: #121212;
+--color-tattoo-accent: #d4af37;
+}
+html {
+  scroll-behavior: smooth;
+}

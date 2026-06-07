@@ -1,0 +1,203 @@
+import React, { useState, useEffect } from 'react';
+import imgPoseidon from '../../assets/portafolio/poseidon.jpg';
+import imgPoseidon2 from '../../assets/portafolio/poseidon2.jpg';
+import imgAguila from '../../assets/portafolio/aguila.jpg';
+import imgAngelCaido from '../../assets/portafolio/angel caido.jpg';
+import imgColibri from '../../assets/portafolio/colibri.jpg';
+import Ojoyfiligrana from '../../assets/portafolio/ojoyfiligrana.jpg';
+import imgLineafina from '../../assets/portafolio/lineafina.jpg';
+import imgRepresentativo1 from '../../assets/portafolio/representativo1.jpeg';
+import imgRepresentativo2 from '../../assets/portafolio/representativo2.jpeg';
+import imgRepresentativo3 from '../../assets/portafolio/representativo3.jpeg';
+
+const GALLERY_ITEMS = [
+  { id: 1, title: 'Sombras', img: imgPoseidon, category: 'Realismo' },
+  { id: 2, title: 'Sombras', img: imgPoseidon2, category: 'Realismo' },
+  { id: 3, title: 'Sombras', img: imgAguila, category: 'Realismo' },
+  { id: 4, title: 'Minimalista', img: imgAngelCaido, category: 'Línea fina' },
+  { id: 5, title: 'Sombras', img: imgColibri, category: 'Realismo' },
+  { id: 6, title: 'Sombras', img: Ojoyfiligrana, category: 'Realismo' },
+  { id: 7, title: 'Minimalista', img: imgLineafina, category: 'Línea fina' },
+  { id: 8, title: 'Sombras', img: imgRepresentativo1, category: 'Realismo' },
+  { id: 9, title: 'Sombras', img: imgRepresentativo2, category: 'Realismo' },
+  { id: 10, title: 'Sombras', img: imgRepresentativo3, category: 'Realismo' },
+]
+
+export default function Gallery() {
+  const [selected, setSelected] = useState(null)
+
+  // Cierra con Escape y bloquea scroll
+  useEffect(() => {
+    if (selected === null) {
+      document.body.style.overflow = ''
+      return
+    }
+    document.body.style.overflow = 'hidden'
+    const handleKey = (e) => {
+      if (e.key === 'Escape') setSelected(null)
+      if (e.key === 'ArrowRight') goNext()
+      if (e.key === 'ArrowLeft') goPrev()
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [selected])
+
+  const goNext = () => {
+    setSelected((prev) => (prev + 1) % GALLERY_ITEMS.length)
+  }
+
+  const goPrev = () => {
+    setSelected((prev) => (prev - 1 + GALLERY_ITEMS.length) % GALLERY_ITEMS.length)
+  }
+
+  return (
+    <section id="galeria" className="py-24 bg-black">
+      <div className="max-w-7xl mx-auto px-4">
+
+        {/* TITULO */}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tighter uppercase">
+            Portafolio
+          </h2>
+          <div className="h-1 w-20 bg-zinc-600 mx-auto"></div>
+        </div>
+
+        {/* GRID */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {GALLERY_ITEMS.map((item, index) => (
+            <div
+              key={item.id}
+              onClick={() => setSelected(index)}
+              className="group relative overflow-hidden rounded-lg aspect-square bg-gray-900 cursor-pointer"
+            >
+              <img
+                src={item.img}
+                alt={item.title}
+                className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110 opacity-70 group-hover:opacity-100"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                <p className="text-zinc-300 text-sm font-bold uppercase tracking-widest mb-1">
+                  {item.category}
+                </p>
+                <h3 className="text-white text-2xl font-black italic">
+                  {item.title}
+                </h3>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* LIGHTBOX */}
+      {selected !== null && (
+        <div
+          onClick={() => setSelected(null)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.92)',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {/* X CERRAR */}
+          <button
+            onClick={() => setSelected(null)}
+            style={{
+              position: 'absolute',
+              top: '20px',
+              right: '24px',
+              background: 'none',
+              border: 'none',
+              color: 'rgba(255,255,255,0.8)',
+              fontSize: '32px',
+              cursor: 'pointer',
+              lineHeight: 1,
+              zIndex: 101,
+            }}
+            aria-label="Cerrar"
+          >
+            ✕
+          </button>
+
+          {/* FLECHA IZQUIERDA */}
+          <button
+            onClick={(e) => { e.stopPropagation(); goPrev(); }}
+            style={{
+              position: 'absolute',
+              left: '16px',
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              color: 'white',
+              fontSize: '24px',
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 101,
+            }}
+            aria-label="Anterior"
+          >
+            ‹
+          </button>
+
+          {/* IMAGEN */}
+          <img
+            src={GALLERY_ITEMS[selected].img}
+            alt={GALLERY_ITEMS[selected].title}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxHeight: '85vh',
+              maxWidth: '85vw',
+              objectFit: 'contain',
+              borderRadius: '8px',
+            }}
+          />
+
+          {/* FLECHA DERECHA */}
+          <button
+            onClick={(e) => { e.stopPropagation(); goNext(); }}
+            style={{
+              position: 'absolute',
+              right: '16px',
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              color: 'white',
+              fontSize: '24px',
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 101,
+            }}
+            aria-label="Siguiente"
+          >
+            ›
+          </button>
+
+          {/* CONTADOR */}
+          <div style={{
+            position: 'absolute',
+            bottom: '24px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            color: 'rgba(255,255,255,0.5)',
+            fontSize: '13px',
+            letterSpacing: '0.2em',
+            userSelect: 'none',
+          }}>
+            {selected + 1} / {GALLERY_ITEMS.length}
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}
