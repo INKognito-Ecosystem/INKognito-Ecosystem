@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
+import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
 
 const products = [
   {
@@ -55,6 +56,7 @@ const products = [
 ]
 
 export default function InkPage() {
+  const { addItem } = useSupplyCart()
   return (
     <>
       <div className="min-h-screen bg-black text-white">
@@ -127,19 +129,22 @@ export default function InkPage() {
                     {product.name}
                   </h3>
 
-                  <div className="flex items-center justify-between">
-
-                    <span className="text-white font-bold text-base md:text-xl">
-                      {product.price}
-                    </span>
-
+                  <span className="text-white font-bold text-base md:text-xl block mb-3">
+                    {product.price}
+                  </span>
+                  <div className="flex gap-2">
                     <Link
                       to={product.link}
-                      className="px-3 md:px-5 py-2 border border-zinc-700 uppercase tracking-[0.2em] text-xs hover:border-white transition-all duration-300"
+                      className="flex-1 py-2 text-center border border-zinc-700 uppercase tracking-[0.15em] text-xs hover:border-white hover:text-white transition-all duration-300"
                     >
                       Ver
                     </Link>
-
+                    <button
+                      onClick={() => addItem(product, 'ink')}
+                      className="flex-1 py-2 border border-zinc-700 uppercase tracking-[0.15em] text-xs hover:border-blue-500 hover:text-blue-500 transition-all duration-300"
+                    >
+                      + Agregar al carrito
+                    </button>
                   </div>
 
                 </div>

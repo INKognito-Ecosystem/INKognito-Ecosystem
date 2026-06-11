@@ -23,8 +23,11 @@ const GALLERY_ITEMS = [
   { id: 10, title: 'Sombras', img: imgRepresentativo3, category: 'Realismo' },
 ]
 
-export default function Gallery() {
+export default function Gallery({ onLightboxChange = () => {} }) {
   const [selected, setSelected] = useState(null)
+
+  const openLightbox = (index) => { setSelected(index); onLightboxChange(true) }
+  const closeLightbox = () => { setSelected(null); onLightboxChange(false) }
 
   // Cierra con Escape y bloquea scroll
   useEffect(() => {
@@ -34,7 +37,7 @@ export default function Gallery() {
     }
     document.body.style.overflow = 'hidden'
     const handleKey = (e) => {
-      if (e.key === 'Escape') setSelected(null)
+      if (e.key === 'Escape') closeLightbox()
       if (e.key === 'ArrowRight') goNext()
       if (e.key === 'ArrowLeft') goPrev()
     }
@@ -63,11 +66,11 @@ export default function Gallery() {
         </div>
 
         {/* GRID */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           {GALLERY_ITEMS.map((item, index) => (
             <div
               key={item.id}
-              onClick={() => setSelected(index)}
+              onClick={() => openLightbox(index)}
               className="group relative overflow-hidden rounded-lg aspect-square bg-gray-900 cursor-pointer"
             >
               <img
@@ -91,7 +94,7 @@ export default function Gallery() {
       {/* LIGHTBOX */}
       {selected !== null && (
         <div
-          onClick={() => setSelected(null)}
+          onClick={() => closeLightbox()}
           style={{
             position: 'fixed',
             inset: 0,
@@ -104,7 +107,7 @@ export default function Gallery() {
         >
           {/* X CERRAR */}
           <button
-            onClick={() => setSelected(null)}
+            onClick={() => closeLightbox()}
             style={{
               position: 'absolute',
               top: '20px',

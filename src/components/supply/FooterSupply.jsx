@@ -4,7 +4,7 @@ export default function FooterSupply() {
 
   return (
 
-    <footer className="border-t border-zinc-900 bg-black px-6 py-10 md:py-12 lg:py-16">
+    <footer id="contacto" className="border-t border-zinc-900 bg-black px-6 py-10 md:py-12 lg:py-16">
 
       <div className="max-w-7xl mx-auto">
 

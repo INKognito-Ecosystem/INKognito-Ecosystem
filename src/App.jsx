@@ -1,3 +1,10 @@
+import StorePage from './components/store/StorePage'
+import RopaDamaPage from './components/store/categories/RopaDamaPage'
+import RopaCaballerosPage from './components/store/categories/RopaCaballerosPage'
+import ZapatosDeportivosPage from './components/store/categories/ZapatosDeportivosPage'
+import ZapatosCasualesPage from './components/store/categories/ZapatosCasualesPage'
+import GuayosPage from './components/store/categories/GuayosPage'
+import TenisGuayoPage from './components/store/categories/TenisGuayoPage'
 import SupplyPage from './components/supply/SupplyPage'
 import MachinesPage from './components/supply/categories/MachinesPage'
 import CartridgesPage from './components/supply/categories/Cartridges/CartridgesPage'
@@ -21,9 +28,11 @@ import FurniturePage from './components/supply/categories/FurniturePage'
 import BundlesPage from './components/supply/categories/BundlesPage'
 import TattooVisionPage from './components/supply/Marcasprofesionales/TattooVisionPage'
 import InkognitoHome from './components/ecosystem/InkognitoHome'
+import { SupplyCartProvider } from './contexts/SupplyCartContext'
+import { StoreCartProvider } from './contexts/StoreCartContext'
 import reservaBg from './assets/reserva/reserva-bg.png'
 import React, { useState } from 'react'
-import { Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route, Link, Outlet } from 'react-router-dom'
 
 import Navbar from './components/tattoo/Navbar'
 import Hero from './components/tattoo/Hero'
@@ -31,6 +40,7 @@ import About from './components/tattoo/About'
 import Gallery from './components/tattoo/Gallery'
 import Testimonials from './components/tattoo/Testimonials'
 import Footer from './components/tattoo/Footer'
+import WhatsAppFloat from './components/tattoo/WhatsAppFloat'
 
 import milogo from './assets/milogo/milogo.png'
 
@@ -134,6 +144,7 @@ function HomePage({
       </section>
 
       <Footer />
+      <WhatsAppFloat />
     </>
   )
 }
@@ -149,12 +160,13 @@ function PortfolioPage({
   tamano,
   setTamano
 }) {
+  const [lightboxOpen, setLightboxOpen] = useState(false)
   return (
     <div className="min-h-screen bg-black text-white">
 
       <Navbar showInicio={true} />
 
-      <Gallery />
+      <Gallery onLightboxChange={setLightboxOpen} />
 
       <section className="relative overflow-hidden py-24 px-4 bg-black border-t border-white/5">
         <img
@@ -203,6 +215,7 @@ function PortfolioPage({
       </section>
 
       <Footer />
+      <WhatsAppFloat hidden={lightboxOpen} />
 
     </div>
   )
@@ -218,6 +231,7 @@ function App() {
   const [tamano, setTamano] = useState('')
 
   return (
+    <SupplyCartProvider>
     <div className="bg-black text-white overflow-x-hidden">
 
       <Routes>
@@ -292,6 +306,15 @@ function App() {
   <Route path="/supply/furniture" element={<FurniturePage />} />
   <Route path="/supply/bundles" element={<BundlesPage />} />
   <Route path="/brands/tattoo-vision" element={<TattooVisionPage />} />
+  <Route element={<StoreCartProvider><Outlet /></StoreCartProvider>}>
+    <Route path="/store" element={<StorePage />} />
+    <Route path="/store/ropa-dama" element={<RopaDamaPage />} />
+    <Route path="/store/ropa-caballeros" element={<RopaCaballerosPage />} />
+    <Route path="/store/zapatos-deportivos" element={<ZapatosDeportivosPage />} />
+    <Route path="/store/zapatos-casuales" element={<ZapatosCasualesPage />} />
+    <Route path="/store/guayos" element={<GuayosPage />} />
+    <Route path="/store/tenis-guayo" element={<TenisGuayoPage />} />
+  </Route>
   <Route path="/supply/ink/dynamic" element={<DynamicColorsPage />}/>
   <Route path="/supply/ink/eternal" element={<EternalColorsPage />} />
   <Route path="/supply/ink/intenze" element={<IntenzeColorsPage />} />
@@ -308,6 +331,7 @@ function App() {
 
 </Routes>
     </div>
+    </SupplyCartProvider>
   )
 }
 

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
+import { useSupplyCart } from '../../../contexts/SupplyCartContext'
 
 const products = [
   { id: 1, name: 'Flux Max', brand: 'FK Irons', price: '$899' },
@@ -12,6 +13,7 @@ const products = [
 ]
 
 export default function MachinesPage() {
+  const { addItem } = useSupplyCart()
   return (
   <>
     <div className="min-h-screen bg-black text-white">
@@ -62,14 +64,15 @@ export default function MachinesPage() {
                 <h3 className="text-lg md:text-2xl font-black uppercase mb-3 md:mb-4">
                   {product.name}
                 </h3>
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-bold text-base md:text-xl">
-                    {product.price}
-                  </span>
-                  <button className="px-3 md:px-5 py-2 border border-zinc-700 uppercase tracking-[0.2em] text-xs md:text-sm hover:border-white hover:text-white transition-all duration-300">
-                    Ver
-                  </button>
-                </div>
+                <span className="text-white font-bold text-base md:text-xl block mb-3">
+                  {product.price}
+                </span>
+                <button
+                  onClick={() => addItem(product, 'machines')}
+                  className="w-full py-2 border border-zinc-700 uppercase tracking-[0.15em] text-xs hover:border-blue-500 hover:text-blue-500 transition-all duration-300"
+                >
+                  + Agregar al carrito
+                </button>
               </div>
             </div>
           ))}

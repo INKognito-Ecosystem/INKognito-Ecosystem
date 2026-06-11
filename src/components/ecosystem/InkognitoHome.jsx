@@ -50,9 +50,15 @@ export default function InkognitoHome() {
             Tattoo Supply
           </Link>
 
-          <button className="w-full py-5 bg-zinc-900 border border-zinc-700 rounded uppercase tracking-[0.3em] font-black text-zinc-500">
+          <Link
+            to="/store"
+            className="w-full py-5 bg-zinc-700 rounded text-center uppercase tracking-[0.3em] font-black transition-all duration-300"
+            style={{ color: 'white' }}
+            onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#C9A84C'; e.currentTarget.style.color = '#000' }}
+            onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#3f3f46'; e.currentTarget.style.color = '#fff' }}
+          >
             Store
-          </button>
+          </Link>
 
           <button className="w-full py-5 bg-zinc-900 border border-zinc-700 rounded uppercase tracking-[0.3em] font-black text-zinc-500">
             Gym

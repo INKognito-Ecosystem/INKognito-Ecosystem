@@ -18,37 +18,27 @@ export default function Navbar({ showInicio = false }) {
 
   return (
     <>
-      <nav className="fixed w-full z-50 bg-white shadow-lg border-b border-gray-200">
+      <nav className="fixed w-full z-50 bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative flex items-center h-20">
+          <div className="flex items-center justify-between h-20">
 
             <Link to="/tattoo" className="flex items-center gap-2">
               <img src={milogo} alt="Logo" className="w-14 h-14 object-contain" />
-              <span className="text-black font-black text-base sm:text-2xl tracking-widest uppercase">
+              <span className="text-black font-black text-lg sm:text-2xl tracking-widest uppercase">
                 JHUMANEZTATTOO
               </span>
             </Link>
 
-            <div className="hidden lg:flex absolute left-0 right-0 justify-center pointer-events-none">
-              <span className="text-black font-black text-sm tracking-[0.3em] uppercase">
-                Disciplina. Arte. Identidad.
-              </span>
-            </div>
-
-            <div className="flex items-center gap-4 ml-auto">
-              <a href="https://wa.me/573207911013?text=Hola%20Jose,%20quiero%20informaci%C3%B3n%20sobre%20un%20tatuaje" target="_blank" rel="noopener noreferrer" className="px-4 py-2 rounded bg-zinc-600 text-white font-bold hover:bg-green-500 transition-all duration-300 uppercase text-sm">
-                Reservar
-              </a>
-              <button onClick={() => setMenuOpen(!menuOpen)} className="text-black hover:text-gray-600 transition-all duration-300">
-                {menuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
-            </div>
+            <button onClick={() => setMenuOpen(!menuOpen)} className="text-black hover:text-gray-600 transition-all duration-300">
+              {menuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
 
           </div>
         </div>
 
+        {/* DROPDOWN */}
         {menuOpen && (
-          <div className="absolute right-4 top-20 bg-white border border-gray-200 shadow-xl w-56 z-50 rounded-lg overflow-hidden">
+          <div className="absolute right-4 top-full bg-white border border-gray-200 shadow-xl w-56 z-50 rounded-lg overflow-hidden">
 
             {showInicio && (
               <Link to="/tattoo" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
@@ -80,7 +70,7 @@ export default function Navbar({ showInicio = false }) {
             {!showInicio && (
               <button onClick={() => scrollTo('testimonios')} className="w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
                 <div className="flex items-center justify-between">
-                  <span>Lo que dicen clientes</span>
+                  <span>nuestros clientes</span>
                   <MessageCircle size={14} />
                 </div>
               </button>
@@ -100,7 +90,14 @@ export default function Navbar({ showInicio = false }) {
               </div>
             </Link>
 
-            <Link to="/" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
+            <Link to="/store" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <span>INKognito Store</span>
+                <ShoppingCart size={14} />
+              </div>
+            </Link>
+
+            <Link to="/" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300">
               <div className="flex items-center justify-between">
                 <span>Ecosistema</span>
                 <Globe size={14} />
