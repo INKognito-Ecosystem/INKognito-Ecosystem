@@ -24,8 +24,20 @@ export default function GlovesPage() {
           </p>
 
           <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
-            Gloves
+            Guantes
           </h1>
+
+          <div className="mt-10 max-w-4xl">
+            <p className="text-zinc-400 leading-relaxed mb-5">
+              La barrera de protección más importante en el estudio de tatuajes es un par de guantes de alta calidad. En un entorno profesional, la higiene y la prevención de la contaminación cruzada son innegociables, por lo que contar con guantes de alta resistencia, excelente sensibilidad táctil y agarre superior es indispensable para cada sesión.
+            </p>
+            <p className="text-zinc-400 leading-relaxed mb-5">
+              En INKognito Supply ofrecemos guantes de nitrilo premium de marcas referentes como Unigloves, Black Diamond, NitriTex y Aurelia. El nitrilo es el material recomendado por excelencia en la industria del tatuaje debido a su alta resistencia a perforaciones, productos químicos y aceites, además de ser 100% libre de látex para evitar reacciones alérgicas.
+            </p>
+            <p className="text-zinc-400 leading-relaxed">
+              Disponibles en color negro para una estética impecable en el estudio y para evitar distracciones visuales con los pigmentos, nuestros guantes garantizan una textura micro-rugosa en los dedos para sostener la máquina y los grips con total seguridad y sin deslizamientos.
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
@@ -66,6 +78,59 @@ export default function GlovesPage() {
           ))}
 
         </div>
+
+        <section className="mt-24 md:mt-32">
+          <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">
+            Preguntas frecuentes
+          </h2>
+
+          <div className="space-y-6">
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Por qué se prefieren los guantes de nitrilo negro en el tatuaje?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                El nitrilo es mucho más resistente a pinchazos y rasgaduras que el látex o el vinilo. Además, el color negro disimula las manchas de tinta y sangre, manteniendo una estética profesional y limpia durante todo el procedimiento.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Los guantes de nitrilo provocan alergias?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                No, el nitrilo es un compuesto sintético 100% libre de proteínas de látex, lo que elimina por completo el riesgo de alergias tanto para el tatuador como para el cliente.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Qué es el acabado texturizado o micro-rugoso en los guantes?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Es un relieve fino en la punta de los dedos o en toda la palma que mejora notablemente el agarre (grip) de herramientas húmedas o aceitosas, permitiendo manipular la máquina de tatuar con total precisión sin que se resbale.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Se pueden reutilizar los guantes si solo se usaron para preparar la mesa?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                No. Los guantes de examen son estrictamente desechables y de un solo uso. Deben cambiarse cada vez que toques una superficie no estéril, antes de tocar al cliente, y desecharse inmediatamente al terminar cada procedimiento.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Cómo elegir la talla correcta de guantes?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Un guante debe quedar perfectamente ajustado a la mano sin apretar demasiado para no cortar la circulación ni fatigar los músculos, pero tampoco quedar holgado, ya que se perdería sensibilidad táctil y precisión en el trazo.
+              </p>
+            </div>
+          </div>
+        </section>
 
       </div>
 

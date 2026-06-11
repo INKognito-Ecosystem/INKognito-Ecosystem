@@ -107,6 +107,18 @@ export default function IntenzeColorsPage() {
           <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
             Catálogo Completo
           </h1>
+
+          <div className="mt-10 max-w-4xl">
+            <p className="text-zinc-400 leading-relaxed mb-5">
+              Intenze Ink es una de las marcas de tinta para tatuaje más reconocidas a nivel mundial. Utilizada por miles de artistas profesionales, destaca por la intensidad de sus pigmentos, la consistencia de sus colores y la amplia variedad de tonos disponibles.
+            </p>
+            <p className="text-zinc-400 leading-relaxed mb-5">
+              Sus líneas incluyen colores sólidos, tonos para realismo, mezclas para retrato y pigmentos desarrollados junto a artistas reconocidos de la industria del tatuaje.
+            </p>
+            <p className="text-zinc-400 leading-relaxed">
+              Explora el catálogo completo de Intenze Ink y encuentra referencias originales para trabajos de color, black and grey, ilustración, neotradicional y realismo.
+            </p>
+          </div>
         </div>
 
         <div className="space-y-10">

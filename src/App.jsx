@@ -1,6 +1,9 @@
 import SupplyPage from './components/supply/SupplyPage'
 import MachinesPage from './components/supply/categories/MachinesPage'
-import CartridgesPage from './components/supply/categories/CartridgesPage'
+import CartridgesPage from './components/supply/categories/Cartridges/CartridgesPage'
+import EZCartridgesPage from './components/supply/categories/Cartridges/EZCartridgesPage'
+import WJXCartridgesPage from './components/supply/categories/Cartridges/WJXCartridgesPage'
+import KwadronCartridgesPage from './components/supply/categories/Cartridges/KwadronCartridgesPage'
 import PowerSuppliesPage from './components/supply/categories/PowerSuppliesPage'
 import NeedlesPage from './components/supply/categories/NeedlesPage'
 import GlovesPage from './components/supply/categories/GlovesPage'
@@ -295,6 +298,10 @@ function App() {
   <Route path="/supply/ink/fusion" element={<FusionColorsPage />} />
   <Route path="/supply/ink/world-famous" element={<WorldFamousColorsPage />} />
   <Route path="/supply/ink/solid-ink" element={<SolidColorsPage />} />
+  <Route path="/supply/cartridges/ez-tattoo" element={<EZCartridgesPage />} />
+  <Route path="/supply/cartridges/wjx" element={<WJXCartridgesPage />} />
+  <Route path="/supply/cartridges/kwadron" element={<KwadronCartridgesPage />} />
+
 
 
 

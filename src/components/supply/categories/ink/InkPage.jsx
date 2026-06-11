@@ -5,10 +5,10 @@ import NavbarCategory from '../../NavbarCategory'
 const products = [
   {
     id: 1,
-    name: 'Intenze Ink Set',
-    brand: 'Intenze',
-    price: '$25',
-    link: '/supply/ink/intenze'
+    name: 'Vice Colors Set',
+    brand: 'Vice',
+    price: '$30',
+    link: '/supply/ink/vice-colors'
   },
   {
     id: 2,
@@ -47,11 +47,11 @@ const products = [
   },
   {
     id: 7,
-    name: 'Vice Colors Set',
-    brand: 'Vice',
-    price: '$30',
-    link: '/supply/ink/vice-colors'
-  }
+    name: 'Intenze Ink Set',
+    brand: 'Intenze',
+    price: '$25',
+    link: '/supply/ink/intenze'
+  },
 ]
 
 export default function InkPage() {
@@ -64,13 +64,40 @@ export default function InkPage() {
         <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">
 
           <div className="mb-10 md:mb-16">
+
             <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm mb-3">
               Categoría
             </p>
 
             <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
-              Ink
+              Tintas
             </h1>
+
+            <div className="mt-10 max-w-4xl">
+
+              <p className="text-zinc-400 leading-relaxed mb-5">
+                Las tintas para tatuaje son uno de los elementos más importantes
+                en el resultado final de cualquier trabajo. La calidad del
+                pigmento influye directamente en la saturación, cicatrización
+                y permanencia del tatuaje.
+              </p>
+
+              <p className="text-zinc-400 leading-relaxed mb-5">
+                En INKognito Supply reunimos algunas de las marcas más utilizadas
+                por artistas profesionales alrededor del mundo, incluyendo
+                Dynamic, Eternal Ink, Fusion, World Famous, Solid Ink,
+                Intenze y Vice Colors.
+              </p>
+
+              <p className="text-zinc-400 leading-relaxed">
+                Explora cada marca para descubrir sus líneas de color, negros,
+                greywash, tonos piel y configuraciones especializadas para
+                realismo, black and grey, color sólido y estilos de alta
+                saturación.
+              </p>
+
+            </div>
+
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
@@ -83,9 +110,11 @@ export default function InkPage() {
               >
 
                 <div className="h-40 md:h-64 bg-zinc-900 flex items-center justify-center">
+
                   <p className="text-zinc-700 uppercase tracking-[0.3em] text-xs md:text-sm">
                     Product Image
                   </p>
+
                 </div>
 
                 <div className="p-4 md:p-6">
@@ -105,10 +134,10 @@ export default function InkPage() {
                     </span>
 
                     <Link
-                       to={product.link}
-                       className="px-3 md:px-5 py-2 border border-zinc-700 uppercase tracking-[0.2em] text-xs hover:border-white transition-all duration-300"
->
-                       Ver
+                      to={product.link}
+                      className="px-3 md:px-5 py-2 border border-zinc-700 uppercase tracking-[0.2em] text-xs hover:border-white transition-all duration-300"
+                    >
+                      Ver
                     </Link>
 
                   </div>
@@ -120,6 +149,88 @@ export default function InkPage() {
             ))}
 
           </div>
+
+          <section className="mt-24 md:mt-32">
+
+            <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">
+              Preguntas frecuentes
+            </h2>
+
+            <div className="space-y-6">
+
+              <div className="border border-zinc-800 rounded-xl p-6">
+
+                <h3 className="font-bold text-lg mb-3">
+                  ¿Cuál es la mejor tinta para tatuar?
+                </h3>
+
+                <p className="text-zinc-400 leading-relaxed">
+                  No existe una única respuesta. Dynamic, Eternal, Fusion,
+                  World Famous y Solid Ink son algunas de las marcas más
+                  utilizadas por tatuadores profesionales dependiendo del
+                  estilo de trabajo.
+                </p>
+
+              </div>
+
+              <div className="border border-zinc-800 rounded-xl p-6">
+
+                <h3 className="font-bold text-lg mb-3">
+                  ¿Qué tinta utilizan los tatuadores profesionales?
+                </h3>
+
+                <p className="text-zinc-400 leading-relaxed">
+                  Las marcas más populares incluyen Dynamic, Eternal Ink,
+                  World Famous, Fusion, Solid Ink, Intenze y Vice Colors.
+                </p>
+
+              </div>
+
+              <div className="border border-zinc-800 rounded-xl p-6">
+
+                <h3 className="font-bold text-lg mb-3">
+                  ¿Cuál es la mejor tinta para realismo?
+                </h3>
+
+                <p className="text-zinc-400 leading-relaxed">
+                  Para realismo suelen utilizarse negros sólidos, greywash
+                  y tonos piel de marcas como Dynamic, Eternal, World Famous,
+                  Fusion y vice colors
+                </p>
+
+              </div>
+
+              <div className="border border-zinc-800 rounded-xl p-6">
+
+                <h3 className="font-bold text-lg mb-3">
+                  ¿Cuál es la mejor tinta para color?
+                </h3>
+
+                <p className="text-zinc-400 leading-relaxed">
+                  World Famous, Solid Ink, Eternal y Vice Colors destacan
+                  por su saturación y variedad cromática para trabajos
+                  a color.
+                </p>
+
+              </div>
+
+              <div className="border border-zinc-800 rounded-xl p-6">
+
+                <h3 className="font-bold text-lg mb-3">
+                  ¿Las tintas para tatuaje son seguras?
+                </h3>
+
+                <p className="text-zinc-400 leading-relaxed">
+                  Sí, siempre que provengan de fabricantes reconocidos y
+                  distribuidores confiables que trabajen con productos
+                  originales.
+                </p>
+
+              </div>
+
+            </div>
+
+          </section>
 
         </div>
 

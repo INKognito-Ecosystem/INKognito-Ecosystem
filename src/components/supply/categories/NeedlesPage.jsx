@@ -24,8 +24,20 @@ export default function NeedlesPage() {
           </p>
 
           <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
-            Needles
+            agujas
           </h1>
+
+          <div className="mt-10 max-w-4xl">
+            <p className="text-zinc-400 leading-relaxed mb-5">
+              Las agujas tradicionales de varilla siguen siendo un pilar fundamental para muchos artistas que prefieren máquinas clásicas de bobinas o rotativas directas. La calidad del acero y la precisión de la soldadura determinan la facilidad de penetración en la piel, la retención de tinta y la limpieza de cada trazo.
+            </p>
+            <p className="text-zinc-400 leading-relaxed mb-5">
+              Nuestra selección de agujas de varilla en INKognito Supply abarca marcas prestigiosas como Kwadron, Cheyenne, Mast y Peak. Fabricadas con acero inoxidable de grado quirúrgico 316L, sometidas a rigurosos controles de calidad y esterilizadas con gas EO para total seguridad.
+            </p>
+            <p className="text-zinc-400 leading-relaxed">
+              Ofrecemos todas las configuraciones esenciales: Round Liner para líneas precisas, Round Shader para transiciones suaves, Magnum para rellenos eficientes, y Curved Magnum para un sombreado homogéneo sin dañar los bordes de la piel.
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
@@ -63,6 +75,59 @@ export default function NeedlesPage() {
             </div>
           ))}
         </div>
+
+        <section className="mt-24 md:mt-32">
+          <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">
+            Preguntas frecuentes
+          </h2>
+
+          <div className="space-y-6">
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Diferencia entre agujas de varilla tradicionales y agujas de cartucho?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Las agujas tradicionales van soldadas a una varilla larga que se conecta directamente al martillo de las máquinas de bobinas o rotativas clásicas, mientras que los cartuchos son sistemas compactos con membranas de seguridad diseñados para máquinas tipo pen o grips especializados.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Qué significa el término "Taper" en las agujas de tatuar?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                El Taper es la longitud de la punta de la aguja. Un "Short Taper" tiene una punta más corta y empaca más tinta rápidamente, mientras que un "Long Taper" o "Super Long Taper" tiene puntas más afiladas y largas, ideales para líneas ultra finas y trabajos de gran detalle sin cortar la piel.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Para qué sirve la configuración Round Shader (RS)?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                A diferencia de las Round Liner, las agujas Round Shader se sueldan en paralelo y no de forma cónica cerrada. Esto las hace perfectas para hacer líneas gruesas, rellenar áreas pequeñas y realizar sombras de baja intensidad.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Las agujas tradicionales vienen esterilizadas?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Sí, todas nuestras agujas están empaquetadas de forma individual en blisters estériles de grado médico y tratadas con gas de Óxido de Etileno (EO). Cada blister incluye su lote y fecha de caducidad visible.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Cómo elijo el calibre adecuado para mis agujas?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                El calibre 12 (0.35 mm) es excelente para líneas sólidas tradicionales y rellenos rápidos; el calibre 10 (0.30 mm) es versátil para trabajos de línea media y sombras; y el calibre 08 (0.25 mm) se prefiere para detalles minuciosos y texturas de sombra muy suaves.
+              </p>
+            </div>
+          </div>
+        </section>
 
       </div>
 

@@ -109,6 +109,18 @@ export default function WorldFamousColorsPage() {
           <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
             Catálogo Completo
           </h1>
+
+          <div className="mt-10 max-w-4xl">
+            <p className="text-zinc-400 leading-relaxed mb-5">
+              World Famous Ink está redefiniendo el arte del tatuaje con pigmentos de una densidad asombrosa y una fluidez de flujo insuperable. Respaldada por un equipo global de artistas de élite, esta marca es venerada por su durabilidad extrema y su brillo inalterable bajo la piel.
+            </p>
+            <p className="text-zinc-400 leading-relaxed mb-5">
+              Su formulación patentada de base vegana pasa por rigurosos procesos de esterilización mediante radiación gamma, asegurando un producto completamente libre de contaminantes y seguro para todo tipo de pieles en cualquier parte del mundo.
+            </p>
+            <p className="text-zinc-400 leading-relaxed">
+              Descubre su amplio repertorio que incluye tanto sets icónicos de realismo retrato como su innovadora línea Limitless, diseñada especialmente para cumplir de forma estricta con las exigentes regulaciones REACH de la Unión Europea.
+            </p>
+          </div>
         </div>
 
         <div className="space-y-10">
@@ -167,6 +179,59 @@ export default function WorldFamousColorsPage() {
           ))}
 
         </div>
+
+        <section className="mt-24 md:mt-32">
+          <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">
+            Preguntas frecuentes
+          </h2>
+
+          <div className="space-y-6">
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Por qué se consideran revolucionarias las tintas World Famous?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Su fama radica en una de las mayores densidades de pigmento del mercado y un flujo ultra rápido que reduce la resistencia al tatuar, logrando curados extremadamente duraderos y nítidos.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Qué es la gama Limitless de World Famous?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Limitless es la línea premium rediseñada de World Famous para cumplir al 100% con los estrictos parámetros del reglamento europeo REACH sobre pigmentos seguros.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Las tintas de World Famous son veganas?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Sí, todos sus productos son completamente libres de crueldad animal, no contienen derivados de origen animal y se clasifican como vegan-friendly.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Dónde se fabrican las tintas World Famous?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Cada envase original se produce en instalaciones avanzadas ubicadas en los Estados Unidos, sujetas a estrictas pautas de grado médico.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Son seguras las tintas World Famous Ink?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Absolutamente. Su esterilización mediante radiación gamma de alta penetración y su envasado hermético garantizan la máxima seguridad higiénica para el artista y el cliente.
+              </p>
+            </div>
+          </div>
+        </section>
 
       </div>
 

@@ -55,6 +55,18 @@ export default function ViceColorsPage() {
           <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
             Catálogo Completo
           </h1>
+
+          <div className="mt-10 max-w-4xl">
+            <p className="text-zinc-400 leading-relaxed mb-5">
+              Vice Colors es una de las marcas de pigmentos más innovadoras y de mayor crecimiento en el sector europeo y latinoamericano. Con una personalidad audaz e ingredientes seleccionados meticulosamente, ha conquistado a los tatuadores que buscan colores con nombres rebeldes y saturaciones extremas.
+            </p>
+            <p className="text-zinc-400 leading-relaxed mb-5">
+              Su formulación destaca por su excelente viscosidad y rapidez de implantación. Productos estrella como Black Sabbath, El Gato Blanco y El Gato Patrón han redefinido la manera en que los artistas abordan los rellenos puros y los delineados de alto contraste.
+            </p>
+            <p className="text-zinc-400 leading-relaxed">
+              Explora una gama cromática llena de actitud y diseñada para aguantar el paso del tiempo intacta. Perfecta para realismo, neotradicional, lettering, y estilos modernos de alta exigencia visual.
+            </p>
+          </div>
         </div>
 
         <div className="space-y-12">
@@ -109,6 +121,59 @@ export default function ViceColorsPage() {
           ))}
 
         </div>
+
+        <section className="mt-24 md:mt-32">
+          <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">
+            Preguntas frecuentes
+          </h2>
+
+          <div className="space-y-6">
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Qué caracteriza a las tintas Vice Colors?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Su excelente saturación y brillo post-cicatrización, acompañados de nombres super creativos inspirados en la cultura pop y del tatuaje, con una inyección sumamente fluida.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Cuál es el negro más recomendado de Vice Colors?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Black Sabbath y Vicious Black son los negros estrella. Black Sabbath destaca para líneas y sombras estables, mientras que Vicious Black ofrece una profundidad absoluta para rellenos sólidos.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Las tintas de Vice Colors son seguras para la piel?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Por supuesto. Se fabrican siguiendo normativas internacionales muy exigentes de bioseguridad, garantizando pigmentos puros, estériles y estables.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Cómo es el proceso de curación con Vice Colors?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Gracias a sus componentes de alta pureza, minimizan el trauma durante la sesión y curan con excelente retención, manteniendo tonos vivos e idénticos al primer día.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Vice Colors es un producto vegano?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Sí, toda la gama de tintas Vice Colors es 100% apta para veganos y está fabricada sin ningún tipo de crueldad o componente de origen animal.
+              </p>
+            </div>
+          </div>
+        </section>
 
       </div>
 

@@ -1,33 +1,38 @@
 import { Link } from 'react-router-dom'
 
 const categories = [
-  { name: 'Machines', path: '/supply/machines' },
-  { name: 'Cartridges', path: '/supply/cartridges' },
-  { name: 'Power Supplies', path: '/supply/power-supplies' },
-  { name: 'Ink', path: '/supply/ink' },
-  { name: 'Needles', path: '/supply/needles' },
-  { name: 'Gloves', path: '/supply/gloves' },
-  { name: 'Aftercare', path: '/supply/aftercare' },
-  { name: 'Accessories', path: '/supply/accessories' },
-  { name: 'Furniture', path: '/supply/furniture' },
-  { name: 'Bundles', path: '/supply/bundles' },
+  { name: 'Máquinas', path: '/supply/machines' },
+  { name: 'Cartuchos', path: '/supply/cartridges' },
+  { name: 'Fuentes', path: '/supply/power-supplies' },
+  { name: 'Tintas', path: '/supply/ink' },
+  { name: 'Agujas', path: '/supply/needles' },
+  { name: 'Guantes', path: '/supply/gloves' },
+  { name: 'Cuidado Posterior', path: '/supply/aftercare' },
+  { name: 'Accesorios', path: '/supply/accessories' },
+  { name: 'Mobiliario', path: '/supply/furniture' },
+  { name: 'Combos', path: '/supply/bundles' },
 ]
 
 export default function CategoriesSupply() {
   return (
-    <section id="categorias" className="py-24 px-6 bg-black">
-      <div className="max-w-7xl mx-auto">
+<section id="categorias" className="pt-6 md:pt-8 lg:pt-10 pb-12 md:pb-16 lg:pb-20 px-6 bg-black">      <div className="max-w-7xl mx-auto">
 
-        <div className="mb-16">
-          <p className="uppercase tracking-[0.25em] text-zinc-400 text-lg md:text-xl mb-4 font-semibold">
-            Categories
-          </p>
-          <h2 className="text-4xl md:text-6xl font-black uppercase leading-none">
-            Equipment
-            <br />
-            Selection
-          </h2>
-        </div>
+        {/* TITULO + SEO */}
+<div className="mb-16 text-center max-w-3xl mx-auto">
+
+  <h2 className="text-4xl md:text-6xl font-black uppercase mb-8">
+    Categorías
+  </h2>
+
+  <div className="bg-zinc-950 border border-blue-500/40 rounded-2xl p-8">
+
+    <p className="text-zinc-400 text-base md:text-lg leading-relaxed">
+      Explora insumos, equipos y herramientas seleccionadas para cada etapa del trabajo profesional.
+    </p>
+
+  </div>
+
+</div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {categories.map((category) => (

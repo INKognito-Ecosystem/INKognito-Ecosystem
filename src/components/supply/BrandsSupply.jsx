@@ -13,24 +13,24 @@ export default function BrandsSupply() {
   return (
     <section
       id="marcas"
-      className="py-28 px-6 bg-zinc-950 border-t border-zinc-900"
-    >
-      <div className="max-w-7xl mx-auto">
+      className="py-12 md:py-16 lg:py-20 px-6 bg-zinc-950 border-t border-zinc-900"
+    > <div className="max-w-7xl mx-auto">
 
-        {/* TITULO */}
-        <div className="mb-16 text-center">
+        {/* TITULO + SEO */}
+<div className="mb-16 text-center max-w-3xl mx-auto">
 
-          <p className="uppercase tracking-[0.25em] text-zinc-400 text-lg md:text-xl mb-4 font-semibold">
-            Marcas
-          </p>
+  <h2 className="text-4xl md:text-6xl font-black uppercase mb-8">
+    Marcas
+  </h2>
 
-          <h2 className="text-4xl md:text-6xl font-black uppercase leading-none">
-            Marcas
-            <br />
-            Profesionales
-          </h2>
+  <div className="bg-zinc-950 border border-blue-500/40 rounded-2xl p-8">
 
-        </div>
+    <p className="text-zinc-400 text-base md:text-lg leading-relaxed">
+Calidad comprobada. Marcas elegidas por profesionales que no dejan nada al azar.    </p>
+
+  </div>
+
+</div>
 
         {/* GRID */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">

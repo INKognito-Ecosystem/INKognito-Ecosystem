@@ -2,19 +2,21 @@ import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
 
 const products = [
-  { id: 1, name: 'Grip Tape', brand: 'Mast', price: '$8' },
-  { id: 2, name: 'Ink Caps', brand: 'EZ Tattoo', price: '$5' },
-  { id: 3, name: 'Machine Bags', brand: 'Peak', price: '$6' },
-  { id: 4, name: 'Clip Cord Covers', brand: 'Cheyenne', price: '$7' },
-  { id: 5, name: 'Practice Skin', brand: 'Reelskin', price: '$18' },
-  { id: 6, name: 'Stencil Paper', brand: 'Spirit', price: '$22' },
+   { id: 1, name: 'Stencil Gel', brand: 'Electrum', price: '$15' },
+  { id: 2, name: 'Espuma Limpiaorda', brand: 'Hornet', price: '$12' },
+  { id: 3, name: 'Solidificador', brand: 'Solidify', price: '$10' },
+  { id: 4, name: 'Cubre Grip', brand: 'Mast', price: '$8' },
+  { id: 5, name: 'Caps', brand: 'EZ Tattoo', price: '$5' },
+  { id: 6, name: 'Fundas para Máquina', brand: 'Peak', price: '$6' },
+  { id: 7, name: 'Fundas para Clip Cord', brand: 'Cheyenne', price: '$7' },
+  { id: 8, name: 'Piel Sintetica', brand: 'Reelskin', price: '$18' },
 ]
 
 export default function AccessoriesPage() {
   return (
     <div className="min-h-screen bg-black text-white">
 
-      <NavbarCategory pageName="Accessories" />
+      <NavbarCategory pageName="Accesorios" />
 
       <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">
 
@@ -24,8 +26,20 @@ export default function AccessoriesPage() {
           </p>
 
           <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
-            Accessories
+            Accesorios
           </h1>
+
+          <div className="mt-10 max-w-4xl">
+            <p className="text-zinc-400 leading-relaxed mb-5">
+              El éxito de una sesión de tatuaje radica en la atención a los detalles y la preparación impecable de la estación de trabajo. Los accesorios y suministros desechables aseguran un entorno completamente higiénico, facilitan la transferencia exacta del diseño y optimizan la comodidad del artista paso a paso.
+            </p>
+            <p className="text-zinc-400 leading-relaxed mb-5">
+              En INKognito Supply contamos con una amplia gama de insumos de marcas destacadas como Electrum, Hornet, Solidify, Mast, Peak y EZ. Todo lo necesario para tu día a día: gel transfer para Stencil de alta definición, espumas de limpieza, solidificadores de líquidos, fundas para máquinas y cables, caps para tinta y piel sintética de primera calidad para practicar.
+            </p>
+            <p className="text-zinc-400 leading-relaxed">
+              Protege tus herramientas de la contaminación cruzada y eleva tus estándares de bioseguridad con accesorios de grado profesional que garantizan un flujo de trabajo fluido, seguro y eficiente en cada sesión.
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
@@ -65,6 +79,60 @@ export default function AccessoriesPage() {
           ))}
 
         </div>
+
+        <section className="mt-24 md:mt-32">
+          <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">
+            Preguntas frecuentes
+          </h2>
+
+          <div className="space-y-6">
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Qué es un solidificador de líquidos y por qué debería usarlo?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Es un polvo superabsorbente que gelifica instantáneamente los residuos líquidos (agua y tinta) en los vasos de enjuague al final de la sesión, evitando derrames accidentales y facilitando su desecho seguro en el contenedor de residuos biológicos.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Para qué sirven las fundas protectoras de máquina y clip cord?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Son barreras plásticas desechables indispensables para cubrir la máquina, el cable de alimentación o la batería inalámbrica. Evitan el contacto directo de fluidos, pigmentos y bacterias con los equipos, previniendo la contaminación cruzada.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Cómo se logra que un stencil dure durante toda la sesión?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Se debe limpiar y desengrasar muy bien la piel del cliente. Luego, aplicar una capa delgada y uniforme de gel transfer de alta calidad (como Electrum), colocar el diseño presionando suavemente y dejar secar por completo entre 10 y 15 minutos antes de empezar a tatuar.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Qué es la piel sintética para tatuar y cuál es la mejor?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Es una plancha de silicona o caucho que simula la textura y resistencia de la piel humana. Las de alta calidad (como Reelskin) tienen el grosor y flexibilidad ideales para practicar técnicas de delineado, sombreado y empaque de color sin pigmentar toda la superficie.
+              </p>
+            </div>
+
+            <div className="border border-zinc-800 rounded-xl p-6">
+              <h3 className="font-bold text-lg mb-3">
+                ¿Qué son los caps para tinta y qué tamaños existen?
+              </h3>
+              <p className="text-zinc-400 leading-relaxed">
+                Son pequeños recipientes de plástico desechables donde se vierte la tinta. Vienen en varios tamaños (pequeños de 8mm, medianos de 12mm y grandes de 15mm o más) para adaptarse a la cantidad de pigmento requerida para cada color del diseño.
+              </p>
+            </div>
+          </div>
+        </section>
+
       </div>
 
       <FooterSupply />
