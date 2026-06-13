@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import milogo from '../../assets/milogo/milogo.webp'
 import { FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa'
-import { Menu, X, ShoppingCart, User, ImageIcon, MessageCircle, Clock, Globe, Home } from 'lucide-react'
+import { Menu, X, ShoppingCart, User, ImageIcon, MessageCircle, Clock, Globe, Home, ShieldCheck } from 'lucide-react'
 
 export default function Navbar({ showInicio = false }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -75,6 +75,13 @@ export default function Navbar({ showInicio = false }) {
                 </div>
               </button>
             )}
+
+            <Link to="/cuidados" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <span>Cuidados</span>
+                <ShieldCheck size={14} />
+              </div>
+            </Link>
 
             <button onClick={() => { setHorarioOpen(true); setMenuOpen(false) }} className="w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
               <div className="flex items-center justify-between">

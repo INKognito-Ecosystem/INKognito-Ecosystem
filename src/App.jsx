@@ -41,6 +41,8 @@ import Gallery from './components/tattoo/Gallery'
 import Testimonials from './components/tattoo/Testimonials'
 import Footer from './components/tattoo/Footer'
 import WhatsAppFloat from './components/tattoo/WhatsAppFloat'
+import CuidadosPage from './components/tattoo/CuidadosPage'
+import CuidadosTeaser from './components/tattoo/CuidadosTeaser'
 import Seo from './components/Seo'
 import ogTattoo from './assets/mifoto/josefoto-og.jpg'
 import ogPortafolio from './assets/portafolio/poseidon.jpg'
@@ -70,6 +72,8 @@ function HomePage({
       <Hero />
 
       <About />
+
+      <CuidadosTeaser />
 
       <Testimonials />
 
@@ -283,6 +287,11 @@ function App() {
         setTamano={setTamano}
       />
     }
+  />
+
+  <Route
+    path="/cuidados"
+    element={<CuidadosPage />}
   />
 
   <Route
