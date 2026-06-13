@@ -2,6 +2,7 @@ import NavbarCategoryStore from '../NavbarCategoryStore'
 import FooterStore from '../FooterStore'
 import { FaWhatsapp } from 'react-icons/fa'
 import StoreProductCard from '../StoreProductCard'
+import Seo from '../../Seo'
 
 const SHOE_SIZES = ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44']
 
@@ -31,7 +32,7 @@ const faqs = [
   },
   {
     q: '¿Hacen envíos a toda la región de Urabá?',
-    a: 'Sí. Cubrimos todo el Urabá antioqueño: Chigorodó, Carepa, Apartadó, Turbo, Mutatá y Arboletes. Entrega en 1 a 3 días hábiles con pago contraentrega disponible.',
+    a: 'Sí. Cubrimos todo el Urabá antioqueño: Chigorodó, Carepa, Apartadó, Turbo, Mutatá y Arboletes. Entrega en 1 a 4 días hábiles con pago contraentrega disponible.',
   },
   {
     q: '¿Qué pasa si la talla no me queda?',
@@ -42,6 +43,12 @@ const faqs = [
 export default function ZapatosCasualesPage() {
   return (
     <>
+      <Seo
+        title="Zapatos casuales | INKognito Store — Urabá"
+        description="Zapatos casuales urbanos para el día a día en Urabá. Air Force 1, Chuck Taylor, Vans y más. Réplicas premium a precio accesible con entrega a domicilio en la región."
+        siteName="INKognito Store"
+        canonical={`${import.meta.env.VITE_SITE_URL}/store/zapatos-casuales`}
+      />
       <NavbarCategoryStore pageName="Zapatos Casuales" />
 
       {/* HERO */}
@@ -55,8 +62,9 @@ export default function ZapatosCasualesPage() {
             Lifestyle • Urbano • Street
           </p>
           <p className="text-gray-700 leading-relaxed max-w-2xl text-base md:text-lg">
-            Calidad premium, precio accesible. Diseños inspirados en las mejores marcas,
-            fabricados para el ritmo de Urabá.
+            Los modelos icónicos que definen el estilo urbano de Urabá: el blanco del Air Force 1,
+            la silueta retro del Forum Low, la actitud del Converse. Casuales que combinan con todo
+            y soportan el ritmo de la región.
           </p>
         </div>
       </div>

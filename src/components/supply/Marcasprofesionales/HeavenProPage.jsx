@@ -20,6 +20,7 @@ export default function HeavenProPage() {
         title="Heaven Pro | Cuidado de tatuajes — INKognito Supply"
         description="Cremas y productos de cuidado post-tatuaje Heaven Pro. Formulados para proteger y realzar la cicatrización. Disponibles en Urabá, Colombia."
         siteName="INKognito Supply"
+        canonical={`${import.meta.env.VITE_SITE_URL}/supply/brands/heaven-pro`}
       />
       <NavbarCategory pageName="Heaven Pro" />
 

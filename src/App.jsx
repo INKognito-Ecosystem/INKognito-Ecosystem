@@ -49,6 +49,34 @@ import Seo from './components/Seo'
 import ogTattoo from './assets/mifoto/josefoto-og.jpg'
 import ogPortafolio from './assets/portafolio/poseidon.jpg'
 
+const tattooJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "TattooParlor",
+  "@id": `${import.meta.env.VITE_SITE_URL}/tattoo#business`,
+  "name": "INKognito Tattoo Studio — Jose Humanez",
+  "description": "Estudio de tatuajes en Chigorodó. Realismo, sombras, línea fina y diseños personalizados. Atendemos toda la región de Urabá: Chigorodó, Apartadó, Turbo, Carepa, Mutatá.",
+  "url": `${import.meta.env.VITE_SITE_URL}/tattoo`,
+  "telephone": "+57-320-791-1013",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Chigorodó",
+    "addressRegion": "Antioquia",
+    "addressCountry": "CO"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 7.6734,
+    "longitude": -76.6868
+  },
+  "areaServed": ["Chigorodó","Apartadó","Turbo","Carepa","Mutatá","Necoclí","San Juan de Urabá"],
+  "openingHours": ["Mo-Fr 09:00-16:00","Sa-Su 09:00-20:00"],
+  "priceRange": "$$",
+  "sameAs": [
+    "https://www.instagram.com/jhumaneztattoo",
+    "https://www.facebook.com/jhumaneztattoo"
+  ],
+  "image": `${import.meta.env.VITE_SITE_URL}/josefoto-og.jpg`
+}
 
 /* =========================
    PAGINA PRINCIPAL
@@ -67,6 +95,8 @@ function HomePage({
         title="Tatuador en Chigorodó, Antioquia | Realismo y diseños personalizados — Jose Humanez"
         description="Tatuador profesional especialista en realismo, sombras y línea fina en Chigorodó, Urabá antioqueño. Estudio privado con cita previa. Cotiza tu tatuaje por WhatsApp."
         image={ogTattoo}
+        canonical={`${import.meta.env.VITE_SITE_URL}/tattoo`}
+        jsonLd={tattooJsonLd}
       />
 
       <Navbar />
@@ -183,6 +213,7 @@ function PortfolioPage({
         title="Portafolio de tatuajes | Realismo, sombras y línea fina — Jose Humanez Tattoo"
         description="Galería de trabajos de Jose Humanez: tatuajes de realismo, sombras, blackwork y línea fina hechos en Chigorodó, Antioquia. Mira el portafolio y reserva tu cita."
         image={ogPortafolio}
+        canonical={`${import.meta.env.VITE_SITE_URL}/portafolio`}
       />
 
       <Navbar showInicio={true} />

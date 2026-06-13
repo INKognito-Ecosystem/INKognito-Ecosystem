@@ -17,8 +17,24 @@ export default function StoreProductCard({ product, category, sizes }) {
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl md:rounded-2xl overflow-hidden hover:border-[#C9A84C] hover:shadow-md transition-all duration-300">
-      <div className="h-40 md:h-56 bg-gray-100 flex items-center justify-center">
-        <p className="text-gray-400 uppercase tracking-[0.3em] text-xs">Imagen</p>
+      <div className="aspect-square w-full overflow-hidden bg-gray-100 relative">
+        {product.image && (
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none'
+              e.currentTarget.nextSibling.style.display = 'flex'
+            }}
+          />
+        )}
+        <div
+          className="absolute inset-0 flex items-center justify-center bg-gray-100"
+          style={{ display: product.image ? 'none' : 'flex' }}
+        >
+          <p className="text-gray-400 uppercase tracking-[0.3em] text-xs">Imagen</p>
+        </div>
       </div>
       <div className="p-4 md:p-5">
         <p className="text-[#C9A84C] uppercase tracking-[0.25em] text-[10px] md:text-xs mb-1">

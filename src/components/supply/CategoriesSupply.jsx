@@ -1,16 +1,17 @@
 import { Link } from 'react-router-dom'
+import { Drill, PenTool, PlugZap, Droplet, Crosshair, Hand, HeartPulse, Toolbox, BedDouble, Package } from 'lucide-react'
 
 const categories = [
-  { name: 'Máquinas', path: '/supply/machines' },
-  { name: 'Cartuchos', path: '/supply/cartridges' },
-  { name: 'Fuentes', path: '/supply/power-supplies' },
-  { name: 'Tintas', path: '/supply/ink' },
-  { name: 'Agujas', path: '/supply/needles' },
-  { name: 'Guantes', path: '/supply/gloves' },
-  { name: 'Cuidado Posterior', path: '/supply/aftercare' },
-  { name: 'Accesorios', path: '/supply/accessories' },
-  { name: 'Mobiliario', path: '/supply/furniture' },
-  { name: 'Combos', path: '/supply/bundles' },
+  { name: 'Máquinas',          path: '/supply/machines',       icon: Drill      },
+  { name: 'Cartuchos',         path: '/supply/cartridges',     icon: PenTool    },
+  { name: 'Fuentes',           path: '/supply/power-supplies', icon: PlugZap    },
+  { name: 'Tintas',            path: '/supply/ink',            icon: Droplet    },
+  { name: 'Agujas',            path: '/supply/needles',        icon: Crosshair  },
+  { name: 'Guantes',           path: '/supply/gloves',         icon: Hand       },
+  { name: 'Cuidado Posterior', path: '/supply/aftercare',      icon: HeartPulse },
+  { name: 'Accesorios',        path: '/supply/accessories',    icon: Toolbox    },
+  { name: 'Mobiliario',        path: '/supply/furniture',      icon: BedDouble  },
+  { name: 'Combos',            path: '/supply/bundles',        icon: Package    },
 ]
 
 export default function CategoriesSupply() {
@@ -39,8 +40,9 @@ export default function CategoriesSupply() {
             <Link
               key={category.name}
               to={category.path}
-              className="h-36 border border-zinc-800 bg-zinc-950 hover:border-blue-500 hover:bg-zinc-900 transition-all duration-300 uppercase tracking-[0.2em] font-bold text-sm text-zinc-300 flex items-center justify-center"
+              className="h-36 border border-zinc-800 bg-zinc-950 hover:border-blue-500 hover:bg-zinc-900 transition-all duration-300 uppercase tracking-[0.2em] font-bold text-sm text-zinc-300 flex flex-col items-center justify-center gap-3 text-center"
             >
+              <category.icon size={32} />
               {category.name}
             </Link>
           ))}

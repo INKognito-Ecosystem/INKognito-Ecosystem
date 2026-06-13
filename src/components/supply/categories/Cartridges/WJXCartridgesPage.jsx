@@ -1,6 +1,7 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import Seo from '../../../Seo'
+import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
 
 const categories = [
   {
@@ -86,12 +87,14 @@ const faq = [
 ]
 
 export default function WJXCartridgesPage() {
+  const { addItem } = useSupplyCart()
   return (
     <div className="min-h-screen bg-black text-white">
       <Seo
         title="Cartuchos WJX | INKognito Supply — Colombia"
         description="Cartuchos WJX de alta precisión para líneas y sombras. Compatibles con máquinas tipo pen. Disponibles en Urabá, Colombia."
         siteName="INKognito Supply"
+        canonical={`${import.meta.env.VITE_SITE_URL}/supply/cartridges/wjx`}
       />
 
       <NavbarCategory pageName="WJX Tattoo" />
@@ -143,44 +146,46 @@ export default function WJXCartridgesPage() {
 
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 
-                {category.products.map((product) => (
+                {category.products.map((name) => {
+                  const product = { id: name, name, brand: 'WJX Tattoo', price: '$XX.XXX' }
+                  return (
+                    <div
+                      key={name}
+                      className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-950 hover:border-zinc-600 transition-all duration-300"
+                    >
 
-                  <div
-                    key={product}
-                    className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-950 hover:border-zinc-600 transition-all duration-300"
-                  >
+                      <div className="aspect-square bg-zinc-900 flex items-center justify-center">
+                        <span className="text-zinc-700 uppercase tracking-[0.2em] text-xs">
+                          foto
+                        </span>
+                      </div>
 
-                    <div className="aspect-square bg-zinc-900 flex items-center justify-center">
+                      <div className="p-4">
 
-                      <span className="text-zinc-700 uppercase tracking-[0.2em] text-xs">
-                        foto
-                      </span>
+                        <h3 className="font-bold text-sm md:text-lg mb-2">
+                          {name}
+                        </h3>
+
+                        <span className="text-zinc-500 text-xs uppercase block mb-2">
+                          WJX Tattoo
+                        </span>
+
+                        <span className="text-white font-bold text-sm block mb-3">
+                          {product.price}
+                        </span>
+
+                        <button
+                          onClick={() => addItem(product, 'cartridges-wjx')}
+                          className="w-full py-2 border border-zinc-700 uppercase tracking-[0.15em] text-xs hover:border-blue-500 hover:text-blue-500 transition-all duration-300"
+                        >
+                          + Agregar al carrito
+                        </button>
+
+                      </div>
 
                     </div>
-
-                    <div className="p-4">
-
-  <h3 className="font-bold text-sm md:text-lg mb-2">
-    {product}
-  </h3>
-
-  <div className="flex items-center justify-between mt-3">
-
-    <span className="text-zinc-500 text-xs uppercase">
-      WJX Tattoo
-    </span>
-
-    <button className="px-3 py-1 border border-zinc-700 text-xs uppercase hover:border-white transition-all duration-300">
-      Ver
-    </button>
-
-  </div>
-
-</div>
-
-                  </div>
-
-                ))}
+                  )
+                })}
 
               </div>
 

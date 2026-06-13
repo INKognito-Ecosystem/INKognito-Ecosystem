@@ -2,18 +2,19 @@ import NavbarCategoryStore from '../NavbarCategoryStore'
 import FooterStore from '../FooterStore'
 import { FaWhatsapp } from 'react-icons/fa'
 import StoreProductCard from '../StoreProductCard'
+import Seo from '../../Seo'
 
 const SHOE_SIZES = ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44']
 
 const products = [
-  { id: 1, name: 'Predator Accuracy.1 FG', brand: 'Adidas', price: '$359.000', tag: 'Terreno Firme' },
-  { id: 2, name: 'Mercurial Vapor XV Elite FG', brand: 'Nike', price: '$399.000', tag: 'Velocidad' },
-  { id: 3, name: 'Phantom GX Elite FG', brand: 'Nike', price: '$379.000', tag: 'Control' },
-  { id: 4, name: 'Copa Pure.1 FG', brand: 'Adidas', price: '$329.000', tag: 'Toque' },
-  { id: 5, name: 'X Speedportal.1 FG', brand: 'Adidas', price: '$345.000', tag: 'Velocidad' },
+  { id: 1, name: 'Predator Accuracy.1 TF', brand: 'Adidas', price: '$359.000', tag: 'Multisuperficie' },
+  { id: 2, name: 'Mercurial Vapor XV Elite TF', brand: 'Nike', price: '$399.000', tag: 'Velocidad' },
+  { id: 3, name: 'Phantom GX Elite TF', brand: 'Nike', price: '$379.000', tag: 'Control' },
+  { id: 4, name: 'Copa Pure.1 TF', brand: 'Adidas', price: '$329.000', tag: 'Toque' },
+  { id: 5, name: 'X Speedportal.1 TF', brand: 'Adidas', price: '$345.000', tag: 'Velocidad' },
   { id: 6, name: 'Tiempo Legend 10 Elite', brand: 'Nike', price: '$315.000', tag: 'Clásico' },
-  { id: 7, name: 'King Pro FG', brand: 'Puma', price: '$289.000', tag: 'Potencia' },
-  { id: 8, name: 'Future 7 Pro FG', brand: 'Puma', price: '$299.000', tag: 'Adaptación' },
+  { id: 7, name: 'King Pro TF', brand: 'Puma', price: '$289.000', tag: 'Potencia' },
+  { id: 8, name: 'Future 7 Pro TF', brand: 'Puma', price: '$299.000', tag: 'Adaptación' },
 ]
 
 const faqs = [
@@ -42,6 +43,12 @@ const faqs = [
 export default function GuayosPage() {
   return (
     <>
+      <Seo
+        title="Guayos | INKognito Store — Urabá"
+        description="Guayos de fútbol Nike, Adidas y Puma para las canchas de Chigorodó, Turbo y todo Urabá. Réplicas premium para terreno sintético. Pide por WhatsApp con entrega regional."
+        siteName="INKognito Store"
+        canonical={`${import.meta.env.VITE_SITE_URL}/store/guayos`}
+      />
       <NavbarCategoryStore pageName="Guayos" />
 
       {/* HERO */}
@@ -55,8 +62,8 @@ export default function GuayosPage() {
             Fútbol • Velocidad • Potencia
           </p>
           <p className="text-gray-700 leading-relaxed max-w-2xl text-base md:text-lg">
-            Calidad premium, precio accesible. Diseños inspirados en las mejores marcas,
-            fabricados para el ritmo de Urabá.
+            Para dominar el balón en las canchas sintéticas de Chigorodó, los polvorientos de Turbo
+            y la grama de Carepa. Tracción, control y potencia en cada par, sin el precio original.
           </p>
         </div>
       </div>

@@ -21,6 +21,7 @@ export default function MachinesPage() {
       title="Máquinas para tatuar | INKognito Supply — Urabá"
       description="FK Irons, Cheyenne, Bishop y Swashdrive. Máquinas rotativas tipo pen para artistas profesionales en Urabá. Consulta disponibilidad y despacho a otras ciudades de Colombia."
       siteName="INKognito Supply"
+      canonical={`${import.meta.env.VITE_SITE_URL}/supply/machines`}
     />
     <div className="min-h-screen bg-black text-white">
 

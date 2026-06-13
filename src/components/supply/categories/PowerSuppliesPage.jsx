@@ -20,6 +20,7 @@ export default function PowerSuppliesPage() {
         title="Fuentes de poder para tatuar | INKognito Supply — Urabá"
         description="FK Irons, Cheyenne, Mast y EZ. Fuentes digitales e inalámbricas para máquinas rotativas y de bobinas. Disponibles en Urabá, Colombia."
         siteName="INKognito Supply"
+        canonical={`${import.meta.env.VITE_SITE_URL}/supply/power-supplies`}
       />
       <div className="min-h-screen bg-black text-white">
 

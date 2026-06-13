@@ -20,6 +20,7 @@ export default function FurniturePage() {
         title="Mobiliario para estudio de tatuaje | INKognito Supply — Urabá"
         description="TATSoul, Mast, InkBed y más. Camillas, sillas y mobiliario profesional para estudios de tatuaje en Urabá, Colombia."
         siteName="INKognito Supply"
+        canonical={`${import.meta.env.VITE_SITE_URL}/supply/furniture`}
       />
       <NavbarCategory pageName="Mobiliario" />
 

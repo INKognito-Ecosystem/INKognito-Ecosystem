@@ -2,6 +2,7 @@ import NavbarCategoryStore from '../NavbarCategoryStore'
 import FooterStore from '../FooterStore'
 import { FaWhatsapp } from 'react-icons/fa'
 import StoreProductCard from '../StoreProductCard'
+import Seo from '../../Seo'
 
 const SHOE_SIZES = ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44']
 
@@ -42,6 +43,12 @@ const faqs = [
 export default function TenisGuayoPage() {
   return (
     <>
+      <Seo
+        title="Tenis y guayos | INKognito Store — Urabá"
+        description="Tenis guayo multisuperficie para las canchas sintéticas de Urabá. Perfectos para fútbol 5 y uso diario. Nike, Adidas y Puma réplica premium. Entrega en toda la región."
+        siteName="INKognito Store"
+        canonical={`${import.meta.env.VITE_SITE_URL}/store/tenis-guayo`}
+      />
       <NavbarCategoryStore pageName="Tenis Guayo" />
 
       {/* HERO */}
@@ -55,8 +62,8 @@ export default function TenisGuayoPage() {
             Multisuperficie • Fútbol • Calle
           </p>
           <p className="text-gray-700 leading-relaxed max-w-2xl text-base md:text-lg">
-            Calidad premium, precio accesible. Diseños inspirados en las mejores marcas,
-            fabricados para el ritmo de Urabá.
+            La solución perfecta para las canchas sintéticas de fútbol 5 de Urabá: tracción de guayo,
+            comodidad de tenis. Del partido a la calle sin cambiar de calzado.
           </p>
         </div>
       </div>

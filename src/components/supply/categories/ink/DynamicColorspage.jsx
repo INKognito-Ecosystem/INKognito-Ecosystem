@@ -1,6 +1,7 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import Seo from '../../../Seo'
+import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
 
 const categories = [
   {
@@ -61,12 +62,14 @@ const categories = [
 ]
 
 export default function DynamicColorsPage() {
+  const { addItem } = useSupplyCart()
   return (
     <div className="min-h-screen bg-black text-white">
       <Seo
         title="Tintas Dynamic | INKognito Supply — Colombia"
         description="Dynamic Black, Triple Black y colores clásicos. Pigmentos densos y fluidos para black and grey y estilo tradicional. Disponibles en Urabá, despacho a Colombia."
         siteName="INKognito Supply"
+        canonical={`${import.meta.env.VITE_SITE_URL}/supply/ink/dynamic`}
       />
       <NavbarCategory pageName="Dynamic" />
 
@@ -105,40 +108,46 @@ export default function DynamicColorsPage() {
 
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
 
-                {category.products.map((product) => (
-                  <div
-                    key={product}
-                    className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-950 hover:border-zinc-600 transition-all duration-300"
-                  >
+                {category.products.map((name) => {
+                  const product = { id: name, name, brand: 'Dynamic', price: '$XX.XXX' }
+                  return (
+                    <div
+                      key={name}
+                      className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-950 hover:border-zinc-600 transition-all duration-300"
+                    >
 
-                    <div className="aspect-square bg-zinc-900 flex items-center justify-center">
-                      <span className="text-zinc-700 uppercase tracking-[0.2em] text-xs">
-                        Foto
-                      </span>
-                    </div>
+                      <div className="aspect-square bg-zinc-900 flex items-center justify-center">
+                        <span className="text-zinc-700 uppercase tracking-[0.2em] text-xs">
+                          Foto
+                        </span>
+                      </div>
 
-                    <div className="p-3 md:p-4">
+                      <div className="p-3 md:p-4">
 
-                      <h3 className="font-bold text-sm md:text-lg">
-                        {product}
-                      </h3>
+                        <h3 className="font-bold text-sm md:text-lg mb-2">
+                          {name}
+                        </h3>
 
-                      <div className="mt-3 flex items-center justify-between">
-
-                        <span className="text-zinc-400 text-xs">
+                        <span className="text-zinc-400 text-xs block mb-2">
                           Dynamic
                         </span>
 
-                        <button className="text-xs px-3 py-1 border border-zinc-700 rounded hover:border-white transition-all duration-300">
-                          Ver
+                        <span className="text-white font-bold text-sm block mb-3">
+                          {product.price}
+                        </span>
+
+                        <button
+                          onClick={() => addItem(product, 'ink-dynamic')}
+                          className="w-full py-2 border border-zinc-700 uppercase tracking-[0.15em] text-xs hover:border-blue-500 hover:text-blue-500 transition-all duration-300"
+                        >
+                          + Agregar al carrito
                         </button>
 
                       </div>
 
                     </div>
-
-                  </div>
-                ))}
+                  )
+                })}
 
               </div>
 

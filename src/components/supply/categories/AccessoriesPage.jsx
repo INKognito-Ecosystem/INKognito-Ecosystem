@@ -22,6 +22,7 @@ export default function AccessoriesPage() {
         title="Accesorios para tatuaje | INKognito Supply — Urabá"
         description="Electrum, Hornet, Solidify, Mast y más. Insumos desechables, stencil gel, fundas y accesorios profesionales para estudios de tatuaje en Urabá, Colombia."
         siteName="INKognito Supply"
+        canonical={`${import.meta.env.VITE_SITE_URL}/supply/accessories`}
       />
       <NavbarCategory pageName="Accesorios" />
 

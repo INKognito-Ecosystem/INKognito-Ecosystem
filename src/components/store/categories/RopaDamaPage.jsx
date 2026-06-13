@@ -2,6 +2,7 @@ import NavbarCategoryStore from '../NavbarCategoryStore'
 import FooterStore from '../FooterStore'
 import { FaWhatsapp } from 'react-icons/fa'
 import StoreProductCard from '../StoreProductCard'
+import Seo from '../../Seo'
 
 const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
 
@@ -42,6 +43,12 @@ const faqs = [
 export default function RopaDamaPage() {
   return (
     <>
+      <Seo
+        title="Ropa para dama | INKognito Store — Urabá"
+        description="Sets, leggings y tops deportivos para mujer en Chigorodó y el Urabá antioqueño. Ropa para gym, running, yoga y ciclismo. Pide por WhatsApp con entrega a domicilio."
+        siteName="INKognito Store"
+        canonical={`${import.meta.env.VITE_SITE_URL}/store/ropa-dama`}
+      />
       <NavbarCategoryStore pageName="Ropa Dama" />
 
       {/* HERO */}
@@ -55,8 +62,9 @@ export default function RopaDamaPage() {
             Gym • Running • Yoga • Ciclismo
           </p>
           <p className="text-gray-700 leading-relaxed max-w-2xl text-base md:text-lg">
-            Calidad premium, precio accesible. Diseños inspirados en las mejores marcas,
-            fabricados para el ritmo de Urabá.
+            Sets de compresión, leggings de alto rendimiento y tops deportivos pensados para el calor de Urabá.
+            Si entrenas en el gym de Chigorodó, corres en Apartadó o practicas yoga en casa,
+            la ropa que usas marca la diferencia.
           </p>
         </div>
       </div>

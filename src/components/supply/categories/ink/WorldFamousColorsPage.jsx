@@ -1,6 +1,7 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import Seo from '../../../Seo'
+import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
 
 const categories = [
   {
@@ -95,12 +96,14 @@ const categories = [
 ]
 
 export default function WorldFamousColorsPage() {
+  const { addItem } = useSupplyCart()
   return (
     <div className="min-h-screen bg-black text-white">
       <Seo
         title="Tintas World Famous | INKognito Supply — Colombia"
         description="World Famous Ink: alta pigmentación, cicatrización limpia y colores que retienen brillantez con el tiempo. Disponibles en Urabá, Colombia."
         siteName="INKognito Supply"
+        canonical={`${import.meta.env.VITE_SITE_URL}/supply/ink/world-famous`}
       />
 
       <NavbarCategory pageName="World Famous" />
@@ -141,42 +144,46 @@ export default function WorldFamousColorsPage() {
 
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 
-                {category.products.map((product) => (
+                {category.products.map((name) => {
+                  const product = { id: name, name, brand: 'World Famous', price: '$XX.XXX' }
+                  return (
+                    <div
+                      key={name}
+                      className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-950 hover:border-zinc-600 transition-all duration-300"
+                    >
 
-                  <div
-                    key={product}
-                    className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-950 hover:border-zinc-600 transition-all duration-300"
-                  >
+                      <div className="aspect-square bg-zinc-900 flex items-center justify-center">
+                        <span className="text-zinc-700 uppercase tracking-[0.2em] text-xs">
+                          Foto
+                        </span>
+                      </div>
 
-                    <div className="aspect-square bg-zinc-900 flex items-center justify-center">
-                      <span className="text-zinc-700 uppercase tracking-[0.2em] text-xs">
-                        Foto
-                      </span>
-                    </div>
+                      <div className="p-3 md:p-4">
 
-                    <div className="p-3 md:p-4">
+                        <h3 className="font-bold text-sm md:text-lg mb-2">
+                          {name}
+                        </h3>
 
-                      <h3 className="font-bold text-sm md:text-lg mb-2">
-                        {product}
-                      </h3>
-
-                      <div className="flex justify-between items-center">
-
-                        <span className="text-zinc-500 text-xs uppercase">
+                        <span className="text-zinc-500 text-xs uppercase block mb-2">
                           World Famous
                         </span>
 
-                        <button className="px-3 py-1 border border-zinc-700 text-xs uppercase hover:border-white transition-all duration-300">
-                          Ver
+                        <span className="text-white font-bold text-sm block mb-3">
+                          {product.price}
+                        </span>
+
+                        <button
+                          onClick={() => addItem(product, 'ink-world-famous')}
+                          className="w-full py-2 border border-zinc-700 uppercase tracking-[0.15em] text-xs hover:border-blue-500 hover:text-blue-500 transition-all duration-300"
+                        >
+                          + Agregar al carrito
                         </button>
 
                       </div>
 
                     </div>
-
-                  </div>
-
-                ))}
+                  )
+                })}
 
               </div>
 

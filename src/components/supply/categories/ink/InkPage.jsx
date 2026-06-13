@@ -20,6 +20,7 @@ export default function InkPage() {
         title="Tintas para tatuaje | INKognito Supply — Urabá"
         description="Vice Colors, Dynamic, Eternal, Intenze, Fusion, World Famous y Solid Ink. La selección más completa de tintas profesionales en Urabá. Pedidos por WhatsApp."
         siteName="INKognito Supply"
+        canonical={`${import.meta.env.VITE_SITE_URL}/supply/ink`}
       />
       <div className="min-h-screen bg-black text-white">
 

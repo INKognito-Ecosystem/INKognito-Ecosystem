@@ -2,6 +2,7 @@ import NavbarCategoryStore from '../NavbarCategoryStore'
 import FooterStore from '../FooterStore'
 import { FaWhatsapp } from 'react-icons/fa'
 import StoreProductCard from '../StoreProductCard'
+import Seo from '../../Seo'
 
 const SHOE_SIZES = ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44']
 
@@ -42,6 +43,12 @@ const faqs = [
 export default function ZapatosDeportivosPage() {
   return (
     <>
+      <Seo
+        title="Zapatos deportivos | INKognito Store — Urabá"
+        description="Zapatillas para correr y entrenar en Chigorodó, Apartadó y toda la región de Urabá. Nike, Adidas, Asics y New Balance réplica premium. Envío en 1 a 4 días hábiles."
+        siteName="INKognito Store"
+        canonical={`${import.meta.env.VITE_SITE_URL}/store/zapatos-deportivos`}
+      />
       <NavbarCategoryStore pageName="Zapatos Deportivos" />
 
       {/* HERO */}
@@ -55,8 +62,8 @@ export default function ZapatosDeportivosPage() {
             Running • Entrenamiento • Gym
           </p>
           <p className="text-gray-700 leading-relaxed max-w-2xl text-base md:text-lg">
-            Calidad premium, precio accesible. Diseños inspirados en las mejores marcas,
-            fabricados para el ritmo de Urabá.
+            Las siluetas de running y entrenamiento más buscadas del mercado, a un precio que tiene
+            sentido para Urabá. Amortiguación para el asfalto de Apartadó, soporte para la pesa de Chigorodó.
           </p>
         </div>
       </div>

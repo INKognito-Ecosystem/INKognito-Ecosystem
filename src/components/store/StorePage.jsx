@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { FaWhatsapp } from 'react-icons/fa'
-import { Truck, Shield, Clock, MapPin, Star, Award } from 'lucide-react'
+import { Truck, Shield, Clock, MapPin, Star, Award, Shirt, Footprints, Sun, Trophy, Zap } from 'lucide-react'
 import NavbarStore from './NavbarStore'
 import FooterStore from './FooterStore'
 import StoreProductCard from './StoreProductCard'
@@ -14,6 +14,7 @@ const categories = [
     tag: 'Deportiva Femenina',
     description: 'Sets, leggings, tops y conjuntos para mujer activa. Gym, running, yoga y ciclismo.',
     link: '/store/ropa-dama',
+    icon: <Shirt size={28} />,
   },
   {
     id: 2,
@@ -21,6 +22,7 @@ const categories = [
     tag: 'Deportiva Masculina',
     description: 'Shorts, camisetas, joggers y conjuntos para hombre activo. Desde el gym hasta la calle.',
     link: '/store/ropa-caballeros',
+    icon: <Shirt size={28} />,
   },
   {
     id: 3,
@@ -28,6 +30,7 @@ const categories = [
     tag: 'Running & Gym',
     description: 'Para correr, entrenar y rendir. Las siluetas más buscadas en el mercado, a tu alcance.',
     link: '/store/zapatos-deportivos',
+    icon: <Footprints size={28} />,
   },
   {
     id: 4,
@@ -35,6 +38,7 @@ const categories = [
     tag: 'Estilo Urbano',
     description: 'Cómodos, frescos y con actitud. Los modelos icónicos para el día a día en Urabá.',
     link: '/store/zapatos-casuales',
+    icon: <Sun size={28} />,
   },
   {
     id: 5,
@@ -42,6 +46,7 @@ const categories = [
     tag: 'Fútbol',
     description: 'Para dominar el balón desde Chigorodó hasta Turbo. Tracción, control y poder.',
     link: '/store/guayos',
+    icon: <Trophy size={28} />,
   },
   {
     id: 6,
@@ -49,6 +54,7 @@ const categories = [
     tag: 'Multisuperficie',
     description: 'Versatilidad total. Canchita de sintético, polvo de ladrillo y calle sin cambiar de par.',
     link: '/store/tenis-guayo',
+    icon: <Zap size={28} />,
   },
 ]
 
@@ -107,6 +113,23 @@ const guarantees = [
   },
 ]
 
+const storeJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Store",
+  "@id": `${import.meta.env.VITE_SITE_URL}/store#business`,
+  "name": "INKognito Store",
+  "description": "Tienda de ropa deportiva, zapatos y guayos en Urabá, Antioquia. Nike, Adidas, Puma y más. Chigorodó, Apartadó, Turbo, Carepa. Envío regional.",
+  "url": `${import.meta.env.VITE_SITE_URL}/store`,
+  "telephone": "+57-320-791-1013",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Chigorodó",
+    "addressRegion": "Antioquia",
+    "addressCountry": "CO"
+  },
+  "areaServed": ["Chigorodó","Apartadó","Turbo","Carepa","Mutatá","Necoclí"]
+}
+
 export default function StorePage() {
   return (
     <main className="bg-white text-gray-900">
@@ -115,6 +138,8 @@ export default function StorePage() {
         title="INKognito Store | Ropa y zapatos deportivos en Urabá"
         description="Ropa deportiva para dama y caballero, zapatos deportivos, casuales y guayos en Chigorodó y el Urabá antioqueño. Pide por WhatsApp con entrega en la región."
         image={ogStore}
+        canonical={`${import.meta.env.VITE_SITE_URL}/store`}
+        jsonLd={storeJsonLd}
       />
 
       <NavbarStore />
@@ -203,6 +228,7 @@ export default function StorePage() {
                 className="group bg-white border border-gray-200 rounded-2xl p-6 hover:border-[#C9A84C] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[220px]"
               >
                 <div>
+                  <div className="mb-4 text-[#C9A84C]">{cat.icon}</div>
                   <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-[10px] mb-3 font-semibold">
                     {cat.tag}
                   </p>

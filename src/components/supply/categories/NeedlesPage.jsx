@@ -20,6 +20,7 @@ export default function NeedlesPage() {
         title="Agujas para tatuar | INKognito Supply — Urabá"
         description="Agujas Kwadron, Cheyenne, Mast, Peak y EZ. Round Liner, Magnum y Curved Magnum en calibre 08, 10 y 12. Disponibles en Urabá, Colombia."
         siteName="INKognito Supply"
+        canonical={`${import.meta.env.VITE_SITE_URL}/supply/needles`}
       />
     <div className="min-h-screen bg-black text-white">
 

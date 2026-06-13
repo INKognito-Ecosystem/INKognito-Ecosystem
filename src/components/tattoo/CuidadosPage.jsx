@@ -108,6 +108,7 @@ export default function CuidadosPage() {
         description="Guía completa de cuidados para tu tatuaje: qué hacer antes de tatuarte y cómo cuidar un tatuaje recién hecho para una cicatrización perfecta. Recomendaciones de Jose Humanez, tatuador en Chigorodó, Antioquia."
         image={ogCuidados}
         type="article"
+        canonical={`${import.meta.env.VITE_SITE_URL}/cuidados`}
       />
       <Helmet>
         <script type="application/ld+json">{JSON.stringify(FAQ_JSONLD)}</script>

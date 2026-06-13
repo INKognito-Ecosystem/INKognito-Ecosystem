@@ -20,6 +20,7 @@ export default function BundlesPage() {
         title="Combos y paquetes para tatuadores | INKognito Supply — Urabá"
         description="Kits completos de insumos: máquinas, cartuchos, tintas y accesorios en un solo paquete. Ideales para iniciarse o renovar el estudio. Disponibles en Urabá, Colombia."
         siteName="INKognito Supply"
+        canonical={`${import.meta.env.VITE_SITE_URL}/supply/bundles`}
       />
       <NavbarCategory pageName="Combos" />
 

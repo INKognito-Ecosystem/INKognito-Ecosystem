@@ -8,6 +8,23 @@ import { FaWhatsapp } from 'react-icons/fa'
 import Seo from '../Seo'
 import ogSupply from '../../assets/milogo/supply.webp'
 
+const supplyJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Store",
+  "@id": `${import.meta.env.VITE_SITE_URL}/supply#business`,
+  "name": "INKognito Supply",
+  "description": "Insumos y equipos profesionales para tatuadores en Urabá, Antioquia. Máquinas, tintas, cartuchos, agujas y accesorios. Despacho a toda Colombia por solicitud.",
+  "url": `${import.meta.env.VITE_SITE_URL}/supply`,
+  "telephone": "+57-320-791-1013",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Chigorodó",
+    "addressRegion": "Antioquia",
+    "addressCountry": "CO"
+  },
+  "areaServed": ["Chigorodó","Apartadó","Turbo","Carepa","Mutatá","Colombia por solicitud"]
+}
+
 export default function SupplyPage() {
 
   return (
@@ -19,6 +36,8 @@ export default function SupplyPage() {
       description="Máquinas, cartuchos, tintas, agujas y accesorios profesionales para tatuadores. Con base en Urabá (Apartadó, Turbo, Carepa). Despacho a otras ciudades de Colombia por solicitud. Pedidos por WhatsApp."
       image={ogSupply}
       siteName="INKognito Supply"
+      canonical={`${import.meta.env.VITE_SITE_URL}/supply`}
+      jsonLd={supplyJsonLd}
     />
 
     <NavbarSupply />

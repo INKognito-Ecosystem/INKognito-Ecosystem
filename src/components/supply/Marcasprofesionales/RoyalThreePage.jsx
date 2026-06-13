@@ -23,6 +23,7 @@ export default function RoyalThreePage() {
         title="Royal Three | Insumos para tatuadores — INKognito Supply"
         description="Cremas, jabones y productos de bioseguridad Royal Three para estudios de tatuaje profesionales. Disponibles en Urabá, Colombia."
         siteName="INKognito Supply"
+        canonical={`${import.meta.env.VITE_SITE_URL}/supply/brands/royal-three`}
       />
       <NavbarCategory pageName="Royal Three" />
 

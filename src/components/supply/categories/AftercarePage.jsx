@@ -21,6 +21,7 @@ export default function AftercarePage() {
         title="Cuidado post-tatuaje | INKognito Supply — Urabá"
         description="Hustle Butter, After Inked, TattooMed y más. Productos profesionales para la cicatrización óptima del tatuaje. Disponibles en Urabá, Colombia."
         siteName="INKognito Supply"
+        canonical={`${import.meta.env.VITE_SITE_URL}/supply/aftercare`}
       />
       <NavbarCategory pageName="Cuidado" />
 

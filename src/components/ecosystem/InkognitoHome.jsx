@@ -9,9 +9,10 @@ export default function InkognitoHome() {
     <section className="relative min-h-screen bg-black text-white flex flex-col items-center px-6 overflow-hidden">
 
       <Seo
-        title="INKognito | Tattoo Studio, Supply y Store en Chigorodó, Antioquia"
-        description="INKognito: estudio de tatuajes de Jose Humanez, insumos profesionales para tatuadores y tienda deportiva en Chigorodó, Urabá antioqueño."
+        title="INKognito Ecosystem"
+        description="Ecosistema de servicios en Urabá, Antioquia: tatuajes, insumos para tatuadores y tienda deportiva."
         image={ogLogo}
+        noindex={true}
       />
 
       {/* NAVBAR */}

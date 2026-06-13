@@ -20,6 +20,7 @@ export default function GlovesPage() {
         title="Guantes de nitrilo para tatuaje | INKognito Supply — Urabá"
         description="Unigloves, Black Diamond, NitriTex y Aurelia. Guantes de nitrilo premium, sin látex, para bioseguridad profesional en estudios de tatuaje en Urabá, Colombia."
         siteName="INKognito Supply"
+        canonical={`${import.meta.env.VITE_SITE_URL}/supply/gloves`}
       />
       <NavbarCategory pageName="Guantes" />
 

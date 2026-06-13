@@ -16,6 +16,7 @@ export default function CartridgesPage() {
         title="Cartuchos de tatuaje | INKognito Supply — Urabá"
         description="Cartuchos EZ, WJX y Kwadron para todos los estilos. Compatibles con máquinas tipo pen. Disponibles en Urabá, despacho a otras ciudades de Colombia por solicitud."
         siteName="INKognito Supply"
+        canonical={`${import.meta.env.VITE_SITE_URL}/supply/cartridges`}
       />
       <div className="min-h-screen bg-black text-white">
 
