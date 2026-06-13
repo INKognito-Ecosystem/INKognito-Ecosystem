@@ -1,5 +1,6 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
+import Seo from '../../../Seo'
 
 const categories = [
   {
@@ -87,6 +88,11 @@ const faq = [
 export default function WJXCartridgesPage() {
   return (
     <div className="min-h-screen bg-black text-white">
+      <Seo
+        title="Cartuchos WJX | INKognito Supply — Colombia"
+        description="Cartuchos WJX de alta precisión para líneas y sombras. Compatibles con máquinas tipo pen. Disponibles en Urabá, Colombia."
+        siteName="INKognito Supply"
+      />
 
       <NavbarCategory pageName="WJX Tattoo" />
 

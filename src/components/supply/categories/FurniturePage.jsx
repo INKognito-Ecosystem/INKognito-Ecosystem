@@ -1,6 +1,7 @@
 import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
 import { useSupplyCart } from '../../../contexts/SupplyCartContext'
+import Seo from '../../Seo'
 
 const products = [
   { id: 1, name: 'Tattoo Chair', brand: 'TATSoul', price: '$850' },
@@ -15,7 +16,11 @@ export default function FurniturePage() {
   const { addItem } = useSupplyCart()
   return (
     <div className="min-h-screen bg-black text-white">
-
+      <Seo
+        title="Mobiliario para estudio de tatuaje | INKognito Supply — Urabá"
+        description="TATSoul, Mast, InkBed y más. Camillas, sillas y mobiliario profesional para estudios de tatuaje en Urabá, Colombia."
+        siteName="INKognito Supply"
+      />
       <NavbarCategory pageName="Mobiliario" />
 
       <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">
@@ -49,7 +54,15 @@ export default function FurniturePage() {
               key={product.id}
               className="border border-zinc-800 bg-zinc-950 rounded-xl md:rounded-2xl overflow-hidden hover:border-zinc-600 transition-all duration-300"
             >
-              <div className="h-40 md:h-64 bg-zinc-900 flex items-center justify-center">
+              <div className="aspect-square bg-zinc-900 relative overflow-hidden flex items-center justify-center">
+                {product.image && (
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => { e.currentTarget.style.display = 'none' }}
+                  />
+                )}
                 <p className="text-zinc-700 uppercase tracking-[0.3em] text-xs md:text-sm">
                   Product Image
                 </p>

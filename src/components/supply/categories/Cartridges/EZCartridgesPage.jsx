@@ -1,5 +1,6 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
+import Seo from '../../../Seo'
 
 const categories = [
 {
@@ -76,6 +77,11 @@ answer:
 
 export default function EZCartridgesPage() {
 return ( <div className="min-h-screen bg-black text-white">
+  <Seo
+    title="Cartuchos EZ Tattoo | INKognito Supply — Colombia"
+    description="Cartuchos EZ en RL, RS, Magnum y Curved Magnum. Excelente relación calidad-precio para realismo, black and grey y lettering. Disponibles en Urabá, Colombia."
+    siteName="INKognito Supply"
+  />
 
 ```
   <NavbarCategory pageName="EZ Tattoo" />

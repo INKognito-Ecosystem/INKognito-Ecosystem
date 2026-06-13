@@ -1,6 +1,7 @@
 import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
 import { useSupplyCart } from '../../../contexts/SupplyCartContext'
+import Seo from '../../Seo'
 
 const products = [
   { id: 1, name: 'Bugpin Round Liner', brand: 'Kwadron', price: '$18' },
@@ -14,6 +15,12 @@ const products = [
 export default function NeedlesPage() {
   const { addItem } = useSupplyCart()
   return (
+    <>
+      <Seo
+        title="Agujas para tatuar | INKognito Supply — Urabá"
+        description="Agujas Kwadron, Cheyenne, Mast, Peak y EZ. Round Liner, Magnum y Curved Magnum en calibre 08, 10 y 12. Disponibles en Urabá, Colombia."
+        siteName="INKognito Supply"
+      />
     <div className="min-h-screen bg-black text-white">
 
       <NavbarCategory pageName="Agujas" />
@@ -48,7 +55,15 @@ export default function NeedlesPage() {
               key={product.id}
               className="border border-zinc-800 bg-zinc-950 rounded-xl md:rounded-2xl overflow-hidden hover:border-zinc-600 transition-all duration-300"
             >
-              <div className="h-40 md:h-64 bg-zinc-900 flex items-center justify-center">
+              <div className="aspect-square bg-zinc-900 relative overflow-hidden flex items-center justify-center">
+                {product.image && (
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => { e.currentTarget.style.display = 'none' }}
+                  />
+                )}
                 <p className="text-zinc-700 uppercase tracking-[0.3em] text-xs md:text-sm">
                   Product Image
                 </p>
@@ -136,5 +151,6 @@ export default function NeedlesPage() {
       <FooterSupply />
 
     </div>
+    </>
   )
 }

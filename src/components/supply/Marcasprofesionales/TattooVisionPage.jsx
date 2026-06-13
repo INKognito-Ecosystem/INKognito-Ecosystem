@@ -1,6 +1,7 @@
 import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
 import { useSupplyCart } from '../../../contexts/SupplyCartContext'
+import Seo from '../../Seo'
 
 const products = [
   { id: 1, name: 'Tattoo Vision 2X', brand: 'Sistema Visual', price: '$1.500.000' },
@@ -23,7 +24,11 @@ export default function TattooVisionPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-
+      <Seo
+        title="Tattoo Vision | Sistemas visuales para tatuadores — INKognito Supply"
+        description="Lámparas, gafas y sistemas de visión Tattoo Vision para tatuadores profesionales. Precisión óptica en cada sesión. Disponibles en Urabá, Colombia."
+        siteName="INKognito Supply"
+      />
       <NavbarCategory pageName="Tattoo Vision" />
 
       <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">
@@ -55,7 +60,15 @@ export default function TattooVisionPage() {
               className="border border-zinc-800 bg-zinc-950 rounded-xl md:rounded-2xl overflow-hidden hover:border-zinc-600 transition-all duration-300"
             >
 
-              <div className="h-40 md:h-72 bg-zinc-900 flex items-center justify-center">
+              <div className="aspect-square bg-zinc-900 relative overflow-hidden flex items-center justify-center">
+                {product.image && (
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => { e.currentTarget.style.display = 'none' }}
+                  />
+                )}
                 <p className="text-zinc-700 uppercase tracking-[0.3em] text-xs md:text-sm text-center px-4">
                   Product Image
                 </p>

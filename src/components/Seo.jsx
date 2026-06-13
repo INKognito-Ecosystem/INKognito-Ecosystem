@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async'
 
-export default function Seo({ title, description, image, type = 'website' }) {
+export default function Seo({ title, description, image, type = 'website', siteName = 'INKognito Tattoo Studio' }) {
   // og:image debe ser URL absoluta; al renderizar en cliente usamos el origin actual
   const absoluteImage = image
     ? image.startsWith('http')
@@ -16,7 +16,7 @@ export default function Seo({ title, description, image, type = 'website' }) {
       <meta property="og:description" content={description} />
       <meta property="og:type" content={type} />
       <meta property="og:locale" content="es_CO" />
-      <meta property="og:site_name" content="INKognito Tattoo Studio" />
+      <meta property="og:site_name" content={siteName} />
       {absoluteImage && <meta property="og:image" content={absoluteImage} />}
     </Helmet>
   )

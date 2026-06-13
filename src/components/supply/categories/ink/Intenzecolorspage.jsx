@@ -1,5 +1,6 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
+import Seo from '../../../Seo'
 
 const categories = [
   {
@@ -94,6 +95,11 @@ const categories = [
 export default function IntenzeColorsPage() {
   return (
     <div className="min-h-screen bg-black text-white">
+      <Seo
+        title="Tintas Intenze | INKognito Supply — Colombia"
+        description="Intenze: alta pigmentación, fórmula estéril y vegana. Zuper Black, True Black y gama completa de colores. Disponibles en Urabá, despacho a Colombia."
+        siteName="INKognito Supply"
+      />
 
       <NavbarCategory pageName="Intenze Ink" />
 

@@ -1,5 +1,6 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
+import Seo from '../../../Seo'
 
 const categories = [
   {
@@ -43,6 +44,11 @@ const categories = [
 export default function ViceColorsPage() {
   return (
     <div className="min-h-screen bg-black text-white">
+      <Seo
+        title="Tintas Vice Colors | INKognito Supply — Colombia"
+        description="Catálogo completo de Vice Colors: negros, grises, rojos, azules, pieles y más. Tintas premium para realismo y neotradicional. Disponibles en Urabá, despacho a Colombia."
+        siteName="INKognito Supply"
+      />
       <NavbarCategory pageName="Vice Colors" />
 
       <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">

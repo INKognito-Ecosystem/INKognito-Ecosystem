@@ -1,11 +1,12 @@
 import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
 import { useSupplyCart } from '../../../contexts/SupplyCartContext'
+import Seo from '../../Seo'
 
 const products = [
-   { id: 1, name: 'Stencil Gel', brand: 'Electrum', price: '$15' },
-  { id: 2, name: 'Espuma Limpiaorda', brand: 'Hornet', price: '$12' },
-  { id: 3, name: 'Solidificador', brand: 'Solidify', price: '$10' },
+   { id: 1, name: 'Stencil Gel', brand: 'Protón', price: '$15' },
+  { id: 2, name: 'Espuma Limpiadora', brand: 'Royal Three', price: '$12' },
+  { id: 3, name: 'Solidificador Medusa', brand: 'Royal Three', price: '$10' },
   { id: 4, name: 'Cubre Grip', brand: 'Mast', price: '$8' },
   { id: 5, name: 'Caps', brand: 'EZ Tattoo', price: '$5' },
   { id: 6, name: 'Fundas para Máquina', brand: 'Peak', price: '$6' },
@@ -17,7 +18,11 @@ export default function AccessoriesPage() {
   const { addItem } = useSupplyCart()
   return (
     <div className="min-h-screen bg-black text-white">
-
+      <Seo
+        title="Accesorios para tatuaje | INKognito Supply — Urabá"
+        description="Electrum, Hornet, Solidify, Mast y más. Insumos desechables, stencil gel, fundas y accesorios profesionales para estudios de tatuaje en Urabá, Colombia."
+        siteName="INKognito Supply"
+      />
       <NavbarCategory pageName="Accesorios" />
 
       <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">
@@ -51,7 +56,15 @@ export default function AccessoriesPage() {
               key={product.id}
               className="border border-zinc-800 bg-zinc-950 rounded-xl md:rounded-2xl overflow-hidden hover:border-zinc-600 transition-all duration-300"
             >
-              <div className="h-40 md:h-64 bg-zinc-900 flex items-center justify-center">
+              <div className="aspect-square bg-zinc-900 relative overflow-hidden flex items-center justify-center">
+                {product.image && (
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => { e.currentTarget.style.display = 'none' }}
+                  />
+                )}
                 <p className="text-zinc-700 uppercase tracking-[0.3em] text-xs md:text-sm">
                   Product Image
                 </p>

@@ -1,5 +1,6 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
+import Seo from '../../../Seo'
 
 const categories = [
   {
@@ -94,6 +95,11 @@ const categories = [
 export default function SolidColorsPage() {  
     return (
     <div className="min-h-screen bg-black text-white">
+      <Seo
+        title="Tintas Solid Ink | INKognito Supply — Colombia"
+        description="Solid Ink: paleta de colores puros y consistentes para realismo y acuarela. Disponibles en Urabá, Colombia."
+        siteName="INKognito Supply"
+      />
 
       <NavbarCategory pageName="Solid Ink" />
 

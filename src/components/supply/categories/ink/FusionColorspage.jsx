@@ -1,5 +1,6 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
+import Seo from '../../../Seo'
 
 const categories = [
   {
@@ -92,6 +93,11 @@ const categories = [
 export default function FusionColorsPage() {
   return (
     <div className="min-h-screen bg-black text-white">
+      <Seo
+        title="Tintas Fusion Ink | INKognito Supply — Colombia"
+        description="Fusion Ink: pigmentos vibrantes y stencil-friendly para color americano y neotradicional. Disponibles en Urabá, Colombia."
+        siteName="INKognito Supply"
+      />
 
       <NavbarCategory pageName="Fusion Ink" />
 

@@ -1,5 +1,6 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
+import Seo from '../../../Seo'
 
 const categories = [
   {
@@ -62,6 +63,11 @@ const categories = [
 export default function DynamicColorsPage() {
   return (
     <div className="min-h-screen bg-black text-white">
+      <Seo
+        title="Tintas Dynamic | INKognito Supply — Colombia"
+        description="Dynamic Black, Triple Black y colores clásicos. Pigmentos densos y fluidos para black and grey y estilo tradicional. Disponibles en Urabá, despacho a Colombia."
+        siteName="INKognito Supply"
+      />
       <NavbarCategory pageName="Dynamic" />
 
       <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">

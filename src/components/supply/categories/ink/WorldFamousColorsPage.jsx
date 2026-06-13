@@ -1,5 +1,6 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
+import Seo from '../../../Seo'
 
 const categories = [
   {
@@ -96,6 +97,11 @@ const categories = [
 export default function WorldFamousColorsPage() {
   return (
     <div className="min-h-screen bg-black text-white">
+      <Seo
+        title="Tintas World Famous | INKognito Supply — Colombia"
+        description="World Famous Ink: alta pigmentación, cicatrización limpia y colores que retienen brillantez con el tiempo. Disponibles en Urabá, Colombia."
+        siteName="INKognito Supply"
+      />
 
       <NavbarCategory pageName="World Famous" />
 

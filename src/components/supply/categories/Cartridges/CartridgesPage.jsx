@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
+import Seo from '../../../Seo'
 
 const products = [
 {
@@ -30,7 +31,12 @@ link: '/supply/cartridges/kwadron'
 export default function CartridgesPage() {
   const { addItem } = useSupplyCart()
 return (
-<> 
+<>
+  <Seo
+    title="Cartuchos de tatuaje | INKognito Supply — Urabá"
+    description="Cartuchos EZ, WJX y Kwadron para todos los estilos. Compatibles con máquinas tipo pen. Disponibles en Urabá, despacho a otras ciudades de Colombia por solicitud."
+    siteName="INKognito Supply"
+  />
   <div className="min-h-screen bg-black text-white">
 
     <NavbarCategory pageName="Cartuchos" />
@@ -68,12 +74,18 @@ return (
             className="border border-zinc-800 bg-zinc-950 rounded-xl md:rounded-2xl overflow-hidden hover:border-zinc-600 transition-all duration-300"
           >
 
-            <div className="h-40 md:h-64 bg-zinc-900 flex items-center justify-center">
-
+            <div className="aspect-square bg-zinc-900 relative overflow-hidden flex items-center justify-center">
+              {product.image && (
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onError={(e) => { e.currentTarget.style.display = 'none' }}
+                />
+              )}
               <p className="text-zinc-700 uppercase tracking-[0.3em] text-xs md:text-sm">
                 Product Image
               </p>
-
             </div>
 
             <div className="p-4 md:p-6">

@@ -15,9 +15,10 @@ export default function SupplyPage() {
     <main className="bg-black text-white">
 
     <Seo
-      title="INKognito Supply | Insumos y equipos para tatuar en Colombia"
-      description="Máquinas, cartuchos, tintas, agujas y accesorios profesionales para tatuadores. Marcas como Kwadron, EZ, Dynamic y Eternal. Envíos en Colombia, pedidos por WhatsApp."
+      title="INKognito Supply | Insumos y equipos para tatuaje en Urabá"
+      description="Máquinas, cartuchos, tintas, agujas y accesorios profesionales para tatuadores. Con base en Urabá (Apartadó, Turbo, Carepa). Despacho a otras ciudades de Colombia por solicitud. Pedidos por WhatsApp."
       image={ogSupply}
+      siteName="INKognito Supply"
     />
 
     <NavbarSupply />

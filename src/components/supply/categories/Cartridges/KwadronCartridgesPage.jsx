@@ -1,5 +1,6 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
+import Seo from '../../../Seo'
 
 const categories = [
   {
@@ -87,6 +88,11 @@ const faq = [
 export default function KwadronCartridgesPage() {
   return (
     <div className="min-h-screen bg-black text-white">
+      <Seo
+        title="Cartuchos Kwadron | INKognito Supply — Colombia"
+        description="Cartuchos Kwadron: el estándar profesional europeo para precisión y consistencia. Usados por artistas de todo el mundo. Disponibles en Urabá, Colombia."
+        siteName="INKognito Supply"
+      />
 
       <NavbarCategory pageName="Kwadron" />
 
