@@ -4,7 +4,7 @@ import { useSupplyCart } from '../../../contexts/SupplyCartContext'
 import Seo from '../../Seo'
 
 const products = [
-  { id: 1, name: 'Heaven Pro', brand: 'cuidado', price: '$11' },
+  { id: 1, name: 'Crema Cicatrizante', brand: 'Aftercare', price: '$11' },
   { id: 2, name: 'Tattoo Butter', brand: 'Hustle Butter', price: '$18' },
   { id: 3, name: 'Healing Balm', brand: 'After Inked', price: '$15' },
   { id: 4, name: 'Tattoo Foam', brand: 'TattooMed', price: '$12' },

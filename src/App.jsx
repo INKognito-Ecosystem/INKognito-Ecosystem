@@ -27,6 +27,8 @@ import AccessoriesPage from './components/supply/categories/AccessoriesPage'
 import FurniturePage from './components/supply/categories/FurniturePage'
 import BundlesPage from './components/supply/categories/BundlesPage'
 import TattooVisionPage from './components/supply/Marcasprofesionales/TattooVisionPage'
+import HeavenProPage from './components/supply/Marcasprofesionales/HeavenProPage'
+import RoyalThreePage from './components/supply/Marcasprofesionales/RoyalThreePage'
 import InkognitoHome from './components/ecosystem/InkognitoHome'
 import { SupplyCartProvider } from './contexts/SupplyCartContext'
 import { StoreCartProvider } from './contexts/StoreCartContext'
@@ -331,6 +333,8 @@ function App() {
   <Route path="/supply/furniture" element={<FurniturePage />} />
   <Route path="/supply/bundles" element={<BundlesPage />} />
   <Route path="/brands/tattoo-vision" element={<TattooVisionPage />} />
+  <Route path="/supply/brands/heaven-pro" element={<HeavenProPage />} />
+  <Route path="/supply/brands/royal-three" element={<RoyalThreePage />} />
   <Route element={<StoreCartProvider><Outlet /></StoreCartProvider>}>
     <Route path="/store" element={<StorePage />} />
     <Route path="/store/ropa-dama" element={<RopaDamaPage />} />

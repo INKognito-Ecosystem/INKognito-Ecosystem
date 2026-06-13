@@ -1,63 +1,19 @@
 import { Link } from 'react-router-dom'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
-import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
 import Seo from '../../../Seo'
 
 const products = [
-  {
-    id: 1,
-    name: 'Vice Colors Set',
-    brand: 'Vice',
-    price: '$30',
-    link: '/supply/ink/vice-colors'
-  },
-  {
-    id: 2,
-    name: 'Dynamic Color Set',
-    brand: 'Dynamic',
-    price: '$20',
-    link: '/supply/ink/dynamic'
-  },
-  {
-    id: 3,
-    name: 'Eternal Ink Set',
-    brand: 'Eternal',
-    price: '$35',
-    link: '/supply/ink/eternal'
-  },
-  {
-    id: 4,
-    name: 'Fusion Ink Set',
-    brand: 'Fusion',
-    price: '$28',
-    link: '/supply/ink/fusion'
-  },
-  {
-    id: 5,
-    name: 'World Famous Set',
-    brand: 'World Famous',
-    price: '$30',
-    link: '/supply/ink/world-famous'
-  },
-  {
-    id: 6,
-    name: 'Solid Ink Set',
-    brand: 'Solid Ink',
-    price: '$22',
-    link: '/supply/ink/solid-ink'
-  },
-  {
-    id: 7,
-    name: 'Intenze Ink Set',
-    brand: 'Intenze',
-    price: '$25',
-    link: '/supply/ink/intenze'
-  },
+  { id: 1, name: 'Vice Colors Set',   brand: 'Vice',         link: '/supply/ink/vice-colors' },
+  { id: 2, name: 'Dynamic Color Set', brand: 'Dynamic',      link: '/supply/ink/dynamic' },
+  { id: 3, name: 'Eternal Ink Set',   brand: 'Eternal',      link: '/supply/ink/eternal' },
+  { id: 4, name: 'Fusion Ink Set',    brand: 'Fusion',       link: '/supply/ink/fusion' },
+  { id: 5, name: 'World Famous Set',  brand: 'World Famous', link: '/supply/ink/world-famous' },
+  { id: 6, name: 'Solid Ink Set',     brand: 'Solid Ink',    link: '/supply/ink/solid-ink' },
+  { id: 7, name: 'Intenze Ink Set',   brand: 'Intenze',      link: '/supply/ink/intenze' },
 ]
 
 export default function InkPage() {
-  const { addItem } = useSupplyCart()
   return (
     <>
       <Seo
@@ -141,23 +97,12 @@ export default function InkPage() {
                     {product.name}
                   </h3>
 
-                  <span className="text-white font-bold text-base md:text-xl block mb-3">
-                    {product.price}
-                  </span>
-                  <div className="flex gap-2">
-                    <Link
-                      to={product.link}
-                      className="flex-1 py-2 text-center border border-zinc-700 uppercase tracking-[0.15em] text-xs hover:border-white hover:text-white transition-all duration-300"
-                    >
-                      Ver
-                    </Link>
-                    <button
-                      onClick={() => addItem(product, 'ink')}
-                      className="flex-1 py-2 border border-zinc-700 uppercase tracking-[0.15em] text-xs hover:border-blue-500 hover:text-blue-500 transition-all duration-300"
-                    >
-                      + Agregar al carrito
-                    </button>
-                  </div>
+                  <Link
+                    to={product.link}
+                    className="block w-full py-2 text-center border border-zinc-700 uppercase tracking-[0.15em] text-xs hover:border-white hover:text-white transition-all duration-300"
+                  >
+                    Ver catálogo
+                  </Link>
 
                 </div>
 
@@ -176,73 +121,58 @@ export default function InkPage() {
             <div className="space-y-6">
 
               <div className="border border-zinc-800 rounded-xl p-6">
-
                 <h3 className="font-bold text-lg mb-3">
                   ¿Cuál es la mejor tinta para tatuar?
                 </h3>
-
                 <p className="text-zinc-400 leading-relaxed">
                   No existe una única respuesta. Dynamic, Eternal, Fusion,
                   World Famous y Solid Ink son algunas de las marcas más
                   utilizadas por tatuadores profesionales dependiendo del
                   estilo de trabajo.
                 </p>
-
               </div>
 
               <div className="border border-zinc-800 rounded-xl p-6">
-
                 <h3 className="font-bold text-lg mb-3">
                   ¿Qué tinta utilizan los tatuadores profesionales?
                 </h3>
-
                 <p className="text-zinc-400 leading-relaxed">
                   Las marcas más populares incluyen Dynamic, Eternal Ink,
                   World Famous, Fusion, Solid Ink, Intenze y Vice Colors.
                 </p>
-
               </div>
 
               <div className="border border-zinc-800 rounded-xl p-6">
-
                 <h3 className="font-bold text-lg mb-3">
                   ¿Cuál es la mejor tinta para realismo?
                 </h3>
-
                 <p className="text-zinc-400 leading-relaxed">
                   Para realismo suelen utilizarse negros sólidos, greywash
                   y tonos piel de marcas como Dynamic, Eternal, World Famous,
                   Fusion y vice colors
                 </p>
-
               </div>
 
               <div className="border border-zinc-800 rounded-xl p-6">
-
                 <h3 className="font-bold text-lg mb-3">
                   ¿Cuál es la mejor tinta para color?
                 </h3>
-
                 <p className="text-zinc-400 leading-relaxed">
                   World Famous, Solid Ink, Eternal y Vice Colors destacan
                   por su saturación y variedad cromática para trabajos
                   a color.
                 </p>
-
               </div>
 
               <div className="border border-zinc-800 rounded-xl p-6">
-
                 <h3 className="font-bold text-lg mb-3">
                   ¿Las tintas para tatuaje son seguras?
                 </h3>
-
                 <p className="text-zinc-400 leading-relaxed">
                   Sí, siempre que provengan de fabricantes reconocidos y
                   distribuidores confiables que trabajen con productos
                   originales.
                 </p>
-
               </div>
 
             </div>

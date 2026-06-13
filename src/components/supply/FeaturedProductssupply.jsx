@@ -1,42 +1,37 @@
 import { Link } from 'react-router-dom'
-import { useSupplyCart } from '../../contexts/SupplyCartContext'
 
 const products = [
   {
     id: 1,
     name: 'Tattoo Vision',
     brand: 'Marca profesional',
-    price: 'Original',
+    tagline: 'Lo más buscado en sistemas visuales',
     link: '/brands/tattoo-vision'
   },
   {
     id: 2,
     name: 'Vice Colors',
     brand: 'Tintas',
-    price: '$30',
+    tagline: 'Recomendado por artistas de color',
     link: '/supply/ink/vice-colors'
   },
   {
     id: 3,
     name: 'WJX',
     brand: 'Cartuchos',
-    price: '$28',
+    tagline: 'Precisión y flujo para cada sesión',
     link: '/supply/cartridges/wjx'
   },
   {
     id: 4,
     name: 'Heaven Pro',
     brand: 'Cuidado pro',
-    price: 'Soon',
-    link: null
+    tagline: 'Nuevo en INKognito Supply',
+    link: '/supply/brands/heaven-pro'
   }
 ]
 
-const isNumericPrice = (price) => price.startsWith('$')
-
 export default function FeaturedProducts() {
-  const { addItem } = useSupplyCart()
-
   return (
     <section
       id="destacados"
@@ -58,9 +53,8 @@ export default function FeaturedProducts() {
 
         {/* GRID */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-
-          {products.map((product) => {
-            const CardContent = (
+          {products.map((product) => (
+            <Link key={product.id} to={product.link} className="block h-full">
               <div className="border border-blue-500/40 bg-zinc-950 rounded-2xl overflow-hidden hover:border-blue-500 hover:shadow-[0_0_25px_rgba(59,130,246,0.25)] transition-all duration-300 h-full flex flex-col justify-between">
 
                 {/* IMAGEN */}
@@ -79,52 +73,18 @@ export default function FeaturedProducts() {
                     <h3 className="text-lg sm:text-2xl font-black uppercase">
                       {product.name}
                     </h3>
+                    <p className="text-zinc-500 text-xs mt-1 leading-relaxed">
+                      {product.tagline}
+                    </p>
                   </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-white font-bold text-sm sm:text-xl">
-                      {product.price}
-                    </span>
-                    {product.link ? (
-                      <span className="px-3 sm:px-5 py-1.5 sm:py-2 border border-zinc-700 uppercase tracking-[0.2em] text-[10px] sm:text-sm hover:border-blue-500 hover:text-white transition-all duration-300">
-                        Ver
-                      </span>
-                    ) : (
-                      <span className="px-3 sm:px-5 py-1.5 sm:py-2 border border-zinc-800 uppercase tracking-[0.2em] text-[10px] sm:text-sm text-zinc-700 cursor-not-allowed">
-                        Soon
-                      </span>
-                    )}
-                  </div>
-
-                  {/* AGREGAR AL CARRITO — solo para productos con precio real */}
-                  {isNumericPrice(product.price) && (
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        addItem(product, 'destacados')
-                      }}
-                      className="w-full py-2 border border-zinc-700 uppercase tracking-[0.15em] text-xs hover:border-blue-500 hover:text-blue-500 transition-all duration-300"
-                    >
-                      + Agregar al carrito
-                    </button>
-                  )}
+                  <span className="text-center px-3 sm:px-5 py-1.5 sm:py-2 border border-zinc-700 uppercase tracking-[0.2em] text-[10px] sm:text-sm hover:border-blue-500 hover:text-white transition-all duration-300">
+                    Ver
+                  </span>
                 </div>
 
               </div>
-            )
-
-            return product.link ? (
-              <Link key={product.id} to={product.link} className="block h-full">
-                {CardContent}
-              </Link>
-            ) : (
-              <div key={product.id} className="block h-full">
-                {CardContent}
-              </div>
-            )
-          })}
-
+            </Link>
+          ))}
         </div>
 
       </div>
