@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import milogo from '../../assets/milogo/milogo.png'
+import milogo from '../../assets/milogo/milogo.webp'
 import { FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa'
 import { Menu, X, ShoppingCart, User, ImageIcon, MessageCircle, Clock, Globe, Home } from 'lucide-react'
 

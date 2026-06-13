@@ -30,7 +30,7 @@ import TattooVisionPage from './components/supply/Marcasprofesionales/TattooVisi
 import InkognitoHome from './components/ecosystem/InkognitoHome'
 import { SupplyCartProvider } from './contexts/SupplyCartContext'
 import { StoreCartProvider } from './contexts/StoreCartContext'
-import reservaBg from './assets/reserva/reserva-bg.png'
+import reservaBg from './assets/reserva/reserva-bg.webp'
 import React, { useState } from 'react'
 import { Routes, Route, Link, Outlet } from 'react-router-dom'
 
@@ -41,8 +41,10 @@ import Gallery from './components/tattoo/Gallery'
 import Testimonials from './components/tattoo/Testimonials'
 import Footer from './components/tattoo/Footer'
 import WhatsAppFloat from './components/tattoo/WhatsAppFloat'
+import Seo from './components/Seo'
+import ogTattoo from './assets/mifoto/josefoto-og.jpg'
+import ogPortafolio from './assets/portafolio/poseidon.jpg'
 
-import milogo from './assets/milogo/milogo.png'
 
 /* =========================
    PAGINA PRINCIPAL
@@ -57,6 +59,12 @@ function HomePage({
 }) {
   return (
     <>
+      <Seo
+        title="Tatuador en Chigorodó, Antioquia | Realismo y diseños personalizados — Jose Humanez"
+        description="Tatuador profesional especialista en realismo, sombras y línea fina en Chigorodó, Urabá antioqueño. Estudio privado con cita previa. Cotiza tu tatuaje por WhatsApp."
+        image={ogTattoo}
+      />
+
       <Navbar />
 
       <Hero />
@@ -74,6 +82,7 @@ function HomePage({
 <img
   src={reservaBg}
   alt=""
+  loading="lazy"
   className="absolute inset-0 w-full h-full object-cover opacity-80"
 />
 
@@ -164,6 +173,12 @@ function PortfolioPage({
   return (
     <div className="min-h-screen bg-black text-white">
 
+      <Seo
+        title="Portafolio de tatuajes | Realismo, sombras y línea fina — Jose Humanez Tattoo"
+        description="Galería de trabajos de Jose Humanez: tatuajes de realismo, sombras, blackwork y línea fina hechos en Chigorodó, Antioquia. Mira el portafolio y reserva tu cita."
+        image={ogPortafolio}
+      />
+
       <Navbar showInicio={true} />
 
       <Gallery onLightboxChange={setLightboxOpen} />
@@ -172,6 +187,7 @@ function PortfolioPage({
         <img
           src={reservaBg}
           alt=""
+          loading="lazy"
           className="absolute inset-0 w-full h-full object-cover opacity-20"
         />
         <div className="relative z-10 max-w-4xl mx-auto text-center">

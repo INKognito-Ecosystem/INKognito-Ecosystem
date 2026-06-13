@@ -4,6 +4,8 @@ import { Truck, Shield, Clock, MapPin, Star, Award } from 'lucide-react'
 import NavbarStore from './NavbarStore'
 import FooterStore from './FooterStore'
 import StoreProductCard from './StoreProductCard'
+import Seo from '../Seo'
+import ogStore from '../../assets/milogo/store.webp'
 
 const categories = [
   {
@@ -108,6 +110,12 @@ const guarantees = [
 export default function StorePage() {
   return (
     <main className="bg-white text-gray-900">
+
+      <Seo
+        title="INKognito Store | Ropa y zapatos deportivos en Urabá"
+        description="Ropa deportiva para dama y caballero, zapatos deportivos, casuales y guayos en Chigorodó y el Urabá antioqueño. Pide por WhatsApp con entrega en la región."
+        image={ogStore}
+      />
 
       <NavbarStore />
 

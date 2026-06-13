@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { ShoppingCart, Menu, X } from 'lucide-react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
-import logoSupply from '../../assets/milogo/supply.png'
+import logoSupply from '../../assets/milogo/supply.webp'
 
 export default function NavbarCategory({ pageName }) {
   const [menuOpen, setMenuOpen] = useState(false)

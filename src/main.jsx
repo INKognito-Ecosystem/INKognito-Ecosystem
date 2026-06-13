@@ -4,6 +4,7 @@ import App from './App'
 import './index.css'
 
 import { BrowserRouter, useLocation } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
 
 function ScrollToHash() {
   const { pathname, hash } = useLocation()
@@ -24,9 +25,11 @@ function ScrollToHash() {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <ScrollToHash />
-      <App />
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <ScrollToHash />
+        <App />
+      </BrowserRouter>
+    </HelmetProvider>
   </React.StrictMode>,
 )

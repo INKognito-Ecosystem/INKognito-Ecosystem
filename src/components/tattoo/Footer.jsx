@@ -1,4 +1,4 @@
-import footerBg from '../../assets/footer/footer-bg.png'
+import footerBg from '../../assets/footer/footer-bg.webp'
 
 import {
   FaInstagram,
@@ -16,6 +16,7 @@ export default function Footer() {
       <img
         src={footerBg}
         alt=""
+        loading="lazy"
         className="absolute inset-0 w-full h-full object-cover object-top opacity-30 translate-y-10"
       />
 

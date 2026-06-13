@@ -1,10 +1,18 @@
 import EcosystemNavbar from './EcosystemNavbar'
 import { Link } from 'react-router-dom'
 import ecosystemBg from '../../assets/ecosystem/ecosystem-bg.jpg'
+import Seo from '../Seo'
+import ogLogo from '../../assets/ecosystem/logo.png'
 
 export default function InkognitoHome() {
   return (
     <section className="relative min-h-screen bg-black text-white flex flex-col items-center px-6 overflow-hidden">
+
+      <Seo
+        title="INKognito | Tattoo Studio, Supply y Store en Chigorodó, Antioquia"
+        description="INKognito: estudio de tatuajes de Jose Humanez, insumos profesionales para tatuadores y tienda deportiva en Chigorodó, Urabá antioqueño."
+        image={ogLogo}
+      />
 
       {/* NAVBAR */}
       <EcosystemNavbar />

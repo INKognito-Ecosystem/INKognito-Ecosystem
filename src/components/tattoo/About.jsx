@@ -1,4 +1,4 @@
-import aboutBg from '../../assets/about/about-bg.png'
+import aboutBg from '../../assets/about/about-bg.webp'
 
 export default function About() {
   return (
@@ -8,6 +8,7 @@ export default function About() {
       <img
         src={aboutBg}
         alt=""
+        loading="lazy"
         className="absolute inset-0 w-full h-full object-cover opacity-50"
       />
 

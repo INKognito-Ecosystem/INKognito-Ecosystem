@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import imgPoseidon from '../../assets/portafolio/poseidon.jpg';
-import imgPoseidon2 from '../../assets/portafolio/poseidon2.jpg';
-import imgAguila from '../../assets/portafolio/aguila.jpg';
-import imgAngelCaido from '../../assets/portafolio/angel caido.jpg';
-import imgColibri from '../../assets/portafolio/colibri.jpg';
-import Ojoyfiligrana from '../../assets/portafolio/ojoyfiligrana.jpg';
-import imgLineafina from '../../assets/portafolio/lineafina.jpg';
-import imgRepresentativo1 from '../../assets/portafolio/representativo1.jpeg';
-import imgRepresentativo2 from '../../assets/portafolio/representativo2.jpeg';
-import imgRepresentativo3 from '../../assets/portafolio/representativo3.jpeg';
+import imgPoseidon from '../../assets/portafolio/poseidon.webp';
+import imgPoseidon2 from '../../assets/portafolio/poseidon2.webp';
+import imgAguila from '../../assets/portafolio/aguila.webp';
+import imgAngelCaido from '../../assets/portafolio/angel-caido.webp';
+import imgColibri from '../../assets/portafolio/colibri.webp';
+import Ojoyfiligrana from '../../assets/portafolio/ojoyfiligrana.webp';
+import imgLineafina from '../../assets/portafolio/lineafina.webp';
+import imgRepresentativo1 from '../../assets/portafolio/representativo1.webp';
+import imgRepresentativo2 from '../../assets/portafolio/representativo2.webp';
+import imgRepresentativo3 from '../../assets/portafolio/representativo3.webp';
 
 const GALLERY_ITEMS = [
   { id: 1, title: 'Sombras', img: imgPoseidon, category: 'Realismo' },
@@ -76,6 +76,7 @@ export default function Gallery({ onLightboxChange = () => {} }) {
               <img
                 src={item.img}
                 alt={item.title}
+                loading="lazy"
                 className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110 opacity-70 group-hover:opacity-100"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">

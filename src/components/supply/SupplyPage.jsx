@@ -5,14 +5,22 @@ import FeaturedProductssupply from './FeaturedProductssupply'
 import BrandsSupply from './BrandsSupply'
 import FooterSupply from './FooterSupply'
 import { FaWhatsapp } from 'react-icons/fa'
+import Seo from '../Seo'
+import ogSupply from '../../assets/milogo/supply.webp'
 
 export default function SupplyPage() {
 
   return (
 
     <main className="bg-black text-white">
-    
-    <NavbarSupply />  
+
+    <Seo
+      title="INKognito Supply | Insumos y equipos para tatuar en Colombia"
+      description="Máquinas, cartuchos, tintas, agujas y accesorios profesionales para tatuadores. Marcas como Kwadron, EZ, Dynamic y Eternal. Envíos en Colombia, pedidos por WhatsApp."
+      image={ogSupply}
+    />
+
+    <NavbarSupply />
 
       <HeroSupply />
 
