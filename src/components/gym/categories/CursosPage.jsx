@@ -1,0 +1,77 @@
+import NavbarGym from '../NavbarGym'
+import FooterGym from '../FooterGym'
+import Seo from '../../Seo'
+
+const cursos = [
+  {
+    nombre: 'Entrenamiento en casa',
+    descripcion: 'Rutinas completas para ganar músculo y perder grasa sin necesidad de ir al gimnasio. Progresión sin equipo o con equipamiento mínimo.',
+  },
+  {
+    nombre: 'Nutrición básica',
+    descripcion: 'Aprende a comer bien para tus objetivos: masa muscular, definición o rendimiento deportivo. Sin extremos ni dietas de moda.',
+  },
+  {
+    nombre: 'Desarrollo personal',
+    descripcion: 'Disciplina mental, hábitos y productividad aplicados al entrenamiento y la vida cotidiana. La base de cualquier transformación real.',
+  },
+  {
+    nombre: 'Soldadura y fabricación',
+    descripcion: 'Aprende las bases de soldadura para fabricar tus propias máquinas y estructuras de acero en casa. Un nicho único que pocos enseñan.',
+  },
+]
+
+export default function CursosPage() {
+  return (
+    <div className="min-h-screen bg-gray-900 text-white">
+      <Seo
+        title="Cursos de Entrenamiento en Casa y Fitness | Colombia"
+        description="Cursos recomendados de entrenamiento en casa, nutrición y desarrollo personal. Selección de los mejores cursos en español disponibles en Hotmart."
+        siteName="INKognito Gym"
+        canonical={`${import.meta.env.VITE_SITE_URL}/gym/cursos`}
+      />
+
+      <NavbarGym />
+
+      <div className="pt-28 md:pt-36 pb-24 px-4 md:px-6 max-w-7xl mx-auto">
+
+        <div className="mb-12 md:mb-16">
+          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Formación</p>
+          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-6">
+            Cursos<br />
+            <span className="text-gray-400">recomendados</span>
+          </h1>
+          <p className="text-gray-400 leading-relaxed max-w-2xl">
+            Selección de los mejores cursos en español para entrenarte en casa, mejorar tu alimentación y aprender a fabricar tus propios equipos.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {cursos.map((curso) => (
+            <div
+              key={curso.nombre}
+              className="border border-gray-800 bg-gray-800/40 rounded-2xl p-6 flex flex-col gap-4 hover:border-gray-600 transition-all duration-300"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="text-lg font-black uppercase tracking-wide leading-tight">{curso.nombre}</h3>
+                <span className="shrink-0 text-[10px] font-bold uppercase tracking-widest bg-orange-500/15 text-orange-400 border border-orange-500/30 rounded-full px-3 py-1">
+                  Hotmart
+                </span>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed flex-1">{curso.descripcion}</p>
+              <a
+                href="#"
+                className="mt-auto inline-block text-center border border-gray-600 text-gray-300 text-xs font-bold uppercase tracking-[0.2em] py-3 px-4 rounded-xl hover:border-gray-300 hover:text-white transition-all duration-300"
+              >
+                Ver curso →
+              </a>
+            </div>
+          ))}
+        </div>
+
+      </div>
+
+      <FooterGym />
+    </div>
+  )
+}

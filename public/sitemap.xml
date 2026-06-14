@@ -145,6 +145,38 @@
     <lastmod>2026-06-13</lastmod>
     <priority>0.6</priority>
   </url>
+  <url>
+    <loc>https://TU-DOMINIO.com/supply/aprende</loc>
+    <lastmod>2026-06-14</lastmod>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- INKognito Gym -->
+  <url>
+    <loc>https://TU-DOMINIO.com/gym</loc>
+    <lastmod>2026-06-14</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://TU-DOMINIO.com/gym/maquinas-pedido</loc>
+    <lastmod>2026-06-14</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://TU-DOMINIO.com/gym/planos</loc>
+    <lastmod>2026-06-14</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://TU-DOMINIO.com/gym/tutoriales</loc>
+    <lastmod>2026-06-14</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://TU-DOMINIO.com/gym/cursos</loc>
+    <lastmod>2026-06-14</lastmod>
+    <priority>0.6</priority>
+  </url>
 
   <!-- INKognito Store -->
   <url>

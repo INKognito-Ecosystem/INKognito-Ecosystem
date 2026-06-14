@@ -38,6 +38,9 @@ const JOBS = [
   // logos de Supply y Store (navbar a 56px + og:image; 600px cubre ambos usos)
   { in: 'milogo/supply.png', out: 'milogo/supply.webp', maxWidth: 600, quality: 80 },
   { in: 'milogo/store.png', out: 'milogo/store.webp', maxWidth: 600, quality: 80 },
+
+  // logo de Gym (mismo uso: navbar + og:image)
+  { in: 'milogo/gym.png', out: 'milogo/gym.webp', maxWidth: 600, quality: 80 },
 ]
 
 for (const job of JOBS) {

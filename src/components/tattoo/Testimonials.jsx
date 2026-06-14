@@ -6,7 +6,7 @@ const REVIEWS = [
 
 export default function Testimonials() {
   return (
-    <section id="testimonios" className="py-24 bg-tattoo-dark">
+    <section id="testimonios" className="pt-12 pb-24 bg-tattoo-dark">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-center mb-16">
           <div className="w-full max-w-4xl bg-white text-black py-4 rounded shadow-lg">

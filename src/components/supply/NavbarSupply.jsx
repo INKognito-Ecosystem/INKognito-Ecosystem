@@ -97,6 +97,10 @@ export default function NavbarSupply() {
                   className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
                   INKognito Store
                 </Link>
+                <Link to="/gym" onClick={() => setMenuOpen(false)}
+                  className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
+                  INKognito Gym
+                </Link>
                 <Link to="/" onClick={() => setMenuOpen(false)}
                   className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
                   Ecosistema

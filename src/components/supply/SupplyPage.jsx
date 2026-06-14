@@ -7,6 +7,7 @@ import FooterSupply from './FooterSupply'
 import { FaWhatsapp } from 'react-icons/fa'
 import Seo from '../Seo'
 import ogSupply from '../../assets/milogo/supply.webp'
+import { Link } from 'react-router-dom'
 
 const supplyJsonLd = {
   "@context": "https://schema.org",
@@ -52,6 +53,30 @@ export default function SupplyPage() {
       <CategoriesSupply />
 
     <BrandsSupply />
+
+    {/* SECCIÓN APRENDE A TATUAR */}
+    <section className="bg-zinc-950 border-t border-zinc-900">
+      <div className="max-w-7xl mx-auto px-6 py-16 md:py-24 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div>
+          <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-3">
+            Para nuevos tatuadores
+          </p>
+          <h2 className="text-3xl md:text-5xl font-black uppercase leading-none mb-3">
+            ¿Quieres aprender<br />
+            <span className="text-zinc-500">a tatuar?</span>
+          </h2>
+          <p className="text-zinc-400 text-base max-w-lg">
+            Cursos, kit básico y recursos para dar tus primeros pasos en el mundo del tatuaje.
+          </p>
+        </div>
+        <Link
+          to="/supply/aprende"
+          className="shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-4 px-8 rounded-xl hover:border-blue-500 hover:bg-blue-500/10 hover:shadow-[0_0_25px_rgba(59,130,246,0.15)] transition-all duration-300 whitespace-nowrap"
+        >
+          Ver recursos para principiantes →
+        </Link>
+      </div>
+    </section>
 
     <section
   id="contacto"

@@ -29,6 +29,12 @@ import BundlesPage from './components/supply/categories/BundlesPage'
 import TattooVisionPage from './components/supply/Marcasprofesionales/TattooVisionPage'
 import HeavenProPage from './components/supply/Marcasprofesionales/HeavenProPage'
 import RoyalThreePage from './components/supply/Marcasprofesionales/RoyalThreePage'
+import AprendePage from './components/supply/AprendePage'
+import GymPage from './components/gym/GymPage'
+import MaquinasPedidoPage from './components/gym/categories/MaquinasPedidoPage'
+import PlanosPage from './components/gym/categories/PlanosPage'
+import VideosTutorialesPage from './components/gym/categories/VideosTutorialesPage'
+import CursosGymPage from './components/gym/categories/CursosPage'
 import InkognitoHome from './components/ecosystem/InkognitoHome'
 import { SupplyCartProvider } from './contexts/SupplyCartContext'
 import { StoreCartProvider } from './contexts/StoreCartContext'
@@ -384,6 +390,12 @@ function App() {
   <Route path="/supply/cartridges/ez-tattoo" element={<EZCartridgesPage />} />
   <Route path="/supply/cartridges/wjx" element={<WJXCartridgesPage />} />
   <Route path="/supply/cartridges/kwadron" element={<KwadronCartridgesPage />} />
+  <Route path="/supply/aprende" element={<AprendePage />} />
+  <Route path="/gym" element={<GymPage />} />
+  <Route path="/gym/maquinas-pedido" element={<MaquinasPedidoPage />} />
+  <Route path="/gym/planos" element={<PlanosPage />} />
+  <Route path="/gym/tutoriales" element={<VideosTutorialesPage />} />
+  <Route path="/gym/cursos" element={<CursosGymPage />} />
 
 
 

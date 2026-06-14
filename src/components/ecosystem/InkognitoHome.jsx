@@ -69,9 +69,12 @@ export default function InkognitoHome() {
             Store
           </Link>
 
-          <button className="w-full py-5 bg-zinc-900 border border-zinc-700 rounded uppercase tracking-[0.3em] font-black text-zinc-500">
+          <Link
+            to="/gym"
+            className="w-full py-5 bg-zinc-700 rounded text-center uppercase tracking-[0.3em] font-black hover:bg-gray-500 transition-all duration-300"
+          >
             Gym
-          </button>
+          </Link>
         </div>
 
       </div>
