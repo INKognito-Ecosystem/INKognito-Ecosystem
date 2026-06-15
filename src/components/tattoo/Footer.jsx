@@ -108,7 +108,7 @@ export default function Footer() {
 
                 {/* FACEBOOK */}
                 <a
-                  href="https://www.facebook.com/jhumaneztattoo"
+                  href="https://www.facebook.com/humanezjose"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-14 h-14 rounded-full border border-gray-700 flex items-center justify-center text-white hover:bg-blue-600 hover:border-transparent transition-all duration-300 hover:scale-110"
