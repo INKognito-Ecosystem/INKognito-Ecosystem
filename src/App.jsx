@@ -65,10 +65,10 @@ const CursosGymPage = lazy(() => import('./components/gym/categories/CursosPage'
 const tattooJsonLd = {
   "@context": "https://schema.org",
   "@type": "TattooParlor",
-  "@id": `${import.meta.env.VITE_SITE_URL}/tattoo#business`,
+  "@id": `${import.meta.env.VITE_SITE_URL}/jhumaneztattoo#business`,
   "name": "INKognito Tattoo Studio — Jose Humanez",
   "description": "Estudio de tatuajes en Chigorodó. Realismo, sombras, línea fina y diseños personalizados. Atendemos toda la región de Urabá: Chigorodó, Apartadó, Turbo, Carepa, Mutatá.",
-  "url": `${import.meta.env.VITE_SITE_URL}/tattoo`,
+  "url": `${import.meta.env.VITE_SITE_URL}/jhumaneztattoo`,
   "telephone": "+57-320-791-1013",
   "address": {
     "@type": "PostalAddress",
@@ -105,7 +105,7 @@ function HomePage() {
         title="Tatuador en Chigorodó, Antioquia | Realismo y diseños personalizados — Jose Humanez"
         description="Tatuador profesional especialista en realismo, sombras y línea fina en Chigorodó, Urabá antioqueño. Estudio privado con cita previa. Cotiza tu tatuaje por WhatsApp."
         image={ogTattoo}
-        canonical={`${import.meta.env.VITE_SITE_URL}/tattoo`}
+        canonical={`${import.meta.env.VITE_SITE_URL}/jhumaneztattoo`}
         jsonLd={tattooJsonLd}
       />
 
@@ -172,7 +172,7 @@ function App() {
       <Suspense fallback={<div className="min-h-screen bg-black" />}>
         <Routes>
           <Route path="/" element={<InkognitoHome />} />
-          <Route path="/tattoo" element={<HomePage />} />
+          <Route path="/jhumaneztattoo" element={<HomePage />} />
           <Route path="/portafolio" element={<PortfolioPage />} />
           <Route path="/cuidados" element={<CuidadosPage />} />
 
