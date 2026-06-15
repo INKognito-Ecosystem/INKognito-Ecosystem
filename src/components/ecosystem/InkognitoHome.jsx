@@ -46,7 +46,7 @@ export default function InkognitoHome() {
 
         <div className="flex flex-col gap-6 w-full max-w-md">
           <Link
-            to="/tattoo"
+            to="/jhumaneztattoo"
             className="w-full py-5 bg-zinc-700 rounded text-center uppercase tracking-[0.3em] font-black hover:bg-red-600 transition-all duration-300"
           >
             Tattoo Studio
