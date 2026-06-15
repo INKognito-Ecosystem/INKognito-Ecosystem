@@ -5,6 +5,9 @@ import './index.css'
 
 import { BrowserRouter, useLocation } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
+import { SupplyCartProvider } from './contexts/SupplyCartContext'
+import { StoreCartProvider } from './contexts/StoreCartContext'
+import { GymCartProvider } from './contexts/GymCartContext'
 
 function ScrollToHash() {
   const { pathname, hash } = useLocation()
@@ -27,8 +30,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <HelmetProvider>
       <BrowserRouter>
-        <ScrollToHash />
-        <App />
+        <SupplyCartProvider>
+          <StoreCartProvider>
+            <GymCartProvider>
+              <ScrollToHash />
+              <App />
+            </GymCartProvider>
+          </StoreCartProvider>
+        </SupplyCartProvider>
       </BrowserRouter>
     </HelmetProvider>
   </React.StrictMode>,

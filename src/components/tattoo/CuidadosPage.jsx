@@ -9,7 +9,7 @@ import Navbar from './Navbar'
 import Footer from './Footer'
 import WhatsAppFloat from './WhatsAppFloat'
 import Seo from '../Seo'
-import ogCuidados from '../../assets/mifoto/josefoto-og.jpg'
+const ogCuidados = '/og/josefoto-og.jpg'
 
 const ANTES = [
   { icon: Moon, title: 'Descansa bien', text: 'Duerme al menos 7-8 horas la noche anterior para que tu cuerpo esté en óptimas condiciones.' },

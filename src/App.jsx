@@ -1,47 +1,9 @@
-import StorePage from './components/store/StorePage'
-import RopaDamaPage from './components/store/categories/RopaDamaPage'
-import RopaCaballerosPage from './components/store/categories/RopaCaballerosPage'
-import ZapatosDeportivosPage from './components/store/categories/ZapatosDeportivosPage'
-import ZapatosCasualesPage from './components/store/categories/ZapatosCasualesPage'
-import GuayosPage from './components/store/categories/GuayosPage'
-import TenisGuayoPage from './components/store/categories/TenisGuayoPage'
-import SupplyPage from './components/supply/SupplyPage'
-import MachinesPage from './components/supply/categories/MachinesPage'
-import CartridgesPage from './components/supply/categories/Cartridges/CartridgesPage'
-import EZCartridgesPage from './components/supply/categories/Cartridges/EZCartridgesPage'
-import WJXCartridgesPage from './components/supply/categories/Cartridges/WJXCartridgesPage'
-import KwadronCartridgesPage from './components/supply/categories/Cartridges/KwadronCartridgesPage'
-import PowerSuppliesPage from './components/supply/categories/PowerSuppliesPage'
-import NeedlesPage from './components/supply/categories/NeedlesPage'
-import GlovesPage from './components/supply/categories/GlovesPage'
-import InkPage from './components/supply/categories/ink/InkPage'
-import ViceColorsPage from './components/supply/categories/ink/ViceColorsPage'
-import DynamicColorsPage from "./components/supply/categories/ink/DynamicColorsPage";
-import EternalColorsPage from './components/supply/categories/ink/EternalColorsPage'
-import IntenzeColorsPage from './components/supply/categories/ink/IntenzeColorsPage'
-import FusionColorsPage from './components/supply/categories/ink/FusionColorsPage'
-import WorldFamousColorsPage from './components/supply/categories/ink/WorldFamousColorsPage'
-import SolidColorsPage from './components/supply/categories/ink/SolidColorsPage'
-import AftercarePage from './components/supply/categories/AftercarePage'
-import AccessoriesPage from './components/supply/categories/AccessoriesPage'
-import FurniturePage from './components/supply/categories/FurniturePage'
-import BundlesPage from './components/supply/categories/BundlesPage'
-import TattooVisionPage from './components/supply/Marcasprofesionales/TattooVisionPage'
-import HeavenProPage from './components/supply/Marcasprofesionales/HeavenProPage'
-import RoyalThreePage from './components/supply/Marcasprofesionales/RoyalThreePage'
-import AprendePage from './components/supply/AprendePage'
-import GymPage from './components/gym/GymPage'
-import MaquinasPedidoPage from './components/gym/categories/MaquinasPedidoPage'
-import PlanosPage from './components/gym/categories/PlanosPage'
-import VideosTutorialesPage from './components/gym/categories/VideosTutorialesPage'
-import CursosGymPage from './components/gym/categories/CursosPage'
-import InkognitoHome from './components/ecosystem/InkognitoHome'
-import { SupplyCartProvider } from './contexts/SupplyCartContext'
-import { StoreCartProvider } from './contexts/StoreCartContext'
-import reservaBg from './assets/reserva/reserva-bg.webp'
-import React, { useState } from 'react'
-import { Routes, Route, Link, Outlet } from 'react-router-dom'
+import React, { lazy, Suspense, useState } from 'react'
+import { Routes, Route } from 'react-router-dom'
+import { TATTOO_HOURS } from './config/business'
 
+// Tattoo module — eager (primary landing content)
+import InkognitoHome from './components/ecosystem/InkognitoHome'
 import Navbar from './components/tattoo/Navbar'
 import Hero from './components/tattoo/Hero'
 import About from './components/tattoo/About'
@@ -51,9 +13,54 @@ import Footer from './components/tattoo/Footer'
 import WhatsAppFloat from './components/tattoo/WhatsAppFloat'
 import CuidadosPage from './components/tattoo/CuidadosPage'
 import CuidadosTeaser from './components/tattoo/CuidadosTeaser'
+import ReservationForm from './components/tattoo/ReservationForm'
 import Seo from './components/Seo'
-import ogTattoo from './assets/mifoto/josefoto-og.jpg'
-import ogPortafolio from './assets/portafolio/poseidon.jpg'
+
+const ogTattoo = '/og/josefoto-og.jpg'
+const ogPortafolio = '/og/portafolio-og.jpg'
+
+// Supply module — lazy
+const SupplyPage = lazy(() => import('./components/supply/SupplyPage'))
+const MachinesPage = lazy(() => import('./components/supply/categories/MachinesPage'))
+const CartridgesPage = lazy(() => import('./components/supply/categories/Cartridges/CartridgesPage'))
+const EZCartridgesPage = lazy(() => import('./components/supply/categories/Cartridges/EZCartridgesPage'))
+const WJXCartridgesPage = lazy(() => import('./components/supply/categories/Cartridges/WJXCartridgesPage'))
+const KwadronCartridgesPage = lazy(() => import('./components/supply/categories/Cartridges/KwadronCartridgesPage'))
+const PowerSuppliesPage = lazy(() => import('./components/supply/categories/PowerSuppliesPage'))
+const InkPage = lazy(() => import('./components/supply/categories/ink/InkPage'))
+const ViceColorsPage = lazy(() => import('./components/supply/categories/ink/ViceColorsPage'))
+const DynamicColorsPage = lazy(() => import('./components/supply/categories/ink/DynamicColorsPage'))
+const EternalColorsPage = lazy(() => import('./components/supply/categories/ink/EternalColorsPage'))
+const IntenzeColorsPage = lazy(() => import('./components/supply/categories/ink/IntenzeColorsPage'))
+const FusionColorsPage = lazy(() => import('./components/supply/categories/ink/FusionColorsPage'))
+const WorldFamousColorsPage = lazy(() => import('./components/supply/categories/ink/WorldFamousColorsPage'))
+const SolidColorsPage = lazy(() => import('./components/supply/categories/ink/SolidColorsPage'))
+const NeedlesPage = lazy(() => import('./components/supply/categories/NeedlesPage'))
+const GlovesPage = lazy(() => import('./components/supply/categories/GlovesPage'))
+const AftercarePage = lazy(() => import('./components/supply/categories/AftercarePage'))
+const AccessoriesPage = lazy(() => import('./components/supply/categories/AccessoriesPage'))
+const FurniturePage = lazy(() => import('./components/supply/categories/FurniturePage'))
+const BundlesPage = lazy(() => import('./components/supply/categories/BundlesPage'))
+const TattooVisionPage = lazy(() => import('./components/supply/marcasProfesionales/TattooVisionPage'))
+const HeavenProPage = lazy(() => import('./components/supply/marcasProfesionales/HeavenProPage'))
+const RoyalThreePage = lazy(() => import('./components/supply/marcasProfesionales/RoyalThreePage'))
+const AprendePage = lazy(() => import('./components/supply/AprendePage'))
+
+// Store module — lazy
+const StorePage = lazy(() => import('./components/store/StorePage'))
+const RopaDamaPage = lazy(() => import('./components/store/categories/RopaDamaPage'))
+const RopaCaballerosPage = lazy(() => import('./components/store/categories/RopaCaballerosPage'))
+const ZapatosDeportivosPage = lazy(() => import('./components/store/categories/ZapatosDeportivosPage'))
+const ZapatosCasualesPage = lazy(() => import('./components/store/categories/ZapatosCasualesPage'))
+const GuayosPage = lazy(() => import('./components/store/categories/GuayosPage'))
+const TenisGuayoPage = lazy(() => import('./components/store/categories/TenisGuayoPage'))
+
+// Gym module — lazy
+const GymPage = lazy(() => import('./components/gym/GymPage'))
+const MaquinasPedidoPage = lazy(() => import('./components/gym/categories/MaquinasPedidoPage'))
+const PlanosPage = lazy(() => import('./components/gym/categories/PlanosPage'))
+const VideosTutorialesPage = lazy(() => import('./components/gym/categories/VideosTutorialesPage'))
+const CursosGymPage = lazy(() => import('./components/gym/categories/CursosPage'))
 
 const tattooJsonLd = {
   "@context": "https://schema.org",
@@ -75,26 +82,23 @@ const tattooJsonLd = {
     "longitude": -76.6868
   },
   "areaServed": ["Chigorodó","Apartadó","Turbo","Carepa","Mutatá","Necoclí","San Juan de Urabá"],
-  "openingHours": ["Mo-Fr 09:00-16:00","Sa-Su 09:00-20:00"],
+  "openingHours": TATTOO_HOURS.schemaOrgFormat,
   "priceRange": "$$",
   "sameAs": [
     "https://www.instagram.com/jhumaneztattoo",
     "https://www.facebook.com/jhumaneztattoo"
   ],
-  "image": `${import.meta.env.VITE_SITE_URL}/josefoto-og.jpg`
+  "image": `${import.meta.env.VITE_SITE_URL}/og/josefoto-og.jpg`
 }
 
 /* =========================
    PAGINA PRINCIPAL
 ========================= */
-function HomePage({
-  estilo,
-  setEstilo,
-  zona,
-  setZona,
-  tamano,
-  setTamano
-}) {
+function HomePage() {
+  const [estilo, setEstilo] = useState('')
+  const [zona, setZona] = useState('')
+  const [tamano, setTamano] = useState('')
+
   return (
     <>
       <Seo
@@ -106,93 +110,16 @@ function HomePage({
       />
 
       <Navbar />
-
       <Hero />
-
       <About />
-
       <CuidadosTeaser />
-
       <Testimonials />
 
-      {/* CONTACTO */}
-     <section
-  id="contacto"
-  className="relative py-24 px-4 overflow-hidden border-t border-white/5"
->
-  {/* IMAGEN DE FONDO */}
-<img
-  src={reservaBg}
-  alt=""
-  loading="lazy"
-  className="absolute inset-0 w-full h-full object-cover opacity-80"
-/>
-
-{/* CAPA OSCURA */}
-<div className="absolute inset-0 bg-black/70"></div>
-        <div className="relative z-10 max-w-4xl mx-auto text-center">
-
-          <h2 className="text-3xl md:text-5xl font-black uppercase italic mb-8">
-            Reserva tu <span className="text-zinc-600">Lugar</span>
-          </h2>
-
-          <div className="max-w-md mx-auto bg-black p-8 rounded-xl border border-gray-800 space-y-5">
-
-            <p className="text-gray-300 text-center text-sm">
-              Completa esto antes de reservar tu cita
-            </p>
-
-            {/* ESTILO */}
-            <select
-              value={estilo}
-              onChange={(e) => setEstilo(e.target.value)}
-              className="w-full bg-zinc-900 border border-gray-700 text-white p-4 rounded outline-none"
-            >
-              <option value="">¿Qué estilo buscas?</option>
-              <option value="Realismo">Realismo</option>
-              <option value="Línea fina">Línea fina</option>
-              <option value="Blackwork">Blackwork</option>
-              <option value="Otro">Otro</option>
-            </select>
-
-            {/* ZONA */}
-            <select
-              value={zona}
-              onChange={(e) => setZona(e.target.value)}
-              className="w-full bg-zinc-900 border border-gray-700 text-white p-4 rounded outline-none"
-            >
-              <option value="">¿Zona del cuerpo?</option>
-              <option value="Brazo">Brazo</option>
-              <option value="Pierna">Pierna</option>
-              <option value="Pecho">Pecho</option>
-              <option value="Espalda">Espalda</option>
-            </select>
-
-            {/* TAMAÑO */}
-            <select
-              value={tamano}
-              onChange={(e) => setTamano(e.target.value)}
-              className="w-full bg-zinc-900 border border-gray-700 text-white p-4 rounded outline-none"
-            >
-              <option value="">¿Tamaño aproximado?</option>
-              <option value="Pequeño">Pequeño</option>
-              <option value="Mediano">Mediano</option>
-              <option value="Grande">Grande</option>
-            </select>
-
-            {/* BOTON */}
-            <a
-              href={`https://wa.me/573207911013?text=Hola Jose,%20quiero%20cotizar%20un%20tatuaje.%0A%0A•%20Estilo:%20${estilo}%0A•%20Zona:%20${zona}%0A•%20Tamaño:%20${tamano}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full bg-zinc-600 text-white font-black py-4 rounded uppercase tracking-widest hover:bg-green-500 transition-all duration-300 text-center"
-            >
-              Continuar por WhatsApp
-            </a>
-
-          </div>
-        </div>
-      </section>
+      <ReservationForm
+        estilo={estilo} setEstilo={setEstilo}
+        zona={zona} setZona={setZona}
+        tamano={tamano} setTamano={setTamano}
+      />
 
       <Footer />
       <WhatsAppFloat />
@@ -203,18 +130,14 @@ function HomePage({
 /* =========================
    PAGINA PORTAFOLIO
 ========================= */
-function PortfolioPage({
-  estilo,
-  setEstilo,
-  zona,
-  setZona,
-  tamano,
-  setTamano
-}) {
+function PortfolioPage() {
+  const [estilo, setEstilo] = useState('')
+  const [zona, setZona] = useState('')
+  const [tamano, setTamano] = useState('')
   const [lightboxOpen, setLightboxOpen] = useState(false)
+
   return (
     <div className="min-h-screen bg-black text-white">
-
       <Seo
         title="Portafolio de tatuajes | Realismo, sombras y línea fina — Jose Humanez Tattoo"
         description="Galería de trabajos de Jose Humanez: tatuajes de realismo, sombras, blackwork y línea fina hechos en Chigorodó, Antioquia. Mira el portafolio y reserva tu cita."
@@ -226,56 +149,16 @@ function PortfolioPage({
 
       <Gallery onLightboxChange={setLightboxOpen} />
 
-      <section className="relative overflow-hidden py-24 px-4 bg-black border-t border-white/5">
-        <img
-          src={reservaBg}
-          alt=""
-          loading="lazy"
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
-        />
-        <div className="relative z-10 max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl font-black uppercase italic mb-8">
-            Reserva tu <span className="text-zinc-600">Lugar</span>
-          </h2>
-          <div className="max-w-md mx-auto bg-black p-8 rounded-xl border border-gray-800 space-y-5">
-            <p className="text-gray-300 text-center text-sm">
-              Completa esto antes de reservar tu cita
-            </p>
-            <select value={estilo} onChange={(e) => setEstilo(e.target.value)} className="w-full bg-zinc-900 border border-gray-700 text-white p-4 rounded outline-none">
-              <option value="">¿Qué estilo buscas?</option>
-              <option value="Realismo">Realismo</option>
-              <option value="Línea fina">Línea fina</option>
-              <option value="Blackwork">Blackwork</option>
-              <option value="Otro">Otro</option>
-            </select>
-            <select value={zona} onChange={(e) => setZona(e.target.value)} className="w-full bg-zinc-900 border border-gray-700 text-white p-4 rounded outline-none">
-              <option value="">¿Zona del cuerpo?</option>
-              <option value="Brazo">Brazo</option>
-              <option value="Pierna">Pierna</option>
-              <option value="Pecho">Pecho</option>
-              <option value="Espalda">Espalda</option>
-            </select>
-            <select value={tamano} onChange={(e) => setTamano(e.target.value)} className="w-full bg-zinc-900 border border-gray-700 text-white p-4 rounded outline-none">
-              <option value="">¿Tamaño aproximado?</option>
-              <option value="Pequeño">Pequeño</option>
-              <option value="Mediano">Mediano</option>
-              <option value="Grande">Grande</option>
-            </select>
-            <a href={`https://wa.me/573207911013?text=Hola Jose,%20quiero%20cotizar%20un%20tatuaje.%0A%0A•%20Estilo:%20${estilo}%0A•%20Zona:%20${zona}%0A•%20Tamaño:%20${tamano}`} target="_blank" rel="noopener noreferrer" className="block w-full bg-zinc-600 text-white font-black py-4 rounded uppercase tracking-widest hover:bg-green-500 transition-all duration-300 text-center">
-              Continuar por WhatsApp
-            </a>
-          </div>
-          <div className="mt-10">
-            <Link to="/tattoo" className="px-10 py-4 rounded bg-zinc-600 text-white font-black text-sm uppercase tracking-widest hover:bg-green-500 transition-all transform hover:-translate-y-1 text-center shadow-lg">
-              Inicio
-            </Link>
-          </div>
-        </div>
-      </section>
+      <ReservationForm
+        estilo={estilo} setEstilo={setEstilo}
+        zona={zona} setZona={setZona}
+        tamano={tamano} setTamano={setTamano}
+        imageOpacity={0.2}
+        showBackLink
+      />
 
       <Footer />
       <WhatsAppFloat hidden={lightboxOpen} />
-
     </div>
   )
 }
@@ -284,126 +167,60 @@ function PortfolioPage({
    APP
 ========================= */
 function App() {
-
-  const [estilo, setEstilo] = useState('')
-  const [zona, setZona] = useState('')
-  const [tamano, setTamano] = useState('')
-
   return (
-    <SupplyCartProvider>
     <div className="bg-black text-white overflow-x-hidden">
+      <Suspense fallback={<div className="min-h-screen bg-black" />}>
+        <Routes>
+          <Route path="/" element={<InkognitoHome />} />
+          <Route path="/tattoo" element={<HomePage />} />
+          <Route path="/portafolio" element={<PortfolioPage />} />
+          <Route path="/cuidados" element={<CuidadosPage />} />
 
-      <Routes>
+          {/* Supply */}
+          <Route path="/supply" element={<SupplyPage />} />
+          <Route path="/supply/machines" element={<MachinesPage />} />
+          <Route path="/supply/cartridges" element={<CartridgesPage />} />
+          <Route path="/supply/cartridges/ez-tattoo" element={<EZCartridgesPage />} />
+          <Route path="/supply/cartridges/wjx" element={<WJXCartridgesPage />} />
+          <Route path="/supply/cartridges/kwadron" element={<KwadronCartridgesPage />} />
+          <Route path="/supply/power-supplies" element={<PowerSuppliesPage />} />
+          <Route path="/supply/ink" element={<InkPage />} />
+          <Route path="/supply/ink/vice-colors" element={<ViceColorsPage />} />
+          <Route path="/supply/ink/dynamic" element={<DynamicColorsPage />} />
+          <Route path="/supply/ink/eternal" element={<EternalColorsPage />} />
+          <Route path="/supply/ink/intenze" element={<IntenzeColorsPage />} />
+          <Route path="/supply/ink/fusion" element={<FusionColorsPage />} />
+          <Route path="/supply/ink/world-famous" element={<WorldFamousColorsPage />} />
+          <Route path="/supply/ink/solid-ink" element={<SolidColorsPage />} />
+          <Route path="/supply/needles" element={<NeedlesPage />} />
+          <Route path="/supply/gloves" element={<GlovesPage />} />
+          <Route path="/supply/aftercare" element={<AftercarePage />} />
+          <Route path="/supply/accessories" element={<AccessoriesPage />} />
+          <Route path="/supply/furniture" element={<FurniturePage />} />
+          <Route path="/supply/bundles" element={<BundlesPage />} />
+          <Route path="/supply/brands/tattoo-vision" element={<TattooVisionPage />} />
+          <Route path="/supply/brands/heaven-pro" element={<HeavenProPage />} />
+          <Route path="/supply/brands/royal-three" element={<RoyalThreePage />} />
+          <Route path="/supply/aprende" element={<AprendePage />} />
 
-  <Route
-    path="/"
-    element={<InkognitoHome />}
-  />
+          {/* Store */}
+          <Route path="/store" element={<StorePage />} />
+          <Route path="/store/ropa-dama" element={<RopaDamaPage />} />
+          <Route path="/store/ropa-caballeros" element={<RopaCaballerosPage />} />
+          <Route path="/store/zapatos-deportivos" element={<ZapatosDeportivosPage />} />
+          <Route path="/store/zapatos-casuales" element={<ZapatosCasualesPage />} />
+          <Route path="/store/guayos" element={<GuayosPage />} />
+          <Route path="/store/tenis-guayo" element={<TenisGuayoPage />} />
 
-  <Route
-    path="/tattoo"
-    element={
-      <HomePage
-        estilo={estilo}
-        setEstilo={setEstilo}
-        zona={zona}
-        setZona={setZona}
-        tamano={tamano}
-        setTamano={setTamano}
-      />
-    }
-  />
-
-  <Route
-    path="/portafolio"
-    element={
-      <PortfolioPage
-        estilo={estilo}
-        setEstilo={setEstilo}
-        zona={zona}
-        setZona={setZona}
-        tamano={tamano}
-        setTamano={setTamano}
-      />
-    }
-  />
-
-  <Route
-    path="/cuidados"
-    element={<CuidadosPage />}
-  />
-
-  <Route
-    path="/supply"
-    element={<SupplyPage />}
-  />
-  <Route 
-    path="/supply/machines" 
-    element={<MachinesPage />} 
-  />
-  <Route 
-  path="/supply/cartridges" 
-  element={<CartridgesPage />} 
-  />
-<Route 
-  path="/supply/power-supplies" 
-  element={<PowerSuppliesPage />} 
-  />
-  <Route 
-  path="/supply/ink" 
-  element={<InkPage />} 
-  />
-  <Route 
-  path="/supply/ink/vice-colors" 
-  element={<ViceColorsPage />} 
-  />
-  <Route 
-  path="/supply/needles" 
-  element={<NeedlesPage />} 
-  />
-  <Route 
-  path="/supply/gloves" 
-  element={<GlovesPage />} 
-  />
-  <Route path="/supply/aftercare" element={<AftercarePage />} />
-  <Route path="/supply/accessories" element={<AccessoriesPage />} />
-  <Route path="/supply/furniture" element={<FurniturePage />} />
-  <Route path="/supply/bundles" element={<BundlesPage />} />
-  <Route path="/brands/tattoo-vision" element={<TattooVisionPage />} />
-  <Route path="/supply/brands/heaven-pro" element={<HeavenProPage />} />
-  <Route path="/supply/brands/royal-three" element={<RoyalThreePage />} />
-  <Route element={<StoreCartProvider><Outlet /></StoreCartProvider>}>
-    <Route path="/store" element={<StorePage />} />
-    <Route path="/store/ropa-dama" element={<RopaDamaPage />} />
-    <Route path="/store/ropa-caballeros" element={<RopaCaballerosPage />} />
-    <Route path="/store/zapatos-deportivos" element={<ZapatosDeportivosPage />} />
-    <Route path="/store/zapatos-casuales" element={<ZapatosCasualesPage />} />
-    <Route path="/store/guayos" element={<GuayosPage />} />
-    <Route path="/store/tenis-guayo" element={<TenisGuayoPage />} />
-  </Route>
-  <Route path="/supply/ink/dynamic" element={<DynamicColorsPage />}/>
-  <Route path="/supply/ink/eternal" element={<EternalColorsPage />} />
-  <Route path="/supply/ink/intenze" element={<IntenzeColorsPage />} />
-  <Route path="/supply/ink/fusion" element={<FusionColorsPage />} />
-  <Route path="/supply/ink/world-famous" element={<WorldFamousColorsPage />} />
-  <Route path="/supply/ink/solid-ink" element={<SolidColorsPage />} />
-  <Route path="/supply/cartridges/ez-tattoo" element={<EZCartridgesPage />} />
-  <Route path="/supply/cartridges/wjx" element={<WJXCartridgesPage />} />
-  <Route path="/supply/cartridges/kwadron" element={<KwadronCartridgesPage />} />
-  <Route path="/supply/aprende" element={<AprendePage />} />
-  <Route path="/gym" element={<GymPage />} />
-  <Route path="/gym/maquinas-pedido" element={<MaquinasPedidoPage />} />
-  <Route path="/gym/planos" element={<PlanosPage />} />
-  <Route path="/gym/tutoriales" element={<VideosTutorialesPage />} />
-  <Route path="/gym/cursos" element={<CursosGymPage />} />
-
-
-
-
-
-</Routes>
+          {/* Gym */}
+          <Route path="/gym" element={<GymPage />} />
+          <Route path="/gym/maquinas-pedido" element={<MaquinasPedidoPage />} />
+          <Route path="/gym/planos" element={<PlanosPage />} />
+          <Route path="/gym/tutoriales" element={<VideosTutorialesPage />} />
+          <Route path="/gym/cursos" element={<CursosGymPage />} />
+        </Routes>
+      </Suspense>
     </div>
-    </SupplyCartProvider>
   )
 }
 

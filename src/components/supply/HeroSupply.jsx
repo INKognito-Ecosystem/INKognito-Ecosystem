@@ -41,7 +41,7 @@ export default function HeroSupply() {
             </Link>
 
             <Link
-              to="/brands/tattoo-vision"
+              to="/supply/brands/tattoo-vision"
               className="px-6 py-3 border border-blue-500 text-white uppercase tracking-widest text-sm hover:bg-blue-500 transition-all duration-300"
             >
               Tattoo Vision

@@ -1,4 +1,5 @@
 import footerBg from '../../assets/footer/footer-bg.webp'
+import { TATTOO_HOURS } from '../../config/business'
 
 import {
   FaInstagram,
@@ -76,11 +77,11 @@ export default function Footer() {
 
               <ul className="text-gray-300 space-y-3 text-sm">
 
-                <li>Lunes - Viernes: 10:00 - 20:00</li>
+                <li>{TATTOO_HOURS.weekdays.label}: {TATTOO_HOURS.weekdays.hours}</li>
 
-                <li>Sábado: 11:00 - 18:00</li>
+                <li>{TATTOO_HOURS.saturday.label}: {TATTOO_HOURS.saturday.hours}</li>
 
-                <li>Domingo: Cerrado</li>
+                <li>{TATTOO_HOURS.sunday.label}: Cerrado</li>
 
               </ul>
 

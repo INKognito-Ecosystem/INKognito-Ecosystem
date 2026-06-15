@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 
 const brands = [
-  { name: 'TATTOO VISION', to: '/brands/tattoo-vision' },
+  { name: 'TATTOO VISION', to: '/supply/brands/tattoo-vision' },
   { name: 'WJX', to: '/supply/cartridges/wjx' },
   { name: 'VICE COLORS', to: '/supply/ink/vice-colors' },
   { name: 'DYNAMIC', to: '/supply/ink/dynamic' },

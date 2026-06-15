@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
+import { STORE_HOURS } from '../../config/business'
 import { FaWhatsapp } from 'react-icons/fa'
 import { Truck, Shield, Clock, MapPin, Star, Award, Shirt, Footprints, Sun, Trophy, Zap } from 'lucide-react'
 import NavbarStore from './NavbarStore'
 import FooterStore from './FooterStore'
 import StoreProductCard from './StoreProductCard'
 import Seo from '../Seo'
-import ogStore from '../../assets/milogo/store.webp'
+const ogStore = '/og/store.webp'
 
 const categories = [
   {
@@ -109,7 +110,7 @@ const guarantees = [
   {
     icon: <Clock size={26} />,
     title: 'Respuesta Inmediata',
-    desc: 'Lunes a Sábado de 8:00 AM a 7:00 PM. Siempre disponibles para resolver tus dudas.',
+    desc: `${STORE_HOURS.weekdays.label} de ${STORE_HOURS.weekdays.hours}. Siempre disponibles para resolver tus dudas.`,
   },
 ]
 
@@ -410,7 +411,7 @@ export default function StorePage() {
                 Hablar con INKognito Store
               </a>
               <p className="text-zinc-600 uppercase tracking-[0.2em] text-sm mt-6">
-                Lunes a Sábado • 8:00 AM – 7:00 PM
+                {STORE_HOURS.weekdays.label} • {STORE_HOURS.weekdays.hours}
               </p>
             </div>
 

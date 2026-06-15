@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { TATTOO_HOURS } from '../../config/business'
 import { Link } from 'react-router-dom'
 import milogo from '../../assets/milogo/milogo.webp'
 import { FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa'
@@ -145,15 +146,15 @@ export default function Navbar({ showInicio = false }) {
             </div>
             <ul className="space-y-4 text-gray-700 text-sm">
               <li className="flex justify-between border-b border-gray-100 pb-3">
-                <span className="font-bold uppercase tracking-wide">Lunes - Viernes</span>
-                <span>10:00 - 20:00</span>
+                <span className="font-bold uppercase tracking-wide">{TATTOO_HOURS.weekdays.label}</span>
+                <span>{TATTOO_HOURS.weekdays.hours}</span>
               </li>
               <li className="flex justify-between border-b border-gray-100 pb-3">
-                <span className="font-bold uppercase tracking-wide">Sábado</span>
-                <span>11:00 - 18:00</span>
+                <span className="font-bold uppercase tracking-wide">{TATTOO_HOURS.saturday.label}</span>
+                <span>{TATTOO_HOURS.saturday.hours}</span>
               </li>
               <li className="flex justify-between">
-                <span className="font-bold uppercase tracking-wide">Domingo</span>
+                <span className="font-bold uppercase tracking-wide">{TATTOO_HOURS.sunday.label}</span>
                 <span className="text-red-500">Cerrado</span>
               </li>
             </ul>

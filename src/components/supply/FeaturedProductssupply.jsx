@@ -6,7 +6,7 @@ const products = [
     name: 'Tattoo Vision',
     brand: 'Marca profesional',
     tagline: 'Lo más buscado en sistemas visuales',
-    link: '/brands/tattoo-vision'
+    link: '/supply/brands/tattoo-vision'
   },
   {
     id: 2,

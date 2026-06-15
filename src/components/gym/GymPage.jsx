@@ -3,7 +3,34 @@ import { Wrench, FileText, GraduationCap, PlayCircle } from 'lucide-react'
 import NavbarGym from './NavbarGym'
 import FooterGym from './FooterGym'
 import Seo from '../Seo'
-import ogGym from '../../assets/milogo/gym.webp'
+import { creaciones, maquinasDestacadas, videosDestacados } from '../../data/gym'
+const ogGym = '/og/gym.webp'
+
+const gymJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "@id": `${import.meta.env.VITE_SITE_URL}/gym#business`,
+  "name": "INKognito Gym",
+  "description": "Máquinas de gym fabricadas artesanalmente con soldadura profesional. Planos técnicos descargables. Tutoriales y cursos de entrenamiento. Envíos a toda Colombia desde Urabá, Antioquia.",
+  "url": `${import.meta.env.VITE_SITE_URL}/gym`,
+  "telephone": "+57-320-791-1013",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Chigorodó",
+    "addressRegion": "Antioquia",
+    "addressCountry": "CO"
+  },
+  "areaServed": "CO",
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Equipos y recursos para gym casero",
+    "itemListElement": [
+      { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Máquinas de gym bajo pedido" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Planos técnicos descargables" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Tutoriales de construcción en video" } }
+    ]
+  }
+}
 
 const servicios = [
   {
@@ -32,46 +59,6 @@ const servicios = [
   },
 ]
 
-const creaciones = []
-
-const maquinasDestacadas = [
-  {
-    id: 1,
-    nombre: 'Jalones al pecho',
-    descripcion: 'Estructura con polea para jalón vertical. Ideal para dorsales y bíceps.',
-  },
-  {
-    id: 2,
-    nombre: 'Banco multiángulo',
-    descripcion: 'Ajustable a plano, inclinado y declinado. Versátil para todo el tren superior.',
-  },
-  {
-    id: 3,
-    nombre: 'Rack para press plano',
-    descripcion: 'Soporte seguro para press con barra. Incluye topes de seguridad.',
-  },
-]
-
-const videosDestacados = [
-  {
-    id: 1,
-    titulo: 'Cómo fabricar mancuernas en casa',
-    descripcion: 'Proceso completo de fabricación con materiales accesibles.',
-    src: '#',
-  },
-  {
-    id: 2,
-    titulo: 'Discos caseros con cemento',
-    descripcion: 'Tutorial para hacer discos de entrenamiento sin gastar mucho.',
-    src: '#',
-  },
-  {
-    id: 3,
-    titulo: 'Banco de press con madera y acero',
-    descripcion: 'Construcción de un banco resistente paso a paso.',
-    src: '#',
-  },
-]
 
 export default function GymPage() {
   return (
@@ -82,6 +69,7 @@ export default function GymPage() {
         image={ogGym}
         siteName="INKognito Gym"
         canonical={`${import.meta.env.VITE_SITE_URL}/gym`}
+        jsonLd={gymJsonLd}
       />
 
       <NavbarGym />
@@ -263,7 +251,7 @@ export default function GymPage() {
                 className="border border-gray-800 bg-gray-900/60 rounded-2xl overflow-hidden hover:border-gray-600 transition-all duration-300"
               >
                 <div className="relative w-full aspect-video bg-gray-900">
-                  {v.src === '#' ? (
+                  {v.src === null ? (
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-gray-600">
                       <span className="text-xs uppercase tracking-widest">Próximamente</span>
                     </div>

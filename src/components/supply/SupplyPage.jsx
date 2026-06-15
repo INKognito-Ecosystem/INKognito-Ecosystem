@@ -1,13 +1,14 @@
 import NavbarSupply from './NavbarSupply'
 import HeroSupply from './HeroSupply'
 import CategoriesSupply from './CategoriesSupply'
-import FeaturedProductssupply from './FeaturedProductssupply'
+import FeaturedProductsSupply from './FeaturedProductsSupply'
 import BrandsSupply from './BrandsSupply'
 import FooterSupply from './FooterSupply'
 import { FaWhatsapp } from 'react-icons/fa'
 import Seo from '../Seo'
-import ogSupply from '../../assets/milogo/supply.webp'
+const ogSupply = '/og/supply.webp'
 import { Link } from 'react-router-dom'
+import { SUPPLY_HOURS } from '../../config/business'
 
 const supplyJsonLd = {
   "@context": "https://schema.org",
@@ -49,7 +50,7 @@ export default function SupplyPage() {
   <div className="border-b border-zinc-900"></div>
 </div>
 
-<FeaturedProductssupply id="productos" />
+<FeaturedProductsSupply id="productos" />
       <CategoriesSupply />
 
     <BrandsSupply />
@@ -131,8 +132,8 @@ export default function SupplyPage() {
       </div>
 
       <div className="text-zinc-500 uppercase tracking-[0.2em] text-sm space-y-2">
-        <p>Lunes a Sábado</p>
-        <p>8:00 AM - 6:00 PM</p>
+        <p>{SUPPLY_HOURS.weekdays.label}</p>
+        <p>{SUPPLY_HOURS.weekdays.hours}</p>
       </div>
 
       <div className="mt-10 pt-10 border-t border-zinc-900">

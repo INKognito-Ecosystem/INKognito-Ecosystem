@@ -2,17 +2,17 @@ import EcosystemNavbar from './EcosystemNavbar'
 import { Link } from 'react-router-dom'
 import ecosystemBg from '../../assets/ecosystem/ecosystem-bg.jpg'
 import Seo from '../Seo'
-import ogLogo from '../../assets/ecosystem/logo.png'
 
 export default function InkognitoHome() {
   return (
     <section className="relative min-h-screen bg-black text-white flex flex-col items-center px-6 overflow-hidden">
 
       <Seo
-        title="INKognito Ecosystem"
-        description="Ecosistema de servicios en Urabá, Antioquia: tatuajes, insumos para tatuadores y tienda deportiva."
-        image={ogLogo}
-        noindex={true}
+        title="INKognito | Tattoo, Supply y Store en Urabá, Colombia"
+        description="Ecosistema de servicios en Chigorodó, Urabá: estudio de tatuajes, insumos profesionales para tatuadores y tienda deportiva. Conoce todos nuestros módulos."
+        image="/og/ecosystem-og.png"
+        siteName="INKognito Ecosystem"
+        canonical={`${import.meta.env.VITE_SITE_URL}/`}
       />
 
       {/* NAVBAR */}
