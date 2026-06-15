@@ -3,7 +3,7 @@ import { CalendarCheck, Droplets } from 'lucide-react'
 
 export default function CuidadosTeaser() {
   return (
-    <section id="cuidados" className="pt-24 pb-12 px-4 bg-black border-t border-white/5">
+    <section id="cuidados" className="pt-12 md:pt-24 pb-6 md:pb-12 px-4 bg-black border-t border-white/5">
       <div className="max-w-4xl mx-auto text-center">
 
         <h2 className="text-3xl md:text-5xl font-black uppercase italic mb-4">

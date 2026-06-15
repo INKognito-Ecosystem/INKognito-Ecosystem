@@ -2,7 +2,7 @@ import aboutBg from '../../assets/about/about-bg.webp'
 
 export default function About() {
   return (
-    <section id="acerca" className="relative py-24 px-4 overflow-hidden border-t border-white/5">
+    <section id="acerca" className="relative py-12 md:py-24 px-4 overflow-hidden border-t border-white/5">
 
       {/* IMAGEN DE FONDO */}
       <img

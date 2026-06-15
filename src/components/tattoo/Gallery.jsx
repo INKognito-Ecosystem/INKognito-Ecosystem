@@ -54,11 +54,11 @@ export default function Gallery({ onLightboxChange = () => {} }) {
   }
 
   return (
-    <section id="galeria" className="py-24 bg-black">
+    <section id="galeria" className="py-12 md:py-24 bg-black">
       <div className="max-w-7xl mx-auto px-4">
 
         {/* TITULO */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-8 md:mb-16">
           <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tighter uppercase">
             Portafolio
           </h2>

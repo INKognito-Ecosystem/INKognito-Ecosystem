@@ -11,7 +11,7 @@ export default function Footer() {
 
   return (
 
-    <footer className="relative overflow-hidden bg-black border-t border-gray-900 pt-20 pb-8">
+    <footer className="relative overflow-hidden bg-black border-t border-gray-900 pt-10 md:pt-20 pb-8">
 
       {/* FONDO CINEMATOGRAFICO */}
       <img
@@ -25,7 +25,7 @@ export default function Footer() {
       <div className="relative z-10 max-w-7xl mx-auto px-4">
 
         {/* TITULO GRANDE */}
-        <div className="mb-16">
+        <div className="mb-8 md:mb-16">
 
           <div className="w-full bg-zinc-700/80 backdrop-blur-sm rounded-xl px-8 py-6 shadow-xl">
 
@@ -38,7 +38,7 @@ export default function Footer() {
         </div>
 
         {/* CONTENIDO ABAJO */}
-        <div className="flex flex-col md:flex-row justify-between gap-16 mb-16">
+        <div className="flex flex-col md:flex-row justify-between gap-8 md:gap-16 mb-8 md:mb-16">
 
           {/* TEXTO IZQUIERDA */}
           <div className="max-w-md">
