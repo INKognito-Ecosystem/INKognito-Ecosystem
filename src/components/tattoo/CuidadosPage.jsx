@@ -117,7 +117,7 @@ export default function CuidadosPage() {
       <Navbar showInicio={true} />
 
       {/* HERO */}
-      <section className="pt-44 pb-16 px-4 text-center">
+      <section className="pt-28 md:pt-44 pb-10 md:pb-16 px-4 text-center">
         <h1 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter">
           Cuidados de tu <span className="text-zinc-600">Tatuaje</span>
         </h1>
@@ -129,9 +129,9 @@ export default function CuidadosPage() {
       </section>
 
       {/* TABS */}
-      <section className="max-w-7xl mx-auto px-4 pb-24">
+      <section className="max-w-7xl mx-auto px-4 pb-12 md:pb-24">
 
-        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-14">
+        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8 sm:mb-14">
           <button
             onClick={() => navigate({ hash: '#antes' })}
             className={`px-10 py-4 rounded font-black text-sm uppercase tracking-widest transition-all duration-300 ${
@@ -181,7 +181,7 @@ export default function CuidadosPage() {
       </section>
 
       {/* CIERRE + CTA */}
-      <section className="border-t border-white/5 py-20 px-4">
+      <section className="border-t border-white/5 py-12 md:py-20 px-4">
         <div className="max-w-3xl mx-auto text-center space-y-8">
 
           <p className="text-gray-300 text-lg leading-relaxed font-light">
