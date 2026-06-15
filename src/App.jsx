@@ -15,6 +15,7 @@ import CuidadosPage from './components/tattoo/CuidadosPage'
 import CuidadosTeaser from './components/tattoo/CuidadosTeaser'
 import ReservationForm from './components/tattoo/ReservationForm'
 import Seo from './components/Seo'
+import ComingSoonPage from './components/ecosystem/ComingSoonPage'
 
 const ogTattoo = '/og/josefoto-og.jpg'
 const ogPortafolio = '/og/portafolio-og.jpg'
@@ -177,7 +178,7 @@ function App() {
           <Route path="/cuidados" element={<CuidadosPage />} />
 
           {/* Supply */}
-          <Route path="/supply" element={<SupplyPage />} />
+          <Route path="/supply" element={<ComingSoonPage />} />
           <Route path="/supply/machines" element={<MachinesPage />} />
           <Route path="/supply/cartridges" element={<CartridgesPage />} />
           <Route path="/supply/cartridges/ez-tattoo" element={<EZCartridgesPage />} />
@@ -204,7 +205,7 @@ function App() {
           <Route path="/supply/aprende" element={<AprendePage />} />
 
           {/* Store */}
-          <Route path="/store" element={<StorePage />} />
+          <Route path="/store" element={<ComingSoonPage />} />
           <Route path="/store/ropa-dama" element={<RopaDamaPage />} />
           <Route path="/store/ropa-caballeros" element={<RopaCaballerosPage />} />
           <Route path="/store/zapatos-deportivos" element={<ZapatosDeportivosPage />} />
@@ -213,7 +214,7 @@ function App() {
           <Route path="/store/tenis-guayo" element={<TenisGuayoPage />} />
 
           {/* Gym */}
-          <Route path="/gym" element={<GymPage />} />
+          <Route path="/gym" element={<ComingSoonPage />} />
           <Route path="/gym/maquinas-pedido" element={<MaquinasPedidoPage />} />
           <Route path="/gym/planos" element={<PlanosPage />} />
           <Route path="/gym/tutoriales" element={<VideosTutorialesPage />} />
