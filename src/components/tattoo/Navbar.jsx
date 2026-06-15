@@ -23,7 +23,7 @@ export default function Navbar({ showInicio = false }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
 
-            <Link to="/tattoo" className="flex items-center gap-2">
+            <Link to="/jhumaneztattoo" className="flex items-center gap-2">
               <img src={milogo} alt="Logo" className="w-14 h-14 object-contain" />
               <span className="text-black font-black text-lg sm:text-2xl tracking-widest uppercase">
                 JHUMANEZTATTOO
@@ -42,7 +42,7 @@ export default function Navbar({ showInicio = false }) {
           <div className="absolute right-4 top-full bg-white border border-gray-200 shadow-xl w-56 z-50 rounded-lg overflow-hidden">
 
             {showInicio && (
-              <Link to="/tattoo" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
+              <Link to="/jhumaneztattoo" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
                 <div className="flex items-center justify-between">
                   <span>Inicio</span>
                   <Home size={14} />

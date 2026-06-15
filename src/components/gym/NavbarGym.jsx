@@ -72,7 +72,7 @@ export default function NavbarGym() {
             Cursos
           </Link>
           <div className="border-t border-gray-800 mt-1 pt-1">
-            <Link to="/tattoo" onClick={() => setMenuOpen(false)}
+            <Link to="/jhumaneztattoo" onClick={() => setMenuOpen(false)}
               className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
               JHumanezTattoo
             </Link>

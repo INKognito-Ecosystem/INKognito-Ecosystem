@@ -88,7 +88,7 @@ export default function ReservationForm({
         {showBackLink && (
           <div className="mt-10">
             <Link
-              to="/tattoo"
+              to="/jhumaneztattoo"
               className="px-10 py-4 rounded bg-zinc-600 text-white font-black text-sm uppercase tracking-widest hover:bg-green-500 transition-all transform hover:-translate-y-1 text-center shadow-lg"
             >
               Inicio

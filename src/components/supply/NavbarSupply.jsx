@@ -89,7 +89,7 @@ export default function NavbarSupply() {
                   className="block w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
                   Contacto
                 </button>
-                <Link to="/tattoo" onClick={() => setMenuOpen(false)}
+                <Link to="/jhumaneztattoo" onClick={() => setMenuOpen(false)}
                   className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
                   JHumanezTattoo
                 </Link>
