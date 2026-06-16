@@ -123,7 +123,7 @@ export default function Navbar({ showInicio = false }) {
               <a href="https://www.instagram.com/jhumaneztattoo?igsh=MXh4ZW9vaGZnMDVtZQ==" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-gradient-to-br hover:from-pink-500 hover:to-yellow-500 hover:text-white hover:border-transparent transition-all duration-300">
                 <FaInstagram size={18} />
               </a>
-              <a href="https://www.facebook.com/share/172JDKdCqe/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-blue-600 hover:text-white hover:border-transparent transition-all duration-300">
+              <a href="https://www.facebook.com/humanezjose" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-blue-600 hover:text-white hover:border-transparent transition-all duration-300">
                 <FaFacebookF size={16} />
               </a>
               <a href="https://youtube.com/@jhumanezz?si=9uXLRHm_QPAWo6uB" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-red-600 hover:text-white hover:border-transparent transition-all duration-300">

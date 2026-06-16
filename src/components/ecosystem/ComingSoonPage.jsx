@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
 import ecosystemBg from '../../assets/ecosystem/ecosystem-bg.jpg'
+import Seo from '../Seo'
 
 export default function ComingSoonPage() {
   return (
     <section className="relative min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 sm:px-6 overflow-hidden">
+      <Seo noindex={true} />
 
       {/* FONDO */}
       <img
