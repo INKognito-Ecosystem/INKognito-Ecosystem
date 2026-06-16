@@ -1,7 +1,7 @@
 # robots.txt — INKognito
-# IMPORTANTE: reemplaza TU-DOMINIO.com por el dominio real al desplegar
+# IMPORTANTE: reemplaza inkognito-ecosystem.com por el dominio real al desplegar
 
 User-agent: *
 Allow: /
 
-Sitemap: https://TU-DOMINIO.com/sitemap.xml
+Sitemap: https://inkognito-ecosystem.com/sitemap.xml
