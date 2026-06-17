@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
+import { useAnalytics } from './hooks/useAnalytics'
 import { TATTOO_HOURS } from './config/business'
 
 // Tattoo module — eager (primary landing content)
@@ -168,6 +169,8 @@ function PortfolioPage() {
    APP
 ========================= */
 function App() {
+  useAnalytics()
+
   return (
     <div className="bg-black text-white overflow-x-hidden">
       <Suspense fallback={<div className="min-h-screen bg-black" />}>
