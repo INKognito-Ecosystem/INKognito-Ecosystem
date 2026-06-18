@@ -4,6 +4,7 @@ import inkognitoLogo from '../../assets/ecosystem/logo.png'
 export default function EcosystemNavbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
+  const [tattooOpen, setTattooOpen] = useState(false)
 
   useEffect(() => {
     document.body.style.overflow = (menuOpen || aboutOpen) ? 'hidden' : ''
@@ -62,6 +63,32 @@ export default function EcosystemNavbar() {
 
         <nav className="flex flex-col gap-1">
           <MenuLink label="About" onClick={openAbout} />
+
+          {/* TATTOO STUDIO — desplegable */}
+          <div>
+            <button
+              onClick={() => setTattooOpen(o => !o)}
+              className="w-full text-left px-4 py-[14px] text-white/85 bg-transparent border-none cursor-pointer uppercase tracking-[0.25em] text-[13px] font-bold rounded hover:bg-white/[0.06] hover:text-white transition-all duration-200 flex items-center justify-between"
+            >
+              Tattoo Studio
+              <span
+                className="text-white/40 text-[10px] transition-transform duration-300"
+                style={{ display: 'inline-block', transform: tattooOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+              >
+                ▾
+              </span>
+            </button>
+            <div
+              className="overflow-hidden transition-all duration-300 ease-in-out"
+              style={{ maxHeight: tattooOpen ? '160px' : '0px', opacity: tattooOpen ? 1 : 0 }}
+            >
+              <div className="flex flex-col pb-1">
+                <SocialLink href="https://www.instagram.com/jhumaneztattoo?igsh=MXh4ZW9vaGZnMDVtZQ==" label="Instagram" />
+                <SocialLink href="https://www.facebook.com/humanezjose" label="Facebook" />
+                <SocialLink href="https://wa.me/573207911013?text=Hola%20Jose,%20quiero%20informaci%C3%B3n%20sobre%20un%20tatuaje" label="WhatsApp" />
+              </div>
+            </div>
+          </div>
         </nav>
 
         <div className="mt-auto border-t border-white/[0.08] pt-6">
@@ -121,5 +148,18 @@ function MenuLink({ label, onClick }) {
     >
       {label}
     </button>
+  )
+}
+
+function SocialLink({ href, label }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block px-8 py-[10px] text-white/50 hover:text-white uppercase tracking-[0.2em] text-[11px] font-bold hover:bg-white/[0.04] transition-all duration-200 rounded"
+    >
+      {label}
+    </a>
   )
 }
