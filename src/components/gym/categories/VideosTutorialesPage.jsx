@@ -5,39 +5,28 @@ import Seo from '../../Seo'
 const videos = [
   {
     id: 1,
-    titulo: 'Cómo fabricar mancuernas caseras',
-    descripcion: 'Proceso completo con materiales accesibles y herramientas básicas.',
-    src: '#',
+    titulo: 'Cómo hacer discos de cemento caseros',
+    src: 'https://www.youtube.com/embed/eSFDi483lGc',
   },
   {
     id: 2,
-    titulo: 'Discos de cemento para entrenamiento',
-    descripcion: 'Fabrica discos resistentes y económicos para tu gym en casa.',
-    src: '#',
+    titulo: 'Mancuernas caseras de cemento — Timelapse',
+    src: 'https://www.youtube.com/embed/-kyLJpmBtn0',
   },
   {
     id: 3,
-    titulo: 'Banco de press con madera y acero',
-    descripcion: 'Construcción paso a paso de un banco resistente y duradero.',
-    src: '#',
+    titulo: 'Aparato casero para fortalecer el tibial anterior',
+    src: 'https://www.youtube.com/embed/ChCrs-vKvdA',
   },
   {
     id: 4,
-    titulo: 'Estructura para dominadas',
-    descripcion: 'Cómo soldar y ensamblar un marco de dominadas seguro y estable.',
-    src: '#',
+    titulo: 'Cómo hacer mancuernas de cemento — Tutorial explicado',
+    src: 'https://www.youtube.com/embed/7KPO3MGvrzY',
   },
   {
     id: 5,
-    titulo: 'Barra olímpica artesanal',
-    descripcion: 'Fabricación de una barra de entrenamiento con materiales locales.',
-    src: '#',
-  },
-  {
-    id: 6,
-    titulo: 'Jalones al pecho desde cero',
-    descripcion: 'Tutorial completo para construir una máquina de jalones con polea.',
-    src: '#',
+    titulo: 'Rack casero de madera para pesas',
+    src: 'https://www.youtube.com/embed/6pe_x5fqYOM',
   },
 ]
 
@@ -95,23 +84,16 @@ export default function VideosTutorialesPage() {
               className="border border-gray-800 bg-gray-800/40 rounded-2xl overflow-hidden hover:border-gray-600 transition-all duration-300"
             >
               <div className="relative w-full aspect-video bg-gray-800">
-                {v.src === '#' ? (
-                  <div className="absolute inset-0 flex items-center justify-center text-gray-600">
-                    <span className="text-xs uppercase tracking-widest">Próximamente</span>
-                  </div>
-                ) : (
-                  <iframe
-                    src={v.src}
-                    title={v.titulo}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                )}
+                <iframe
+                  src={v.src}
+                  title={v.titulo}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
               </div>
               <div className="p-5">
-                <h3 className="font-black uppercase text-sm mb-2 leading-tight">{v.titulo}</h3>
-                <p className="text-gray-500 text-xs leading-relaxed">{v.descripcion}</p>
+                <h3 className="font-black uppercase text-sm leading-tight">{v.titulo}</h3>
               </div>
             </div>
           ))}
