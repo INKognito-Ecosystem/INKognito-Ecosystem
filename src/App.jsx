@@ -217,7 +217,7 @@ function App() {
           <Route path="/store/tenis-guayo" element={<TenisGuayoPage />} />
 
           {/* Gym */}
-          <Route path="/gym" element={<GymPage />} />
+          <Route path="/gym" element={<ComingSoonPage />} />
           <Route path="/gym/maquinas-pedido" element={<MaquinasPedidoPage />} />
           <Route path="/gym/planos" element={<PlanosPage />} />
           <Route path="/gym/tutoriales" element={<VideosTutorialesPage />} />
