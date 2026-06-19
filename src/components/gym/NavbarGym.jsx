@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import { Menu, X, Dumbbell } from 'lucide-react'
+import { Menu, X, Dumbbell, ShoppingCart } from 'lucide-react'
 import logoGym from '../../assets/milogo/gym.webp'
 
-export default function NavbarGym() {
+export default function NavbarGym({ cartCount = 0, onCartClick = null }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
@@ -38,13 +38,29 @@ export default function NavbarGym() {
             </Link>
           </div>
 
-          {/* HAMBURGUESA */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="text-gray-400 hover:text-white transition-all duration-300"
-          >
-            {menuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
+          {/* CARRITO + HAMBURGUESA */}
+          <div className="flex items-center gap-4">
+            {onCartClick && (
+              <button
+                onClick={onCartClick}
+                className="relative text-gray-400 hover:text-white transition-all duration-300"
+                aria-label="Abrir carrito"
+              >
+                <ShoppingCart size={20} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] rounded-full bg-white text-gray-950 text-[9px] font-black flex items-center justify-center px-0.5">
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
+              </button>
+            )}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="text-gray-400 hover:text-white transition-all duration-300"
+            >
+              {menuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
         </div>
       </div>
 
