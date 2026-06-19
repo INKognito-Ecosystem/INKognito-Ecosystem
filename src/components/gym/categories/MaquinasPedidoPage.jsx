@@ -51,7 +51,7 @@ const productos = [
   {
     id: 6,
     nombre: 'Femorales acostado',
-    descripcion: 'Curl femoral acostado con carga de discos. Consíguela fabricada artesanalmente o construye la tuya con el plano.',
+    descripcion: 'Curl femoral acostado con carga de discos. Consíguela hecha con soldadura profesional o construye la tuya con el plano.',
     precio_fabricado: null,
     precio_plano: null,
     image1: null, image2: null,
@@ -127,8 +127,8 @@ export default function MaquinasPedidoPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Seo
-        title="Máquinas de Gym y Planos Técnicos | Fabricación Artesanal — Colombia"
-        description="Máquinas de gym bajo pedido fabricadas artesanalmente en Urabá + planos técnicos en PDF para construirlas tú mismo. Envíos a toda Colombia."
+        title="Máquinas de Gym y Planos Técnicos | Soldadura Profesional — Colombia"
+        description="Máquinas de gym bajo pedido construidas con soldadura profesional en Urabá + planos técnicos en PDF para hacerlas tú mismo. Envíos a toda Colombia."
         siteName="INKognito Gym"
         canonical={`${import.meta.env.VITE_SITE_URL}/gym/maquinas-pedido`}
       />
@@ -141,14 +141,14 @@ export default function MaquinasPedidoPage() {
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
           <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">
-            Fabricación artesanal · Planos digitales
+            Soldadura profesional · Planos digitales
           </p>
           <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-6">
             Máquinas<br />
             <span className="text-gray-400">y planos</span>
           </h1>
           <p className="text-gray-400 leading-relaxed max-w-2xl mb-6">
-            Fabricamos equipos de gym artesanalmente en Urabá, Antioquia — o descarga los planos técnicos en PDF para construirlos tú mismo. Cada máquina y plano se ajusta a tus necesidades.
+            Fabricamos equipos de gym con soldadura profesional en Urabá, Antioquia — o descarga los planos técnicos en PDF para construirlos tú mismo. Cada máquina y plano se ajusta a tus necesidades.
           </p>
           <div className="border border-gray-700 bg-gray-800/50 rounded-xl p-5 max-w-2xl">
             <p className="text-gray-400 text-sm leading-relaxed">

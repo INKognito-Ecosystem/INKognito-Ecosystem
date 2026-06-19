@@ -11,7 +11,7 @@ const gymJsonLd = {
   "@type": "LocalBusiness",
   "@id": `${import.meta.env.VITE_SITE_URL}/gym#business`,
   "name": "INKognito Gym",
-  "description": "Máquinas de gym fabricadas artesanalmente con soldadura profesional. Planos técnicos descargables. Tutoriales y cursos de entrenamiento. Envíos a toda Colombia desde Urabá, Antioquia.",
+  "description": "Máquinas de gym construidas con soldadura profesional. Planos técnicos descargables. Tutoriales y cursos de entrenamiento. Envíos a toda Colombia desde Urabá, Antioquia.",
   "url": `${import.meta.env.VITE_SITE_URL}/gym`,
   "telephone": "+57-320-791-1013",
   "address": {
@@ -36,7 +36,7 @@ const servicios = [
   {
     icon: Wrench,
     titulo: 'Máquinas y planos',
-    descripcion: 'Encarga tu máquina fabricada artesanalmente o descarga el plano PDF para construirla tú mismo.',
+    descripcion: 'Encarga tu máquina construida con soldadura profesional o descarga el plano PDF para hacerla tú mismo.',
     link: '/gym/maquinas-pedido',
   },
   {
@@ -58,8 +58,8 @@ export default function GymPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Seo
-        title="INKognito Gym | Máquinas de Gym Artesanales y Planos Profesionales — Colombia"
-        description="Máquinas de gym fabricadas artesanalmente con soldadura profesional. Planos técnicos descargables. Envíos a toda Colombia desde Urabá, Antioquia."
+        title="INKognito Gym | Máquinas de Gym con Soldadura Profesional y Planos Técnicos — Colombia"
+        description="Máquinas de gym construidas con soldadura profesional. Planos técnicos descargables. Envíos a toda Colombia desde Urabá, Antioquia."
         image={ogGym}
         siteName="INKognito Gym"
         canonical={`${import.meta.env.VITE_SITE_URL}/gym`}
@@ -175,7 +175,7 @@ export default function GymPage() {
         <div className="border-t border-gray-800 pt-16">
           <div className="flex items-end justify-between mb-12">
             <div>
-              <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Fabricación artesanal</p>
+              <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Soldadura profesional</p>
               <h2 className="text-3xl md:text-5xl font-black uppercase leading-none">Máquinas bajo pedido</h2>
             </div>
             <Link
