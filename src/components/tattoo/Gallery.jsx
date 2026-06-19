@@ -54,7 +54,7 @@ export default function Gallery({ onLightboxChange = () => {} }) {
   }
 
   return (
-    <section id="galeria" className="py-12 md:py-24 bg-black">
+    <section id="galeria" className="pt-24 pb-12 md:py-24 bg-black">
       <div className="max-w-7xl mx-auto px-4">
 
         {/* TITULO */}
