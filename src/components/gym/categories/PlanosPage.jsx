@@ -66,7 +66,7 @@ export default function PlanosPage() {
         canonical={`${import.meta.env.VITE_SITE_URL}/gym/planos`}
       />
 
-      <NavbarGym />
+      <NavbarGym cartCount={cart.length} onCartClick={() => setCartOpen(true)} />
 
       {/* HERO */}
       <section className="relative pt-28 md:pt-36 pb-16 px-4 md:px-6 overflow-hidden">
@@ -87,11 +87,6 @@ export default function PlanosPage() {
       </section>
 
       <div className="pb-32 px-4 md:px-6 max-w-7xl mx-auto pt-12">
-
-        {/* DESCRIPCIÓN GENERAL */}
-        <p className="text-gray-400 leading-relaxed max-w-2xl mb-12 text-sm md:text-base">
-          En esta sección encontrarás planos técnicos en formato PDF listos para descargar. Cada plano incluye medidas exactas, lista de materiales y pasos clave para que puedas construir tu propio equipo de gym en casa, sin importar tu nivel de experiencia en soldadura o carpintería.
-        </p>
 
         {/* CARD MEMBRESÍA */}
         <div className="relative border border-gray-400/40 bg-gray-900 rounded-2xl p-8 md:p-10 mb-12 overflow-hidden">
@@ -184,20 +179,6 @@ export default function PlanosPage() {
       </div>
 
       <FooterGym />
-
-      {/* BOTÓN CARRITO FLOTANTE */}
-      <button
-        onClick={() => setCartOpen(true)}
-        className="fixed bottom-6 right-6 z-50 bg-white text-gray-950 rounded-full w-14 h-14 flex items-center justify-center shadow-2xl hover:bg-gray-200 transition-all duration-300"
-        aria-label="Abrir carrito"
-      >
-        <span className="text-xl">🛒</span>
-        {cart.length > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black rounded-full w-5 h-5 flex items-center justify-center">
-            {cart.length}
-          </span>
-        )}
-      </button>
 
       {/* DRAWER CARRITO */}
       <div
