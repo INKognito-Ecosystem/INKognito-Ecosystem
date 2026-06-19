@@ -6,7 +6,7 @@ const planos = []
 
 export default function PlanosPage() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-gray-950 text-white">
       <Seo
         title="Planos Técnicos de Máquinas de Gym | Descarga Digital — Colombia"
         description="Planos profesionales en PDF para fabricar tus propias máquinas de gym. Diseños probados y funcionales. Descarga inmediata. Disponibles para toda Colombia."

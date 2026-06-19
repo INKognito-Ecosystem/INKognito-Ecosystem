@@ -3,7 +3,7 @@ import { FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa'
 
 export default function FooterGym() {
   return (
-    <footer className="relative border-t border-gray-800 bg-gray-900 px-6 py-10 md:py-16 overflow-hidden">
+    <footer className="relative border-t border-gray-800 bg-gray-950 px-6 py-10 md:py-16 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
       <div
         className="absolute inset-0 opacity-[0.04]"

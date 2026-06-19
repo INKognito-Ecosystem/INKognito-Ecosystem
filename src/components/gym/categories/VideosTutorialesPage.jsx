@@ -43,7 +43,7 @@ const videos = [
 
 export default function VideosTutorialesPage() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-gray-950 text-white">
       <Seo
         title="Cómo Fabricar Máquinas de Gym | Tutoriales Profesionales — Colombia"
         description="Videos de fabricación de equipos de gym con soldadura: mancuernas, discos, barras y máquinas. Canal de Jose Humanez en YouTube."

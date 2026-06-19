@@ -23,7 +23,7 @@ const cursos = [
 
 export default function CursosPage() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-gray-950 text-white">
       <Seo
         title="Cursos de Entrenamiento en Casa y Fitness | Colombia"
         description="Cursos recomendados de entrenamiento en casa, nutrición y desarrollo personal. Selección de los mejores cursos en español disponibles en Hotmart."

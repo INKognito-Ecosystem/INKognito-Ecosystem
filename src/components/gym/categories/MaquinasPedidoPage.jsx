@@ -57,7 +57,7 @@ const maquinas = [
 
 export default function MaquinasPedidoPage() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-gray-950 text-white">
       <Seo
         title="Máquinas de Gym Bajo Pedido | Fabricación Artesanal — Envío a Colombia"
         description="Racks, bancos multiángulo, jalones, extensiones y más. Fabricadas con soldadura profesional en Urabá. Envío por transportadora a toda Colombia. Cotiza por WhatsApp."
