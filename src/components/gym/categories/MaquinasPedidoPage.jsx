@@ -250,7 +250,7 @@ export default function MaquinasPedidoPage() {
                     <button
                       disabled={!p.precio_plano || inCart}
                       onClick={() => addToCart(p)}
-                      className={`text-[10px] font-bold uppercase tracking-[0.15em] py-2.5 rounded-xl border transition-all duration-300 ${
+                      className={`w-full text-center text-[10px] font-bold uppercase tracking-[0.15em] py-2.5 rounded-xl border transition-all duration-300 ${
                         !p.precio_plano
                           ? 'border-gray-800 text-gray-700 cursor-not-allowed'
                           : inCart
@@ -335,7 +335,7 @@ export default function MaquinasPedidoPage() {
       {/* LIGHTBOX */}
       {lightbox && (
         <div
-          className="fixed inset-0 bg-black/90 z-[80] flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/90 z-[80] flex items-center justify-center p-4 overflow-y-auto"
           onClick={() => setLightbox(null)}
         >
           <button
