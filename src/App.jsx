@@ -60,7 +60,6 @@ const TenisGuayoPage = lazy(() => import('./components/store/categories/TenisGua
 // Gym module — lazy
 const GymPage = lazy(() => import('./components/gym/GymPage'))
 const MaquinasPedidoPage = lazy(() => import('./components/gym/categories/MaquinasPedidoPage'))
-const PlanosPage = lazy(() => import('./components/gym/categories/PlanosPage'))
 const VideosTutorialesPage = lazy(() => import('./components/gym/categories/VideosTutorialesPage'))
 const CursosGymPage = lazy(() => import('./components/gym/categories/CursosPage'))
 
@@ -219,7 +218,6 @@ function App() {
           {/* Gym */}
           <Route path="/gym" element={<GymPage />} />
           <Route path="/gym/maquinas-pedido" element={<MaquinasPedidoPage />} />
-          <Route path="/gym/planos" element={<PlanosPage />} />
           <Route path="/gym/tutoriales" element={<VideosTutorialesPage />} />
           <Route path="/gym/cursos" element={<CursosGymPage />} />
         </Routes>

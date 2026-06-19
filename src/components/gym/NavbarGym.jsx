@@ -27,9 +27,6 @@ export default function NavbarGym({ cartCount = 0, onCartClick = null }) {
             <Link to="/gym/maquinas-pedido" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
               Máquinas
             </Link>
-            <Link to="/gym/planos" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
-              Planos
-            </Link>
             <Link to="/gym/tutoriales" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
               Tutoriales
             </Link>
@@ -74,10 +71,6 @@ export default function NavbarGym({ cartCount = 0, onCartClick = null }) {
           <Link to="/gym/maquinas-pedido" onClick={() => setMenuOpen(false)}
             className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
             Máquinas
-          </Link>
-          <Link to="/gym/planos" onClick={() => setMenuOpen(false)}
-            className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
-            Planos
           </Link>
           <Link to="/gym/tutoriales" onClick={() => setMenuOpen(false)}
             className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
