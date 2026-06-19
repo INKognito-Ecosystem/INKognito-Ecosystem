@@ -33,9 +33,18 @@ export default function CursosPage() {
 
       <NavbarGym />
 
-      <div className="pt-28 md:pt-36 pb-24 px-4 md:px-6 max-w-7xl mx-auto">
-
-        <div className="mb-12 md:mb-16">
+      {/* HERO */}
+      <section className="relative pt-28 md:pt-36 pb-16 px-4 md:px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage:
+              'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
+          }}
+        />
+        <div className="relative z-10 max-w-7xl mx-auto">
+        <div className="mb-0">
           <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Formación</p>
           <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-6">
             Cursos<br />
@@ -45,7 +54,10 @@ export default function CursosPage() {
             Selección de los mejores cursos en español para entrenarte en casa, mejorar tu alimentación y aprender a fabricar tus propios equipos.
           </p>
         </div>
+        </div>
+      </section>
 
+      <div className="pb-24 px-4 md:px-6 max-w-7xl mx-auto pt-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {cursos.map((curso) => (
             <div

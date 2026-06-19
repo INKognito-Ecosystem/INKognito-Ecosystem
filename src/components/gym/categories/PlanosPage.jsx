@@ -16,9 +16,18 @@ export default function PlanosPage() {
 
       <NavbarGym />
 
-      <div className="pt-28 md:pt-36 pb-24 px-4 md:px-6 max-w-7xl mx-auto">
-
-        <div className="mb-12 md:mb-16">
+      {/* HERO */}
+      <section className="relative pt-28 md:pt-36 pb-16 px-4 md:px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage:
+              'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
+          }}
+        />
+        <div className="relative z-10 max-w-7xl mx-auto">
+        <div className="mb-0">
           <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">
             Descarga digital
           </p>
@@ -30,7 +39,10 @@ export default function PlanosPage() {
             Planos en PDF con medidas exactas, cortes y lista de materiales para que puedas fabricar tus propias máquinas de gym en casa. Descarga inmediata tras la compra.
           </p>
         </div>
+        </div>
+      </section>
 
+      <div className="pb-24 px-4 md:px-6 max-w-7xl mx-auto pt-12">
         {planos.length === 0 ? (
           <div className="border border-gray-800 bg-gray-800/20 rounded-2xl py-24 md:py-32 text-center">
             <p className="text-gray-500 uppercase tracking-[0.25em] text-sm mb-2">Próximamente</p>
