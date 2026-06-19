@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Wrench, FileText, GraduationCap, PlayCircle } from 'lucide-react'
+import { Wrench, GraduationCap, PlayCircle } from 'lucide-react'
 import NavbarGym from './NavbarGym'
 import FooterGym from './FooterGym'
 import Seo from '../Seo'
@@ -35,15 +35,9 @@ const gymJsonLd = {
 const servicios = [
   {
     icon: Wrench,
-    titulo: 'Máquinas bajo pedido',
-    descripcion: 'Jalones, bancos, racks y más. Fabricadas artesanalmente y enviadas a toda Colombia.',
+    titulo: 'Máquinas y planos',
+    descripcion: 'Encarga tu máquina fabricada artesanalmente o descarga el plano PDF para construirla tú mismo.',
     link: '/gym/maquinas-pedido',
-  },
-  {
-    icon: FileText,
-    titulo: 'Planos digitales',
-    descripcion: 'Descarga planos PDF para fabricar tus propios equipos en casa con herramientas básicas.',
-    link: '/gym/planos',
   },
   {
     icon: PlayCircle,
@@ -103,13 +97,7 @@ export default function GymPage() {
               to="/gym/maquinas-pedido"
               className="inline-block text-center bg-gray-400 text-gray-900 text-sm font-black uppercase tracking-[0.2em] py-4 px-8 rounded hover:bg-white transition-all duration-300"
             >
-              Ver máquinas
-            </Link>
-            <Link
-              to="/gym/planos"
-              className="inline-block text-center border border-gray-700 text-gray-400 text-sm font-black uppercase tracking-[0.2em] py-4 px-8 rounded hover:border-gray-400 hover:text-white transition-all duration-300"
-            >
-              Ver planos
+              Ver máquinas y planos
             </Link>
           </div>
         </div>

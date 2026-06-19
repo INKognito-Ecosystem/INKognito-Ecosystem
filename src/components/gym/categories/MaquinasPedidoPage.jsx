@@ -1,146 +1,355 @@
+import { useState } from 'react'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import Seo from '../../Seo'
 
-const maquinas = [
+const WA = '573207911013'
+const MEMBRESIA_PRECIO = '$XX.000 COP'
+const PAGE_SIZE = 6
+
+const productos = [
   {
     id: 1,
-    nombre: 'Jalones al pecho',
-    descripcion: 'Estructura con polea para jalón vertical. Ideal para trabajar dorsales, bíceps y espalda alta.',
+    nombre: 'Banco Militar / Funcional',
+    descripcion: 'Banco multifuncional fabricado a mano con soldadura profesional, o consigue el plano técnico en PDF para construirlo tú mismo.',
+    precio_fabricado: null,
+    precio_plano: 5000,
+    image1: null, image2: null,
   },
   {
     id: 2,
-    nombre: 'Banco estático',
-    descripcion: 'Banco plano resistente para press, remo y variaciones de bíceps. Construcción en acero.',
+    nombre: 'Jalones al pecho',
+    descripcion: 'Estructura con polea para jalón vertical fabricada en acero, o descarga el plano PDF y constrúyela desde casa.',
+    precio_fabricado: null,
+    precio_plano: null,
+    image1: null, image2: null,
   },
   {
     id: 3,
-    nombre: 'Banco multiángulo',
-    descripcion: 'Ajustable a plano, inclinado y declinado. Versátil para todo el tren superior con mancuernas o barra.',
+    nombre: 'Banco estático',
+    descripcion: 'Banco plano resistente para press, remo y variaciones de bíceps — ya fabricado o en plano para construirlo tú.',
+    precio_fabricado: null,
+    precio_plano: null,
+    image1: null, image2: null,
   },
   {
     id: 4,
-    nombre: 'Extensión de cuádriceps con discos',
-    descripcion: 'Máquina de extensión de pierna con carga de discos. Aísla el cuádriceps con seguridad.',
+    nombre: 'Banco multiángulo',
+    descripcion: 'Ajustable a plano, inclinado y declinado. Disponible listo para usar o como plano técnico descargable.',
+    precio_fabricado: null,
+    precio_plano: null,
+    image1: null, image2: null,
   },
   {
     id: 5,
-    nombre: 'Femorales acostado con discos',
-    descripcion: 'Máquina de curl femoral acostado para trabajar la parte posterior del muslo y los isquiotibiales.',
+    nombre: 'Extensión de cuádriceps',
+    descripcion: 'Máquina de extensión de pierna con carga de discos. La fabricamos bajo pedido o te damos el plano en PDF.',
+    precio_fabricado: null,
+    precio_plano: null,
+    image1: null, image2: null,
   },
   {
     id: 6,
-    nombre: 'Rack para press plano',
-    descripcion: 'Soporte seguro para press de banca con barra. Incluye topes de seguridad regulables.',
+    nombre: 'Femorales acostado',
+    descripcion: 'Curl femoral acostado con carga de discos. Consíguela fabricada artesanalmente o construye la tuya con el plano.',
+    precio_fabricado: null,
+    precio_plano: null,
+    image1: null, image2: null,
   },
   {
     id: 7,
-    nombre: 'Banco para press inclinado',
-    descripcion: 'Banco fijo con inclinación para press y mancuernas inclinadas. Mayor activación del pecho superior.',
+    nombre: 'Rack para press plano',
+    descripcion: 'Soporte para press de banca con barra, con topes de seguridad. Bajo pedido en acero o plano PDF para fabricarlo.',
+    precio_fabricado: null,
+    precio_plano: null,
+    image1: null, image2: null,
   },
   {
     id: 8,
-    nombre: 'Banco para remos',
-    descripcion: 'Banco tipo Scott adaptado para ejercicios de remo y trabajo de espalda con apoyo de pecho.',
+    nombre: 'Banco para press inclinado',
+    descripcion: 'Banco fijo con inclinación para mayor activación del pecho superior. Fabricado a mano o en plano técnico.',
+    precio_fabricado: null,
+    precio_plano: null,
+    image1: null, image2: null,
   },
   {
     id: 9,
-    nombre: 'Banco para bíceps',
-    descripcion: 'Banco tipo predicador para curl concentrado y bíceps con barra. Aísla el bíceps completamente.',
+    nombre: 'Banco para remos / bíceps',
+    descripcion: 'Banco tipo Scott adaptado para curl concentrado y remo. Disponible fabricado o como plano descargable.',
+    precio_fabricado: null,
+    precio_plano: null,
+    image1: null, image2: null,
   },
   {
     id: 10,
     nombre: 'Estructura para dominadas',
-    descripcion: 'Marco fijo de acero para dominadas amplias, neutras y cerradas. Soporta altos niveles de carga.',
+    descripcion: 'Marco de acero para dominadas amplias, neutras y cerradas. Encarga la tuya hecha o consigue el plano en PDF.',
+    precio_fabricado: null,
+    precio_plano: null,
+    image1: null, image2: null,
   },
 ]
 
+const fmt = (p) => p != null ? `$${Number(p).toLocaleString('es-CO')} COP` : 'Próximamente'
+
+const GRID_PATTERN = {
+  backgroundImage:
+    'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
+}
+
 export default function MaquinasPedidoPage() {
+  const [cart, setCart]       = useState([])
+  const [cartOpen, setCartOpen] = useState(false)
+  const [lightbox, setLightbox] = useState(null)
+  const [visible, setVisible]   = useState(PAGE_SIZE)
+
+  const addToCart    = (p) => setCart(prev => prev.find(i => i.id === p.id) ? prev : [...prev, p])
+  const removeFromCart = (id) => setCart(prev => prev.filter(i => i.id !== id))
+  const cartTotal    = cart.reduce((sum, i) => sum + (i.precio_plano ?? 0), 0)
+
+  const buildCartMsg = () => {
+    const lines = cart.map(i => `• Plano: ${i.nombre} — ${fmt(i.precio_plano)}`)
+    const msg = [
+      'Hola, quiero adquirir los siguientes planos de INKognito Gym:',
+      '',
+      ...lines,
+      '',
+      cartTotal > 0 ? `Total planos: ${fmt(cartTotal)}` : '',
+      '',
+      'Por favor confirmar disponibilidad y método de pago. ¡Gracias!',
+    ].filter(Boolean).join('\n')
+    return `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`
+  }
+
+  const membresiaMsg = `https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero el acceso completo a todos los planos de Gym')}`
+  const visibles = productos.slice(0, visible)
+
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Seo
-        title="Máquinas de Gym Bajo Pedido | Fabricación Artesanal — Envío a Colombia"
-        description="Racks, bancos multiángulo, jalones, extensiones y más. Fabricadas con soldadura profesional en Urabá. Envío por transportadora a toda Colombia. Cotiza por WhatsApp."
+        title="Máquinas de Gym y Planos Técnicos | Fabricación Artesanal — Colombia"
+        description="Máquinas de gym bajo pedido fabricadas artesanalmente en Urabá + planos técnicos en PDF para construirlas tú mismo. Envíos a toda Colombia."
         siteName="INKognito Gym"
         canonical={`${import.meta.env.VITE_SITE_URL}/gym/maquinas-pedido`}
       />
 
-      <NavbarGym />
+      <NavbarGym cartCount={cart.length} onCartClick={() => setCartOpen(true)} />
 
       {/* HERO */}
       <section className="relative pt-28 md:pt-36 pb-16 px-4 md:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
-          }}
-        />
+        <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
-        <div className="mb-0">
           <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">
-            Fabricación artesanal
+            Fabricación artesanal · Planos digitales
           </p>
           <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-6">
             Máquinas<br />
-            <span className="text-gray-400">bajo pedido</span>
+            <span className="text-gray-400">y planos</span>
           </h1>
           <p className="text-gray-400 leading-relaxed max-w-2xl mb-6">
-            Fabricamos equipos de gym artesanalmente en Urabá, Antioquia. Cada máquina se construye con acero de calidad y se ajusta a tus necesidades específicas.
+            Fabricamos equipos de gym artesanalmente en Urabá, Antioquia — o descarga los planos técnicos en PDF para construirlos tú mismo. Cada máquina y plano se ajusta a tus necesidades.
           </p>
-
-          {/* NOTA INFORMATIVA */}
           <div className="border border-gray-700 bg-gray-800/50 rounded-xl p-5 max-w-2xl">
             <p className="text-gray-400 text-sm leading-relaxed">
-              <span className="font-bold text-white">Nota:</span>{' '}
+              <span className="font-bold text-white">Envíos:</span>{' '}
               Fabricamos en Urabá con envíos a nivel nacional por transportadora (Servientrega, Coordinadora). El flete corre por cuenta del cliente.
             </p>
           </div>
         </div>
-        </div>
       </section>
 
-      <div className="pb-24 px-4 md:px-6 max-w-7xl mx-auto pt-12">
-        {/* GRID DE MÁQUINAS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {maquinas.map((m) => (
-            <div
-              key={m.id}
-              className="border border-gray-800 bg-gray-800/40 rounded-2xl overflow-hidden hover:border-gray-600 transition-all duration-300 flex flex-col"
-            >
-              <div className="aspect-square bg-gray-800 flex items-center justify-center">
-                <span className="text-gray-700 text-xs uppercase tracking-widest text-center px-6">
-                  Foto próximamente
-                </span>
-              </div>
-              <div className="p-5 flex flex-col gap-3 flex-1">
-                <div className="flex gap-2 flex-wrap">
-                  <span className="text-[10px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-3 py-1">
-                    Bajo pedido
-                  </span>
-                  <span className="text-[10px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-3 py-1">
-                    Envío nacional
-                  </span>
-                </div>
-                <h3 className="font-black uppercase text-base leading-tight">{m.nombre}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed flex-1">{m.descripcion}</p>
-                <a
-                  href={`https://wa.me/573207911013?text=Hola,%20me%20interesa%20cotizar%20la%20m%C3%A1quina:%20${encodeURIComponent(m.nombre)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-auto block text-center border border-gray-600 text-gray-300 text-xs font-bold uppercase tracking-[0.15em] py-3 rounded-xl hover:border-gray-300 hover:text-white transition-all duration-300"
-                >
-                  Cotizar por WhatsApp
-                </a>
-              </div>
+      <div className="pb-32 px-4 md:px-6 max-w-7xl mx-auto pt-12">
+
+        {/* CARD MEMBRESÍA */}
+        <div className="relative border border-gray-400/40 bg-gray-900 rounded-2xl p-8 md:p-10 mb-12 overflow-hidden">
+          <div className="absolute inset-0 opacity-[0.025]" style={GRID_PATTERN} />
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="flex-1">
+              <span className="inline-block text-[10px] font-black uppercase tracking-[0.25em] bg-white text-gray-950 rounded-full px-3 py-1 mb-4">
+                Acceso total
+              </span>
+              <h2 className="text-2xl md:text-4xl font-black uppercase leading-tight mb-3">
+                Membresía de por vida
+              </h2>
+              <p className="text-gray-400 leading-relaxed max-w-lg text-sm md:text-base">
+                Paga una sola vez y obtén acceso a todos los planos disponibles, incluyendo los que se agreguen en el futuro.
+              </p>
             </div>
-          ))}
+            <div className="flex flex-col items-start md:items-end gap-4 shrink-0">
+              <span className="text-3xl md:text-4xl font-black text-white">{MEMBRESIA_PRECIO}</span>
+              <a
+                href={membresiaMsg}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-white text-gray-950 font-black uppercase tracking-[0.15em] text-xs py-3 px-6 rounded-xl hover:bg-gray-200 transition-all duration-300"
+              >
+                Obtener acceso completo
+              </a>
+            </div>
+          </div>
         </div>
 
+        {/* GRID */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {visibles.map((p) => {
+            const hasImages = p.image1 || p.image2
+            const inCart    = cart.some(i => i.id === p.id)
+            return (
+              <div
+                key={p.id}
+                className="border border-gray-800 bg-gray-800/40 rounded-2xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
+              >
+                {/* IMAGEN */}
+                <div className="relative w-full aspect-video bg-gray-800 flex items-center justify-center">
+                  {p.image1
+                    ? <img src={p.image1} alt={p.nombre} className="w-full h-full object-cover" />
+                    : <span className="text-gray-700 text-xs uppercase tracking-widest">Imagen próximamente</span>
+                  }
+                  {hasImages && (
+                    <button
+                      onClick={() => setLightbox(p)}
+                      className="absolute bottom-2 right-2 bg-black/60 border border-gray-600 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-lg hover:bg-black/90 transition-all"
+                    >
+                      Ver
+                    </button>
+                  )}
+                </div>
+
+                {/* CONTENIDO */}
+                <div className="p-5 flex flex-col gap-3 flex-1">
+                  <div className="flex gap-2 flex-wrap">
+                    <span className="text-[10px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-3 py-1">Bajo pedido</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-3 py-1">Envío nacional</span>
+                  </div>
+                  <h3 className="font-black uppercase text-base leading-tight">{p.nombre}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed flex-1">{p.descripcion}</p>
+
+                  {/* PRECIOS */}
+                  <div className="border-t border-gray-800 pt-3 flex flex-col gap-1">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-gray-500 uppercase tracking-widest">Fabricada</span>
+                      <span className={p.precio_fabricado ? 'text-white font-black' : 'text-gray-600'}>{fmt(p.precio_fabricado)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-gray-500 uppercase tracking-widest">Plano PDF</span>
+                      <span className={p.precio_plano ? 'text-white font-black' : 'text-gray-600'}>{fmt(p.precio_plano)}</span>
+                    </div>
+                  </div>
+
+                  {/* BOTONES */}
+                  <div className="flex flex-col gap-2 mt-1">
+                    <a
+                      href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, me interesa cotizar la máquina: ${p.nombre}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-center border border-gray-600 text-gray-300 text-[10px] font-bold uppercase tracking-[0.15em] py-2.5 rounded-xl hover:border-gray-300 hover:text-white transition-all duration-300"
+                    >
+                      Cotizar máquina fabricada
+                    </a>
+                    <button
+                      disabled={!p.precio_plano || inCart}
+                      onClick={() => addToCart(p)}
+                      className={`text-[10px] font-bold uppercase tracking-[0.15em] py-2.5 rounded-xl border transition-all duration-300 ${
+                        !p.precio_plano
+                          ? 'border-gray-800 text-gray-700 cursor-not-allowed'
+                          : inCart
+                          ? 'border-gray-500 text-gray-400 cursor-default'
+                          : 'border-gray-600 text-gray-300 hover:border-white hover:text-white cursor-pointer'
+                      }`}
+                    >
+                      {inCart ? 'Plano en carrito ✓' : 'Agregar plano al carrito'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* CARGAR MÁS */}
+        {visible < productos.length && (
+          <div className="text-center mt-10">
+            <button
+              onClick={() => setVisible(v => Math.min(v + PAGE_SIZE, productos.length))}
+              className="border border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-[0.2em] py-3 px-8 rounded-xl hover:border-gray-400 hover:text-white transition-all duration-300"
+            >
+              Cargar más ({productos.length - visible} restantes)
+            </button>
+          </div>
+        )}
       </div>
 
       <FooterGym />
+
+      {/* BACKDROP CARRITO */}
+      <div
+        className={`fixed inset-0 bg-black/70 z-[60] transition-opacity duration-300 ${cartOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        onClick={() => setCartOpen(false)}
+      />
+
+      {/* DRAWER CARRITO */}
+      <aside className={`fixed top-0 right-0 h-full w-full max-w-sm bg-gray-950 border-l border-gray-800 z-[70] flex flex-col transition-transform duration-300 ease-out ${cartOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-800">
+          <h2 className="font-black uppercase tracking-[0.2em] text-sm">Carrito de planos</h2>
+          <button onClick={() => setCartOpen(false)} className="text-gray-400 hover:text-white text-2xl leading-none bg-transparent border-none cursor-pointer">✕</button>
+        </div>
+        <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-3">
+          {cart.length === 0
+            ? <p className="text-gray-600 text-sm text-center mt-12">No has agregado ningún plano.</p>
+            : cart.map(item => (
+                <div key={item.id} className="border border-gray-800 rounded-xl p-4 flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-black uppercase text-xs leading-tight mb-1">{item.nombre}</p>
+                    <p className="text-gray-400 text-xs">{fmt(item.precio_plano)}</p>
+                  </div>
+                  <button
+                    onClick={() => removeFromCart(item.id)}
+                    className="text-gray-600 hover:text-red-400 text-xs uppercase tracking-widest border border-gray-800 rounded-lg px-2 py-1 transition-colors shrink-0"
+                  >
+                    Quitar
+                  </button>
+                </div>
+              ))
+          }
+        </div>
+        <div className="px-6 py-5 border-t border-gray-800 flex flex-col gap-3">
+          {cartTotal > 0 && (
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400 text-sm uppercase tracking-widest">Total</span>
+              <span className="font-black text-lg">{fmt(cartTotal)}</span>
+            </div>
+          )}
+          <a
+            href={cart.length > 0 ? buildCartMsg() : '#'}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={e => { if (cart.length === 0) e.preventDefault() }}
+            className={`block text-center font-black uppercase tracking-[0.15em] text-xs py-4 rounded-xl transition-all duration-300 ${cart.length > 0 ? 'bg-white text-gray-950 hover:bg-gray-200' : 'bg-gray-800 text-gray-600 cursor-not-allowed'}`}
+          >
+            Finalizar por WhatsApp
+          </a>
+        </div>
+      </aside>
+
+      {/* LIGHTBOX */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 bg-black/90 z-[80] flex items-center justify-center p-4"
+          onClick={() => setLightbox(null)}
+        >
+          <button
+            className="absolute top-5 right-6 text-white/60 hover:text-white text-3xl leading-none bg-transparent border-none cursor-pointer z-10"
+            onClick={() => setLightbox(null)}
+            aria-label="Cerrar"
+          >✕</button>
+          <div className="flex flex-col md:flex-row gap-4 max-w-4xl w-full" onClick={e => e.stopPropagation()}>
+            {[lightbox.image1, lightbox.image2].filter(Boolean).map((src, i) => (
+              <img key={i} src={src} alt={`${lightbox.nombre} — imagen ${i + 1}`} className="rounded-xl object-contain max-h-[75vh] flex-1" />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
