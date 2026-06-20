@@ -13,24 +13,22 @@ const GRID_PATTERN = {
 
 const productos = [
   // Proteína
-  { id: 1,  categoria: 'Proteína',   nombre: 'Whey Protein 2 lb',              precio: null, image: null },
-  { id: 2,  categoria: 'Proteína',   nombre: 'Whey Protein 5 lb',              precio: null, image: null },
-  { id: 3,  categoria: 'Proteína',   nombre: 'Proteína vegana 2 lb',           precio: null, image: null },
+  { id: 1,  categoria: 'Proteína',    nombre: 'Whey Protein 2 lb',              precioLabel: '$XXX.000', image: null },
+  { id: 2,  categoria: 'Proteína',    nombre: 'Whey Protein 5 lb',              precioLabel: '$XXX.000', image: null },
+  { id: 3,  categoria: 'Proteína',    nombre: 'Proteína vegana 2 lb',           precioLabel: '$XXX.000', image: null },
   // Creatina
-  { id: 4,  categoria: 'Creatina',   nombre: 'Creatina monohidrato 300 g',     precio: null, image: null },
-  { id: 5,  categoria: 'Creatina',   nombre: 'Creatina monohidrato 500 g',     precio: null, image: null },
-  { id: 6,  categoria: 'Creatina',   nombre: 'Creatina micronizada 300 g',     precio: null, image: null },
+  { id: 4,  categoria: 'Creatina',    nombre: 'Creatina monohidrato 300 g',     precioLabel: '$XXX.000', image: null },
+  { id: 5,  categoria: 'Creatina',    nombre: 'Creatina monohidrato 500 g',     precioLabel: '$XXX.000', image: null },
+  { id: 6,  categoria: 'Creatina',    nombre: 'Creatina micronizada 300 g',     precioLabel: '$XXX.000', image: null },
   // Pre-entreno
-  { id: 7,  categoria: 'Pre-entreno', nombre: 'Pre-entreno con estimulante',   precio: null, image: null },
-  { id: 8,  categoria: 'Pre-entreno', nombre: 'Pre-entreno sin estimulante',   precio: null, image: null },
-  { id: 9,  categoria: 'Pre-entreno', nombre: 'Pre-entreno + creatina',        precio: null, image: null },
+  { id: 7,  categoria: 'Pre-entreno', nombre: 'Pre-entreno con estimulante',    precioLabel: '$XXX.000', image: null },
+  { id: 8,  categoria: 'Pre-entreno', nombre: 'Pre-entreno sin estimulante',    precioLabel: '$XXX.000', image: null },
+  { id: 9,  categoria: 'Pre-entreno', nombre: 'Pre-entreno + creatina',         precioLabel: '$XXX.000', image: null },
   // Vitaminas
-  { id: 10, categoria: 'Vitaminas',  nombre: 'Multivitamínico completo',       precio: null, image: null },
-  { id: 11, categoria: 'Vitaminas',  nombre: 'Vitamina C 1000 mg',             precio: null, image: null },
-  { id: 12, categoria: 'Vitaminas',  nombre: 'Omega 3 — 60 cápsulas',          precio: null, image: null },
+  { id: 10, categoria: 'Vitaminas',   nombre: 'Multivitamínico completo',       precioLabel: '$XXX.000', image: null },
+  { id: 11, categoria: 'Vitaminas',   nombre: 'Vitamina C 1000 mg',             precioLabel: '$XXX.000', image: null },
+  { id: 12, categoria: 'Vitaminas',   nombre: 'Omega 3 — 60 cápsulas',          precioLabel: '$XXX.000', image: null },
 ]
-
-const fmt = (p) => p != null ? `$${Number(p).toLocaleString('es-CO')} COP` : 'Próximamente'
 
 const CATEGORIAS = ['Todos', 'Proteína', 'Creatina', 'Pre-entreno', 'Vitaminas']
 
@@ -40,24 +38,21 @@ export default function SuplementosPage() {
   const [filtro, setFiltro]     = useState('Todos')
   const [visible, setVisible]   = useState(PAGE_SIZE)
 
-  const addToCart    = (p) => setCart(prev => prev.find(i => i.id === p.id) ? prev : [...prev, p])
+  const addToCart      = (p) => setCart(prev => prev.find(i => i.id === p.id) ? prev : [...prev, p])
   const removeFromCart = (id) => setCart(prev => prev.filter(i => i.id !== id))
-  const cartTotal    = cart.reduce((sum, i) => sum + (i.precio ?? 0), 0)
 
   const filtrados = filtro === 'Todos' ? productos : productos.filter(p => p.categoria === filtro)
   const visibles  = filtrados.slice(0, visible)
 
   const buildCartMsg = () => {
-    const lines = cart.map(i => `• ${i.nombre} — ${fmt(i.precio)}`)
+    const lines = cart.map(i => `• ${i.nombre} — ${i.precioLabel}`)
     const msg = [
       'Hola, quiero adquirir los siguientes suplementos de INKognito Gym:',
       '',
       ...lines,
       '',
-      cartTotal > 0 ? `Total: ${fmt(cartTotal)}` : '',
-      '',
-      'Por favor confirmar disponibilidad y método de pago. ¡Gracias!',
-    ].filter(Boolean).join('\n')
+      'Por favor confirmar disponibilidad, precio final y método de pago. ¡Gracias!',
+    ].join('\n')
     return `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`
   }
 
@@ -110,13 +105,13 @@ export default function SuplementosPage() {
         </div>
 
         {/* GRID */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {visibles.map((p) => {
             const inCart = cart.some(i => i.id === p.id)
             return (
               <div
                 key={p.id}
-                className="border border-gray-800 bg-gray-800/40 rounded-2xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
+                className="border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
               >
                 {/* IMAGEN */}
                 <div className="relative w-full aspect-square bg-gray-800 flex items-center justify-center">
@@ -127,32 +122,28 @@ export default function SuplementosPage() {
                         className="w-full h-full object-cover"
                         onError={(e) => { e.target.style.display = 'none' }}
                       />
-                    : <span className="text-gray-700 text-xs uppercase tracking-widest text-center px-4">Imagen próximamente</span>
+                    : <span className="text-gray-700 text-[10px] uppercase tracking-widest text-center px-2">Imagen próx.</span>
                   }
                 </div>
 
                 {/* CONTENIDO */}
-                <div className="p-5 flex flex-col gap-3 flex-1">
-                  <span className="text-[10px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-3 py-1 self-start">
+                <div className="p-3 flex flex-col gap-2 flex-1">
+                  <span className="text-[9px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-2 py-0.5 self-start">
                     {p.categoria}
                   </span>
-                  <h3 className="font-black uppercase text-sm leading-tight">{p.nombre}</h3>
-                  <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-800">
-                    <span className={`font-black text-base ${p.precio ? 'text-white' : 'text-gray-600'}`}>
-                      {fmt(p.precio)}
-                    </span>
+                  <h3 className="font-black uppercase text-xs leading-tight">{p.nombre}</h3>
+                  <div className="flex flex-col gap-1.5 mt-auto pt-2 border-t border-gray-800">
+                    <span className="text-white font-black text-sm">{p.precioLabel}</span>
                     <button
-                      disabled={!p.precio || inCart}
+                      disabled={inCart}
                       onClick={() => addToCart(p)}
-                      className={`w-auto text-center text-[10px] font-bold uppercase tracking-[0.15em] py-2 px-4 rounded-lg border transition-all duration-300 ${
-                        !p.precio
-                          ? 'border-gray-800 text-gray-700 cursor-not-allowed'
-                          : inCart
+                      className={`w-full text-center text-[9px] font-bold uppercase tracking-widest py-1.5 rounded-lg border transition-all duration-300 ${
+                        inCart
                           ? 'border-gray-500 text-gray-400 cursor-default'
                           : 'border-gray-600 text-gray-300 hover:border-white hover:text-white cursor-pointer'
                       }`}
                     >
-                      {inCart ? 'En carrito ✓' : 'Agregar'}
+                      {inCart ? 'En carrito ✓' : 'Agregar al carrito'}
                     </button>
                   </div>
                 </div>
@@ -196,7 +187,7 @@ export default function SuplementosPage() {
                   <div className="flex-1 min-w-0">
                     <p className="font-black uppercase text-xs leading-tight mb-1">{item.nombre}</p>
                     <p className="text-gray-500 text-[10px] uppercase tracking-widest">{item.categoria}</p>
-                    <p className="text-gray-400 text-xs mt-0.5">{fmt(item.precio)}</p>
+                    <p className="text-gray-400 text-xs mt-0.5">{item.precioLabel}</p>
                   </div>
                   <button
                     onClick={() => removeFromCart(item.id)}
@@ -209,12 +200,6 @@ export default function SuplementosPage() {
           }
         </div>
         <div className="px-6 py-5 border-t border-gray-800 flex flex-col gap-3">
-          {cartTotal > 0 && (
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400 text-sm uppercase tracking-widest">Total</span>
-              <span className="font-black text-lg">{fmt(cartTotal)}</span>
-            </div>
-          )}
           <a
             href={cart.length > 0 ? buildCartMsg() : '#'}
             target="_blank"
