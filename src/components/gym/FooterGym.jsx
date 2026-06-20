@@ -1,7 +1,20 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa'
 
 export default function FooterGym() {
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
+
+  const goToPlanos = (e) => {
+    e.preventDefault()
+    if (pathname === '/gym') {
+      document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' })
+    } else {
+      navigate('/gym')
+      setTimeout(() => document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' }), 400)
+    }
+  }
+
   return (
     <footer className="relative border-t border-gray-800 bg-gray-950 px-6 py-10 md:py-16 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
@@ -37,8 +50,11 @@ export default function FooterGym() {
               <Link to="/gym/maquinas-pedido" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
                 Máquinas bajo pedido
               </Link>
-              <Link to="/gym/planos" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
+              <a href="/gym#planos" onClick={goToPlanos} className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
                 Planos digitales
+              </a>
+              <Link to="/gym/suplementos" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
+                Suplementos
               </Link>
               <Link to="/gym/tutoriales" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
                 Tutoriales en video

@@ -122,7 +122,7 @@ export default function MaquinasPedidoPage() {
 
       {/* GRID */}
       <div className="pb-32 px-4 md:px-6 max-w-7xl mx-auto pt-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           {productos.map((p) => {
             const hasImages = p.image1 || p.image2
             const inCart    = cart.some(i => i.id === p.id)
