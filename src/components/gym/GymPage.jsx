@@ -147,8 +147,16 @@ export default function GymPage() {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {creaciones.map((item) => (
                 <div key={item.name} className="border border-gray-800 bg-gray-900 rounded-xl overflow-hidden">
-                  <div className="aspect-square bg-gray-700 flex items-center justify-center">
-                    {item.image ? (
+                  <div className={`${item.video ? 'aspect-video' : 'aspect-square'} bg-gray-700 flex items-center justify-center`}>
+                    {item.video ? (
+                      <iframe
+                        src={item.video}
+                        title={item.name}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : item.image ? (
                       <img
                         src={item.image}
                         alt={item.name}
