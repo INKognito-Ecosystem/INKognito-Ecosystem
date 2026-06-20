@@ -1,13 +1,12 @@
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import Seo from '../../Seo'
+import { Instagram, Facebook, Youtube } from 'lucide-react'
 
 const GRID_PATTERN = {
   backgroundImage:
     'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
 }
-
-const IG = 'https://www.instagram.com/jhumaneztattoo'
 
 const ebooks = [
   {
@@ -91,7 +90,7 @@ export default function RecursosPage() {
                   <p className="text-gray-500 text-sm leading-relaxed">{eb.descripcion}</p>
                 </div>
 
-                <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-gray-800">
+                <div className="mt-auto pt-4 border-t border-gray-800">
                   <a
                     href={eb.pdf}
                     download
@@ -99,18 +98,31 @@ export default function RecursosPage() {
                   >
                     Descargar gratis
                   </a>
-                  <a
-                    href={IG}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-center border border-gray-600 text-gray-400 font-bold uppercase tracking-[0.15em] text-xs py-3 px-6 rounded-xl hover:border-gray-300 hover:text-white transition-all duration-300"
-                  >
-                    Síguenos en Instagram
-                  </a>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+
+        {/* SECCIÓN REDES */}
+        <div className="mt-16 border-t border-gray-800 pt-12 text-center max-w-xl mx-auto">
+          <p className="text-gray-400 leading-relaxed text-sm md:text-base mb-8">
+            Si estos recursos te fueron de ayuda, te invito a seguirme en mis redes y a suscribirte a mi canal de YouTube — ahí comparto todo el proceso de construir esto desde cero.
+          </p>
+          <div className="flex items-center justify-center gap-8">
+            <a href="#" target="_blank" rel="noopener noreferrer"
+               className="text-gray-500 hover:text-white transition-colors duration-300">
+              <Instagram size={28} />
+            </a>
+            <a href="#" target="_blank" rel="noopener noreferrer"
+               className="text-gray-500 hover:text-white transition-colors duration-300">
+              <Facebook size={28} />
+            </a>
+            <a href="#" target="_blank" rel="noopener noreferrer"
+               className="text-gray-500 hover:text-white transition-colors duration-300">
+              <Youtube size={28} />
+            </a>
+          </div>
         </div>
       </div>
 
