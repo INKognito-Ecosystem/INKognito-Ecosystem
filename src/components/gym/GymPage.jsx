@@ -75,7 +75,8 @@ const membresiaMsg = `https://wa.me/${WA}?text=${encodeURIComponent('Hola, quier
 const PLANO_MUESTRAS = [null, null, null]
 
 export default function GymPage() {
-  const [planosModalOpen, setPlanosModalOpen] = useState(false)
+  const [planosModalOpen, setPlanosModalOpen]   = useState(false)
+  const [historiaModalOpen, setHistoriaModalOpen] = useState(false)
 
   const scrollToSection = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -107,9 +108,15 @@ export default function GymPage() {
             <span className="text-gray-400">propio gym</span><br />
             desde cero
           </h1>
-          <p className="text-gray-400 text-lg md:text-xl leading-relaxed max-w-2xl">
+          <p className="text-gray-400 text-lg md:text-xl leading-relaxed max-w-2xl mb-10">
             Máquinas fabricadas a mano, planos digitales y recursos para entrenar en casa sin gastar una fortuna.
           </p>
+          <button
+            onClick={() => setHistoriaModalOpen(true)}
+            className="inline-block border border-gray-600 text-gray-300 text-sm font-bold uppercase tracking-[0.2em] py-4 px-8 rounded hover:border-gray-300 hover:text-white transition-all duration-300"
+          >
+            Nuestra historia
+          </button>
         </div>
       </section>
 
@@ -291,6 +298,49 @@ export default function GymPage() {
       </section>
 
       <FooterGym />
+
+      {/* MODAL NUESTRA HISTORIA */}
+      {historiaModalOpen && (
+        <div
+          className="fixed inset-0 bg-black/80 z-[80] flex items-center justify-center p-4 overflow-y-auto"
+          onClick={() => setHistoriaModalOpen(false)}
+        >
+          <div
+            className="relative bg-gray-950 border border-gray-800 rounded-2xl w-full max-w-xl mx-auto my-auto p-8 md:p-10 max-h-[90vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setHistoriaModalOpen(false)}
+              aria-label="Cerrar"
+              className="absolute top-5 right-6 text-gray-500 hover:text-white text-2xl leading-none bg-transparent border-none cursor-pointer"
+            >✕</button>
+
+            <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-6">Nuestra historia</p>
+
+            <p className="text-white text-base md:text-lg font-bold leading-relaxed mb-6 italic">
+              "Empecé como cualquiera: queriendo entrenar, sin poder pagar un gimnasio."
+            </p>
+
+            <p className="text-gray-400 text-sm leading-relaxed mb-5">
+              No tenía el dinero para una membresía mensual, ni para comprar máquinas comerciales que cuestan millones. Así que hice lo que sabía hacer: aprendí a soldar, conseguí una pulidora, y empecé a construir mis propias herramientas — primero mancuernas de cemento, después discos, y con el tiempo, máquinas completas.
+            </p>
+
+            <p className="text-gray-400 text-sm leading-relaxed mb-5">
+              Hoy entreno en mi propio gym, hecho con mis manos, en Chigorodó. Y me di cuenta de algo: si yo lo necesitaba, seguro hay muchas personas en Urabá y en toda Colombia que también quieren entrenar fuerte, sin gastar lo que cuesta un gimnasio comercial o una máquina importada.
+            </p>
+
+            <p className="text-gray-400 text-sm leading-relaxed mb-5">
+              Por eso fabrico estas máquinas — con la misma calidad y resistencia que uso yo mismo todos los días, pero a un precio que tenga sentido para la gente real. No es un negocio que inventé desde un escritorio — es algo que vivo, que uso, y que sé que funciona.
+            </p>
+
+            <p className="text-gray-400 text-sm leading-relaxed mb-8">
+              Si tú también quieres construirte a ti mismo, sin importar dónde empiezas, aquí tienes una alternativa real.
+            </p>
+
+            <p className="text-white font-black uppercase tracking-[0.15em] text-sm">— Jose</p>
+          </div>
+        </div>
+      )}
 
       {/* MODAL MUESTRA PLANOS */}
       {planosModalOpen && (
