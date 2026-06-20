@@ -63,6 +63,7 @@ const MaquinasPedidoPage = lazy(() => import('./components/gym/categories/Maquin
 const VideosTutorialesPage = lazy(() => import('./components/gym/categories/VideosTutorialesPage'))
 const CursosGymPage = lazy(() => import('./components/gym/categories/CursosPage'))
 const SuplementosGymPage = lazy(() => import('./components/gym/categories/SuplementosPage'))
+const RecursosGymPage    = lazy(() => import('./components/gym/categories/RecursosPage'))
 
 const tattooJsonLd = {
   "@context": "https://schema.org",
@@ -222,6 +223,7 @@ function App() {
           <Route path="/gym/tutoriales" element={<VideosTutorialesPage />} />
           <Route path="/gym/cursos" element={<CursosGymPage />} />
           <Route path="/gym/suplementos" element={<SuplementosGymPage />} />
+          <Route path="/gym/recursos"    element={<RecursosGymPage />} />
         </Routes>
       </Suspense>
     </div>
