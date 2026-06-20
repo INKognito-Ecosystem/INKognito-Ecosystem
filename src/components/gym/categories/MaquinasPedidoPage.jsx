@@ -5,7 +5,8 @@ import Seo from '../../Seo'
 import imgBancoMultiangulo from '../../../assets/imagenesgym/bancomultiangulo.jpg'
 import imgRemoAcostado     from '../../../assets/imagenesgym/remoacostado.jpg'
 import imgHipThrust        from '../../../assets/imagenesgym/hipthrust.jpg'
-import imgExtencionFemoral from '../../../assets/imagenesgym/extencionyfemoral.jpg'
+import imgExtencionFemoral  from '../../../assets/imagenesgym/extencionyfemoral.jpg'
+import imgFondosDominadas  from '../../../assets/imagenesgym/fonfosydominadas.jpg'
 
 const WA = '573207911013'
 
@@ -55,7 +56,7 @@ const productos = [
     nombre: 'Estructura para dominadas y fondos',
     descripcion: 'Marco de acero multipropósito para dominadas amplias, neutras y fondos en paralelas.',
     precio: null,
-    image1: null, image2: null,
+    image1: imgFondosDominadas, image2: null,
   },
   {
     id: 7,
