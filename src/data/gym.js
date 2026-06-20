@@ -1,6 +1,13 @@
-// Añade objetos con { id, name, description, image } al publicar el portafolio de máquinas.
-// Cada entrada genera una card en la sección "Mis creaciones" de GymPage.
-export const creaciones = []
+export const creaciones = [
+  { id: 1, name: 'Máquina de jalones al pecho',          description: 'Para trabajar espalda y dorsales con resistencia ajustable.',                                            image: null },
+  { id: 2, name: 'Banco multiángulo',                    description: 'Ajustable para press plano e inclinado.',                                                                image: null },
+  { id: 3, name: 'Barra hexagonal multifuncional',       description: 'Herramienta versátil para sentadillas, peso muerto y ejercicios de brazos en un solo equipo.',          image: null },
+  { id: 4, name: 'Máquina de hipextensiones',            description: 'Fortalece zona lumbar, glúteos e isquiotibiales.',                                                       image: null },
+  { id: 5, name: 'Máquina de extensión de cuádriceps',   description: 'Aislamiento específico para fortalecer cuádriceps.',                                                     image: null },
+  { id: 6, name: 'Mancuernas de cemento',                description: 'Hechas a mano, ajustables en peso según necesidad.',                                                     image: null },
+  { id: 7, name: 'Discos de cemento',                    description: 'Compatibles con barras estándar, fabricados con moldes propios.',                                        image: null },
+  { id: 8, name: 'Barras para pesas',                    description: 'Fabricadas para resistir el uso diario de entrenamiento en casa.',                                       image: null },
+]
 
 export const maquinasDestacadas = [
   {
