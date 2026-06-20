@@ -47,6 +47,7 @@ export default function NavbarGym({ cartCount = 0, onCartClick = null }) {
             <Link to="/gym/suplementos" className={LINK}>Suplementos</Link>
             <Link to="/gym/tutoriales" className={LINK}>Tutoriales</Link>
             <Link to="/gym/cursos" className={LINK}>Cursos</Link>
+            <Link to="/gym/recursos" className={LINK}>Recursos</Link>
           </div>
 
           {/* CARRITO + HAMBURGUESA */}
@@ -83,7 +84,8 @@ export default function NavbarGym({ cartCount = 0, onCartClick = null }) {
           <button                          onClick={goToPlanos}  className={MOBILE_BTN}>Planos</button>
           <Link to="/gym/suplementos"      onClick={close} className={MOBILE_LINK}>Suplementos</Link>
           <Link to="/gym/tutoriales"       onClick={close} className={MOBILE_LINK}>Tutoriales</Link>
-          <Link to="/gym/cursos"           onClick={close} className={MOBILE_LINK}>Cursos</Link>
+          <Link to="/gym/cursos"            onClick={close} className={MOBILE_LINK}>Cursos</Link>
+          <Link to="/gym/recursos"          onClick={close} className={MOBILE_LINK}>Recursos</Link>
           <div className="border-t border-gray-800 mt-1 pt-1">
             <Link to="/jhumaneztattoo" onClick={close} className={MOBILE_LINK}>JHumanezTattoo</Link>
             <Link to="/supply"         onClick={close} className={MOBILE_LINK}>INKognito Supply</Link>

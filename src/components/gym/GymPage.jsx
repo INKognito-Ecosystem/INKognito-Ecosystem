@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { GraduationCap, PlayCircle, FileText, FlaskConical, Wrench } from 'lucide-react'
+import { GraduationCap, PlayCircle, FileText, FlaskConical, Wrench, BookOpen } from 'lucide-react'
 import NavbarGym from './NavbarGym'
 import FooterGym from './FooterGym'
 import Seo from '../Seo'
@@ -70,6 +70,12 @@ const servicios = [
     titulo: 'Cursos recomendados',
     descripcion: 'Los mejores cursos de entrenamiento, nutrición y fabricación en español.',
     link: '/gym/cursos',
+  },
+  {
+    icon: BookOpen,
+    titulo: 'Recursos gratis',
+    descripcion: 'Ebooks gratuitos sobre hábitos y entrenamiento para empezar desde cero.',
+    link: '/gym/recursos',
   },
 ]
 

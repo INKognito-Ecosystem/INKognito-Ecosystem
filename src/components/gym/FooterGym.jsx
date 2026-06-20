@@ -62,6 +62,9 @@ export default function FooterGym() {
               <Link to="/gym/cursos" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
                 Cursos
               </Link>
+              <Link to="/gym/recursos" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
+                Recursos gratis
+              </Link>
             </div>
           </div>
 
