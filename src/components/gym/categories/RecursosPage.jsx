@@ -49,8 +49,8 @@ export default function RecursosPage() {
             Recursos<br />
             <span className="text-gray-400">gratuitos</span>
           </h1>
-          <p className="text-gray-400 leading-relaxed max-w-xl">
-            Ebooks para empezar tu propio camino, sin pagar nada.
+          <p className="text-gray-400 leading-relaxed max-w-2xl">
+            No necesitas pagar nada para empezar a cambiar tu vida. Estos recursos nacieron de mi propia experiencia — construyendo mi gym desde cero, entrenando sin equipo, y aprendiendo a base de prueba y error. Si a mí me sirvió, puede servirte a ti también. Descárgalos, úsalos, y empieza donde estás.
           </p>
         </div>
       </section>
