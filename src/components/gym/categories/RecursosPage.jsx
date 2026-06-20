@@ -1,7 +1,7 @@
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import Seo from '../../Seo'
-import { Instagram, Facebook, Youtube } from 'lucide-react'
+import { FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa'
 
 const GRID_PATTERN = {
   backgroundImage:
@@ -112,15 +112,15 @@ export default function RecursosPage() {
           <div className="flex items-center justify-center gap-8">
             <a href="#" target="_blank" rel="noopener noreferrer"
                className="text-gray-500 hover:text-white transition-colors duration-300">
-              <Instagram size={28} />
+              <FaInstagram size={28} />
             </a>
             <a href="#" target="_blank" rel="noopener noreferrer"
                className="text-gray-500 hover:text-white transition-colors duration-300">
-              <Facebook size={28} />
+              <FaFacebookF size={28} />
             </a>
             <a href="#" target="_blank" rel="noopener noreferrer"
                className="text-gray-500 hover:text-white transition-colors duration-300">
-              <Youtube size={28} />
+              <FaYoutube size={28} />
             </a>
           </div>
         </div>
