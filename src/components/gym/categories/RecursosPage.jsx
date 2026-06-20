@@ -57,11 +57,11 @@ export default function RecursosPage() {
 
       {/* GRID DE EBOOKS */}
       <div className="pb-24 px-4 md:px-6 max-w-4xl mx-auto pt-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+        <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto sm:max-w-none">
           {ebooks.map((eb) => (
             <div
               key={eb.id}
-              className="border border-gray-800 bg-gray-800/40 rounded-2xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
+              className="border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
             >
               {/* PORTADA (aspect 3:4 tipo libro) */}
               <div
@@ -76,25 +76,25 @@ export default function RecursosPage() {
                     onError={(e) => { e.target.style.display = 'none' }}
                   />
                 ) : (
-                  <div className="flex flex-col items-center justify-center gap-3 px-8 text-center">
-                    <span className="text-gray-600 text-4xl">📖</span>
-                    <span className="text-gray-600 text-xs uppercase tracking-widest">Portada próximamente</span>
+                  <div className="flex flex-col items-center justify-center gap-2 px-4 text-center">
+                    <span className="text-gray-600 text-2xl">📖</span>
+                    <span className="text-gray-700 text-[10px] uppercase tracking-widest">Próximamente</span>
                   </div>
                 )}
               </div>
 
               {/* CONTENIDO */}
-              <div className="p-6 flex flex-col gap-4 flex-1">
+              <div className="p-3 flex flex-col gap-2 flex-1">
                 <div>
-                  <h2 className="font-black uppercase text-base leading-tight mb-2">{eb.nombre}</h2>
-                  <p className="text-gray-500 text-sm leading-relaxed">{eb.descripcion}</p>
+                  <h2 className="font-black uppercase text-xs leading-tight mb-1">{eb.nombre}</h2>
+                  <p className="text-gray-500 text-[11px] leading-relaxed">{eb.descripcion}</p>
                 </div>
 
-                <div className="mt-auto pt-4 border-t border-gray-800">
+                <div className="mt-auto pt-2 border-t border-gray-800">
                   <a
                     href={eb.pdf}
                     download
-                    className="block text-center bg-white text-gray-950 font-black uppercase tracking-[0.15em] text-xs py-3 px-6 rounded-xl hover:bg-gray-200 transition-all duration-300"
+                    className="block text-center bg-white text-gray-950 font-black uppercase tracking-[0.1em] text-[10px] py-2 rounded-lg hover:bg-gray-200 transition-all duration-300"
                   >
                     Descargar gratis
                   </a>
