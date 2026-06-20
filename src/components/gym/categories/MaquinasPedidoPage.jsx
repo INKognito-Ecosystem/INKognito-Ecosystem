@@ -2,6 +2,7 @@ import { useState } from 'react'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import Seo from '../../Seo'
+import imgBancoMultiangulo from '../../../assets/imagenesgym/bancomultiangulo.png'
 
 const WA = '573207911013'
 
@@ -16,7 +17,7 @@ const productos = [
     nombre: 'Banco multiángulo',
     descripcion: 'Ajustable a plano, inclinado y declinado. Versátil para todo el tren superior con mancuernas o barra.',
     precio: null,
-    image1: null, image2: null,
+    image1: imgBancoMultiangulo, image2: null,
   },
   {
     id: 2,
