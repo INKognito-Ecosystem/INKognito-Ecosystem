@@ -156,7 +156,7 @@ export default function GymPage() {
                         onError={(e) => { e.target.style.display = 'none' }}
                       />
                     ) : (
-                      <span className="text-gray-600 text-xs uppercase tracking-widest">Sin imagen</span>
+                      <span className="text-gray-600 text-xs uppercase tracking-widest text-center px-3">Imagen próximamente</span>
                     )}
                   </div>
                   <div className="p-4">
