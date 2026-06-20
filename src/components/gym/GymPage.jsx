@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Wrench, GraduationCap, PlayCircle, FileText } from 'lucide-react'
+import { GraduationCap, PlayCircle, FileText, FlaskConical } from 'lucide-react'
 import NavbarGym from './NavbarGym'
 import FooterGym from './FooterGym'
 import Seo from '../Seo'
@@ -46,6 +46,12 @@ const servicios = [
     titulo: 'Planos Digitales',
     descripcion: 'Planos técnicos en PDF para fabricar tus propias máquinas de gym.',
     scrollTo: 'planos',
+  },
+  {
+    icon: FlaskConical,
+    titulo: 'Suplementos',
+    descripcion: 'Proteína, creatina, pre-entreno y vitaminas para potenciar tu entrenamiento.',
+    link: '/gym/suplementos',
   },
   {
     icon: PlayCircle,
@@ -122,7 +128,7 @@ export default function GymPage() {
           <h2 className="text-3xl md:text-5xl font-black uppercase leading-none mb-12">
             Lo que puedes conseguir aquí
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {servicios.map((s) => {
               const Icon = s.icon
               const inner = (
@@ -247,8 +253,8 @@ export default function GymPage() {
         </div>
       </section>
 
-      {/* MÁQUINAS BAJO PEDIDO — BLOQUE DESCRIPTIVO */}
-      <section className="pb-20 px-4 md:px-6 max-w-7xl mx-auto">
+      {/* MÁQUINAS BAJO PEDIDO + CONTACTO — UNIFICADO */}
+      <section className="pb-24 px-4 md:px-6 max-w-7xl mx-auto">
         <div className="border-t border-gray-800 pt-16">
           <div className="flex items-end justify-between mb-10">
             <div>
@@ -263,50 +269,31 @@ export default function GymPage() {
             </Link>
           </div>
 
-          <div className="border border-gray-800 bg-gray-900/60 rounded-2xl p-8 md:p-10">
-            <p className="text-gray-300 leading-relaxed text-base md:text-lg max-w-2xl mb-8">
-              Fabrico máquinas de gym a tu medida, con soldadura profesional y a precios muy accesibles. Cuéntame qué necesitas y te cotizo.
+          <div className="bg-gray-900/60 border border-gray-700 rounded-2xl p-8 md:p-14 hover:border-gray-600 transition-all duration-300">
+            <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-4">Contacto directo</p>
+            <h3 className="text-2xl md:text-4xl font-black uppercase leading-none mb-4">
+              ¿Tienes alguna<br />
+              <span className="text-gray-400">idea en mente?</span>
+            </h3>
+            <p className="text-gray-300 leading-relaxed text-base max-w-2xl mb-8">
+              Fabrico máquinas de gym a tu medida, con soldadura profesional y a precios muy accesibles. ¿Tienes alguna idea en mente? Cuéntanos qué máquina necesitas y te damos un presupuesto personalizado.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <a
-                href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, me interesa cotizar una máquina de gym personalizada')}`}
+                href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, me interesa una máquina de gym personalizada')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block text-center bg-white text-gray-950 font-black uppercase tracking-[0.2em] text-sm py-4 px-8 rounded-xl hover:bg-gray-200 transition-all duration-300"
+                className="inline-block text-center bg-white text-gray-950 font-black uppercase tracking-[0.2em] text-sm py-4 px-10 rounded-xl hover:bg-gray-200 transition-all duration-300"
               >
-                Cotizar mi máquina
+                Escríbenos por WhatsApp
               </a>
               <Link
                 to="/gym/maquinas-pedido"
-                className="inline-block text-center border border-gray-700 text-gray-400 font-bold uppercase tracking-[0.2em] text-sm py-4 px-8 rounded-xl hover:border-gray-400 hover:text-white transition-all duration-300 md:hidden"
+                className="inline-block text-center border border-gray-700 text-gray-400 font-bold uppercase tracking-[0.2em] text-sm py-4 px-8 rounded-xl hover:border-gray-400 hover:text-white transition-all duration-300"
               >
                 Ver catálogo completo →
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA FINAL */}
-      <section className="pb-24 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-gray-800 pt-16">
-          <div className="bg-gray-900/60 border border-gray-700 rounded-2xl p-8 md:p-14 text-center hover:border-gray-600 transition-all duration-300">
-            <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-4">Contacto directo</p>
-            <h2 className="text-3xl md:text-5xl font-black uppercase leading-none mb-4">
-              ¿Tienes alguna<br />
-              <span className="text-gray-400">idea en mente?</span>
-            </h2>
-            <p className="text-gray-400 mb-10 max-w-md mx-auto">
-              Cuéntanos qué máquina necesitas y te damos un presupuesto personalizado.
-            </p>
-            <a
-              href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, me interesa una máquina de gym personalizada')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block bg-gray-400 text-gray-900 font-black uppercase tracking-[0.2em] py-4 px-12 rounded hover:bg-white transition-all duration-300"
-            >
-              Escríbenos por WhatsApp
-            </a>
           </div>
         </div>
       </section>
