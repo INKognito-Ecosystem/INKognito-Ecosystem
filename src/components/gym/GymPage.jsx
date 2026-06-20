@@ -147,7 +147,7 @@ export default function GymPage() {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {creaciones.map((item) => (
                 <div key={item.name} className="border border-gray-800 bg-gray-900 rounded-xl overflow-hidden">
-                  <div className={`${item.video ? 'aspect-video' : 'aspect-square'} bg-gray-700 flex items-center justify-center`}>
+                  <div className="aspect-video bg-gray-700 flex items-center justify-center">
                     {item.video ? (
                       <iframe
                         src={item.video}
@@ -167,9 +167,9 @@ export default function GymPage() {
                       <span className="text-gray-600 text-xs uppercase tracking-widest text-center px-3">Imagen próximamente</span>
                     )}
                   </div>
-                  <div className="p-4">
-                    <p className="font-black uppercase text-sm">{item.name}</p>
-                    <p className="text-gray-500 text-xs mt-1">{item.description}</p>
+                  <div className="p-3">
+                    <p className="font-black uppercase text-xs leading-tight mb-1">{item.name}</p>
+                    <p className="text-gray-500 text-xs leading-relaxed">{item.description}</p>
                   </div>
                 </div>
               ))}
