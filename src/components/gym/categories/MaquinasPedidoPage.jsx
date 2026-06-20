@@ -6,7 +6,7 @@ import imgBancoMultiangulo from '../../../assets/imagenesgym/bancomultiangulo.jp
 import imgRemoAcostado     from '../../../assets/imagenesgym/remoacostado.jpg'
 import imgHipThrust        from '../../../assets/imagenesgym/hipthrust.jpg'
 import imgExtencionFemoral  from '../../../assets/imagenesgym/extencionyfemoral.jpg'
-import imgFondosDominadas  from '../../../assets/imagenesgym/fonfosydominadas.jpg'
+import imgFondosDominadas  from '../../../assets/imagenesgym/fondosydominadas.jpg'
 
 const WA = '573207911013'
 
