@@ -1,10 +1,28 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { Menu, X, Dumbbell, ShoppingCart } from 'lucide-react'
 import logoGym from '../../assets/milogo/gym.webp'
 
+const LINK = 'uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300'
+const MOBILE_LINK = 'block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300'
+const MOBILE_BTN  = 'block w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300 bg-transparent border-none cursor-pointer'
+
 export default function NavbarGym({ cartCount = 0, onCartClick = null }) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
+
+  const goToPlanos = () => {
+    setMenuOpen(false)
+    if (pathname === '/gym') {
+      document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' })
+    } else {
+      navigate('/gym')
+      setTimeout(() => document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' }), 400)
+    }
+  }
+
+  const close = () => setMenuOpen(false)
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-gray-950 border-b border-gray-800">
@@ -24,15 +42,11 @@ export default function NavbarGym({ cartCount = 0, onCartClick = null }) {
 
           {/* MENÚ DESKTOP */}
           <div className="hidden md:flex items-center gap-8">
-            <Link to="/gym/maquinas-pedido" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
-              Máquinas
-            </Link>
-            <Link to="/gym/tutoriales" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
-              Tutoriales
-            </Link>
-            <Link to="/gym/cursos" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
-              Cursos
-            </Link>
+            <Link to="/gym/maquinas-pedido" className={LINK}>Máquinas</Link>
+            <button onClick={goToPlanos} className={LINK}>Planos</button>
+            <Link to="/gym/suplementos" className={LINK}>Suplementos</Link>
+            <Link to="/gym/tutoriales" className={LINK}>Tutoriales</Link>
+            <Link to="/gym/cursos" className={LINK}>Cursos</Link>
           </div>
 
           {/* CARRITO + HAMBURGUESA */}
@@ -64,39 +78,17 @@ export default function NavbarGym({ cartCount = 0, onCartClick = null }) {
       {/* DROPDOWN MÓVIL */}
       {menuOpen && (
         <div className="absolute right-4 top-16 md:top-20 bg-gray-950 border border-gray-700 w-56 z-50">
-          <Link to="/gym" onClick={() => setMenuOpen(false)}
-            className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
-            Inicio
-          </Link>
-          <Link to="/gym/maquinas-pedido" onClick={() => setMenuOpen(false)}
-            className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
-            Máquinas
-          </Link>
-          <Link to="/gym/tutoriales" onClick={() => setMenuOpen(false)}
-            className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
-            Tutoriales
-          </Link>
-          <Link to="/gym/cursos" onClick={() => setMenuOpen(false)}
-            className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
-            Cursos
-          </Link>
+          <Link to="/gym"                  onClick={close} className={MOBILE_LINK}>Inicio</Link>
+          <Link to="/gym/maquinas-pedido"  onClick={close} className={MOBILE_LINK}>Máquinas</Link>
+          <button                          onClick={goToPlanos}  className={MOBILE_BTN}>Planos</button>
+          <Link to="/gym/suplementos"      onClick={close} className={MOBILE_LINK}>Suplementos</Link>
+          <Link to="/gym/tutoriales"       onClick={close} className={MOBILE_LINK}>Tutoriales</Link>
+          <Link to="/gym/cursos"           onClick={close} className={MOBILE_LINK}>Cursos</Link>
           <div className="border-t border-gray-800 mt-1 pt-1">
-            <Link to="/jhumaneztattoo" onClick={() => setMenuOpen(false)}
-              className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
-              JHumanezTattoo
-            </Link>
-            <Link to="/supply" onClick={() => setMenuOpen(false)}
-              className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
-              INKognito Supply
-            </Link>
-            <Link to="/store" onClick={() => setMenuOpen(false)}
-              className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
-              INKognito Store
-            </Link>
-            <Link to="/" onClick={() => setMenuOpen(false)}
-              className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
-              Ecosistema
-            </Link>
+            <Link to="/jhumaneztattoo" onClick={close} className={MOBILE_LINK}>JHumanezTattoo</Link>
+            <Link to="/supply"         onClick={close} className={MOBILE_LINK}>INKognito Supply</Link>
+            <Link to="/store"          onClick={close} className={MOBILE_LINK}>INKognito Store</Link>
+            <Link to="/"               onClick={close} className={MOBILE_LINK}>Ecosistema</Link>
           </div>
         </div>
       )}
