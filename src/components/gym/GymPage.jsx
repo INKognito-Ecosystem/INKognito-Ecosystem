@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { GraduationCap, PlayCircle, FileText, FlaskConical } from 'lucide-react'
+import { GraduationCap, PlayCircle, FileText, FlaskConical, Wrench } from 'lucide-react'
 import NavbarGym from './NavbarGym'
 import FooterGym from './FooterGym'
 import Seo from '../Seo'
@@ -41,6 +41,12 @@ const gymJsonLd = {
 }
 
 const servicios = [
+  {
+    icon: Wrench,
+    titulo: 'Máquinas bajo pedido',
+    descripcion: 'Fabrico máquinas de gym a tu medida, con soldadura profesional y a precios muy accesibles.',
+    link: '/gym/maquinas-pedido',
+  },
   {
     icon: FileText,
     titulo: 'Planos Digitales',
