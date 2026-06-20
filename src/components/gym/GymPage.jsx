@@ -107,17 +107,9 @@ export default function GymPage() {
             <span className="text-gray-400">propio gym</span><br />
             desde cero
           </h1>
-          <p className="text-gray-400 text-lg md:text-xl leading-relaxed max-w-2xl mb-10">
+          <p className="text-gray-400 text-lg md:text-xl leading-relaxed max-w-2xl">
             Máquinas fabricadas a mano, planos digitales y recursos para entrenar en casa sin gastar una fortuna.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link
-              to="/gym/maquinas-pedido"
-              className="inline-block text-center bg-gray-400 text-gray-900 text-sm font-black uppercase tracking-[0.2em] py-4 px-8 rounded hover:bg-white transition-all duration-300"
-            >
-              Ver máquinas y planos
-            </Link>
-          </div>
         </div>
       </section>
 
