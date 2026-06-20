@@ -2,7 +2,10 @@ import { useState } from 'react'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import Seo from '../../Seo'
-import imgBancoMultiangulo from '../../../assets/imagenesgym/bancomultiangulo.png'
+import imgBancoMultiangulo from '../../../assets/imagenesgym/bancomultiangulo.jpg'
+import imgRemoAcostado     from '../../../assets/imagenesgym/remoacostado.jpg'
+import imgHipThrust        from '../../../assets/imagenesgym/hipthrust.jpg'
+import imgExtencionFemoral from '../../../assets/imagenesgym/extencionyfemoral.jpg'
 
 const WA = '573207911013'
 
@@ -31,7 +34,7 @@ const productos = [
     nombre: 'Remo acostado',
     descripcion: 'Banco con soporte de pecho para remo horizontal con barra o mancuernas. Aísla espalda alta y media.',
     precio: null,
-    image1: null, image2: null,
+    image1: imgRemoAcostado, image2: null,
   },
   {
     id: 4,
@@ -45,7 +48,7 @@ const productos = [
     nombre: 'Hip thrust',
     descripcion: 'Banco de empuje de cadera con soporte para barra y topes acolchados. Glúteos e isquiotibiales.',
     precio: null,
-    image1: null, image2: null,
+    image1: imgHipThrust, image2: null,
   },
   {
     id: 6,
@@ -56,10 +59,10 @@ const productos = [
   },
   {
     id: 7,
-    nombre: 'Extensión de cuádriceps',
-    descripcion: 'Máquina de extensión de pierna con carga de discos. Aislamiento específico del cuádriceps.',
+    nombre: 'Extensión y femorales',
+    descripcion: 'Aislamiento específico para fortalecer cuádriceps y femorales en un solo equipo.',
     precio: null,
-    image1: null, image2: null,
+    image1: imgExtencionFemoral, image2: null,
   },
 ]
 
