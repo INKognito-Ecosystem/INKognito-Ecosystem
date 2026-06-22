@@ -1,6 +1,6 @@
 import heroBg from '../../assets/hero/hero-bg.webp'
 import { Link } from 'react-router-dom'
-import imgmifoto from '../../assets/mifoto/josefoto.webp'
+import imgmifoto from '../../assets/mifoto/fondoperfilweb.jpg'
 
 export default function Hero() {
   return (
