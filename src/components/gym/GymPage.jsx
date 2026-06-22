@@ -5,6 +5,7 @@ import NavbarGym from './NavbarGym'
 import FooterGym from './FooterGym'
 import Seo from '../Seo'
 import { creaciones, maquinasDestacadas } from '../../data/gym'
+import logoPattern from '../../assets/milogo/logopanel.png'
 
 const ogGym = '/og/gym.webp'
 const WA = '573207911013'
@@ -13,6 +14,13 @@ const GRID_PATTERN = {
   backgroundImage:
     'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
 }
+
+// Patrón de logo repetido para secciones internas (se define después de importar logoPattern)
+const makeLogoPattern = (url) => ({
+  backgroundImage: `url(${url})`,
+  backgroundRepeat: 'repeat',
+  backgroundSize: '80px 80px',
+})
 
 const gymJsonLd = {
   "@context": "https://schema.org",
@@ -133,8 +141,9 @@ export default function GymPage() {
       </section>
 
       {/* LO QUE PUEDES CONSEGUIR AQUÍ */}
-      <section className="pb-20 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-gray-800 pt-16">
+      <section className="relative overflow-hidden pb-20 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="absolute inset-0 pointer-events-none" style={{ ...makeLogoPattern(logoPattern), opacity: 0.06 }} />
+        <div className="relative z-[1] border-t border-gray-800 pt-16">
           <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Servicios</p>
           <h2 className="text-3xl md:text-5xl font-black uppercase leading-none mb-12">
             Lo que puedes conseguir aquí
@@ -173,8 +182,10 @@ export default function GymPage() {
       </section>
 
       {/* PLANOS DIGITALES */}
-      <section id="planos" className="pb-20 px-4 md:px-6 max-w-7xl mx-auto scroll-mt-20">
-        <div className="border-t border-gray-800 pt-16">
+
+      <section id="planos" className="relative overflow-hidden pb-20 px-4 md:px-6 max-w-7xl mx-auto scroll-mt-20">
+        <div className="absolute inset-0 pointer-events-none" style={{ ...makeLogoPattern(logoPattern), opacity: 0.06 }} />
+        <div className="relative z-[1] border-t border-gray-800 pt-16">
           <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Descarga digital</p>
           <h2 className="text-3xl md:text-5xl font-black uppercase leading-none mb-6">Planos digitales</h2>
           <p className="text-gray-400 leading-relaxed max-w-2xl mb-12 text-sm md:text-base">
@@ -219,8 +230,9 @@ export default function GymPage() {
       </section>
 
       {/* MIS CREACIONES */}
-      <section className="pb-20 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-gray-800 pt-16">
+      <section className="relative overflow-hidden pb-20 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="absolute inset-0 pointer-events-none" style={{ ...makeLogoPattern(logoPattern), opacity: 0.06 }} />
+        <div className="relative z-[1] border-t border-gray-800 pt-16">
           <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Portafolio</p>
           <h2 className="text-3xl md:text-5xl font-black uppercase leading-none mb-12">Mis creaciones</h2>
 
@@ -265,8 +277,9 @@ export default function GymPage() {
       </section>
 
       {/* MÁQUINAS BAJO PEDIDO + CONTACTO — UNIFICADO */}
-      <section className="pb-24 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-gray-800 pt-16">
+      <section className="relative overflow-hidden pb-24 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="absolute inset-0 pointer-events-none" style={{ ...makeLogoPattern(logoPattern), opacity: 0.06 }} />
+        <div className="relative z-[1] border-t border-gray-800 pt-16">
           <div className="flex items-end justify-between mb-10">
             <div>
               <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Soldadura profesional</p>
