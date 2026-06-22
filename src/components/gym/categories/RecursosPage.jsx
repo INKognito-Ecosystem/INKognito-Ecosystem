@@ -56,18 +56,16 @@ export default function RecursosPage() {
       </section>
 
       {/* GRID DE EBOOKS */}
-      <div className="pb-24 px-4 md:px-6 max-w-4xl mx-auto pt-12">
-        <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto sm:max-w-none">
+      <div className="pb-24 px-4 md:px-6 max-w-2xl mx-auto pt-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {ebooks.map((eb) => (
             <div
               key={eb.id}
               className="border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
+              style={{ maxHeight: '300px' }}
             >
-              {/* PORTADA (aspect 3:4 tipo libro) */}
-              <div
-                className="relative w-full bg-gray-800 flex items-center justify-center"
-                style={{ aspectRatio: '3/4' }}
-              >
+              {/* PORTADA */}
+              <div className="relative bg-gray-800 flex items-center justify-center flex-1 min-h-0 overflow-hidden">
                 {eb.imagen ? (
                   <img
                     src={eb.imagen}
@@ -76,7 +74,7 @@ export default function RecursosPage() {
                     onError={(e) => { e.target.style.display = 'none' }}
                   />
                 ) : (
-                  <div className="flex flex-col items-center justify-center gap-2 px-4 text-center">
+                  <div className="flex flex-col items-center justify-center gap-2 px-4 text-center py-6">
                     <span className="text-gray-600 text-2xl">📖</span>
                     <span className="text-gray-700 text-[10px] uppercase tracking-widest">Próximamente</span>
                   </div>
@@ -84,17 +82,16 @@ export default function RecursosPage() {
               </div>
 
               {/* CONTENIDO */}
-              <div className="p-3 flex flex-col gap-2 flex-1">
+              <div className="p-3 flex flex-col gap-2 flex-shrink-0">
                 <div>
                   <h2 className="font-black uppercase text-xs leading-tight mb-1">{eb.nombre}</h2>
-                  <p className="text-gray-500 text-[11px] leading-relaxed">{eb.descripcion}</p>
+                  <p className="text-gray-500 text-[10px] leading-relaxed line-clamp-2">{eb.descripcion}</p>
                 </div>
-
-                <div className="mt-auto pt-2 border-t border-gray-800">
+                <div className="pt-2 border-t border-gray-800">
                   <a
                     href={eb.pdf}
                     download
-                    className="block text-center bg-white text-gray-950 font-black uppercase tracking-[0.1em] text-[10px] py-2 rounded-lg hover:bg-gray-200 transition-all duration-300"
+                    className="block text-center bg-white text-gray-950 font-black uppercase tracking-[0.1em] text-[10px] py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-300"
                   >
                     Descargar gratis
                   </a>
