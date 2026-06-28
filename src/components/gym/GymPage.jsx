@@ -43,38 +43,38 @@ const gymJsonLd = {
 const servicios = [
   {
     icon: Wrench,
-    titulo: 'Máquinas bajo pedido',
-    descripcion: 'Fabrico máquinas de gym a tu medida, con soldadura profesional y a precios muy accesibles.',
+    titulo: 'Máquinas',
+    texto: 'Acero, soldadura profesional, a tu medida.',
     link: '/gym/maquinas-pedido',
   },
   {
     icon: FileText,
-    titulo: 'Planos Digitales',
-    descripcion: 'Planos técnicos en PDF para fabricar tus propias máquinas de gym.',
+    titulo: 'Planos PDF',
+    texto: 'Medidas exactas para fabricarlas tú mismo.',
     scrollTo: 'planos',
   },
   {
     icon: FlaskConical,
     titulo: 'Suplementos',
-    descripcion: 'Proteína, creatina, pre-entreno y vitaminas para potenciar tu entrenamiento.',
+    texto: 'Proteína, creatina y pre-entreno.',
     link: '/gym/suplementos',
   },
   {
     icon: PlayCircle,
-    titulo: 'Tutoriales en video',
-    descripcion: 'Videos paso a paso de cómo construir mancuernas, discos y máquinas caseras.',
+    titulo: 'Tutoriales',
+    texto: 'Construye máquinas caseras paso a paso.',
     link: '/gym/tutoriales',
   },
   {
     icon: GraduationCap,
-    titulo: 'Cursos recomendados',
-    descripcion: 'Los mejores cursos de entrenamiento, nutrición y fabricación en español.',
+    titulo: 'Cursos',
+    texto: 'Entrenamiento y nutrición en español.',
     link: '/gym/cursos',
   },
   {
     icon: BookOpen,
-    titulo: 'Recursos gratis',
-    descripcion: 'Ebooks gratuitos sobre hábitos y entrenamiento para empezar desde cero.',
+    titulo: 'Recursos',
+    texto: 'Ebooks y guías gratuitas para empezar.',
     link: '/gym/recursos',
   },
 ]
@@ -144,12 +144,13 @@ export default function GymPage() {
               const Icon = s.icon
               const inner = (
                 <>
-                  {Icon && <Icon size={18} className="text-gray-400 group-hover:text-white transition-colors duration-300 flex-shrink-0" />}
-                  <h3 className="text-xs font-black uppercase tracking-wide leading-tight">{s.titulo}</h3>
-                  <p className="text-gray-500 text-[11px] leading-relaxed flex-1 hidden md:block">{s.descripcion}</p>
-                  <span className="text-gray-600 text-[10px] font-bold uppercase tracking-[0.15em] group-hover:text-gray-400 transition-colors duration-300">
-                    Ver →
-                  </span>
+                  {/* Nombre izquierda — icono derecha */}
+                  <div className="flex items-center justify-between gap-1">
+                    <h3 className="text-xs font-black uppercase tracking-wide leading-tight">{s.titulo}</h3>
+                    {Icon && <Icon size={16} className="text-gray-500 group-hover:text-white transition-colors duration-300 flex-shrink-0" />}
+                  </div>
+                  {/* Texto preciso de lo que encontrará */}
+                  <p className="text-gray-500 text-[10px] leading-snug group-hover:text-gray-400 transition-colors duration-300">{s.texto}</p>
                 </>
               )
               return s.scrollTo
