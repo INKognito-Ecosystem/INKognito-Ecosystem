@@ -64,7 +64,7 @@ export default function RecursosPage() {
               className="border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
             >
               {/* PORTADA */}
-              <div className="relative bg-gray-800 flex items-center justify-center aspect-[3/4]">
+              <div className="relative bg-gray-800 flex items-center justify-center h-20">
                 {eb.imagen ? (
                   <img
                     src={eb.imagen}
@@ -73,9 +73,9 @@ export default function RecursosPage() {
                     onError={(e) => { e.target.style.display = 'none' }}
                   />
                 ) : (
-                  <div className="flex flex-col items-center justify-center gap-2 px-3 text-center py-4">
-                    <span className="text-gray-600 text-xl">📖</span>
-                    <span className="text-gray-700 text-[9px] uppercase tracking-widest">Próximamente</span>
+                  <div className="flex flex-col items-center justify-center gap-1 px-3 text-center">
+                    <span className="text-gray-600 text-lg">📖</span>
+                    <span className="text-gray-700 text-[9px] uppercase tracking-widest">Portada próximamente</span>
                   </div>
                 )}
               </div>
@@ -106,15 +106,15 @@ export default function RecursosPage() {
             Si estos recursos te fueron de ayuda, te invito a seguirme en mis redes y a suscribirte a mi canal de YouTube — ahí comparto todo el proceso de construir esto desde cero.
           </p>
           <div className="flex items-center justify-center gap-8">
-            <a href="#" target="_blank" rel="noopener noreferrer"
+            <a href="https://www.instagram.com/jhumaneztattoo" target="_blank" rel="noopener noreferrer"
                className="text-gray-500 hover:text-white transition-colors duration-300">
               <FaInstagram size={28} />
             </a>
-            <a href="#" target="_blank" rel="noopener noreferrer"
+            <a href="https://www.facebook.com/jhumaneztattoo" target="_blank" rel="noopener noreferrer"
                className="text-gray-500 hover:text-white transition-colors duration-300">
               <FaFacebookF size={28} />
             </a>
-            <a href="#" target="_blank" rel="noopener noreferrer"
+            <a href="https://www.youtube.com/@JhumanezZ" target="_blank" rel="noopener noreferrer"
                className="text-gray-500 hover:text-white transition-colors duration-300">
               <FaYoutube size={28} />
             </a>
