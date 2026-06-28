@@ -43,7 +43,6 @@ export default function RecursosPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
-          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-3">Descarga gratuita</p>
           {/* H1 + icono grande a la derecha en móvil */}
           <div className="flex items-center justify-between gap-4 mb-4">
             <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
