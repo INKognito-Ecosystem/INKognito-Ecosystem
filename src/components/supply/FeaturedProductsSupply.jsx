@@ -118,7 +118,9 @@ export default function FeaturedProductsSupply() {
         ) : allProducts.length === 0 ? (
           <div className="border border-blue-500/20 bg-zinc-950 rounded-2xl p-12 text-center">
             <p className="text-zinc-400 text-lg mb-2">Catálogo en actualización</p>
-            <p className="text-zinc-600 text-sm mb-6">Nuevos productos disponibles próximamente.</p>
+            <p className="text-zinc-600 text-sm mb-6">
+              Los productos aparecen aquí cuando el proveedor los agrega al inventario con categoría y foto.
+            </p>
             <a
               href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola, quiero ver el catálogo de insumos para tatuaje disponible')}`}
               target="_blank" rel="noopener noreferrer"
@@ -128,14 +130,17 @@ export default function FeaturedProductsSupply() {
             </a>
           </div>
         ) : (
-          <div className="flex flex-col gap-12">
+          <div className="flex flex-col gap-16">
             {Object.entries(categorias).map(([cat, items]) => (
               <div key={cat}>
-                <h3 className="text-xl font-black uppercase tracking-[0.15em] text-zinc-400 mb-5 flex items-center gap-3">
-                  <span className="flex-1 h-px bg-zinc-800" />
-                  {cat}
-                  <span className="flex-1 h-px bg-zinc-800" />
-                </h3>
+                {/* Cabecera de categoría */}
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="flex-1 h-px bg-zinc-800" />
+                  <h3 className="text-2xl md:text-3xl font-black uppercase tracking-[0.15em] text-white px-2">
+                    {cat}
+                  </h3>
+                  <div className="flex-1 h-px bg-zinc-800" />
+                </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                   {items.map(item => <ProductCard key={item.name} item={item} />)}
                 </div>
