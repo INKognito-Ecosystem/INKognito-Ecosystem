@@ -58,8 +58,8 @@ export default function HeroSupply() {
 
         </div>
 
-        {/* DERECHA */}
-<div className="flex justify-center">
+        {/* DERECHA — solo desktop */}
+<div className="hidden md:flex justify-center">
 
 <div className="bg-zinc-950 border border-blue-500/30 rounded-2xl p-8 hover:border-blue-500 hover:shadow-[0_0_25px_rgba(59,130,246,0.15)] transition-all duration-300">
     <p className="text-zinc-500 uppercase tracking-[0.3em] text-xs mb-4">
