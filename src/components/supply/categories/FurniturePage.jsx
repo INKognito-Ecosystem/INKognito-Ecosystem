@@ -5,7 +5,8 @@ export default function FurniturePage() {
       title="Muebles"
       categoria="Muebles"
       slug="furniture"
-      desc="Mobiliario para estudio de tatuajes en Uraba. Camillas, sillas de cliente, bancos y almacenamiento profesional. Pedidos por WhatsApp en Chigorodo."
+      desc="Muebles para estudio de tatuajes en Uraba."
+      intro="Tu espacio dice mas de ti que cualquier otro elemento. Un buen banco, una buena camilla — la diferencia entre un cuarto y un estudio."
     />
   )
 }

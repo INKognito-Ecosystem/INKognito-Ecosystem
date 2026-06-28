@@ -119,25 +119,28 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
       />
       <NavbarCategory pageName={title} backPath="/supply" backLabel="Supply" />
 
-      <div className="bg-black pt-20 md:pt-24">
+      <div className="bg-black pt-16 md:pt-24">
 
-        {/* HERO DE CATEGORÍA */}
-        <div className="px-6 max-w-7xl mx-auto pb-8 md:pb-12">
-          <p className="uppercase tracking-[0.25em] text-blue-500/70 text-xs mb-3">Supply — {categoria}</p>
-          <h1 className="text-5xl md:text-7xl font-black uppercase leading-none mb-6 text-white">{title}</h1>
+        {/* HERO — sin label pequeño, H1 pegado al navbar */}
+        <div className="px-6 max-w-7xl mx-auto pb-5 md:pb-10">
+          <h1 className="text-5xl md:text-7xl font-black uppercase leading-none mb-4 text-white">{title}</h1>
           {intro && (
             <p className="text-zinc-400 text-base md:text-lg leading-relaxed max-w-3xl">{intro}</p>
           )}
         </div>
 
-        {/* PRODUCTOS DINÁMICOS */}
-        <div className="px-6 pb-10 max-w-7xl mx-auto">
+        {/* PRODUCTOS — scroll horizontal en móvil, grid en desktop */}
+        <div className="pb-10 max-w-7xl mx-auto">
           {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => <SkeletonCard key={i} />)}
+            <div className="flex gap-4 px-6 overflow-x-hidden">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="flex-shrink-0 w-[44vw] md:w-48">
+                  <SkeletonCard />
+                </div>
+              ))}
             </div>
           ) : products.length === 0 ? (
-            <div className="border border-blue-500/20 bg-zinc-950 rounded-2xl p-12 text-center">
+            <div className="mx-6 border border-blue-500/20 bg-zinc-950 rounded-2xl p-12 text-center">
               <p className="text-zinc-400 text-lg mb-2">Próximamente disponible</p>
               <p className="text-zinc-600 text-sm mb-6">
                 Escríbenos para consultar disponibilidad de {title.toLowerCase()}.
@@ -152,8 +155,12 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
               </a>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {products.map(item => <ProductCard key={item.name} item={item} />)}
+            <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-0 px-6 md:px-6 pb-3 md:pb-0 scrollbar-hide">
+              {products.map(item => (
+                <div key={item.name} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">
+                  <ProductCard item={item} />
+                </div>
+              ))}
             </div>
           )}
         </div>

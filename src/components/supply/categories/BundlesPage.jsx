@@ -5,7 +5,8 @@ export default function BundlesPage() {
       title="Bundles"
       categoria="Bundles"
       slug="bundles"
-      desc="Combos y paquetes de insumos para tatuadores en Uraba. Kits para iniciar y paquetes de reposicion con descuento. Pedidos por WhatsApp."
+      desc="Combos y paquetes de insumos para tatuadores en Uraba."
+      intro="Todo lo que necesitas, seleccionado para que te enfoques en tatuar. Sin buscar, sin improvisar, sin excusas."
     />
   )
 }

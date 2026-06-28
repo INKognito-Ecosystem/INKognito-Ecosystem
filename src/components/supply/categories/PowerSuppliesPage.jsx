@@ -5,7 +5,8 @@ export default function PowerSuppliesPage() {
       title="Fuentes de poder"
       categoria="Fuentes"
       slug="power-supplies"
-      desc="Fuentes de poder para maquinas de tatuar en Chigorodo, Uraba. Control de voltaje preciso, pantalla digital y compatibles con todas las rotativas. Pedidos por WhatsApp."
+      desc="Fuentes de poder para maquinas de tatuar en Chigorodo, Uraba."
+      intro="La fuente que no falla es la que nunca piensas en ella mientras tatuas. Voltaje estable, mente libre para crear."
     />
   )
 }

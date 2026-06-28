@@ -5,7 +5,8 @@ export default function AccessoriesPage() {
       title="Accesorios"
       categoria="Accesorios"
       slug="accessories"
-      desc="Accesorios para tatuadores en Chigorodo, Uraba. Bandejas de mezcla, film plastico, clips de cable, transfer paper y mas. Envios a toda la region."
+      desc="Accesorios para tatuadores en Chigorodo, Uraba."
+      intro="Los detalles que hacen fluir el trabajo. Porque cuando el proceso es suave, la creatividad no se interrumpe."
     />
   )
 }
