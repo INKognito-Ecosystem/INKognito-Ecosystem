@@ -85,9 +85,9 @@ export default function SupplyPage() {
       <p className="text-zinc-500 text-sm mb-5">Urabá, puerta a puerta.</p>
 
       {/* Aliado transportadora */}
-      <div className="flex flex-col items-center justify-center mb-5 bg-white rounded-xl p-4 gap-2">
-        <img src="/eljach.png" alt="Eljach Transportadora" className="h-14 w-auto object-contain" />
-        <div className="text-center">
+      <div className="flex items-center mb-5 bg-white rounded-xl p-3 gap-3">
+        <img src="/eljach.png" alt="Eljach Transportadora" className="h-12 w-auto object-contain flex-shrink-0" />
+        <div className="flex flex-col justify-center">
           <p className="text-zinc-900 text-xs font-bold uppercase tracking-wide">Eljach Transportadora</p>
           <p className="text-zinc-500 text-[11px]">Entregas locales y contra entrega</p>
         </div>
