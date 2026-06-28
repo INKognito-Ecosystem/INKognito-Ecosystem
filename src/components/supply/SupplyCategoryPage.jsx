@@ -138,10 +138,10 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
 
         {/* HERO — H1 + ícono de categoría en móvil */}
         <div className="px-6 max-w-7xl mx-auto pb-5 md:pb-10">
-          <div className="flex items-center justify-between gap-4 mb-4">
-            <h1 className="text-5xl md:text-7xl font-black uppercase leading-none text-white">{title}</h1>
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <h1 className="text-3xl md:text-7xl font-black uppercase leading-none text-white">{title}</h1>
             {CatIcon && (
-              <CatIcon size={72} className="text-zinc-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+              <CatIcon size={64} className="text-zinc-800 flex-shrink-0 md:hidden" strokeWidth={1} />
             )}
           </div>
           {intro && (
