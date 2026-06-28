@@ -51,15 +51,15 @@ export default function CategoriesSupply() {
                 to={category.path}
                 className={`
                   relative h-36 border bg-zinc-950 transition-all duration-300
-                  uppercase tracking-[0.2em] font-bold text-sm flex flex-col
-                  items-center justify-center gap-3 text-center
+                  uppercase tracking-[0.08em] font-bold text-[10px] md:text-xs flex flex-col
+                  items-center justify-center gap-2 text-center px-1
                   ${hasStock
                     ? 'border-blue-500/50 hover:border-blue-500 hover:bg-zinc-900 text-zinc-300'
                     : 'border-zinc-800 hover:border-zinc-600 text-zinc-600'
                   }
                 `}
               >
-                <category.icon size={32} className={hasStock ? 'text-blue-400' : 'text-zinc-700'} />
+                <category.icon size={26} className={hasStock ? 'text-blue-400' : 'text-zinc-700'} />
                 <span>{category.name}</span>
 
                 {/* Badge de stock en tiempo real */}
