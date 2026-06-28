@@ -45,7 +45,7 @@ export default function SupplyPage() {
 
       <HeroSupply />
 
-<div className="max-w-7xl mx-auto px-6 mt-10 md:mt-16 lg:mt-20">
+<div className="max-w-7xl mx-auto px-6 mt-4 md:mt-8">
   <div className="border-b border-zinc-900"></div>
 </div>
 
@@ -55,7 +55,7 @@ export default function SupplyPage() {
 
     {/* SECCIÓN APRENDE A TATUAR */}
     <section className="bg-zinc-950 border-t border-zinc-900">
-      <div className="max-w-7xl mx-auto px-6 py-16 md:py-24 flex flex-col md:flex-row items-center justify-between gap-8">
+      <div className="max-w-7xl mx-auto px-6 py-8 md:py-16 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
         <div>
           <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-3">
             Para nuevos tatuadores
