@@ -111,16 +111,13 @@ export default function GymPage() {
       <section className="relative pt-16 md:pt-24 pb-8 md:pb-14 px-4 md:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
-        <div className="relative z-10 max-w-7xl mx-auto">
-          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-4">
-            Gym casero — Urabá, Colombia
-          </p>
+        <div className="relative z-10 max-w-7xl mx-auto text-center md:text-left">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase leading-none mb-4">
             Construí mi<br />
             <span className="text-gray-400">propio gym</span><br />
             desde cero
           </h1>
-          <p className="text-gray-400 text-base md:text-lg leading-relaxed max-w-2xl mb-6">
+          <p className="text-gray-400 text-base md:text-lg leading-relaxed max-w-2xl mb-6 mx-auto md:mx-0">
             Máquinas fabricadas a mano, planos digitales y recursos para entrenar en casa sin gastar una fortuna.
           </p>
           <button
@@ -176,8 +173,10 @@ export default function GymPage() {
       {/* PLANOS DIGITALES */}
       <section id="planos" className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto scroll-mt-20">
         <div className="border-t border-gray-800 pt-6 md:pt-10">
-          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-2">Descarga digital</p>
-          <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-3">Planos digitales</h2>
+          <div className="flex items-center justify-between gap-4 mb-3 md:block">
+            <h2 className="text-2xl md:text-4xl font-black uppercase leading-none md:mb-3">Planos digitales</h2>
+            <FileText size={56} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+          </div>
           <p className="text-gray-400 leading-relaxed max-w-2xl mb-6 text-sm md:text-base">
             Son planos técnicos completos en formato PDF, con medidas exactas y lista de materiales necesarios para construir cada equipo. Pensados para quien quiere fabricar sus propias máquinas de gym en casa — ya sea para uso personal o para empezar su propio negocio de fabricación de equipos fitness.
           </p>
