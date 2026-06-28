@@ -79,7 +79,7 @@ const servicios = [
   },
 ]
 
-const CARD_CLASS = 'border border-gray-800 bg-gray-900/60 rounded-2xl p-6 flex flex-col gap-4 hover:border-gray-600 hover:bg-gray-900/80 transition-all duration-300 group'
+const CARD_CLASS = 'border border-gray-800 bg-gray-900/60 rounded-xl p-3 md:p-4 flex flex-col gap-2 hover:border-gray-600 hover:bg-gray-900/80 transition-all duration-300 group'
 
 const membresiaMsg = `https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero el acceso completo a todos los planos de Gym')}`
 
@@ -108,19 +108,19 @@ export default function GymPage() {
       <NavbarGym />
 
       {/* HERO */}
-      <section className="relative pt-20 md:pt-28 pb-24 px-4 md:px-6 overflow-hidden">
+      <section className="relative pt-16 md:pt-24 pb-8 md:pb-14 px-4 md:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
           <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-4">
             Gym casero — Urabá, Colombia
           </p>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase leading-none mb-6">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase leading-none mb-4">
             Construí mi<br />
             <span className="text-gray-400">propio gym</span><br />
             desde cero
           </h1>
-          <p className="text-gray-400 text-lg md:text-xl leading-relaxed max-w-2xl mb-10">
+          <p className="text-gray-400 text-base md:text-lg leading-relaxed max-w-2xl mb-6">
             Máquinas fabricadas a mano, planos digitales y recursos para entrenar en casa sin gastar una fortuna.
           </p>
           <button
@@ -133,22 +133,22 @@ export default function GymPage() {
       </section>
 
       {/* LO QUE PUEDES CONSEGUIR AQUÍ */}
-      <section className="pb-20 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-gray-800 pt-16">
-          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Servicios</p>
-          <h2 className="text-3xl md:text-5xl font-black uppercase leading-none mb-12">
+      <section className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="border-t border-gray-800 pt-6 md:pt-10">
+          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-2">Servicios</p>
+          <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-5 md:mb-8">
             Lo que puedes conseguir aquí
           </h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-3">
             {servicios.map((s) => {
               const Icon = s.icon
               const inner = (
                 <>
-                  {Icon && <Icon size={28} className="text-gray-400 group-hover:text-white transition-colors duration-300" />}
-                  <h3 className="text-base font-black uppercase tracking-wide leading-tight">{s.titulo}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed flex-1">{s.descripcion}</p>
-                  <span className="text-gray-500 text-xs font-bold uppercase tracking-[0.2em] group-hover:text-gray-300 transition-colors duration-300">
-                    Ver más →
+                  {Icon && <Icon size={18} className="text-gray-400 group-hover:text-white transition-colors duration-300 flex-shrink-0" />}
+                  <h3 className="text-xs font-black uppercase tracking-wide leading-tight">{s.titulo}</h3>
+                  <p className="text-gray-500 text-[11px] leading-relaxed flex-1 hidden md:block">{s.descripcion}</p>
+                  <span className="text-gray-600 text-[10px] font-bold uppercase tracking-[0.15em] group-hover:text-gray-400 transition-colors duration-300">
+                    Ver →
                   </span>
                 </>
               )
@@ -173,11 +173,11 @@ export default function GymPage() {
       </section>
 
       {/* PLANOS DIGITALES */}
-      <section id="planos" className="pb-20 px-4 md:px-6 max-w-7xl mx-auto scroll-mt-20">
-        <div className="border-t border-gray-800 pt-16">
-          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Descarga digital</p>
-          <h2 className="text-3xl md:text-5xl font-black uppercase leading-none mb-6">Planos digitales</h2>
-          <p className="text-gray-400 leading-relaxed max-w-2xl mb-12 text-sm md:text-base">
+      <section id="planos" className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto scroll-mt-20">
+        <div className="border-t border-gray-800 pt-6 md:pt-10">
+          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-2">Descarga digital</p>
+          <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-3">Planos digitales</h2>
+          <p className="text-gray-400 leading-relaxed max-w-2xl mb-6 text-sm md:text-base">
             Son planos técnicos completos en formato PDF, con medidas exactas y lista de materiales necesarios para construir cada equipo. Pensados para quien quiere fabricar sus propias máquinas de gym en casa — ya sea para uso personal o para empezar su propio negocio de fabricación de equipos fitness.
           </p>
 
@@ -219,10 +219,10 @@ export default function GymPage() {
       </section>
 
       {/* MIS CREACIONES */}
-      <section className="pb-20 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-gray-800 pt-16">
-          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Portafolio</p>
-          <h2 className="text-3xl md:text-5xl font-black uppercase leading-none mb-12">Mis creaciones</h2>
+      <section className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="border-t border-gray-800 pt-6 md:pt-10">
+          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-2">Portafolio</p>
+          <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-5 md:mb-8">Mis creaciones</h2>
 
           {creaciones.length === 0 ? (
             <div className="border border-gray-800 bg-gray-900/30 rounded-2xl py-20 text-center">
@@ -265,12 +265,12 @@ export default function GymPage() {
       </section>
 
       {/* MÁQUINAS BAJO PEDIDO + CONTACTO — UNIFICADO */}
-      <section className="pb-24 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-gray-800 pt-16">
-          <div className="flex items-end justify-between mb-10">
+      <section className="pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="border-t border-gray-800 pt-6 md:pt-10">
+          <div className="flex items-end justify-between mb-5 md:mb-8">
             <div>
-              <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Soldadura profesional</p>
-              <h2 className="text-3xl md:text-5xl font-black uppercase leading-none">Máquinas bajo pedido</h2>
+              <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-2">Soldadura profesional</p>
+              <h2 className="text-2xl md:text-4xl font-black uppercase leading-none">Máquinas bajo pedido</h2>
             </div>
             <Link
               to="/gym/maquinas-pedido"
