@@ -183,28 +183,28 @@ export default function MaquinasPedidoPage() {
                 </div>
 
                 {/* CONTENIDO */}
-                <div className="p-5 flex flex-col gap-3 flex-1">
-                  <div className="flex gap-2 flex-wrap">
-                    <span className="text-[10px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-3 py-1">Bajo pedido</span>
-                    <span className="text-[10px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-3 py-1">Envío nacional</span>
+                <div className="p-3 flex flex-col gap-2">
+                  {/* Badges — fila superior */}
+                  <div className="flex gap-1.5">
+                    <span className="text-[9px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-2 py-0.5">Bajo pedido</span>
+                    <span className="text-[9px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-2 py-0.5">Envío nacional</span>
                   </div>
-                  <h3 className="font-black uppercase text-base leading-tight">{p.nombre}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed flex-1">{p.descripcion}</p>
-
-                  <div className="border-t border-gray-800 pt-3 flex items-center justify-between">
-                    <span className="text-gray-400 text-sm font-black">{fmtPrecio(p.precio)}</span>
-                    <button
-                      disabled={inCart}
-                      onClick={() => addToCart(p)}
-                      className={`text-[10px] font-bold uppercase tracking-[0.15em] py-2 px-4 rounded-xl border transition-all duration-300 ${
-                        inCart
-                          ? 'border-gray-500 text-gray-400 cursor-default'
-                          : 'border-gray-600 text-gray-300 hover:border-white hover:text-white cursor-pointer'
-                      }`}
-                    >
-                      {inCart ? 'En carrito ✓' : 'Agregar al carrito'}
-                    </button>
-                  </div>
+                  {/* Título */}
+                  <h3 className="font-black uppercase text-xs leading-tight">{p.nombre}</h3>
+                  {/* Precio */}
+                  <p className="text-white text-xs font-black">{fmtPrecio(p.precio)}</p>
+                  {/* Carrito — ancho completo */}
+                  <button
+                    disabled={inCart}
+                    onClick={() => addToCart(p)}
+                    className={`w-full text-[10px] font-bold uppercase tracking-[0.12em] py-2 rounded-xl border transition-all duration-300 ${
+                      inCart
+                        ? 'border-gray-600 text-gray-500 cursor-default'
+                        : 'border-gray-600 text-gray-300 hover:border-white hover:text-white cursor-pointer'
+                    }`}
+                  >
+                    {inCart ? 'En carrito ✓' : '+ Agregar al carrito'}
+                  </button>
                 </div>
               </div>
             )
