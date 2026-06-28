@@ -1,6 +1,7 @@
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import Seo from '../../Seo'
+import { GraduationCap } from 'lucide-react'
 
 const cursos = [
   {
@@ -45,11 +46,13 @@ export default function CursosPage() {
         />
         <div className="relative z-10 max-w-7xl mx-auto">
         <div className="mb-0">
-          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Formación</p>
-          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-6">
-            Cursos<br />
-            <span className="text-gray-400">recomendados</span>
-          </h1>
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
+              Cursos<br />
+              <span className="text-gray-400">recomendados</span>
+            </h1>
+            <GraduationCap size={80} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+          </div>
           <p className="text-gray-400 leading-relaxed max-w-2xl">
             Selección de los mejores cursos en español para entrenarte en casa, mejorar tu alimentación y aprender a fabricar tus propios equipos.
           </p>

@@ -3,6 +3,7 @@ import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import Seo from '../../Seo'
 import { useCatalog } from '../../../hooks/useCatalog'
+import { Wrench } from 'lucide-react'
 import imgBancoMultiangulo from '../../../assets/imagenesgym/bancomultiangulo.jpg'
 import imgRemoAcostado     from '../../../assets/imagenesgym/remoacostado.jpg'
 import imgHipThrust        from '../../../assets/imagenesgym/hipthrust.jpg'
@@ -135,13 +136,13 @@ export default function MaquinasPedidoPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
-          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">
-            Soldadura profesional
-          </p>
-          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-6">
-            Máquinas<br />
-            <span className="text-gray-400">bajo pedido</span>
-          </h1>
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
+              Máquinas<br />
+              <span className="text-gray-400">bajo pedido</span>
+            </h1>
+            <Wrench size={80} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+          </div>
           <p className="text-gray-400 leading-relaxed max-w-2xl mb-6">
             Máquinas de gym hechas a tu medida, con soldadura profesional. Elige la que necesitas y la fabricamos para ti.
           </p>

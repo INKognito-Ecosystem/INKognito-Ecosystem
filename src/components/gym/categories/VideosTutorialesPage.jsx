@@ -1,6 +1,7 @@
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import Seo from '../../Seo'
+import { PlayCircle } from 'lucide-react'
 
 const videos = [
   {
@@ -54,11 +55,13 @@ export default function VideosTutorialesPage() {
         />
         <div className="relative z-10 max-w-7xl mx-auto">
         <div className="mb-0">
-          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">YouTube</p>
-          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-6">
-            Tutoriales<br />
-            <span className="text-gray-400">en video</span>
-          </h1>
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
+              Tutoriales<br />
+              <span className="text-gray-400">en video</span>
+            </h1>
+            <PlayCircle size={80} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+          </div>
           <div className="flex flex-col md:flex-row md:items-end gap-6">
             <p className="text-gray-400 leading-relaxed max-w-2xl">
               Videos paso a paso de cómo construir equipos de gym caseros. Los videos se reproducen directamente desde YouTube.
