@@ -1,6 +1,7 @@
 import NavbarSupply from './NavbarSupply'
 import HeroSupply from './HeroSupply'
 import FeaturedProductsSupply from './FeaturedProductsSupply'
+import CategoriesSupply from './CategoriesSupply'
 import BrandsSupply from './BrandsSupply'
 import FooterSupply from './FooterSupply'
 import { FaWhatsapp } from 'react-icons/fa'
@@ -50,6 +51,7 @@ export default function SupplyPage() {
 </div>
 
 <FeaturedProductsSupply />
+      <CategoriesSupply />
 
     <BrandsSupply />
 
