@@ -77,9 +77,54 @@ export default function SupplyPage() {
       </div>
     </section>
 
+    {/* ── COBERTURA + CONTACTO — solo móvil ────────────────────── */}
+    <section className="md:hidden border-t border-zinc-900 bg-zinc-950 px-6 py-8">
+      <h2 className="text-2xl font-black uppercase leading-none mb-1 text-white">
+        Llegamos donde estás
+      </h2>
+      <p className="text-zinc-500 text-sm mb-5">Urabá, puerta a puerta.</p>
+
+      {/* Aliado transportadora */}
+      <div className="flex items-center gap-3 mb-5 border border-zinc-800 rounded-xl p-3">
+        <img src="/Eljachlogo.png" alt="Eljach Transportadora" className="h-8 w-auto object-contain" />
+        <div>
+          <p className="text-white text-xs font-bold uppercase tracking-wide">Eljach Transportadora</p>
+          <p className="text-zinc-500 text-[11px]">Entregas locales en Urabá el mismo día</p>
+        </div>
+      </div>
+
+      {/* Ciudades de cobertura */}
+      <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">Zonas de cobertura</p>
+      <div className="flex flex-wrap gap-1.5 mb-5">
+        {['Chigorodó','Carepa','Apartadó','Turbo','Currulao','El Tres','Coldesa','Río Grande','El Reposo','Casa Verde'].map(c => (
+          <span key={c} className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-blue-500/30 text-blue-400 bg-blue-500/5">{c}</span>
+        ))}
+      </div>
+
+      {/* Garantías */}
+      <div className="flex flex-col gap-2 mb-5">
+        {['Pago contraentrega disponible','Atención personalizada por WhatsApp','Envíos a toda Colombia*'].map(g => (
+          <div key={g} className="flex items-center gap-2">
+            <span className="text-green-500 text-sm font-bold">✓</span>
+            <span className="text-zinc-400 text-xs">{g}</span>
+          </div>
+        ))}
+      </div>
+      <p className="text-zinc-700 text-[9px] mb-5">* Fuera de Urabá por transportadora nacional. Flete por cuenta del cliente.</p>
+
+      {/* CTA */}
+      <a
+        href="https://wa.me/573207911013?text=Hola%2C%20quiero%20hacer%20un%20pedido%20en%20INKognito%20Supply"
+        target="_blank" rel="noopener noreferrer"
+        className="flex items-center justify-center gap-2 w-full py-4 rounded-xl border border-green-500/40 bg-zinc-950 text-white font-bold uppercase tracking-[0.15em] text-sm hover:border-green-500 hover:shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all duration-300"
+      >
+        📱 Hacer mi pedido ahora
+      </a>
+    </section>
+
     <section
   id="contacto"
-  className="max-w-7xl mx-auto px-6 py-12 md:py-16 lg:py-20 border-t border-zinc-900"
+  className="hidden md:block max-w-7xl mx-auto px-6 py-12 md:py-16 lg:py-20 border-t border-zinc-900"
 >
 
   <div className="grid md:grid-cols-2 gap-12 items-start">
