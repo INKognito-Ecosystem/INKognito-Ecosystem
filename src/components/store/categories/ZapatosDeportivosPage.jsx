@@ -3,6 +3,7 @@ import FooterStore from '../FooterStore'
 import { FaWhatsapp } from 'react-icons/fa'
 import StoreProductCard from '../StoreProductCard'
 import Seo from '../../Seo'
+import { useCatalog, toProdCard } from '../../../hooks/useCatalog'
 
 const SHOE_SIZES = ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44']
 
@@ -41,6 +42,7 @@ const faqs = [
 ]
 
 export default function ZapatosDeportivosPage() {
+  const { allProducts: catalogItems, loading } = useCatalog('store', 'Zapatos Deportivos')
   return (
     <>
       <Seo
@@ -72,14 +74,20 @@ export default function ZapatosDeportivosPage() {
       <div className="bg-gray-50 pt-4 pb-10 md:pt-6 md:pb-14 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {products.map((product) => (
+            {loading ? <p className="text-gray-400 col-span-4 py-8 text-center">Cargando...</p>
+              : catalogItems.length === 0 ? <p className="text-gray-400 col-span-4 py-8 text-center">Próximamente disponible</p>
+              : catalogItems.map(item => {
+                const prod = toProdCard(item)
+                const sizes = item.variantes.map(v => v.variant).filter(Boolean)
+                return (
               <StoreProductCard
-                key={product.id}
-                product={product}
+                key={item.name}
+                product={prod}
                 category="zapatos-deportivos"
-                sizes={SHOE_SIZES}
+                sizes={sizes.length ? sizes : SHOE_SIZES}
               />
-            ))}
+              )
+            })}
           </div>
         </div>
       </div>
