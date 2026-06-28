@@ -87,10 +87,10 @@ export default function MaquinasPedidoPage() {
   const [cart, setCart]         = useState([])
   const [cartOpen, setCartOpen] = useState(false)
   const [lightbox, setLightbox] = useState(null)
-  const { allProducts: apiMaquinas } = useCatalog('gym')
+  const { allProducts: apiMaquinas, loading: catalogLoading } = useCatalog('gym')
 
-  // Mezclar datos del API con respaldo local
-  const productosFinales = apiMaquinas.length > 0
+  // Mezclar datos del API con respaldo local — esperar carga antes de decidir
+  const productosFinales = catalogLoading ? [] : apiMaquinas.length > 0
     ? apiMaquinas.map((item, i) => {
         const key = item.name.toLowerCase()
         return {
@@ -158,7 +158,21 @@ export default function MaquinasPedidoPage() {
       {/* GRID */}
       <div className="pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto pt-6 md:pt-8">
         {/* Scroll horizontal en móvil, grid en desktop */}
-        <div className="flex md:grid md:grid-cols-3 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide">
+        {catalogLoading && (
+          <div className="flex gap-3 overflow-x-hidden">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex-shrink-0 w-[46vw] md:w-64 rounded-2xl bg-gray-800/40 border border-gray-800 animate-pulse">
+                <div className="aspect-video bg-gray-700 rounded-t-2xl" />
+                <div className="p-3 flex flex-col gap-2">
+                  <div className="h-2 bg-gray-700 rounded w-3/4" />
+                  <div className="h-3 bg-gray-700 rounded w-1/2" />
+                  <div className="h-6 bg-gray-700 rounded mt-1" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className={`flex md:grid md:grid-cols-3 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide ${catalogLoading ? 'hidden' : ''}`}>
           {productosFinales.map((p) => {
             const hasImages = p.image1 || p.image2
             const inCart    = cart.some(i => i.id === p.id)

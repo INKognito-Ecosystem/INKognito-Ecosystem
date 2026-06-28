@@ -113,17 +113,14 @@ export default function GymPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto text-center md:text-left">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase leading-none mb-4">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase leading-none mb-5">
             Construyo mi<br />
             <span className="text-gray-400">propio gym</span><br />
             desde cero
           </h1>
-          <p className="text-gray-400 text-base md:text-lg leading-relaxed max-w-2xl mb-6 mx-auto md:mx-0">
-            Máquinas fabricadas a mano, planos digitales y recursos para entrenar en casa sin gastar una fortuna.
-          </p>
           <button
             onClick={() => setHistoriaModalOpen(true)}
-            className="inline-block border border-gray-600 text-gray-300 text-sm font-bold uppercase tracking-[0.2em] py-4 px-8 rounded hover:border-gray-300 hover:text-white transition-all duration-300"
+            className="inline-block border border-gray-600 text-gray-300 text-sm font-bold uppercase tracking-[0.2em] py-3 px-7 rounded hover:border-gray-300 hover:text-white transition-all duration-300"
           >
             Nuestra historia
           </button>
@@ -234,9 +231,9 @@ export default function GymPage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
                 {creaciones.slice(0, creacionesVisible).map((item) => (
-                  <div key={item.name} className="border border-gray-800 bg-gray-900 rounded-xl overflow-hidden">
+                  <div key={item.name} className="snap-start flex-shrink-0 w-[46vw] md:w-auto border border-gray-800 bg-gray-900 rounded-xl overflow-hidden">
                     <div className="aspect-video bg-gray-700 flex items-center justify-center">
                       {item.video ? (
                         <iframe
