@@ -85,11 +85,15 @@ export default function SupplyPage() {
       <p className="text-zinc-500 text-sm mb-5">Urabá, puerta a puerta.</p>
 
       {/* Aliado transportadora */}
-      <div className="flex items-center gap-3 mb-5 bg-white rounded-xl p-3">
-        <img src="/eljach.png" alt="Eljach Transportadora" className="h-8 w-auto object-contain flex-shrink-0" />
-        <div>
-          <p className="text-zinc-900 text-xs font-bold uppercase tracking-wide">Eljach Transportadora</p>
-          <p className="text-zinc-600 text-[11px]">Entregas locales y contra entrega</p>
+      <div className="flex gap-2 mb-5">
+        {/* Card logo — círculo blanco */}
+        <div className="flex items-center justify-center bg-white rounded-xl p-3 flex-shrink-0 aspect-square w-16">
+          <img src="/eljach.png" alt="Eljach" className="w-10 h-10 object-contain" />
+        </div>
+        {/* Card info — negra */}
+        <div className="flex flex-col justify-center bg-black border border-zinc-800 rounded-xl px-3 py-2 flex-1">
+          <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Eljach Transportadora</p>
+          <p className="text-zinc-500 text-[11px] mt-0.5">Entregas locales y contra entrega</p>
         </div>
       </div>
 
