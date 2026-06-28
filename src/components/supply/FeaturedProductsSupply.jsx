@@ -1,98 +1,148 @@
-import { Link } from 'react-router-dom'
+import { useCatalog } from '../../hooks/useCatalog'
 
-const products = [
-  {
-    id: 1,
-    name: 'Tattoo Vision',
-    brand: 'Marca profesional',
-    tagline: 'Lo más buscado en sistemas visuales',
-    link: '/supply/brands/tattoo-vision'
-  },
-  {
-    id: 2,
-    name: 'Vice Colors',
-    brand: 'Tintas',
-    tagline: 'Recomendado por artistas de color',
-    link: '/supply/ink/vice-colors'
-  },
-  {
-    id: 3,
-    name: 'WJX',
-    brand: 'Cartuchos',
-    tagline: 'Precisión y flujo para cada sesión',
-    link: '/supply/cartridges/wjx'
-  },
-  {
-    id: 4,
-    name: 'Heaven Pro',
-    brand: 'Cuidado pro',
-    tagline: 'Nuevo en INKognito Supply',
-    link: '/supply/brands/heaven-pro'
-  }
-]
+const WA_NUMBER = '573207911013'
 
-export default function FeaturedProducts() {
+function ProductCard({ item }) {
+  const firstVariant = item.variantes?.[0]
+  const price = firstVariant?.price
+    ? '$' + Math.round(firstVariant.price).toLocaleString('es-CO')
+    : null
+  const variants = item.variantes?.map(v => v.variant).filter(Boolean) ?? []
+  const totalStock = item.variantes?.reduce((s, v) => s + (v.stock || 0), 0) ?? 0
+
+  const waText = encodeURIComponent(
+    `Hola, quiero información sobre: ${item.name}${variants[0] ? ' — ' + variants[0] : ''}`
+  )
+
   return (
-    <section
-      id="destacados"
-      className="pt-12 md:pt-16 lg:pt-20 pb-4 md:pb-6 lg:pb-8 px-6 bg-black"
-    >
-      <div className="max-w-7xl mx-auto">
+    <div className="border border-blue-500/40 bg-zinc-950 rounded-2xl overflow-hidden hover:border-blue-500 hover:shadow-[0_0_25px_rgba(59,130,246,0.25)] transition-all duration-300 flex flex-col">
 
-        {/* TITULO */}
-        <div className="mb-16 text-center max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-6xl font-black uppercase mb-8">
-            Destacados
-          </h2>
-          <div className="bg-zinc-950 border border-blue-500/40 rounded-2xl p-8">
-            <p className="text-zinc-400 text-base md:text-lg leading-relaxed">
-              Descubre los productos más buscados por tatuadores profesionales.
+      {/* IMAGEN */}
+      <div className="aspect-square w-full bg-zinc-900 overflow-hidden relative">
+        {item.image_url ? (
+          <img
+            src={item.image_url}
+            alt={item.name}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <p className="text-zinc-700 uppercase tracking-[0.3em] text-xs text-center px-4">
+              {item.name}
             </p>
           </div>
+        )}
+        {totalStock <= 2 && totalStock > 0 && (
+          <span className="absolute top-2 right-2 bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">
+            Últimas {totalStock}
+          </span>
+        )}
+      </div>
+
+      {/* INFO */}
+      <div className="p-4 flex flex-col gap-3 flex-1">
+        <div className="flex-1">
+          {item.descripcion && (
+            <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] mb-1">
+              {item.descripcion}
+            </p>
+          )}
+          <h3 className="text-base font-black uppercase leading-tight text-white">
+            {item.name}
+          </h3>
+          {/* Variantes disponibles */}
+          {variants.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {variants.slice(0, 4).map(v => (
+                <span key={v} className="text-[10px] border border-zinc-700 text-zinc-400 px-2 py-0.5 rounded">
+                  {v}
+                </span>
+              ))}
+              {variants.length > 4 && (
+                <span className="text-[10px] text-zinc-600">+{variants.length - 4}</span>
+              )}
+            </div>
+          )}
+          {price && (
+            <p className="text-white font-bold text-sm mt-2">{price}</p>
+          )}
         </div>
 
-        {/* GRID */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-          {products.map((product) => (
-            <Link key={product.id} to={product.link} className="block h-full">
-              <div className="border border-blue-500/40 bg-zinc-950 rounded-2xl overflow-hidden hover:border-blue-500 hover:shadow-[0_0_25px_rgba(59,130,246,0.25)] transition-all duration-300 h-full flex flex-col justify-between">
+        <a
+          href={`https://wa.me/${WA_NUMBER}?text=${waText}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-center px-4 py-2 border border-blue-500/50 text-blue-400 uppercase tracking-[0.15em] text-[11px] font-bold hover:bg-blue-500 hover:text-white transition-all duration-300 rounded"
+        >
+          Consultar
+        </a>
+      </div>
+    </div>
+  )
+}
 
-                {/* IMAGEN */}
-                <div className="h-48 sm:h-72 bg-zinc-900 flex items-center justify-center">
-                  <p className="text-zinc-600 uppercase tracking-[0.3em] text-xs sm:text-sm">
-                    Product Image
-                  </p>
-                </div>
+function SkeletonCard() {
+  return (
+    <div className="border border-zinc-800 bg-zinc-950 rounded-2xl overflow-hidden animate-pulse">
+      <div className="aspect-square bg-zinc-900" />
+      <div className="p-4 flex flex-col gap-3">
+        <div className="h-4 bg-zinc-800 rounded w-3/4" />
+        <div className="h-3 bg-zinc-800 rounded w-1/2" />
+        <div className="h-8 bg-zinc-800 rounded mt-2" />
+      </div>
+    </div>
+  )
+}
 
-                {/* INFO */}
-                <div className="p-4 sm:p-6 flex flex-col gap-3">
-                  <div>
-                    <p className="text-zinc-500 uppercase tracking-[0.25em] text-[10px] sm:text-xs mb-2">
-                      {product.brand}
-                    </p>
-                    <h3 className="text-lg sm:text-2xl font-black uppercase">
-                      {product.name}
-                    </h3>
-                    <p className="text-zinc-500 text-xs mt-1 leading-relaxed">
-                      {product.tagline}
-                    </p>
-                  </div>
-                  <span className="text-center px-3 sm:px-5 py-1.5 sm:py-2 border border-zinc-700 uppercase tracking-[0.2em] text-[10px] sm:text-sm hover:border-blue-500 hover:text-white transition-all duration-300">
-                    Ver
-                  </span>
-                </div>
+export default function FeaturedProductsSupply() {
+  const { products, loading } = useCatalog('supply')
 
-              </div>
-            </Link>
-          ))}
+  return (
+    <section id="productos" className="pt-12 md:pt-16 lg:pt-20 pb-4 md:pb-6 lg:pb-8 px-6 bg-black">
+      <div className="max-w-7xl mx-auto">
+
+        <div className="mb-12 text-center max-w-3xl mx-auto">
+          <h2 className="text-4xl md:text-6xl font-black uppercase mb-6 text-white">
+            Disponible ahora
+          </h2>
+          <p className="text-zinc-500 text-base leading-relaxed">
+            Insumos profesionales con stock real. Lo que ves está disponible para pedido inmediato.
+          </p>
         </div>
+
+        {loading ? (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
+          </div>
+        ) : products.length === 0 ? (
+          <div className="border border-blue-500/20 bg-zinc-950 rounded-2xl p-12 text-center">
+            <p className="text-zinc-400 text-lg mb-2">Catálogo en actualización</p>
+            <p className="text-zinc-600 text-sm mb-6">
+              Nuevos productos disponibles próximamente. Escríbenos para ver disponibilidad.
+            </p>
+            <a
+              href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola, quiero ver el catálogo de insumos para tatuaje disponible')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white font-bold uppercase tracking-[0.15em] text-sm rounded hover:bg-blue-600 transition"
+            >
+              Ver disponibilidad por WhatsApp
+            </a>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {products.map(item => (
+              <ProductCard key={item.name} item={item} />
+            ))}
+          </div>
+        )}
 
       </div>
 
       <div className="max-w-7xl mx-auto px-6 mt-10 md:mt-16 lg:mt-20">
         <div className="border-b border-zinc-900" />
       </div>
-
     </section>
   )
 }

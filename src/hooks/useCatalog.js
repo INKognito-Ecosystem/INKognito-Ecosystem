@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel.vercel.app'
+const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
 /**
  * Carga el catálogo de productos desde el panel (PostgreSQL).
