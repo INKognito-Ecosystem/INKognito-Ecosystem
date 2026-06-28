@@ -56,16 +56,15 @@ export default function RecursosPage() {
       </section>
 
       {/* GRID DE EBOOKS */}
-      <div className="pb-8 md:pb-14 px-4 md:px-6 max-w-2xl mx-auto pt-6 md:pt-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div className="pb-8 md:pb-14 px-4 md:px-6 max-w-xl mx-auto pt-6 md:pt-8">
+        <div className="grid grid-cols-2 gap-3">
           {ebooks.map((eb) => (
             <div
               key={eb.id}
               className="border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
-              style={{ maxHeight: '300px' }}
             >
               {/* PORTADA */}
-              <div className="relative bg-gray-800 flex items-center justify-center flex-1 min-h-0 overflow-hidden">
+              <div className="relative bg-gray-800 flex items-center justify-center aspect-[3/4]">
                 {eb.imagen ? (
                   <img
                     src={eb.imagen}
@@ -74,24 +73,24 @@ export default function RecursosPage() {
                     onError={(e) => { e.target.style.display = 'none' }}
                   />
                 ) : (
-                  <div className="flex flex-col items-center justify-center gap-2 px-4 text-center py-6">
-                    <span className="text-gray-600 text-2xl">📖</span>
-                    <span className="text-gray-700 text-[10px] uppercase tracking-widest">Próximamente</span>
+                  <div className="flex flex-col items-center justify-center gap-2 px-3 text-center py-4">
+                    <span className="text-gray-600 text-xl">📖</span>
+                    <span className="text-gray-700 text-[9px] uppercase tracking-widest">Próximamente</span>
                   </div>
                 )}
               </div>
 
               {/* CONTENIDO */}
-              <div className="p-3 flex flex-col gap-2 flex-shrink-0">
+              <div className="p-2 flex flex-col gap-1.5 flex-shrink-0">
                 <div>
-                  <h2 className="font-black uppercase text-xs leading-tight mb-1">{eb.nombre}</h2>
-                  <p className="text-gray-500 text-[10px] leading-relaxed line-clamp-2">{eb.descripcion}</p>
+                  <h2 className="font-black uppercase text-[10px] leading-tight mb-0.5">{eb.nombre}</h2>
+                  <p className="text-gray-500 text-[9px] leading-relaxed line-clamp-2">{eb.descripcion}</p>
                 </div>
-                <div className="pt-2 border-t border-gray-800">
+                <div className="pt-1.5 border-t border-gray-800">
                   <a
                     href={eb.pdf}
                     download
-                    className="block text-center bg-white text-gray-950 font-black uppercase tracking-[0.1em] text-[10px] py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-300"
+                    className="block text-center bg-white text-gray-950 font-black uppercase tracking-[0.1em] text-[9px] py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-300"
                   >
                     Descargar gratis
                   </a>
@@ -102,7 +101,7 @@ export default function RecursosPage() {
         </div>
 
         {/* SECCIÓN REDES */}
-        <div className="mt-16 border-t border-gray-800 pt-12 text-center max-w-xl mx-auto">
+        <div className="mt-8 border-t border-gray-800 pt-8 text-center max-w-xl mx-auto">
           <p className="text-gray-400 leading-relaxed text-sm md:text-base mb-8">
             Si estos recursos te fueron de ayuda, te invito a seguirme en mis redes y a suscribirte a mi canal de YouTube — ahí comparto todo el proceso de construir esto desde cero.
           </p>

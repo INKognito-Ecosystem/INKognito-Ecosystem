@@ -77,11 +77,11 @@ export default function VideosTutorialesPage() {
       </section>
 
       <div className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto pt-6 md:pt-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {videos.map((v) => (
             <div
               key={v.id}
-              className="border border-gray-800 bg-gray-800/40 rounded-2xl overflow-hidden hover:border-gray-600 transition-all duration-300"
+              className="border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden hover:border-gray-600 transition-all duration-300"
             >
               <div className="relative w-full aspect-video bg-gray-800">
                 <iframe
@@ -92,13 +92,12 @@ export default function VideosTutorialesPage() {
                   allowFullScreen
                 />
               </div>
-              <div className="p-5">
-                <h3 className="font-black uppercase text-sm leading-tight">{v.titulo}</h3>
+              <div className="p-2 md:p-3">
+                <h3 className="font-black uppercase text-[10px] md:text-xs leading-tight">{v.titulo}</h3>
               </div>
             </div>
           ))}
         </div>
-
       </div>
 
       <FooterGym />
