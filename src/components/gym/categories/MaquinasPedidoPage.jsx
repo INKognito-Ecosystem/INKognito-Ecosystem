@@ -143,13 +143,11 @@ export default function MaquinasPedidoPage() {
             </h1>
             <Wrench size={80} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
           </div>
-          <p className="text-gray-400 leading-relaxed max-w-2xl mb-6">
-            Máquinas de gym hechas a tu medida, con soldadura profesional. Elige la que necesitas y la fabricamos para ti.
-          </p>
-          <div className="border border-gray-700 bg-gray-800/50 rounded-xl p-5 max-w-2xl">
-            <p className="text-gray-400 text-sm leading-relaxed">
-              <span className="font-bold text-white">Envíos:</span>{' '}
-              Fabricamos en Urabá, Antioquia. Enviamos a toda Colombia por transportadora (Servientrega, Coordinadora). El flete corre por cuenta del cliente.
+          <div className="border border-gray-700 bg-gray-800/50 rounded-xl p-4 max-w-2xl">
+            <p className="text-gray-300 text-sm leading-relaxed">
+              Cada máquina sale de Chigorodó, hecha a mano con soldadura profesional.
+              La tuya puede llegar a cualquier rincón de Colombia.{' '}
+              <span className="text-white font-semibold">Cuéntanos dónde estás.</span>
             </p>
           </div>
         </div>
