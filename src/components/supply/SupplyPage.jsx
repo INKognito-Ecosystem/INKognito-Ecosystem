@@ -93,7 +93,7 @@ export default function SupplyPage() {
         {/* Card info — negra */}
         <div className="flex flex-col justify-center bg-black border border-zinc-800 rounded-xl px-3 py-2 flex-1">
           <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Eljach Transportadora</p>
-          <p className="text-zinc-500 text-[11px] mt-0.5">Entregas locales y contra entrega</p>
+          <p className="text-zinc-500 text-[10px] mt-0.5">Entregas locales y contra entrega</p>
         </div>
       </div>
 
