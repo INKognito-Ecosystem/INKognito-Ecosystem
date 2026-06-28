@@ -84,7 +84,7 @@ export default function SuplementosPage() {
       <NavbarGym cartCount={cart.length} onCartClick={() => setCartOpen(true)} />
 
       {/* HERO */}
-      <section className="relative pt-28 md:pt-36 pb-16 px-4 md:px-6 overflow-hidden">
+      <section className="relative pt-16 md:pt-24 pb-6 md:pb-10 px-4 md:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
@@ -101,7 +101,7 @@ export default function SuplementosPage() {
         </div>
       </section>
 
-      <div className="pb-32 px-4 md:px-6 max-w-7xl mx-auto pt-10">
+      <div className="pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto pt-6 md:pt-8">
 
         {/* FILTROS POR CATEGORÍA */}
         <div className="flex gap-2 flex-wrap mb-10">
