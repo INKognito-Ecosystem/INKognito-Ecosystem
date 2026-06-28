@@ -137,7 +137,8 @@ export default function GymPage() {
           <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-5 md:mb-8">
             Lo que puedes conseguir aquí
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-3">
+          {/* Scroll horizontal en móvil (3 visibles + hint), grid en desktop */}
+          <div className="flex md:grid md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
             {servicios.map((s) => {
               const Icon = s.icon
               const inner = (
@@ -151,18 +152,19 @@ export default function GymPage() {
                   <p className="text-[11px] md:text-xs leading-snug text-gray-500 group-hover:text-gray-400 transition-colors duration-300">{s.texto}</p>
                 </>
               )
+              const cardCls = `${CARD_CLASS} snap-start flex-shrink-0 w-[30vw] md:w-auto`
               return s.scrollTo
                 ? (
                     <button
                       key={s.titulo}
                       onClick={() => scrollToSection(s.scrollTo)}
-                      className={`${CARD_CLASS} text-left w-full`}
+                      className={`${cardCls} text-left`}
                     >
                       {inner}
                     </button>
                   )
                 : (
-                    <Link key={s.titulo} to={s.link} className={CARD_CLASS}>
+                    <Link key={s.titulo} to={s.link} className={cardCls}>
                       {inner}
                     </Link>
                   )
