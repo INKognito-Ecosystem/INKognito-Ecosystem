@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Drill, PenTool, PlugZap, Droplet, Crosshair, Hand, HeartPulse, Toolbox, BedDouble, Package } from 'lucide-react'
+import { Drill, PenTool, PlugZap, Droplet, Crosshair, Hand, ShieldCheck, Toolbox, BedDouble, Package } from 'lucide-react'
 import { useCatalog } from '../../hooks/useCatalog'
 
 const categories = [
@@ -8,7 +8,7 @@ const categories = [
   { name: 'Agujas',            path: '/supply/needles',        icon: Crosshair,  cat: 'Agujas'            },
   { name: 'Máquinas',          path: '/supply/machines',       icon: Drill,      cat: 'Máquinas'          },
   { name: 'Guantes',           path: '/supply/gloves',         icon: Hand,       cat: 'Guantes'           },
-  { name: 'Espumas',           path: '/supply/aftercare',      icon: HeartPulse, cat: 'Espumas y limpieza'},
+  { name: 'Cuidados',          path: '/supply/aftercare',      icon: ShieldCheck, cat: 'Cuidados'          },
   { name: 'Fuentes',           path: '/supply/power-supplies', icon: PlugZap,    cat: 'Fuentes'           },
   { name: 'Accesorios',        path: '/supply/accessories',    icon: Toolbox,    cat: 'Accesorios'        },
   { name: 'Mobiliario',        path: '/supply/furniture',      icon: BedDouble,  cat: 'Muebles'           },

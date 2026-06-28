@@ -4,19 +4,19 @@ import FooterSupply from './FooterSupply'
 import Seo from '../Seo'
 import { useCatalog } from '../../hooks/useCatalog'
 import { FaWhatsapp } from 'react-icons/fa'
-import { Droplet, PenTool, Crosshair, Drill, Hand, HeartPulse, PlugZap, Toolbox, BedDouble, Package } from 'lucide-react'
+import { Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package } from 'lucide-react'
 
 const CAT_ICONS = {
-  'Tintas':             Droplet,
-  'Cartuchos':          PenTool,
-  'Agujas':             Crosshair,
-  'Maquinas':           Drill,
-  'Guantes':            Hand,
-  'Espumas y limpieza': HeartPulse,
-  'Fuentes':            PlugZap,
-  'Accesorios':         Toolbox,
-  'Muebles':            BedDouble,
-  'Bundles':            Package,
+  'Tintas':    Droplet,
+  'Cartuchos': PenTool,
+  'Agujas':    Crosshair,
+  'Maquinas':  Drill,
+  'Guantes':   Hand,
+  'Cuidados':  ShieldCheck,
+  'Fuentes':   PlugZap,
+  'Accesorios':Toolbox,
+  'Muebles':   BedDouble,
+  'Bundles':   Package,
 }
 
 const WA = '573207911013'
