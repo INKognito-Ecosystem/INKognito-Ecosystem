@@ -216,9 +216,8 @@ export default function GymPage() {
 
       {/* MIS CREACIONES */}
       <section className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-gray-800 pt-6 md:pt-10">
-          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-2">Portafolio</p>
-          <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-5 md:mb-8">Mis creaciones</h2>
+        <div className="pt-3 md:pt-8">
+          <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-4 md:mb-8">Mis creaciones</h2>
 
           {creaciones.length === 0 ? (
             <div className="border border-gray-800 bg-gray-900/30 rounded-2xl py-20 text-center">
@@ -264,10 +263,9 @@ export default function GymPage() {
 
       {/* MÁQUINAS BAJO PEDIDO + CONTACTO — UNIFICADO */}
       <section className="pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-gray-800 pt-6 md:pt-10">
+        <div className="pt-3 md:pt-8">
           <div className="flex items-end justify-between mb-5 md:mb-8">
             <div>
-              <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-2">Soldadura profesional</p>
               <h2 className="text-2xl md:text-4xl font-black uppercase leading-none">Máquinas bajo pedido</h2>
             </div>
             <Link
