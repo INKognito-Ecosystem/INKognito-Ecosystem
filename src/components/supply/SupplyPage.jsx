@@ -53,8 +53,8 @@ export default function SupplyPage() {
 
     <BrandsSupply />
 
-    {/* SECCIÓN APRENDE A TATUAR */}
-    <section className="bg-zinc-950 border-t border-zinc-900">
+    {/* SECCIÓN APRENDE A TATUAR — solo desktop */}
+    <section className="hidden md:block bg-zinc-950 border-t border-zinc-900">
       <div className="max-w-7xl mx-auto px-6 py-8 md:py-16 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
         <div>
           <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-3">
@@ -86,7 +86,7 @@ export default function SupplyPage() {
 
       {/* Aliado transportadora */}
       <div className="flex items-center gap-3 mb-5 border border-zinc-800 rounded-xl p-3">
-        <img src="/Eljachlogo.png" alt="Eljach Transportadora" className="h-8 w-auto object-contain" />
+        <img src="/eljach.png" alt="Eljach Transportadora" className="h-8 w-auto object-contain" />
         <div>
           <p className="text-white text-xs font-bold uppercase tracking-wide">Eljach Transportadora</p>
           <p className="text-zinc-500 text-[11px]">Entregas locales en Urabá el mismo día</p>
