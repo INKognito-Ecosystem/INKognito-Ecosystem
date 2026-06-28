@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import NavbarCategory from './NavbarCategory'
 import FooterSupply from './FooterSupply'
 import Seo from '../Seo'
@@ -69,6 +70,42 @@ function SkeletonCard() {
   )
 }
 
+function AccordionCard({ icon, title, subtitle, children }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="border border-zinc-800 bg-zinc-950 rounded-2xl overflow-hidden">
+      {/* Header — siempre visible, toca para abrir/cerrar */}
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-zinc-900 transition-colors duration-150"
+      >
+        <div className="flex-1 min-w-0 pr-4">
+          <div className="flex items-center gap-3 mb-1">
+            <span className="text-xl flex-shrink-0">{icon}</span>
+            <span className="font-black uppercase text-white tracking-[0.08em] text-sm">{title}</span>
+          </div>
+          <p className="text-zinc-500 text-xs leading-relaxed pl-8">{subtitle}</p>
+        </div>
+        <span
+          className="text-zinc-500 text-xs flex-shrink-0 transition-transform duration-200"
+          style={{ transform: open ? 'rotate(90deg)' : 'rotate(0deg)' }}
+        >
+          ▶
+        </span>
+      </button>
+
+      {/* Contenido — scroll interno, solo visible cuando está abierto */}
+      {open && (
+        <div className="border-t border-zinc-800 overflow-y-auto" style={{ maxHeight: '340px' }}>
+          <div className="px-6 py-5">
+            {children}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function SupplyCategoryPage({ title, categoria, slug, desc, intro, guide, faqs }) {
   const { allProducts: products, loading } = useCatalog('supply', categoria)
 
@@ -83,6 +120,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
       <NavbarCategory pageName={title} backPath="/supply" backLabel="Supply" />
 
       <div className="bg-black pt-20 md:pt-24">
+
         {/* HERO DE CATEGORÍA */}
         <div className="px-6 max-w-7xl mx-auto pb-8 md:pb-12">
           <p className="uppercase tracking-[0.25em] text-blue-500/70 text-xs mb-3">Supply — {categoria}</p>
@@ -93,7 +131,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
         </div>
 
         {/* PRODUCTOS DINÁMICOS */}
-        <div className="px-6 pb-16 max-w-7xl mx-auto">
+        <div className="px-6 pb-10 max-w-7xl mx-auto">
           {loading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => <SkeletonCard key={i} />)}
@@ -102,7 +140,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
             <div className="border border-blue-500/20 bg-zinc-950 rounded-2xl p-12 text-center">
               <p className="text-zinc-400 text-lg mb-2">Próximamente disponible</p>
               <p className="text-zinc-600 text-sm mb-6">
-                Escríbenos para consultar disponibilidad de {title.toLowerCase()} y te asesoramos.
+                Escríbenos para consultar disponibilidad de {title.toLowerCase()}.
               </p>
               <a
                 href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero consultar ${title} disponibles`)}`}
@@ -120,60 +158,47 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
           )}
         </div>
 
-        {/* GUÍA DE COMPRA */}
-        {guide && guide.length > 0 && (
-          <div className="bg-zinc-950 border-t border-zinc-900 py-16 px-6">
-            <div className="max-w-7xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-black uppercase mb-10 text-white">
-                Cómo elegir {title.toLowerCase()}
-              </h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {guide.map((item, i) => (
-                  <div key={i} className="border border-zinc-800 bg-black rounded-2xl p-6">
-                    <div className="text-blue-400 text-2xl mb-3">{item.icon}</div>
-                    <h3 className="font-black uppercase text-white mb-2 text-sm tracking-[0.1em]">{item.title}</h3>
-                    <p className="text-zinc-500 text-sm leading-relaxed">{item.text}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+        {/* ACORDEONES — guía de compra y FAQ */}
+        {(guide?.length > 0 || faqs?.length > 0) && (
+          <div className="px-6 pb-16 max-w-7xl mx-auto flex flex-col gap-4">
 
-        {/* CTA WHATSAPP */}
-        <div className="bg-black py-16 px-6 text-center border-t border-zinc-900">
-          <h2 className="text-2xl md:text-3xl font-black uppercase text-white mb-3">
-            ¿No encuentras lo que buscas?
-          </h2>
-          <p className="text-zinc-500 mb-8 text-sm">
-            Escríbenos. Tenemos más referencias disponibles y te asesoramos sin costo.
-          </p>
-          <a
-            href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, busco ${title} y quiero asesoría`)}`}
-            target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 px-10 py-5 bg-blue-500 text-white font-bold uppercase tracking-[0.15em] text-sm rounded hover:bg-blue-600 transition"
-          >
-            <FaWhatsapp size={20} />
-            Pedir asesoría por WhatsApp
-          </a>
-        </div>
+            {guide?.length > 0 && (
+              <AccordionCard
+                icon="📖"
+                title={`Cómo elegir ${title.toLowerCase()}`}
+                subtitle="Tipos, usos, compatibilidad y qué factores tener en cuenta antes de comprar. Toca para desplegar la guía completa."
+              >
+                <div className="flex flex-col gap-5">
+                  {guide.map((item, i) => (
+                    <div key={i} className="flex gap-4">
+                      <span className="text-2xl flex-shrink-0">{item.icon}</span>
+                      <div>
+                        <p className="font-black uppercase text-white text-xs tracking-[0.1em] mb-1">{item.title}</p>
+                        <p className="text-zinc-500 text-sm leading-relaxed">{item.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </AccordionCard>
+            )}
 
-        {/* FAQ */}
-        {faqs && faqs.length > 0 && (
-          <div className="bg-zinc-950 py-20 px-6 border-t border-zinc-900">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl md:text-5xl font-black uppercase mb-10 text-white">
-                Preguntas frecuentes
-              </h2>
-              <div className="space-y-4">
-                {faqs.map((faq, i) => (
-                  <div key={i} className="border border-zinc-800 rounded-xl p-6 hover:border-blue-500/40 transition-all duration-300">
-                    <h3 className="font-bold text-white mb-3 text-sm md:text-base">{faq.q}</h3>
-                    <p className="text-zinc-500 leading-relaxed text-sm">{faq.a}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {faqs?.length > 0 && (
+              <AccordionCard
+                icon="❓"
+                title="Preguntas frecuentes"
+                subtitle="Envíos, calidad, cantidades y todo lo que necesitas saber antes de hacer tu pedido. Toca para ver las respuestas."
+              >
+                <div className="flex flex-col gap-5">
+                  {faqs.map((faq, i) => (
+                    <div key={i} className={i < faqs.length - 1 ? 'pb-5 border-b border-zinc-800' : ''}>
+                      <p className="font-bold text-white text-sm mb-2">{faq.q}</p>
+                      <p className="text-zinc-500 text-sm leading-relaxed">{faq.a}</p>
+                    </div>
+                  ))}
+                </div>
+              </AccordionCard>
+            )}
+
           </div>
         )}
 
