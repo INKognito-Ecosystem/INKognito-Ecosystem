@@ -87,8 +87,8 @@ export default function SupplyPage() {
       {/* Aliado transportadora */}
       <div className="flex gap-2 mb-5">
         {/* Card logo — círculo blanco */}
-        <div className="flex items-center justify-center bg-white rounded-xl p-3 flex-shrink-0 aspect-square w-16">
-          <img src="/eljach.png" alt="Eljach" className="w-10 h-10 object-contain" />
+        <div className="flex items-center justify-center bg-white rounded-xl p-1 flex-shrink-0 aspect-square w-16">
+          <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
         </div>
         {/* Card info — negra */}
         <div className="flex flex-col justify-center bg-black border border-zinc-800 rounded-xl px-3 py-2 flex-1">
