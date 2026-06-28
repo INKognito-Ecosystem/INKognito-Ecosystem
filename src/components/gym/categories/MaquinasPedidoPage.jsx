@@ -157,14 +157,15 @@ export default function MaquinasPedidoPage() {
 
       {/* GRID */}
       <div className="pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto pt-6 md:pt-8">
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Scroll horizontal en móvil, grid en desktop */}
+        <div className="flex md:grid md:grid-cols-3 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide">
           {productosFinales.map((p) => {
             const hasImages = p.image1 || p.image2
             const inCart    = cart.some(i => i.id === p.id)
             return (
               <div
                 key={p.id}
-                className="border border-gray-800 bg-gray-800/40 rounded-2xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
+                className="snap-start flex-shrink-0 w-[46vw] md:w-auto border border-gray-800 bg-gray-800/40 rounded-2xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
               >
                 {/* IMAGEN */}
                 <div className="relative w-full aspect-video bg-gray-800 flex items-center justify-center">
