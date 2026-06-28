@@ -43,14 +43,19 @@ export default function RecursosPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 mb-3">
-            <BookOpen size={18} className="text-gray-600 flex-shrink-0" />
-            <p className="uppercase tracking-[0.25em] text-gray-500 text-xs">Descarga gratuita</p>
+          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-3">Descarga gratuita</p>
+          {/* H1 + icono grande a la derecha en móvil */}
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
+              Recursos<br />
+              <span className="text-gray-400">gratuitos</span>
+            </h1>
+            <BookOpen
+              size={80}
+              className="text-gray-800 flex-shrink-0 md:hidden"
+              strokeWidth={1}
+            />
           </div>
-          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-4">
-            Recursos<br />
-            <span className="text-gray-400">gratuitos</span>
-          </h1>
           <p className="text-gray-400 leading-relaxed max-w-2xl">
             No necesitas pagar nada para empezar a cambiar tu vida. Estos recursos nacieron de mi propia experiencia — construyendo mi gym desde cero, entrenando sin equipo, y aprendiendo a base de prueba y error. Si a mí me sirvió, puede servirte a ti también. Descárgalos, úsalos, y empieza donde estás.
           </p>
@@ -79,31 +84,21 @@ export default function RecursosPage() {
                 )}
               </div>
 
-              {/* INFO — franja izquierda (ícono) + bloque derecho (texto+botón) */}
-              <div className="flex flex-1 border-t border-gray-800">
-
-                {/* FRANJA IZQUIERDA: ícono ocupa todo el alto */}
-                <div className="flex items-center justify-center w-8 flex-shrink-0 border-r border-gray-800 bg-gray-900/50">
-                  <BookOpen size={14} className="text-gray-600" />
+              {/* INFO — ancho completo, título arriba, botón abajo */}
+              <div className="p-2 flex flex-col flex-1 border-t border-gray-800">
+                <div className="flex-1">
+                  <h2 className="font-black uppercase text-[11px] leading-tight mb-1">{eb.nombre}</h2>
+                  <p className="text-gray-500 text-[10px] leading-relaxed line-clamp-2">{eb.descripcion}</p>
                 </div>
-
-                {/* BLOQUE DERECHO: título arriba, botón abajo */}
-                <div className="p-2 flex flex-col flex-1 min-w-0">
-                  <div className="flex-1">
-                    <h2 className="font-black uppercase text-[11px] leading-tight mb-1">{eb.nombre}</h2>
-                    <p className="text-gray-500 text-[10px] leading-relaxed line-clamp-2">{eb.descripcion}</p>
-                  </div>
-                  <div className="mt-2 pt-1.5 border-t border-gray-800">
-                    <a
-                      href={eb.pdf}
-                      download
-                      className="block text-center bg-white text-gray-950 font-black uppercase tracking-[0.1em] text-[10px] py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-300"
-                    >
-                      Descargar gratis
-                    </a>
-                  </div>
+                <div className="mt-2 pt-1.5 border-t border-gray-800">
+                  <a
+                    href={eb.pdf}
+                    download
+                    className="block text-center bg-white text-gray-950 font-black uppercase tracking-[0.1em] text-[10px] py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-300"
+                  >
+                    Descargar gratis
+                  </a>
                 </div>
-
               </div>
             </div>
           ))}
