@@ -4,6 +4,20 @@ import FooterSupply from './FooterSupply'
 import Seo from '../Seo'
 import { useCatalog } from '../../hooks/useCatalog'
 import { FaWhatsapp } from 'react-icons/fa'
+import { Droplet, PenTool, Crosshair, Drill, Hand, HeartPulse, PlugZap, Toolbox, BedDouble, Package } from 'lucide-react'
+
+const CAT_ICONS = {
+  'Tintas':             Droplet,
+  'Cartuchos':          PenTool,
+  'Agujas':             Crosshair,
+  'Maquinas':           Drill,
+  'Guantes':            Hand,
+  'Espumas y limpieza': HeartPulse,
+  'Fuentes':            PlugZap,
+  'Accesorios':         Toolbox,
+  'Muebles':            BedDouble,
+  'Bundles':            Package,
+}
 
 const WA = '573207911013'
 
@@ -108,6 +122,7 @@ function AccordionCard({ icon, title, subtitle, children }) {
 
 export default function SupplyCategoryPage({ title, categoria, slug, desc, intro, guide, faqs }) {
   const { allProducts: products, loading } = useCatalog('supply', categoria)
+  const CatIcon = CAT_ICONS[categoria] || null
 
   return (
     <>
@@ -121,9 +136,14 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
 
       <div className="bg-black pt-16 md:pt-24">
 
-        {/* HERO — sin label pequeño, H1 pegado al navbar */}
+        {/* HERO — H1 + ícono de categoría en móvil */}
         <div className="px-6 max-w-7xl mx-auto pb-5 md:pb-10">
-          <h1 className="text-5xl md:text-7xl font-black uppercase leading-none mb-4 text-white">{title}</h1>
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <h1 className="text-5xl md:text-7xl font-black uppercase leading-none text-white">{title}</h1>
+            {CatIcon && (
+              <CatIcon size={72} className="text-zinc-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+            )}
+          </div>
           {intro && (
             <p className="text-zinc-400 text-base md:text-lg leading-relaxed max-w-3xl">{intro}</p>
           )}
