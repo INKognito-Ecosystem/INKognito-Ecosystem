@@ -2,8 +2,6 @@ import { useCatalog } from '../../hooks/useCatalog'
 
 const WA_NUMBER = '573207911013'
 
-const WA_NUMBER = '573207911013'
-
 function ProductCard({ item }) {
   const firstVariant = item.variantes?.[0]
   const price = firstVariant?.price
