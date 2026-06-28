@@ -89,6 +89,7 @@ const PLANO_MUESTRAS = [null, null, null]
 export default function GymPage() {
   const [planosModalOpen, setPlanosModalOpen]   = useState(false)
   const [historiaModalOpen, setHistoriaModalOpen] = useState(false)
+  const [creacionesVisible, setCreacionesVisible] = useState(4)
 
   const scrollToSection = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -113,7 +114,7 @@ export default function GymPage() {
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto text-center md:text-left">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase leading-none mb-4">
-            Construí mi<br />
+            Construyo mi<br />
             <span className="text-gray-400">propio gym</span><br />
             desde cero
           </h1>
@@ -230,36 +231,48 @@ export default function GymPage() {
               <p className="text-gray-600 text-sm">Estamos cargando el portafolio de máquinas</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {creaciones.map((item) => (
-                <div key={item.name} className="border border-gray-800 bg-gray-900 rounded-xl overflow-hidden">
-                  <div className="aspect-video bg-gray-700 flex items-center justify-center">
-                    {item.video ? (
-                      <iframe
-                        src={item.video}
-                        title={item.name}
-                        className="w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    ) : item.image ? (
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => { e.target.style.display = 'none' }}
-                      />
-                    ) : (
-                      <span className="text-gray-600 text-xs uppercase tracking-widest text-center px-3">Imagen próximamente</span>
-                    )}
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {creaciones.slice(0, creacionesVisible).map((item) => (
+                  <div key={item.name} className="border border-gray-800 bg-gray-900 rounded-xl overflow-hidden">
+                    <div className="aspect-video bg-gray-700 flex items-center justify-center">
+                      {item.video ? (
+                        <iframe
+                          src={item.video}
+                          title={item.name}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => { e.target.style.display = 'none' }}
+                        />
+                      ) : (
+                        <span className="text-gray-600 text-xs uppercase tracking-widest text-center px-3">Imagen próximamente</span>
+                      )}
+                    </div>
+                    <div className="p-3">
+                      <p className="font-black uppercase text-xs leading-tight mb-1">{item.name}</p>
+                      <p className="text-gray-500 text-xs leading-relaxed">{item.description}</p>
+                    </div>
                   </div>
-                  <div className="p-3">
-                    <p className="font-black uppercase text-xs leading-tight mb-1">{item.name}</p>
-                    <p className="text-gray-500 text-xs leading-relaxed">{item.description}</p>
-                  </div>
+                ))}
+              </div>
+              {creacionesVisible < creaciones.length && (
+                <div className="text-center mt-6">
+                  <button
+                    onClick={() => setCreacionesVisible(v => v + 4)}
+                    className="border border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-[0.2em] py-3 px-8 rounded hover:border-gray-400 hover:text-white transition-all duration-300"
+                  >
+                    Ver más
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
       </section>
