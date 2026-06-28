@@ -27,18 +27,16 @@ export default function CategoriesSupply() {
   }
 
   return (
-    <section id="categorias" className="pt-6 md:pt-8 lg:pt-10 pb-12 md:pb-16 lg:pb-20 px-6 bg-black">
+    <section id="categorias" className="pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-black">
       <div className="max-w-7xl mx-auto">
 
-        <div className="mb-6 md:mb-10 text-center max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-6xl font-black uppercase mb-8">
+        <div className="mb-4 md:mb-8">
+          <h2 className="text-2xl md:text-4xl font-black uppercase mb-2">
             Categorías
           </h2>
-          <div className="bg-zinc-950 border border-blue-500/40 rounded-2xl p-8">
-            <p className="text-zinc-400 text-base md:text-lg leading-relaxed">
-              Explora insumos, equipos y herramientas seleccionadas para cada etapa del trabajo profesional.
-            </p>
-          </div>
+          <p className="text-zinc-500 text-sm leading-relaxed">
+            Insumos y equipos para cada etapa del trabajo profesional.
+          </p>
         </div>
 
         <div className="flex md:grid md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
