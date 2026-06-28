@@ -146,11 +146,11 @@ export default function GymPage() {
                 <>
                   {/* Nombre izquierda — icono derecha */}
                   <div className="flex items-center justify-between gap-1">
-                    <h3 className="text-xs font-black uppercase tracking-wide leading-tight">{s.titulo}</h3>
+                    <h3 className="text-[11px] md:text-xs font-black uppercase tracking-wide leading-tight">{s.titulo}</h3>
                     {Icon && <Icon size={16} className="text-gray-500 group-hover:text-white transition-colors duration-300 flex-shrink-0" />}
                   </div>
-                  {/* Texto preciso de lo que encontrará */}
-                  <p className="text-gray-500 text-[10px] leading-snug group-hover:text-gray-400 transition-colors duration-300">{s.texto}</p>
+                  {/* Texto preciso — ocupa dos renglones completos */}
+                  <p className="text-[11px] md:text-xs leading-snug text-gray-500 group-hover:text-gray-400 transition-colors duration-300">{s.texto}</p>
                 </>
               )
               return s.scrollTo
@@ -198,7 +198,7 @@ export default function GymPage() {
                 </p>
               </div>
               <div className="flex flex-col items-start md:items-end gap-3 shrink-0">
-                <span className="text-3xl font-black text-white">$XX.000 COP</span>
+                <span className="text-3xl font-black text-white">$10.000 COP</span>
                 <a
                   href={membresiaMsg}
                   target="_blank"
