@@ -1,6 +1,5 @@
 import NavbarSupply from './NavbarSupply'
 import HeroSupply from './HeroSupply'
-import FeaturedProductsSupply from './FeaturedProductsSupply'
 import CategoriesSupply from './CategoriesSupply'
 import BrandsSupply from './BrandsSupply'
 import FooterSupply from './FooterSupply'
@@ -50,8 +49,7 @@ export default function SupplyPage() {
   <div className="border-b border-zinc-900"></div>
 </div>
 
-<FeaturedProductsSupply />
-      <CategoriesSupply />
+<CategoriesSupply />
 
     <BrandsSupply />
 
