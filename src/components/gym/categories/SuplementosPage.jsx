@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import Seo from '../../Seo'
@@ -38,23 +38,19 @@ export default function SuplementosPage() {
   const [cartOpen, setCartOpen] = useState(false)
   const [filtro, setFiltro]     = useState('Todos')
   const [visible, setVisible]   = useState(PAGE_SIZE)
-  const { categorias: apiCats, allProducts: apiProds } = useCatalog('suplementos')
+  const { allProducts: apiProds } = useCatalog('suplementos')
 
-  // Usar productos del API si hay, sino fallback hardcodeado
-  const productosActivos = useMemo(() => {
-    if (apiProds.length > 0) {
-      return apiProds.map((item, i) => ({
-        id:         i + 1,
-        categoria:  item.categoria || 'Otro',
-        nombre:     item.name,
+  const productosActivos = apiProds.length > 0
+    ? apiProds.map((item, i) => ({
+        id:          i + 1,
+        categoria:   item.categoria || 'Suplementos',
+        nombre:      item.name,
         precioLabel: item.variantes?.[0]?.price
           ? '$' + Math.round(item.variantes[0].price).toLocaleString('es-CO')
-          : '$XXX.000',
+          : 'Consultar precio',
         image: item.image_url || null,
       }))
-    }
-    return productos
-  }, [apiProds])
+    : productos
 
   const CATEGORIAS_DIN = ['Todos', ...new Set(productosActivos.map(p => p.categoria))]
 

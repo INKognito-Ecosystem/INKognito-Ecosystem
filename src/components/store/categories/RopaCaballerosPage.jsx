@@ -29,7 +29,7 @@ const faqs = [
 ]
 
 export default function RopaCaballerosPage() {
-  const { allProducts: catalogItems, loading } = useCatalog('store', 'Ropa Caballeros')
+  const { allProducts: catalogItems, loading } = useCatalog('store')
 
   return (
     <>
