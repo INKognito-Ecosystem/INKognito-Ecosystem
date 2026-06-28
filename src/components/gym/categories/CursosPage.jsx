@@ -61,11 +61,11 @@ export default function CursosPage() {
       </section>
 
       <div className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto pt-6 md:pt-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div className="flex md:grid md:grid-cols-2 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
           {cursos.map((curso) => (
             <div
               key={curso.nombre}
-              className="border border-gray-800 bg-gray-800/40 rounded-2xl p-6 flex flex-col gap-4 hover:border-gray-600 transition-all duration-300"
+              className="snap-start flex-shrink-0 w-[72vw] md:w-auto border border-gray-800 bg-gray-800/40 rounded-2xl p-5 flex flex-col gap-3 hover:border-gray-600 transition-all duration-300"
             >
               <div className="flex items-start justify-between gap-3">
                 <h3 className="text-lg font-black uppercase tracking-wide leading-tight">{curso.nombre}</h3>

@@ -80,11 +80,11 @@ export default function VideosTutorialesPage() {
       </section>
 
       <div className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto pt-6 md:pt-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
           {videos.map((v) => (
             <div
               key={v.id}
-              className="border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden hover:border-gray-600 transition-all duration-300"
+              className="snap-start flex-shrink-0 w-[70vw] md:w-auto border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden hover:border-gray-600 transition-all duration-300"
             >
               <div className="relative w-full aspect-video bg-gray-800">
                 <iframe
