@@ -2,6 +2,8 @@ import { useCatalog } from '../../hooks/useCatalog'
 
 const WA_NUMBER = '573207911013'
 
+const WA_NUMBER = '573207911013'
+
 function ProductCard({ item }) {
   const firstVariant = item.variantes?.[0]
   const price = firstVariant?.price
@@ -96,7 +98,7 @@ function SkeletonCard() {
 }
 
 export default function FeaturedProductsSupply() {
-  const { products, loading } = useCatalog('supply')
+  const { categorias, allProducts, loading } = useCatalog('supply')
 
   return (
     <section id="productos" className="pt-12 md:pt-16 lg:pt-20 pb-4 md:pb-6 lg:pb-8 px-6 bg-black">
@@ -115,25 +117,31 @@ export default function FeaturedProductsSupply() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
           </div>
-        ) : products.length === 0 ? (
+        ) : allProducts.length === 0 ? (
           <div className="border border-blue-500/20 bg-zinc-950 rounded-2xl p-12 text-center">
             <p className="text-zinc-400 text-lg mb-2">Catálogo en actualización</p>
-            <p className="text-zinc-600 text-sm mb-6">
-              Nuevos productos disponibles próximamente. Escríbenos para ver disponibilidad.
-            </p>
+            <p className="text-zinc-600 text-sm mb-6">Nuevos productos disponibles próximamente.</p>
             <a
               href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola, quiero ver el catálogo de insumos para tatuaje disponible')}`}
-              target="_blank"
-              rel="noopener noreferrer"
+              target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white font-bold uppercase tracking-[0.15em] text-sm rounded hover:bg-blue-600 transition"
             >
               Ver disponibilidad por WhatsApp
             </a>
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map(item => (
-              <ProductCard key={item.name} item={item} />
+          <div className="flex flex-col gap-12">
+            {Object.entries(categorias).map(([cat, items]) => (
+              <div key={cat}>
+                <h3 className="text-xl font-black uppercase tracking-[0.15em] text-zinc-400 mb-5 flex items-center gap-3">
+                  <span className="flex-1 h-px bg-zinc-800" />
+                  {cat}
+                  <span className="flex-1 h-px bg-zinc-800" />
+                </h3>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                  {items.map(item => <ProductCard key={item.name} item={item} />)}
+                </div>
+              </div>
             ))}
           </div>
         )}

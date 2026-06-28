@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import Seo from '../../Seo'
+import { useCatalog } from '../../../hooks/useCatalog'
 
 const WA = '573207911013'
 const PAGE_SIZE = 6
@@ -37,11 +38,30 @@ export default function SuplementosPage() {
   const [cartOpen, setCartOpen] = useState(false)
   const [filtro, setFiltro]     = useState('Todos')
   const [visible, setVisible]   = useState(PAGE_SIZE)
+  const { categorias: apiCats, allProducts: apiProds } = useCatalog('suplementos')
+
+  // Usar productos del API si hay, sino fallback hardcodeado
+  const productosActivos = useMemo(() => {
+    if (apiProds.length > 0) {
+      return apiProds.map((item, i) => ({
+        id:         i + 1,
+        categoria:  item.categoria || 'Otro',
+        nombre:     item.name,
+        precioLabel: item.variantes?.[0]?.price
+          ? '$' + Math.round(item.variantes[0].price).toLocaleString('es-CO')
+          : '$XXX.000',
+        image: item.image_url || null,
+      }))
+    }
+    return productos
+  }, [apiProds])
+
+  const CATEGORIAS_DIN = ['Todos', ...new Set(productosActivos.map(p => p.categoria))]
 
   const addToCart      = (p) => setCart(prev => prev.find(i => i.id === p.id) ? prev : [...prev, p])
   const removeFromCart = (id) => setCart(prev => prev.filter(i => i.id !== id))
 
-  const filtrados = filtro === 'Todos' ? productos : productos.filter(p => p.categoria === filtro)
+  const filtrados = filtro === 'Todos' ? productosActivos : productosActivos.filter(p => p.categoria === filtro)
   const visibles  = filtrados.slice(0, visible)
 
   const buildCartMsg = () => {
@@ -89,7 +109,7 @@ export default function SuplementosPage() {
 
         {/* FILTROS POR CATEGORÍA */}
         <div className="flex gap-2 flex-wrap mb-10">
-          {CATEGORIAS.map(cat => (
+          {CATEGORIAS_DIN.map(cat => (
             <button
               key={cat}
               onClick={() => { setFiltro(cat); setVisible(PAGE_SIZE) }}

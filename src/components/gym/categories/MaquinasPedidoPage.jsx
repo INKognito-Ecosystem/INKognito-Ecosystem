@@ -2,6 +2,7 @@ import { useState } from 'react'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import Seo from '../../Seo'
+import { useCatalog } from '../../../hooks/useCatalog'
 import imgBancoMultiangulo from '../../../assets/imagenesgym/bancomultiangulo.jpg'
 import imgRemoAcostado     from '../../../assets/imagenesgym/remoacostado.jpg'
 import imgHipThrust        from '../../../assets/imagenesgym/hipthrust.jpg'
@@ -69,10 +70,38 @@ const productos = [
 
 const fmtPrecio = (p) => p != null ? `$${Number(p).toLocaleString('es-CO')} COP` : 'Desde $XX.000'
 
+// Imágenes locales de respaldo por nombre de producto
+const LOCAL_IMAGES = {
+  'banco multiángulo': imgBancoMultiangulo,
+  'banco multiangulo': imgBancoMultiangulo,
+  'remo acostado':     imgRemoAcostado,
+  'hip thrust':        imgHipThrust,
+  'extensión y femorales': imgExtencionFemoral,
+  'extension y femorales': imgExtencionFemoral,
+  'estructura para dominadas y fondos': imgFondosDominadas,
+  'dominadas y fondos': imgFondosDominadas,
+}
+
 export default function MaquinasPedidoPage() {
   const [cart, setCart]         = useState([])
   const [cartOpen, setCartOpen] = useState(false)
   const [lightbox, setLightbox] = useState(null)
+  const { allProducts: apiMaquinas } = useCatalog('gym')
+
+  // Mezclar datos del API con respaldo local
+  const productosFinales = apiMaquinas.length > 0
+    ? apiMaquinas.map((item, i) => {
+        const key = item.name.toLowerCase()
+        return {
+          id:          i + 1,
+          nombre:      item.name,
+          descripcion: item.descripcion || '',
+          precio:      item.variantes?.[0]?.price || null,
+          image1:      item.image_url || LOCAL_IMAGES[key] || null,
+          image2:      null,
+        }
+      })
+    : productos  // fallback a hardcoded
 
   const addToCart      = (p) => setCart(prev => prev.find(i => i.id === p.id) ? prev : [...prev, p])
   const removeFromCart = (id) => setCart(prev => prev.filter(i => i.id !== id))
@@ -128,7 +157,7 @@ export default function MaquinasPedidoPage() {
       {/* GRID */}
       <div className="pb-32 px-4 md:px-6 max-w-7xl mx-auto pt-12">
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          {productos.map((p) => {
+          {productosFinales.map((p) => {
             const hasImages = p.image1 || p.image2
             const inCart    = cart.some(i => i.id === p.id)
             return (
