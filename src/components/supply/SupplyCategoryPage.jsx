@@ -2,6 +2,7 @@ import NavbarCategory from './NavbarCategory'
 import FooterSupply from './FooterSupply'
 import Seo from '../Seo'
 import { useCatalog } from '../../hooks/useCatalog'
+import { FaWhatsapp } from 'react-icons/fa'
 
 const WA = '573207911013'
 
@@ -15,7 +16,6 @@ function ProductCard({ item }) {
   const waText = encodeURIComponent(
     `Hola, quiero información sobre: ${item.name}${variants[0] ? ' — ' + variants[0] : ''}`
   )
-
   return (
     <div className="border border-blue-500/40 bg-zinc-950 rounded-2xl overflow-hidden hover:border-blue-500 hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-300 flex flex-col">
       <div className="aspect-square w-full bg-zinc-900 overflow-hidden">
@@ -29,9 +29,7 @@ function ProductCard({ item }) {
       </div>
       <div className="p-4 flex flex-col gap-3 flex-1">
         <div className="flex-1">
-          {item.descripcion && (
-            <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] mb-1">{item.descripcion}</p>
-          )}
+          {item.descripcion && <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] mb-1">{item.descripcion}</p>}
           <h3 className="text-sm font-black uppercase leading-tight text-white">{item.name}</h3>
           {variants.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
@@ -71,49 +69,48 @@ function SkeletonCard() {
   )
 }
 
-/**
- * Página dinámica de categoría supply.
- * @param {string} title     - Nombre visible (ej: "Tintas")
- * @param {string} categoria - Categoría exacta del inventario (ej: "Tintas")
- * @param {string} slug      - Slug de la URL para SEO (ej: "tintas")
- * @param {string} desc      - Descripción SEO
- */
-export default function SupplyCategoryPage({ title, categoria, slug, desc }) {
+export default function SupplyCategoryPage({ title, categoria, slug, desc, intro, guide, faqs }) {
   const { allProducts: products, loading } = useCatalog('supply', categoria)
 
   return (
     <>
       <Seo
-        title={`${title} | INKognito Supply — Urabá`}
-        description={desc || `${title} profesionales para tatuadores en Urabá. Pedidos por WhatsApp.`}
+        title={`${title} para tatuadores en Urabá | INKognito Supply — Chigorodó`}
+        description={desc || `${title} profesionales para tatuadores en Chigorodó, Urabá. Stock real y envíos a toda la región. Pedidos por WhatsApp.`}
         siteName="INKognito Supply"
-        canonical={`${import.meta.env.VITE_SITE_URL}/supply/${slug || categoria.toLowerCase()}`}
+        canonical={`${import.meta.env.VITE_SITE_URL}/supply/${slug}`}
       />
       <NavbarCategory pageName={title} backPath="/supply" backLabel="Supply" />
 
-      <div className="bg-black min-h-screen pt-20 md:pt-24">
-        <div className="px-6 max-w-7xl mx-auto pb-6">
+      <div className="bg-black pt-20 md:pt-24">
+        {/* HERO DE CATEGORÍA */}
+        <div className="px-6 max-w-7xl mx-auto pb-8 md:pb-12">
           <p className="uppercase tracking-[0.25em] text-blue-500/70 text-xs mb-3">Supply — {categoria}</p>
-          <h1 className="text-5xl md:text-7xl font-black uppercase leading-none mb-2 text-white">{title}</h1>
+          <h1 className="text-5xl md:text-7xl font-black uppercase leading-none mb-6 text-white">{title}</h1>
+          {intro && (
+            <p className="text-zinc-400 text-base md:text-lg leading-relaxed max-w-3xl">{intro}</p>
+          )}
         </div>
 
-        <div className="px-6 pb-20 max-w-7xl mx-auto">
+        {/* PRODUCTOS DINÁMICOS */}
+        <div className="px-6 pb-16 max-w-7xl mx-auto">
           {loading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : products.length === 0 ? (
-            <div className="border border-blue-500/20 bg-zinc-950 rounded-2xl p-12 text-center mt-8">
+            <div className="border border-blue-500/20 bg-zinc-950 rounded-2xl p-12 text-center">
               <p className="text-zinc-400 text-lg mb-2">Próximamente disponible</p>
               <p className="text-zinc-600 text-sm mb-6">
-                Escríbenos para consultar disponibilidad de {title.toLowerCase()}.
+                Escríbenos para consultar disponibilidad de {title.toLowerCase()} y te asesoramos.
               </p>
               <a
-                href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero consultar disponibilidad de ${title}`)}`}
+                href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero consultar ${title} disponibles`)}`}
                 target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white font-bold uppercase tracking-[0.15em] text-sm rounded hover:bg-blue-600 transition"
               >
-                Consultar por WhatsApp
+                <FaWhatsapp size={18} />
+                Consultar disponibilidad
               </a>
             </div>
           ) : (
@@ -122,9 +119,66 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc }) {
             </div>
           )}
         </div>
-      </div>
 
-      <FooterSupply />
+        {/* GUÍA DE COMPRA */}
+        {guide && guide.length > 0 && (
+          <div className="bg-zinc-950 border-t border-zinc-900 py-16 px-6">
+            <div className="max-w-7xl mx-auto">
+              <h2 className="text-3xl md:text-4xl font-black uppercase mb-10 text-white">
+                Cómo elegir {title.toLowerCase()}
+              </h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {guide.map((item, i) => (
+                  <div key={i} className="border border-zinc-800 bg-black rounded-2xl p-6">
+                    <div className="text-blue-400 text-2xl mb-3">{item.icon}</div>
+                    <h3 className="font-black uppercase text-white mb-2 text-sm tracking-[0.1em]">{item.title}</h3>
+                    <p className="text-zinc-500 text-sm leading-relaxed">{item.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* CTA WHATSAPP */}
+        <div className="bg-black py-16 px-6 text-center border-t border-zinc-900">
+          <h2 className="text-2xl md:text-3xl font-black uppercase text-white mb-3">
+            ¿No encuentras lo que buscas?
+          </h2>
+          <p className="text-zinc-500 mb-8 text-sm">
+            Escríbenos. Tenemos más referencias disponibles y te asesoramos sin costo.
+          </p>
+          <a
+            href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, busco ${title} y quiero asesoría`)}`}
+            target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 px-10 py-5 bg-blue-500 text-white font-bold uppercase tracking-[0.15em] text-sm rounded hover:bg-blue-600 transition"
+          >
+            <FaWhatsapp size={20} />
+            Pedir asesoría por WhatsApp
+          </a>
+        </div>
+
+        {/* FAQ */}
+        {faqs && faqs.length > 0 && (
+          <div className="bg-zinc-950 py-20 px-6 border-t border-zinc-900">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-3xl md:text-5xl font-black uppercase mb-10 text-white">
+                Preguntas frecuentes
+              </h2>
+              <div className="space-y-4">
+                {faqs.map((faq, i) => (
+                  <div key={i} className="border border-zinc-800 rounded-xl p-6 hover:border-blue-500/40 transition-all duration-300">
+                    <h3 className="font-bold text-white mb-3 text-sm md:text-base">{faq.q}</h3>
+                    <p className="text-zinc-500 leading-relaxed text-sm">{faq.a}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <FooterSupply />
+      </div>
     </>
   )
 }
