@@ -6,6 +6,68 @@ import { useCatalog } from '../../../hooks/useCatalog'
 import { useGymCart } from '../../../contexts/GymCartContext'
 import { FlaskConical } from 'lucide-react'
 
+function SuplCard({ p, onAddToCart }) {
+  const [selIdx, setSelIdx] = useState(0)
+  const variantes = p.variantes || []
+  const sel       = variantes[selIdx] || {}
+
+  const precio = sel.price
+    ? '$' + Math.round(sel.price).toLocaleString('es-CO')
+    : p.precioLabel || 'Consultar precio'
+
+  const imagen = sel.image_url || p.image || null
+  const hasVariants = variantes.length > 1
+
+  return (
+    <div className="snap-start flex-shrink-0 w-[40vw] md:w-auto border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300">
+      {/* IMAGEN */}
+      <div className="relative w-full aspect-square bg-gray-800 flex items-center justify-center flex-shrink-0">
+        {imagen
+          ? <img src={imagen} alt={p.nombre} className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none' }} />
+          : <span className="text-gray-700 text-[10px] uppercase tracking-widest text-center px-2">Imagen próx.</span>
+        }
+      </div>
+
+      {/* CONTENIDO */}
+      <div className="p-3 flex flex-col flex-1">
+        <span className="text-[9px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-2 py-0.5 self-start mb-1">
+          {p.categoria}
+        </span>
+        <h3 className="font-black uppercase text-xs leading-tight mb-1.5">{p.nombre}</h3>
+
+        {/* SELECTOR DE VARIANTES */}
+        {hasVariants && (
+          <div className="flex flex-wrap gap-1 mb-2">
+            {variantes.map((v, i) => (
+              <button
+                key={i}
+                onClick={() => setSelIdx(i)}
+                className={`text-[9px] font-bold px-2 py-0.5 rounded-full border transition-all duration-200 ${
+                  selIdx === i
+                    ? 'bg-white text-gray-950 border-white'
+                    : 'border-gray-700 text-gray-500 hover:border-gray-400 hover:text-white'
+                }`}
+              >
+                {v.variant || `Opción ${i + 1}`}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <span className="text-white font-black text-sm mt-auto">{precio}</span>
+      </div>
+
+      {/* BOTÓN */}
+      <button
+        onClick={() => onAddToCart(p, sel)}
+        className="w-full py-2.5 font-bold uppercase tracking-[0.1em] text-[10px] bg-white text-gray-950 hover:bg-gray-200 transition-all duration-300 flex-shrink-0"
+      >
+        + Agregar al carrito
+      </button>
+    </div>
+  )
+}
+
 const WA = '573207911013'
 const PAGE_SIZE = 6
 
@@ -46,10 +108,11 @@ export default function SuplementosPage() {
         id:          i + 1,
         categoria:   item.categoria || 'Suplementos',
         nombre:      item.name,
+        image:       item.image_url || item.variantes?.[0]?.image_url || null,
+        variantes:   item.variantes || [],
         precioLabel: item.variantes?.[0]?.price
           ? '$' + Math.round(item.variantes[0].price).toLocaleString('es-CO')
           : 'Consultar precio',
-        image: item.image_url || null,
       }))
     : productos
 
@@ -58,13 +121,17 @@ export default function SuplementosPage() {
   const filtrados = filtro === 'Todos' ? productosActivos : productosActivos.filter(p => p.categoria === filtro)
   const visibles  = filtrados.slice(0, visible)
 
-  const handleAddToCart = (p) => {
+  const handleAddToCart = (p, sel = {}) => {
+    const precio = sel.price
+      ? '$' + Math.round(sel.price).toLocaleString('es-CO')
+      : p.precioLabel
+    const nombre = sel.variant ? `${p.nombre} — ${sel.variant}` : p.nombre
     addItem({
       id:    p.id,
-      name:  p.nombre,
-      price: p.precioLabel,
+      name:  nombre,
+      price: precio,
       brand: p.categoria,
-      image: p.image || '',
+      image: sel.image_url || p.image || '',
     }, 'suplementos')
   }
 
@@ -119,35 +186,7 @@ export default function SuplementosPage() {
         {/* GRID */}
         <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
           {visibles.map((p) => (
-            <div
-              key={p.id}
-              className="snap-start flex-shrink-0 w-[40vw] md:w-auto border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
-            >
-              {/* IMAGEN */}
-              <div className="relative w-full aspect-square bg-gray-800 flex items-center justify-center flex-shrink-0">
-                {p.image
-                  ? <img src={p.image} alt={p.nombre} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none' }} />
-                  : <span className="text-gray-700 text-[10px] uppercase tracking-widest text-center px-2">Imagen próx.</span>
-                }
-              </div>
-
-              {/* CONTENIDO */}
-              <div className="p-3 flex flex-col flex-1">
-                <span className="text-[9px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-2 py-0.5 self-start mb-1">
-                  {p.categoria}
-                </span>
-                <h3 className="font-black uppercase text-xs leading-tight mb-1">{p.nombre}</h3>
-                <span className="text-white font-black text-sm mt-auto">{p.precioLabel}</span>
-              </div>
-
-              {/* BOTÓN — flush al borde inferior */}
-              <button
-                onClick={() => handleAddToCart(p)}
-                className="w-full py-2.5 font-bold uppercase tracking-[0.1em] text-[10px] bg-white text-gray-950 hover:bg-gray-200 transition-all duration-300 flex-shrink-0"
-              >
-                + Agregar al carrito
-              </button>
-            </div>
+            <SuplCard key={p.id} p={p} onAddToCart={handleAddToCart} />
           ))}
         </div>
 
