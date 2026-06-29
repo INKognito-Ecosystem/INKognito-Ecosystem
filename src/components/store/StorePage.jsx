@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { STORE_HOURS } from '../../config/business'
 import { FaWhatsapp } from 'react-icons/fa'
-import { Truck, Shield, Clock, MapPin, Star, Award, Shirt, Footprints, Sun, Trophy, Zap } from 'lucide-react'
+import { Truck, Shield, Clock, Star, Award, Shirt, Footprints, Sun, Trophy, Zap } from 'lucide-react'
 import NavbarStore from './NavbarStore'
 import FooterStore from './FooterStore'
 import StoreProductCard from './StoreProductCard'
@@ -288,124 +288,64 @@ export default function StorePage() {
         </div>
       </section>
 
-      {/* ── ENVÍOS + CONFIANZA + CONTACTO — solo desktop ── */}
+      {/* ── LOGÍSTICA + GARANTÍAS + CONTACTO — solo desktop (dark, 3 col) ── */}
       <div className="hidden md:block">
-
-        {/* ENVÍOS */}
-        <section id="envios" className="bg-gray-50 py-10 md:py-16 px-6">
+        <section className="bg-black text-white py-14 px-6">
           <div className="max-w-7xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-16 items-start">
+            <div className="grid lg:grid-cols-3 gap-12">
 
+              {/* COL 1: LOGÍSTICA */}
               <div>
-                <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs md:text-sm mb-4">
-                  Cobertura
-                </p>
-                <h2 className="text-4xl md:text-6xl font-black uppercase leading-none mb-6 text-gray-900">
-                  Enviamos a Toda<br />la Región de Urabá
-                </h2>
-                <p className="text-gray-500 text-lg leading-relaxed mb-10">
-                  No importa en qué municipio estés, tu pedido llega. Cubrimos los 6 municipios
-                  principales del Urabá antioqueño con tiempos de entrega garantizados y
-                  seguimiento incluido.
-                </p>
-
-                <div className="space-y-4">
-                  <div className="flex items-start gap-4 p-4 border border-gray-200 rounded-xl hover:border-[#C9A84C] transition-all duration-300 bg-white">
-                    <Truck size={20} className="text-[#C9A84C] mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="font-bold uppercase tracking-[0.15em] text-sm text-gray-900">Envío Rápido</p>
-                      <p className="text-gray-500 text-sm mt-1">1 a 4 días hábiles según tu municipio</p>
-                    </div>
+                <p className="uppercase tracking-[0.25em] text-[#C9A84C]/70 text-[10px] mb-4">Logística · Cobertura</p>
+                <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Llegamos donde estás</h2>
+                <div className="flex gap-3 mb-6">
+                  <div className="flex items-center justify-center bg-white rounded-xl p-2 flex-shrink-0 w-14 h-14">
+                    <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
                   </div>
-                  <div className="flex items-start gap-4 p-4 border border-gray-200 rounded-xl hover:border-[#C9A84C] transition-all duration-300 bg-white">
-                    <MapPin size={20} className="text-[#C9A84C] mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="font-bold uppercase tracking-[0.15em] text-sm text-gray-900">Entrega a Domicilio</p>
-                      <p className="text-gray-500 text-sm mt-1">Directamente en tu puerta, sin filas ni desplazamientos</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4 p-4 border border-gray-200 rounded-xl hover:border-[#C9A84C] transition-all duration-300 bg-white">
-                    <Clock size={20} className="text-[#C9A84C] mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="font-bold uppercase tracking-[0.15em] text-sm text-gray-900">Seguimiento en Tiempo Real</p>
-                      <p className="text-gray-500 text-sm mt-1">Te avisamos por WhatsApp en cada paso de tu pedido</p>
-                    </div>
+                  <div className="flex flex-col justify-center bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 flex-1">
+                    <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Eljach Transportadora</p>
+                    <p className="text-zinc-500 text-xs mt-0.5">Entregas locales y contra entrega</p>
                   </div>
                 </div>
-              </div>
-
-              <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
-                <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs mb-6 font-semibold">
-                  Municipios con cobertura
-                </p>
-                <div className="space-y-1">
-                  {cities.map((city, i) => (
-                    <div
-                      key={city.name}
-                      className={`flex items-center justify-between py-4 ${i < cities.length - 1 ? 'border-b border-gray-100' : ''}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#C9A84C' }} />
-                        <span className="font-bold uppercase tracking-[0.15em] text-sm text-gray-900">{city.name}</span>
-                      </div>
-                      <span className="text-gray-500 text-xs uppercase tracking-[0.15em]">{city.time}</span>
+                <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-3">6 municipios con cobertura</p>
+                <div className="flex flex-col gap-2 mb-5">
+                  {cities.map((c, i) => (
+                    <div key={c.name} className={`flex items-center justify-between py-2 ${i < cities.length - 1 ? 'border-b border-zinc-900' : ''}`}>
+                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{c.name}</span>
+                      <span className="text-zinc-600 text-[10px] uppercase tracking-[0.1em]">{c.time}</span>
                     </div>
                   ))}
                 </div>
-                <div className="mt-6 p-4 rounded-xl text-center bg-gray-50 border border-gray-200">
-                  <p className="text-sm text-gray-600">
-                    Costo desde{' '}
-                    <span className="text-[#C9A84C] font-bold">$8.000</span>
-                    {' '}— Gratis en compras mayores a{' '}
-                    <span className="text-[#C9A84C] font-bold">$300.000</span>
+                <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-center">
+                  <p className="text-xs text-zinc-500">
+                    Flete desde <span className="text-[#C9A84C] font-bold">$8.000</span>
+                    {' '}· Gratis en compras +<span className="text-[#C9A84C] font-bold"> $300.000</span>
                   </p>
                 </div>
               </div>
 
-            </div>
-          </div>
-        </section>
-
-        {/* CONFIANZA */}
-        <section className="bg-white py-10 md:py-16 px-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-8 md:mb-10">
-              <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs md:text-sm mb-4">
-                Garantías
-              </p>
-              <h2 className="text-4xl md:text-6xl font-black uppercase leading-none text-gray-900">
-                Compra con Confianza
-              </h2>
-            </div>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {guarantees.map((item, i) => (
-                <div
-                  key={i}
-                  className="border border-gray-200 rounded-2xl p-6 hover:border-[#C9A84C] hover:shadow-sm transition-all duration-300 bg-white"
-                >
-                  <div className="mb-4" style={{ color: '#C9A84C' }}>{item.icon}</div>
-                  <h3 className="font-black uppercase tracking-[0.1em] text-base mb-2 text-gray-900">{item.title}</h3>
-                  <p className="text-gray-700 text-sm leading-relaxed">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CONTACTO DARK */}
-        <section id="contacto-desktop" className="bg-black text-white py-10 md:py-16 px-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-
+              {/* COL 2: GARANTÍAS */}
               <div>
-                <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs md:text-sm mb-4">
-                  Contacto
-                </p>
-                <h2 className="text-4xl md:text-6xl font-black uppercase leading-none mb-6">
-                  Hablemos
-                </h2>
-                <p className="text-zinc-400 text-lg leading-relaxed mb-10">
+                <p className="uppercase tracking-[0.25em] text-[#C9A84C]/70 text-[10px] mb-4">Garantías</p>
+                <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Compra con Confianza</h2>
+                <div className="flex flex-col gap-4">
+                  {guarantees.map((g, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <span className="text-[#C9A84C] font-black text-base mt-0.5 flex-shrink-0">✓</span>
+                      <div>
+                        <p className="text-white text-sm font-bold uppercase tracking-[0.06em]">{g.title}</p>
+                        <p className="text-zinc-500 text-xs mt-0.5 leading-relaxed">{g.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* COL 3: CONTACTO */}
+              <div>
+                <p className="uppercase tracking-[0.25em] text-[#C9A84C]/70 text-[10px] mb-4">Contacto</p>
+                <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Hablemos</h2>
+                <p className="text-zinc-400 text-base leading-relaxed mb-7">
                   ¿Buscas un modelo específico? ¿Quieres saber disponibilidad de tu talla?
                   Escríbenos y te respondemos en minutos.
                 </p>
@@ -413,38 +353,20 @@ export default function StorePage() {
                   href="https://wa.me/573207911013?text=Hola,%20quiero%20información%20sobre%20INKognito%20Store"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-3 w-full max-w-sm py-5 px-6 rounded-xl border text-white uppercase tracking-[0.2em] font-semibold transition-all duration-300 hover:shadow-[0_0_30px_rgba(201,168,76,0.2)] hover:border-[#C9A84C]"
+                  className="flex items-center justify-center gap-3 w-full py-4 px-6 rounded-xl border text-white uppercase tracking-[0.2em] font-semibold transition-all duration-300 hover:shadow-[0_0_30px_rgba(201,168,76,0.2)] hover:border-[#C9A84C] mb-5"
                   style={{ borderColor: 'rgba(201,168,76,0.3)', backgroundColor: 'rgba(201,168,76,0.04)' }}
                 >
-                  <FaWhatsapp size={24} />
+                  <FaWhatsapp size={22} />
                   Hablar con INKognito Store
                 </a>
-                <p className="text-zinc-600 uppercase tracking-[0.2em] text-sm mt-6">
-                  {STORE_HOURS.weekdays.label} • {STORE_HOURS.weekdays.hours}
+                <p className="text-zinc-600 uppercase tracking-[0.2em] text-xs mb-6">
+                  {STORE_HOURS.weekdays.label} · {STORE_HOURS.weekdays.hours}
                 </p>
-              </div>
-
-              <div
-                className="bg-zinc-950 rounded-2xl p-8"
-                style={{ border: '1px solid rgba(201,168,76,0.15)' }}
-              >
-                <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-4">
-                  INKognito Store
-                </p>
-                <h3 className="text-2xl md:text-3xl font-black uppercase mb-8">
-                  Zona de Urabá
-                </h3>
-                <div className="space-y-5">
-                  {[
-                    'Réplicas premium de alta calidad',
-                    'Cobertura en toda la región de Urabá',
-                    'Atención personalizada por WhatsApp',
-                    'Cambios de talla garantizados',
-                    'Pago contraentrega disponible',
-                  ].map((item) => (
+                <div className="flex flex-col gap-3">
+                  {['Réplicas premium de alta calidad','Cobertura en toda la región de Urabá','Atención personalizada por WhatsApp','Cambios de talla garantizados','Pago contraentrega disponible'].map(item => (
                     <div key={item} className="flex items-center gap-3">
-                      <span className="text-[#C9A84C] text-lg">✓</span>
-                      <span className="text-zinc-300">{item}</span>
+                      <span className="text-[#C9A84C] text-sm flex-shrink-0">✓</span>
+                      <span className="text-zinc-400 text-sm">{item}</span>
                     </div>
                   ))}
                 </div>
@@ -453,19 +375,14 @@ export default function StorePage() {
             </div>
           </div>
         </section>
-
       </div>
 
       {/* ── LLEGAMOS DONDE ESTÁS — solo móvil ── */}
       <section id="contacto" className="md:hidden bg-black text-white border-t border-zinc-900 px-6 py-8">
-        <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">
-          Llegamos donde estás
-        </h2>
+        <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">Llegamos donde estás</h2>
         <p className="text-zinc-400 text-sm leading-relaxed mb-5">
           Contamos con transportadora aliada para entregas seguras y con pago contraentrega en toda la región de Urabá.
         </p>
-
-        {/* Aliado transportadora */}
         <div className="flex gap-2 mb-5">
           <div className="flex items-center justify-center bg-white rounded-xl p-1 flex-shrink-0 aspect-square w-16">
             <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
@@ -475,26 +392,23 @@ export default function StorePage() {
             <p className="text-zinc-500 text-[10px] mt-0.5">Entregas locales y contra entrega</p>
           </div>
         </div>
-
-        {/* Ciudades */}
-        <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">Zonas de cobertura</p>
+        <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">6 municipios con cobertura</p>
         <div className="flex flex-wrap gap-1.5 mb-5">
-          {['Chigorodó','Carepa','Apartadó','Turbo','Currulao','El Tres','Coldesa','Río Grande','El Reposo','Casa Verde'].map(c => (
-            <span key={c} className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{c}</span>
+          {cities.map(c => (
+            <div key={c.name} className="flex items-center gap-1">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{c.name}</span>
+              <span className="text-zinc-600 text-[9px]">{c.time}</span>
+            </div>
           ))}
         </div>
-
-        {/* Garantías */}
         <div className="flex flex-col gap-2 mb-5">
-          {['Pago contraentrega disponible','Atención personalizada por WhatsApp','Cobertura en toda la región de Urabá'].map(g => (
+          {['Pago contraentrega disponible','Atención personalizada por WhatsApp','Cambios de talla garantizados','Cobertura en toda la región de Urabá'].map(g => (
             <div key={g} className="flex items-center gap-2">
-              <span className="font-bold text-sm" style={{ color: '#C9A84C' }}>✓</span>
+              <span className="font-bold text-sm flex-shrink-0" style={{ color: '#C9A84C' }}>✓</span>
               <span className="text-zinc-400 text-xs">{g}</span>
             </div>
           ))}
         </div>
-
-        {/* CTA */}
         <a
           href="https://wa.me/573207911013?text=Hola%2C%20quiero%20hacer%20un%20pedido%20en%20INKognito%20Store"
           target="_blank" rel="noopener noreferrer"
