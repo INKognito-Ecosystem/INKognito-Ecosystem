@@ -6,7 +6,7 @@ export default function FooterStore() {
     <footer id="contacto" className="border-t border-zinc-900 bg-black px-6 py-10 md:py-12 lg:py-16">
       <div className="max-w-7xl mx-auto">
 
-        <div className="grid md:grid-cols-3 gap-12">
+        <div className="grid md:grid-cols-2 gap-12">
 
           {/* IZQUIERDA */}
           <div>
@@ -16,7 +16,7 @@ export default function FooterStore() {
             </h2>
             <p className="text-zinc-500 leading-relaxed max-w-sm mb-6">
               Ropa y calzado deportivo para la región de Urabá. Réplicas premium
-              con entrega a domicilio en los 6 municipios de la región.
+              con entrega a domicilio en los 4 municipios de la región.
             </p>
             <div className="flex gap-5">
               <a
@@ -39,7 +39,7 @@ export default function FooterStore() {
             </div>
           </div>
 
-          {/* CENTRO — CATEGORÍAS */}
+          {/* DERECHA — CATEGORÍAS */}
           <div>
             <p className="uppercase tracking-[0.25em] text-zinc-400 text-sm mb-6 font-semibold">
               Categorías
@@ -66,27 +66,6 @@ export default function FooterStore() {
             </div>
           </div>
 
-          {/* DERECHA — COBERTURA */}
-          <div>
-            <p className="uppercase tracking-[0.25em] text-zinc-400 text-sm mb-6 font-semibold">
-              Cobertura de Envíos
-            </p>
-            <div className="flex flex-col gap-2 text-zinc-500 text-sm uppercase tracking-[0.15em] mb-8">
-              <span>Chigorodó</span>
-              <span>Carepa</span>
-              <span>Apartadó</span>
-              <span>Turbo</span>
-              <span>Mutatá</span>
-              <span>Arboletes</span>
-            </div>
-            <Link
-              to="/"
-              className="inline-block border border-zinc-700 px-6 py-3 uppercase tracking-[0.2em] text-sm text-zinc-300 hover:border-[#C9A84C] hover:text-[#C9A84C] transition-all duration-300"
-            >
-              Ecosistema
-            </Link>
-          </div>
-
         </div>
 
         {/* LÍNEA INFERIOR */}
@@ -94,15 +73,23 @@ export default function FooterStore() {
           <p className="text-zinc-600 uppercase tracking-[0.2em] text-xs">
             © 2026 INKOGNITO. Todos los derechos reservados.
           </p>
-          <a
-            href="https://wa.me/573207911013?text=Hola,%20quiero%20información%20sobre%20INKognito%20Store"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-zinc-500 hover:text-[#C9A84C] transition-all duration-300 uppercase tracking-[0.15em] text-xs"
-          >
-            <FaWhatsapp size={14} />
-            +57 320 791 1013
-          </a>
+          <div className="flex items-center gap-6">
+            <Link
+              to="/"
+              className="border border-zinc-700 px-5 py-2 uppercase tracking-[0.2em] text-xs text-zinc-400 hover:border-[#C9A84C] hover:text-[#C9A84C] transition-all duration-300"
+            >
+              Ecosistema
+            </Link>
+            <a
+              href="https://wa.me/573207911013?text=Hola,%20quiero%20información%20sobre%20INKognito%20Store"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-zinc-500 hover:text-[#C9A84C] transition-all duration-300 uppercase tracking-[0.15em] text-xs"
+            >
+              <FaWhatsapp size={14} />
+              +57 320 791 1013
+            </a>
+          </div>
         </div>
 
       </div>

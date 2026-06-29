@@ -412,13 +412,29 @@ export default function StorePage() {
             <p className="text-zinc-500 text-[10px] mt-0.5">Entregas locales y contra entrega</p>
           </div>
         </div>
-        {/* Ciudades */}
-        <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">Zonas de cobertura</p>
-        <div className="flex flex-wrap gap-1.5 mb-5">
-          {['Chigorodó','Carepa','Apartadó','Turbo','Currulao','El Tres','Coldesa','Río Grande','El Reposo','Casa Verde'].map(c => (
-            <span key={c} className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{c}</span>
+        {/* Municipios con tiempos */}
+        <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">Urabá — Entrega directa</p>
+        <div className="flex flex-col gap-1 mb-3">
+          {[{n:'Chigorodó',t:'1–2 días'},{n:'Carepa',t:'1–2 días'},{n:'Apartadó',t:'1–2 días'},{n:'Turbo',t:'2–3 días'}].map(c => (
+            <div key={c.n} className="flex items-center justify-between border-b border-zinc-900 py-1">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{c.n}</span>
+              <span className="text-zinc-600 text-[9px] uppercase tracking-widest">{c.t}</span>
+            </div>
           ))}
         </div>
+
+        {/* Corregimientos y sectores */}
+        <p className="text-zinc-700 text-[9px] uppercase tracking-widest mb-1.5">Corregimientos y sectores</p>
+        <div className="flex flex-wrap gap-1 mb-3">
+          {['Currulao','El Tres','Coldesa','Río Grande','El Reposo','Casa Verde'].map(c => (
+            <span key={c} className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full border border-zinc-800 text-zinc-600 bg-zinc-900">{c}</span>
+          ))}
+        </div>
+
+        {/* Nacional — sutil */}
+        <p className="text-zinc-700 text-[9px] leading-relaxed mb-4">
+          ¿Fuera de Urabá? También enviamos al resto de Colombia — tiempo y costo se coordinan al confirmar.
+        </p>
 
         {/* Garantías */}
         <div className="flex flex-col gap-2 mb-5">
