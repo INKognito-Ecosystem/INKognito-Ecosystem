@@ -314,10 +314,10 @@ export default function GymPage() {
           <div className="max-w-7xl mx-auto">
             <p className="text-gray-600 text-[10px] uppercase tracking-widest mb-1">AliExpress · Mercado Libre · Afiliados</p>
             <h2 className="text-2xl md:text-3xl font-black uppercase leading-none mb-2 text-white">
-              Consigue los materiales
+              Complementa tu gym
             </h2>
             <p className="text-gray-500 text-sm mb-6">
-              Ruedas, cables, poleas y materiales esenciales para armar o mejorar tu máquina de gym en casa.
+              Materiales, accesorios y productos recomendados disponibles en AliExpress y Mercado Libre con envío a toda Colombia.
             </p>
             <div className="flex md:grid md:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
               {gymAfiliados.map((item, i) => {
