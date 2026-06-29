@@ -69,11 +69,8 @@ export default function FooterStore() {
         </div>
 
         {/* LÍNEA INFERIOR */}
-        <div className="border-t border-zinc-900 mt-16 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-zinc-600 uppercase tracking-[0.2em] text-xs">
-            © 2026 INKOGNITO. Todos los derechos reservados.
-          </p>
-          <div className="flex items-center gap-6">
+        <div className="border-t border-zinc-900 mt-16 pt-8 flex flex-col gap-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <Link
               to="/"
               className="border border-zinc-700 px-5 py-2 uppercase tracking-[0.2em] text-xs text-zinc-400 hover:border-[#C9A84C] hover:text-[#C9A84C] transition-all duration-300"
@@ -90,6 +87,9 @@ export default function FooterStore() {
               +57 320 791 1013
             </a>
           </div>
+          <p className="text-zinc-600 uppercase tracking-[0.2em] text-xs text-center md:text-left">
+            © 2026 INKOGNITO. Todos los derechos reservados.
+          </p>
         </div>
 
       </div>

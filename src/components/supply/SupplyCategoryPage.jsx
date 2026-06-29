@@ -114,7 +114,7 @@ function ProductCard({ item, categoria }) {
           <img
             key={activeImage}
             src={activeImage}
-            alt={`${item.name}${resolvedVariant ? ' ' + resolvedVariant : ''}`}
+            alt={`${item.name}${selectedVariant ? ' ' + selectedVariant : ''}`}
             className="w-full h-full object-cover transition-opacity duration-200"
             loading="lazy"
           />
