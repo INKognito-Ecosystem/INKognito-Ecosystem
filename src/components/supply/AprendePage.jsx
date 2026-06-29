@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import NavbarCategory from './NavbarCategory'
 import FooterSupply from './FooterSupply'
 import Seo from '../Seo'
-import { BookOpen, Layers, PenTool, Square, Droplet, Package, Crosshair, Hand, ShieldCheck, FileText, Youtube, Users, Instagram, Monitor } from 'lucide-react'
+import { BookOpen, Layers, PenTool, Square, Droplet, Package, Crosshair, Hand, ShieldCheck, FileText, PlayCircle, Users, Camera, Monitor } from 'lucide-react'
 
 // ── CURSOS HOTMART ────────────────────────────────────────────────
 const cursos = [
@@ -92,7 +92,7 @@ const kitBasico = [
 // ── RECURSOS GRATUITOS ────────────────────────────────────────────
 const recursosGratuitos = [
   {
-    icon: Youtube,
+    icon: PlayCircle,
     nombre: 'YouTube',
     desc: 'Busca "curso tatuaje principiantes español". Canal Fredy Tattoo, Jesús Navarro.',
   },
@@ -102,7 +102,7 @@ const recursosGratuitos = [
     desc: 'Comunidades de tatuadores colombianos. Consejos, feedback y networking.',
   },
   {
-    icon: Instagram,
+    icon: Camera,
     nombre: 'Instagram',
     desc: 'Sigue tatuadores de tu estilo para inspirarte y aprender viendo su proceso.',
   },
