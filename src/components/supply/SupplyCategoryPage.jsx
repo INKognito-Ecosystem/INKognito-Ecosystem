@@ -23,19 +23,19 @@ const CAT_ICONS = {
 const WA = '573207911013'
 const VAR_THRESHOLD = 3
 
-function VariantSelectorSupply({ variantObjs, selected, onChange }) {
+function VariantSelectorSupply({ variantObjs, selIdx, onChange }) {
   const [open, setOpen] = useState(false)
-  if (!variantObjs || variantObjs.length === 0) return null
+  if (!variantObjs || variantObjs.length <= 1) return null
 
   if (variantObjs.length <= VAR_THRESHOLD) {
     return (
       <div className="grid gap-1 w-full" style={{ gridTemplateColumns: `repeat(${variantObjs.length}, 1fr)` }}>
-        {variantObjs.map(v => (
+        {variantObjs.map((v, i) => (
           <button
-            key={v.variant}
-            onClick={() => onChange(v.variant)}
+            key={i}
+            onClick={() => onChange(i)}
             className={`text-[9px] font-bold py-1 rounded border transition-all duration-200 text-center truncate ${
-              selected === v.variant
+              selIdx === i
                 ? 'bg-blue-500 text-white border-blue-500'
                 : 'border-zinc-700 text-zinc-500 hover:border-blue-400 hover:text-white'
             }`}
@@ -53,17 +53,17 @@ function VariantSelectorSupply({ variantObjs, selected, onChange }) {
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-between py-1.5 px-2 rounded border border-zinc-700 text-[9px] font-bold text-zinc-300 hover:border-blue-400 transition-all duration-200"
       >
-        <span className="truncate">{selected || 'Elegir variante'}</span>
+        <span className="truncate">{variantObjs[selIdx]?.variant || '—'}</span>
         <span className={`ml-1 flex-shrink-0 transition-transform duration-200 ${open ? 'rotate-90' : ''}`}>▶</span>
       </button>
       {open && (
         <div className="mt-1 grid grid-cols-2 gap-1">
-          {variantObjs.map(v => (
+          {variantObjs.map((v, i) => (
             <button
-              key={v.variant}
-              onClick={() => { onChange(v.variant); setOpen(false) }}
+              key={i}
+              onClick={() => { onChange(i); setOpen(false) }}
               className={`text-[9px] font-bold py-1.5 px-1 rounded border transition-all duration-200 text-center truncate ${
-                selected === v.variant
+                selIdx === i
                   ? 'bg-blue-500 text-white border-blue-500'
                   : 'border-zinc-700 text-zinc-500 hover:border-blue-400 hover:text-white'
               }`}
@@ -79,25 +79,22 @@ function VariantSelectorSupply({ variantObjs, selected, onChange }) {
 
 function ProductCard({ item, categoria }) {
   const { addItem } = useSupplyCart()
-  const [selectedVariant, setSelectedVariant] = useState('')
-  const [added, setAdded] = useState(false)
+  const [selIdx, setSelIdx] = useState(0)
+  const [added, setAdded]   = useState(false)
 
   const variantObjs = item.variantes?.filter(v => v.variant) ?? []
-  const hasVariants = variantObjs.length > 0
   const totalStock  = item.variantes?.reduce((s, v) => s + (v.stock || 0), 0) ?? 0
+  const sel         = variantObjs[selIdx] || variantObjs[0] || {}
 
-  const resolvedVariantObj = variantObjs.find(v => v.variant === selectedVariant) || (hasVariants ? null : variantObjs[0])
-  const resolvedPrice = resolvedVariantObj?.price
-    ? '$' + Math.round(resolvedVariantObj.price).toLocaleString('es-CO')
+  const resolvedPrice = sel.price
+    ? '$' + Math.round(sel.price).toLocaleString('es-CO')
     : null
-  const activeImage = resolvedVariantObj?.image_url || item.image_url || null
-  const canAdd = !hasVariants || !!selectedVariant
+  const activeImage = sel.image_url || item.image_url || null
 
   const handleAdd = () => {
-    if (!canAdd) return
     addItem({
-      id:    item.name + (selectedVariant ? '-' + selectedVariant : ''),
-      name:  item.name + (selectedVariant ? ` (${selectedVariant})` : ''),
+      id:    item.name + (sel.variant ? '-' + sel.variant : ''),
+      name:  item.name + (sel.variant ? ` (${sel.variant})` : ''),
       price: resolvedPrice || '—',
       brand: item.descripcion || item.categoria || '',
       image: activeImage || '',
@@ -114,7 +111,7 @@ function ProductCard({ item, categoria }) {
           <img
             key={activeImage}
             src={activeImage}
-            alt={`${item.name}${selectedVariant ? ' ' + selectedVariant : ''}`}
+            alt={`${item.name}${sel.variant ? ' ' + sel.variant : ''}`}
             className="w-full h-full object-cover transition-opacity duration-200"
             loading="lazy"
           />
@@ -135,20 +132,17 @@ function ProductCard({ item, categoria }) {
           <p className="text-yellow-500 text-[9px] font-bold">⚠️ Últimas {totalStock}</p>
         )}
         <div className="mt-auto pt-1">
-          <VariantSelectorSupply variantObjs={variantObjs} selected={selectedVariant} onChange={setSelectedVariant} />
+          <VariantSelectorSupply variantObjs={variantObjs} selIdx={selIdx} onChange={setSelIdx} />
         </div>
       </div>
 
       <button
         onClick={handleAdd}
-        disabled={!canAdd}
         className={`w-full py-2.5 font-bold uppercase tracking-[0.1em] text-[10px] flex-shrink-0 transition-all duration-300 ${
-          added    ? 'bg-green-500 text-white'
-          : canAdd ? 'bg-blue-500 text-white hover:bg-blue-600'
-          : 'bg-zinc-900 text-zinc-600 cursor-not-allowed'
+          added ? 'bg-green-500 text-white' : 'bg-blue-500 text-white hover:bg-blue-600'
         }`}
       >
-        {added ? '✓ Agregado' : canAdd ? '+ Agregar al carrito' : 'Elige variante'}
+        {added ? '✓ Agregado' : '+ Agregar al carrito'}
       </button>
     </div>
   )

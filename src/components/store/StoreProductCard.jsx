@@ -3,23 +3,21 @@ import { useStoreCart } from '../../contexts/StoreCartContext'
 
 const VAR_THRESHOLD = 3
 
-function SizeSelector({ sizes, selected, onChange }) {
+function SizeSelector({ sizes, selIdx, onChange }) {
   const [open, setOpen] = useState(false)
-  if (!sizes || sizes.length === 0) return null
+  if (!sizes || sizes.length <= 1) return null
 
   if (sizes.length <= VAR_THRESHOLD) {
     return (
       <div className="grid gap-1 w-full" style={{ gridTemplateColumns: `repeat(${sizes.length}, 1fr)` }}>
-        {sizes.map(s => (
+        {sizes.map((s, i) => (
           <button
-            key={s}
-            onClick={() => onChange(s)}
+            key={i}
+            onClick={() => onChange(i)}
             className={`text-[9px] font-bold py-1 rounded border transition-all duration-200 text-center truncate ${
-              selected === s
-                ? 'text-black border-[#C9A84C]'
-                : 'border-gray-300 text-gray-500 hover:border-[#C9A84C] hover:text-gray-900'
+              selIdx === i ? 'text-black border-[#C9A84C]' : 'border-gray-300 text-gray-500 hover:border-[#C9A84C] hover:text-gray-900'
             }`}
-            style={selected === s ? { backgroundColor: '#C9A84C' } : {}}
+            style={selIdx === i ? { backgroundColor: '#C9A84C' } : {}}
           >
             {s}
           </button>
@@ -34,21 +32,19 @@ function SizeSelector({ sizes, selected, onChange }) {
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-between py-1.5 px-2 rounded border border-gray-300 text-[9px] font-bold text-gray-600 hover:border-[#C9A84C] transition-all duration-200"
       >
-        <span className="truncate">{selected || 'Elegir talla'}</span>
+        <span className="truncate">{sizes[selIdx] || '—'}</span>
         <span className={`ml-1 flex-shrink-0 transition-transform duration-200 ${open ? 'rotate-90' : ''}`}>▶</span>
       </button>
       {open && (
         <div className="mt-1 grid grid-cols-3 gap-1">
-          {sizes.map(s => (
+          {sizes.map((s, i) => (
             <button
-              key={s}
-              onClick={() => { onChange(s); setOpen(false) }}
+              key={i}
+              onClick={() => { onChange(i); setOpen(false) }}
               className={`text-[9px] font-bold py-1.5 px-1 rounded border transition-all duration-200 text-center truncate ${
-                selected === s
-                  ? 'text-black border-[#C9A84C]'
-                  : 'border-gray-300 text-gray-500 hover:border-[#C9A84C] hover:text-gray-900'
+                selIdx === i ? 'text-black border-[#C9A84C]' : 'border-gray-300 text-gray-500 hover:border-[#C9A84C] hover:text-gray-900'
               }`}
-              style={selected === s ? { backgroundColor: '#C9A84C' } : {}}
+              style={selIdx === i ? { backgroundColor: '#C9A84C' } : {}}
             >
               {s}
             </button>
@@ -61,11 +57,10 @@ function SizeSelector({ sizes, selected, onChange }) {
 
 export default function StoreProductCard({ product, category, sizes }) {
   const { addItem } = useStoreCart()
-  const [selectedSize, setSelectedSize] = useState('')
-  const [added, setAdded] = useState(false)
+  const [selIdx, setSelIdx] = useState(0)
+  const [added, setAdded]   = useState(false)
 
-  const hasSizes = sizes && sizes.length > 0
-  const canAdd   = !hasSizes || !!selectedSize
+  const selectedSize = sizes?.[selIdx] || ''
 
   const activeImage = (() => {
     if (selectedSize && product._item?.variantes) {
@@ -76,7 +71,6 @@ export default function StoreProductCard({ product, category, sizes }) {
   })()
 
   const handleAdd = () => {
-    if (!canAdd) return
     addItem(product, category, selectedSize)
     setAdded(true)
     setTimeout(() => setAdded(false), 1500)
@@ -112,21 +106,18 @@ export default function StoreProductCard({ product, category, sizes }) {
         </h3>
         <span className="text-gray-900 font-bold text-sm">{product.price}</span>
         <div className="mt-auto pt-1">
-          <SizeSelector sizes={sizes} selected={selectedSize} onChange={setSelectedSize} />
+          <SizeSelector sizes={sizes} selIdx={selIdx} onChange={setSelIdx} />
         </div>
       </div>
 
       <button
         onClick={handleAdd}
-        disabled={!canAdd}
         className={`w-full py-2.5 font-bold uppercase tracking-[0.1em] text-[10px] md:text-xs flex-shrink-0 transition-all duration-300 ${
-          added    ? 'bg-green-500 text-white'
-          : canAdd ? 'text-black hover:brightness-90'
-          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+          added ? 'bg-green-500 text-white' : 'text-black hover:brightness-90'
         }`}
-        style={added || !canAdd ? {} : { backgroundColor: '#C9A84C' }}
+        style={added ? {} : { backgroundColor: '#C9A84C' }}
       >
-        {added ? '✓ Agregado' : canAdd ? '+ Agregar al carrito' : 'Elige talla'}
+        {added ? '✓ Agregado' : '+ Agregar al carrito'}
       </button>
 
     </div>
