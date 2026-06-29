@@ -3,6 +3,7 @@ import NavbarCategory from './NavbarCategory'
 import FooterSupply from './FooterSupply'
 import Seo from '../Seo'
 import { useCatalog } from '../../hooks/useCatalog'
+import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { FaWhatsapp } from 'react-icons/fa'
 import { Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package } from 'lucide-react'
 
@@ -20,53 +21,136 @@ const CAT_ICONS = {
 }
 
 const WA = '573207911013'
+const VAR_THRESHOLD = 3
 
-function ProductCard({ item }) {
-  const firstVariant = item.variantes?.[0]
-  const price = firstVariant?.price
-    ? '$' + Math.round(firstVariant.price).toLocaleString('es-CO')
-    : null
-  const variants = item.variantes?.map(v => v.variant).filter(Boolean) ?? []
-  const totalStock = item.variantes?.reduce((s, v) => s + (v.stock || 0), 0) ?? 0
-  const waText = encodeURIComponent(
-    `Hola, quiero información sobre: ${item.name}${variants[0] ? ' — ' + variants[0] : ''}`
-  )
+function VariantSelectorSupply({ variantObjs, selected, onChange }) {
+  const [open, setOpen] = useState(false)
+  if (!variantObjs || variantObjs.length <= 1) return null
+
+  if (variantObjs.length <= VAR_THRESHOLD) {
+    return (
+      <div className="grid gap-1 w-full" style={{ gridTemplateColumns: `repeat(${variantObjs.length}, 1fr)` }}>
+        {variantObjs.map(v => (
+          <button
+            key={v.variant}
+            onClick={() => onChange(v.variant)}
+            className={`text-[9px] font-bold py-1 rounded border transition-all duration-200 text-center truncate ${
+              selected === v.variant
+                ? 'bg-blue-500 text-white border-blue-500'
+                : 'border-zinc-700 text-zinc-500 hover:border-blue-400 hover:text-white'
+            }`}
+          >
+            {v.variant}
+          </button>
+        ))}
+      </div>
+    )
+  }
+
   return (
-    <div className="border border-blue-500/40 bg-zinc-950 rounded-2xl overflow-hidden hover:border-blue-500 hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-300 flex flex-col">
-      <div className="aspect-square w-full bg-zinc-900 overflow-hidden">
-        {item.image_url ? (
-          <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" loading="lazy" />
+    <div className="w-full">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between py-1.5 px-2 rounded border border-zinc-700 text-[9px] font-bold text-zinc-300 hover:border-blue-400 transition-all duration-200"
+      >
+        <span className="truncate">{selected || 'Elegir variante'}</span>
+        <span className={`ml-1 flex-shrink-0 transition-transform duration-200 ${open ? 'rotate-90' : ''}`}>▶</span>
+      </button>
+      {open && (
+        <div className="mt-1 grid grid-cols-2 gap-1">
+          {variantObjs.map(v => (
+            <button
+              key={v.variant}
+              onClick={() => { onChange(v.variant); setOpen(false) }}
+              className={`text-[9px] font-bold py-1.5 px-1 rounded border transition-all duration-200 text-center truncate ${
+                selected === v.variant
+                  ? 'bg-blue-500 text-white border-blue-500'
+                  : 'border-zinc-700 text-zinc-500 hover:border-blue-400 hover:text-white'
+              }`}
+            >
+              {v.variant}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ProductCard({ item, categoria }) {
+  const { addItem } = useSupplyCart()
+  const [selectedVariant, setSelectedVariant] = useState('')
+  const [added, setAdded] = useState(false)
+
+  const variantObjs = item.variantes?.filter(v => v.variant) ?? []
+  const hasVariants = variantObjs.length > 1
+  const totalStock  = item.variantes?.reduce((s, v) => s + (v.stock || 0), 0) ?? 0
+
+  const resolvedVariant    = hasVariants ? selectedVariant : (variantObjs[0]?.variant || '')
+  const resolvedVariantObj = variantObjs.find(v => v.variant === resolvedVariant) || variantObjs[0]
+  const resolvedPrice      = resolvedVariantObj?.price
+    ? '$' + Math.round(resolvedVariantObj.price).toLocaleString('es-CO')
+    : null
+  const activeImage = resolvedVariantObj?.image_url || item.image_url || null
+  const canAdd = !hasVariants || selectedVariant
+
+  const handleAdd = () => {
+    if (!canAdd) return
+    addItem({
+      id:    item.name + (resolvedVariant ? '-' + resolvedVariant : ''),
+      name:  item.name + (resolvedVariant ? ` (${resolvedVariant})` : ''),
+      price: resolvedVariantObj?.price ? '$' + Math.round(resolvedVariantObj.price).toLocaleString('es-CO') : '—',
+      brand: item.descripcion || item.categoria || '',
+      image: activeImage || '',
+    }, categoria)
+    setAdded(true)
+    setTimeout(() => setAdded(false), 1500)
+  }
+
+  return (
+    <div className="border border-blue-500/40 bg-zinc-950 rounded-2xl overflow-hidden hover:border-blue-500 hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-300 flex flex-col h-full">
+
+      <div className="aspect-square w-full bg-zinc-900 overflow-hidden flex-shrink-0">
+        {activeImage ? (
+          <img
+            key={activeImage}
+            src={activeImage}
+            alt={`${item.name}${resolvedVariant ? ' ' + resolvedVariant : ''}`}
+            className="w-full h-full object-cover transition-opacity duration-200"
+            loading="lazy"
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <p className="text-zinc-700 uppercase tracking-[0.3em] text-xs text-center px-3">{item.name}</p>
+            <p className="text-zinc-700 uppercase tracking-[0.3em] text-[10px] text-center px-3">{item.name}</p>
           </div>
         )}
       </div>
-      <div className="p-4 flex flex-col gap-3 flex-1">
-        <div className="flex-1">
-          {item.descripcion && <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] mb-1">{item.descripcion}</p>}
-          <h3 className="text-sm font-black uppercase leading-tight text-white">{item.name}</h3>
-          {variants.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-2">
-              {variants.slice(0, 4).map(v => (
-                <span key={v} className="text-[10px] border border-zinc-700 text-zinc-400 px-2 py-0.5 rounded">{v}</span>
-              ))}
-              {variants.length > 4 && <span className="text-[10px] text-zinc-600">+{variants.length - 4}</span>}
-            </div>
-          )}
-          {price && <p className="text-white font-bold text-sm mt-2">{price}</p>}
-          {totalStock <= 3 && totalStock > 0 && (
-            <p className="text-yellow-500 text-[10px] mt-1 font-bold">⚠️ Últimas {totalStock} unidades</p>
-          )}
+
+      <div className="p-3 flex flex-col flex-1 gap-1.5 min-h-0">
+        {item.descripcion && (
+          <p className="text-zinc-500 uppercase tracking-[0.2em] text-[9px] leading-none">{item.descripcion}</p>
+        )}
+        <h3 className="text-xs font-black uppercase leading-tight text-white">{item.name}</h3>
+        {resolvedPrice && <p className="text-white font-bold text-sm">{resolvedPrice}</p>}
+        {totalStock <= 3 && totalStock > 0 && (
+          <p className="text-yellow-500 text-[9px] font-bold">⚠️ Últimas {totalStock}</p>
+        )}
+        <div className="mt-auto pt-1">
+          <VariantSelectorSupply variantObjs={variantObjs} selected={selectedVariant} onChange={setSelectedVariant} />
         </div>
-        <a
-          href={`https://wa.me/${WA}?text=${waText}`}
-          target="_blank" rel="noopener noreferrer"
-          className="text-center px-4 py-2 border border-blue-500/50 text-blue-400 uppercase tracking-[0.15em] text-[11px] font-bold hover:bg-blue-500 hover:text-white transition-all duration-300 rounded"
-        >
-          Consultar
-        </a>
       </div>
+
+      <button
+        onClick={handleAdd}
+        disabled={!canAdd}
+        className={`w-full py-2.5 font-bold uppercase tracking-[0.1em] text-[10px] flex-shrink-0 transition-all duration-300 ${
+          added        ? 'bg-green-500 text-white'
+          : canAdd     ? 'bg-blue-500 text-white hover:bg-blue-600'
+          : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+        }`}
+      >
+        {added ? '✓ Agregado' : '+ Agregar al carrito'}
+      </button>
     </div>
   )
 }
@@ -178,7 +262,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
             <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-0 px-6 md:px-6 pb-3 md:pb-0 scrollbar-hide">
               {products.map(item => (
                 <div key={item.name} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">
-                  <ProductCard item={item} />
+                  <ProductCard item={item} categoria={categoria} />
                 </div>
               ))}
             </div>
