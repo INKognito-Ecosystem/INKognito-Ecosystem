@@ -187,7 +187,7 @@ export default function StorePage() {
           {/* STATS */}
           <div className="mt-8 md:mt-16 grid grid-cols-3 gap-6 max-w-xl mx-auto">
             <div className="text-center">
-              <p className="text-3xl md:text-5xl font-black text-[#C9A84C]">6</p>
+              <p className="text-3xl md:text-5xl font-black text-[#C9A84C]">4</p>
               <p className="text-gray-600 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Municipios</p>
             </div>
             <div className="text-center border-x border-gray-300">
@@ -307,13 +307,10 @@ export default function StorePage() {
                     <p className="text-zinc-500 text-xs mt-0.5">Entregas locales y contra entrega</p>
                   </div>
                 </div>
-                <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-3">6 municipios con cobertura</p>
-                <div className="flex flex-col gap-2 mb-5">
-                  {cities.map((c, i) => (
-                    <div key={c.name} className={`flex items-center justify-between py-2 ${i < cities.length - 1 ? 'border-b border-zinc-900' : ''}`}>
-                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{c.name}</span>
-                      <span className="text-zinc-600 text-[10px] uppercase tracking-[0.1em]">{c.time}</span>
-                    </div>
+                <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-3">Zonas de cobertura</p>
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                  {['Chigorodó','Carepa','Apartadó','Turbo','Currulao','El Tres','Coldesa','Río Grande','El Reposo','Casa Verde'].map(z => (
+                    <span key={z} className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{z}</span>
                   ))}
                 </div>
                 <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-center">
@@ -392,19 +389,19 @@ export default function StorePage() {
             <p className="text-zinc-500 text-[10px] mt-0.5">Entregas locales y contra entrega</p>
           </div>
         </div>
-        <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">6 municipios con cobertura</p>
+        {/* Ciudades */}
+        <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">Zonas de cobertura</p>
         <div className="flex flex-wrap gap-1.5 mb-5">
-          {cities.map(c => (
-            <div key={c.name} className="flex items-center gap-1">
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{c.name}</span>
-              <span className="text-zinc-600 text-[9px]">{c.time}</span>
-            </div>
+          {['Chigorodó','Carepa','Apartadó','Turbo','Currulao','El Tres','Coldesa','Río Grande','El Reposo','Casa Verde'].map(c => (
+            <span key={c} className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{c}</span>
           ))}
         </div>
+
+        {/* Garantías */}
         <div className="flex flex-col gap-2 mb-5">
-          {['Pago contraentrega disponible','Atención personalizada por WhatsApp','Cambios de talla garantizados','Cobertura en toda la región de Urabá'].map(g => (
+          {['Pago contraentrega disponible','Atención personalizada por WhatsApp','Cobertura en toda la región de Urabá'].map(g => (
             <div key={g} className="flex items-center gap-2">
-              <span className="font-bold text-sm flex-shrink-0" style={{ color: '#C9A84C' }}>✓</span>
+              <span className="font-bold text-sm" style={{ color: '#C9A84C' }}>✓</span>
               <span className="text-zinc-400 text-xs">{g}</span>
             </div>
           ))}
