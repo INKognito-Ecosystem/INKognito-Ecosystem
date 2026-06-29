@@ -19,7 +19,7 @@ function SizeSelector({ sizes, selIdx, onChange }) {
             }`}
             style={selIdx === i ? { backgroundColor: '#C9A84C' } : {}}
           >
-            {s}
+            T {s}
           </button>
         ))}
       </div>
@@ -32,7 +32,7 @@ function SizeSelector({ sizes, selIdx, onChange }) {
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-between py-1.5 px-2 rounded border border-gray-300 text-[9px] font-bold text-gray-600 hover:border-[#C9A84C] transition-all duration-200"
       >
-        <span className="truncate">{sizes[selIdx] || '—'}</span>
+        <span className="truncate">{sizes[selIdx] ? `T ${sizes[selIdx]}` : '—'}</span>
         <span className={`ml-1 flex-shrink-0 transition-transform duration-200 ${open ? 'rotate-90' : ''}`}>▶</span>
       </button>
       {open && (
@@ -46,7 +46,7 @@ function SizeSelector({ sizes, selIdx, onChange }) {
               }`}
               style={selIdx === i ? { backgroundColor: '#C9A84C' } : {}}
             >
-              {s}
+              T {s}
             </button>
           ))}
         </div>
