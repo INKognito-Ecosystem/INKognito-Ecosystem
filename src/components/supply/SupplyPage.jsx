@@ -8,38 +8,7 @@ import Seo from '../Seo'
 const ogSupply = '/og/supply.webp'
 import { Link } from 'react-router-dom'
 import { SUPPLY_HOURS } from '../../config/business'
-import { Package, Droplet, PenTool, ShieldCheck } from 'lucide-react'
-
-const recursos = [
-  {
-    icon: Package,
-    titulo: 'Kit básico starter',
-    desc: 'Todo lo que necesitas para tu primera sesión: máquina, tintas, cartuchos y accesorios esenciales.',
-    link: '/supply/bundles',
-    label: 'Ver kits',
-  },
-  {
-    icon: Droplet,
-    titulo: 'Primeras tintas',
-    desc: 'Negros sólidos y colores básicos. Pigmentos profesionales recomendados para aprendices.',
-    link: '/supply/ink',
-    label: 'Ver tintas',
-  },
-  {
-    icon: PenTool,
-    titulo: 'Cartuchos y agujas',
-    desc: 'Los calibres correctos para comenzar: liner fino para trazos y magnum para rellenos.',
-    link: '/supply/cartridges',
-    label: 'Ver cartuchos',
-  },
-  {
-    icon: ShieldCheck,
-    titulo: 'Bioseguridad',
-    desc: 'Guantes, plástico adherente y todo para trabajar con los protocolos de higiene correctos.',
-    link: '/supply/gloves',
-    label: 'Ver higiene',
-  },
-]
+import { useCatalog } from '../../hooks/useCatalog'
 
 const supplyJsonLd = {
   "@context": "https://schema.org",
@@ -59,6 +28,8 @@ const supplyJsonLd = {
 }
 
 export default function SupplyPage() {
+  const { allProducts } = useCatalog('supply')
+  const cursoDestacado = allProducts.find(p => p.tipo === 'afiliado') || null
 
   return (
 
@@ -86,45 +57,44 @@ export default function SupplyPage() {
     <BrandsSupply />
 
     {/* SECCIÓN PARA NUEVOS TATUADORES */}
-    <section className="pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-zinc-950 border-t border-zinc-900">
-      <div className="max-w-7xl mx-auto">
-
-        <div className="mb-4 md:mb-8">
-          <p className="uppercase tracking-[0.25em] text-zinc-500 text-[10px] mb-2">
+    <section className="bg-zinc-950 border-t border-zinc-900">
+      <div className="max-w-7xl mx-auto px-6 py-8 md:py-16 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
+        <div>
+          <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-3">
             Para nuevos tatuadores
           </p>
-          <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-2 text-white">
-            ¿Quieres aprender a tatuar?
+          <h2 className="text-3xl md:text-5xl font-black uppercase leading-none mb-3">
+            {cursoDestacado?.name || '¿Quieres aprender'}<br />
+            <span className="text-zinc-500">
+              {cursoDestacado ? 'disponible ahora' : 'a tatuar?'}
+            </span>
           </h2>
-          <p className="text-zinc-500 text-sm">
-            Los insumos, herramientas y recursos para dar tus primeros pasos.
+          <p className="text-zinc-400 text-base max-w-lg">
+            {cursoDestacado?.descripcion || 'Cursos, kit básico y recursos para dar tus primeros pasos en el mundo del tatuaje.'}
           </p>
+          {cursoDestacado && (
+            <span className="inline-block mt-3 text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-blue-500/30 text-blue-400 bg-blue-500/5">
+              Curso digital · Hotmart
+            </span>
+          )}
         </div>
-
-        <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
-          {recursos.map((r) => {
-            const Icon = r.icon
-            return (
-              <Link
-                key={r.titulo}
-                to={r.link}
-                className="snap-start flex-shrink-0 w-[44vw] md:w-auto border border-zinc-800 bg-black rounded-2xl p-5 flex flex-col gap-3 hover:border-blue-500/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.1)] transition-all duration-300"
-              >
-                <Icon size={22} className="text-blue-400" strokeWidth={1.5} />
-                <h3 className="font-black uppercase text-xs tracking-[0.08em] text-white leading-snug">
-                  {r.titulo}
-                </h3>
-                <p className="text-zinc-500 text-[10px] leading-relaxed flex-1">
-                  {r.desc}
-                </p>
-                <span className="text-blue-400 text-[10px] font-bold uppercase tracking-[0.15em]">
-                  {r.label} →
-                </span>
-              </Link>
-            )
-          })}
-        </div>
-
+        {cursoDestacado?.url_ventas ? (
+          <a
+            href={cursoDestacado.url_ventas}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-4 px-8 rounded-xl hover:border-blue-500 hover:bg-blue-500/10 hover:shadow-[0_0_25px_rgba(59,130,246,0.15)] transition-all duration-300 whitespace-nowrap"
+          >
+            Ver seminario →
+          </a>
+        ) : (
+          <Link
+            to="/supply/aprende"
+            className="shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-4 px-8 rounded-xl hover:border-blue-500 hover:bg-blue-500/10 hover:shadow-[0_0_25px_rgba(59,130,246,0.15)] transition-all duration-300 whitespace-nowrap"
+          >
+            Ver recursos para principiantes →
+          </Link>
+        )}
       </div>
     </section>
 
