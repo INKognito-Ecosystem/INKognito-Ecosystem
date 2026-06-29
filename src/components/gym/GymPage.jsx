@@ -5,6 +5,7 @@ import NavbarGym from './NavbarGym'
 import FooterGym from './FooterGym'
 import Seo from '../Seo'
 import { creaciones, maquinasDestacadas } from '../../data/gym'
+import { useCatalog } from '../../hooks/useCatalog'
 
 const ogGym = '/og/gym.webp'
 const WA = '573207911013'
@@ -89,6 +90,8 @@ const PLANO_MUESTRAS = [null, null, null]
 export default function GymPage() {
   const [planosModalOpen, setPlanosModalOpen]   = useState(false)
   const [historiaModalOpen, setHistoriaModalOpen] = useState(false)
+  const { allProducts: gymProds } = useCatalog('gym')
+  const gymAfiliados = gymProds.filter(p => p.tipo === 'afiliado')
 
   const scrollToSection = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -304,6 +307,53 @@ export default function GymPage() {
           </div>
         </div>
       </section>
+
+      {/* ── MATERIALES AFILIADOS (AliExpress / Mercado Libre) — solo si hay productos ── */}
+      {gymAfiliados.length > 0 && (
+        <section className="border-t border-gray-800 bg-gray-950 px-4 md:px-6 py-8 md:py-12">
+          <div className="max-w-7xl mx-auto">
+            <p className="text-gray-600 text-[10px] uppercase tracking-widest mb-1">AliExpress · Mercado Libre · Afiliados</p>
+            <h2 className="text-2xl md:text-3xl font-black uppercase leading-none mb-2 text-white">
+              Consigue los materiales
+            </h2>
+            <p className="text-gray-500 text-sm mb-6">
+              Ruedas, cables, poleas y materiales esenciales para armar o mejorar tu máquina de gym en casa.
+            </p>
+            <div className="flex md:grid md:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+              {gymAfiliados.map((item, i) => {
+                const isAli = item.categoria === 'AliExpress'
+                const accentColor = isAli ? 'text-orange-400' : 'text-yellow-400'
+                const borderHover = isAli ? 'hover:border-orange-500/40' : 'hover:border-yellow-500/40'
+                return (
+                  <a
+                    key={i}
+                    href={item.url_ventas || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`snap-start flex-shrink-0 w-[44vw] md:w-auto border border-gray-800 bg-gray-900/60 rounded-xl overflow-hidden ${borderHover} transition-all duration-300 flex flex-col`}
+                  >
+                    {item.image_url ? (
+                      <img src={item.image_url} alt={item.name} className="w-full aspect-square object-cover flex-shrink-0" />
+                    ) : (
+                      <div className="w-full aspect-square bg-gray-800 flex items-center justify-center flex-shrink-0">
+                        <span className="text-3xl">{isAli ? '🌐' : '🛒'}</span>
+                      </div>
+                    )}
+                    <div className="p-3 flex flex-col flex-1">
+                      <span className={`text-[9px] font-bold uppercase tracking-widest ${accentColor} opacity-80 mb-1`}>{item.categoria}</span>
+                      <h3 className="font-black uppercase text-xs leading-tight text-white mb-1">{item.name}</h3>
+                      {item.descripcion && <p className="text-gray-500 text-[10px] leading-relaxed flex-1">{item.descripcion}</p>}
+                      <span className={`${accentColor} text-[10px] font-bold uppercase tracking-widest mt-2 flex-shrink-0`}>
+                        Ver en {item.categoria} →
+                      </span>
+                    </div>
+                  </a>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       <FooterGym />
 

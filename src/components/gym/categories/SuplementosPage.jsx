@@ -133,8 +133,12 @@ export default function SuplementosPage() {
   const { allProducts: apiProds } = useCatalog('suplementos')
   const { addItem, count: cartCount } = useGymCart()
 
-  const productosActivos = apiProds.length > 0
-    ? apiProds.map((item, i) => ({
+  // Separar físicos de afiliados — afiliados van a su propia sección
+  const apiFisicos   = apiProds.filter(item => (item.tipo || 'fisico') !== 'afiliado')
+  const apiAfiliados = apiProds.filter(item => item.tipo === 'afiliado')
+
+  const productosActivos = apiFisicos.length > 0
+    ? apiFisicos.map((item, i) => ({
         id:          i + 1,
         categoria:   item.categoria || 'Suplementos',
         nombre:      item.name,
@@ -232,6 +236,46 @@ export default function SuplementosPage() {
           </div>
         )}
       </div>
+
+      {/* ── AFILIADOS MERCADO LIBRE — solo si hay productos cargados ── */}
+      {apiAfiliados.length > 0 && (
+        <section className="border-t border-gray-800 bg-gray-950 px-4 md:px-6 py-8 md:py-12">
+          <div className="max-w-7xl mx-auto">
+            <p className="text-gray-600 text-[10px] uppercase tracking-widest mb-1">Mercado Libre · Afiliados</p>
+            <h2 className="text-2xl md:text-3xl font-black uppercase leading-none mb-2 text-white">
+              También disponible en ML
+            </h2>
+            <p className="text-gray-500 text-sm mb-6">
+              Suplementos adicionales con envío a toda Colombia a través de Mercado Libre.
+            </p>
+            <div className="flex md:grid md:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+              {apiAfiliados.map((item, i) => (
+                <a
+                  key={i}
+                  href={item.url_ventas || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="snap-start flex-shrink-0 w-[44vw] md:w-auto border border-gray-800 bg-gray-900/60 rounded-xl overflow-hidden hover:border-yellow-500/40 transition-all duration-300 flex flex-col"
+                >
+                  {item.image_url ? (
+                    <img src={item.image_url} alt={item.name} className="w-full aspect-square object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-full aspect-square bg-gray-800 flex items-center justify-center flex-shrink-0">
+                      <span className="text-3xl">🛒</span>
+                    </div>
+                  )}
+                  <div className="p-3 flex flex-col flex-1">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-yellow-500/80 mb-1">{item.categoria}</span>
+                    <h3 className="font-black uppercase text-xs leading-tight text-white mb-1">{item.name}</h3>
+                    {item.descripcion && <p className="text-gray-500 text-[10px] leading-relaxed flex-1">{item.descripcion}</p>}
+                    <span className="text-yellow-400 text-[10px] font-bold uppercase tracking-widest mt-2 flex-shrink-0">Ver en ML →</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* COBERTURA + CONTACTO — solo móvil */}
       <section className="md:hidden border-t border-gray-800 bg-gray-950 px-4 py-8">
