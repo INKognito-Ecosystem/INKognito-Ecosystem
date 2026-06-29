@@ -90,8 +90,10 @@ const PLANO_MUESTRAS = [null, null, null]
 export default function GymPage() {
   const [planosModalOpen, setPlanosModalOpen]   = useState(false)
   const [historiaModalOpen, setHistoriaModalOpen] = useState(false)
-  const { allProducts: gymProds } = useCatalog('gym')
+  const { allProducts: gymProds, loading: gymLoading } = useCatalog('gym')
   const gymAfiliados = gymProds.filter(p => p.tipo === 'afiliado')
+  const gymMateriales = gymProds.filter(p => !p.tipo || p.tipo === 'fisico')
+  const { allProducts: suplProds, loading: suplLoading } = useCatalog('suplementos')
 
   const scrollToSection = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -305,6 +307,97 @@ export default function GymPage() {
               </Link>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── SUPLEMENTOS ─────────────────────────────────────────────── */}
+      <section className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="border-t border-gray-800 pt-3 md:pt-8">
+          <div className="flex items-end justify-between mb-4 md:mb-8">
+            <div>
+              <p className="text-gray-600 text-[10px] uppercase tracking-widest mb-1">INKognito Gym</p>
+              <h2 className="text-2xl md:text-4xl font-black uppercase leading-none">Suplementos</h2>
+            </div>
+            <Link
+              to="/gym/suplementos"
+              className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-white border border-gray-700 hover:border-gray-400 px-5 py-3 rounded transition-all duration-300 whitespace-nowrap"
+            >
+              Ver catálogo →
+            </Link>
+          </div>
+          {suplLoading ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[1,2,3,4].map(i => <div key={i} className="aspect-square bg-gray-900/40 rounded-xl animate-pulse" />)}
+            </div>
+          ) : suplProds.length === 0 ? (
+            <div className="border border-dashed border-gray-800 rounded-2xl py-14 text-center">
+              <FlaskConical size={32} className="text-gray-700 mx-auto mb-3" strokeWidth={1} />
+              <p className="text-gray-600 uppercase tracking-[0.2em] text-xs mb-1">Próximamente</p>
+              <p className="text-gray-700 text-xs">El catálogo de suplementos estará disponible pronto</p>
+            </div>
+          ) : (
+            <div className="flex md:grid md:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+              {suplProds.slice(0, 4).map((item, i) => {
+                const precio = item.variantes?.[0]?.price
+                return (
+                  <Link key={i} to="/gym/suplementos" className="snap-start flex-shrink-0 w-[44vw] md:w-auto border border-gray-800 bg-gray-900/60 rounded-xl overflow-hidden hover:border-gray-600 transition-all duration-300 flex flex-col">
+                    {item.image_url
+                      ? <img src={item.image_url} alt={item.name} className="w-full aspect-square object-cover flex-shrink-0" />
+                      : <div className="w-full aspect-square bg-gray-800 flex items-center justify-center flex-shrink-0"><FlaskConical size={28} className="text-gray-600" strokeWidth={1} /></div>
+                    }
+                    <div className="p-3 flex flex-col gap-1 flex-1">
+                      <h3 className="font-black uppercase text-xs leading-tight text-white">{item.name}</h3>
+                      {precio && <span className="text-gray-400 text-[10px] font-bold">${Math.round(precio).toLocaleString('es-CO')} COP</span>}
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ── MATERIALES & COMPONENTES (ruedas, poleas, accesorios físicos) ── */}
+      <section className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="border-t border-gray-800 pt-3 md:pt-8">
+          <div className="flex items-end justify-between mb-4 md:mb-8">
+            <div>
+              <p className="text-gray-600 text-[10px] uppercase tracking-widest mb-1">INKognito Gym</p>
+              <h2 className="text-2xl md:text-4xl font-black uppercase leading-none">Materiales &amp; componentes</h2>
+              <p className="text-gray-500 text-sm mt-1">Ruedas, poleas, cables y accesorios para armar tu equipo</p>
+            </div>
+          </div>
+          {gymLoading ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[1,2,3,4].map(i => <div key={i} className="aspect-square bg-gray-900/40 rounded-xl animate-pulse" />)}
+            </div>
+          ) : gymMateriales.length === 0 ? (
+            <div className="border border-dashed border-gray-800 rounded-2xl py-14 text-center">
+              <Wrench size={32} className="text-gray-700 mx-auto mb-3" strokeWidth={1} />
+              <p className="text-gray-600 uppercase tracking-[0.2em] text-xs mb-1">Próximamente</p>
+              <p className="text-gray-700 text-xs">Ruedas, poleas y componentes para fabricación propia</p>
+            </div>
+          ) : (
+            <div className="flex md:grid md:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+              {gymMateriales.slice(0, 8).map((item, i) => {
+                const precio = item.variantes?.[0]?.price
+                const waMsg = `https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero ${item.name}`)}`
+                return (
+                  <a key={i} href={waMsg} target="_blank" rel="noopener noreferrer" className="snap-start flex-shrink-0 w-[44vw] md:w-auto border border-gray-800 bg-gray-900/60 rounded-xl overflow-hidden hover:border-gray-600 transition-all duration-300 flex flex-col">
+                    {item.image_url
+                      ? <img src={item.image_url} alt={item.name} className="w-full aspect-square object-cover flex-shrink-0" />
+                      : <div className="w-full aspect-square bg-gray-800 flex items-center justify-center flex-shrink-0"><Wrench size={28} className="text-gray-600" strokeWidth={1} /></div>
+                    }
+                    <div className="p-3 flex flex-col gap-1 flex-1">
+                      <h3 className="font-black uppercase text-xs leading-tight text-white">{item.name}</h3>
+                      {precio && <span className="text-gray-400 text-[10px] font-bold">${Math.round(precio).toLocaleString('es-CO')} COP</span>}
+                      <span className="text-gray-600 text-[9px] uppercase tracking-widest mt-auto">Pedir por WhatsApp →</span>
+                    </div>
+                  </a>
+                )
+              })}
+            </div>
+          )}
         </div>
       </section>
 

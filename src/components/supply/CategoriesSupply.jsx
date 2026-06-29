@@ -1,18 +1,19 @@
 import { Link } from 'react-router-dom'
-import { Drill, PenTool, PlugZap, Droplet, Crosshair, Hand, ShieldCheck, Toolbox, BedDouble, Package } from 'lucide-react'
+import { Drill, PenTool, PlugZap, Droplet, Crosshair, Hand, ShieldCheck, Toolbox, BedDouble, Package, GraduationCap } from 'lucide-react'
 import { useCatalog } from '../../hooks/useCatalog'
 
 const categories = [
-  { name: 'Tintas',            path: '/supply/ink',            icon: Droplet,    cat: 'Tintas'            },
-  { name: 'Cartuchos',         path: '/supply/cartridges',     icon: PenTool,    cat: 'Cartuchos'         },
-  { name: 'Agujas',            path: '/supply/needles',        icon: Crosshair,  cat: 'Agujas'            },
-  { name: 'Máquinas',          path: '/supply/machines',       icon: Drill,      cat: 'Máquinas'          },
-  { name: 'Guantes',           path: '/supply/gloves',         icon: Hand,       cat: 'Guantes'           },
-  { name: 'Cuidados',          path: '/supply/aftercare',      icon: ShieldCheck, cat: 'Cuidados'          },
-  { name: 'Fuentes',           path: '/supply/power-supplies', icon: PlugZap,    cat: 'Fuentes'           },
-  { name: 'Accesorios',        path: '/supply/accessories',    icon: Toolbox,    cat: 'Accesorios'        },
-  { name: 'Mobiliario',        path: '/supply/furniture',      icon: BedDouble,  cat: 'Muebles'           },
-  { name: 'Combos',            path: '/supply/bundles',        icon: Package,    cat: 'Bundles'           },
+  { name: 'Tintas',            path: '/supply/ink',            icon: Droplet,        cat: 'Tintas'      },
+  { name: 'Cartuchos',         path: '/supply/cartridges',     icon: PenTool,        cat: 'Cartuchos'   },
+  { name: 'Agujas',            path: '/supply/needles',        icon: Crosshair,      cat: 'Agujas'      },
+  { name: 'Máquinas',          path: '/supply/machines',       icon: Drill,          cat: 'Máquinas'    },
+  { name: 'Guantes',           path: '/supply/gloves',         icon: Hand,           cat: 'Guantes'     },
+  { name: 'Cuidados',          path: '/supply/aftercare',      icon: ShieldCheck,    cat: 'Cuidados'    },
+  { name: 'Fuentes',           path: '/supply/power-supplies', icon: PlugZap,        cat: 'Fuentes'     },
+  { name: 'Accesorios',        path: '/supply/accessories',    icon: Toolbox,        cat: 'Accesorios'  },
+  { name: 'Mobiliario',        path: '/supply/furniture',      icon: BedDouble,      cat: 'Muebles'     },
+  { name: 'Combos',            path: '/supply/bundles',        icon: Package,        cat: 'Bundles'     },
+  { name: 'Digitales',         path: '/supply/aprende',        icon: GraduationCap,  cat: 'Digitales'   },
 ]
 
 export default function CategoriesSupply() {
