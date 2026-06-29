@@ -25,7 +25,7 @@ const VAR_THRESHOLD = 3
 
 function VariantSelectorSupply({ variantObjs, selected, onChange }) {
   const [open, setOpen] = useState(false)
-  if (!variantObjs || variantObjs.length <= 1) return null
+  if (!variantObjs || variantObjs.length === 0) return null
 
   if (variantObjs.length <= VAR_THRESHOLD) {
     return (
@@ -83,23 +83,22 @@ function ProductCard({ item, categoria }) {
   const [added, setAdded] = useState(false)
 
   const variantObjs = item.variantes?.filter(v => v.variant) ?? []
-  const hasVariants = variantObjs.length > 1
+  const hasVariants = variantObjs.length > 0
   const totalStock  = item.variantes?.reduce((s, v) => s + (v.stock || 0), 0) ?? 0
 
-  const resolvedVariant    = hasVariants ? selectedVariant : (variantObjs[0]?.variant || '')
-  const resolvedVariantObj = variantObjs.find(v => v.variant === resolvedVariant) || variantObjs[0]
-  const resolvedPrice      = resolvedVariantObj?.price
+  const resolvedVariantObj = variantObjs.find(v => v.variant === selectedVariant) || (hasVariants ? null : variantObjs[0])
+  const resolvedPrice = resolvedVariantObj?.price
     ? '$' + Math.round(resolvedVariantObj.price).toLocaleString('es-CO')
     : null
   const activeImage = resolvedVariantObj?.image_url || item.image_url || null
-  const canAdd = !hasVariants || selectedVariant
+  const canAdd = !hasVariants || !!selectedVariant
 
   const handleAdd = () => {
     if (!canAdd) return
     addItem({
-      id:    item.name + (resolvedVariant ? '-' + resolvedVariant : ''),
-      name:  item.name + (resolvedVariant ? ` (${resolvedVariant})` : ''),
-      price: resolvedVariantObj?.price ? '$' + Math.round(resolvedVariantObj.price).toLocaleString('es-CO') : '—',
+      id:    item.name + (selectedVariant ? '-' + selectedVariant : ''),
+      name:  item.name + (selectedVariant ? ` (${selectedVariant})` : ''),
+      price: resolvedPrice || '—',
       brand: item.descripcion || item.categoria || '',
       image: activeImage || '',
     }, categoria)
@@ -144,12 +143,12 @@ function ProductCard({ item, categoria }) {
         onClick={handleAdd}
         disabled={!canAdd}
         className={`w-full py-2.5 font-bold uppercase tracking-[0.1em] text-[10px] flex-shrink-0 transition-all duration-300 ${
-          added        ? 'bg-green-500 text-white'
-          : canAdd     ? 'bg-blue-500 text-white hover:bg-blue-600'
-          : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+          added    ? 'bg-green-500 text-white'
+          : canAdd ? 'bg-blue-500 text-white hover:bg-blue-600'
+          : 'bg-zinc-900 text-zinc-600 cursor-not-allowed'
         }`}
       >
-        {added ? '✓ Agregado' : '+ Agregar al carrito'}
+        {added ? '✓ Agregado' : canAdd ? '+ Agregar al carrito' : 'Elige variante'}
       </button>
     </div>
   )
