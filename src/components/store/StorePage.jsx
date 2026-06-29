@@ -298,25 +298,48 @@ export default function StorePage() {
               <div>
                 <p className="uppercase tracking-[0.25em] text-[#C9A84C]/70 text-[10px] mb-4">Logística · Cobertura</p>
                 <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Llegamos donde estás</h2>
-                <div className="flex gap-3 mb-6">
+
+                {/* Urabá — cobertura directa */}
+                <p className="text-zinc-500 text-[10px] uppercase tracking-widest mb-3">Urabá — Entrega directa</p>
+                <div className="flex gap-3 mb-4">
                   <div className="flex items-center justify-center bg-white rounded-xl p-2 flex-shrink-0 w-14 h-14">
                     <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
                   </div>
                   <div className="flex flex-col justify-center bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 flex-1">
                     <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Eljach Transportadora</p>
-                    <p className="text-zinc-500 text-xs mt-0.5">Entregas locales y contra entrega</p>
+                    <p className="text-zinc-500 text-xs mt-0.5">Aliado logístico · Contra entrega</p>
                   </div>
                 </div>
-                <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-3">Zonas de cobertura</p>
-                <div className="flex flex-wrap gap-1.5 mb-5">
-                  {['Chigorodó','Carepa','Apartadó','Turbo','Currulao','El Tres','Coldesa','Río Grande','El Reposo','Casa Verde'].map(z => (
-                    <span key={z} className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{z}</span>
+
+                {/* Municipios con tiempos */}
+                <div className="flex flex-col gap-1.5 mb-3">
+                  {[
+                    { name: 'Chigorodó', time: '1–2 días' },
+                    { name: 'Carepa',    time: '1–2 días' },
+                    { name: 'Apartadó', time: '1–2 días' },
+                    { name: 'Turbo',    time: '2–3 días' },
+                  ].map(c => (
+                    <div key={c.name} className="flex items-center justify-between py-1.5 border-b border-zinc-900">
+                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{c.name}</span>
+                      <span className="text-zinc-600 text-[10px] uppercase tracking-[0.12em]">{c.time}</span>
+                    </div>
                   ))}
                 </div>
-                <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-center">
-                  <p className="text-xs text-zinc-500">
-                    Flete desde <span className="text-[#C9A84C] font-bold">$8.000</span>
-                    {' '}· Gratis en compras +<span className="text-[#C9A84C] font-bold"> $300.000</span>
+
+                {/* Corregimientos y sectores */}
+                <p className="text-zinc-700 text-[9px] uppercase tracking-widest mb-2">Corregimientos y sectores</p>
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                  {['Currulao','El Tres','Coldesa','Río Grande','El Reposo','Casa Verde'].map(z => (
+                    <span key={z} className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-zinc-800 text-zinc-500 bg-zinc-900">{z}</span>
+                  ))}
+                </div>
+
+                {/* Resto de Colombia */}
+                <div className="border-t border-zinc-800 pt-4">
+                  <p className="text-zinc-500 text-[10px] uppercase tracking-widest mb-1.5">Resto de Colombia</p>
+                  <p className="text-zinc-600 text-xs leading-relaxed">
+                    ¿Estás fuera de Urabá? Podemos enviarte tu pedido a cualquier parte del país.
+                    Tiempo y costo de envío se coordinan al confirmar el pedido.
                   </p>
                 </div>
               </div>
