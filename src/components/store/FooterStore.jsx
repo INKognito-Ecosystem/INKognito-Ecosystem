@@ -2,13 +2,14 @@ import { Link } from 'react-router-dom'
 import { FaWhatsapp, FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa'
 
 const STRIPE_PATTERN = {
-  backgroundImage: 'repeating-linear-gradient(45deg,transparent,transparent 19px,rgba(156,163,175,1) 19px,rgba(156,163,175,1) 20px)',
+  backgroundImage: 'repeating-linear-gradient(45deg,transparent,transparent 19px,rgba(113,113,122,1) 19px,rgba(113,113,122,1) 20px)',
 }
 
 export default function FooterStore() {
   return (
-    <footer id="contacto" className="relative overflow-hidden border-t border-zinc-900 bg-black px-6 py-10 md:py-12 lg:py-16">
-      <div className="absolute inset-0 opacity-[0.03]" style={STRIPE_PATTERN} />
+    <footer id="contacto" className="relative overflow-hidden border-t border-zinc-900 px-6 py-10 md:py-12 lg:py-16">
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
+      <div className="absolute inset-0 opacity-[0.07]" style={STRIPE_PATTERN} />
       <div className="relative z-10 max-w-7xl mx-auto">
 
         <div className="grid md:grid-cols-2 gap-12">

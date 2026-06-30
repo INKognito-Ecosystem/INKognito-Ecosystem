@@ -151,7 +151,7 @@ export default function StorePage() {
               'radial-gradient(ellipse at 15% 50%, rgba(201,168,76,0.10) 0%, transparent 55%), radial-gradient(ellipse at 85% 15%, rgba(201,168,76,0.06) 0%, transparent 50%)',
           }}
         />
-        <div className="absolute inset-0 opacity-[0.08]" style={STRIPE_PATTERN} />
+        <div className="absolute inset-0 opacity-[0.13]" style={STRIPE_PATTERN} />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C9A84C]/25 to-transparent" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 pt-4 pb-8 md:pt-8 md:pb-12 text-center">
