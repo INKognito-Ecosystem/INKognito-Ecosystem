@@ -82,7 +82,7 @@ export default function CategoriesSupply() {
               >
                 {imgs[catKey(category.cat)]
                   ? <img src={imgs[catKey(category.cat)]} alt={category.name}
-                      className="w-12 h-12 object-cover rounded-lg" />
+                      className="w-20 h-20 object-contain" />
                   : <category.icon size={26} className={hasStock ? 'text-blue-400' : 'text-zinc-700'} />
                 }
                 <span>{category.name}</span>
