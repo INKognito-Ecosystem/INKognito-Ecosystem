@@ -4,6 +4,14 @@ import FooterSupply from './FooterSupply'
 import Seo from '../Seo'
 import { useCatalog } from '../../hooks/useCatalog'
 import { ExternalLink, BookOpen, Package, PlayCircle } from 'lucide-react'
+import { FaWhatsapp } from 'react-icons/fa'
+
+const WA = '573207911013'
+
+const DOT_PATTERN = {
+  backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
+  backgroundSize: '18px 18px',
+}
 
 // ── CARDS ─────────────────────────────────────────────────────────────────
 
@@ -77,8 +85,9 @@ function SeccionAfiliados({ label, titulo, subtitulo, items, color, cols }) {
   if (!items.length) return null
   return (
     <>
-      <section className="pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-black">
-        <div className="max-w-7xl mx-auto">
+      <section className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950">
+        <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+        <div className="relative z-10 max-w-7xl mx-auto">
           <div className="mb-4 md:mb-8">
             <p className={`uppercase tracking-[0.25em] text-${color}-500/70 text-[10px] mb-2`}>{label}</p>
             <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-2 text-white">{titulo}</h2>
@@ -110,7 +119,7 @@ export default function AprendePage() {
   const hayContenido = cursos.length > 0 || kitExt.length > 0 || recursos.length > 0
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-gray-950 text-white">
       <Seo
         title="Aprende a Tatuar | Cursos, Kit y Recursos — INKognito Supply"
         description="Recursos para aprender a tatuar desde cero. Cursos, kit básico y recursos gratuitos para principiantes en Colombia."
@@ -121,8 +130,9 @@ export default function AprendePage() {
       <NavbarCategory pageName="Aprende a Tatuar" backPath="/supply" backLabel="Supply" />
 
       {/* HERO */}
-      <div className="bg-black pt-16 md:pt-24">
-        <div className="px-6 max-w-7xl mx-auto pb-5 md:pb-8">
+      <div className="relative overflow-hidden bg-gray-950 pt-16 md:pt-24">
+        <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+        <div className="relative z-10 px-6 max-w-7xl mx-auto pb-5 md:pb-8">
           <p className="uppercase tracking-[0.25em] text-zinc-500 text-[10px] mb-2">
             Para nuevos tatuadores
           </p>
@@ -152,7 +162,15 @@ export default function AprendePage() {
       {!loading && !hayContenido && (
         <div className="max-w-7xl mx-auto px-6 py-16 text-center">
           <p className="text-zinc-500 text-sm mb-2">Recursos próximamente</p>
-          <p className="text-zinc-700 text-xs">Los cursos, kit y recursos aparecerán aquí cuando se publiquen.</p>
+          <p className="text-zinc-700 text-xs mb-6">Los cursos, kit y recursos aparecerán aquí cuando se publiquen.</p>
+          <a
+            href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya cursos y recursos disponibles en INKognito Supply.')}`}
+            target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white font-bold uppercase tracking-[0.15em] text-sm rounded hover:bg-blue-600 transition"
+          >
+            <FaWhatsapp size={18} />
+            Avisarme cuando haya stock →
+          </a>
         </div>
       )}
 
