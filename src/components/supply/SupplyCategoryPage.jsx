@@ -5,7 +5,7 @@ import Seo from '../Seo'
 import { useCatalog } from '../../hooks/useCatalog'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { FaWhatsapp } from 'react-icons/fa'
-import { Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package } from 'lucide-react'
+import { ExternalLink, Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package } from 'lucide-react'
 
 const CAT_ICONS = {
   'Tintas':    Droplet,
@@ -161,6 +161,35 @@ function SkeletonCard() {
   )
 }
 
+function AfiliadoCard({ item }) {
+  const url = item.url_ventas || item.url_checkout || null
+  const inner = (
+    <div className="border border-blue-500/20 bg-zinc-950 rounded-2xl overflow-hidden flex flex-col h-full hover:border-blue-500/50 hover:shadow-[0_0_16px_rgba(59,130,246,0.12)] transition-all duration-300">
+      <div className="aspect-square w-full bg-zinc-900 overflow-hidden flex-shrink-0 flex items-center justify-center">
+        {item.image_url
+          ? <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" loading="lazy" />
+          : <ExternalLink size={32} className="text-zinc-700" strokeWidth={1} />
+        }
+      </div>
+      <div className="p-3 flex flex-col gap-1.5 flex-1">
+        <span className="text-[9px] font-black uppercase tracking-widest text-blue-400/70">Recurso digital</span>
+        <h3 className="text-xs font-black uppercase leading-tight text-white">{item.name}</h3>
+        {item.descripcion && (
+          <p className="text-zinc-500 text-[10px] leading-relaxed flex-1">{item.descripcion}</p>
+        )}
+        {url && (
+          <span className="mt-auto pt-1 text-[9px] font-bold uppercase tracking-widest text-blue-400 flex items-center gap-1">
+            Ver recurso <ExternalLink size={9} />
+          </span>
+        )}
+      </div>
+    </div>
+  )
+  return url
+    ? <a href={url} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 w-[44vw] md:w-auto snap-start">{inner}</a>
+    : <div className="flex-shrink-0 w-[44vw] md:w-auto snap-start">{inner}</div>
+}
+
 function AccordionCard({ icon, title, subtitle, children }) {
   const [open, setOpen] = useState(false)
   return (
@@ -198,7 +227,9 @@ function AccordionCard({ icon, title, subtitle, children }) {
 }
 
 export default function SupplyCategoryPage({ title, categoria, slug, desc, intro, guide, faqs }) {
-  const { allProducts: products, loading } = useCatalog('supply', categoria)
+  const { allProducts: allProds, loading } = useCatalog('supply', categoria)
+  const products  = allProds.filter(p => !p.tipo || p.tipo === 'fisico')
+  const afiliados = allProds.filter(p => p.tipo === 'afiliado')
   const CatIcon = CAT_ICONS[categoria] || null
 
   return (
@@ -226,7 +257,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
           )}
         </div>
 
-        {/* PRODUCTOS — scroll horizontal en móvil, grid en desktop */}
+        {/* PRODUCTOS FÍSICOS — scroll horizontal en móvil, grid en desktop */}
         <div className="pb-10 max-w-7xl mx-auto">
           {loading ? (
             <div className="flex gap-4 px-6 overflow-x-hidden">
@@ -261,6 +292,24 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
             </div>
           )}
         </div>
+
+        {/* RECURSOS DIGITALES AFILIADOS — solo si hay productos afiliados para esta categoría */}
+        {!loading && afiliados.length > 0 && (
+          <div className="pb-10 max-w-7xl mx-auto px-6">
+            <div className="border-t border-zinc-900 pt-8 mb-6">
+              <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-1">Recursos digitales · {categoria}</p>
+              <h2 className="text-xl md:text-2xl font-black uppercase leading-none text-white">
+                Aprende más sobre {title.toLowerCase()}
+              </h2>
+            </div>
+            <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide">
+              {afiliados.map(item => (
+                <AfiliadoCard key={item.name} item={item} />
+              ))}
+            </div>
+          </div>
+        )}
+
 
         {/* ACORDEONES — guía de compra y FAQ */}
         {(guide?.length > 0 || faqs?.length > 0) && (
