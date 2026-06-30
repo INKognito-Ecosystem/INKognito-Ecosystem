@@ -76,7 +76,7 @@ const FAQ_JSONLD = {
 function CuidadoCard({ item, index }) {
   const Icon = item.icon
   return (
-    <div className="snap-start flex-shrink-0 w-[calc(100vw-2rem)] md:w-full bg-black/40 p-8 border-l-4 border-zinc-600 rounded-r-lg hover:bg-black/60 transition-colors">
+    <div className="snap-start flex-shrink-0 w-[calc(100vw-2rem)] md:w-72 lg:w-80 bg-black/40 p-8 border-l-4 border-zinc-600 rounded-r-lg hover:bg-black/60 transition-colors">
       <div className="flex items-center gap-4 mb-4">
         <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center shrink-0 text-zinc-300">
           <Icon size={22} />

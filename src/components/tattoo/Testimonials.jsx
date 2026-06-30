@@ -18,7 +18,7 @@ export default function Testimonials() {
 
         <div className="flex gap-6 md:gap-8 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 scrollbar-hide">
           {REVIEWS.map((review) => (
-            <div key={review.id} className="snap-start flex-shrink-0 w-[calc(100vw-2rem)] md:w-full bg-black/40 p-8 border-l-4 border-tattoo-accent rounded-r-lg hover:bg-black/60 transition-colors">
+            <div key={review.id} className="snap-start flex-shrink-0 w-[calc(100vw-2rem)] md:w-80 lg:w-96 bg-black/40 p-8 border-l-4 border-tattoo-accent rounded-r-lg hover:bg-black/60 transition-colors">
               <div className="text-tattoo-accent text-4xl mb-4 font-serif">"</div>
               <p className="text-gray-300 italic mb-6 leading-relaxed">"{review.text}"</p>
               <div>
