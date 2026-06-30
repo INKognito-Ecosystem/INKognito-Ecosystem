@@ -11,7 +11,7 @@ export default function Footer() {
 
   return (
 
-    <footer className="relative overflow-hidden bg-black border-t border-gray-900 pt-10 md:pt-20 pb-8">
+    <footer className="relative overflow-hidden bg-black border-t border-gray-900 pt-8 md:pt-14 pb-8">
 
       {/* FONDO CINEMATOGRAFICO */}
       <img
