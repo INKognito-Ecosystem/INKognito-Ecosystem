@@ -82,7 +82,6 @@ function AfiliadoCard({ item, color, accentColor }) {
 
 // ── SECCIÓN GENÉRICA CON SCROLL ───────────────────────────────────────────
 function SeccionAfiliados({ label, titulo, subtitulo, items, color, cols }) {
-  if (!items.length) return null
   return (
     <>
       <section className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950">
@@ -93,11 +92,25 @@ function SeccionAfiliados({ label, titulo, subtitulo, items, color, cols }) {
             <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-2 text-white">{titulo}</h2>
             {subtitulo && <p className="text-zinc-500 text-sm">{subtitulo}</p>}
           </div>
-          <div className={`flex md:grid md:grid-cols-2 ${cols} gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide`}>
-            {items.map((item, i) => (
-              <AfiliadoCard key={item.name + i} item={item} color={color} />
-            ))}
-          </div>
+          {items.length > 0 ? (
+            <div className={`flex md:grid md:grid-cols-2 ${cols} gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide`}>
+              {items.map((item, i) => (
+                <AfiliadoCard key={item.name + i} item={item} color={color} />
+              ))}
+            </div>
+          ) : (
+            <div className="border border-zinc-800 bg-zinc-950 rounded-2xl p-6 text-center">
+              <p className="text-zinc-500 text-sm mb-4">Próximamente disponible en esta sección.</p>
+              <a
+                href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero que me avisen cuando haya ${titulo.toLowerCase()} disponibles en INKognito Supply.`)}`}
+                target="_blank" rel="noopener noreferrer"
+                className={`inline-flex items-center gap-2 px-5 py-2.5 bg-${color}-500 text-white font-bold uppercase tracking-[0.15em] text-xs rounded hover:opacity-90 transition`}
+              >
+                <FaWhatsapp size={16} />
+                Avisarme cuando esté disponible →
+              </a>
+            </div>
+          )}
         </div>
       </section>
       <div className="max-w-7xl mx-auto px-6">

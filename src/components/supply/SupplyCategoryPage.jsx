@@ -22,54 +22,54 @@ const CAT_ICONS = {
 
 const AFILIADO_COPY = {
   'Tintas': {
-    badge: 'Importa directamente y ahorra',
-    title: 'Tinta de nivel internacional al precio que debería ser',
-    desc:  'Marcas como Eternal, Intenze y World Famous disponibles desde Amazon con envío a Colombia. Para quien no quiere pagar el sobreprecio local pero sí quiere calidad real. ¿Prefieres tenerlas ya en mano en Urabá? INKognito Supply te cubre.',
+    badge: 'Calidad que se nota en el resultado',
+    title: 'La tinta que define cómo cicatriza tu trabajo',
+    desc:  'Eternal, Intenze y World Famous: las marcas que eligen los tatuadores que no dejan nada al azar. Color que se mantiene vibrante con los años, disponible para importar con envío a Colombia.',
   },
   'Cartuchos': {
-    badge: 'Los que usan los que ya cobran bien',
+    badge: 'Precisión desde el primer trazo',
     title: 'El cartucho que no te falla a mitad de sesión',
-    desc:  'Membrana precisa, aguja consistente, entrada limpia. Marcas internacionales disponibles para importar directo desde Amazon. Porque un cartucho barato te cobra la sesión en reprocesos.',
+    desc:  'Membrana precisa, aguja consistente, entrada limpia. Marcas internacionales para quien no negocia con la calidad de su trazo.',
   },
   'Agujas': {
-    badge: 'La configuración exacta que necesitas',
+    badge: 'La configuración exacta que tu técnica exige',
     title: 'Cada técnica exige su aguja — aquí están todas',
-    desc:  'Desde liner fino hasta magnum curvo: configuraciones específicas que no siempre están en el mercado local. Importa lo que necesitas, cuando lo necesitas.',
+    desc:  'Desde liner fino hasta magnum curvo: configuraciones específicas para resultados específicos. Disponibles para importar cuando las necesites.',
   },
   'Máquinas': {
-    badge: 'Equipos internacionales al precio real',
-    title: 'Tu próxima rotativa, sin pasar por tres intermediarios',
-    desc:  'Máquinas de marcas reconocidas disponibles directamente desde distribuidores. Compara antes de decidir. Si quieres orientación personalizada, el equipo de INKognito te asesora por WhatsApp.',
+    badge: 'Equipos de nivel internacional',
+    title: 'Tu próxima rotativa, directo del distribuidor',
+    desc:  'Máquinas de marcas reconocidas por tatuadores que viven de esto. Si necesitas orientación para elegir la tuya, el equipo de INKognito te asesora por WhatsApp.',
   },
   'Guantes': {
-    badge: 'Volumen sin excusas',
-    title: 'El precio por unidad que deberías estar pagando',
-    desc:  'Cajas de guantes nitrilo grado médico desde Amazon. Cuando compras en cantidad, el ahorro es real. Sin excusas para saltarse la protección básica.',
+    badge: 'Protección sin negociación',
+    title: 'Bioseguridad de grado médico, sin excusas',
+    desc:  'Guantes nitrilo grado médico por caja, para estudios que no improvisan en higiene. Disponibles para importar con envío a Colombia.',
   },
   'Cuidados': {
-    badge: 'El aftercare que los internacionales ya usan',
-    title: 'Cuida el trabajo tan bien como lo hiciste',
+    badge: 'El aftercare que respalda tu trabajo',
+    title: 'Cuida el resultado tan bien como lo hiciste',
     desc:  'Cremas de cicatrización, protector solar y aftercare de las marcas que recomiendan tatuadores de referencia. Disponibles para importar con envío a Colombia.',
   },
   'Fuentes': {
     badge: 'Estabilidad que se nota en el trazo',
-    title: 'Una buena fuente no se reemplaza — invierte bien',
-    desc:  'Fuentes digitales con voltaje estable y pantalla LED de marcas confiables en Amazon. Mejor precio que el mercado local y la tranquilidad de saber que tu máquina recibe lo que necesita.',
+    title: 'Una buena fuente no se reemplaza — se elige bien',
+    desc:  'Voltaje estable y control preciso, de marcas confiables. La base invisible de cada sesión bien hecha.',
   },
   'Accesorios': {
     badge: 'Los detalles que completan un set profesional',
     title: 'Un workspace de pro no improvisa',
-    desc:  'Porta cartuchos, racks, organizadores y todo lo que hace que tu estudio funcione limpio y eficiente. Disponibles para importar — porque el orden también es parte del servicio.',
+    desc:  'Porta cartuchos, racks y organizadores para un estudio que funciona limpio y eficiente. El orden también es parte del oficio.',
   },
   'Muebles': {
-    badge: 'El ambiente también vende',
+    badge: 'El ambiente también respalda tu trabajo',
     title: 'Un estudio que dice "esto es en serio"',
-    desc:  'Camillas, sillas ergonómicas y mobiliario profesional disponibles para importar. Los clientes notan el espacio antes de notar la máquina. Dale al tuyo el nivel que merece.',
+    desc:  'Camillas y mobiliario profesional pensado para la comodidad de la sesión y la percepción del cliente. El espacio habla antes que la máquina.',
   },
   'Combos': {
-    badge: 'Todo en un solo pedido',
-    title: 'El kit para arrancar o escalar sin dar vueltas',
-    desc:  'Sets de equipos curados para quien empieza o para quien quiere actualizar todo de una. Un solo pedido bien hecho vale más que diez compras improvisadas.',
+    badge: 'Todo en un solo pedido, sin vueltas',
+    title: 'El kit para escalar tu estudio de una vez',
+    desc:  'Sets de equipos curados para quien ya sabe lo que necesita y no quiere perder tiempo en compras sueltas.',
   },
 }
 
