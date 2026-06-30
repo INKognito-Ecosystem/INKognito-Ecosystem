@@ -70,13 +70,13 @@ export default function SupplyPage() {
             Educación · Crecimiento profesional
           </p>
           <h2 className="text-3xl md:text-5xl font-black uppercase leading-none mb-3">
-            {cursoDestacado?.name || 'Fórmate.'}<br />
+            {cursoDestacado?.name || 'Domina tu oficio.'}<br />
             <span className="text-zinc-500">
-              {cursoDestacado ? 'disponible ahora' : 'Sin atajos.'}
+              {cursoDestacado ? 'disponible ahora' : 'No lo improvises.'}
             </span>
           </h2>
           <p className="text-zinc-400 text-base max-w-lg">
-            {cursoDestacado?.descripcion || 'Cursos grabados por tatuadores que ya viven de esto. Técnica real, sin relleno, para que tu trabajo se vea como el de alguien que sabe lo que hace.'}
+            {cursoDestacado?.descripcion || 'Cursos, el kit esencial y recursos gratuitos — todo en un solo lugar para tatuadores que no se conforman con improvisar. Lo que aprendes aquí se nota en cada sesión.'}
           </p>
           {cursoDestacado && (
             <span className="inline-block mt-3 text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-blue-500/30 text-blue-400 bg-blue-500/5">
