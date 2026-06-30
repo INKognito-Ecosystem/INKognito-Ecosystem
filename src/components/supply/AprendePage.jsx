@@ -81,7 +81,7 @@ function AfiliadoCard({ item, color, accentColor }) {
 }
 
 // ── SECCIÓN GENÉRICA CON SCROLL ───────────────────────────────────────────
-function SeccionAfiliados({ id, label, titulo, subtitulo, items, color, cols }) {
+function SeccionAfiliados({ id, label, titulo, subtitulo, items, loading, color, cols }) {
   return (
     <>
       <section id={id} className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950 scroll-mt-20">
@@ -92,7 +92,9 @@ function SeccionAfiliados({ id, label, titulo, subtitulo, items, color, cols }) 
             <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-2 text-white">{titulo}</h2>
             {subtitulo && <p className="text-zinc-500 text-sm">{subtitulo}</p>}
           </div>
-          {items.length > 0 ? (
+          {loading ? (
+            <p className="text-zinc-600 text-sm uppercase tracking-widest">Cargando…</p>
+          ) : items.length > 0 ? (
             <div className={`flex md:grid md:grid-cols-2 ${cols} gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide`}>
               {items.map((item, i) => (
                 <AfiliadoCard key={item.name + i} item={item} color={color} />
@@ -163,45 +165,38 @@ export default function AprendePage() {
         <div className="border-b border-zinc-900" />
       </div>
 
-      {/* Estado de carga */}
-      {loading && (
-        <div className="max-w-7xl mx-auto px-6 py-16 text-center">
-          <p className="text-zinc-600 text-sm uppercase tracking-widest">Cargando recursos…</p>
-        </div>
-      )}
-
-      {/* Secciones — cada una maneja su propio estado vacío */}
-      {!loading && (
-        <>
-          <SeccionAfiliados
-            id="cursos"
-            label="Hotmart · Cursos digitales"
-            titulo="Formación que se nota en tu trazo"
-            subtitulo="Desde fundamentos hasta especialización en realismo, sombras y color. Acceso de por vida, a tu ritmo."
-            items={cursos}
-            color="orange"
-            cols="lg:grid-cols-5"
-          />
-          <SeccionAfiliados
-            id="kit"
-            label="Amazon · AliExpress · Kit básico"
-            titulo="El kit que respalda tu práctica"
-            subtitulo="Insumos seleccionados para trabajar con seriedad, sin sobrecostos."
-            items={kitExt}
-            color="blue"
-            cols="lg:grid-cols-6"
-          />
-          <SeccionAfiliados
-            id="recursos"
-            label="Sin costo"
-            titulo="Recursos gratuitos"
-            subtitulo="Contenido sin costo para seguir creciendo. La práctica constante es lo que realmente marca la diferencia."
-            items={recursos}
-            color="green"
-            cols="lg:grid-cols-4"
-          />
-        </>
-      )}
+      {/* Secciones — siempre montadas (para que los anclajes #cursos/#kit/#recursos
+          existan desde el primer render); cada una maneja su propio loading/vacío */}
+      <SeccionAfiliados
+        id="cursos"
+        label="Hotmart · Cursos digitales"
+        titulo="Formación que se nota en tu trazo"
+        subtitulo="Desde fundamentos hasta especialización en realismo, sombras y color. Acceso de por vida, a tu ritmo."
+        items={cursos}
+        loading={loading}
+        color="orange"
+        cols="lg:grid-cols-5"
+      />
+      <SeccionAfiliados
+        id="kit"
+        label="Amazon · AliExpress · Kit básico"
+        titulo="El kit que respalda tu práctica"
+        subtitulo="Insumos seleccionados para trabajar con seriedad, sin sobrecostos."
+        items={kitExt}
+        loading={loading}
+        color="blue"
+        cols="lg:grid-cols-6"
+      />
+      <SeccionAfiliados
+        id="recursos"
+        label="Sin costo"
+        titulo="Recursos gratuitos"
+        subtitulo="Contenido sin costo para seguir creciendo. La práctica constante es lo que realmente marca la diferencia."
+        items={recursos}
+        loading={loading}
+        color="green"
+        cols="lg:grid-cols-4"
+      />
 
       {/* CTA FINAL */}
       <section className="pt-3 md:pt-6 pb-12 md:pb-20 px-6">
