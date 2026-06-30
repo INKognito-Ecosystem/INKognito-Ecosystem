@@ -76,6 +76,11 @@ const AFILIADO_COPY = {
 const WA = '573207911013'
 const VAR_THRESHOLD = 3
 
+const DOT_PATTERN = {
+  backgroundImage: 'radial-gradient(rgba(156,163,175,1) 1px, transparent 1px)',
+  backgroundSize: '18px 18px',
+}
+
 function VariantSelectorSupply({ variantObjs, selIdx, onChange }) {
   const [open, setOpen] = useState(false)
   if (!variantObjs || variantObjs.length <= 1) return null
@@ -298,15 +303,16 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
       <div className="bg-black pt-16 md:pt-24">
 
         {/* HERO — H1 + ícono de categoría en móvil */}
-        <div className="px-6 max-w-7xl mx-auto pb-5 md:pb-10">
-          <div className="flex items-center justify-between gap-3 mb-4">
+        <div className="relative overflow-hidden px-6 max-w-7xl mx-auto pb-5 md:pb-10">
+          <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
+          <div className="relative z-10 flex items-center justify-between gap-3 mb-4">
             <h1 className="text-3xl md:text-7xl font-black uppercase leading-none text-white">{title}</h1>
             {CatIcon && (
               <CatIcon size={64} className="text-zinc-800 flex-shrink-0 md:hidden" strokeWidth={1} />
             )}
           </div>
           {intro && (
-            <p className="text-zinc-400 text-base md:text-lg leading-relaxed max-w-3xl">{intro}</p>
+            <p className="relative z-10 text-zinc-400 text-base md:text-lg leading-relaxed max-w-3xl">{intro}</p>
           )}
         </div>
 

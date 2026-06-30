@@ -1,5 +1,10 @@
 import { Link } from 'react-router-dom'
 
+const DOT_PATTERN = {
+  backgroundImage: 'radial-gradient(rgba(156,163,175,1) 1px, transparent 1px)',
+  backgroundSize: '18px 18px',
+}
+
 export default function HeroSupply() {
 
   const featuredBrand = {
@@ -10,9 +15,10 @@ export default function HeroSupply() {
 
   return (
 
-    <section className="min-h-[60vh] md:min-h-screen pt-16 md:pt-32 pb-8 md:pb-0 bg-black text-white flex items-center px-6">
+    <section className="relative min-h-[60vh] md:min-h-screen pt-16 md:pt-32 pb-8 md:pb-0 bg-black text-white flex items-center px-6 overflow-hidden">
+      <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
 
-      <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-16 items-center">
+      <div className="relative z-10 max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-16 items-center">
 
         {/* IZQUIERDA */}
         <div>

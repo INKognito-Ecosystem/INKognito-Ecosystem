@@ -1,12 +1,18 @@
 import { Link } from 'react-router-dom'
 
+const DOT_PATTERN = {
+  backgroundImage: 'radial-gradient(rgba(156,163,175,1) 1px, transparent 1px)',
+  backgroundSize: '18px 18px',
+}
+
 export default function FooterSupply() {
 
   return (
 
-    <footer id="contacto" className="border-t border-zinc-900 bg-black px-6 py-10 md:py-12 lg:py-16">
+    <footer id="contacto" className="relative overflow-hidden border-t border-zinc-900 bg-black px-6 py-10 md:py-12 lg:py-16">
+      <div className="absolute inset-0 opacity-[0.04]" style={DOT_PATTERN} />
 
-      <div className="max-w-7xl mx-auto">
+      <div className="relative z-10 max-w-7xl mx-auto">
 
         {/* GRID */}
         <div className="grid md:grid-cols-3 gap-12">
