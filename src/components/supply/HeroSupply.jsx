@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 
 const DOT_PATTERN = {
-  backgroundImage: 'radial-gradient(rgba(113,113,122,1) 1px, transparent 1px)',
+  backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
   backgroundSize: '18px 18px',
 }
 
@@ -15,9 +15,8 @@ export default function HeroSupply() {
 
   return (
 
-    <section className="relative min-h-[60vh] md:min-h-screen pt-16 md:pt-32 pb-8 md:pb-0 text-white flex items-center px-6 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
-      <div className="absolute inset-0 opacity-[0.09]" style={DOT_PATTERN} />
+    <section className="relative min-h-[60vh] md:min-h-screen pt-16 md:pt-32 pb-8 md:pb-0 bg-gray-950 text-white flex items-center px-6 overflow-hidden">
+      <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
 
       <div className="relative z-10 max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-16 items-center">
 
