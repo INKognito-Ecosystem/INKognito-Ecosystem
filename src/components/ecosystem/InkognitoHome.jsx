@@ -36,7 +36,7 @@ export default function InkognitoHome() {
           <span className="text-zinc-300">OGNITO</span>
         </h1>
 
-        <p className="mt-2 mb-10 text-zinc-300 uppercase tracking-[0.5em] text-sm md:text-base font-semibold text-center">
+        <p className="mt-2 mb-10 text-zinc-300 uppercase tracking-[0.15em] sm:tracking-[0.5em] text-xs sm:text-sm md:text-base font-semibold text-center whitespace-nowrap px-2">
           Disciplina • Arte • Identidad
         </p>
 
