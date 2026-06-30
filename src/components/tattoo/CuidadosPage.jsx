@@ -76,7 +76,7 @@ const FAQ_JSONLD = {
 function CuidadoCard({ item, index }) {
   const Icon = item.icon
   return (
-    <div className="snap-start flex-shrink-0 w-[calc(100vw-2rem)] md:w-auto bg-black/40 p-8 border-l-4 border-zinc-600 rounded-r-lg hover:bg-black/60 transition-colors">
+    <div className="snap-start flex-shrink-0 w-[calc(100vw-2rem)] md:w-full bg-black/40 p-8 border-l-4 border-zinc-600 rounded-r-lg hover:bg-black/60 transition-colors">
       <div className="flex items-center gap-4 mb-4">
         <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center shrink-0 text-zinc-300">
           <Icon size={22} />
@@ -155,7 +155,7 @@ export default function CuidadosPage() {
 
         {/* ANTES — ambos bloques quedan en el DOM para que Google indexe todo el contenido */}
         <div id="antes" className={tab === 'antes' ? '' : 'hidden'}>
-          <div className="flex md:grid md:grid-cols-2 gap-6 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+          <div className="flex gap-6 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 scrollbar-hide">
             {ANTES.map((item, i) => (
               <CuidadoCard key={i} item={item} index={i} />
             ))}
@@ -164,7 +164,7 @@ export default function CuidadosPage() {
 
         {/* DESPUES */}
         <div id="despues" className={tab === 'despues' ? '' : 'hidden'}>
-          <div className="flex md:grid md:grid-cols-2 gap-6 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+          <div className="flex gap-6 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 scrollbar-hide">
             {DESPUES.map((item, i) => (
               <CuidadoCard key={i} item={item} index={i} />
             ))}

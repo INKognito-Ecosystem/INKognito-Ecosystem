@@ -24,7 +24,7 @@ export default function Hero() {
             <img
               src={imgmifoto}
               alt="Jose Humanez"
-              className="relative w-72 h-72 md:w-96 md:h-96 object-cover rounded-full border-2 border-white/10 shadow-2xl"
+              className="relative w-40 h-40 md:w-96 md:h-96 object-cover rounded-full border-2 border-white/10 shadow-2xl"
             />
 
           </div>
