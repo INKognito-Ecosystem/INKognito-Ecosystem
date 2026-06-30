@@ -71,43 +71,55 @@ export default function CategoriesSupply() {
                 to={category.path}
                 className={`
                   snap-start flex-shrink-0 w-[44vw] md:w-auto
-                  relative h-36 border bg-zinc-950 transition-all duration-300
+                  relative h-36 border bg-zinc-950 transition-all duration-300 overflow-hidden
                   uppercase tracking-[0.08em] font-bold text-[10px] md:text-xs flex flex-col
                   items-center justify-center gap-2 text-center px-1
                   ${hasStock
-                    ? 'border-blue-500/50 hover:border-blue-500 hover:bg-zinc-900 text-zinc-300'
+                    ? 'border-blue-500/50 hover:border-blue-500 text-zinc-300'
                     : 'border-zinc-800 hover:border-zinc-600 text-zinc-600'
                   }
                 `}
               >
-                {imgs[catKey(category.cat)]
-                  ? <>
-                      <div className="flex-1 min-h-0 flex items-center justify-center w-full p-2">
-                        <img src={imgs[catKey(category.cat)]} alt={category.name}
-                          className="max-h-full max-w-full object-contain" />
-                      </div>
-                      <span>{category.name}</span>
-                    </>
-                  : <>
-                      <category.icon size={26} className={hasStock ? 'text-blue-400' : 'text-zinc-700'} />
-                      <span>{category.name}</span>
-                    </>
-                }
-
-                {/* Badge de stock en tiempo real */}
-                {!loading && (
-                  <span className={`
-                    absolute bottom-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-full
-                    ${hasStock
-                      ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                      : 'bg-zinc-800 text-zinc-600 border border-zinc-700'
-                    }
-                  `}>
-                    {hasStock ? `${count} producto${count > 1 ? 's' : ''}` : 'Sin stock'}
-                  </span>
-                )}
-                {loading && (
-                  <span className="absolute bottom-2 right-2 text-[9px] text-zinc-700 px-2">...</span>
+                {imgs[catKey(category.cat)] ? (
+                  <>
+                    <img
+                      src={imgs[catKey(category.cat)]}
+                      alt={category.name}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <span className="absolute bottom-0 left-0 right-0 bg-black/65 py-1.5 text-center text-[10px] font-bold uppercase tracking-[0.08em] text-white z-10">
+                      {category.name}
+                    </span>
+                    {!loading && (
+                      <span className={`
+                        absolute top-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-full z-10
+                        ${hasStock
+                          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                          : 'bg-zinc-800/80 text-zinc-600 border border-zinc-700'
+                        }
+                      `}>
+                        {hasStock ? `${count} producto${count > 1 ? 's' : ''}` : 'Sin stock'}
+                      </span>
+                    )}
+                    {loading && <span className="absolute top-2 right-2 text-[9px] text-zinc-700 px-2 z-10">...</span>}
+                  </>
+                ) : (
+                  <>
+                    <category.icon size={26} className={hasStock ? 'text-blue-400' : 'text-zinc-700'} />
+                    <span>{category.name}</span>
+                    {!loading && (
+                      <span className={`
+                        absolute bottom-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-full
+                        ${hasStock
+                          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                          : 'bg-zinc-800 text-zinc-600 border border-zinc-700'
+                        }
+                      `}>
+                        {hasStock ? `${count} producto${count > 1 ? 's' : ''}` : 'Sin stock'}
+                      </span>
+                    )}
+                    {loading && <span className="absolute bottom-2 right-2 text-[9px] text-zinc-700 px-2">...</span>}
+                  </>
                 )}
               </Link>
             )
