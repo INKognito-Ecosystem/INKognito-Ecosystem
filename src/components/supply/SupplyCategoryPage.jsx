@@ -17,7 +17,60 @@ const CAT_ICONS = {
   'Fuentes':   PlugZap,
   'Accesorios':Toolbox,
   'Muebles':   BedDouble,
-  'Bundles':   Package,
+  'Combos':    Package,
+}
+
+const AFILIADO_COPY = {
+  'Tintas': {
+    badge: 'Importa directamente y ahorra',
+    title: 'Tinta de nivel internacional al precio que debería ser',
+    desc:  'Marcas como Eternal, Intenze y World Famous disponibles desde Amazon con envío a Colombia. Para quien no quiere pagar el sobreprecio local pero sí quiere calidad real. ¿Prefieres tenerlas ya en mano en Urabá? INKognito Supply te cubre.',
+  },
+  'Cartuchos': {
+    badge: 'Los que usan los que ya cobran bien',
+    title: 'El cartucho que no te falla a mitad de sesión',
+    desc:  'Membrana precisa, aguja consistente, entrada limpia. Marcas internacionales disponibles para importar directo desde Amazon. Porque un cartucho barato te cobra la sesión en reprocesos.',
+  },
+  'Agujas': {
+    badge: 'La configuración exacta que necesitas',
+    title: 'Cada técnica exige su aguja — aquí están todas',
+    desc:  'Desde liner fino hasta magnum curvo: configuraciones específicas que no siempre están en el mercado local. Importa lo que necesitas, cuando lo necesitas.',
+  },
+  'Máquinas': {
+    badge: 'Equipos internacionales al precio real',
+    title: 'Tu próxima rotativa, sin pasar por tres intermediarios',
+    desc:  'Máquinas de marcas reconocidas disponibles directamente desde distribuidores. Compara antes de decidir. Si quieres orientación personalizada, el equipo de INKognito te asesora por WhatsApp.',
+  },
+  'Guantes': {
+    badge: 'Volumen sin excusas',
+    title: 'El precio por unidad que deberías estar pagando',
+    desc:  'Cajas de guantes nitrilo grado médico desde Amazon. Cuando compras en cantidad, el ahorro es real. Sin excusas para saltarse la protección básica.',
+  },
+  'Cuidados': {
+    badge: 'El aftercare que los internacionales ya usan',
+    title: 'Cuida el trabajo tan bien como lo hiciste',
+    desc:  'Cremas de cicatrización, protector solar y aftercare de las marcas que recomiendan tatuadores de referencia. Disponibles para importar con envío a Colombia.',
+  },
+  'Fuentes': {
+    badge: 'Estabilidad que se nota en el trazo',
+    title: 'Una buena fuente no se reemplaza — invierte bien',
+    desc:  'Fuentes digitales con voltaje estable y pantalla LED de marcas confiables en Amazon. Mejor precio que el mercado local y la tranquilidad de saber que tu máquina recibe lo que necesita.',
+  },
+  'Accesorios': {
+    badge: 'Los detalles que completan un set profesional',
+    title: 'Un workspace de pro no improvisa',
+    desc:  'Porta cartuchos, racks, organizadores y todo lo que hace que tu estudio funcione limpio y eficiente. Disponibles para importar — porque el orden también es parte del servicio.',
+  },
+  'Muebles': {
+    badge: 'El ambiente también vende',
+    title: 'Un estudio que dice "esto es en serio"',
+    desc:  'Camillas, sillas ergonómicas y mobiliario profesional disponibles para importar. Los clientes notan el espacio antes de notar la máquina. Dale al tuyo el nivel que merece.',
+  },
+  'Combos': {
+    badge: 'Todo en un solo pedido',
+    title: 'El kit para arrancar o escalar sin dar vueltas',
+    desc:  'Sets de equipos curados para quien empieza o para quien quiere actualizar todo de una. Un solo pedido bien hecho vale más que diez compras improvisadas.',
+  },
 }
 
 const WA = '573207911013'
@@ -294,15 +347,17 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
         </div>
 
         {/* RECURSOS DIGITALES AFILIADOS — solo si hay productos afiliados para esta categoría */}
-        {!loading && afiliados.length > 0 && (
+        {!loading && afiliados.length > 0 && (() => {
+          const copy = AFILIADO_COPY[categoria] || { badge: `Recursos para ${title.toLowerCase()}`, title: 'Lleva tu técnica al siguiente nivel', desc: `Selección curada para dominar ${title.toLowerCase()}.` }
+          return (
           <div className="pb-10 max-w-7xl mx-auto px-6">
             <div className="border-t-2 border-blue-500/20 pt-8 mb-6">
-              <p className="text-blue-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ Recursos para {title.toLowerCase()}</p>
+              <p className="text-blue-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ {copy.badge}</p>
               <h2 className="text-xl md:text-2xl font-black uppercase leading-none text-white">
-                Lleva tu técnica al siguiente nivel
+                {copy.title}
               </h2>
               <p className="text-zinc-500 text-sm mt-2 max-w-lg leading-relaxed">
-                Cursos y materiales validados por tatuadores activos. Solo publicamos lo que recomendamos para dominar {title.toLowerCase()} y aumentar tus ingresos.
+                {copy.desc}
               </p>
             </div>
             <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide">
@@ -311,7 +366,8 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
               ))}
             </div>
           </div>
-        )}
+          )
+        })()}
 
 
         {/* ACORDEONES — guía de compra y FAQ */}

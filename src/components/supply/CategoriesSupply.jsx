@@ -12,7 +12,7 @@ const categories = [
   { name: 'Fuentes',           path: '/supply/power-supplies', icon: PlugZap,    cat: 'Fuentes'     },
   { name: 'Accesorios',        path: '/supply/accessories',    icon: Toolbox,    cat: 'Accesorios'  },
   { name: 'Mobiliario',        path: '/supply/furniture',      icon: BedDouble,  cat: 'Muebles'     },
-  { name: 'Combos',            path: '/supply/bundles',        icon: Package,    cat: 'Bundles'     },
+  { name: 'Combos',            path: '/supply/bundles',        icon: Package,    cat: 'Combos'      },
 ]
 
 export default function CategoriesSupply() {
