@@ -18,7 +18,7 @@ export default function ReservationForm({
   return (
     <section
       id="contacto"
-      className="relative py-12 md:py-24 px-4 overflow-hidden bg-black border-t border-white/5"
+      className="relative py-10 md:py-16 px-4 overflow-hidden bg-black border-t border-white/5"
     >
       <img
         src={reservaBg}

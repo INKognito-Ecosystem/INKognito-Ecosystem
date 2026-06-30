@@ -24,9 +24,10 @@ export default function NavbarCategory({ pageName }) {
             {/* LOGO */}
             <Link to="/supply" className="flex items-center gap-2">
               <img src={logoSupply} alt="INKognito Supply" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
-              <span className="text-base md:text-2xl font-black uppercase tracking-wide md:tracking-[0.2em] whitespace-nowrap">
+              <span className="text-xl md:text-2xl font-black uppercase tracking-wide md:tracking-[0.2em] whitespace-nowrap">
                 <span className="text-white">INK</span>
-                <span className="text-zinc-500">OGNITO SUPPLY</span>
+                <span className="text-zinc-500">OGNITO </span>
+                <span className="text-blue-500">SUPPLY</span>
               </span>
             </Link>
 

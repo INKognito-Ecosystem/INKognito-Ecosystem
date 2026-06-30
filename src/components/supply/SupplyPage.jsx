@@ -6,6 +6,11 @@ import FooterSupply from './FooterSupply'
 import { FaWhatsapp } from 'react-icons/fa'
 import Seo from '../Seo'
 const ogSupply = '/og/supply.webp'
+
+const DOT_PATTERN = {
+  backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
+  backgroundSize: '18px 18px',
+}
 import { Link } from 'react-router-dom'
 import { SUPPLY_HOURS } from '../../config/business'
 import { useCatalog } from '../../hooks/useCatalog'
@@ -29,11 +34,11 @@ const supplyJsonLd = {
 
 export default function SupplyPage() {
   const { allProducts } = useCatalog('supply')
-  const cursoDestacado = allProducts.find(p => p.tipo === 'afiliado') || null
+  const cursoDestacado = allProducts.find(p => p.tipo === 'afiliado' && p.categoria === 'Cursos') || null
 
   return (
 
-    <main className="bg-black text-white">
+    <main className="bg-gray-950 text-white">
 
     <Seo
       title="INKognito Supply | Insumos y equipos para tatuaje en Urabá"
@@ -56,50 +61,93 @@ export default function SupplyPage() {
 
     <BrandsSupply />
 
-    {/* SECCIÓN PARA NUEVOS TATUADORES */}
-    <section className="bg-zinc-950 border-t border-zinc-900">
-      <div className="max-w-7xl mx-auto px-6 py-8 md:py-16 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
-        <div>
-          <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-3">
-            Para nuevos tatuadores
-          </p>
-          <h2 className="text-3xl md:text-5xl font-black uppercase leading-none mb-3">
-            {cursoDestacado?.name || '¿Quieres aprender'}<br />
-            <span className="text-zinc-500">
-              {cursoDestacado ? 'disponible ahora' : 'a tatuar?'}
-            </span>
-          </h2>
-          <p className="text-zinc-400 text-base max-w-lg">
-            {cursoDestacado?.descripcion || 'Cursos, kit básico y recursos para dar tus primeros pasos en el mundo del tatuaje.'}
-          </p>
-          {cursoDestacado && (
-            <span className="inline-block mt-3 text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-blue-500/30 text-blue-400 bg-blue-500/5">
-              Curso digital · Hotmart
-            </span>
-          )}
+    {/* SECCIÓN EDUCACIÓN — Cursos, Kit, Recursos */}
+    <section className="relative overflow-hidden bg-gray-950 border-t border-zinc-900 py-8 md:py-16">
+      <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+      <div className="relative z-10 max-w-7xl mx-auto px-6">
+        <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-6">
+          Educación · Crecimiento profesional
+        </p>
+
+        <div className="flex md:grid md:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+
+          {/* CARD CURSOS */}
+          <div className="snap-start flex-shrink-0 w-[80vw] md:w-auto border border-blue-500/20 bg-zinc-950 rounded-2xl p-6 md:p-7 flex flex-col hover:border-blue-500/40 transition-all duration-300">
+            <h3 className="text-xl md:text-2xl font-black uppercase leading-none mb-3">
+              {cursoDestacado?.name || 'Domina tu oficio.'}<br />
+              <span className="text-zinc-500">
+                {cursoDestacado ? 'disponible ahora' : 'No lo improvises.'}
+              </span>
+            </h3>
+            <p className="text-zinc-400 text-sm mb-5 flex-1">
+              {cursoDestacado?.descripcion || 'Cursos grabados por tatuadores que ya viven de esto. Acceso de por vida, a tu ritmo.'}
+            </p>
+            {cursoDestacado && (
+              <span className="inline-block mb-4 self-start text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-blue-500/30 text-blue-400 bg-blue-500/5">
+                Curso digital · Hotmart
+              </span>
+            )}
+            {cursoDestacado?.url_ventas ? (
+              <a
+                href={cursoDestacado.url_ventas}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-3 px-6 rounded-xl text-center hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
+              >
+                Ver seminario →
+              </a>
+            ) : (
+              <Link
+                to="/supply/aprende#cursos"
+                className="shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-3 px-6 rounded-xl text-center hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
+              >
+                Ver cursos →
+              </Link>
+            )}
+          </div>
+
+          {/* CARD KIT */}
+          <div className="snap-start flex-shrink-0 w-[80vw] md:w-auto border border-blue-500/20 bg-zinc-950 rounded-2xl p-6 md:p-7 flex flex-col hover:border-blue-500/40 transition-all duration-300">
+            <h3 className="text-xl md:text-2xl font-black uppercase leading-none mb-3">
+              Equípate bien<br />
+              <span className="text-zinc-500">desde el día uno.</span>
+            </h3>
+            <p className="text-zinc-400 text-sm mb-5 flex-1">
+              Insumos básicos seleccionados en Amazon y AliExpress para empezar a tatuar con seriedad, sin sobrecostos.
+            </p>
+            <Link
+              to="/supply/aprende#kit"
+              className="shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-3 px-6 rounded-xl text-center hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
+            >
+              Ver kit recomendado →
+            </Link>
+          </div>
+
+          {/* CARD RECURSOS */}
+          <div className="snap-start flex-shrink-0 w-[80vw] md:w-auto border border-blue-500/20 bg-zinc-950 rounded-2xl p-6 md:p-7 flex flex-col hover:border-blue-500/40 transition-all duration-300">
+            <h3 className="text-xl md:text-2xl font-black uppercase leading-none mb-3">
+              Conocimiento<br />
+              <span className="text-zinc-500">que no cuesta nada.</span>
+            </h3>
+            <p className="text-zinc-400 text-sm mb-5 flex-1">
+              Contenido gratuito para seguir creciendo. La práctica constante es lo que realmente marca la diferencia.
+            </p>
+            <Link
+              to="/supply/aprende#recursos"
+              className="shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-3 px-6 rounded-xl text-center hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
+            >
+              Ver recursos gratuitos →
+            </Link>
+          </div>
+
         </div>
-        {cursoDestacado?.url_ventas ? (
-          <a
-            href={cursoDestacado.url_ventas}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-4 px-8 rounded-xl hover:border-blue-500 hover:bg-blue-500/10 hover:shadow-[0_0_25px_rgba(59,130,246,0.15)] transition-all duration-300 whitespace-nowrap"
-          >
-            Ver seminario →
-          </a>
-        ) : (
-          <Link
-            to="/supply/aprende"
-            className="shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-4 px-8 rounded-xl hover:border-blue-500 hover:bg-blue-500/10 hover:shadow-[0_0_25px_rgba(59,130,246,0.15)] transition-all duration-300 whitespace-nowrap"
-          >
-            Ver recursos para principiantes →
-          </Link>
-        )}
       </div>
     </section>
 
     {/* ── COBERTURA + CONTACTO — solo móvil ────────────────────── */}
-    <section id="contacto" className="md:hidden border-t border-zinc-900 bg-zinc-950 px-6 py-8">
+    <section id="contacto" className="relative overflow-hidden md:hidden border-t border-zinc-900 bg-gray-950 px-6 py-8">
+      <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+      <div className="relative z-10">
       <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">Llegamos donde estás</h2>
       <p className="text-zinc-400 text-sm leading-relaxed mb-5">
         Contamos con transportadora aliada para entregas seguras y con pago contraentrega en toda la región de Urabá.
@@ -146,11 +194,13 @@ export default function SupplyPage() {
       >
         📱 Hacer mi pedido ahora
       </a>
+      </div>
     </section>
 
     {/* ── LOGÍSTICA + GARANTÍAS + CONTACTO — solo desktop ── */}
-    <section id="contacto-desktop" className="hidden md:block bg-zinc-950 border-t border-zinc-900 px-6 py-14">
-      <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-12">
+    <section id="contacto-desktop" className="relative overflow-hidden hidden md:block bg-gray-950 border-t border-zinc-900 px-6 py-14">
+      <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+      <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-3 gap-12">
 
         {/* COL 1: LOGÍSTICA */}
         <div>

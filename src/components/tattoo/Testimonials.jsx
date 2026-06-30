@@ -6,7 +6,7 @@ const REVIEWS = [
 
 export default function Testimonials() {
   return (
-    <section id="testimonios" className="pt-6 md:pt-12 pb-12 md:pb-24 bg-tattoo-dark">
+    <section id="testimonios" className="pt-6 md:pt-10 pb-8 md:pb-14 bg-tattoo-dark">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-center mb-8 md:mb-16">
           <div className="w-full max-w-4xl bg-white text-black py-4 rounded shadow-lg">
@@ -16,9 +16,9 @@ export default function Testimonials() {
           </div>
         </div>
 
-        <div className="flex md:grid md:grid-cols-3 gap-6 md:gap-8 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+        <div className="flex gap-6 md:gap-8 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 scrollbar-hide">
           {REVIEWS.map((review) => (
-            <div key={review.id} className="snap-start flex-shrink-0 w-[calc(100vw-2rem)] md:w-auto bg-black/40 p-8 border-l-4 border-tattoo-accent rounded-r-lg hover:bg-black/60 transition-colors">
+            <div key={review.id} className="snap-start flex-shrink-0 w-[calc(100vw-2rem)] md:w-80 lg:w-96 bg-black/40 p-8 border-l-4 border-tattoo-accent rounded-r-lg hover:bg-black/60 transition-colors">
               <div className="text-tattoo-accent text-4xl mb-4 font-serif">"</div>
               <p className="text-gray-300 italic mb-6 leading-relaxed">"{review.text}"</p>
               <div>

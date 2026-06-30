@@ -2,6 +2,11 @@ import { Link } from 'react-router-dom'
 import { Drill, PenTool, PlugZap, Droplet, Crosshair, Hand, ShieldCheck, Toolbox, BedDouble, Package } from 'lucide-react'
 import { useCatalog } from '../../hooks/useCatalog'
 
+const DOT_PATTERN = {
+  backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
+  backgroundSize: '18px 18px',
+}
+
 const categories = [
   { name: 'Tintas',            path: '/supply/ink',            icon: Droplet,    cat: 'Tintas'      },
   { name: 'Cartuchos',         path: '/supply/cartridges',     icon: PenTool,    cat: 'Cartuchos'   },
@@ -27,8 +32,9 @@ export default function CategoriesSupply() {
   }
 
   return (
-    <section id="categorias" className="pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-black">
-      <div className="max-w-7xl mx-auto">
+    <section id="categorias" className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950">
+      <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+      <div className="relative z-10 max-w-7xl mx-auto">
 
         <div className="mb-4 md:mb-8">
           <h2 className="text-2xl md:text-4xl font-black uppercase mb-2">

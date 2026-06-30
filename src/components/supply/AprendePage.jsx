@@ -4,6 +4,14 @@ import FooterSupply from './FooterSupply'
 import Seo from '../Seo'
 import { useCatalog } from '../../hooks/useCatalog'
 import { ExternalLink, BookOpen, Package, PlayCircle } from 'lucide-react'
+import { FaWhatsapp } from 'react-icons/fa'
+
+const WA = '573207911013'
+
+const DOT_PATTERN = {
+  backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
+  backgroundSize: '18px 18px',
+}
 
 // ── CARDS ─────────────────────────────────────────────────────────────────
 
@@ -73,22 +81,38 @@ function AfiliadoCard({ item, color, accentColor }) {
 }
 
 // ── SECCIÓN GENÉRICA CON SCROLL ───────────────────────────────────────────
-function SeccionAfiliados({ label, titulo, subtitulo, items, color, cols }) {
-  if (!items.length) return null
+function SeccionAfiliados({ id, label, titulo, subtitulo, items, loading, color, cols }) {
   return (
     <>
-      <section className="pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-black">
-        <div className="max-w-7xl mx-auto">
+      <section id={id} className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950 scroll-mt-20">
+        <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+        <div className="relative z-10 max-w-7xl mx-auto">
           <div className="mb-4 md:mb-8">
             <p className={`uppercase tracking-[0.25em] text-${color}-500/70 text-[10px] mb-2`}>{label}</p>
             <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-2 text-white">{titulo}</h2>
             {subtitulo && <p className="text-zinc-500 text-sm">{subtitulo}</p>}
           </div>
-          <div className={`flex md:grid md:grid-cols-2 ${cols} gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide`}>
-            {items.map((item, i) => (
-              <AfiliadoCard key={item.name + i} item={item} color={color} />
-            ))}
-          </div>
+          {loading ? (
+            <p className="text-zinc-600 text-sm uppercase tracking-widest">Cargando…</p>
+          ) : items.length > 0 ? (
+            <div className={`flex md:grid md:grid-cols-2 ${cols} gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide`}>
+              {items.map((item, i) => (
+                <AfiliadoCard key={item.name + i} item={item} color={color} />
+              ))}
+            </div>
+          ) : (
+            <div className="border border-zinc-800 bg-zinc-950 rounded-2xl p-6 text-center">
+              <p className="text-zinc-500 text-sm mb-4">Próximamente disponible en esta sección.</p>
+              <a
+                href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero que me avisen cuando haya ${titulo.toLowerCase()} disponibles en INKognito Supply.`)}`}
+                target="_blank" rel="noopener noreferrer"
+                className={`inline-flex items-center gap-2 px-5 py-2.5 bg-${color}-500 text-white font-bold uppercase tracking-[0.15em] text-xs rounded hover:opacity-90 transition`}
+              >
+                <FaWhatsapp size={16} />
+                Avisarme cuando esté disponible →
+              </a>
+            </div>
+          )}
         </div>
       </section>
       <div className="max-w-7xl mx-auto px-6">
@@ -107,13 +131,11 @@ export default function AprendePage() {
   const kitExt   = afiliados.filter(p => p.categoria === 'Kit Externo')
   const recursos = afiliados.filter(p => p.categoria === 'Recursos')
 
-  const hayContenido = cursos.length > 0 || kitExt.length > 0 || recursos.length > 0
-
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-gray-950 text-white">
       <Seo
         title="Aprende a Tatuar | Cursos, Kit y Recursos — INKognito Supply"
-        description="Recursos para aprender a tatuar desde cero. Cursos, kit básico y recursos gratuitos para principiantes en Colombia."
+        description="Cursos, kit y recursos para tatuadores en cualquier etapa: desde quienes empiezan hasta quienes buscan especializarse. Formación real para el oficio, en Colombia."
         siteName="INKognito Supply"
         canonical={`${import.meta.env.VITE_SITE_URL}/supply/aprende`}
       />
@@ -121,18 +143,20 @@ export default function AprendePage() {
       <NavbarCategory pageName="Aprende a Tatuar" backPath="/supply" backLabel="Supply" />
 
       {/* HERO */}
-      <div className="bg-black pt-16 md:pt-24">
-        <div className="px-6 max-w-7xl mx-auto pb-5 md:pb-8">
+      <div className="relative overflow-hidden bg-gray-950 pt-16 md:pt-24">
+        <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+        <div className="relative z-10 px-6 max-w-7xl mx-auto pb-5 md:pb-8">
           <p className="uppercase tracking-[0.25em] text-zinc-500 text-[10px] mb-2">
-            Para nuevos tatuadores
+            Educación · Crecimiento profesional
           </p>
           <h1 className="text-3xl md:text-7xl font-black uppercase leading-none mb-3 text-white">
-            Empieza tu camino<br />
-            <span className="text-zinc-500">como tatuador</span>
+            Fórmate. Especialízate.<br />
+            <span className="text-zinc-500">Evoluciona.</span>
           </h1>
           <p className="text-zinc-400 text-sm md:text-lg leading-relaxed max-w-2xl">
-            Cursos recomendados, el kit básico de insumos y recursos para aprender
-            a tatuar con confianza.
+            Cursos y recursos para tatuadores en cualquier etapa: desde tu primera
+            máquina hasta la técnica que te falta dominar. Conocimiento real,
+            aplicable desde la primera sesión.
           </p>
         </div>
       </div>
@@ -141,50 +165,38 @@ export default function AprendePage() {
         <div className="border-b border-zinc-900" />
       </div>
 
-      {/* Estado de carga */}
-      {loading && (
-        <div className="max-w-7xl mx-auto px-6 py-16 text-center">
-          <p className="text-zinc-600 text-sm uppercase tracking-widest">Cargando recursos…</p>
-        </div>
-      )}
-
-      {/* Sin contenido aún */}
-      {!loading && !hayContenido && (
-        <div className="max-w-7xl mx-auto px-6 py-16 text-center">
-          <p className="text-zinc-500 text-sm mb-2">Recursos próximamente</p>
-          <p className="text-zinc-700 text-xs">Los cursos, kit y recursos aparecerán aquí cuando se publiquen.</p>
-        </div>
-      )}
-
-      {/* Secciones dinámicas — solo aparecen si hay datos */}
-      {!loading && (
-        <>
-          <SeccionAfiliados
-            label="Hotmart · Cursos digitales"
-            titulo="Aprende con los mejores"
-            subtitulo="Formación online. Compra una vez, acceso de por vida."
-            items={cursos}
-            color="orange"
-            cols="lg:grid-cols-5"
-          />
-          <SeccionAfiliados
-            label="Amazon · AliExpress · Kit básico"
-            titulo="Lo que necesitas para empezar"
-            subtitulo="URL Ventas = Amazon · URL Checkout = AliExpress"
-            items={kitExt}
-            color="blue"
-            cols="lg:grid-cols-6"
-          />
-          <SeccionAfiliados
-            label="Sin costo"
-            titulo="Recursos gratuitos"
-            subtitulo="Aprende sin gastar. La práctica constante es la clave."
-            items={recursos}
-            color="green"
-            cols="lg:grid-cols-4"
-          />
-        </>
-      )}
+      {/* Secciones — siempre montadas (para que los anclajes #cursos/#kit/#recursos
+          existan desde el primer render); cada una maneja su propio loading/vacío */}
+      <SeccionAfiliados
+        id="cursos"
+        label="Hotmart · Cursos digitales"
+        titulo="Formación que se nota en tu trazo"
+        subtitulo="Desde fundamentos hasta especialización en realismo, sombras y color. Acceso de por vida, a tu ritmo."
+        items={cursos}
+        loading={loading}
+        color="orange"
+        cols="lg:grid-cols-5"
+      />
+      <SeccionAfiliados
+        id="kit"
+        label="Amazon · AliExpress · Kit básico"
+        titulo="El kit que respalda tu práctica"
+        subtitulo="Insumos seleccionados para trabajar con seriedad, sin sobrecostos."
+        items={kitExt}
+        loading={loading}
+        color="blue"
+        cols="lg:grid-cols-6"
+      />
+      <SeccionAfiliados
+        id="recursos"
+        label="Sin costo"
+        titulo="Recursos gratuitos"
+        subtitulo="Contenido sin costo para seguir creciendo. La práctica constante es lo que realmente marca la diferencia."
+        items={recursos}
+        loading={loading}
+        color="green"
+        cols="lg:grid-cols-4"
+      />
 
       {/* CTA FINAL */}
       <section className="pt-3 md:pt-6 pb-12 md:pb-20 px-6">
@@ -192,7 +204,7 @@ export default function AprendePage() {
           <div className="border border-blue-500/20 bg-zinc-950 rounded-2xl p-7 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 hover:border-blue-500/40 transition-all duration-300">
             <div>
               <p className="uppercase tracking-[0.25em] text-zinc-500 text-[10px] mb-2">Próximo paso</p>
-              <h3 className="text-xl md:text-3xl font-black uppercase leading-tight text-white">¿Ya tienes lo básico?</h3>
+              <h3 className="text-xl md:text-3xl font-black uppercase leading-tight text-white">¿Listo para el siguiente nivel?</h3>
               <p className="text-zinc-400 mt-2 text-sm">Explora nuestro catálogo de insumos profesionales</p>
             </div>
             <Link to="/supply"
