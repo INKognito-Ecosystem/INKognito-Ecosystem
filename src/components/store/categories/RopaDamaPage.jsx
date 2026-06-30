@@ -13,24 +13,16 @@ const STRIPE_PATTERN = {
 
 const faqs = [
   {
-    q: '¿Los productos son originales o réplicas?',
-    a: 'Son réplicas de alta calidad con materiales premium similares a los originales, a una fracción del precio. Los diseños están inspirados en las mejores marcas deportivas y fabricados con los mismos estándares de acabado y elasticidad.',
+    q: '¿Cómo llega mi pedido y en cuánto tiempo?',
+    a: 'Despachamos con Eljach Transportadora, nuestro aliado logístico en la región. Tiempos estimados: Chigorodó, Carepa y Apartadó en 1 a 2 días hábiles; Turbo y Mutatá en 2 a 3 días. El pago es contraentrega — pagas cuando recibes el paquete.',
   },
   {
-    q: '¿La ropa deportiva dura con el uso intenso?',
-    a: 'Sí. Fabricada con telas de alto estiramiento y resistencia al sudor, pensada para el uso diario en el clima cálido de Urabá. Las costuras reforzadas garantizan durabilidad en entrenamientos exigentes.',
+    q: '¿Cómo elijo la talla sin poder probármela?',
+    a: 'Escríbenos por WhatsApp con tu talla habitual y tus medidas de cintura y cadera. Te orientamos antes de confirmar el pedido para que no tengas sorpresas. Manejamos XS, S, M, L, XL y XXL.',
   },
   {
-    q: '¿Las tallas son las mismas que en tiendas de marca?',
-    a: 'Manejamos tallas XS a XXL. Como las medidas pueden variar, te recomendamos escribirnos con tu talla habitual y tus medidas de cintura y cadera para orientarte correctamente antes del pedido.',
-  },
-  {
-    q: '¿Hacen envíos a toda la región de Urabá?',
-    a: 'Sí. Cubrimos todo el Urabá antioqueño: Chigorodó, Carepa, Apartadó, Turbo, Mutatá y Arboletes. Entrega en 1 a 4 días hábiles con pago contraentrega disponible.',
-  },
-  {
-    q: '¿Qué pasa si la talla no me queda?',
-    a: 'Hacemos cambio de talla sin problema. Contáctanos dentro de los 3 días hábiles de recibir tu pedido. Por WhatsApp te guiamos para elegir la talla correcta antes de hacer el pedido.',
+    q: '¿La ropa aguanta el clima cálido y los entrenamientos de Urabá?',
+    a: 'Sí. Telas de alto estiramiento con resistencia al sudor y costuras reforzadas para el uso diario en el calor de la región. Diseños inspirados en las marcas más reconocidas del mercado deportivo, a un precio que tiene sentido para Urabá.',
   },
 ]
 
@@ -57,7 +49,7 @@ export default function RopaDamaPage() {
           </h1>
           <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4">Gym • Running • Yoga • Ciclismo</p>
           <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg">
-            Sets de compresión, leggings de alto rendimiento y tops deportivos pensados para el calor de Urabá.
+            Sets de compresión, leggings y tops para mujer activa. Diseños de marcas reconocidas, fabricados con telas técnicas que resisten el calor y el uso intenso. Despacho con Eljach a toda la región de Urabá — pagas cuando recibes.
           </p>
         </div>
       </div>

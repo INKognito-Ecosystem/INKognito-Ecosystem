@@ -13,24 +13,16 @@ const STRIPE_PATTERN = {
 
 const faqs = [
   {
-    q: '¿Los productos son originales o réplicas?',
-    a: 'Son réplicas de alta calidad con materiales premium similares a los originales, a una fracción del precio. Los diseños están inspirados en las mejores marcas deportivas y fabricados con los mismos estándares de acabado y resistencia.',
+    q: '¿Cómo llega mi pedido y en cuánto tiempo?',
+    a: 'Despachamos con Eljach Transportadora, nuestro aliado logístico en Urabá. Chigorodó, Carepa y Apartadó: 1 a 2 días hábiles. Turbo y Mutatá: 2 a 3 días. Pago contraentrega — pagas cuando recibes, sin adelantos.',
   },
   {
-    q: '¿La ropa deportiva aguanta entrenamientos exigentes?',
-    a: 'Sí. Fabricada con telas técnicas de alto rendimiento, resistentes al sudor y con buena ventilación — ideal para el clima cálido de Urabá. Shorts, camisetas y conjuntos pensados para que la ropa no sea el límite.',
+    q: '¿Cómo sé qué talla pedir sin probármela?',
+    a: 'Escríbenos por WhatsApp con tu talla habitual y tus medidas de pecho y cintura. Te asesoramos antes de confirmar. Manejamos S, M, L, XL y XXL. Si la talla no queda, coordina el cambio dentro de los 3 días hábiles de recibido.',
   },
   {
-    q: '¿Las tallas son las mismas que en tiendas de marca?',
-    a: 'Manejamos tallas S, M, L, XL y XXL. Como las medidas pueden variar entre réplicas, te recomendamos escribirnos con tu talla habitual y tus medidas de pecho y cintura para orientarte correctamente.',
-  },
-  {
-    q: '¿Hacen envíos a toda la región de Urabá?',
-    a: 'Sí. Cubrimos todo el Urabá antioqueño: Chigorodó, Carepa, Apartadó, Turbo, Mutatá y Arboletes. Entrega en 1 a 4 días hábiles con pago contraentrega disponible.',
-  },
-  {
-    q: '¿Qué pasa si la talla no me queda?',
-    a: 'Hacemos cambio de talla sin problema. Contáctanos dentro de los 3 días hábiles de recibir tu pedido. Por WhatsApp te guiamos para elegir la talla correcta antes de hacer el pedido.',
+    q: '¿Las telas aguantan el entrenamiento y el calor de Urabá?',
+    a: 'Sí. Dry-fit con ventilación activa y costuras reforzadas para uso intenso en el clima cálido de la región. Shorts, joggers y camisetas fabricados con los mismos estándares de las marcas de referencia — a un precio accesible.',
   },
 ]
 
@@ -59,7 +51,7 @@ export default function RopaCaballerosPage() {
             Gym • Running • Ciclismo • Urbano
           </p>
           <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg">
-            Camisetas dry-fit, shorts de running, joggers y conjuntos para el hombre activo de Urabá.
+            Camisetas dry-fit, shorts y joggers para el hombre activo. Diseños de marcas reconocidas con telas que resisten el sudor y el calor de Urabá. Despacho con Eljach a toda la región — pago contraentrega, sin adelantos.
           </p>
         </div>
       </div>

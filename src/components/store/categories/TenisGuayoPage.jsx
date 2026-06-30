@@ -11,6 +11,21 @@ const STRIPE_PATTERN = {
   backgroundImage: 'repeating-linear-gradient(45deg,transparent,transparent 19px,rgba(201,168,76,1) 19px,rgba(201,168,76,1) 20px)',
 }
 
+const faqs = [
+  {
+    q: '¿Para qué superficies sirven exactamente?',
+    a: 'Los tenis guayo están diseñados para rendir en sintético, polvo de ladrillo y calle sin cambiar de par. Son la opción más versátil para quien juega en diferentes superficies o quiere un calzado que también use fuera de la cancha.',
+  },
+  {
+    q: '¿Cómo llegan a mi municipio en Urabá?',
+    a: 'Despachamos con Eljach Transportadora a toda la región. Chigorodó, Carepa y Apartadó: 1 a 2 días hábiles. Turbo y Mutatá: 2 a 3 días. Pago contraentrega — pagas cuando recibes el paquete en tu puerta, sin adelantos.',
+  },
+  {
+    q: '¿Cómo pido si no sé bien la talla?',
+    a: 'Escríbenos por WhatsApp con tu talla habitual de calzado y la medida de tu pie en centímetros. Te orientamos antes de confirmar el pedido para que no tengas sorpresas. Si la talla no queda, coordina el cambio dentro de los 3 días hábiles de recibido.',
+  },
+]
+
 export default function TenisGuayoPage() {
   const { allProducts: catalogItems, loading } = useCatalog('store', 'Tenis y guayo')
 
@@ -18,7 +33,7 @@ export default function TenisGuayoPage() {
     <>
       <Seo
         title="Tenis y guayo | INKognito Store — Urabá"
-        description="Tenis multideporte y guayo en Chigorodó y Urabá. Pedidos por WhatsApp."
+        description="Tenis multideporte para sintético, polvo de ladrillo y calle en Urabá. Versatilidad total, despacho con Eljach a toda la región. Pago contraentrega."
         siteName="INKognito Store"
         canonical={`${import.meta.env.VITE_SITE_URL}/store/tenis-guayo`}
       />
@@ -30,6 +45,9 @@ export default function TenisGuayoPage() {
           <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs mb-2">Categoría</p>
           <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-2 text-gray-900">Tenis<br />y Guayo</h1>
           <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4">Multisuperficie • Sintético • Calle</p>
+          <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg">
+            El calzado más versátil de Urabá: rinde en sintético, polvo de ladrillo y calle sin cambiar de par. La opción inteligente para quien juega donde se pueda y quiere un solo calzado para todo. Despachamos con Eljach a toda la región — pago contraentrega.
+          </p>
         </div>
       </div>
 
@@ -42,7 +60,10 @@ export default function TenisGuayoPage() {
               ))}
             </div>
           ) : catalogItems.length === 0 ? (
-            <p className="text-gray-400 py-8 text-center">Próximamente disponible</p>
+            <div className="text-center py-12">
+              <p className="text-gray-400 text-lg mb-4">Catálogo actualizándose…</p>
+              <p className="text-gray-400 text-sm">Escríbenos por WhatsApp para ver disponibilidad</p>
+            </div>
           ) : (
             <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
               {catalogItems.map(item => {
@@ -68,11 +89,24 @@ export default function TenisGuayoPage() {
         </a>
       </div>
 
+      {/* FAQ */}
+      <div className="bg-white py-10 md:py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-2xl md:text-5xl font-black uppercase mb-6 md:mb-10 text-gray-900">Preguntas Frecuentes</h2>
+          <div className="space-y-4">
+            {faqs.map((faq, i) => (
+              <div key={i} className="border border-gray-200 rounded-xl p-5 hover:border-[#C9A84C] transition-all duration-300 bg-white">
+                <h3 className="font-bold text-sm md:text-lg mb-2 text-gray-900">{faq.q}</h3>
+                <p className="text-gray-500 leading-relaxed text-sm">{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* LLEGAMOS DONDE ESTÁS — solo móvil */}
       <div className="md:hidden bg-black text-white border-t border-zinc-900 px-6 py-8">
-        <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">
-          Llegamos donde estás
-        </h2>
+        <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">Llegamos donde estás</h2>
         <p className="text-zinc-400 text-sm leading-relaxed mb-5">
           Contamos con transportadora aliada para entregas seguras y con pago contraentrega en toda la región de Urabá.
         </p>

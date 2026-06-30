@@ -11,6 +11,21 @@ const STRIPE_PATTERN = {
   backgroundImage: 'repeating-linear-gradient(45deg,transparent,transparent 19px,rgba(201,168,76,1) 19px,rgba(201,168,76,1) 20px)',
 }
 
+const faqs = [
+  {
+    q: '¿Llegan a mi municipio en Urabá?',
+    a: 'Sí. Despachamos con Eljach Transportadora a toda la región. Chigorodó, Carepa y Apartadó: 1 a 2 días hábiles. Turbo y Mutatá: 2 a 3 días. Pago contraentrega — pagas cuando recibes el paquete, sin adelantos.',
+  },
+  {
+    q: '¿Cómo elijo la talla para un zapato casual?',
+    a: 'Escríbenos por WhatsApp con tu talla habitual y la medida de tu pie en centímetros. Te asesoramos antes de confirmar. Si la talla no queda, coordina el cambio dentro de los 3 días hábiles de recibido — sin complicaciones.',
+  },
+  {
+    q: '¿Qué modelos manejan y para qué ocasiones sirven?',
+    a: 'Manejamos modelos icónicos del mercado — los diseños que más se buscan para el día a día: parque, calle, trabajo y salidas casuales. Cómodos para el clima cálido de Urabá, con el estilo de las marcas más reconocidas a un precio accesible.',
+  },
+]
+
 export default function ZapatosCasualesPage() {
   const { allProducts: catalogItems, loading } = useCatalog('store', 'Zapatos Casuales')
 
@@ -18,7 +33,7 @@ export default function ZapatosCasualesPage() {
     <>
       <Seo
         title="Zapatos casuales | INKognito Store — Urabá"
-        description="Zapatos casuales de calidad en Chigorodó y Urabá. Pedidos por WhatsApp."
+        description="Zapatos casuales de calidad en Chigorodó y Urabá. Modelos icónicos para el día a día. Entrega con Eljach a toda la región. Pago contraentrega."
         siteName="INKognito Store"
         canonical={`${import.meta.env.VITE_SITE_URL}/store/zapatos-casuales`}
       />
@@ -30,6 +45,9 @@ export default function ZapatosCasualesPage() {
           <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs mb-2">Categoría</p>
           <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-2 text-gray-900">Zapatos<br />Casuales</h1>
           <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4">Estilo • Comodidad • Urabá</p>
+          <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg">
+            Modelos icónicos para el día a día — frescos, cómodos y con actitud. Del parque a la calle sin esfuerzo. Diseños inspirados en las marcas más reconocidas del mercado, con despacho con Eljach a cualquier municipio de Urabá. Pago contraentrega.
+          </p>
         </div>
       </div>
 
@@ -42,7 +60,10 @@ export default function ZapatosCasualesPage() {
               ))}
             </div>
           ) : catalogItems.length === 0 ? (
-            <p className="text-gray-400 py-8 text-center">Próximamente disponible</p>
+            <div className="text-center py-12">
+              <p className="text-gray-400 text-lg mb-4">Catálogo actualizándose…</p>
+              <p className="text-gray-400 text-sm">Escríbenos por WhatsApp para ver disponibilidad</p>
+            </div>
           ) : (
             <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
               {catalogItems.map(item => {
@@ -68,11 +89,24 @@ export default function ZapatosCasualesPage() {
         </a>
       </div>
 
+      {/* FAQ */}
+      <div className="bg-white py-10 md:py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-2xl md:text-5xl font-black uppercase mb-6 md:mb-10 text-gray-900">Preguntas Frecuentes</h2>
+          <div className="space-y-4">
+            {faqs.map((faq, i) => (
+              <div key={i} className="border border-gray-200 rounded-xl p-5 hover:border-[#C9A84C] transition-all duration-300 bg-white">
+                <h3 className="font-bold text-sm md:text-lg mb-2 text-gray-900">{faq.q}</h3>
+                <p className="text-gray-500 leading-relaxed text-sm">{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* LLEGAMOS DONDE ESTÁS — solo móvil */}
       <div className="md:hidden bg-black text-white border-t border-zinc-900 px-6 py-8">
-        <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">
-          Llegamos donde estás
-        </h2>
+        <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">Llegamos donde estás</h2>
         <p className="text-zinc-400 text-sm leading-relaxed mb-5">
           Contamos con transportadora aliada para entregas seguras y con pago contraentrega en toda la región de Urabá.
         </p>

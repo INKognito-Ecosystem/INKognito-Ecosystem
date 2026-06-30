@@ -18,7 +18,7 @@ const categories = [
     id: 1,
     name: 'Ropa Dama',
     tag: 'Deportiva Femenina',
-    description: 'Sets, leggings, tops y conjuntos para mujer activa. Gym, running, yoga y ciclismo.',
+    description: 'Sets de compresión, leggings y tops para mujer activa. Telas técnicas resistentes al calor de Urabá. Despacho con Eljach a Chigorodó, Apartadó, Carepa y Turbo — pago contraentrega.',
     link: '/store/ropa-dama',
     icon: <Shirt size={28} />,
   },
@@ -26,7 +26,7 @@ const categories = [
     id: 2,
     name: 'Ropa Caballeros',
     tag: 'Deportiva Masculina',
-    description: 'Shorts, camisetas, joggers y conjuntos para hombre activo. Desde el gym hasta la calle.',
+    description: 'Camisetas dry-fit, shorts y joggers para el hombre activo. Diseños de marcas reconocidas, fabricados para entrenar en el clima cálido de la región. Llegan a tu puerta con Eljach.',
     link: '/store/ropa-caballeros',
     icon: <Shirt size={28} />,
   },
@@ -34,7 +34,7 @@ const categories = [
     id: 3,
     name: 'Zapatos Deportivos',
     tag: 'Running & Gym',
-    description: 'Para correr, entrenar y rendir. Las siluetas más buscadas en el mercado, a tu alcance.',
+    description: 'Las siluetas de running y entrenamiento más buscadas del mercado. Réplica premium con amortiguación y acabados de nivel. Entrega en 1 a 4 días hábiles con Eljach en toda Urabá.',
     link: '/store/zapatos-deportivos',
     icon: <Footprints size={28} />,
   },
@@ -42,7 +42,7 @@ const categories = [
     id: 4,
     name: 'Zapatos Casuales',
     tag: 'Estilo Urbano',
-    description: 'Cómodos, frescos y con actitud. Los modelos icónicos para el día a día en Urabá.',
+    description: 'Modelos icónicos para el día a día — frescos, cómodos y con actitud. Del parque a la calle sin esfuerzo. Despacho a cualquier municipio del Urabá antioqueño con pago contraentrega.',
     link: '/store/zapatos-casuales',
     icon: <Sun size={28} />,
   },
@@ -50,7 +50,7 @@ const categories = [
     id: 5,
     name: 'Guayos',
     tag: 'Fútbol',
-    description: 'Para dominar el balón desde Chigorodó hasta Turbo. Tracción, control y poder.',
+    description: 'Control, tracción y durabilidad para jugar en canchas de la región. Terreno firme y canchita de sintético. Despacho con Eljach a Chigorodó, Carepa, Apartadó, Turbo y municipios cercanos.',
     link: '/store/guayos',
     icon: <Trophy size={28} />,
   },
@@ -58,7 +58,7 @@ const categories = [
     id: 6,
     name: 'Tenis Guayo',
     tag: 'Multisuperficie',
-    description: 'Versatilidad total. Canchita de sintético, polvo de ladrillo y calle sin cambiar de par.',
+    description: 'El calzado más versátil de Urabá: rinde en sintético, polvo de ladrillo y calle sin cambiar de par. La opción inteligente para quien juega donde se pueda. Llega con Eljach, contraentrega.',
     link: '/store/tenis-guayo',
     icon: <Zap size={28} />,
   },
@@ -219,12 +219,12 @@ export default function StorePage() {
             </h2>
           </div>
 
-          <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+          <div className="flex md:grid md:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
             {categories.map((cat) => (
               <Link
                 key={cat.id}
                 to={cat.link}
-                className="group snap-start flex-shrink-0 w-[75vw] md:w-auto bg-white border border-gray-200 rounded-2xl p-5 hover:border-[#C9A84C] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[160px] md:min-h-[220px]"
+                className="group snap-start flex-shrink-0 w-[75vw] md:w-auto bg-white border border-gray-200 rounded-2xl p-5 hover:border-[#C9A84C] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[160px] md:min-h-[140px]"
               >
                 <div>
                   <div className="mb-3 text-[#C9A84C]">{cat.icon}</div>
@@ -262,8 +262,8 @@ export default function StorePage() {
           </div>
 
           {featuredLoading ? (
-            <div className="flex md:grid md:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
-              {[...Array(3)].map((_, i) => (
+            <div className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+              {[...Array(4)].map((_, i) => (
                 <div key={i} className="snap-start flex-shrink-0 w-[44vw] md:w-auto bg-gray-200 rounded-xl animate-pulse aspect-[3/4]" />
               ))}
             </div>
@@ -273,7 +273,7 @@ export default function StorePage() {
               <p className="text-gray-500 text-xs">Agrega productos con categoría "Destacados" desde el panel</p>
             </div>
           ) : (
-            <div className="flex md:grid md:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+            <div className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
               {featuredItems.map(item => {
                 const prod = toProdCard(item)
                 const sizes = item.variantes.map(v => v.variant).filter(Boolean)
