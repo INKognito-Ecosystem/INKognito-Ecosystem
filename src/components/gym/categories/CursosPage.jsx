@@ -72,7 +72,7 @@ export default function CursosPage() {
                     <div className="flex items-start justify-between gap-3">
                       <h3 className="text-lg font-black uppercase tracking-wide leading-tight">{curso.name}</h3>
                       <span className="shrink-0 text-[10px] font-bold uppercase tracking-widest bg-orange-500/15 text-orange-400 border border-orange-500/30 rounded-full px-3 py-1">
-                        Curso digital
+                        {curso.plataforma || 'Hotmart'}
                       </span>
                     </div>
                     {curso.descripcion && (

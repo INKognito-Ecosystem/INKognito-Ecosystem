@@ -225,7 +225,7 @@ function AfiliadoCard({ item }) {
         }
       </div>
       <div className="p-3 flex flex-col gap-1.5 flex-1">
-        <span className="text-[9px] font-black uppercase tracking-widest text-blue-400/70">Recurso digital</span>
+        <span className="text-[9px] font-black uppercase tracking-widest text-blue-400/70">Recurso digital{item.plataforma ? ` · ${item.plataforma}` : ''}</span>
         <h3 className="text-xs font-black uppercase leading-tight text-white">{item.name}</h3>
         {item.descripcion && (
           <p className="text-zinc-500 text-[10px] leading-relaxed flex-1">{item.descripcion}</p>

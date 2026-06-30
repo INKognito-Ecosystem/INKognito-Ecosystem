@@ -45,7 +45,7 @@ export default function MaquinasPedidoPage() {
   const [lightbox, setLightbox] = useState(null)
   const { allProducts: gymAllProds, loading: catalogLoading } = useCatalog('gym')
   const apiMaquinas   = gymAllProds.filter(p => p.tipo !== 'afiliado')
-  const gymAfiliados  = gymAllProds.filter(p => p.tipo === 'afiliado')
+  const gymAfiliados  = gymAllProds.filter(p => p.tipo === 'afiliado' && p.categoria !== 'Cursos')
   const { addItem } = useGymCart()
 
   const productosFinales = catalogLoading ? [] : apiMaquinas.length > 0
@@ -191,7 +191,7 @@ export default function MaquinasPedidoPage() {
                       }
                     </div>
                     <div className="p-3 flex flex-col gap-1.5 flex-1">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-yellow-400/70">Recurso externo · {item.categoria}</span>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-yellow-400/70">Recurso externo · {item.plataforma || item.categoria}</span>
                       <h3 className="text-xs font-black uppercase leading-tight text-white">{item.name}</h3>
                       {item.descripcion && (
                         <p className="text-gray-500 text-[10px] leading-relaxed flex-1">{item.descripcion}</p>

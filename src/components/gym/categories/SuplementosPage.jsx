@@ -260,7 +260,7 @@ export default function SuplementosPage() {
                       }
                     </div>
                     <div className="p-3 flex flex-col gap-1.5 flex-1">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-green-400/70">Recurso externo · {item.categoria}</span>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-green-400/70">Recurso externo · {item.plataforma || item.categoria}</span>
                       <h3 className="text-xs font-black uppercase leading-tight text-white">{item.name}</h3>
                       {item.descripcion && (
                         <p className="text-gray-500 text-[10px] leading-relaxed flex-1">{item.descripcion}</p>
