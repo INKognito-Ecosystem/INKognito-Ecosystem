@@ -58,7 +58,7 @@ export default function BrandsSupply() {
             >
               {imgs[brandKey(brand.name)]
                 ? <img src={imgs[brandKey(brand.name)]} alt={brand.name}
-                    className="w-full h-full object-contain p-4" />
+                    className="max-h-full max-w-full object-contain p-3" />
                 : <p className="text-zinc-500 font-black tracking-[0.15em] text-[10px] md:text-xs text-center px-2">
                     {brand.name}
                   </p>

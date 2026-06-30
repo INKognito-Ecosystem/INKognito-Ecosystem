@@ -81,11 +81,18 @@ export default function CategoriesSupply() {
                 `}
               >
                 {imgs[catKey(category.cat)]
-                  ? <img src={imgs[catKey(category.cat)]} alt={category.name}
-                      className="w-20 h-20 object-contain" />
-                  : <category.icon size={26} className={hasStock ? 'text-blue-400' : 'text-zinc-700'} />
+                  ? <>
+                      <div className="flex-1 min-h-0 flex items-center justify-center w-full p-2">
+                        <img src={imgs[catKey(category.cat)]} alt={category.name}
+                          className="max-h-full max-w-full object-contain" />
+                      </div>
+                      <span>{category.name}</span>
+                    </>
+                  : <>
+                      <category.icon size={26} className={hasStock ? 'text-blue-400' : 'text-zinc-700'} />
+                      <span>{category.name}</span>
+                    </>
                 }
-                <span>{category.name}</span>
 
                 {/* Badge de stock en tiempo real */}
                 {!loading && (
