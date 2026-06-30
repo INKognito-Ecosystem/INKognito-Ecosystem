@@ -81,10 +81,10 @@ function AfiliadoCard({ item, color, accentColor }) {
 }
 
 // ── SECCIÓN GENÉRICA CON SCROLL ───────────────────────────────────────────
-function SeccionAfiliados({ label, titulo, subtitulo, items, color, cols }) {
+function SeccionAfiliados({ id, label, titulo, subtitulo, items, color, cols }) {
   return (
     <>
-      <section className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950">
+      <section id={id} className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950 scroll-mt-20">
         <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
           <div className="mb-4 md:mb-8">
@@ -174,6 +174,7 @@ export default function AprendePage() {
       {!loading && (
         <>
           <SeccionAfiliados
+            id="cursos"
             label="Hotmart · Cursos digitales"
             titulo="Formación que se nota en tu trazo"
             subtitulo="Desde fundamentos hasta especialización en realismo, sombras y color. Acceso de por vida, a tu ritmo."
@@ -182,6 +183,7 @@ export default function AprendePage() {
             cols="lg:grid-cols-5"
           />
           <SeccionAfiliados
+            id="kit"
             label="Amazon · AliExpress · Kit básico"
             titulo="El kit que respalda tu práctica"
             subtitulo="Insumos seleccionados para trabajar con seriedad, sin sobrecostos."
@@ -190,6 +192,7 @@ export default function AprendePage() {
             cols="lg:grid-cols-6"
           />
           <SeccionAfiliados
+            id="recursos"
             label="Sin costo"
             titulo="Recursos gratuitos"
             subtitulo="Contenido sin costo para seguir creciendo. La práctica constante es lo que realmente marca la diferencia."
