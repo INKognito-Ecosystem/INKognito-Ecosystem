@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Drill, PenTool, PlugZap, Droplet, Crosshair, Hand, ShieldCheck, Toolbox, BedDouble, Package } from 'lucide-react'
 import { useCatalog } from '../../hooks/useCatalog'
@@ -6,6 +7,13 @@ const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
   backgroundSize: '18px 18px',
 }
+
+const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+
+// Convierte el campo `cat` de cada categoría a la clave de settings usada en el panel
+const catKey = (cat) => 'supply_cat_' + cat.toLowerCase()
+  .replace(/[áéíóú]/g, c => ({á:'a',é:'e',í:'i',ó:'o',ú:'u'})[c])
+  .replace(/[^a-z0-9]/g, '_').replace(/_+/g,'_').replace(/^_|_$/g,'')
 
 const categories = [
   { name: 'Tintas',            path: '/supply/ink',            icon: Droplet,    cat: 'Tintas'      },
@@ -22,6 +30,14 @@ const categories = [
 
 export default function CategoriesSupply() {
   const { categorias, loading } = useCatalog('supply')
+  const [imgs, setImgs] = useState({})
+
+  useEffect(() => {
+    fetch(`${PANEL_URL}/api/visual/supply`)
+      .then(r => r.json())
+      .then(data => setImgs(data || {}))
+      .catch(() => {})
+  }, [])
 
   // Mapa de categoría → cantidad de productos disponibles
   const stockPorCat = {}
@@ -64,7 +80,11 @@ export default function CategoriesSupply() {
                   }
                 `}
               >
-                <category.icon size={26} className={hasStock ? 'text-blue-400' : 'text-zinc-700'} />
+                {imgs[catKey(category.cat)]
+                  ? <img src={imgs[catKey(category.cat)]} alt={category.name}
+                      className="w-12 h-12 object-cover rounded-lg" />
+                  : <category.icon size={26} className={hasStock ? 'text-blue-400' : 'text-zinc-700'} />
+                }
                 <span>{category.name}</span>
 
                 {/* Badge de stock en tiempo real */}
