@@ -22,17 +22,17 @@ export default function CartDrawerStore({ open, onClose }) {
 
   const buildWhatsAppMessage = () => {
     const lines = items.map(i => {
-      const subtotal = (parseInt(String(i.price).replace(/[^0-9]/g, ''), 10) || 0) * i.qty
-      return `• ${i.name}${i.size ? ` — Talla ${i.size}` : ''} (${i.brand}) x${i.qty} — ${i.price}c/u = $${subtotal.toLocaleString('es-CO')}`
+      const talla = i.size ? ` — Talla ${i.size}` : ''
+      return `• ${i.name}${talla} — ${i.qty} und — ${i.price} c/u`
     })
     const msg = [
-      '¡Hola! Quiero realizar un pedido en *INKognito Store*:',
+      'Hola, quiero hacer un pedido en INKognito Store:',
       '',
       ...lines,
       '',
-      `*Total estimado: $${total.toLocaleString('es-CO')}*`,
+      `Total aprox: $${total.toLocaleString('es-CO')}`,
       '',
-      'Por favor confirmar disponibilidad, talla y método de pago. ¡Gracias!',
+      '¿Me confirmas disponibilidad y cómo sería la entrega?',
     ].join('\n')
     return `https://wa.me/573207911013?text=${encodeURIComponent(msg)}`
   }
