@@ -1,8 +1,22 @@
+import { useState, useEffect } from 'react'
 import heroBg from '../../assets/hero/hero-bg.webp'
 import { Link } from 'react-router-dom'
 import imgmifoto from '../../assets/mifoto/fondoperfilweb.jpg'
 
+const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+
 export default function Hero() {
+  // Foto editable desde el panel (pestaña "Tattoo") — si no hay nada
+  // configurado o falla la petición, se queda con la foto actual del código.
+  const [heroPhoto, setHeroPhoto] = useState(imgmifoto)
+
+  useEffect(() => {
+    fetch(`${PANEL_URL}/api/jhumaneztattoo/hero`)
+      .then(r => r.json())
+      .then(data => { if (data.image_url) setHeroPhoto(data.image_url) })
+      .catch(() => {})
+  }, [])
+
   return (
     <section className="relative overflow-hidden min-h-screen bg-black flex items-center justify-center pt-24 pb-12">
 
@@ -22,7 +36,7 @@ export default function Hero() {
             <div className="absolute -inset-1 bg-red-600 rounded-full blur opacity-20 group-hover:opacity-40 transition duration-700"></div>
 
             <img
-              src={imgmifoto}
+              src={heroPhoto}
               alt="Jose Humanez"
               className="relative w-40 h-40 md:w-96 md:h-96 object-cover rounded-full border-2 border-white/10 shadow-2xl"
             />

@@ -11,7 +11,8 @@ import imgRepresentativo1 from '../../assets/portafolio/representativo1.webp';
 import imgRepresentativo2 from '../../assets/portafolio/representativo2.webp';
 import imgRepresentativo3 from '../../assets/portafolio/representativo3.webp';
 
-const GALLERY_ITEMS = [
+// Respaldo — se muestra mientras carga o si el panel aún no tiene fotos cargadas
+const FALLBACK_ITEMS = [
   { id: 1, title: 'Sombras', img: imgPoseidon, category: 'Realismo' },
   { id: 2, title: 'Sombras', img: imgPoseidon2, category: 'Realismo' },
   { id: 3, title: 'Sombras', img: imgAguila, category: 'Realismo' },
@@ -24,11 +25,38 @@ const GALLERY_ITEMS = [
   { id: 10, title: 'Sombras', img: imgRepresentativo3, category: 'Realismo' },
 ]
 
+const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+
 export default function Gallery({ onLightboxChange = () => {} }) {
   const [selected, setSelected] = useState(null)
+  // Fotos editables desde el panel (pestaña "Tattoo"). Si aún no hay
+  // ninguna cargada o falla la petición, se queda con las del código.
+  const [items, setItems] = useState(FALLBACK_ITEMS)
+
+  useEffect(() => {
+    fetch(`${PANEL_URL}/api/portfolio`)
+      .then(r => r.json())
+      .then(rows => {
+        if (Array.isArray(rows) && rows.length > 0) {
+          setItems(rows.map(r => ({
+            id: r.id,
+            title: r.titulo || 'Tatuaje',
+            img: r.image_url,
+            category: r.categoria || 'Realismo',
+          })))
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   const openLightbox = (index) => { setSelected(index); onLightboxChange(true) }
   const closeLightbox = () => { setSelected(null); onLightboxChange(false) }
+
+  // Si la lista cambia de tamaño (llegan las fotos reales del panel) mientras
+  // el lightbox está abierto en un índice que ya no existe, lo cierra.
+  useEffect(() => {
+    if (selected !== null && selected >= items.length) closeLightbox()
+  }, [items])
 
   // Cierra con Escape y bloquea scroll
   useEffect(() => {
@@ -47,11 +75,11 @@ export default function Gallery({ onLightboxChange = () => {} }) {
   }, [selected])
 
   const goNext = () => {
-    setSelected((prev) => (prev + 1) % GALLERY_ITEMS.length)
+    setSelected((prev) => (prev + 1) % items.length)
   }
 
   const goPrev = () => {
-    setSelected((prev) => (prev - 1 + GALLERY_ITEMS.length) % GALLERY_ITEMS.length)
+    setSelected((prev) => (prev - 1 + items.length) % items.length)
   }
 
   return (
@@ -72,7 +100,7 @@ export default function Gallery({ onLightboxChange = () => {} }) {
 
         {/* GRID */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          {GALLERY_ITEMS.map((item, index) => (
+          {items.map((item, index) => (
             <div
               key={item.id}
               onClick={() => openLightbox(index)}
@@ -174,8 +202,8 @@ export default function Gallery({ onLightboxChange = () => {} }) {
 
           {/* IMAGEN */}
           <img
-            src={GALLERY_ITEMS[selected].img}
-            alt={GALLERY_ITEMS[selected].title}
+            src={items[selected].img}
+            alt={items[selected].title}
             onClick={(e) => e.stopPropagation()}
             style={{
               maxHeight: '85vh',
@@ -220,7 +248,7 @@ export default function Gallery({ onLightboxChange = () => {} }) {
             letterSpacing: '0.2em',
             userSelect: 'none',
           }}>
-            {selected + 1} / {GALLERY_ITEMS.length}
+            {selected + 1} / {items.length}
           </div>
         </div>
       )}
