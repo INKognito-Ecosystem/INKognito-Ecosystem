@@ -4,7 +4,7 @@ import FooterGym from '../FooterGym'
 import Seo from '../../Seo'
 import { useCatalog } from '../../../hooks/useCatalog'
 import { useGymCart } from '../../../contexts/GymCartContext'
-import { FlaskConical } from 'lucide-react'
+import { FlaskConical, ExternalLink } from 'lucide-react'
 
 const VAR_THRESHOLD = 3
 
@@ -237,41 +237,46 @@ export default function SuplementosPage() {
         )}
       </div>
 
-      {/* ── AFILIADOS MERCADO LIBRE — solo si hay productos cargados ── */}
+      {/* ── SUPLEMENTOS AFILIADOS — sección propia, solo si hay productos ── */}
       {apiAfiliados.length > 0 && (
-        <section className="border-t border-gray-800 bg-gray-950 px-4 md:px-6 py-8 md:py-12">
+        <section className="border-t-2 border-green-500/20 bg-[#0c0c0c] px-4 md:px-6 py-10 md:py-14">
           <div className="max-w-7xl mx-auto">
-            <p className="text-gray-600 text-[10px] uppercase tracking-widest mb-1">Mercado Libre · Afiliados</p>
+            <p className="text-green-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ Amplía tu stack</p>
             <h2 className="text-2xl md:text-3xl font-black uppercase leading-none mb-2 text-white">
-              También disponible en ML
+              Más opciones, mismos resultados
             </h2>
-            <p className="text-gray-500 text-sm mb-6">
-              Suplementos adicionales con envío a toda Colombia a través de Mercado Libre.
+            <p className="text-gray-500 text-sm mb-8 max-w-lg leading-relaxed">
+              Suplementos adicionales disponibles con envío a toda Colombia. Plataformas de confianza, productos verificados.
             </p>
-            <div className="flex md:grid md:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
-              {apiAfiliados.map((item, i) => (
-                <a
-                  key={i}
-                  href={item.url_ventas || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="snap-start flex-shrink-0 w-[44vw] md:w-auto border border-gray-800 bg-gray-900/60 rounded-xl overflow-hidden hover:border-yellow-500/40 transition-all duration-300 flex flex-col"
-                >
-                  {item.image_url ? (
-                    <img src={item.image_url} alt={item.name} className="w-full aspect-square object-cover flex-shrink-0" />
-                  ) : (
-                    <div className="w-full aspect-square bg-gray-800 flex items-center justify-center flex-shrink-0">
-                      <span className="text-3xl">🛒</span>
+            <div className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+              {apiAfiliados.map((item, i) => {
+                const url = item.url_ventas || item.url_checkout || null
+                const inner = (
+                  <div className="border border-green-500/15 bg-gray-950 rounded-2xl overflow-hidden flex flex-col h-full hover:border-green-500/40 hover:shadow-[0_0_16px_rgba(34,197,94,0.08)] transition-all duration-300">
+                    <div className="aspect-square w-full bg-gray-900 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                      {item.image_url
+                        ? <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" loading="lazy" />
+                        : <ExternalLink size={28} className="text-gray-700" strokeWidth={1} />
+                      }
                     </div>
-                  )}
-                  <div className="p-3 flex flex-col flex-1">
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-yellow-500/80 mb-1">{item.categoria}</span>
-                    <h3 className="font-black uppercase text-xs leading-tight text-white mb-1">{item.name}</h3>
-                    {item.descripcion && <p className="text-gray-500 text-[10px] leading-relaxed flex-1">{item.descripcion}</p>}
-                    <span className="text-yellow-400 text-[10px] font-bold uppercase tracking-widest mt-2 flex-shrink-0">Ver en ML →</span>
+                    <div className="p-3 flex flex-col gap-1.5 flex-1">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-green-400/70">Recurso externo · {item.categoria}</span>
+                      <h3 className="text-xs font-black uppercase leading-tight text-white">{item.name}</h3>
+                      {item.descripcion && (
+                        <p className="text-gray-500 text-[10px] leading-relaxed flex-1">{item.descripcion}</p>
+                      )}
+                      {url && (
+                        <span className="mt-auto pt-1 text-[9px] font-bold uppercase tracking-widest text-green-400 flex items-center gap-1">
+                          Ver producto <ExternalLink size={9} />
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </a>
-              ))}
+                )
+                return url
+                  ? <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="snap-start flex-shrink-0 w-[44vw] md:w-auto">{inner}</a>
+                  : <div key={i} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">{inner}</div>
+              })}
             </div>
           </div>
         </section>

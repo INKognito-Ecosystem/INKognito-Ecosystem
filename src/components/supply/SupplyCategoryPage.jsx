@@ -296,11 +296,14 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
         {/* RECURSOS DIGITALES AFILIADOS — solo si hay productos afiliados para esta categoría */}
         {!loading && afiliados.length > 0 && (
           <div className="pb-10 max-w-7xl mx-auto px-6">
-            <div className="border-t border-zinc-900 pt-8 mb-6">
-              <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-1">Recursos digitales · {categoria}</p>
+            <div className="border-t-2 border-blue-500/20 pt-8 mb-6">
+              <p className="text-blue-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ Recursos para {title.toLowerCase()}</p>
               <h2 className="text-xl md:text-2xl font-black uppercase leading-none text-white">
-                Aprende más sobre {title.toLowerCase()}
+                Lleva tu técnica al siguiente nivel
               </h2>
+              <p className="text-zinc-500 text-sm mt-2 max-w-lg leading-relaxed">
+                Cursos y materiales validados por tatuadores activos. Solo publicamos lo que recomendamos para dominar {title.toLowerCase()} y aumentar tus ingresos.
+              </p>
             </div>
             <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide">
               {afiliados.map(item => (

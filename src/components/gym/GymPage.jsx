@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { GraduationCap, PlayCircle, FileText, FlaskConical, Wrench, BookOpen } from 'lucide-react'
+import { GraduationCap, PlayCircle, FileText, FlaskConical, Wrench, BookOpen, ExternalLink } from 'lucide-react'
 import NavbarGym from './NavbarGym'
 import FooterGym from './FooterGym'
 import Seo from '../Seo'
@@ -308,47 +308,45 @@ export default function GymPage() {
         </div>
       </section>
 
-      {/* ── MATERIALES AFILIADOS (AliExpress / Mercado Libre) — solo si hay productos ── */}
+      {/* ── RECURSOS EXTERNOS — sección propia, solo si hay afiliados ── */}
       {gymAfiliados.length > 0 && (
-        <section className="border-t border-gray-800 bg-gray-950 px-4 md:px-6 py-8 md:py-12">
+        <section className="border-t-2 border-yellow-500/20 bg-[#0c0c0c] px-4 md:px-6 py-10 md:py-14">
           <div className="max-w-7xl mx-auto">
-            <p className="text-gray-600 text-[10px] uppercase tracking-widest mb-1">AliExpress · Mercado Libre · Afiliados</p>
+            <p className="text-yellow-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ Consigue los materiales</p>
             <h2 className="text-2xl md:text-3xl font-black uppercase leading-none mb-2 text-white">
-              Complementa tu gym
+              Construye sin límites
             </h2>
-            <p className="text-gray-500 text-sm mb-6">
-              Materiales, accesorios y productos recomendados disponibles en AliExpress y Mercado Libre con envío a toda Colombia.
+            <p className="text-gray-500 text-sm mb-8 max-w-lg leading-relaxed">
+              Materiales, componentes y accesorios con envío a toda Colombia. Solo publicamos lo que vale la pena comprar para tu proyecto.
             </p>
-            <div className="flex md:grid md:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+            <div className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
               {gymAfiliados.map((item, i) => {
-                const isAli = item.categoria === 'AliExpress'
-                const accentColor = isAli ? 'text-orange-400' : 'text-yellow-400'
-                const borderHover = isAli ? 'hover:border-orange-500/40' : 'hover:border-yellow-500/40'
-                return (
-                  <a
-                    key={i}
-                    href={item.url_ventas || '#'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`snap-start flex-shrink-0 w-[44vw] md:w-auto border border-gray-800 bg-gray-900/60 rounded-xl overflow-hidden ${borderHover} transition-all duration-300 flex flex-col`}
-                  >
-                    {item.image_url ? (
-                      <img src={item.image_url} alt={item.name} className="w-full aspect-square object-cover flex-shrink-0" />
-                    ) : (
-                      <div className="w-full aspect-square bg-gray-800 flex items-center justify-center flex-shrink-0">
-                        <span className="text-3xl">{isAli ? '🌐' : '🛒'}</span>
-                      </div>
-                    )}
-                    <div className="p-3 flex flex-col flex-1">
-                      <span className={`text-[9px] font-bold uppercase tracking-widest ${accentColor} opacity-80 mb-1`}>{item.categoria}</span>
-                      <h3 className="font-black uppercase text-xs leading-tight text-white mb-1">{item.name}</h3>
-                      {item.descripcion && <p className="text-gray-500 text-[10px] leading-relaxed flex-1">{item.descripcion}</p>}
-                      <span className={`${accentColor} text-[10px] font-bold uppercase tracking-widest mt-2 flex-shrink-0`}>
-                        Ver en {item.categoria} →
-                      </span>
+                const url = item.url_ventas || item.url_checkout || null
+                const inner = (
+                  <div className="border border-yellow-500/15 bg-gray-950 rounded-2xl overflow-hidden flex flex-col h-full hover:border-yellow-500/40 hover:shadow-[0_0_16px_rgba(234,179,8,0.08)] transition-all duration-300">
+                    <div className="aspect-square w-full bg-gray-900 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                      {item.image_url
+                        ? <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" loading="lazy" />
+                        : <ExternalLink size={28} className="text-gray-700" strokeWidth={1} />
+                      }
                     </div>
-                  </a>
+                    <div className="p-3 flex flex-col gap-1.5 flex-1">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-yellow-400/70">Recurso externo · {item.categoria}</span>
+                      <h3 className="text-xs font-black uppercase leading-tight text-white">{item.name}</h3>
+                      {item.descripcion && (
+                        <p className="text-gray-500 text-[10px] leading-relaxed flex-1">{item.descripcion}</p>
+                      )}
+                      {url && (
+                        <span className="mt-auto pt-1 text-[9px] font-bold uppercase tracking-widest text-yellow-400 flex items-center gap-1">
+                          Ver producto <ExternalLink size={9} />
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 )
+                return url
+                  ? <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="snap-start flex-shrink-0 w-[44vw] md:w-auto">{inner}</a>
+                  : <div key={i} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">{inner}</div>
               })}
             </div>
           </div>
