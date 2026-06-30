@@ -76,7 +76,7 @@ const FAQ_JSONLD = {
 function CuidadoCard({ item, index }) {
   const Icon = item.icon
   return (
-    <div className="snap-start flex-shrink-0 w-[calc(100vw-2rem)] md:w-72 lg:w-80 bg-black/40 p-8 border-l-4 border-zinc-600 rounded-r-lg hover:bg-black/60 transition-colors">
+    <div className="snap-start flex-shrink-0 w-[calc(100vw-2rem)] md:w-72 lg:w-80 bg-black/40 p-5 sm:p-6 border-l-4 border-zinc-600 rounded-r-lg hover:bg-black/60 transition-colors">
       <div className="flex items-center gap-4 mb-4">
         <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center shrink-0 text-zinc-300">
           <Icon size={22} />
@@ -129,7 +129,7 @@ export default function CuidadosPage() {
       <Navbar showInicio={true} />
 
       {/* VOLVER */}
-      <div className="pt-24 md:pt-32 px-4 max-w-7xl mx-auto">
+      <div className="pt-24 px-4 max-w-7xl mx-auto">
         <Link
           to="/jhumaneztattoo#cuidados"
           className="inline-flex items-center gap-2 text-zinc-400 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors"
@@ -140,7 +140,7 @@ export default function CuidadosPage() {
       </div>
 
       {/* HERO */}
-      <section className="pt-6 md:pt-10 pb-10 md:pb-16 px-4 text-center">
+      <section className="pt-6 md:pt-10 pb-6 md:pb-8 px-4 text-center">
         <h1 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter">
           {HERO_TEXT.title}
         </h1>
@@ -151,7 +151,7 @@ export default function CuidadosPage() {
       </section>
 
       {/* CONTENIDO */}
-      <section className="max-w-7xl mx-auto px-4 pb-12 md:pb-24">
+      <section className="max-w-7xl mx-auto px-4 pb-6 md:pb-10">
 
         {/* ANTES — ambos bloques quedan en el DOM para que Google indexe todo el contenido */}
         <div id="antes" className={tab === 'antes' ? '' : 'hidden'}>
@@ -174,7 +174,7 @@ export default function CuidadosPage() {
       </section>
 
       {/* CIERRE + CTA */}
-      <section className="border-t border-white/5 py-12 md:py-20 px-4">
+      <section className="border-t border-white/5 py-8 md:py-12 px-4">
         <div className="max-w-3xl mx-auto text-center space-y-8">
 
           <p className="text-gray-300 text-lg leading-relaxed font-light">
