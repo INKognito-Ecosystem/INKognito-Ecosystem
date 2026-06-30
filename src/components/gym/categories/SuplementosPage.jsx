@@ -241,12 +241,12 @@ export default function SuplementosPage() {
       {apiAfiliados.length > 0 && (
         <section className="border-t-2 border-green-500/20 bg-[#0c0c0c] px-4 md:px-6 py-10 md:py-14">
           <div className="max-w-7xl mx-auto">
-            <p className="text-green-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ Amplía tu stack</p>
+            <p className="text-green-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ Las marcas que no llegan al local, disponibles para ti</p>
             <h2 className="text-2xl md:text-3xl font-black uppercase leading-none mb-2 text-white">
-              Más opciones, mismos resultados
+              Los suplementos que ya usan los que van en serio
             </h2>
             <p className="text-gray-500 text-sm mb-8 max-w-lg leading-relaxed">
-              Suplementos adicionales disponibles con envío a toda Colombia. Plataformas de confianza, productos verificados.
+              Proteínas, creatinas y pre-entrenos de marcas internacionales desde Mercado Libre con envío a Colombia. La misma calidad de los grandes, sin pagar el sobreprecio del intermediario. Complementa tu stack sin limitarte a lo que hay en Urabá.
             </p>
             <div className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
               {apiAfiliados.map((item, i) => {

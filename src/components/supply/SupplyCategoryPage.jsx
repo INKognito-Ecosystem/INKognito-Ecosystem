@@ -321,18 +321,19 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
               ))}
             </div>
           ) : products.length === 0 ? (
-            <div className="mx-6 border border-blue-500/20 bg-zinc-950 rounded-2xl p-12 text-center">
-              <p className="text-zinc-400 text-lg mb-2">Próximamente disponible</p>
-              <p className="text-zinc-600 text-sm mb-6">
-                Escríbenos para consultar disponibilidad de {title.toLowerCase()}.
+            <div className="mx-6 border border-blue-500/20 bg-zinc-950 rounded-2xl p-10 text-center">
+              <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2">Sin stock por el momento</p>
+              <p className="text-white text-lg font-black uppercase mb-2">Próximamente disponible</p>
+              <p className="text-zinc-500 text-sm mb-6 max-w-sm mx-auto">
+                Déjanos tu número y te avisamos cuando tengamos {title.toLowerCase()} disponibles. Sé el primero en saber.
               </p>
               <a
-                href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero consultar ${title} disponibles`)}`}
+                href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero que me avisen cuando haya ${title} disponibles en INKognito Supply.`)}`}
                 target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white font-bold uppercase tracking-[0.15em] text-sm rounded hover:bg-blue-600 transition"
               >
                 <FaWhatsapp size={18} />
-                Consultar disponibilidad
+                Avisarme cuando haya stock →
               </a>
             </div>
           ) : (

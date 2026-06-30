@@ -312,12 +312,12 @@ export default function GymPage() {
       {gymAfiliados.length > 0 && (
         <section className="border-t-2 border-yellow-500/20 bg-[#0c0c0c] px-4 md:px-6 py-10 md:py-14">
           <div className="max-w-7xl mx-auto">
-            <p className="text-yellow-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ Consigue los materiales</p>
+            <p className="text-yellow-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ Lo que necesitas para construir, disponible hoy</p>
             <h2 className="text-2xl md:text-3xl font-black uppercase leading-none mb-2 text-white">
-              Construye sin límites
+              Fabrica sin que te falte nada
             </h2>
             <p className="text-gray-500 text-sm mb-8 max-w-lg leading-relaxed">
-              Materiales, componentes y accesorios con envío a toda Colombia. Solo publicamos lo que vale la pena comprar para tu proyecto.
+              Ruedas, poleas, cables y componentes disponibles en AliExpress y Mercado Libre con envío a toda Colombia. Material verificado para que no improvises ni pagues de más. Un gym propio empieza con las piezas correctas.
             </p>
             <div className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
               {gymAfiliados.map((item, i) => {
