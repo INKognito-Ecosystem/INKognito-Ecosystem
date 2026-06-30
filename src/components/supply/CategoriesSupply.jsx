@@ -27,7 +27,7 @@ export default function CategoriesSupply() {
   }
 
   return (
-    <section id="categorias" className="pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-black">
+    <section id="categorias" className="pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950">
       <div className="max-w-7xl mx-auto">
 
         <div className="mb-4 md:mb-8">

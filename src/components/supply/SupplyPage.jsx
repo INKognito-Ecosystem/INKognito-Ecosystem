@@ -33,7 +33,7 @@ export default function SupplyPage() {
 
   return (
 
-    <main className="bg-black text-white">
+    <main className="bg-gray-950 text-white">
 
     <Seo
       title="INKognito Supply | Insumos y equipos para tatuaje en Urabá"

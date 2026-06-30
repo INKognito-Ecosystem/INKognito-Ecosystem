@@ -99,7 +99,7 @@ export default function FeaturedProductsSupply() {
   const { categorias, allProducts, loading } = useCatalog('supply')
 
   return (
-    <section id="productos" className="pt-12 md:pt-16 lg:pt-20 pb-4 md:pb-6 lg:pb-8 px-6 bg-black">
+    <section id="productos" className="pt-12 md:pt-16 lg:pt-20 pb-4 md:pb-6 lg:pb-8 px-6 bg-gray-950">
       <div className="max-w-7xl mx-auto">
 
         <div className="mb-12 text-center max-w-3xl mx-auto">
