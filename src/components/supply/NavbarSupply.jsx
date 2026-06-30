@@ -41,7 +41,7 @@ export default function NavbarSupply() {
               <button onClick={() => scrollTo('marcas')} className="uppercase text-sm tracking-[0.2em] text-zinc-400 hover:text-white transition-all duration-300">
                 Marcas
               </button>
-              <button className="uppercase text-sm tracking-[0.2em] text-zinc-400 hover:text-white transition-all duration-300">
+              <button onClick={() => scrollTo('contacto-desktop')} className="uppercase text-sm tracking-[0.2em] text-zinc-400 hover:text-white transition-all duration-300">
                 Contacto
               </button>
             </div>

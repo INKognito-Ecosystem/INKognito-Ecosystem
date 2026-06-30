@@ -43,43 +43,43 @@ const gymJsonLd = {
 const servicios = [
   {
     icon: Wrench,
-    titulo: 'Máquinas bajo pedido',
-    descripcion: 'Fabrico máquinas de gym a tu medida, con soldadura profesional y a precios muy accesibles.',
+    titulo: 'Máquinas',
+    texto: 'Acero, soldadura profesional, a tu medida.',
     link: '/gym/maquinas-pedido',
   },
   {
     icon: FileText,
-    titulo: 'Planos Digitales',
-    descripcion: 'Planos técnicos en PDF para fabricar tus propias máquinas de gym.',
+    titulo: 'Planos PDF',
+    texto: 'Medidas exactas para fabricarlas tú mismo.',
     scrollTo: 'planos',
   },
   {
     icon: FlaskConical,
     titulo: 'Suplementos',
-    descripcion: 'Proteína, creatina, pre-entreno y vitaminas para potenciar tu entrenamiento.',
+    texto: 'Proteína, creatina y pre-entreno.',
     link: '/gym/suplementos',
   },
   {
     icon: PlayCircle,
-    titulo: 'Tutoriales en video',
-    descripcion: 'Videos paso a paso de cómo construir mancuernas, discos y máquinas caseras.',
+    titulo: 'Tutoriales',
+    texto: 'Construye máquinas caseras paso a paso.',
     link: '/gym/tutoriales',
   },
   {
     icon: GraduationCap,
-    titulo: 'Cursos recomendados',
-    descripcion: 'Los mejores cursos de entrenamiento, nutrición y fabricación en español.',
+    titulo: 'Cursos',
+    texto: 'Entrenamiento y nutrición en español.',
     link: '/gym/cursos',
   },
   {
     icon: BookOpen,
-    titulo: 'Recursos gratis',
-    descripcion: 'Ebooks gratuitos sobre hábitos y entrenamiento para empezar desde cero.',
+    titulo: 'Recursos',
+    texto: 'Ebooks y guías gratuitas para empezar.',
     link: '/gym/recursos',
   },
 ]
 
-const CARD_CLASS = 'border border-gray-800 bg-gray-900/60 rounded-2xl p-6 flex flex-col gap-4 hover:border-gray-600 hover:bg-gray-900/80 transition-all duration-300 group'
+const CARD_CLASS = 'border border-gray-800 bg-gray-900/60 rounded-xl p-3 md:p-4 flex flex-col gap-2 hover:border-gray-600 hover:bg-gray-900/80 transition-all duration-300 group'
 
 const membresiaMsg = `https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero el acceso completo a todos los planos de Gym')}`
 
@@ -108,24 +108,18 @@ export default function GymPage() {
       <NavbarGym />
 
       {/* HERO */}
-      <section className="relative pt-20 md:pt-28 pb-24 px-4 md:px-6 overflow-hidden">
+      <section className="relative pt-16 md:pt-24 pb-8 md:pb-14 px-4 md:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
-        <div className="relative z-10 max-w-7xl mx-auto">
-          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-4">
-            Gym casero — Urabá, Colombia
-          </p>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase leading-none mb-6">
-            Construí mi<br />
+        <div className="relative z-10 max-w-7xl mx-auto text-center md:text-left">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase leading-none mb-5">
+            Construyo mi<br />
             <span className="text-gray-400">propio gym</span><br />
             desde cero
           </h1>
-          <p className="text-gray-400 text-lg md:text-xl leading-relaxed max-w-2xl mb-10">
-            Máquinas fabricadas a mano, planos digitales y recursos para entrenar en casa sin gastar una fortuna.
-          </p>
           <button
             onClick={() => setHistoriaModalOpen(true)}
-            className="inline-block border border-gray-600 text-gray-300 text-sm font-bold uppercase tracking-[0.2em] py-4 px-8 rounded hover:border-gray-300 hover:text-white transition-all duration-300"
+            className="inline-block border border-gray-600 text-gray-300 text-sm font-bold uppercase tracking-[0.2em] py-3 px-7 rounded hover:border-gray-300 hover:text-white transition-all duration-300"
           >
             Nuestra historia
           </button>
@@ -133,37 +127,37 @@ export default function GymPage() {
       </section>
 
       {/* LO QUE PUEDES CONSEGUIR AQUÍ */}
-      <section className="pb-20 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-gray-800 pt-16">
-          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Servicios</p>
-          <h2 className="text-3xl md:text-5xl font-black uppercase leading-none mb-12">
+      <section className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="border-t border-gray-800 pt-3 md:pt-8">
+          <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-4 md:mb-8">
             Lo que puedes conseguir aquí
           </h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* 2 cards visibles en móvil, 6 en desktop */}
+          <div className="flex md:grid md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
             {servicios.map((s) => {
               const Icon = s.icon
               const inner = (
                 <>
-                  {Icon && <Icon size={28} className="text-gray-400 group-hover:text-white transition-colors duration-300" />}
-                  <h3 className="text-base font-black uppercase tracking-wide leading-tight">{s.titulo}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed flex-1">{s.descripcion}</p>
-                  <span className="text-gray-500 text-xs font-bold uppercase tracking-[0.2em] group-hover:text-gray-300 transition-colors duration-300">
-                    Ver más →
-                  </span>
+                  <div className="flex items-center justify-between gap-1">
+                    <h3 className="text-xs md:text-xs font-black uppercase tracking-wide leading-tight">{s.titulo}</h3>
+                    {Icon && <Icon size={18} className="text-gray-500 group-hover:text-white transition-colors duration-300 flex-shrink-0" />}
+                  </div>
+                  <p className="text-xs leading-snug text-gray-500 group-hover:text-gray-400 transition-colors duration-300">{s.texto}</p>
                 </>
               )
+              const cardCls = `${CARD_CLASS} snap-start flex-shrink-0 w-[44vw] md:w-auto`
               return s.scrollTo
                 ? (
                     <button
                       key={s.titulo}
                       onClick={() => scrollToSection(s.scrollTo)}
-                      className={`${CARD_CLASS} text-left w-full`}
+                      className={`${cardCls} text-left`}
                     >
                       {inner}
                     </button>
                   )
                 : (
-                    <Link key={s.titulo} to={s.link} className={CARD_CLASS}>
+                    <Link key={s.titulo} to={s.link} className={cardCls}>
                       {inner}
                     </Link>
                   )
@@ -173,11 +167,13 @@ export default function GymPage() {
       </section>
 
       {/* PLANOS DIGITALES */}
-      <section id="planos" className="pb-20 px-4 md:px-6 max-w-7xl mx-auto scroll-mt-20">
-        <div className="border-t border-gray-800 pt-16">
-          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Descarga digital</p>
-          <h2 className="text-3xl md:text-5xl font-black uppercase leading-none mb-6">Planos digitales</h2>
-          <p className="text-gray-400 leading-relaxed max-w-2xl mb-12 text-sm md:text-base">
+      <section id="planos" className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto scroll-mt-20">
+        <div className="border-t border-gray-800 pt-3 md:pt-8">
+          <div className="flex items-center justify-between gap-4 mb-3 md:block">
+            <h2 className="text-2xl md:text-4xl font-black uppercase leading-none md:mb-3">Planos digitales</h2>
+            <FileText size={56} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+          </div>
+          <p className="text-gray-400 leading-relaxed max-w-2xl mb-6 text-sm md:text-base">
             Son planos técnicos completos en formato PDF, con medidas exactas y lista de materiales necesarios para construir cada equipo. Pensados para quien quiere fabricar sus propias máquinas de gym en casa — ya sea para uso personal o para empezar su propio negocio de fabricación de equipos fitness.
           </p>
 
@@ -197,7 +193,7 @@ export default function GymPage() {
                 </p>
               </div>
               <div className="flex flex-col items-start md:items-end gap-3 shrink-0">
-                <span className="text-3xl font-black text-white">$XX.000 COP</span>
+                <span className="text-3xl font-black text-white">$10.000 COP</span>
                 <a
                   href={membresiaMsg}
                   target="_blank"
@@ -219,10 +215,9 @@ export default function GymPage() {
       </section>
 
       {/* MIS CREACIONES */}
-      <section className="pb-20 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-gray-800 pt-16">
-          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Portafolio</p>
-          <h2 className="text-3xl md:text-5xl font-black uppercase leading-none mb-12">Mis creaciones</h2>
+      <section className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="border-t border-gray-800 pt-3 md:pt-8">
+          <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-4 md:mb-8">Mis creaciones</h2>
 
           {creaciones.length === 0 ? (
             <div className="border border-gray-800 bg-gray-900/30 rounded-2xl py-20 text-center">
@@ -230,47 +225,48 @@ export default function GymPage() {
               <p className="text-gray-600 text-sm">Estamos cargando el portafolio de máquinas</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {creaciones.map((item) => (
-                <div key={item.name} className="border border-gray-800 bg-gray-900 rounded-xl overflow-hidden">
-                  <div className="aspect-video bg-gray-700 flex items-center justify-center">
-                    {item.video ? (
-                      <iframe
-                        src={item.video}
-                        title={item.name}
-                        className="w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    ) : item.image ? (
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => { e.target.style.display = 'none' }}
-                      />
-                    ) : (
-                      <span className="text-gray-600 text-xs uppercase tracking-widest text-center px-3">Imagen próximamente</span>
-                    )}
+            <>
+              <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+                {creaciones.map((item) => (
+                  <div key={item.name} className="snap-start flex-shrink-0 w-[46vw] md:w-auto border border-gray-800 bg-gray-900 rounded-xl overflow-hidden">
+                    <div className="aspect-video bg-gray-700 flex items-center justify-center">
+                      {item.video ? (
+                        <iframe
+                          src={item.video}
+                          title={item.name}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => { e.target.style.display = 'none' }}
+                        />
+                      ) : (
+                        <span className="text-gray-600 text-xs uppercase tracking-widest text-center px-3">Imagen próximamente</span>
+                      )}
+                    </div>
+                    <div className="p-3">
+                      <p className="font-black uppercase text-xs leading-tight mb-1">{item.name}</p>
+                      <p className="text-gray-500 text-xs leading-relaxed">{item.description}</p>
+                    </div>
                   </div>
-                  <div className="p-3">
-                    <p className="font-black uppercase text-xs leading-tight mb-1">{item.name}</p>
-                    <p className="text-gray-500 text-xs leading-relaxed">{item.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </section>
 
       {/* MÁQUINAS BAJO PEDIDO + CONTACTO — UNIFICADO */}
-      <section className="pb-24 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-gray-800 pt-16">
-          <div className="flex items-end justify-between mb-10">
+      <section className="pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="border-t border-gray-800 pt-3 md:pt-8">
+          <div className="flex items-end justify-between mb-5 md:mb-8">
             <div>
-              <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">Soldadura profesional</p>
-              <h2 className="text-3xl md:text-5xl font-black uppercase leading-none">Máquinas bajo pedido</h2>
+              <h2 className="text-2xl md:text-4xl font-black uppercase leading-none">Máquinas bajo pedido</h2>
             </div>
             <Link
               to="/gym/maquinas-pedido"

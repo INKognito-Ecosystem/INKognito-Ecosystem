@@ -3,19 +3,7 @@ import FooterStore from '../FooterStore'
 import { FaWhatsapp } from 'react-icons/fa'
 import StoreProductCard from '../StoreProductCard'
 import Seo from '../../Seo'
-
-const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
-
-const products = [
-  { id: 1, name: 'Short Running Hombre', brand: 'Nike', price: '$65.000', tag: 'Running' },
-  { id: 2, name: 'Conjunto Deportivo Pro', brand: 'Adidas', price: '$125.000', tag: 'Training' },
-  { id: 3, name: 'Camiseta Dry-Fit Pro', brand: 'Nike', price: '$55.000', tag: 'Gym' },
-  { id: 4, name: 'Pants Jogger Premium', brand: 'Puma', price: '$89.000', tag: 'Casual-Sport' },
-  { id: 5, name: 'Conjunto Ciclismo Hombre', brand: 'Adidas', price: '$145.000', tag: 'Ciclismo' },
-  { id: 6, name: 'Sudadera con Capucha', brand: 'Nike', price: '$109.000', tag: 'Urbano' },
-  { id: 7, name: 'Set Training Hombre', brand: 'Under Armour', price: '$139.000', tag: 'Entrenamiento' },
-  { id: 8, name: 'Licra Deportiva Hombre', brand: 'Adidas', price: '$79.000', tag: 'Compresión' },
-]
+import { useCatalog, toProdCard } from '../../../hooks/useCatalog'
 
 const faqs = [
   {
@@ -41,6 +29,8 @@ const faqs = [
 ]
 
 export default function RopaCaballerosPage() {
+  const { allProducts: catalogItems, loading } = useCatalog('store', 'Ropa Caballeros')
+
   return (
     <>
       <Seo
@@ -69,19 +59,36 @@ export default function RopaCaballerosPage() {
         </div>
       </div>
 
-      {/* PRODUCTS */}
+      {/* PRODUCTS — dinámico desde el panel */}
       <div className="bg-gray-50 pt-4 pb-10 md:pt-6 md:pb-14 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {products.map((product) => (
-              <StoreProductCard
-                key={product.id}
-                product={product}
-                category="ropa-caballeros"
-                sizes={CLOTHING_SIZES}
-              />
-            ))}
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="bg-gray-200 rounded-xl animate-pulse aspect-[3/4]" />
+              ))}
+            </div>
+          ) : catalogItems.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-gray-400 text-lg mb-4">Catálogo actualizándose…</p>
+              <p className="text-gray-400 text-sm">Escríbenos por WhatsApp para ver disponibilidad</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {catalogItems.map(item => {
+                const prod = toProdCard(item)
+                const sizes = item.variantes.map(v => v.variant).filter(Boolean)
+                return (
+                  <StoreProductCard
+                    key={item.name}
+                    product={prod}
+                    category="ropa-caballeros"
+                    sizes={sizes.length ? sizes : ['Talla única']}
+                  />
+                )
+              })}
+            </div>
+          )}
         </div>
       </div>
 

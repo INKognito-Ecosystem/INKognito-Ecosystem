@@ -5,7 +5,7 @@ import imgmifoto from '../../assets/mifoto/fondoperfilweb.jpg'
 export default function Hero() {
   return (
     <section className="relative overflow-hidden min-h-screen bg-black flex items-center justify-center pt-24 pb-12">
-      
+
       {/* FONDO */}
 <img
   src={heroBg}
@@ -29,9 +29,9 @@ export default function Hero() {
 
           </div>
 
-          <div className="mt-8 text-center">
+          <div className="mt-3 text-center">
 
-            <h2 className="text-4xl font-black uppercase tracking-tighter text-white">
+            <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white">
               Jose Humanez
             </h2>
 
@@ -39,11 +39,18 @@ export default function Hero() {
               Tatuador Profesional
             </p>
 
-            <p className="text-gray-500 text-sm mt-3 font-medium">
+            <p className="text-gray-500 text-sm mt-2 font-medium">
               Chigorodó, Antioquia • Colombia
             </p>
 
           </div>
+
+          <Link
+            to="/portafolio"
+            className="mt-5 px-10 py-4 rounded bg-zinc-600 text-white font-black text-sm uppercase tracking-widest hover:bg-green-500 transition-all transform hover:-translate-y-1 text-center shadow-lg"
+          >
+            Ver Portafolio
+          </Link>
         </div>
 
         {/* DERECHA */}
@@ -72,16 +79,6 @@ export default function Hero() {
 
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-5 justify-center md:justify-start">
-
-            <Link
-              to="/portafolio"
-              className="px-10 py-4 rounded bg-zinc-600 text-white font-black text-sm uppercase tracking-widest hover:bg-green-500 transition-all transform hover:-translate-y-1 text-center shadow-lg"
-            >
-              Ver Portafolio
-            </Link>
-
-          </div>
         </div>
 
       </div>

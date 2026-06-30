@@ -1,6 +1,7 @@
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import Seo from '../../Seo'
+import { PlayCircle } from 'lucide-react'
 
 const videos = [
   {
@@ -43,7 +44,7 @@ export default function VideosTutorialesPage() {
       <NavbarGym />
 
       {/* HERO */}
-      <section className="relative pt-28 md:pt-36 pb-16 px-4 md:px-6 overflow-hidden">
+      <section className="relative pt-16 md:pt-24 pb-6 md:pb-10 px-4 md:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div
           className="absolute inset-0 opacity-[0.04]"
@@ -54,11 +55,13 @@ export default function VideosTutorialesPage() {
         />
         <div className="relative z-10 max-w-7xl mx-auto">
         <div className="mb-0">
-          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">YouTube</p>
-          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-6">
-            Tutoriales<br />
-            <span className="text-gray-400">en video</span>
-          </h1>
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
+              Tutoriales<br />
+              <span className="text-gray-400">en video</span>
+            </h1>
+            <PlayCircle size={80} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+          </div>
           <div className="flex flex-col md:flex-row md:items-end gap-6">
             <p className="text-gray-400 leading-relaxed max-w-2xl">
               Videos paso a paso de cómo construir equipos de gym caseros. Los videos se reproducen directamente desde YouTube.
@@ -76,12 +79,12 @@ export default function VideosTutorialesPage() {
         </div>
       </section>
 
-      <div className="pb-24 px-4 md:px-6 max-w-7xl mx-auto pt-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto pt-6 md:pt-8">
+        <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
           {videos.map((v) => (
             <div
               key={v.id}
-              className="border border-gray-800 bg-gray-800/40 rounded-2xl overflow-hidden hover:border-gray-600 transition-all duration-300"
+              className="snap-start flex-shrink-0 w-[70vw] md:w-auto border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden hover:border-gray-600 transition-all duration-300"
             >
               <div className="relative w-full aspect-video bg-gray-800">
                 <iframe
@@ -92,13 +95,12 @@ export default function VideosTutorialesPage() {
                   allowFullScreen
                 />
               </div>
-              <div className="p-5">
-                <h3 className="font-black uppercase text-sm leading-tight">{v.titulo}</h3>
+              <div className="p-2 md:p-3">
+                <h3 className="font-black uppercase text-[10px] md:text-xs leading-tight">{v.titulo}</h3>
               </div>
             </div>
           ))}
         </div>
-
       </div>
 
       <FooterGym />

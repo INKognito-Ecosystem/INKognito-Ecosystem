@@ -10,15 +10,15 @@ export default function Testimonials() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-center mb-8 md:mb-16">
           <div className="w-full max-w-4xl bg-white text-black py-4 rounded shadow-lg">
-            <h2 className="text-2xl md:text-4xl font-black uppercase tracking-widest text-center">
+            <h2 className="text-base sm:text-2xl md:text-4xl font-black uppercase tracking-tight sm:tracking-widest text-center whitespace-nowrap px-2">
               Lo que dicen nuestros clientes
             </h2>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="flex md:grid md:grid-cols-3 gap-6 md:gap-8 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
           {REVIEWS.map((review) => (
-            <div key={review.id} className="bg-black/40 p-8 border-l-4 border-tattoo-accent rounded-r-lg hover:bg-black/60 transition-colors">
+            <div key={review.id} className="snap-start flex-shrink-0 w-[calc(100vw-2rem)] md:w-auto bg-black/40 p-8 border-l-4 border-tattoo-accent rounded-r-lg hover:bg-black/60 transition-colors">
               <div className="text-tattoo-accent text-4xl mb-4 font-serif">"</div>
               <p className="text-gray-300 italic mb-6 leading-relaxed">"{review.text}"</p>
               <div>

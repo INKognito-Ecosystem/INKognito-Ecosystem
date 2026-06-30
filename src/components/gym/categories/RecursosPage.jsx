@@ -2,6 +2,7 @@ import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import Seo from '../../Seo'
 import { FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa'
+import { BookOpen } from 'lucide-react'
 
 const GRID_PATTERN = {
   backgroundImage:
@@ -38,17 +39,22 @@ export default function RecursosPage() {
       <NavbarGym />
 
       {/* HERO */}
-      <section className="relative pt-28 md:pt-36 pb-16 px-4 md:px-6 overflow-hidden">
+      <section className="relative pt-16 md:pt-24 pb-6 md:pb-10 px-4 md:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
-          <p className="uppercase tracking-[0.25em] text-gray-500 text-xs md:text-sm mb-3">
-            Descarga gratuita
-          </p>
-          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-4">
-            Recursos<br />
-            <span className="text-gray-400">gratuitos</span>
-          </h1>
+          {/* H1 + icono grande a la derecha en móvil */}
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
+              Recursos<br />
+              <span className="text-gray-400">gratuitos</span>
+            </h1>
+            <BookOpen
+              size={80}
+              className="text-gray-800 flex-shrink-0 md:hidden"
+              strokeWidth={1}
+            />
+          </div>
           <p className="text-gray-400 leading-relaxed max-w-2xl">
             No necesitas pagar nada para empezar a cambiar tu vida. Estos recursos nacieron de mi propia experiencia — construyendo mi gym desde cero, entrenando sin equipo, y aprendiendo a base de prueba y error. Si a mí me sirvió, puede servirte a ti también. Descárgalos, úsalos, y empieza donde estás.
           </p>
@@ -56,16 +62,15 @@ export default function RecursosPage() {
       </section>
 
       {/* GRID DE EBOOKS */}
-      <div className="pb-24 px-4 md:px-6 max-w-2xl mx-auto pt-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div className="pb-8 md:pb-14 px-4 md:px-6 max-w-xl mx-auto pt-6 md:pt-8">
+        <div className="grid grid-cols-2 gap-3">
           {ebooks.map((eb) => (
             <div
               key={eb.id}
               className="border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
-              style={{ maxHeight: '300px' }}
             >
-              {/* PORTADA */}
-              <div className="relative bg-gray-800 flex items-center justify-center flex-1 min-h-0 overflow-hidden">
+              {/* PORTADA — altura fija 2x (alinea ambas cards) */}
+              <div className="relative bg-gray-800 flex items-center justify-center h-36">
                 {eb.imagen ? (
                   <img
                     src={eb.imagen}
@@ -74,20 +79,17 @@ export default function RecursosPage() {
                     onError={(e) => { e.target.style.display = 'none' }}
                   />
                 ) : (
-                  <div className="flex flex-col items-center justify-center gap-2 px-4 text-center py-6">
-                    <span className="text-gray-600 text-2xl">📖</span>
-                    <span className="text-gray-700 text-[10px] uppercase tracking-widest">Próximamente</span>
-                  </div>
+                  <span className="text-gray-700 text-[9px] uppercase tracking-widest">Portada próximamente</span>
                 )}
               </div>
 
-              {/* CONTENIDO */}
-              <div className="p-3 flex flex-col gap-2 flex-shrink-0">
-                <div>
-                  <h2 className="font-black uppercase text-xs leading-tight mb-1">{eb.nombre}</h2>
+              {/* INFO — ancho completo, título arriba, botón abajo */}
+              <div className="p-2 flex flex-col flex-1 border-t border-gray-800">
+                <div className="flex-1">
+                  <h2 className="font-black uppercase text-[11px] leading-tight mb-1">{eb.nombre}</h2>
                   <p className="text-gray-500 text-[10px] leading-relaxed line-clamp-2">{eb.descripcion}</p>
                 </div>
-                <div className="pt-2 border-t border-gray-800">
+                <div className="mt-2 pt-1.5 border-t border-gray-800">
                   <a
                     href={eb.pdf}
                     download
@@ -102,20 +104,20 @@ export default function RecursosPage() {
         </div>
 
         {/* SECCIÓN REDES */}
-        <div className="mt-16 border-t border-gray-800 pt-12 text-center max-w-xl mx-auto">
+        <div className="mt-8 border-t border-gray-800 pt-8 text-center max-w-xl mx-auto">
           <p className="text-gray-400 leading-relaxed text-sm md:text-base mb-8">
             Si estos recursos te fueron de ayuda, te invito a seguirme en mis redes y a suscribirte a mi canal de YouTube — ahí comparto todo el proceso de construir esto desde cero.
           </p>
           <div className="flex items-center justify-center gap-8">
-            <a href="#" target="_blank" rel="noopener noreferrer"
+            <a href="https://www.instagram.com/jhumaneztattoo" target="_blank" rel="noopener noreferrer"
                className="text-gray-500 hover:text-white transition-colors duration-300">
               <FaInstagram size={28} />
             </a>
-            <a href="#" target="_blank" rel="noopener noreferrer"
+            <a href="https://www.facebook.com/jhumaneztattoo" target="_blank" rel="noopener noreferrer"
                className="text-gray-500 hover:text-white transition-colors duration-300">
               <FaFacebookF size={28} />
             </a>
-            <a href="#" target="_blank" rel="noopener noreferrer"
+            <a href="https://www.youtube.com/@JhumanezZ" target="_blank" rel="noopener noreferrer"
                className="text-gray-500 hover:text-white transition-colors duration-300">
               <FaYoutube size={28} />
             </a>

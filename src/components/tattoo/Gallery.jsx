@@ -62,7 +62,11 @@ export default function Gallery({ onLightboxChange = () => {} }) {
           <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tighter uppercase">
             Portafolio
           </h2>
-          <div className="h-1 w-20 bg-zinc-600 mx-auto"></div>
+          <div className="h-1 w-20 bg-zinc-600 mx-auto mb-6"></div>
+          <p className="text-gray-400 text-base md:text-lg max-w-xl mx-auto leading-relaxed font-light">
+            Cada tatuaje cuenta una historia distinta. Esta es una muestra real de mi trabajo
+            en realismo, sombras y línea fina, tal como queda después de cada sesión — sin filtros ni retoques.
+          </p>
         </div>
 
         {/* GRID */}
@@ -71,15 +75,16 @@ export default function Gallery({ onLightboxChange = () => {} }) {
             <div
               key={item.id}
               onClick={() => openLightbox(index)}
-              className="group relative overflow-hidden rounded-lg aspect-square bg-gray-900 cursor-pointer"
+              className="group relative overflow-y-auto scrollbar-hide rounded-lg aspect-square bg-gray-900 cursor-pointer"
             >
               <img
                 src={item.img}
                 alt={item.title}
                 loading="lazy"
-                className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                className="block w-full h-auto"
+                style={{ filter: 'contrast(1.12) saturate(1.15)' }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 pointer-events-none">
                 <p className="text-zinc-300 text-sm font-bold uppercase tracking-widest mb-1">
                   {item.category}
                 </p>
@@ -89,6 +94,18 @@ export default function Gallery({ onLightboxChange = () => {} }) {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* CIERRE ESTRATEGICO */}
+        <div className="text-center mt-12 md:mt-20 max-w-2xl mx-auto px-2">
+          <div className="h-1 w-20 bg-zinc-600 mx-auto mb-6"></div>
+          <h3 className="text-2xl md:text-3xl font-black uppercase italic mb-4">
+            ¿Ya tienes una idea en mente?
+          </h3>
+          <p className="text-gray-400 text-base md:text-lg leading-relaxed font-light">
+            Cada proyecto empieza con una buena conversación. Cuéntame qué quieres tatuarte
+            y trabajemos juntos en una pieza que se vea tan bien en años como el día que saliste del estudio.
+          </p>
         </div>
       </div>
 

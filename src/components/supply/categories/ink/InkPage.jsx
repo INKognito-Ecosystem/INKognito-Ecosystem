@@ -1,191 +1,34 @@
-import { Link } from 'react-router-dom'
-import FooterSupply from '../../FooterSupply'
-import NavbarCategory from '../../NavbarCategory'
-import Seo from '../../../Seo'
+import SupplyCategoryPage from '../../SupplyCategoryPage'
 
-const products = [
-  { id: 1, name: 'Vice Colors Set',   brand: 'Vice',         link: '/supply/ink/vice-colors' },
-  { id: 2, name: 'Dynamic Color Set', brand: 'Dynamic',      link: '/supply/ink/dynamic' },
-  { id: 3, name: 'Eternal Ink Set',   brand: 'Eternal',      link: '/supply/ink/eternal' },
-  { id: 4, name: 'Fusion Ink Set',    brand: 'Fusion',       link: '/supply/ink/fusion' },
-  { id: 5, name: 'World Famous Set',  brand: 'World Famous', link: '/supply/ink/world-famous' },
-  { id: 6, name: 'Solid Ink Set',     brand: 'Solid Ink',    link: '/supply/ink/solid-ink' },
-  { id: 7, name: 'Intenze Ink Set',   brand: 'Intenze',      link: '/supply/ink/intenze' },
+const intro = `Tintas y pigmentos de alta densidad para tatuadores profesionales en Chigorodó, Urabá. Colores con alta concentración de pigmento, formulados para definición nítida, larga duración y cicatrización limpia. Disponibles en 1oz, 2oz y 4oz según existencias.`
+
+const guide = [
+  { icon: '🎨', title: 'Negros y grises', text: 'Esenciales para realismo y sombras. Busca alta densidad para trazo limpio y negros absolutos sin dilución. Los negros de calidad mantienen el color sin desvanecer con los años.' },
+  { icon: '🌈', title: 'Colores vivos', text: 'Para color tradicional y neotrad. Elige tintas con alta saturación. Los rojos y amarillos son los más difíciles de mantener — invierte en marcas probadas.' },
+  { icon: '💧', title: 'Dilución correcta', text: 'Dilata solo con agua destilada estéril. Jamás con agua del grifo ni alcohol. La proporción correcta depende del efecto: del 10% al 50% según el gris que busques.' },
+  { icon: '🔒', title: 'Sellos y fechas', text: 'Verifica fecha de vencimiento y sello de seguridad. Tintas abiertas tienen vida útil de 12 meses. Almacena lejos de luz directa y a temperatura ambiente.' },
+  { icon: '📦', title: 'Cantidad por sesión', text: 'Para una sesión de 4-6 horas de trabajo en color calculas entre 3 y 6 tintas según paleta. En piezas grandes conviene tener respaldo de los colores base.' },
+  { icon: '🔬', title: 'Veganas y aptas piel', text: 'Todas las tintas en nuestro catálogo son libres de crueldad animal y formuladas para uso dérmico profesional, cumpliendo estándares de seguridad para tatuaje.' },
+]
+
+const faqs = [
+  { q: '¿Las tintas son originales de las marcas que ofrecen?', a: 'Sí. Trabajamos con distribución directa de las marcas que tenemos disponibles. Cada tinta viene con sello de fábrica y fecha de vencimiento visible.' },
+  { q: '¿Hacen envíos a ciudades fuera de Chigorodó?', a: 'Sí. Despachamos a Apartadó, Turbo, Carepa, Mutatá, Arboletes y otras ciudades de Urabá. Confirmamos tiempos y costos de envío por WhatsApp.' },
+  { q: '¿Qué tinta me recomiendan para comenzar en el realismo?', a: 'Para realismo negro y gris te recomendamos una tinta negra de alta densidad más sets de grises ya preparados. Escríbenos y te orientamos según tu estilo y máquina.' },
+  { q: '¿Tienen disponibilidad inmediata o es por pedido?', a: 'Depende del producto. Lo que ves en la tienda está en stock actual. Si necesitas algo específico que no aparece, escríbenos — podemos conseguirlo con tiempo.' },
+  { q: '¿Puedo comprar tintas individuales o solo cajas?', a: 'Vendemos por unidad y en cantidades mayores. El precio varía según volumen. Para compras de 6 unidades o más consultamos descuento especial.' },
 ]
 
 export default function InkPage() {
   return (
-    <>
-      <Seo
-        title="Tintas para tatuaje | INKognito Supply — Urabá"
-        description="Vice Colors, Dynamic, Eternal, Intenze, Fusion, World Famous y Solid Ink. La selección más completa de tintas profesionales en Urabá. Pedidos por WhatsApp."
-        siteName="INKognito Supply"
-        canonical={`${import.meta.env.VITE_SITE_URL}/supply/ink`}
-      />
-      <div className="min-h-screen bg-black text-white">
-
-        <NavbarCategory pageName="Tintas" />
-
-        <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">
-
-          <div className="mb-10 md:mb-16">
-
-            <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm mb-3">
-              Categoría
-            </p>
-
-            <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
-              Tintas
-            </h1>
-
-            <div className="mt-10 max-w-4xl">
-
-              <p className="text-zinc-400 leading-relaxed mb-5">
-                Las tintas para tatuaje son uno de los elementos más importantes
-                en el resultado final de cualquier trabajo. La calidad del
-                pigmento influye directamente en la saturación, cicatrización
-                y permanencia del tatuaje.
-              </p>
-
-              <p className="text-zinc-400 leading-relaxed mb-5">
-                En INKognito Supply reunimos algunas de las marcas más utilizadas
-                por artistas profesionales alrededor del mundo, incluyendo
-                Dynamic, Eternal Ink, Fusion, World Famous, Solid Ink,
-                Intenze y Vice Colors.
-              </p>
-
-              <p className="text-zinc-400 leading-relaxed">
-                Explora cada marca para descubrir sus líneas de color, negros,
-                greywash, tonos piel y configuraciones especializadas para
-                realismo, black and grey, color sólido y estilos de alta
-                saturación.
-              </p>
-
-            </div>
-
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
-
-            {products.map((product) => (
-
-              <div
-                key={product.id}
-                className="border border-zinc-800 bg-zinc-950 rounded-xl md:rounded-2xl overflow-hidden hover:border-zinc-600 transition-all duration-300"
-              >
-
-                <div className="aspect-square bg-zinc-900 relative overflow-hidden flex items-center justify-center">
-                  {product.image && (
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="absolute inset-0 w-full h-full object-cover"
-                      onError={(e) => { e.currentTarget.style.display = 'none' }}
-                    />
-                  )}
-                  <p className="text-zinc-700 uppercase tracking-[0.3em] text-xs md:text-sm">
-                    Product Image
-                  </p>
-                </div>
-
-                <div className="p-4 md:p-6">
-
-                  <p className="text-zinc-500 uppercase tracking-[0.2em] text-xs mb-1">
-                    {product.brand}
-                  </p>
-
-                  <h3 className="text-lg md:text-2xl font-black uppercase mb-3">
-                    {product.name}
-                  </h3>
-
-                  <Link
-                    to={product.link}
-                    className="block w-full py-2 text-center border border-zinc-700 uppercase tracking-[0.15em] text-xs hover:border-white hover:text-white transition-all duration-300"
-                  >
-                    Ver catálogo
-                  </Link>
-
-                </div>
-
-              </div>
-
-            ))}
-
-          </div>
-
-          <section className="mt-24 md:mt-32">
-
-            <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">
-              Preguntas frecuentes
-            </h2>
-
-            <div className="space-y-6">
-
-              <div className="border border-zinc-800 rounded-xl p-6">
-                <h3 className="font-bold text-lg mb-3">
-                  ¿Cuál es la mejor tinta para tatuar?
-                </h3>
-                <p className="text-zinc-400 leading-relaxed">
-                  No existe una única respuesta. Dynamic, Eternal, Fusion,
-                  World Famous y Solid Ink son algunas de las marcas más
-                  utilizadas por tatuadores profesionales dependiendo del
-                  estilo de trabajo.
-                </p>
-              </div>
-
-              <div className="border border-zinc-800 rounded-xl p-6">
-                <h3 className="font-bold text-lg mb-3">
-                  ¿Qué tinta utilizan los tatuadores profesionales?
-                </h3>
-                <p className="text-zinc-400 leading-relaxed">
-                  Las marcas más populares incluyen Dynamic, Eternal Ink,
-                  World Famous, Fusion, Solid Ink, Intenze y Vice Colors.
-                </p>
-              </div>
-
-              <div className="border border-zinc-800 rounded-xl p-6">
-                <h3 className="font-bold text-lg mb-3">
-                  ¿Cuál es la mejor tinta para realismo?
-                </h3>
-                <p className="text-zinc-400 leading-relaxed">
-                  Para realismo suelen utilizarse negros sólidos, greywash
-                  y tonos piel de marcas como Dynamic, Eternal, World Famous,
-                  Fusion y vice colors
-                </p>
-              </div>
-
-              <div className="border border-zinc-800 rounded-xl p-6">
-                <h3 className="font-bold text-lg mb-3">
-                  ¿Cuál es la mejor tinta para color?
-                </h3>
-                <p className="text-zinc-400 leading-relaxed">
-                  World Famous, Solid Ink, Eternal y Vice Colors destacan
-                  por su saturación y variedad cromática para trabajos
-                  a color.
-                </p>
-              </div>
-
-              <div className="border border-zinc-800 rounded-xl p-6">
-                <h3 className="font-bold text-lg mb-3">
-                  ¿Las tintas para tatuaje son seguras?
-                </h3>
-                <p className="text-zinc-400 leading-relaxed">
-                  Sí, siempre que provengan de fabricantes reconocidos y
-                  distribuidores confiables que trabajen con productos
-                  originales.
-                </p>
-              </div>
-
-            </div>
-
-          </section>
-
-        </div>
-
-      </div>
-
-      <FooterSupply />
-
-    </>
+    <SupplyCategoryPage
+      title="Tintas"
+      categoria="Tintas"
+      slug="ink"
+      desc="Tintas y pigmentos profesionales para tatuaje en Chigorodó, Urabá. Alta densidad, larga duración. Marcas como Vice Colors, Dynamic, Eternal. Envíos a Apartadó, Turbo y toda la región."
+      intro={intro}
+      guide={guide}
+      faqs={faqs}
+    />
   )
 }

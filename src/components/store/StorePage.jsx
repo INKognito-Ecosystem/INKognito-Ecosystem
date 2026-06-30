@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
 import { STORE_HOURS } from '../../config/business'
 import { FaWhatsapp } from 'react-icons/fa'
-import { Truck, Shield, Clock, MapPin, Star, Award, Shirt, Footprints, Sun, Trophy, Zap } from 'lucide-react'
+import { Truck, Shield, Clock, Star, Award, Shirt, Footprints, Sun, Trophy, Zap } from 'lucide-react'
 import NavbarStore from './NavbarStore'
 import FooterStore from './FooterStore'
 import StoreProductCard from './StoreProductCard'
 import Seo from '../Seo'
+import { useCatalog, toProdCard } from '../../hooks/useCatalog'
 const ogStore = '/og/store.webp'
 
 const categories = [
@@ -61,16 +62,6 @@ const categories = [
 
 const SHOE_SIZES = ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44']
 const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
-const CLOTHING_CATS = ['Ropa Dama', 'Ropa Caballeros']
-
-const featured = [
-  { id: 1, name: 'Leggings Running Pro', brand: 'Nike', price: '$89.000', category: 'Ropa Dama', tag: 'Running' },
-  { id: 2, name: 'Conjunto Deportivo Pro', brand: 'Adidas', price: '$125.000', category: 'Ropa Caballeros', tag: 'Training' },
-  { id: 3, name: 'Air Zoom Pegasus 40', brand: 'Nike', price: '$289.000', category: 'Zapatos Deportivos', tag: 'Running' },
-  { id: 4, name: 'Air Force 1 Low', brand: 'Nike', price: '$269.000', category: 'Zapatos Casuales', tag: 'Clásico' },
-  { id: 5, name: 'Predator Accuracy.1 FG', brand: 'Adidas', price: '$359.000', category: 'Guayos', tag: 'Terreno Firme' },
-  { id: 6, name: 'Mercurial Vapor 15 Club TF', brand: 'Nike', price: '$239.000', category: 'Tenis Guayo', tag: 'Velocidad' },
-]
 
 const cities = [
   { name: 'Chigorodó', time: '1–2 días' },
@@ -132,6 +123,8 @@ const storeJsonLd = {
 }
 
 export default function StorePage() {
+  const { allProducts: featuredItems, loading: featuredLoading } = useCatalog('store', 'Destacados')
+
   return (
     <main className="bg-white text-gray-900">
 
@@ -146,7 +139,7 @@ export default function StorePage() {
       <NavbarStore />
 
       {/* ── HERO ── */}
-      <section className="relative min-h-screen flex flex-col justify-start overflow-hidden pt-16 bg-gray-50">
+      <section className="relative min-h-[65vh] md:min-h-screen flex flex-col justify-start overflow-hidden pt-16 bg-gray-50">
         <div
           className="absolute inset-0"
           style={{
@@ -156,18 +149,18 @@ export default function StorePage() {
         />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C9A84C]/25 to-transparent" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-8 pb-12 text-center">
-          <p className="uppercase tracking-[0.4em] text-[#C9A84C] text-xs md:text-sm mb-6 font-semibold">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-4 pb-8 md:pt-8 md:pb-12 text-center">
+          <p className="uppercase tracking-[0.4em] text-[#C9A84C] text-xs md:text-sm mb-4 md:mb-6 font-semibold">
             INKognito Store — Urabá, Antioquia
           </p>
 
-          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] font-black uppercase leading-[0.9] mb-8">
+          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] font-black uppercase leading-[0.9] mb-6 md:mb-8">
             <span className="block text-gray-900">Ropa &</span>
             <span className="block text-[#C9A84C]">Calzado</span>
             <span className="block text-gray-900">Para Urabá</span>
           </h1>
 
-          <p className="text-gray-700 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto mb-12">
+          <p className="text-gray-700 text-base md:text-xl leading-relaxed max-w-2xl mx-auto mb-8 md:mb-12">
             Calidad premium, precio accesible. Diseños inspirados en las mejores marcas,
             fabricados para el ritmo de Urabá.
           </p>
@@ -184,7 +177,7 @@ export default function StorePage() {
               href="https://wa.me/573207911013?text=Hola,%20quiero%20ver%20el%20catálogo%20de%20INKognito%20Store"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-10 py-4 uppercase tracking-[0.25em] font-bold text-sm border border-gray-300 text-gray-700 hover:border-[#C9A84C] hover:text-[#C9A84C] transition-all duration-300 flex items-center justify-center gap-2"
+              className="hidden sm:flex px-10 py-4 uppercase tracking-[0.25em] font-bold text-sm border border-gray-300 text-gray-700 hover:border-[#C9A84C] hover:text-[#C9A84C] transition-all duration-300 items-center justify-center gap-2"
             >
               <FaWhatsapp size={18} />
               WhatsApp
@@ -192,9 +185,9 @@ export default function StorePage() {
           </div>
 
           {/* STATS */}
-          <div className="mt-10 md:mt-16 grid grid-cols-3 gap-6 max-w-xl mx-auto">
+          <div className="mt-8 md:mt-16 grid grid-cols-3 gap-6 max-w-xl mx-auto">
             <div className="text-center">
-              <p className="text-3xl md:text-5xl font-black text-[#C9A84C]">6</p>
+              <p className="text-3xl md:text-5xl font-black text-[#C9A84C]">4</p>
               <p className="text-gray-600 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Municipios</p>
             </div>
             <div className="text-center border-x border-gray-300">
@@ -210,37 +203,37 @@ export default function StorePage() {
       </section>
 
       {/* ── CATEGORÍAS ── */}
-      <section id="categorias" className="bg-gray-50 py-10 md:py-16 px-6">
+      <section id="categorias" className="bg-gray-50 pt-3 md:pt-6 pb-8 md:pb-12 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-8 md:mb-10">
-            <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs md:text-sm mb-4">
+          <div className="mb-4 md:mb-8">
+            <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs mb-2">
               Catálogo
             </p>
-            <h2 className="text-4xl md:text-6xl font-black uppercase leading-none text-gray-900">
-              Nuestras<br />Categorías
+            <h2 className="text-2xl md:text-4xl font-black uppercase leading-none text-gray-900">
+              Nuestras Categorías
             </h2>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
             {categories.map((cat) => (
               <Link
                 key={cat.id}
                 to={cat.link}
-                className="group bg-white border border-gray-200 rounded-2xl p-6 hover:border-[#C9A84C] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[220px]"
+                className="group snap-start flex-shrink-0 w-[75vw] md:w-auto bg-white border border-gray-200 rounded-2xl p-5 hover:border-[#C9A84C] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[160px] md:min-h-[220px]"
               >
                 <div>
-                  <div className="mb-4 text-[#C9A84C]">{cat.icon}</div>
-                  <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-[10px] mb-3 font-semibold">
+                  <div className="mb-3 text-[#C9A84C]">{cat.icon}</div>
+                  <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-[10px] mb-2 font-semibold">
                     {cat.tag}
                   </p>
-                  <h3 className="text-2xl md:text-3xl font-black uppercase mb-3 text-gray-900 group-hover:text-[#C9A84C] transition-colors duration-300">
+                  <h3 className="text-xl md:text-3xl font-black uppercase mb-2 text-gray-900 group-hover:text-[#C9A84C] transition-colors duration-300">
                     {cat.name}
                   </h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">
+                  <p className="text-gray-500 text-xs md:text-sm leading-relaxed">
                     {cat.description}
                   </p>
                 </div>
-                <div className="mt-6">
+                <div className="mt-4 md:mt-6">
                   <span className="uppercase tracking-[0.2em] text-xs text-gray-400 group-hover:text-[#C9A84C] transition-colors duration-300">
                     Ver categoría →
                   </span>
@@ -252,198 +245,214 @@ export default function StorePage() {
       </section>
 
       {/* ── DESTACADOS ── */}
-      <section id="destacados" className="bg-white py-10 md:py-16 px-6">
+      <section id="destacados" className="bg-white pt-3 md:pt-6 pb-8 md:pb-12 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-8 md:mb-10">
-            <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs md:text-sm mb-4">
+          <div className="mb-4 md:mb-8">
+            <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs mb-2">
               Selección
             </p>
-            <h2 className="text-4xl md:text-6xl font-black uppercase leading-none text-gray-900">
+            <h2 className="text-2xl md:text-4xl font-black uppercase leading-none text-gray-900">
               Destacados
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {featured.map((product) => (
-              <StoreProductCard
-                key={product.id}
-                product={product}
-                category={product.category.toLowerCase().replace(/ /g, '-')}
-                sizes={CLOTHING_CATS.includes(product.category) ? CLOTHING_SIZES : SHOE_SIZES}
-              />
-            ))}
-          </div>
+          {featuredLoading ? (
+            <div className="flex md:grid md:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="snap-start flex-shrink-0 w-[44vw] md:w-auto bg-gray-200 rounded-xl animate-pulse aspect-[3/4]" />
+              ))}
+            </div>
+          ) : featuredItems.length === 0 ? (
+            <div className="border border-gray-200 rounded-xl py-10 text-center">
+              <p className="text-gray-400 text-sm mb-1">Selección en preparación</p>
+              <p className="text-gray-500 text-xs">Agrega productos con categoría "Destacados" desde el panel</p>
+            </div>
+          ) : (
+            <div className="flex md:grid md:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+              {featuredItems.map(item => {
+                const prod = toProdCard(item)
+                const sizes = item.variantes.map(v => v.variant).filter(Boolean)
+                const isClothing = item.descripcion?.toLowerCase().includes('ropa') || item.name?.toLowerCase().includes('ropa')
+                return (
+                  <div key={item.name} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">
+                    <StoreProductCard
+                      product={prod}
+                      category="destacados"
+                      sizes={sizes.length ? sizes : (isClothing ? CLOTHING_SIZES : SHOE_SIZES)}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* ── ENVÍOS ── */}
-      <section id="envios" className="bg-gray-50 py-10 md:py-16 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-start">
+      {/* ── LOGÍSTICA + GARANTÍAS + CONTACTO — solo desktop (dark, 3 col) ── */}
+      <div className="hidden md:block">
+        <section className="bg-black text-white py-14 px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid lg:grid-cols-3 gap-12">
 
-            {/* IZQUIERDA */}
-            <div>
-              <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs md:text-sm mb-4">
-                Cobertura
-              </p>
-              <h2 className="text-4xl md:text-6xl font-black uppercase leading-none mb-6 text-gray-900">
-                Enviamos a Toda<br />la Región de Urabá
-              </h2>
-              <p className="text-gray-500 text-lg leading-relaxed mb-10">
-                No importa en qué municipio estés, tu pedido llega. Cubrimos los 6 municipios
-                principales del Urabá antioqueño con tiempos de entrega garantizados y
-                seguimiento incluido.
-              </p>
+              {/* COL 1: LOGÍSTICA */}
+              <div>
+                <p className="uppercase tracking-[0.25em] text-[#C9A84C]/70 text-[10px] mb-4">Logística · Cobertura</p>
+                <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Llegamos donde estás</h2>
 
-              <div className="space-y-4">
-                <div className="flex items-start gap-4 p-4 border border-gray-200 rounded-xl hover:border-[#C9A84C] transition-all duration-300 bg-white">
-                  <Truck size={20} className="text-[#C9A84C] mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-bold uppercase tracking-[0.15em] text-sm text-gray-900">Envío Rápido</p>
-                    <p className="text-gray-500 text-sm mt-1">1 a 4 días hábiles según tu municipio</p>
+                {/* Urabá — cobertura directa */}
+                <p className="text-zinc-500 text-[10px] uppercase tracking-widest mb-3">Urabá — Entrega directa</p>
+                <div className="flex gap-3 mb-4">
+                  <div className="flex items-center justify-center bg-white rounded-xl p-2 flex-shrink-0 w-14 h-14">
+                    <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="flex flex-col justify-center bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 flex-1">
+                    <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Eljach Transportadora</p>
+                    <p className="text-zinc-500 text-xs mt-0.5">Aliado logístico · Contra entrega</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-4 p-4 border border-gray-200 rounded-xl hover:border-[#C9A84C] transition-all duration-300 bg-white">
-                  <MapPin size={20} className="text-[#C9A84C] mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-bold uppercase tracking-[0.15em] text-sm text-gray-900">Entrega a Domicilio</p>
-                    <p className="text-gray-500 text-sm mt-1">Directamente en tu puerta, sin filas ni desplazamientos</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4 p-4 border border-gray-200 rounded-xl hover:border-[#C9A84C] transition-all duration-300 bg-white">
-                  <Clock size={20} className="text-[#C9A84C] mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-bold uppercase tracking-[0.15em] text-sm text-gray-900">Seguimiento en Tiempo Real</p>
-                    <p className="text-gray-500 text-sm mt-1">Te avisamos por WhatsApp en cada paso de tu pedido</p>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            {/* DERECHA — MUNICIPIOS */}
-            <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
-              <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs mb-6 font-semibold">
-                Municipios con cobertura
-              </p>
-              <div className="space-y-1">
-                {cities.map((city, i) => (
-                  <div
-                    key={city.name}
-                    className={`flex items-center justify-between py-4 ${i < cities.length - 1 ? 'border-b border-gray-100' : ''}`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="w-2 h-2 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: '#C9A84C' }}
-                      />
-                      <span className="font-bold uppercase tracking-[0.15em] text-sm text-gray-900">{city.name}</span>
+                {/* Municipios con tiempos */}
+                <div className="flex flex-col gap-1.5 mb-3">
+                  {[
+                    { name: 'Chigorodó', time: '1–2 días' },
+                    { name: 'Carepa',    time: '1–2 días' },
+                    { name: 'Apartadó', time: '1–2 días' },
+                    { name: 'Turbo',    time: '2–3 días' },
+                  ].map(c => (
+                    <div key={c.name} className="flex items-center justify-between py-1.5 border-b border-zinc-900">
+                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{c.name}</span>
+                      <span className="text-zinc-600 text-[10px] uppercase tracking-[0.12em]">{c.time}</span>
                     </div>
-                    <span className="text-gray-500 text-xs uppercase tracking-[0.15em]">{city.time}</span>
-                  </div>
-                ))}
+                  ))}
+                </div>
+
+                {/* Corregimientos y sectores */}
+                <p className="text-zinc-700 text-[9px] uppercase tracking-widest mb-2">Corregimientos y sectores</p>
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                  {['Currulao','El Tres','Coldesa','Río Grande','El Reposo','Casa Verde'].map(z => (
+                    <span key={z} className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-zinc-800 text-zinc-500 bg-zinc-900">{z}</span>
+                  ))}
+                </div>
+
+                {/* Resto de Colombia */}
+                <div className="border-t border-zinc-800 pt-4">
+                  <p className="text-zinc-500 text-[10px] uppercase tracking-widest mb-1.5">Resto de Colombia</p>
+                  <p className="text-zinc-600 text-xs leading-relaxed">
+                    ¿Estás fuera de Urabá? Podemos enviarte tu pedido a cualquier parte del país.
+                    Tiempo y costo de envío se coordinan al confirmar el pedido.
+                  </p>
+                </div>
               </div>
-              <div className="mt-6 p-4 rounded-xl text-center bg-gray-50 border border-gray-200">
-                <p className="text-sm text-gray-600">
-                  Costo desde{' '}
-                  <span className="text-[#C9A84C] font-bold">$8.000</span>
-                  {' '}— Gratis en compras mayores a{' '}
-                  <span className="text-[#C9A84C] font-bold">$300.000</span>
+
+              {/* COL 2: GARANTÍAS */}
+              <div>
+                <p className="uppercase tracking-[0.25em] text-[#C9A84C]/70 text-[10px] mb-4">Garantías</p>
+                <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Compra con Confianza</h2>
+                <div className="flex flex-col gap-4">
+                  {guarantees.map((g, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <span className="text-[#C9A84C] font-black text-base mt-0.5 flex-shrink-0">✓</span>
+                      <div>
+                        <p className="text-white text-sm font-bold uppercase tracking-[0.06em]">{g.title}</p>
+                        <p className="text-zinc-500 text-xs mt-0.5 leading-relaxed">{g.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* COL 3: CONTACTO */}
+              <div>
+                <p className="uppercase tracking-[0.25em] text-[#C9A84C]/70 text-[10px] mb-4">Contacto</p>
+                <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Hablemos</h2>
+                <p className="text-zinc-400 text-base leading-relaxed mb-7">
+                  ¿Buscas un modelo específico? ¿Quieres saber disponibilidad de tu talla?
+                  Escríbenos y te respondemos en minutos.
                 </p>
+                <a
+                  href="https://wa.me/573207911013?text=Hola,%20quiero%20información%20sobre%20INKognito%20Store"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-3 w-full py-4 px-6 rounded-xl border text-white uppercase tracking-[0.2em] font-semibold transition-all duration-300 hover:shadow-[0_0_30px_rgba(201,168,76,0.2)] hover:border-[#C9A84C] mb-5"
+                  style={{ borderColor: 'rgba(201,168,76,0.3)', backgroundColor: 'rgba(201,168,76,0.04)' }}
+                >
+                  <FaWhatsapp size={22} />
+                  Hablar con INKognito Store
+                </a>
+                <p className="text-zinc-600 uppercase tracking-[0.2em] text-xs mb-6">
+                  {STORE_HOURS.weekdays.label} · {STORE_HOURS.weekdays.hours}
+                </p>
+                <div className="flex flex-col gap-3">
+                  {['Réplicas premium de alta calidad','Cobertura en toda la región de Urabá','Atención personalizada por WhatsApp','Cambios de talla garantizados','Pago contraentrega disponible'].map(item => (
+                    <div key={item} className="flex items-center gap-3">
+                      <span className="text-[#C9A84C] text-sm flex-shrink-0">✓</span>
+                      <span className="text-zinc-400 text-sm">{item}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
 
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* ── LLEGAMOS DONDE ESTÁS — solo móvil ── */}
+      <section id="contacto" className="md:hidden bg-black text-white border-t border-zinc-900 px-6 py-8">
+        <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">Llegamos donde estás</h2>
+        <p className="text-zinc-400 text-sm leading-relaxed mb-5">
+          Contamos con transportadora aliada para entregas seguras y con pago contraentrega en toda la región de Urabá.
+        </p>
+        <div className="flex gap-2 mb-5">
+          <div className="flex items-center justify-center bg-white rounded-xl p-1 flex-shrink-0 aspect-square w-16">
+            <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
+          </div>
+          <div className="flex flex-col justify-center bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 flex-1">
+            <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Eljach Transportadora</p>
+            <p className="text-zinc-500 text-[10px] mt-0.5">Entregas locales y contra entrega</p>
           </div>
         </div>
-      </section>
-
-      {/* ── CONFIANZA ── */}
-      <section className="bg-white py-10 md:py-16 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-8 md:mb-10">
-            <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs md:text-sm mb-4">
-              Garantías
-            </p>
-            <h2 className="text-4xl md:text-6xl font-black uppercase leading-none text-gray-900">
-              Compra con Confianza
-            </h2>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {guarantees.map((item, i) => (
-              <div
-                key={i}
-                className="border border-gray-200 rounded-2xl p-6 hover:border-[#C9A84C] hover:shadow-sm transition-all duration-300 bg-white"
-              >
-                <div className="mb-4" style={{ color: '#C9A84C' }}>{item.icon}</div>
-                <h3 className="font-black uppercase tracking-[0.1em] text-base mb-2 text-gray-900">{item.title}</h3>
-                <p className="text-gray-700 text-sm leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CONTACTO DARK ── */}
-      <section id="contacto" className="bg-black text-white py-10 md:py-16 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-
-            {/* IZQUIERDA */}
-            <div>
-              <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs md:text-sm mb-4">
-                Contacto
-              </p>
-              <h2 className="text-4xl md:text-6xl font-black uppercase leading-none mb-6">
-                Hablemos
-              </h2>
-              <p className="text-zinc-400 text-lg leading-relaxed mb-10">
-                ¿Buscas un modelo específico? ¿Quieres saber disponibilidad de tu talla?
-                Escríbenos y te respondemos en minutos.
-              </p>
-              <a
-                href="https://wa.me/573207911013?text=Hola,%20quiero%20información%20sobre%20INKognito%20Store"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-3 w-full max-w-sm py-5 px-6 rounded-xl border text-white uppercase tracking-[0.2em] font-semibold transition-all duration-300 hover:shadow-[0_0_30px_rgba(201,168,76,0.2)] hover:border-[#C9A84C]"
-                style={{ borderColor: 'rgba(201,168,76,0.3)', backgroundColor: 'rgba(201,168,76,0.04)' }}
-              >
-                <FaWhatsapp size={24} />
-                Hablar con INKognito Store
-              </a>
-              <p className="text-zinc-600 uppercase tracking-[0.2em] text-sm mt-6">
-                {STORE_HOURS.weekdays.label} • {STORE_HOURS.weekdays.hours}
-              </p>
+        {/* Municipios con tiempos */}
+        <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">Urabá — Entrega directa</p>
+        <div className="flex flex-col gap-1 mb-3">
+          {[{n:'Chigorodó',t:'1–2 días'},{n:'Carepa',t:'1–2 días'},{n:'Apartadó',t:'1–2 días'},{n:'Turbo',t:'2–3 días'}].map(c => (
+            <div key={c.n} className="flex items-center justify-between border-b border-zinc-900 py-1">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{c.n}</span>
+              <span className="text-zinc-600 text-[9px] uppercase tracking-widest">{c.t}</span>
             </div>
-
-            {/* DERECHA */}
-            <div
-              className="bg-zinc-950 rounded-2xl p-8"
-              style={{ border: '1px solid rgba(201,168,76,0.15)' }}
-            >
-              <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-4">
-                INKognito Store
-              </p>
-              <h3 className="text-2xl md:text-3xl font-black uppercase mb-8">
-                Zona de Urabá
-              </h3>
-              <div className="space-y-5">
-                {[
-                  'Réplicas premium de alta calidad',
-                  'Envío a los 6 municipios de Urabá',
-                  'Atención personalizada por WhatsApp',
-                  'Cambios de talla garantizados',
-                  'Pago contraentrega disponible',
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-3">
-                    <span className="text-[#C9A84C] text-lg">✓</span>
-                    <span className="text-zinc-300">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-          </div>
+          ))}
         </div>
+
+        {/* Corregimientos y sectores */}
+        <p className="text-zinc-700 text-[9px] uppercase tracking-widest mb-1.5">Corregimientos y sectores</p>
+        <div className="flex flex-wrap gap-1 mb-3">
+          {['Currulao','El Tres','Coldesa','Río Grande','El Reposo','Casa Verde'].map(c => (
+            <span key={c} className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full border border-zinc-800 text-zinc-600 bg-zinc-900">{c}</span>
+          ))}
+        </div>
+
+        {/* Nacional — sutil */}
+        <p className="text-zinc-700 text-[9px] leading-relaxed mb-4">
+          ¿Fuera de Urabá? También enviamos al resto de Colombia — tiempo y costo se coordinan al confirmar.
+        </p>
+
+        {/* Garantías */}
+        <div className="flex flex-col gap-2 mb-5">
+          {['Pago contraentrega disponible','Atención personalizada por WhatsApp','Cobertura en toda la región de Urabá'].map(g => (
+            <div key={g} className="flex items-center gap-2">
+              <span className="font-bold text-sm" style={{ color: '#C9A84C' }}>✓</span>
+              <span className="text-zinc-400 text-xs">{g}</span>
+            </div>
+          ))}
+        </div>
+        <a
+          href="https://wa.me/573207911013?text=Hola%2C%20quiero%20hacer%20un%20pedido%20en%20INKognito%20Store"
+          target="_blank" rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full py-4 rounded-xl border text-white font-bold uppercase tracking-[0.15em] text-sm transition-all duration-300 hover:shadow-[0_0_20px_rgba(201,168,76,0.3)]"
+          style={{ borderColor: 'rgba(201,168,76,0.4)', backgroundColor: 'rgba(201,168,76,0.04)' }}
+        >
+          📱 Hacer mi pedido ahora
+        </a>
       </section>
 
       <FooterStore />

@@ -10,7 +10,7 @@ export default function HeroSupply() {
 
   return (
 
-    <section className="min-h-screen pt-24 md:pt-32 bg-black text-white flex items-center px-6">
+    <section className="min-h-[60vh] md:min-h-screen pt-16 md:pt-32 pb-8 md:pb-0 bg-black text-white flex items-center px-6">
 
       <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-16 items-center">
 
@@ -30,36 +30,32 @@ export default function HeroSupply() {
             para artistas que trabajan con precisión absoluta.
           </p>
 
-          {/* BOTONES */}
-          <div className="flex flex-wrap gap-4 mt-10">
-
+          {/* BOTONES — ancho completo en móvil, flex en desktop */}
+          <div className="grid grid-cols-3 md:flex md:flex-wrap gap-3 mt-6 md:mt-10">
             <Link
               to="/supply/machines"
-              className="px-6 py-3 border border-blue-500 text-white uppercase tracking-widest text-sm hover:bg-blue-500 transition-all duration-300"
+              className="text-center py-3 border border-blue-500 text-white uppercase tracking-wider text-[11px] md:text-sm md:px-6 hover:bg-blue-500 transition-all duration-300"
             >
               Maquinas
             </Link>
-
             <Link
               to="/supply/brands/tattoo-vision"
-              className="px-6 py-3 border border-blue-500 text-white uppercase tracking-widest text-sm hover:bg-blue-500 transition-all duration-300"
+              className="text-center py-3 border border-blue-500 text-white uppercase tracking-wider text-[11px] md:text-sm md:px-6 hover:bg-blue-500 transition-all duration-300"
             >
               Tattoo Vision
             </Link>
-
             <Link
               to="/supply/cartridges"
-              className="px-6 py-3 border border-blue-500 text-white uppercase tracking-widest text-sm hover:bg-blue-500 transition-all duration-300"
+              className="text-center py-3 border border-blue-500 text-white uppercase tracking-wider text-[11px] md:text-sm md:px-6 hover:bg-blue-500 transition-all duration-300"
             >
               Cartuchos
             </Link>
-
           </div>
 
         </div>
 
-        {/* DERECHA */}
-<div className="flex justify-center">
+        {/* DERECHA — solo desktop */}
+<div className="hidden md:flex justify-center">
 
 <div className="bg-zinc-950 border border-blue-500/30 rounded-2xl p-8 hover:border-blue-500 hover:shadow-[0_0_25px_rgba(59,130,246,0.15)] transition-all duration-300">
     <p className="text-zinc-500 uppercase tracking-[0.3em] text-xs mb-4">

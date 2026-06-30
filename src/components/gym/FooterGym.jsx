@@ -1,5 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa'
+import { Dumbbell } from 'lucide-react'
 
 export default function FooterGym() {
   const navigate = useNavigate()
@@ -31,11 +32,14 @@ export default function FooterGym() {
 
           {/* IZQUIERDA */}
           <div>
-            <h2 className="text-2xl font-black uppercase tracking-[0.15em] mb-4">
-              <span className="text-white">INK</span>
-              <span className="text-gray-500">OGNITO </span>
-              <span className="text-gray-300">GYM</span>
-            </h2>
+            <div className="flex items-center gap-2 mb-4">
+              <Dumbbell size={20} className="text-gray-400" />
+              <h2 className="text-2xl font-black uppercase tracking-[0.15em]">
+                <span className="text-white">INK</span>
+                <span className="text-gray-500">OGNITO </span>
+                <span className="text-gray-300">GYM</span>
+              </h2>
+            </div>
             <p className="text-gray-500 leading-relaxed max-w-sm">
               Máquinas fabricadas a mano, planos digitales y recursos para entrenar en casa sin gastar una fortuna.
             </p>
