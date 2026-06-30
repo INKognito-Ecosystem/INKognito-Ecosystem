@@ -122,7 +122,7 @@ export default function AprendePage() {
     <div className="min-h-screen bg-gray-950 text-white">
       <Seo
         title="Aprende a Tatuar | Cursos, Kit y Recursos — INKognito Supply"
-        description="Recursos para aprender a tatuar desde cero. Cursos, kit básico y recursos gratuitos para principiantes en Colombia."
+        description="Cursos, kit y recursos para tatuadores en cualquier etapa: desde quienes empiezan hasta quienes buscan especializarse. Formación real para el oficio, en Colombia."
         siteName="INKognito Supply"
         canonical={`${import.meta.env.VITE_SITE_URL}/supply/aprende`}
       />
@@ -134,15 +134,16 @@ export default function AprendePage() {
         <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
         <div className="relative z-10 px-6 max-w-7xl mx-auto pb-5 md:pb-8">
           <p className="uppercase tracking-[0.25em] text-zinc-500 text-[10px] mb-2">
-            Para nuevos tatuadores
+            Educación · Crecimiento profesional
           </p>
           <h1 className="text-3xl md:text-7xl font-black uppercase leading-none mb-3 text-white">
-            Empieza tu camino<br />
-            <span className="text-zinc-500">como tatuador</span>
+            Fórmate. Especialízate.<br />
+            <span className="text-zinc-500">Evoluciona.</span>
           </h1>
           <p className="text-zinc-400 text-sm md:text-lg leading-relaxed max-w-2xl">
-            Cursos recomendados, el kit básico de insumos y recursos para aprender
-            a tatuar con confianza.
+            Cursos y recursos para tatuadores en cualquier etapa: desde tu primera
+            máquina hasta la técnica que te falta dominar. Conocimiento real,
+            aplicable desde la primera sesión.
           </p>
         </div>
       </div>
@@ -161,8 +162,8 @@ export default function AprendePage() {
       {/* Sin contenido aún */}
       {!loading && !hayContenido && (
         <div className="max-w-7xl mx-auto px-6 py-16 text-center">
-          <p className="text-zinc-500 text-sm mb-2">Recursos próximamente</p>
-          <p className="text-zinc-700 text-xs mb-6">Los cursos, kit y recursos aparecerán aquí cuando se publiquen.</p>
+          <p className="text-zinc-500 text-sm mb-2">Contenido en construcción</p>
+          <p className="text-zinc-700 text-xs mb-6">Estamos preparando cursos y recursos para tatuadores en todos los niveles. Escríbenos y te avisamos apenas estén disponibles.</p>
           <a
             href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya cursos y recursos disponibles en INKognito Supply.')}`}
             target="_blank" rel="noopener noreferrer"
@@ -179,16 +180,16 @@ export default function AprendePage() {
         <>
           <SeccionAfiliados
             label="Hotmart · Cursos digitales"
-            titulo="Aprende con los mejores"
-            subtitulo="Formación online. Compra una vez, acceso de por vida."
+            titulo="Formación que se nota en tu trazo"
+            subtitulo="Desde fundamentos hasta especialización en realismo, sombras y color. Acceso de por vida, a tu ritmo."
             items={cursos}
             color="orange"
             cols="lg:grid-cols-5"
           />
           <SeccionAfiliados
             label="Amazon · AliExpress · Kit básico"
-            titulo="Lo que necesitas para empezar"
-            subtitulo="URL Ventas = Amazon · URL Checkout = AliExpress"
+            titulo="El kit que respalda tu práctica"
+            subtitulo="Insumos seleccionados para trabajar con seriedad, sin sobrecostos."
             items={kitExt}
             color="blue"
             cols="lg:grid-cols-6"
@@ -196,7 +197,7 @@ export default function AprendePage() {
           <SeccionAfiliados
             label="Sin costo"
             titulo="Recursos gratuitos"
-            subtitulo="Aprende sin gastar. La práctica constante es la clave."
+            subtitulo="Contenido sin costo para seguir creciendo. La práctica constante es lo que realmente marca la diferencia."
             items={recursos}
             color="green"
             cols="lg:grid-cols-4"
@@ -210,7 +211,7 @@ export default function AprendePage() {
           <div className="border border-blue-500/20 bg-zinc-950 rounded-2xl p-7 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 hover:border-blue-500/40 transition-all duration-300">
             <div>
               <p className="uppercase tracking-[0.25em] text-zinc-500 text-[10px] mb-2">Próximo paso</p>
-              <h3 className="text-xl md:text-3xl font-black uppercase leading-tight text-white">¿Ya tienes lo básico?</h3>
+              <h3 className="text-xl md:text-3xl font-black uppercase leading-tight text-white">¿Listo para el siguiente nivel?</h3>
               <p className="text-zinc-400 mt-2 text-sm">Explora nuestro catálogo de insumos profesionales</p>
             </div>
             <Link to="/supply"
