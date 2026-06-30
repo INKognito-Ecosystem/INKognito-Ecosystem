@@ -129,8 +129,6 @@ export default function AprendePage() {
   const kitExt   = afiliados.filter(p => p.categoria === 'Kit Externo')
   const recursos = afiliados.filter(p => p.categoria === 'Recursos')
 
-  const hayContenido = cursos.length > 0 || kitExt.length > 0 || recursos.length > 0
-
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Seo
@@ -172,23 +170,7 @@ export default function AprendePage() {
         </div>
       )}
 
-      {/* Sin contenido aún */}
-      {!loading && !hayContenido && (
-        <div className="max-w-7xl mx-auto px-6 py-16 text-center">
-          <p className="text-zinc-500 text-sm mb-2">Contenido en construcción</p>
-          <p className="text-zinc-700 text-xs mb-6">Estamos preparando cursos y recursos para tatuadores en todos los niveles. Escríbenos y te avisamos apenas estén disponibles.</p>
-          <a
-            href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya cursos y recursos disponibles en INKognito Supply.')}`}
-            target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white font-bold uppercase tracking-[0.15em] text-sm rounded hover:bg-blue-600 transition"
-          >
-            <FaWhatsapp size={18} />
-            Avisarme cuando haya stock →
-          </a>
-        </div>
-      )}
-
-      {/* Secciones dinámicas — solo aparecen si hay datos */}
+      {/* Secciones — cada una maneja su propio estado vacío */}
       {!loading && (
         <>
           <SeccionAfiliados
