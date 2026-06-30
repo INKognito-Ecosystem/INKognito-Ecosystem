@@ -39,59 +39,55 @@ const faqs = [
 
 export default function DeportivosPage() {
   const { addItem } = useStoreCart()
+
   return (
     <>
       <div className="min-h-screen bg-black text-white">
 
         <NavbarCategoryStore pageName="Deportivos" />
 
-        <div className="pt-32 pb-24 px-6 max-w-7xl mx-auto">
+        <div className="pt-20 md:pt-32 pb-10 md:pb-24 px-6 max-w-7xl mx-auto">
 
           {/* ENCABEZADO */}
-          <div className="mb-16">
-            <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-sm mb-4">
+          <div className="mb-8 md:mb-16">
+            <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs mb-2">
               Categoría
             </p>
-            <h1 className="text-5xl md:text-7xl font-black uppercase leading-none mb-3">
+            <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-2">
               Deportivos
             </h1>
-            <p className="uppercase tracking-[0.2em] text-zinc-500 text-xs mb-10">
+            <p className="uppercase tracking-[0.2em] text-zinc-500 text-xs mb-6 md:mb-10">
               Running • Entrenamiento • Gym
             </p>
 
-            <div className="mt-6 max-w-4xl space-y-4">
-              <p className="text-zinc-400 leading-relaxed">
+            <div className="max-w-4xl space-y-4">
+              <p className="text-zinc-400 leading-relaxed text-sm md:text-base">
                 En Urabá se vive el deporte con intensidad. Desde las madrugadas en el malecón de Turbo
                 hasta las canchas de Apartadó, el calzado deportivo que usas hace la diferencia entre
                 rendir o lesionarte. En INKognito Store seleccionamos zapatillas de alto rendimiento
                 para corredores, atletas y personas que entrenan fuerte.
               </p>
-              <p className="text-zinc-400 leading-relaxed">
-                Trabajamos con las marcas más reconocidas del mercado: Nike, Adidas, Asics y New Balance.
-                Cada modelo está elegido por su rendimiento, durabilidad y tecnología de amortiguación,
-                pensado para el ritmo activo de la región.
-              </p>
             </div>
           </div>
 
           {/* GRID DE PRODUCTOS */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
             {products.map((product) => (
               <div
                 key={product.id}
-                className="border border-zinc-800 bg-zinc-950 rounded-xl md:rounded-2xl overflow-hidden hover:border-[#C9A84C]/50 transition-all duration-300"
+                className="snap-start flex-shrink-0 w-[44vw] md:w-auto border border-zinc-800 bg-zinc-950 rounded-xl overflow-hidden hover:border-[#C9A84C]/50 transition-all duration-300"
               >
-                <div className="h-40 md:h-56 bg-zinc-900 flex items-center justify-center">
+                <div className="h-36 md:h-56 bg-zinc-900 flex items-center justify-center">
                   <p className="text-zinc-700 uppercase tracking-[0.3em] text-xs">Imagen</p>
                 </div>
-                <div className="p-4 md:p-5">
-                  <p className="text-[#C9A84C] uppercase tracking-[0.25em] text-[10px] md:text-xs mb-1">
+                <div className="p-3 md:p-5">
+                  <p className="text-[#C9A84C] uppercase tracking-[0.25em] text-[10px] mb-1">
                     {product.brand} — {product.tag}
                   </p>
-                  <h3 className="text-base md:text-xl font-black uppercase mb-3 leading-tight">
+                  <h3 className="text-sm md:text-xl font-black uppercase mb-2 leading-tight">
                     {product.name}
                   </h3>
-                  <span className="text-white font-bold text-base md:text-lg block mb-3">
+                  <span className="text-white font-bold text-sm md:text-lg block mb-2">
                     {product.price}
                   </span>
                   <button
@@ -105,8 +101,8 @@ export default function DeportivosPage() {
             ))}
           </div>
 
-          {/* CTA WHATSAPP */}
-          <div className="mt-16 text-center">
+          {/* CTA WHATSAPP — solo desktop */}
+          <div className="hidden md:block mt-16 text-center">
             <a
               href="https://wa.me/573207911013?text=Hola,%20quiero%20ver%20el%20catálogo%20completo%20de%20zapatos%20deportivos"
               target="_blank"
@@ -120,21 +116,62 @@ export default function DeportivosPage() {
           </div>
 
           {/* FAQ */}
-          <section className="mt-24 md:mt-32">
-            <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">
+          <section className="mt-10 md:mt-32">
+            <h2 className="text-2xl md:text-5xl font-black uppercase mb-6 md:mb-10">
               Preguntas Frecuentes
             </h2>
             <div className="space-y-4">
               {faqs.map((faq, i) => (
-                <div key={i} className="border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-all duration-300">
-                  <h3 className="font-bold text-base md:text-lg mb-3">{faq.q}</h3>
-                  <p className="text-zinc-400 leading-relaxed text-sm md:text-base">{faq.a}</p>
+                <div key={i} className="border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all duration-300">
+                  <h3 className="font-bold text-sm md:text-lg mb-2">{faq.q}</h3>
+                  <p className="text-zinc-400 leading-relaxed text-sm">{faq.a}</p>
                 </div>
               ))}
             </div>
           </section>
 
         </div>
+      </div>
+
+      {/* LLEGAMOS DONDE ESTÁS — solo móvil */}
+      <div className="md:hidden bg-black text-white border-t border-zinc-900 px-6 py-8">
+        <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">
+          Llegamos donde estás
+        </h2>
+        <p className="text-zinc-400 text-sm leading-relaxed mb-5">
+          Contamos con transportadora aliada para entregas seguras y con pago contraentrega en toda la región de Urabá.
+        </p>
+        <div className="flex gap-2 mb-5">
+          <div className="flex items-center justify-center bg-white rounded-xl p-1 flex-shrink-0 aspect-square w-16">
+            <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
+          </div>
+          <div className="flex flex-col justify-center bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 flex-1">
+            <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Eljach Transportadora</p>
+            <p className="text-zinc-500 text-[10px] mt-0.5">Entregas locales y contra entrega</p>
+          </div>
+        </div>
+        <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">Zonas de cobertura</p>
+        <div className="flex flex-wrap gap-1.5 mb-5">
+          {['Chigorodó','Carepa','Apartadó','Turbo','Currulao','El Tres','Coldesa','Río Grande','El Reposo','Casa Verde'].map(c => (
+            <span key={c} className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{c}</span>
+          ))}
+        </div>
+        <div className="flex flex-col gap-2 mb-5">
+          {['Pago contraentrega disponible','Atención personalizada por WhatsApp','Cobertura en toda la región de Urabá'].map(g => (
+            <div key={g} className="flex items-center gap-2">
+              <span className="font-bold text-sm" style={{ color: '#C9A84C' }}>✓</span>
+              <span className="text-zinc-400 text-xs">{g}</span>
+            </div>
+          ))}
+        </div>
+        <a
+          href="https://wa.me/573207911013?text=Hola%2C%20quiero%20hacer%20un%20pedido%20en%20INKognito%20Store"
+          target="_blank" rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full py-4 rounded-xl border text-white font-bold uppercase tracking-[0.15em] text-sm transition-all duration-300 hover:shadow-[0_0_20px_rgba(201,168,76,0.3)]"
+          style={{ borderColor: 'rgba(201,168,76,0.4)', backgroundColor: 'rgba(201,168,76,0.04)' }}
+        >
+          📱 Hacer mi pedido ahora
+        </a>
       </div>
 
       <FooterStore />
