@@ -1,4 +1,5 @@
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import { FaInstagram, FaFacebookF, FaWhatsapp } from 'react-icons/fa'
 import {
@@ -75,7 +76,7 @@ const FAQ_JSONLD = {
 function CuidadoCard({ item, index }) {
   const Icon = item.icon
   return (
-    <div className="bg-black/40 p-8 border-l-4 border-zinc-600 rounded-r-lg hover:bg-black/60 transition-colors">
+    <div className="snap-start flex-shrink-0 w-[calc(100vw-2rem)] md:w-auto bg-black/40 p-8 border-l-4 border-zinc-600 rounded-r-lg hover:bg-black/60 transition-colors">
       <div className="flex items-center gap-4 mb-4">
         <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center shrink-0 text-zinc-300">
           <Icon size={22} />
@@ -95,10 +96,21 @@ function CuidadoCard({ item, index }) {
 }
 
 export default function CuidadosPage() {
-  // el tab activo se deriva del hash de la URL (/cuidados#antes | /cuidados#despues)
+  // la sección activa se deriva del hash de la URL (/cuidados#antes | /cuidados#despues)
+  // cada link es de un solo sentido: muestra SOLO esa sección, no un selector entre ambas
   const { hash } = useLocation()
-  const navigate = useNavigate()
   const tab = hash === '#despues' ? 'despues' : 'antes'
+
+  const HERO_TEXT = {
+    antes: {
+      title: <>Antes de tu <span className="text-zinc-600">Sesión</span></>,
+      intro: 'Un buen tatuaje empieza con una buena preparación. Sigue estas recomendaciones para llegar listo a tu cita y sacarle el máximo provecho a tu sesión.',
+    },
+    despues: {
+      title: <>Después de tu <span className="text-zinc-600">Sesión</span></>,
+      intro: 'El cuidado no termina cuando sales del estudio. Sigue estas recomendaciones para una cicatrización perfecta y un tatuaje que luzca increíble por años.',
+    },
+  }[tab]
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -116,50 +128,34 @@ export default function CuidadosPage() {
 
       <Navbar showInicio={true} />
 
+      {/* VOLVER */}
+      <div className="pt-24 md:pt-32 px-4 max-w-7xl mx-auto">
+        <Link
+          to="/jhumaneztattoo#cuidados"
+          className="inline-flex items-center gap-2 text-zinc-400 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors"
+        >
+          <ArrowLeft size={16} />
+          Volver
+        </Link>
+      </div>
+
       {/* HERO */}
-      <section className="pt-28 md:pt-44 pb-10 md:pb-16 px-4 text-center">
+      <section className="pt-6 md:pt-10 pb-10 md:pb-16 px-4 text-center">
         <h1 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter">
-          Cuidados de tu <span className="text-zinc-600">Tatuaje</span>
+          {HERO_TEXT.title}
         </h1>
         <p className="text-gray-400 text-lg max-w-2xl mx-auto mt-6 font-light leading-relaxed">
-          Un buen tatuaje empieza antes de la aguja y termina mucho después de la sesión.
-          Sigue estas recomendaciones para un proceso cómodo y una cicatrización perfecta.
+          {HERO_TEXT.intro}
         </p>
         <div className="h-1 w-20 bg-zinc-600 mx-auto mt-8"></div>
       </section>
 
-      {/* TABS */}
+      {/* CONTENIDO */}
       <section className="max-w-7xl mx-auto px-4 pb-12 md:pb-24">
-
-        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8 sm:mb-14">
-          <button
-            onClick={() => navigate({ hash: '#antes' })}
-            className={`px-10 py-4 rounded font-black text-sm uppercase tracking-widest transition-all duration-300 ${
-              tab === 'antes'
-                ? 'bg-zinc-600 text-white'
-                : 'bg-zinc-900 border border-zinc-700 text-zinc-500 hover:text-white'
-            }`}
-          >
-            Antes de tu sesión
-          </button>
-          <button
-            onClick={() => navigate({ hash: '#despues' })}
-            className={`px-10 py-4 rounded font-black text-sm uppercase tracking-widest transition-all duration-300 ${
-              tab === 'despues'
-                ? 'bg-zinc-600 text-white'
-                : 'bg-zinc-900 border border-zinc-700 text-zinc-500 hover:text-white'
-            }`}
-          >
-            Después de tu sesión
-          </button>
-        </div>
 
         {/* ANTES — ambos bloques quedan en el DOM para que Google indexe todo el contenido */}
         <div id="antes" className={tab === 'antes' ? '' : 'hidden'}>
-          <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-center mb-10">
-            Antes de tu <span className="text-zinc-600">Sesión</span>
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="flex md:grid md:grid-cols-2 gap-6 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
             {ANTES.map((item, i) => (
               <CuidadoCard key={i} item={item} index={i} />
             ))}
@@ -168,10 +164,7 @@ export default function CuidadosPage() {
 
         {/* DESPUES */}
         <div id="despues" className={tab === 'despues' ? '' : 'hidden'}>
-          <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-center mb-10">
-            Después de tu <span className="text-zinc-600">Sesión</span>
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="flex md:grid md:grid-cols-2 gap-6 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
             {DESPUES.map((item, i) => (
               <CuidadoCard key={i} item={item} index={i} />
             ))}

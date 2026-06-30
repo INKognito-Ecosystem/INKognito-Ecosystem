@@ -27,9 +27,9 @@ export default function Footer() {
         {/* TITULO GRANDE */}
         <div className="mb-8 md:mb-16">
 
-          <div className="w-full bg-zinc-700/80 backdrop-blur-sm rounded-xl px-8 py-6 shadow-xl">
+          <div className="w-full bg-zinc-700/80 backdrop-blur-sm rounded-xl px-3 sm:px-8 py-4 sm:py-6 shadow-xl">
 
-            <h2 className="text-white font-black text-3xl md:text-5xl tracking-[0.2em] uppercase italic text-center">
+            <h2 className="text-white font-black text-base sm:text-3xl md:text-5xl tracking-tight sm:tracking-[0.2em] uppercase italic text-center whitespace-nowrap">
               INKOGNITO ESTUDIO DE TATUAJES
             </h2>
 
