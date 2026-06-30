@@ -1,4 +1,11 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+
+const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+
+const brandKey = (name) => 'supply_brand_' + name.toLowerCase()
+  .replace(/[áéíóú]/g, c => ({á:'a',é:'e',í:'i',ó:'o',ú:'u'})[c])
+  .replace(/[^a-z0-9]/g, '_').replace(/_+/g,'_').replace(/^_|_$/g,'')
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
@@ -16,6 +23,15 @@ const brands = [
 ]
 
 export default function BrandsSupply() {
+  const [imgs, setImgs] = useState({})
+
+  useEffect(() => {
+    fetch(`${PANEL_URL}/api/visual/supply`)
+      .then(r => r.json())
+      .then(data => setImgs(data || {}))
+      .catch(() => {})
+  }, [])
+
   return (
     <section
       id="marcas"
@@ -40,9 +56,13 @@ export default function BrandsSupply() {
               to={brand.to}
               className="snap-start flex-shrink-0 w-[44vw] md:w-auto h-36 border border-zinc-800 bg-black flex items-center justify-center hover:border-blue-500 transition-all duration-300"
             >
-              <p className="text-zinc-500 font-black tracking-[0.15em] text-[10px] md:text-xs text-center px-2">
-                {brand.name}
-              </p>
+              {imgs[brandKey(brand.name)]
+                ? <img src={imgs[brandKey(brand.name)]} alt={brand.name}
+                    className="w-20 h-20 object-contain" />
+                : <p className="text-zinc-500 font-black tracking-[0.15em] text-[10px] md:text-xs text-center px-2">
+                    {brand.name}
+                  </p>
+              }
             </Link>
           ))}
         </div>
