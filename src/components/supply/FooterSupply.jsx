@@ -9,7 +9,18 @@ export default function FooterSupply() {
 
   return (
 
-    <footer id="contacto" className="relative overflow-hidden border-t border-zinc-900 bg-gray-950 px-6 py-10 md:py-12 lg:py-16">
+    <footer id="contacto" className="relative overflow-hidden border-t border-zinc-900">
+
+      {/* BARRA SUPERIOR — negra, igual al navbar */}
+      <div className="bg-black border-b border-zinc-900 px-6 py-5">
+        <h2 className="max-w-7xl mx-auto text-2xl font-black uppercase tracking-[0.15em]">
+          <span className="text-white">INK</span>
+          <span className="text-zinc-500">OGNITO </span>
+          <span className="text-blue-500">SUPPLY</span>
+        </h2>
+      </div>
+
+      <div className="relative bg-gray-950 px-6 py-10 md:py-12 lg:py-16">
       <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
 
       <div className="relative z-10 max-w-7xl mx-auto">
@@ -19,18 +30,6 @@ export default function FooterSupply() {
 
           {/* IZQUIERDA */}
           <div>
-
-            <h2 className="text-2xl font-black uppercase tracking-[0.15em] mb-4">
-
-              <span className="text-white">
-                INK
-              </span>
-
-              <span className="text-zinc-500">
-                OGNITO SUPPLY
-              </span>
-
-            </h2>
 
             <p className="text-zinc-500 leading-relaxed max-w-sm">
               Equipamiento profesional para artistas que trabajan con precisión, identidad y disciplina.
@@ -96,6 +95,8 @@ export default function FooterSupply() {
           </p>
 
         </div>
+
+      </div>
 
       </div>
 
