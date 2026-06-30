@@ -1,5 +1,10 @@
 import { Link } from 'react-router-dom'
 
+const DOT_PATTERN = {
+  backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
+  backgroundSize: '18px 18px',
+}
+
 const brands = [
   { name: 'TATTOO VISION', to: '/supply/brands/tattoo-vision' },
   { name: 'WJX', to: '/supply/cartridges/wjx' },
@@ -14,9 +19,10 @@ export default function BrandsSupply() {
   return (
     <section
       id="marcas"
-      className="pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-zinc-950 border-t border-zinc-900"
+      className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950 border-t border-zinc-900"
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+      <div className="relative z-10 max-w-7xl mx-auto">
 
         <div className="mb-4 md:mb-8">
           <h2 className="text-2xl md:text-4xl font-black uppercase mb-2">

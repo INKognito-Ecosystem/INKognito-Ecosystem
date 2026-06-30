@@ -6,6 +6,11 @@ import FooterSupply from './FooterSupply'
 import { FaWhatsapp } from 'react-icons/fa'
 import Seo from '../Seo'
 const ogSupply = '/og/supply.webp'
+
+const DOT_PATTERN = {
+  backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
+  backgroundSize: '18px 18px',
+}
 import { Link } from 'react-router-dom'
 import { SUPPLY_HOURS } from '../../config/business'
 import { useCatalog } from '../../hooks/useCatalog'
@@ -57,8 +62,9 @@ export default function SupplyPage() {
     <BrandsSupply />
 
     {/* SECCIÓN PARA NUEVOS TATUADORES */}
-    <section className="bg-zinc-950 border-t border-zinc-900">
-      <div className="max-w-7xl mx-auto px-6 py-8 md:py-16 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
+    <section className="relative overflow-hidden bg-gray-950 border-t border-zinc-900">
+      <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-8 md:py-16 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
         <div>
           <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-3">
             Para nuevos tatuadores
@@ -99,7 +105,9 @@ export default function SupplyPage() {
     </section>
 
     {/* ── COBERTURA + CONTACTO — solo móvil ────────────────────── */}
-    <section id="contacto" className="md:hidden border-t border-zinc-900 bg-zinc-950 px-6 py-8">
+    <section id="contacto" className="relative overflow-hidden md:hidden border-t border-zinc-900 bg-gray-950 px-6 py-8">
+      <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+      <div className="relative z-10">
       <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">Llegamos donde estás</h2>
       <p className="text-zinc-400 text-sm leading-relaxed mb-5">
         Contamos con transportadora aliada para entregas seguras y con pago contraentrega en toda la región de Urabá.
@@ -146,11 +154,13 @@ export default function SupplyPage() {
       >
         📱 Hacer mi pedido ahora
       </a>
+      </div>
     </section>
 
     {/* ── LOGÍSTICA + GARANTÍAS + CONTACTO — solo desktop ── */}
-    <section id="contacto-desktop" className="hidden md:block bg-zinc-950 border-t border-zinc-900 px-6 py-14">
-      <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-12">
+    <section id="contacto-desktop" className="relative overflow-hidden hidden md:block bg-gray-950 border-t border-zinc-900 px-6 py-14">
+      <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+      <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-3 gap-12">
 
         {/* COL 1: LOGÍSTICA */}
         <div>
