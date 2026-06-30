@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Eye } from 'lucide-react';
 import imgPoseidon from '../../assets/portafolio/poseidon.webp';
 import imgPoseidon2 from '../../assets/portafolio/poseidon2.webp';
 import imgAguila from '../../assets/portafolio/aguila.webp';
@@ -75,22 +76,26 @@ export default function Gallery({ onLightboxChange = () => {} }) {
             <div
               key={item.id}
               onClick={() => openLightbox(index)}
-              className="group relative overflow-y-auto scrollbar-hide rounded-lg aspect-square bg-gray-900 cursor-pointer"
+              className="group relative overflow-hidden rounded-lg aspect-square bg-gray-900 cursor-pointer"
             >
               <img
                 src={item.img}
                 alt={item.title}
                 loading="lazy"
-                className="block w-full h-auto"
+                className="object-cover w-full h-full"
                 style={{ filter: 'contrast(1.12) saturate(1.15)' }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 pointer-events-none">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
                 <p className="text-zinc-300 text-sm font-bold uppercase tracking-widest mb-1">
                   {item.category}
                 </p>
-                <h3 className="text-white text-2xl font-black italic">
+                <h3 className="text-white text-2xl font-black italic mb-3">
                   {item.title}
                 </h3>
+                <span className="self-start inline-flex items-center gap-2 px-4 py-2 rounded bg-white/10 border border-white/30 text-white text-xs font-bold uppercase tracking-widest">
+                  <Eye size={14} />
+                  Ver
+                </span>
               </div>
             </div>
           ))}
