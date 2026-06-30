@@ -182,7 +182,7 @@ function App() {
           <Route path="/cuidados" element={<CuidadosPage />} />
 
           {/* Supply */}
-          <Route path="/supply" element={<SupplyPage />} />
+          <Route path="/supply" element={<ComingSoonPage />} />
           <Route path="/supply/machines" element={<MachinesPage />} />
           <Route path="/supply/cartridges" element={<CartridgesPage />} />
           <Route path="/supply/cartridges/ez-tattoo" element={<EZCartridgesPage />} />
@@ -209,7 +209,7 @@ function App() {
           <Route path="/supply/aprende" element={<AprendePage />} />
 
           {/* Store */}
-          <Route path="/store" element={<StorePage />} />
+          <Route path="/store" element={<ComingSoonPage />} />
           <Route path="/store/ropa-dama" element={<RopaDamaPage />} />
           <Route path="/store/ropa-caballeros" element={<RopaCaballerosPage />} />
           <Route path="/store/zapatos-deportivos" element={<ZapatosDeportivosPage />} />
