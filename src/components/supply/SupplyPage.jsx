@@ -67,16 +67,16 @@ export default function SupplyPage() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-8 md:py-16 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
         <div>
           <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-3">
-            Para nuevos tatuadores
+            Educación · Crecimiento profesional
           </p>
           <h2 className="text-3xl md:text-5xl font-black uppercase leading-none mb-3">
-            {cursoDestacado?.name || '¿Quieres aprender'}<br />
+            {cursoDestacado?.name || 'Fórmate.'}<br />
             <span className="text-zinc-500">
-              {cursoDestacado ? 'disponible ahora' : 'a tatuar?'}
+              {cursoDestacado ? 'disponible ahora' : 'Especialízate.'}
             </span>
           </h2>
           <p className="text-zinc-400 text-base max-w-lg">
-            {cursoDestacado?.descripcion || 'Cursos, kit básico y recursos para dar tus primeros pasos en el mundo del tatuaje.'}
+            {cursoDestacado?.descripcion || 'Cursos y recursos para tatuadores en cualquier etapa: desde tus primeros pasos hasta la técnica que te falta dominar.'}
           </p>
           {cursoDestacado && (
             <span className="inline-block mt-3 text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-blue-500/30 text-blue-400 bg-blue-500/5">
@@ -98,7 +98,7 @@ export default function SupplyPage() {
             to="/supply/aprende"
             className="shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-4 px-8 rounded-xl hover:border-blue-500 hover:bg-blue-500/10 hover:shadow-[0_0_25px_rgba(59,130,246,0.15)] transition-all duration-300 whitespace-nowrap"
           >
-            Ver recursos para principiantes →
+            Ver cursos y recursos →
           </Link>
         )}
       </div>
