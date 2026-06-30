@@ -34,7 +34,7 @@ const supplyJsonLd = {
 
 export default function SupplyPage() {
   const { allProducts } = useCatalog('supply')
-  const cursoDestacado = allProducts.find(p => p.tipo === 'afiliado') || null
+  const cursoDestacado = allProducts.find(p => p.tipo === 'afiliado' && p.categoria === 'Cursos') || null
 
   return (
 
