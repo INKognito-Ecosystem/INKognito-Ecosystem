@@ -6,15 +6,15 @@ import imgmifoto from '../../assets/mifoto/fondoperfilweb.jpg'
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
 export default function Hero() {
-  // Foto editable desde el panel (pestaña "Tattoo") — si no hay nada
-  // configurado o falla la petición, se queda con la foto actual del código.
-  const [heroPhoto, setHeroPhoto] = useState(imgmifoto)
+  // null = todavía cargando (muestra placeholder neutro para evitar flash de imagen antigua)
+  // string = URL a mostrar (del panel o fallback estático si falla/vacío)
+  const [heroPhoto, setHeroPhoto] = useState(null)
 
   useEffect(() => {
     fetch(`${PANEL_URL}/api/jhumaneztattoo/hero`)
       .then(r => r.json())
-      .then(data => { if (data.image_url) setHeroPhoto(data.image_url) })
-      .catch(() => {})
+      .then(data => setHeroPhoto(data.image_url || imgmifoto))
+      .catch(() => setHeroPhoto(imgmifoto))
   }, [])
 
   return (
@@ -35,11 +35,14 @@ export default function Hero() {
 
             <div className="absolute -inset-1 bg-red-600 rounded-full blur opacity-20 group-hover:opacity-40 transition duration-700"></div>
 
-            <img
-              src={heroPhoto}
-              alt="Jose Humanez"
-              className="relative w-40 h-40 md:w-96 md:h-96 object-cover rounded-full border-2 border-white/10 shadow-2xl"
-            />
+            {heroPhoto
+              ? <img
+                  src={heroPhoto}
+                  alt="Jose Humanez"
+                  className="relative w-40 h-40 md:w-96 md:h-96 object-cover rounded-full border-2 border-white/10 shadow-2xl"
+                />
+              : <div className="relative w-40 h-40 md:w-96 md:h-96 rounded-full border-2 border-white/10 bg-zinc-900 shadow-2xl" />
+            }
 
           </div>
 
