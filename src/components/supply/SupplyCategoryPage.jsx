@@ -347,8 +347,8 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
           )}
         </div>
 
-        {/* RECURSOS DIGITALES AFILIADOS — solo si hay productos afiliados para esta categoría */}
-        {!loading && afiliados.length > 0 && (() => {
+        {/* RECURSOS DIGITALES AFILIADOS — sección fija, siempre visible */}
+        {!loading && (() => {
           const copy = AFILIADO_COPY[categoria] || { badge: `Recursos para ${title.toLowerCase()}`, title: 'Lleva tu técnica al siguiente nivel', desc: `Selección curada para dominar ${title.toLowerCase()}.` }
           return (
           <div className="pb-10 max-w-7xl mx-auto px-6">
@@ -361,11 +361,27 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
                 {copy.desc}
               </p>
             </div>
-            <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide">
-              {afiliados.map(item => (
-                <AfiliadoCard key={item.name} item={item} />
-              ))}
-            </div>
+            {afiliados.length > 0 ? (
+              <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide">
+                {afiliados.map(item => (
+                  <AfiliadoCard key={item.name} item={item} />
+                ))}
+              </div>
+            ) : (
+              <div className="border border-blue-500/20 bg-zinc-950 rounded-2xl p-6 text-center">
+                <p className="text-zinc-500 text-sm mb-4 max-w-sm mx-auto">
+                  Aún no tenemos un link de importación activo para {title.toLowerCase()}. Avísanos y te contactamos apenas esté disponible.
+                </p>
+                <a
+                  href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero que me avisen cuando haya ${title} disponibles en INKognito Supply.`)}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-500 text-white font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-blue-600 transition"
+                >
+                  <FaWhatsapp size={16} />
+                  Avisarme cuando haya stock →
+                </a>
+              </div>
+            )}
           </div>
           )
         })()}

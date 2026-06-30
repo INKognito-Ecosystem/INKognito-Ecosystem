@@ -237,17 +237,17 @@ export default function SuplementosPage() {
         )}
       </div>
 
-      {/* ── SUPLEMENTOS AFILIADOS — sección propia, solo si hay productos ── */}
-      {apiAfiliados.length > 0 && (
-        <section className="border-t-2 border-green-500/20 bg-[#0c0c0c] px-4 md:px-6 py-10 md:py-14">
-          <div className="max-w-7xl mx-auto">
-            <p className="text-green-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ Las marcas que no llegan al local, disponibles para ti</p>
-            <h2 className="text-2xl md:text-3xl font-black uppercase leading-none mb-2 text-white">
-              Los suplementos que ya usan los que van en serio
-            </h2>
-            <p className="text-gray-500 text-sm mb-8 max-w-lg leading-relaxed">
-              Proteínas, creatinas y pre-entrenos de marcas internacionales desde Mercado Libre con envío a Colombia. La misma calidad de los grandes, sin pagar el sobreprecio del intermediario. Complementa tu stack sin limitarte a lo que hay en Urabá.
-            </p>
+      {/* ── SUPLEMENTOS AFILIADOS — sección fija, siempre visible ── */}
+      <section className="border-t-2 border-green-500/20 bg-[#0c0c0c] px-4 md:px-6 py-10 md:py-14">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-green-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ Las marcas que no llegan al local, disponibles para ti</p>
+          <h2 className="text-2xl md:text-3xl font-black uppercase leading-none mb-2 text-white">
+            Los suplementos que ya usan los que van en serio
+          </h2>
+          <p className="text-gray-500 text-sm mb-8 max-w-lg leading-relaxed">
+            Proteínas, creatinas y pre-entrenos de marcas internacionales desde Mercado Libre con envío a Colombia. La misma calidad de los grandes, sin pagar el sobreprecio del intermediario. Complementa tu stack sin limitarte a lo que hay en Urabá.
+          </p>
+          {apiAfiliados.length > 0 ? (
             <div className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
               {apiAfiliados.map((item, i) => {
                 const url = item.url_ventas || item.url_checkout || null
@@ -278,9 +278,22 @@ export default function SuplementosPage() {
                   : <div key={i} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">{inner}</div>
               })}
             </div>
-          </div>
-        </section>
-      )}
+          ) : (
+            <div className="border border-green-500/15 bg-gray-950 rounded-2xl p-6 text-center">
+              <p className="text-gray-500 text-sm mb-4 max-w-sm mx-auto">
+                Aún no tenemos suplementos importados cargados. Avísanos y te contactamos apenas tengamos opciones disponibles.
+              </p>
+              <a
+                href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya suplementos disponibles en INKognito Suplementos.')}`}
+                target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 text-gray-950 font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-green-400 transition"
+              >
+                Avisarme cuando haya stock →
+              </a>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* COBERTURA + CONTACTO — solo móvil */}
       <section className="md:hidden border-t border-gray-800 bg-gray-950 px-4 py-8">

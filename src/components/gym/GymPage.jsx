@@ -308,17 +308,17 @@ export default function GymPage() {
         </div>
       </section>
 
-      {/* ── RECURSOS EXTERNOS — sección propia, solo si hay afiliados ── */}
-      {gymAfiliados.length > 0 && (
-        <section className="border-t-2 border-yellow-500/20 bg-[#0c0c0c] px-4 md:px-6 py-10 md:py-14">
-          <div className="max-w-7xl mx-auto">
-            <p className="text-yellow-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ Lo que necesitas para construir, disponible hoy</p>
-            <h2 className="text-2xl md:text-3xl font-black uppercase leading-none mb-2 text-white">
-              Fabrica sin que te falte nada
-            </h2>
-            <p className="text-gray-500 text-sm mb-8 max-w-lg leading-relaxed">
-              Ruedas, poleas, cables y componentes disponibles en AliExpress y Mercado Libre con envío a toda Colombia. Material verificado para que no improvises ni pagues de más. Un gym propio empieza con las piezas correctas.
-            </p>
+      {/* ── RECURSOS EXTERNOS — sección fija, siempre visible ── */}
+      <section className="border-t-2 border-yellow-500/20 bg-[#0c0c0c] px-4 md:px-6 py-10 md:py-14">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-yellow-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ Lo que necesitas para construir, disponible hoy</p>
+          <h2 className="text-2xl md:text-3xl font-black uppercase leading-none mb-2 text-white">
+            Fabrica sin que te falte nada
+          </h2>
+          <p className="text-gray-500 text-sm mb-8 max-w-lg leading-relaxed">
+            Ruedas, poleas, cables y componentes disponibles en AliExpress y Mercado Libre con envío a toda Colombia. Material verificado para que no improvises ni pagues de más. Un gym propio empieza con las piezas correctas.
+          </p>
+          {gymAfiliados.length > 0 ? (
             <div className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
               {gymAfiliados.map((item, i) => {
                 const url = item.url_ventas || item.url_checkout || null
@@ -349,9 +349,22 @@ export default function GymPage() {
                   : <div key={i} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">{inner}</div>
               })}
             </div>
-          </div>
-        </section>
-      )}
+          ) : (
+            <div className="border border-yellow-500/15 bg-gray-950 rounded-2xl p-6 text-center">
+              <p className="text-gray-500 text-sm mb-4 max-w-sm mx-auto">
+                Aún no tenemos materiales cargados. Avísanos y te contactamos apenas tengamos opciones disponibles.
+              </p>
+              <a
+                href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya materiales disponibles en INKognito Gym.')}`}
+                target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-yellow-500 text-gray-950 font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-yellow-400 transition"
+              >
+                Avisarme cuando haya stock →
+              </a>
+            </div>
+          )}
+        </div>
+      </section>
 
       <FooterGym />
 
