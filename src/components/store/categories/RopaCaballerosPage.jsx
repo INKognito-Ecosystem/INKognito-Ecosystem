@@ -18,7 +18,7 @@ const faqs = [
   },
   {
     q: '¿Qué pasa si la talla que recibo no me queda?',
-    a: 'Las tallas disponibles las ves directamente en cada producto del catálogo. Si la que recibiste no queda bien, escríbenos por WhatsApp dentro de los 3 días hábiles de recibido y coordinamos el cambio sin complicaciones.',
+    a: 'Las tallas disponibles las ves directamente en cada producto del catálogo. Si tienes duda entre dos tallas, escríbenos por WhatsApp con tu medida de pecho y cintura en centímetros y te orientamos antes de confirmar. Si la talla llegó y no queda bien, coordina el cambio dentro de los 3 días hábiles de recibido.',
   },
   {
     q: '¿Las telas aguantan el entrenamiento y el calor de Urabá?',
