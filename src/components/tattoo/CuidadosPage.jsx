@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
@@ -108,8 +107,6 @@ export default function CuidadosPage() {
   const { hash } = useLocation()
   const tab = hash === '#despues' ? 'despues' : 'antes'
 
-  useEffect(() => { window.scrollTo(0, 0) }, [])
-
   const HERO_TEXT = {
     antes: {
       title: <>Antes de tu <span className="text-zinc-600">Sesión</span></>,
@@ -140,7 +137,7 @@ export default function CuidadosPage() {
       {/* VOLVER */}
       <div className="pt-24 px-4 max-w-7xl mx-auto">
         <Link
-          to="/jhumaneztattoo#cuidados"
+          to="/jhumaneztattoo"
           className="inline-flex items-center gap-2 text-zinc-400 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors"
         >
           <ArrowLeft size={16} />
@@ -163,7 +160,7 @@ export default function CuidadosPage() {
       <section className="max-w-7xl mx-auto px-4 pb-6 md:pb-10">
 
         {/* ANTES — ambos bloques quedan en el DOM para que Google indexe todo el contenido */}
-        <div id="antes" className={tab === 'antes' ? '' : 'hidden'}>
+        <div className={tab === 'antes' ? '' : 'hidden'}>
           <div className="flex gap-6 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 scrollbar-hide">
             {ANTES.map((item, i) => (
               <CuidadoCard key={i} item={item} index={i} isFirst={i === 0} />
@@ -172,7 +169,7 @@ export default function CuidadosPage() {
         </div>
 
         {/* DESPUES */}
-        <div id="despues" className={tab === 'despues' ? '' : 'hidden'}>
+        <div className={tab === 'despues' ? '' : 'hidden'}>
           <div className="flex gap-6 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 scrollbar-hide">
             {DESPUES.map((item, i) => (
               <CuidadoCard key={i} item={item} index={i} isFirst={i === 0} />
