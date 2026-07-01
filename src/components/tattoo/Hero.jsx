@@ -39,24 +39,24 @@ export default function Hero() {
               ? <img
                   src={heroPhoto}
                   alt="Jose Humanez"
-                  className="relative w-40 h-40 md:w-96 md:h-96 object-cover rounded-full border-2 border-white/10 shadow-2xl"
+                  className="relative w-28 h-28 md:w-96 md:h-96 object-cover rounded-full border-2 border-white/10 shadow-2xl"
                 />
-              : <div className="relative w-40 h-40 md:w-96 md:h-96 rounded-full border-2 border-white/10 bg-zinc-900 shadow-2xl" />
+              : <div className="relative w-28 h-28 md:w-96 md:h-96 rounded-full border-2 border-white/10 bg-zinc-900 shadow-2xl" />
             }
 
           </div>
 
-          <div className="mt-3 text-center">
+          <div className="mt-2 text-center">
 
             <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white">
               Jose Humanez
             </h2>
 
-            <p className="text-zinc-600 font-bold text-xs uppercase tracking-[0.4em] mt-1">
+            <p className="text-zinc-600 font-bold text-xs uppercase tracking-[0.4em] mt-0.5">
               Tatuador Profesional
             </p>
 
-            <p className="text-gray-500 text-sm mt-2 font-medium">
+            <p className="text-gray-500 text-sm mt-1 font-medium">
               Chigorodó, Antioquia • Colombia
             </p>
 
@@ -64,7 +64,7 @@ export default function Hero() {
 
           <Link
             to="/portafolio"
-            className="mt-5 px-10 py-4 rounded bg-zinc-600 text-white font-black text-sm uppercase tracking-widest hover:bg-green-500 transition-all transform hover:-translate-y-1 text-center shadow-lg"
+            className="mt-3 px-10 py-4 rounded bg-zinc-600 text-white font-black text-sm uppercase tracking-widest hover:bg-green-500 transition-all transform hover:-translate-y-1 text-center shadow-lg"
           >
             Ver Portafolio
           </Link>
