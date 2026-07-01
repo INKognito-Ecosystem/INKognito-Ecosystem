@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
@@ -106,6 +107,8 @@ export default function CuidadosPage() {
   // cada link es de un solo sentido: muestra SOLO esa sección, no un selector entre ambas
   const { hash } = useLocation()
   const tab = hash === '#despues' ? 'despues' : 'antes'
+
+  useEffect(() => { window.scrollTo(0, 0) }, [])
 
   const HERO_TEXT = {
     antes: {
