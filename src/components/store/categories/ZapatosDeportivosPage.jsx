@@ -14,11 +14,11 @@ const STRIPE_PATTERN = {
 const faqs = [
   {
     q: '¿Cómo llegan los zapatos a mi municipio?',
-    a: 'Despachamos con Eljach Transportadora a toda la región. Chigorodó, Carepa y Apartadó: 1 a 2 días hábiles. Turbo y Mutatá: 2 a 3 días. Pago contraentrega — pagas cuando recibes el paquete en tu puerta.',
+    a: 'Despachamos con Eljach Transportadora, ruta diaria a toda la zona de Urabá. Entrega estimada de 1 a 2 días hábiles a Chigorodó, Carepa, Apartadó y Turbo. Pago contraentrega: pagas cuando recibes el paquete en tu puerta, sin adelantos.',
   },
   {
-    q: '¿Cómo elijo la talla correcta sin probármelos?',
-    a: 'Escríbenos por WhatsApp con tu talla habitual y la medida de tu pie en centímetros. Te orientamos antes de confirmar el pedido. Si aún así la talla no queda, coordina el cambio dentro de los 3 días hábiles de recibido.',
+    q: '¿Qué pasa si la talla no me queda?',
+    a: 'Las tallas disponibles las ves directamente en cada producto del catálogo. Si tienes duda entre dos números, escríbenos por WhatsApp con la medida de tu pie en centímetros y te orientamos. Si la talla que llegó no queda, coordina el cambio dentro de los 3 días hábiles de recibido.',
   },
   {
     q: '¿En qué se diferencian los de running y los de entrenamiento?',

@@ -34,7 +34,7 @@ const categories = [
     id: 3,
     name: 'Zapatos Deportivos',
     tag: 'Running & Gym',
-    description: 'Las siluetas de running y entrenamiento más buscadas del mercado. Réplica premium con amortiguación y acabados de nivel. Entrega en 1 a 4 días hábiles con Eljach en toda Urabá.',
+    description: 'Las siluetas de running y entrenamiento más buscadas del mercado. Réplica premium con amortiguación y acabados de nivel. Ruta diaria con Eljach — entrega en 1 a 2 días hábiles en Chigorodó, Carepa, Apartadó y Turbo.',
     link: '/store/zapatos-deportivos',
     icon: <Footprints size={28} />,
   },

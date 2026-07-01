@@ -14,15 +14,15 @@ const STRIPE_PATTERN = {
 const faqs = [
   {
     q: '¿Cómo llegan los guayos a mi municipio?',
-    a: 'Despachamos con Eljach Transportadora a toda la región de Urabá. Chigorodó, Carepa y Apartadó: 1 a 2 días hábiles. Turbo y Mutatá: 2 a 3 días. Pago contraentrega — pagas cuando recibes el paquete en tu puerta, sin adelantos.',
+    a: 'Despachamos con Eljach Transportadora, ruta diaria a toda la zona de Urabá. Entrega estimada de 1 a 2 días hábiles a Chigorodó, Carepa, Apartadó y Turbo. Pago contraentrega: pagas cuando recibes el paquete en tu puerta, sin adelantos.',
   },
   {
     q: '¿Qué tipo de guayo sirve para las canchas de Urabá?',
-    a: 'Para canchas de terreno firme (tierra o grama natural) recomendamos tacos de terreno firme (FG). Para sintético, los de tacos cortos de goma (AG o TF). Escríbenos y te orientamos según la cancha donde juegas habitualmente.',
+    a: 'Para canchas de terreno firme (tierra o grama natural) recomendamos tacos FG. Para sintético, tacos cortos de goma (AG o TF). Escríbenos por WhatsApp y te orientamos según la cancha donde juegas habitualmente.',
   },
   {
-    q: '¿Cómo elijo la talla sin probarlos?',
-    a: 'Escríbenos por WhatsApp con tu talla habitual de calzado y la medida de tu pie en centímetros. Te asesoramos antes de confirmar el pedido. Si la talla no queda, coordina el cambio dentro de los 3 días hábiles de recibido.',
+    q: '¿Qué pasa si la talla no me queda?',
+    a: 'Las tallas disponibles las ves directamente en cada producto del catálogo. Si tienes duda entre dos números, escríbenos con la medida de tu pie en centímetros antes de confirmar. Si la talla llegó y no queda, coordina el cambio por WhatsApp dentro de los 3 días hábiles de recibido.',
   },
 ]
 

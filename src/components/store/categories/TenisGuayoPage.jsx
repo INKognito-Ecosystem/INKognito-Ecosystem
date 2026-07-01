@@ -17,12 +17,12 @@ const faqs = [
     a: 'Los tenis guayo están diseñados para rendir en sintético, polvo de ladrillo y calle sin cambiar de par. Son la opción más versátil para quien juega en diferentes superficies o quiere un calzado que también use fuera de la cancha.',
   },
   {
-    q: '¿Cómo llegan a mi municipio en Urabá?',
-    a: 'Despachamos con Eljach Transportadora a toda la región. Chigorodó, Carepa y Apartadó: 1 a 2 días hábiles. Turbo y Mutatá: 2 a 3 días. Pago contraentrega — pagas cuando recibes el paquete en tu puerta, sin adelantos.',
+    q: '¿Cómo llegan a mi municipio y en cuánto tiempo?',
+    a: 'Despachamos con Eljach Transportadora, ruta diaria a toda la zona de Urabá. Entrega estimada de 1 a 2 días hábiles a Chigorodó, Carepa, Apartadó y Turbo. Pago contraentrega: pagas cuando recibes el paquete, sin adelantos.',
   },
   {
-    q: '¿Cómo pido si no sé bien la talla?',
-    a: 'Escríbenos por WhatsApp con tu talla habitual de calzado y la medida de tu pie en centímetros. Te orientamos antes de confirmar el pedido para que no tengas sorpresas. Si la talla no queda, coordina el cambio dentro de los 3 días hábiles de recibido.',
+    q: '¿Qué pasa si la talla no me queda?',
+    a: 'Las tallas disponibles las ves directamente en cada producto del catálogo. Si tienes duda entre dos números, escríbenos por WhatsApp con la medida de tu pie en centímetros antes de confirmar. Si la talla llegó y no queda, coordina el cambio dentro de los 3 días hábiles de recibido.',
   },
 ]
 

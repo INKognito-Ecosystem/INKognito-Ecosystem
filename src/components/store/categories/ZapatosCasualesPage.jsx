@@ -13,12 +13,12 @@ const STRIPE_PATTERN = {
 
 const faqs = [
   {
-    q: '¿Llegan a mi municipio en Urabá?',
-    a: 'Sí. Despachamos con Eljach Transportadora a toda la región. Chigorodó, Carepa y Apartadó: 1 a 2 días hábiles. Turbo y Mutatá: 2 a 3 días. Pago contraentrega — pagas cuando recibes el paquete, sin adelantos.',
+    q: '¿Llegan a mi municipio y en cuánto tiempo?',
+    a: 'Sí. Despachamos con Eljach Transportadora, ruta diaria a toda la zona de Urabá. Entrega estimada de 1 a 2 días hábiles a Chigorodó, Carepa, Apartadó y Turbo. Pago contraentrega: pagas cuando recibes, sin adelantos.',
   },
   {
-    q: '¿Cómo elijo la talla para un zapato casual?',
-    a: 'Escríbenos por WhatsApp con tu talla habitual y la medida de tu pie en centímetros. Te asesoramos antes de confirmar. Si la talla no queda, coordina el cambio dentro de los 3 días hábiles de recibido — sin complicaciones.',
+    q: '¿Qué pasa si la talla no me queda?',
+    a: 'Las tallas disponibles las ves directamente en cada producto del catálogo. Si la que recibiste no queda bien, escríbenos por WhatsApp dentro de los 3 días hábiles de recibido y coordinamos el cambio sin complicaciones.',
   },
   {
     q: '¿Qué modelos manejan y para qué ocasiones sirven?',

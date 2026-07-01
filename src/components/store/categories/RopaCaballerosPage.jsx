@@ -14,11 +14,11 @@ const STRIPE_PATTERN = {
 const faqs = [
   {
     q: '¿Cómo llega mi pedido y en cuánto tiempo?',
-    a: 'Despachamos con Eljach Transportadora, nuestro aliado logístico en Urabá. Chigorodó, Carepa y Apartadó: 1 a 2 días hábiles. Turbo y Mutatá: 2 a 3 días. Pago contraentrega — pagas cuando recibes, sin adelantos.',
+    a: 'Despachamos con Eljach Transportadora, nuestro aliado logístico en Urabá. La ruta es diaria — entrega estimada de 1 a 2 días hábiles a Chigorodó, Carepa, Apartadó y Turbo. Pago contraentrega: pagas cuando recibes el paquete, sin adelantos.',
   },
   {
-    q: '¿Cómo sé qué talla pedir sin probármela?',
-    a: 'Escríbenos por WhatsApp con tu talla habitual y tus medidas de pecho y cintura. Te asesoramos antes de confirmar. Manejamos S, M, L, XL y XXL. Si la talla no queda, coordina el cambio dentro de los 3 días hábiles de recibido.',
+    q: '¿Qué pasa si la talla que recibo no me queda?',
+    a: 'Las tallas disponibles las ves directamente en cada producto del catálogo. Si la que recibiste no queda bien, escríbenos por WhatsApp dentro de los 3 días hábiles de recibido y coordinamos el cambio sin complicaciones.',
   },
   {
     q: '¿Las telas aguantan el entrenamiento y el calor de Urabá?',
