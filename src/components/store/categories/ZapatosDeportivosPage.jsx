@@ -13,24 +13,16 @@ const STRIPE_PATTERN = {
 
 const faqs = [
   {
-    q: '¿Los productos son originales o réplicas?',
-    a: 'Son réplicas de alta calidad con materiales premium similares a los originales, a una fracción del precio. Los diseños están inspirados en las mejores marcas del mercado y fabricados con los mismos estándares de acabado.',
-  },
-  {
-    q: '¿La calidad es buena? ¿Realmente duran?',
-    a: 'Sí. Cada par está fabricado con materiales seleccionados y probados para el uso diario en el clima cálido y la actividad intensa de Urabá. Miles de clientes en la región los usan con satisfacción.',
-  },
-  {
-    q: '¿Cómo elijo entre running y entrenamiento?',
-    a: 'Las de running tienen mayor amortiguación en talón y antepié para movimiento unidireccional. Las de entrenamiento ofrecen estabilidad lateral para pesas, sentadillas y movimientos en múltiples direcciones. Escríbenos y te asesoramos según tu actividad.',
-  },
-  {
-    q: '¿Hacen envíos a toda la región de Urabá?',
-    a: 'Sí. Cubrimos todo el Urabá antioqueño: Chigorodó, Carepa, Apartadó, Turbo, Mutatá y Arboletes. Entrega en 1 a 4 días hábiles con pago contraentrega disponible.',
+    q: '¿Cómo llegan los zapatos a mi municipio?',
+    a: 'Despachamos con Eljach Transportadora, ruta diaria a toda la zona de Urabá. Entrega estimada de 1 a 2 días hábiles a Chigorodó, Carepa, Apartadó y Turbo. Pago contraentrega: pagas cuando recibes el paquete en tu puerta, sin adelantos.',
   },
   {
     q: '¿Qué pasa si la talla no me queda?',
-    a: 'Hacemos cambio de talla sin problema. Contáctanos dentro de los 3 días hábiles de recibir tu pedido y coordinamos el cambio. Por WhatsApp te guiamos para elegir la talla correcta antes de hacer el pedido.',
+    a: 'Las tallas disponibles las ves directamente en cada producto del catálogo. Si tienes duda entre dos números, escríbenos por WhatsApp con la medida de tu pie en centímetros y te orientamos. Si la talla que llegó no queda, coordina el cambio dentro de los 3 días hábiles de recibido.',
+  },
+  {
+    q: '¿En qué se diferencian los de running y los de entrenamiento?',
+    a: 'Los de running tienen mayor amortiguación en talón y antepié para movimiento continuo. Los de entrenamiento dan estabilidad lateral para pesas, sentadillas y cambios de dirección. Escríbenos y te asesoramos según tu actividad.',
   },
 ]
 
@@ -59,7 +51,7 @@ export default function ZapatosDeportivosPage() {
             Running • Entrenamiento • Gym
           </p>
           <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg">
-            Las siluetas de running y entrenamiento más buscadas del mercado, a un precio que tiene sentido para Urabá.
+            Las siluetas de running y gym más buscadas del mercado. Réplica premium con amortiguación y acabados de nivel — a un precio que tiene sentido para Urabá. Despacho con Eljach a Chigorodó, Apartadó, Carepa, Turbo y municipios cercanos. Pago contraentrega.
           </p>
         </div>
       </div>

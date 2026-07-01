@@ -22,54 +22,54 @@ const CAT_ICONS = {
 
 const AFILIADO_COPY = {
   'Tintas': {
-    badge: 'Calidad que se nota en el resultado',
-    title: 'La tinta que define cómo cicatriza tu trabajo',
-    desc:  'Eternal, Intenze y World Famous: las marcas que eligen los tatuadores que no dejan nada al azar. Color que se mantiene vibrante con los años, disponible para importar con envío a Colombia.',
+    badge: 'Importación internacional · bajo pedido',
+    title: 'Las mismas marcas — traídas directamente del exterior',
+    desc:  'Eternal, Intenze, World Famous y más: las mismas marcas de referencia que usas o quieres usar, pero importadas. No están en el mercado local — se gestionan bajo pedido y llegan a Colombia con envío incluido.',
   },
   'Cartuchos': {
-    badge: 'Precisión desde el primer trazo',
-    title: 'El cartucho que no te falla a mitad de sesión',
-    desc:  'Membrana precisa, aguja consistente, entrada limpia. Marcas internacionales para quien no negocia con la calidad de su trazo.',
+    badge: 'Importación internacional · bajo pedido',
+    title: 'Cartuchos de marcas internacionales, traídos para ti',
+    desc:  'Kwadron, EZ Tattoo, WJX y otros: marcas que no se consiguen fácil en Colombia. Se importan bajo pedido — mismos productos, diferente canal. Consulta disponibilidad y tiempos por WhatsApp.',
   },
   'Agujas': {
-    badge: 'La configuración exacta que tu técnica exige',
-    title: 'Cada técnica exige su aguja — aquí están todas',
-    desc:  'Desde liner fino hasta magnum curvo: configuraciones específicas para resultados específicos. Disponibles para importar cuando las necesites.',
+    badge: 'Importación internacional · bajo pedido',
+    title: 'La configuración exacta que buscas, traída del exterior',
+    desc:  'Si necesitas una configuración específica que no hay en el mercado local, estas se importan bajo pedido. Las mismas agujas, sin pasar por distribuidores colombianos.',
   },
   'Máquinas': {
-    badge: 'Equipos de nivel internacional',
-    title: 'Tu próxima rotativa, directo del distribuidor',
-    desc:  'Máquinas de marcas reconocidas por tatuadores que viven de esto. Si necesitas orientación para elegir la tuya, el equipo de INKognito te asesora por WhatsApp.',
+    badge: 'Importación internacional · bajo pedido',
+    title: 'Tu próxima rotativa, gestionada desde el exterior',
+    desc:  'Equipos de marcas internacionales que raramente llegan al mercado colombiano. Se importan bajo pedido con asesoría incluida — el equipo de INKognito te orienta en la elección antes de confirmar.',
   },
   'Guantes': {
-    badge: 'Protección sin negociación',
-    title: 'Bioseguridad de grado médico, sin excusas',
-    desc:  'Guantes nitrilo grado médico por caja, para estudios que no improvisan en higiene. Disponibles para importar con envío a Colombia.',
+    badge: 'Importación internacional · bajo pedido',
+    title: 'Bioseguridad de grado médico, importada directamente',
+    desc:  'Los mismos guantes nitrilo que usan estudios de referencia internacional, disponibles para importar en volumen. Calidad certificada que no siempre circula en el mercado local.',
   },
   'Cuidados': {
-    badge: 'El aftercare que respalda tu trabajo',
-    title: 'Cuida el resultado tan bien como lo hiciste',
-    desc:  'Cremas de cicatrización, protector solar y aftercare de las marcas que recomiendan tatuadores de referencia. Disponibles para importar con envío a Colombia.',
+    badge: 'Importación internacional · bajo pedido',
+    title: 'Aftercare de primer nivel, traído directamente',
+    desc:  'Cremas y protectores de las marcas que recomiendan tatuadores de referencia fuera del país. Se importan bajo pedido — los mismos productos que ves en referentes internacionales, sin intermediarios locales.',
   },
   'Fuentes': {
-    badge: 'Estabilidad que se nota en el trazo',
-    title: 'Una buena fuente no se reemplaza — se elige bien',
-    desc:  'Voltaje estable y control preciso, de marcas confiables. La base invisible de cada sesión bien hecha.',
+    badge: 'Importación internacional · bajo pedido',
+    title: 'Fuentes de marcas internacionales, bajo pedido',
+    desc:  'Si buscas una fuente específica que no encuentras en Colombia, se puede importar. Consulta disponibilidad y tiempos de entrega por WhatsApp antes de confirmar el pedido.',
   },
   'Accesorios': {
-    badge: 'Los detalles que completan un set profesional',
-    title: 'Un workspace de pro no improvisa',
-    desc:  'Porta cartuchos, racks y organizadores para un estudio que funciona limpio y eficiente. El orden también es parte del oficio.',
+    badge: 'Importación internacional · bajo pedido',
+    title: 'Accesorios de estudio que no llegan al mercado local',
+    desc:  'Organizadores, racks y accesorios de marcas internacionales que no circulan en Colombia. Importados bajo pedido según lo que necesites para completar tu set.',
   },
   'Muebles': {
-    badge: 'El ambiente también respalda tu trabajo',
-    title: 'Un estudio que dice "esto es en serio"',
-    desc:  'Camillas y mobiliario profesional pensado para la comodidad de la sesión y la percepción del cliente. El espacio habla antes que la máquina.',
+    badge: 'Importación internacional · bajo pedido',
+    title: 'Mobiliario de estándar internacional, importado',
+    desc:  'Camillas y mobiliario profesional de nivel internacional, disponibles para importar. Los tiempos de entrega son mayores que el stock local — consulta condiciones antes de pedir.',
   },
   'Combos': {
-    badge: 'Todo en un solo pedido, sin vueltas',
-    title: 'El kit para escalar tu estudio de una vez',
-    desc:  'Sets de equipos curados para quien ya sabe lo que necesita y no quiere perder tiempo en compras sueltas.',
+    badge: 'Importación internacional · bajo pedido',
+    title: 'Sets completos de marcas internacionales, bajo pedido',
+    desc:  'Combos de equipos y consumibles que no se arman con lo que hay en el mercado local. Se gestionan desde el exterior — ideal para quien quiere escalar con marcas de referencia internacional.',
   },
 }
 
@@ -230,7 +230,7 @@ function AfiliadoCard({ item }) {
         }
       </div>
       <div className="p-3 flex flex-col gap-1.5 flex-1">
-        <span className="text-[9px] font-black uppercase tracking-widest text-blue-400/70">Recurso digital{item.plataforma ? ` · ${item.plataforma}` : ''}</span>
+        <span className="text-[9px] font-black uppercase tracking-widest text-blue-400/70">Importación internacional{item.plataforma ? ` · ${item.plataforma}` : ''}</span>
         <h3 className="text-xs font-black uppercase leading-tight text-white">{item.name}</h3>
         {item.descripcion && (
           <p className="text-zinc-500 text-[10px] leading-relaxed flex-1">{item.descripcion}</p>
@@ -376,7 +376,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
             ) : (
               <div className="border border-blue-500/20 bg-zinc-950 rounded-2xl p-6 text-center">
                 <p className="text-zinc-500 text-sm mb-4 max-w-sm mx-auto">
-                  Aún no tenemos un link de importación activo para {title.toLowerCase()}. Avísanos y te contactamos apenas esté disponible.
+                  Aún no tenemos activo el canal de importación para {title.toLowerCase()}. Avísanos y te contactamos en cuanto esté disponible — gestionamos el pedido desde el exterior.
                 </p>
                 <a
                   href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero que me avisen cuando haya ${title} disponibles en INKognito Supply.`)}`}

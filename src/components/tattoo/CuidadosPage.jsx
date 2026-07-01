@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
@@ -73,7 +74,7 @@ const FAQ_JSONLD = {
   ],
 }
 
-function CuidadoCard({ item, index }) {
+function CuidadoCard({ item, index, isFirst }) {
   const Icon = item.icon
   return (
     <div className="snap-start flex-shrink-0 w-[calc(100vw-2rem)] md:w-72 lg:w-80 bg-black/40 p-5 sm:p-6 border-l-4 border-zinc-600 rounded-r-lg hover:bg-black/60 transition-colors">
@@ -91,6 +92,12 @@ function CuidadoCard({ item, index }) {
       <p className="text-gray-300 leading-relaxed font-light text-sm">
         {item.text}
       </p>
+      {isFirst && (
+        <div className="md:hidden mt-4 pt-3 border-t border-zinc-800 flex items-center justify-end gap-2 text-zinc-500 text-[10px] font-bold uppercase tracking-widest">
+          <span>Desliza para ver más</span>
+          <span className="animate-bounce">→</span>
+        </div>
+      )}
     </div>
   )
 }
@@ -100,6 +107,8 @@ export default function CuidadosPage() {
   // cada link es de un solo sentido: muestra SOLO esa sección, no un selector entre ambas
   const { hash } = useLocation()
   const tab = hash === '#despues' ? 'despues' : 'antes'
+
+  useEffect(() => { window.scrollTo(0, 0) }, [])
 
   const HERO_TEXT = {
     antes: {
@@ -157,7 +166,7 @@ export default function CuidadosPage() {
         <div id="antes" className={tab === 'antes' ? '' : 'hidden'}>
           <div className="flex gap-6 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 scrollbar-hide">
             {ANTES.map((item, i) => (
-              <CuidadoCard key={i} item={item} index={i} />
+              <CuidadoCard key={i} item={item} index={i} isFirst={i === 0} />
             ))}
           </div>
         </div>
@@ -166,7 +175,7 @@ export default function CuidadosPage() {
         <div id="despues" className={tab === 'despues' ? '' : 'hidden'}>
           <div className="flex gap-6 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 scrollbar-hide">
             {DESPUES.map((item, i) => (
-              <CuidadoCard key={i} item={item} index={i} />
+              <CuidadoCard key={i} item={item} index={i} isFirst={i === 0} />
             ))}
           </div>
         </div>
