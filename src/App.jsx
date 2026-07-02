@@ -57,6 +57,9 @@ const ZapatosCasualesPage = lazy(() => import('./components/store/categories/Zap
 const GuayosPage = lazy(() => import('./components/store/categories/GuayosPage'))
 const TenisGuayoPage = lazy(() => import('./components/store/categories/TenisGuayoPage'))
 
+// Landing page dinámica por producto (para ads y Dropi)
+const ProductLandingPage = lazy(() => import('./components/landing/ProductLandingPage'))
+
 // Gym module — lazy
 const GymPage = lazy(() => import('./components/gym/GymPage'))
 const MaquinasPedidoPage = lazy(() => import('./components/gym/categories/MaquinasPedidoPage'))
@@ -180,6 +183,7 @@ function App() {
           <Route path="/jhumaneztattoo" element={<HomePage />} />
           <Route path="/portafolio" element={<PortfolioPage />} />
           <Route path="/cuidados" element={<CuidadosPage />} />
+          <Route path="/p/:id" element={<ProductLandingPage />} />
 
           {/* Supply */}
           <Route path="/supply" element={<ComingSoonPage />} />
