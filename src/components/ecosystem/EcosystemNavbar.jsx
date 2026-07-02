@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import inkognitoLogo from '../../assets/ecosystem/logo.png'
 
-export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio' }) {
+export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio', logoAccent = null }) {
   const [menuOpen,  setMenuOpen]  = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [tattooOpen, setTattooOpen] = useState(false)
@@ -26,11 +26,12 @@ export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio' }) {
   return (
     <>
       {/* NAVBAR */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4">
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between pl-2 pr-6 py-4">
         <img
           src={inkognitoLogo}
           alt="INKognito"
           className="h-[52px] w-auto object-contain mr-8"
+          style={logoAccent ? { filter: `drop-shadow(0 0 8px ${logoAccent})` } : {}}
         />
 
         {/* TAGLINE central — desaparece al hacer scroll */}

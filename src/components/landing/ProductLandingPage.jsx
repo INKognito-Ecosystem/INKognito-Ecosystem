@@ -101,7 +101,7 @@ export default function ProductLandingPage() {
         image={imageUrl}
       />
 
-      <EcosystemNavbar tattooLabel="Jhumaneztattoo" />
+      <EcosystemNavbar tattooLabel="Jhumaneztattoo" logoAccent={accent} />
 
       <div className="pt-20 max-w-5xl mx-auto px-4 py-8 md:py-16">
         <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-start">
@@ -145,14 +145,14 @@ export default function ProductLandingPage() {
 
             {/* Tagline — solo supply */}
             {isSupply && (
-              <p className="text-xs italic tracking-wide border-l-2 pl-3" style={{ borderColor: accent, color: accent }}>
+              <p className="text-xs italic tracking-wide border-l-2 border-zinc-600 pl-3 text-zinc-400">
                 De un tatuador, para tatuadores.
               </p>
             )}
 
             {/* Stock bajo */}
             {stockBajo && (
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide" style={{ color: accent }}>
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-amber-400">
                 <Zap size={13} />
                 ¡Solo {variant.stock} disponibles!
               </div>
@@ -169,10 +169,9 @@ export default function ProductLandingPage() {
                       onClick={() => setActive(i)}
                       className={`px-4 py-2 rounded border text-sm font-bold transition-all ${
                         i === activeVariant
-                          ? 'text-black'
+                          ? 'border-white bg-white text-black'
                           : 'border-zinc-700 text-zinc-300 hover:border-zinc-500'
                       }`}
-                    style={i === activeVariant ? { borderColor: accent, backgroundColor: accent } : {}}
                     >
                       {v.variant || 'Único'}
                     </button>
@@ -190,15 +189,15 @@ export default function ProductLandingPage() {
             {!isAfiliado && (
               <div className="border-t border-zinc-800 pt-4 space-y-2">
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <Truck size={13} className="shrink-0" style={{ color: accent }} />
+                  <Truck size={13} className="shrink-0" />
                   <span>Envío a todo Colombia — Urabá en 1-2 días hábiles</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <ShoppingBag size={13} className="shrink-0" style={{ color: accent }} />
+                  <ShoppingBag size={13} className="shrink-0" />
                   <span>Contraentrega disponible en Urabá</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <Shield size={13} className="shrink-0" style={{ color: accent }} />
+                  <Shield size={13} className="shrink-0" />
                   <span>Garantía de calidad en cada producto</span>
                 </div>
               </div>
