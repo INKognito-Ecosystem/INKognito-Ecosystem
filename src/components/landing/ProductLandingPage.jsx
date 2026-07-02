@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { FaWhatsapp } from 'react-icons/fa'
 import { Package, ExternalLink, Truck, Shield, ShoppingBag } from 'lucide-react'
 import Seo from '../Seo'
+import EcosystemNavbar from '../ecosystem/EcosystemNavbar'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL
 const WA_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '573207911013'
@@ -57,12 +58,9 @@ export default function ProductLandingPage() {
         image={imageUrl}
       />
 
-      {/* HEADER mínimo */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-b border-white/5 px-5 py-3">
-        <span className="font-black uppercase tracking-widest text-sm">INKognito</span>
-      </header>
+      <EcosystemNavbar />
 
-      <div className="pt-16 max-w-5xl mx-auto px-4 py-10 md:py-20">
+      <div className="pt-24 max-w-5xl mx-auto px-4 py-10 md:py-20">
         <div className="grid md:grid-cols-2 gap-10 md:gap-20 items-start">
 
           {/* IMAGEN */}
