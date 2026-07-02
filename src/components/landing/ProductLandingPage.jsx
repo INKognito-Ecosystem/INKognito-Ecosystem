@@ -15,6 +15,13 @@ const PLATAFORMA_LABEL = {
   hotmart:      'Hotmart',
 }
 
+const MODULE_COLOR = {
+  supply:      '#38BDF8', // azul eléctrico
+  store:       '#FBBF24', // dorado
+  suplementos: '#A1A1AA', // gris
+  gym:         '#A1A1AA', // gris
+}
+
 export default function ProductLandingPage() {
   const { id } = useParams()
   const [product, setProduct]      = useState(null)
@@ -50,6 +57,7 @@ export default function ProductLandingPage() {
   const variant         = product.variantes[activeVariant] || product.variantes[0]
   const isAfiliado      = product.tipo === 'afiliado'
   const isSupply        = product.module === 'supply'
+  const accent          = MODULE_COLOR[product.module] || '#A1A1AA'
   const imageUrl        = variant?.image_url || product.variantes[0]?.image_url
   const stockBajo       = !isAfiliado && variant?.stock > 0 && variant?.stock <= 5
   const sinStock        = !isAfiliado && variant?.stock === 0
@@ -137,14 +145,14 @@ export default function ProductLandingPage() {
 
             {/* Tagline — solo supply */}
             {isSupply && (
-              <p className="text-zinc-500 text-xs italic tracking-wide border-l-2 border-zinc-700 pl-3">
+              <p className="text-xs italic tracking-wide border-l-2 pl-3" style={{ borderColor: accent, color: accent }}>
                 De un tatuador, para tatuadores.
               </p>
             )}
 
             {/* Stock bajo */}
             {stockBajo && (
-              <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wide">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide" style={{ color: accent }}>
                 <Zap size={13} />
                 ¡Solo {variant.stock} disponibles!
               </div>
@@ -161,9 +169,10 @@ export default function ProductLandingPage() {
                       onClick={() => setActive(i)}
                       className={`px-4 py-2 rounded border text-sm font-bold transition-all ${
                         i === activeVariant
-                          ? 'border-white bg-white text-black'
+                          ? 'text-black'
                           : 'border-zinc-700 text-zinc-300 hover:border-zinc-500'
                       }`}
+                    style={i === activeVariant ? { borderColor: accent, backgroundColor: accent } : {}}
                     >
                       {v.variant || 'Único'}
                     </button>
@@ -181,15 +190,15 @@ export default function ProductLandingPage() {
             {!isAfiliado && (
               <div className="border-t border-zinc-800 pt-4 space-y-2">
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <Truck size={13} className="shrink-0 text-zinc-600" />
+                  <Truck size={13} className="shrink-0" style={{ color: accent }} />
                   <span>Envío a todo Colombia — Urabá en 1-2 días hábiles</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <ShoppingBag size={13} className="shrink-0 text-zinc-600" />
+                  <ShoppingBag size={13} className="shrink-0" style={{ color: accent }} />
                   <span>Contraentrega disponible en Urabá</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <Shield size={13} className="shrink-0 text-zinc-600" />
+                  <Shield size={13} className="shrink-0" style={{ color: accent }} />
                   <span>Garantía de calidad en cada producto</span>
                 </div>
               </div>

@@ -30,7 +30,7 @@ export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio' }) {
         <img
           src={inkognitoLogo}
           alt="INKognito"
-          className="h-[52px] w-auto object-contain"
+          className="h-[52px] w-auto object-contain mr-8"
         />
 
         {/* TAGLINE central — desaparece al hacer scroll */}
