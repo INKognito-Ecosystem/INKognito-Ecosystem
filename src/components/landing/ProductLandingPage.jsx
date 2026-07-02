@@ -91,18 +91,23 @@ export default function ProductLandingPage() {
       <div className="pt-20 max-w-5xl mx-auto px-4 py-8 md:py-16">
         <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-start">
 
-          {/* IMAGEN — object-contain para no recortar, aspect natural en móvil */}
-          <div className="w-full aspect-[4/3] md:aspect-square rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 flex items-center justify-center">
+          {/* COLUMNA IZQUIERDA — imagen + descripción */}
+          <div className="space-y-5">
+            {/* Imagen sin contenedor fijo — se adapta al tamaño natural de la foto */}
             {imageUrl
-              ? <img key={imageUrl} src={imageUrl} alt={product.name} className="w-full h-full object-contain" />
-              : <Package size={64} className="text-zinc-700" />
+              ? <img key={imageUrl} src={imageUrl} alt={product.name} className="w-full h-auto rounded-xl border border-zinc-800" />
+              : <div className="aspect-square rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-700"><Package size={64} /></div>
             }
+
+            {/* Descripción — debajo de la imagen en desktop, se oculta en móvil (va al final) */}
+            {product.descripcion && (
+              <p className="hidden md:block text-zinc-400 text-sm leading-relaxed">{product.descripcion}</p>
+            )}
           </div>
 
-          {/* DETALLE */}
+          {/* COLUMNA DERECHA — decisión de compra */}
           <div className="space-y-5">
 
-            {/* CATEGORÍA + NOMBRE + PRECIO */}
             <div>
               <p className="text-zinc-500 text-[11px] uppercase tracking-widest mb-1">{product.categoria}</p>
               <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tight leading-tight">
@@ -115,14 +120,14 @@ export default function ProductLandingPage() {
               )}
             </div>
 
-            {/* TAGLINE — solo módulo supply */}
+            {/* Tagline — solo supply */}
             {isSupply && (
               <p className="text-zinc-500 text-xs italic tracking-wide border-l-2 border-zinc-700 pl-3">
                 De un tatuador, para tatuadores.
               </p>
             )}
 
-            {/* ALERTA STOCK BAJO */}
+            {/* Stock bajo */}
             {stockBajo && (
               <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wide">
                 <Zap size={13} />
@@ -130,7 +135,7 @@ export default function ProductLandingPage() {
               </div>
             )}
 
-            {/* VARIANTES */}
+            {/* Variantes */}
             {product.variantes.length > 1 && (
               <div>
                 <p className="text-zinc-500 text-[11px] uppercase tracking-widest mb-2">Variante</p>
@@ -157,12 +162,7 @@ export default function ProductLandingPage() {
               <CTAButton className="w-full" />
             </div>
 
-            {/* DESCRIPCIÓN */}
-            {product.descripcion && (
-              <p className="text-zinc-400 text-sm leading-relaxed">{product.descripcion}</p>
-            )}
-
-            {/* TRUST SIGNALS */}
+            {/* Trust signals */}
             {!isAfiliado && (
               <div className="border-t border-zinc-800 pt-4 space-y-2">
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
@@ -182,9 +182,17 @@ export default function ProductLandingPage() {
 
           </div>
         </div>
+
+        {/* Descripción en móvil — debajo de todo */}
+        {product.descripcion && (
+          <p className="md:hidden text-zinc-400 text-sm leading-relaxed mt-8 pt-6 border-t border-zinc-800">
+            {product.descripcion}
+          </p>
+        )}
+
       </div>
 
-      {/* CTA FIJO MÓVIL */}
+      {/* CTA fijo móvil */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-black/95 backdrop-blur-sm border-t border-white/10 px-4 py-3">
         <CTAButton className="w-full" />
       </div>
