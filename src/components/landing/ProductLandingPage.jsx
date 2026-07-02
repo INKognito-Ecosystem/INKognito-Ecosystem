@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { FaWhatsapp } from 'react-icons/fa'
-import { Package, ExternalLink, Truck, Shield, ShoppingBag, Zap, CheckCircle2 } from 'lucide-react'
+import { Package, ExternalLink, Truck, Shield, ShoppingBag, Zap } from 'lucide-react'
 import Seo from '../Seo'
 import EcosystemNavbar from '../ecosystem/EcosystemNavbar'
 
@@ -15,17 +15,11 @@ const PLATAFORMA_LABEL = {
   hotmart:      'Hotmart',
 }
 
-const PASOS = [
-  { n: '01', title: 'Escríbenos',   text: 'Toca el botón y cuéntanos qué quieres pedir.' },
-  { n: '02', title: 'Confirmamos',  text: 'Te confirmamos disponibilidad y datos de entrega.' },
-  { n: '03', title: 'Lo recibís',   text: 'Despacho en 24h. Contraentrega disponible en Urabá.' },
-]
-
 export default function ProductLandingPage() {
   const { id } = useParams()
-  const [product, setProduct]  = useState(null)
-  const [loading, setLoading]  = useState(true)
-  const [notFound, setNotFound] = useState(false)
+  const [product, setProduct]      = useState(null)
+  const [loading, setLoading]      = useState(true)
+  const [notFound, setNotFound]    = useState(false)
   const [activeVariant, setActive] = useState(0)
 
   useEffect(() => {
@@ -46,11 +40,12 @@ export default function ProductLandingPage() {
     </div>
   )
 
-  const variant       = product.variantes[activeVariant] || product.variantes[0]
-  const isAfiliado    = product.tipo === 'afiliado'
-  const imageUrl      = variant?.image_url || product.variantes[0]?.image_url
-  const stockBajo     = !isAfiliado && variant?.stock > 0 && variant?.stock <= 5
-  const sinStock      = !isAfiliado && variant?.stock === 0
+  const variant         = product.variantes[activeVariant] || product.variantes[0]
+  const isAfiliado      = product.tipo === 'afiliado'
+  const isSupply        = product.module === 'supply'
+  const imageUrl        = variant?.image_url || product.variantes[0]?.image_url
+  const stockBajo       = !isAfiliado && variant?.stock > 0 && variant?.stock <= 5
+  const sinStock        = !isAfiliado && variant?.stock === 0
   const plataformaLabel = PLATAFORMA_LABEL[product.plataforma?.toLowerCase()] || product.plataforma || 'Tienda'
 
   const waMessage = encodeURIComponent(
@@ -93,15 +88,14 @@ export default function ProductLandingPage() {
 
       <EcosystemNavbar />
 
-      {/* HERO — 2 columnas desktop, apilado móvil */}
       <div className="pt-20 max-w-5xl mx-auto px-4 py-8 md:py-16">
         <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-start">
 
-          {/* IMAGEN — altura fija en móvil para no empujar el contenido */}
-          <div className="w-full h-64 md:h-auto md:aspect-square rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800">
+          {/* IMAGEN — object-contain para no recortar, aspect natural en móvil */}
+          <div className="w-full aspect-[4/3] md:aspect-square rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 flex items-center justify-center">
             {imageUrl
-              ? <img key={imageUrl} src={imageUrl} alt={product.name} className="w-full h-full object-cover" />
-              : <div className="w-full h-full flex items-center justify-center text-zinc-700"><Package size={64} /></div>
+              ? <img key={imageUrl} src={imageUrl} alt={product.name} className="w-full h-full object-contain" />
+              : <Package size={64} className="text-zinc-700" />
             }
           </div>
 
@@ -115,16 +109,23 @@ export default function ProductLandingPage() {
                 {product.name}
               </h1>
               {variant?.price != null && (
-                <p className="text-3xl font-black mt-3 text-white">
+                <p className="text-3xl font-black mt-3">
                   ${variant.price.toLocaleString('es-CO')}
                 </p>
               )}
             </div>
 
-            {/* ALERTA STOCK */}
+            {/* TAGLINE — solo módulo supply */}
+            {isSupply && (
+              <p className="text-zinc-500 text-xs italic tracking-wide border-l-2 border-zinc-700 pl-3">
+                De un tatuador, para tatuadores.
+              </p>
+            )}
+
+            {/* ALERTA STOCK BAJO */}
             {stockBajo && (
               <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wide">
-                <Zap size={14} />
+                <Zap size={13} />
                 ¡Solo {variant.stock} disponibles!
               </div>
             )}
@@ -151,7 +152,7 @@ export default function ProductLandingPage() {
               </div>
             )}
 
-            {/* CTA — visible en desktop, oculto en móvil (está en la barra fija) */}
+            {/* CTA desktop */}
             <div className="hidden md:block">
               <CTAButton className="w-full" />
             </div>
@@ -165,15 +166,15 @@ export default function ProductLandingPage() {
             {!isAfiliado && (
               <div className="border-t border-zinc-800 pt-4 space-y-2">
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <Truck size={13} className="shrink-0 text-zinc-500" />
+                  <Truck size={13} className="shrink-0 text-zinc-600" />
                   <span>Envío a todo Colombia — Urabá en 1-2 días hábiles</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <ShoppingBag size={13} className="shrink-0 text-zinc-500" />
+                  <ShoppingBag size={13} className="shrink-0 text-zinc-600" />
                   <span>Contraentrega disponible en Urabá</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <Shield size={13} className="shrink-0 text-zinc-500" />
+                  <Shield size={13} className="shrink-0 text-zinc-600" />
                   <span>Garantía de calidad en cada producto</span>
                 </div>
               </div>
@@ -183,32 +184,7 @@ export default function ProductLandingPage() {
         </div>
       </div>
 
-      {/* CÓMO FUNCIONA — solo productos propios/dropi */}
-      {!isAfiliado && (
-        <section className="border-t border-white/5 py-12 px-4">
-          <div className="max-w-4xl mx-auto">
-            <p className="text-zinc-500 text-[11px] uppercase tracking-widest text-center mb-8">Cómo funciona</p>
-            <div className="grid grid-cols-3 gap-4 md:gap-8">
-              {PASOS.map(p => (
-                <div key={p.n} className="text-center">
-                  <span className="text-4xl md:text-5xl font-black text-zinc-800 italic">{p.n}</span>
-                  <p className="text-white font-bold uppercase tracking-wide text-xs md:text-sm mt-2 mb-1">{p.title}</p>
-                  <p className="text-zinc-500 text-xs leading-relaxed hidden md:block">{p.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* LINK AL ECOSISTEMA */}
-      <div className="text-center py-8 border-t border-white/5">
-        <Link to="/" className="text-zinc-600 text-xs uppercase tracking-widest hover:text-zinc-400 transition-colors">
-          Ver más productos → inkognito-ecosystem.com
-        </Link>
-      </div>
-
-      {/* BARRA CTA FIJA EN MÓVIL */}
+      {/* CTA FIJO MÓVIL */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-black/95 backdrop-blur-sm border-t border-white/10 px-4 py-3">
         <CTAButton className="w-full" />
       </div>
