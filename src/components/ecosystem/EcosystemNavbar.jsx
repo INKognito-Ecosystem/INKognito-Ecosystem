@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import inkognitoLogo from '../../assets/ecosystem/logo.png'
 
-export default function EcosystemNavbar() {
+export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio' }) {
   const [menuOpen,  setMenuOpen]  = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [tattooOpen, setTattooOpen] = useState(false)
@@ -35,7 +35,7 @@ export default function EcosystemNavbar() {
 
         {/* TAGLINE central — desaparece al hacer scroll */}
         <span
-          className="absolute left-1/2 -translate-x-1/2 text-white/35 text-[10px] tracking-[0.28em] uppercase font-bold pointer-events-none transition-opacity duration-500 hidden sm:block"
+          className="absolute left-1/2 -translate-x-1/2 text-white/60 text-[10px] tracking-[0.28em] uppercase font-bold pointer-events-none transition-opacity duration-500 hidden sm:block"
           style={{ opacity: scrolled ? 0 : 1 }}
         >
           Disciplina. Arte. Identidad.
@@ -86,7 +86,7 @@ export default function EcosystemNavbar() {
               onClick={() => setTattooOpen(o => !o)}
               className="w-full text-left px-4 py-[14px] text-white/85 bg-transparent border-none cursor-pointer uppercase tracking-[0.25em] text-[13px] font-bold rounded hover:bg-white/[0.06] hover:text-white transition-all duration-200 flex items-center justify-between"
             >
-              Tattoo Studio
+              {tattooLabel}
               <span
                 className="text-white/40 text-[10px] transition-transform duration-300"
                 style={{ display: 'inline-block', transform: tattooOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
