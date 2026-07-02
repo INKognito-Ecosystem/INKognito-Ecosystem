@@ -35,7 +35,7 @@ export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio' }) {
 
         {/* TAGLINE central — desaparece al hacer scroll */}
         <span
-          className="absolute left-1/2 -translate-x-1/2 text-white/80 text-[10px] tracking-[0.28em] uppercase font-bold pointer-events-none transition-opacity duration-500 hidden sm:block"
+          className="absolute left-1/2 -translate-x-1/2 text-white/80 text-[10px] tracking-[0.28em] uppercase font-bold pointer-events-none transition-opacity duration-500"
           style={{ opacity: scrolled ? 0 : 1 }}
         >
           Disciplina. Arte. Identidad.
