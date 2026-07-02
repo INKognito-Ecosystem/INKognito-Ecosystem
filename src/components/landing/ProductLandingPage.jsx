@@ -15,11 +15,11 @@ const PLATAFORMA_LABEL = {
   hotmart:      'Hotmart',
 }
 
-const MODULE_COLOR = {
-  supply:      '#38BDF8', // azul eléctrico
-  store:       '#FBBF24', // dorado
-  suplementos: '#A1A1AA', // gris
-  gym:         '#A1A1AA', // gris
+const MODULE_LOGO_FILTER = {
+  supply:      'brightness(0) saturate(100%) invert(65%) sepia(73%) saturate(1000%) hue-rotate(176deg) brightness(107%)',
+  store:       'brightness(0) saturate(100%) invert(87%) sepia(97%) saturate(506%) hue-rotate(344deg) brightness(100%)',
+  suplementos: 'brightness(0) saturate(100%) invert(69%) sepia(8%) saturate(312%) hue-rotate(225deg) brightness(96%)',
+  gym:         'brightness(0) saturate(100%) invert(69%) sepia(8%) saturate(312%) hue-rotate(225deg) brightness(96%)',
 }
 
 export default function ProductLandingPage() {
@@ -57,7 +57,7 @@ export default function ProductLandingPage() {
   const variant         = product.variantes[activeVariant] || product.variantes[0]
   const isAfiliado      = product.tipo === 'afiliado'
   const isSupply        = product.module === 'supply'
-  const accent          = MODULE_COLOR[product.module] || '#A1A1AA'
+  const logoFilter      = MODULE_LOGO_FILTER[product.module] || MODULE_LOGO_FILTER.gym
   const imageUrl        = variant?.image_url || product.variantes[0]?.image_url
   const stockBajo       = !isAfiliado && variant?.stock > 0 && variant?.stock <= 5
   const sinStock        = !isAfiliado && variant?.stock === 0
@@ -101,7 +101,7 @@ export default function ProductLandingPage() {
         image={imageUrl}
       />
 
-      <EcosystemNavbar tattooLabel="Jhumaneztattoo" logoAccent={accent} />
+      <EcosystemNavbar tattooLabel="Jhumaneztattoo" logoFilter={logoFilter} />
 
       <div className="pt-20 max-w-5xl mx-auto px-4 py-8 md:py-16">
         <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-start">

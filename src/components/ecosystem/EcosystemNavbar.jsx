@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import inkognitoLogo from '../../assets/ecosystem/logo.png'
 
-export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio', logoAccent = null }) {
+export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio', logoFilter = null }) {
   const [menuOpen,  setMenuOpen]  = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [tattooOpen, setTattooOpen] = useState(false)
@@ -31,7 +31,7 @@ export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio', logoAcc
           src={inkognitoLogo}
           alt="INKognito"
           className="h-[52px] w-auto object-contain mr-8"
-          style={logoAccent ? { filter: `drop-shadow(0 0 8px ${logoAccent})` } : {}}
+          style={logoFilter ? { filter: logoFilter } : {}}
         />
 
         {/* TAGLINE central — desaparece al hacer scroll */}
