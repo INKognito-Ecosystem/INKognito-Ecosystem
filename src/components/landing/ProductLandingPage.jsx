@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { FaWhatsapp } from 'react-icons/fa'
-import { Package, ExternalLink, Truck, Shield, ShoppingBag, Zap } from 'lucide-react'
+import { Package, ExternalLink, Truck, Shield, MessageSquare, Zap } from 'lucide-react'
 import Seo from '../Seo'
 import EcosystemNavbar from '../ecosystem/EcosystemNavbar'
 
@@ -15,11 +15,12 @@ const PLATAFORMA_LABEL = {
   hotmart:      'Hotmart',
 }
 
-const MODULE_LOGO_FILTER = {
-  supply:      'brightness(0) saturate(100%) invert(32%) sepia(96%) saturate(1355%) hue-rotate(211deg) brightness(102%)', // blue-500 #3B82F6
-  store:       'brightness(0) saturate(100%) invert(79%) sepia(45%) saturate(550%) hue-rotate(12deg) brightness(90%)',   // gold #C9A84C
-  suplementos: 'brightness(0) saturate(100%) invert(69%) sepia(8%) saturate(312%) hue-rotate(225deg) brightness(96%)',  // zinc #A1A1AA
-  gym:         'brightness(0) saturate(100%) invert(69%) sepia(8%) saturate(312%) hue-rotate(225deg) brightness(96%)',  // zinc #A1A1AA
+const MODULE_ACCENT = {
+  supply:      '#3B82F6',
+  store:       '#C9A84C',
+  suplementos: '#A1A1AA',
+  gym:         '#A1A1AA',
+  dropi:       '#EC6F2D',
 }
 
 export default function ProductLandingPage() {
@@ -57,7 +58,7 @@ export default function ProductLandingPage() {
   const variant         = product.variantes[activeVariant] || product.variantes[0]
   const isAfiliado      = product.tipo === 'afiliado'
   const isSupply        = product.module === 'supply'
-  const logoFilter      = MODULE_LOGO_FILTER[product.module] || MODULE_LOGO_FILTER.gym
+  const moduleAccent    = MODULE_ACCENT[product.module] ?? '#A1A1AA'
   const imageUrl        = variant?.image_url || product.variantes[0]?.image_url
   const stockNum        = (!isAfiliado && variant?.stock != null) ? Number(variant.stock) : null
   const sinStock        = stockNum === 0
@@ -102,7 +103,7 @@ export default function ProductLandingPage() {
         image={imageUrl}
       />
 
-      <EcosystemNavbar tattooLabel="Jhumaneztattoo" logoFilter={logoFilter} />
+      <EcosystemNavbar tattooLabel="Jhumaneztattoo" logoFilter="brightness(0) invert(1)" />
 
       <div className="pt-20 max-w-5xl mx-auto px-4 py-8 md:py-16">
         <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-start">
@@ -125,7 +126,7 @@ export default function ProductLandingPage() {
           <div className="space-y-5">
 
             <div>
-              <p className="text-zinc-500 text-[11px] uppercase tracking-widest mb-1">{product.categoria}</p>
+              <p className="text-[11px] uppercase tracking-widest mb-1" style={{ color: moduleAccent }}>{product.categoria}</p>
               <div className="flex items-start justify-between gap-4">
                 <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tight leading-tight">
                   {product.name}
@@ -197,15 +198,15 @@ export default function ProductLandingPage() {
               <div className="border-t border-zinc-800 pt-4 space-y-2">
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
                   <Truck size={13} className="shrink-0" />
-                  <span>Envío a todo Colombia — Urabá en 1-2 días hábiles</span>
+                  <span>Envío gestionado con transportadora — seguimiento en tiempo real</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <ShoppingBag size={13} className="shrink-0" />
-                  <span>Contraentrega disponible en Urabá</span>
+                  <MessageSquare size={13} className="shrink-0" />
+                  <span>Confirmación por WhatsApp en minutos — pedido directo al proveedor</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
                   <Shield size={13} className="shrink-0" />
-                  <span>Garantía de calidad en cada producto</span>
+                  <span>Garantía en cada producto — si algo falla, lo resolvemos</span>
                 </div>
               </div>
             )}
