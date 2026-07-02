@@ -16,10 +16,10 @@ const PLATAFORMA_LABEL = {
 }
 
 const MODULE_LOGO_FILTER = {
-  supply:      'brightness(0) saturate(100%) invert(65%) sepia(73%) saturate(1000%) hue-rotate(176deg) brightness(107%)',
-  store:       'brightness(0) saturate(100%) invert(87%) sepia(97%) saturate(506%) hue-rotate(344deg) brightness(100%)',
-  suplementos: 'brightness(0) saturate(100%) invert(69%) sepia(8%) saturate(312%) hue-rotate(225deg) brightness(96%)',
-  gym:         'brightness(0) saturate(100%) invert(69%) sepia(8%) saturate(312%) hue-rotate(225deg) brightness(96%)',
+  supply:      'brightness(0) saturate(100%) invert(32%) sepia(96%) saturate(1355%) hue-rotate(211deg) brightness(102%)', // blue-500 #3B82F6
+  store:       'brightness(0) saturate(100%) invert(79%) sepia(45%) saturate(550%) hue-rotate(12deg) brightness(90%)',   // gold #C9A84C
+  suplementos: 'brightness(0) saturate(100%) invert(69%) sepia(8%) saturate(312%) hue-rotate(225deg) brightness(96%)',  // zinc #A1A1AA
+  gym:         'brightness(0) saturate(100%) invert(69%) sepia(8%) saturate(312%) hue-rotate(225deg) brightness(96%)',  // zinc #A1A1AA
 }
 
 export default function ProductLandingPage() {
