@@ -2,14 +2,21 @@ import { useState, useEffect } from 'react'
 import inkognitoLogo from '../../assets/ecosystem/logo.png'
 
 export default function EcosystemNavbar() {
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [menuOpen,  setMenuOpen]  = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [tattooOpen, setTattooOpen] = useState(false)
+  const [scrolled,  setScrolled]  = useState(false)
 
   useEffect(() => {
     document.body.style.overflow = (menuOpen || aboutOpen) ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [menuOpen, aboutOpen])
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   const openAbout = () => {
     setMenuOpen(false)
@@ -25,6 +32,15 @@ export default function EcosystemNavbar() {
           alt="INKognito"
           className="h-[52px] w-auto object-contain"
         />
+
+        {/* TAGLINE central — desaparece al hacer scroll */}
+        <span
+          className="absolute left-1/2 -translate-x-1/2 text-white/35 text-[10px] tracking-[0.28em] uppercase font-bold pointer-events-none transition-opacity duration-500 hidden sm:block"
+          style={{ opacity: scrolled ? 0 : 1 }}
+        >
+          Disciplina. Arte. Identidad.
+        </span>
+
         <button
           onClick={() => setMenuOpen(true)}
           aria-label="Abrir menú"
@@ -64,7 +80,7 @@ export default function EcosystemNavbar() {
         <nav className="flex flex-col gap-1">
           <MenuLink label="About" onClick={openAbout} />
 
-          {/* TATTOO STUDIO — desplegable */}
+          {/* TATTOO STUDIO — desplegable con solo redes sociales */}
           <div>
             <button
               onClick={() => setTattooOpen(o => !o)}
@@ -80,12 +96,11 @@ export default function EcosystemNavbar() {
             </button>
             <div
               className="overflow-hidden transition-all duration-300 ease-in-out"
-              style={{ maxHeight: tattooOpen ? '160px' : '0px', opacity: tattooOpen ? 1 : 0 }}
+              style={{ maxHeight: tattooOpen ? '120px' : '0px', opacity: tattooOpen ? 1 : 0 }}
             >
               <div className="flex flex-col pb-1">
                 <SocialLink href="https://www.instagram.com/jhumaneztattoo?igsh=MXh4ZW9vaGZnMDVtZQ==" label="Instagram" />
                 <SocialLink href="https://www.facebook.com/humanezjose" label="Facebook" />
-                <SocialLink href="https://wa.me/573207911013?text=Hola%20Jose,%20quiero%20informaci%C3%B3n%20sobre%20un%20tatuaje" label="WhatsApp" />
               </div>
             </div>
           </div>
@@ -120,9 +135,7 @@ export default function EcosystemNavbar() {
           ✕
         </button>
 
-        <p className="text-white/40 text-[10px] tracking-[0.3em] uppercase mb-6">
-          About
-        </p>
+        <p className="text-white/40 text-[10px] tracking-[0.3em] uppercase mb-6">About</p>
 
         <p className="text-white text-xl font-bold tracking-[0.05em] uppercase mb-5 leading-[1.3]">
           INKognito.<br />Una forma de ver el mundo.
