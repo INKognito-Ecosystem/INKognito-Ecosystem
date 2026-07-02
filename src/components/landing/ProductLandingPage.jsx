@@ -59,8 +59,9 @@ export default function ProductLandingPage() {
   const isSupply        = product.module === 'supply'
   const logoFilter      = MODULE_LOGO_FILTER[product.module] || MODULE_LOGO_FILTER.gym
   const imageUrl        = variant?.image_url || product.variantes[0]?.image_url
-  const stockBajo       = !isAfiliado && variant?.stock > 0 && variant?.stock <= 5
-  const sinStock        = !isAfiliado && variant?.stock === 0
+  const stockNum        = (!isAfiliado && variant?.stock != null) ? Number(variant.stock) : null
+  const sinStock        = stockNum === 0
+  const stockBajo       = stockNum !== null && stockNum > 0 && stockNum <= 5
   const plataformaLabel = PLATAFORMA_LABEL[product.plataforma?.toLowerCase()] || product.plataforma || 'Tienda'
 
   const waMessage = encodeURIComponent(
@@ -150,11 +151,17 @@ export default function ProductLandingPage() {
               </p>
             )}
 
-            {/* Stock bajo */}
-            {stockBajo && (
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-amber-400">
-                <Zap size={13} />
-                ¡Solo {variant.stock} disponibles!
+            {/* Stock */}
+            {stockNum !== null && (
+              <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide ${
+                sinStock ? 'text-red-500' : stockBajo ? 'text-amber-400' : 'text-zinc-500'
+              }`}>
+                {(sinStock || stockBajo) && <Zap size={13} />}
+                {sinStock
+                  ? 'Agotado por el momento'
+                  : stockBajo
+                    ? `¡Solo ${stockNum} disponible${stockNum !== 1 ? 's' : ''}!`
+                    : `${stockNum} en stock`}
               </div>
             )}
 
