@@ -21,6 +21,13 @@ export default function ProductLandingPage() {
   const [loading, setLoading]      = useState(true)
   const [notFound, setNotFound]    = useState(false)
   const [activeVariant, setActive] = useState(0)
+  const [scrolled, setScrolled]    = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   useEffect(() => {
     fetch(`${PANEL_URL}/api/product/${id}`)
@@ -110,9 +117,17 @@ export default function ProductLandingPage() {
 
             <div>
               <p className="text-zinc-500 text-[11px] uppercase tracking-widest mb-1">{product.categoria}</p>
-              <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tight leading-tight">
-                {product.name}
-              </h1>
+              <div className="flex items-start justify-between gap-4">
+                <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tight leading-tight">
+                  {product.name}
+                </h1>
+                {/* Flecha de scroll — desaparece al bajar */}
+                <span
+                  className={`md:hidden mt-1 text-zinc-600 text-lg transition-opacity duration-500 animate-bounce shrink-0 ${scrolled ? 'opacity-0' : 'opacity-100'}`}
+                >
+                  ↓
+                </span>
+              </div>
               {variant?.price != null && (
                 <p className="text-3xl font-black mt-3">
                   ${variant.price.toLocaleString('es-CO')}
