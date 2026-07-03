@@ -88,7 +88,6 @@ export default function ProductLandingPage() {
   const variant         = product.variantes[activeVariant] || product.variantes[0]
   const isAfiliado      = product.tipo === 'afiliado'
   const isSupply        = product.module === 'supply'
-  const moduleAccent    = MODULE_ACCENT[product.module] ?? '#A1A1AA'
   const imageUrl        = variant?.image_url || product.variantes[0]?.image_url
   const stockNum        = (!isAfiliado && variant?.stock != null) ? Number(variant.stock) : null
   const sinStock        = stockNum === 0
@@ -141,25 +140,18 @@ export default function ProductLandingPage() {
       <div className="pt-20 max-w-5xl mx-auto px-4 py-8 md:py-16">
         <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-start">
 
-          {/* COLUMNA IZQUIERDA — imagen + descripción */}
-          <div className="space-y-5">
-            {/* Imagen sin contenedor fijo — se adapta al tamaño natural de la foto */}
+          {/* COLUMNA IZQUIERDA — imagen */}
+          <div>
             {imageUrl
               ? <img key={imageUrl} src={imageUrl} alt={product.name} className="w-full h-auto rounded-xl border border-zinc-800" />
               : <div className="aspect-square rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-700"><Package size={64} /></div>
             }
-
-            {/* Descripción — debajo de la imagen en desktop, se oculta en móvil (va al final) */}
-            {product.descripcion && (
-              <p className="hidden md:block text-zinc-400 text-sm leading-relaxed">{product.descripcion}</p>
-            )}
           </div>
 
           {/* COLUMNA DERECHA — decisión de compra */}
           <div className="space-y-5">
 
             <div>
-              <p className="text-[11px] uppercase tracking-widest mb-1" style={{ color: moduleAccent }}>{product.categoria}</p>
               <div className="flex items-start justify-between gap-4">
                 <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tight leading-tight">
                   {product.name}
@@ -191,6 +183,11 @@ export default function ProductLandingPage() {
                 <span>{plataformaBadge.emoji}</span>
                 <span>{plataformaBadge.text}</span>
               </div>
+            )}
+
+            {/* Descripción — parte del flujo de decisión */}
+            {product.descripcion && (
+              <p className="text-zinc-400 text-sm leading-relaxed">{product.descripcion}</p>
             )}
 
             {/* Stock */}
@@ -265,13 +262,6 @@ export default function ProductLandingPage() {
 
           </div>
         </div>
-
-        {/* Descripción en móvil — debajo de todo */}
-        {product.descripcion && (
-          <p className="md:hidden text-zinc-400 text-sm leading-relaxed mt-8 pt-6 border-t border-zinc-800">
-            {product.descripcion}
-          </p>
-        )}
 
       </div>
 
