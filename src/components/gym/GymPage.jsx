@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { GraduationCap, PlayCircle, FileText, FlaskConical, Wrench, BookOpen } from 'lucide-react'
 import NavbarGym from './NavbarGym'
@@ -81,14 +81,27 @@ const servicios = [
 
 const CARD_CLASS = 'border border-gray-800 bg-gray-900/60 rounded-xl p-3 md:p-4 flex flex-col gap-2 hover:border-gray-600 hover:bg-gray-900/80 transition-all duration-300 group'
 
+const PANEL_URL = import.meta.env.VITE_PANEL_URL
+
 const membresiaMsg = `https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero el acceso completo a todos los planos de Gym')}`
 
 // Imágenes de muestra del plano (reemplazar con URLs reales cuando estén listas)
 const PLANO_MUESTRAS = [null, null, null]
 
 export default function GymPage() {
-  const [planosModalOpen, setPlanosModalOpen]   = useState(false)
+  const [planosModalOpen, setPlanosModalOpen]     = useState(false)
   const [historiaModalOpen, setHistoriaModalOpen] = useState(false)
+  const [precioPlanos, setPrecioPlanos]           = useState(10000)
+
+  useEffect(() => {
+    fetch(`${PANEL_URL}/api/settings`)
+      .then(r => r.json())
+      .then(rows => {
+        const entry = rows.find(r => r.key === 'precio_planos')
+        if (entry?.value) setPrecioPlanos(Number(entry.value))
+      })
+      .catch(() => {})
+  }, [])
 
   const scrollToSection = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -193,7 +206,7 @@ export default function GymPage() {
                 </p>
               </div>
               <div className="flex flex-col items-start md:items-end gap-3 shrink-0">
-                <span className="text-3xl font-black text-white">$10.000 COP</span>
+                <span className="text-3xl font-black text-white">${precioPlanos.toLocaleString('es-CO')} COP</span>
                 <a
                   href={membresiaMsg}
                   target="_blank"
