@@ -13,6 +13,7 @@ const PLATAFORMA_LABEL = {
   aliexpress:   'AliExpress',
   mercadolibre: 'Mercado Libre',
   hotmart:      'Hotmart',
+  dropi:        'Dropi',
 }
 
 const PLATAFORMA_BADGE = {
@@ -20,6 +21,7 @@ const PLATAFORMA_BADGE = {
   amazon:       { emoji: '📦', text: 'Producto físico — entregado por Amazon' },
   aliexpress:   { emoji: '📦', text: 'Producto físico — envío internacional desde AliExpress' },
   mercadolibre: { emoji: '🛍️', text: 'Producto físico — disponible en Mercado Libre' },
+  dropi:        { emoji: '📦', text: 'Producto físico — pago contraentrega al recibir' },
 }
 
 const PLATAFORMA_TRUST = {
@@ -42,6 +44,11 @@ const PLATAFORMA_TRUST = {
     { Icon: Truck,        text: 'Envío con Mercado Envíos — seguimiento en tiempo real' },
     { Icon: Shield,       text: 'Compra protegida por Mercado Libre' },
     { Icon: ExternalLink, text: 'Plataforma líder de comercio en Colombia' },
+  ],
+  dropi: [
+    { Icon: Truck,        text: 'Contraentrega — pagas en efectivo solo cuando el producto llega a tu puerta' },
+    { Icon: Shield,       text: 'Compra segura respaldada por Dropi y su red de transportadoras' },
+    { Icon: Package,      text: 'Producto listo para despacho inmediato' },
   ],
 }
 
