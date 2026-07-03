@@ -45,6 +45,12 @@ const PLATAFORMA_TRUST = {
   ],
 }
 
+const PLATAFORMA_TRUST_FALLBACK = [
+  { Icon: Shield,       text: 'Compra directamente en la tienda oficial del producto' },
+  { Icon: ExternalLink, text: 'Proceso de compra 100% en línea — sin intermediarios' },
+  { Icon: Truck,        text: 'Envío y entrega gestionados por la plataforma' },
+]
+
 const MODULE_ACCENT = {
   supply:      '#3B82F6',
   store:       '#C9A84C',
@@ -95,7 +101,7 @@ export default function ProductLandingPage() {
   const plataformaKey   = product.plataforma?.toLowerCase().replace(/\s+/g, '')
   const plataformaLabel = PLATAFORMA_LABEL[plataformaKey] || product.plataforma || 'Tienda'
   const plataformaBadge = isAfiliado ? (PLATAFORMA_BADGE[plataformaKey] ?? null) : null
-  const plataformaTrust = isAfiliado ? (PLATAFORMA_TRUST[plataformaKey] ?? []) : []
+  const plataformaTrust = isAfiliado ? (PLATAFORMA_TRUST[plataformaKey] ?? PLATAFORMA_TRUST_FALLBACK) : []
 
   const waMessage = encodeURIComponent(
     `Hola, quiero pedir:\n• ${product.name}${variant?.variant ? ` — ${variant.variant}` : ''}\nPrecio: $${variant?.price?.toLocaleString('es-CO') ?? '?'}`
