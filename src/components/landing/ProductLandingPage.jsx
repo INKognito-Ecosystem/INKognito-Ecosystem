@@ -92,7 +92,7 @@ export default function ProductLandingPage() {
   const stockNum        = (!isAfiliado && variant?.stock != null) ? Number(variant.stock) : null
   const sinStock        = stockNum === 0
   const stockBajo       = stockNum !== null && stockNum > 0 && stockNum <= 5
-  const plataformaKey   = product.plataforma?.toLowerCase()
+  const plataformaKey   = product.plataforma?.toLowerCase().replace(/\s+/g, '')
   const plataformaLabel = PLATAFORMA_LABEL[plataformaKey] || product.plataforma || 'Tienda'
   const plataformaBadge = isAfiliado ? (PLATAFORMA_BADGE[plataformaKey] ?? null) : null
   const plataformaTrust = isAfiliado ? (PLATAFORMA_TRUST[plataformaKey] ?? []) : []
