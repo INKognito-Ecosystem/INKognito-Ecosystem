@@ -15,6 +15,36 @@ const PLATAFORMA_LABEL = {
   hotmart:      'Hotmart',
 }
 
+const PLATAFORMA_BADGE = {
+  hotmart:      { emoji: '📚', text: 'Curso digital — acceso inmediato tras la compra' },
+  amazon:       { emoji: '📦', text: 'Producto físico — entregado por Amazon' },
+  aliexpress:   { emoji: '📦', text: 'Producto físico — envío internacional desde AliExpress' },
+  mercadolibre: { emoji: '🛍️', text: 'Producto físico — disponible en Mercado Libre' },
+}
+
+const PLATAFORMA_TRUST = {
+  hotmart: [
+    { Icon: Zap,          text: 'Acceso inmediato — link directo a tu cuenta tras la compra' },
+    { Icon: Shield,       text: 'Garantía de 7 días incluida por Hotmart' },
+    { Icon: ExternalLink, text: 'Millones de estudiantes en Latinoamérica' },
+  ],
+  amazon: [
+    { Icon: Truck,        text: 'Envío gestionado directamente por Amazon' },
+    { Icon: Shield,       text: 'Compra protegida por Amazon' },
+    { Icon: ExternalLink, text: 'La tienda online más grande del mundo' },
+  ],
+  aliexpress: [
+    { Icon: Truck,        text: 'Envío internacional con seguimiento en tiempo real' },
+    { Icon: Shield,       text: 'Protección al comprador incluida por AliExpress' },
+    { Icon: ExternalLink, text: 'Millones de productos verificados' },
+  ],
+  mercadolibre: [
+    { Icon: Truck,        text: 'Envío con Mercado Envíos — seguimiento en tiempo real' },
+    { Icon: Shield,       text: 'Compra protegida por Mercado Libre' },
+    { Icon: ExternalLink, text: 'Plataforma líder de comercio en Colombia' },
+  ],
+}
+
 const MODULE_ACCENT = {
   supply:      '#3B82F6',
   store:       '#C9A84C',
@@ -63,7 +93,10 @@ export default function ProductLandingPage() {
   const stockNum        = (!isAfiliado && variant?.stock != null) ? Number(variant.stock) : null
   const sinStock        = stockNum === 0
   const stockBajo       = stockNum !== null && stockNum > 0 && stockNum <= 5
-  const plataformaLabel = PLATAFORMA_LABEL[product.plataforma?.toLowerCase()] || product.plataforma || 'Tienda'
+  const plataformaKey   = product.plataforma?.toLowerCase()
+  const plataformaLabel = PLATAFORMA_LABEL[plataformaKey] || product.plataforma || 'Tienda'
+  const plataformaBadge = isAfiliado ? (PLATAFORMA_BADGE[plataformaKey] ?? null) : null
+  const plataformaTrust = isAfiliado ? (PLATAFORMA_TRUST[plataformaKey] ?? []) : []
 
   const waMessage = encodeURIComponent(
     `Hola, quiero pedir:\n• ${product.name}${variant?.variant ? ` — ${variant.variant}` : ''}\nPrecio: $${variant?.price?.toLocaleString('es-CO') ?? '?'}`
@@ -152,6 +185,14 @@ export default function ProductLandingPage() {
               </p>
             )}
 
+            {/* Badge de plataforma — solo afiliados */}
+            {plataformaBadge && (
+              <div className="flex items-center gap-2 text-xs text-zinc-300 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 w-fit">
+                <span>{plataformaBadge.emoji}</span>
+                <span>{plataformaBadge.text}</span>
+              </div>
+            )}
+
             {/* Stock */}
             {stockNum !== null && (
               <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide ${
@@ -208,6 +249,17 @@ export default function ProductLandingPage() {
                   <Shield size={13} className="shrink-0" />
                   <span>Garantía en cada producto — si algo falla, lo resolvemos</span>
                 </div>
+              </div>
+            )}
+
+            {plataformaTrust.length > 0 && (
+              <div className="border-t border-zinc-800 pt-4 space-y-2">
+                {plataformaTrust.map(({ Icon, text }, i) => (
+                  <div key={i} className="flex items-center gap-3 text-zinc-400 text-xs">
+                    <Icon size={13} className="shrink-0" />
+                    <span>{text}</span>
+                  </div>
+                ))}
               </div>
             )}
 
