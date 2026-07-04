@@ -91,6 +91,18 @@ export default function ProductLandingPage() {
       .catch(() => { setNotFound(true); setLoading(false) })
   }, [id])
 
+  useEffect(() => {
+    if (!product || typeof window.fbq !== 'function') return
+    const v = product.variantes[0]
+    window.fbq('track', 'ViewContent', {
+      content_name:  product.name,
+      content_ids:   [String(id)],
+      content_type:  'product',
+      value:         v?.price ?? 0,
+      currency:      'COP',
+    })
+  }, [product])
+
   if (loading)  return <div className="min-h-screen bg-black" />
   if (notFound) return (
     <div className="min-h-screen bg-black flex items-center justify-center text-zinc-500 text-sm uppercase tracking-widest">
