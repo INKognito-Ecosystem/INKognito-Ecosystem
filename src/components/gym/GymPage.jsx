@@ -137,6 +137,9 @@ export default function GymPage() {
           >
             Nuestra historia
           </button>
+          <p className="mt-5 text-gray-400 text-xs md:text-sm italic tracking-wide">
+            Hago arte para no morir, desafío cuerpo y mente.
+          </p>
         </div>
       </section>
 

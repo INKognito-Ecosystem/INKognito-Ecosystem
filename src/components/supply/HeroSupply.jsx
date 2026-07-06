@@ -58,6 +58,10 @@ export default function HeroSupply() {
             </Link>
           </div>
 
+          <p className="md:hidden mt-5 text-center text-xs italic tracking-wide text-zinc-400">
+            De un tatuador, para tatuadores.
+          </p>
+
         </div>
 
         {/* DERECHA — solo desktop */}
