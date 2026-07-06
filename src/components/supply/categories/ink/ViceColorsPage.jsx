@@ -84,7 +84,7 @@ export default function ViceColorsPage() {
             <div className="h-20 md:h-32" />
           ) : logoUrl ? (
             <div className="text-justify [hyphens:auto]">
-              <div className="float-left w-[180px] mr-6 md:mr-8 mb-2">
+              <div className="float-left w-[180px] mr-6 md:mr-8 mb-2 flex justify-center">
                 <img
                   src={logoUrl}
                   alt="Vice Colors"

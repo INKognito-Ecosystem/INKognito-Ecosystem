@@ -128,7 +128,9 @@ export default function AprendePage() {
   const { allProducts, loading } = useCatalog('supply')
   const afiliados = allProducts.filter(p => p.tipo === 'afiliado')
 
-  const cursos   = afiliados.filter(p => p.categoria === 'Cursos')
+  const cursos   = afiliados
+    .filter(p => p.categoria === 'Cursos')
+    .sort((a, b) => (b.descripcion?.length || 0) - (a.descripcion?.length || 0))
   const kitExt   = afiliados.filter(p => p.categoria === 'Kit Externo')
   const recursos = afiliados.filter(p => p.categoria === 'Recursos')
 

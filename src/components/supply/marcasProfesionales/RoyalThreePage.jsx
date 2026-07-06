@@ -85,7 +85,7 @@ export default function RoyalThreePage() {
             <div className="h-24 md:h-40" />
           ) : logoUrl ? (
             <div>
-              <div className="float-left w-[180px] mr-6 md:mr-8 mb-2">
+              <div className="float-left w-[180px] mr-6 md:mr-8 mb-2 flex justify-center">
                 <img
                   src={logoUrl}
                   alt="Royal Three"
