@@ -17,6 +17,7 @@ const DOT_PATTERN = {
 
 function AfiliadoCard({ item, color, accentColor }) {
   const borderHover = `hover:border-${color}-500/50`
+  const url = item.url_ventas || item.url_checkout
   const card = (
     <div className={`snap-start flex-shrink-0 w-[44vw] md:w-auto border border-zinc-800 bg-zinc-950 rounded-2xl overflow-hidden flex flex-col transition-all duration-300 ${borderHover}`}>
       {/* Foto si existe */}
@@ -60,7 +61,7 @@ function AfiliadoCard({ item, color, accentColor }) {
               </a>
             )}
           </div>
-        ) : item.url_ventas ? (
+        ) : url ? (
           <span className={`text-${color}-400 text-[10px] font-bold uppercase tracking-[0.15em] flex items-center gap-1 mt-auto pt-2`}>
             <ExternalLink size={10} /> {item.categoria === 'Cursos' ? 'Comprar en Hotmart →' : 'Ver →'}
           </span>
@@ -70,9 +71,9 @@ function AfiliadoCard({ item, color, accentColor }) {
   )
 
   // Cursos y Recursos → card completa es clickeable
-  if (item.categoria !== 'Kit Externo' && item.url_ventas) {
+  if (item.categoria !== 'Kit Externo' && url) {
     return (
-      <a href={item.url_ventas} target="_blank" rel="noopener noreferrer" className="contents">
+      <a href={url} target="_blank" rel="noopener noreferrer" className="contents">
         {card}
       </a>
     )
@@ -127,7 +128,9 @@ export default function AprendePage() {
   const { allProducts, loading } = useCatalog('supply')
   const afiliados = allProducts.filter(p => p.tipo === 'afiliado')
 
-  const cursos   = afiliados.filter(p => p.categoria === 'Cursos')
+  const cursos   = afiliados
+    .filter(p => p.categoria === 'Cursos')
+    .sort((a, b) => (b.descripcion?.length || 0) - (a.descripcion?.length || 0))
   const kitExt   = afiliados.filter(p => p.categoria === 'Kit Externo')
   const recursos = afiliados.filter(p => p.categoria === 'Recursos')
 
