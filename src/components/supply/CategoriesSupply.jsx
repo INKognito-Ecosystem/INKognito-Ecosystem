@@ -74,10 +74,8 @@ export default function CategoriesSupply() {
                   relative h-36 border bg-zinc-950 transition-all duration-300 overflow-hidden
                   uppercase tracking-[0.08em] font-bold text-[10px] md:text-xs flex flex-col
                   items-center justify-center gap-2 text-center px-1
-                  ${hasStock
-                    ? 'border-blue-500/50 hover:border-blue-500 text-zinc-300'
-                    : 'border-zinc-800 hover:border-zinc-600 text-zinc-600'
-                  }
+                  border-blue-500 hover:bg-blue-500/10
+                  ${hasStock ? 'text-zinc-300' : 'text-zinc-600'}
                 `}
               >
                 {imgs[catKey(category.cat)] ? (
