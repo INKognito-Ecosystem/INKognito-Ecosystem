@@ -1,11 +1,15 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import NavbarCategory from './NavbarCategory'
 import FooterSupply from './FooterSupply'
+import AccordionCard from './AccordionCard'
 import Seo from '../Seo'
 import { useCatalog } from '../../hooks/useCatalog'
+import { useScrolled } from '../../hooks/useScrolled'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { FaWhatsapp } from 'react-icons/fa'
-import { ExternalLink, Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package } from 'lucide-react'
+import { ExternalLink, Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package, ArrowLeft, ArrowRight } from 'lucide-react'
+import { getAdjacentCategories } from '../../data/supplyCategoriesOrder'
 
 const CAT_ICONS = {
   'Tintas':    Droplet,
@@ -248,47 +252,14 @@ function AfiliadoCard({ item }) {
     : <div className="flex-shrink-0 w-[44vw] md:w-auto snap-start">{inner}</div>
 }
 
-function AccordionCard({ icon, title, subtitle, children }) {
-  const [open, setOpen] = useState(false)
-  return (
-    <div className="border border-zinc-800 bg-zinc-950 rounded-2xl overflow-hidden">
-      {/* Header — siempre visible, toca para abrir/cerrar */}
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-zinc-900 transition-colors duration-150"
-      >
-        <div className="flex-1 min-w-0 pr-4">
-          <div className="flex items-center gap-3 mb-1">
-            <span className="text-xl flex-shrink-0">{icon}</span>
-            <span className="font-black uppercase text-white tracking-[0.08em] text-sm">{title}</span>
-          </div>
-          <p className="text-zinc-500 text-xs leading-relaxed pl-8">{subtitle}</p>
-        </div>
-        <span
-          className="text-zinc-500 text-xs flex-shrink-0 transition-transform duration-200"
-          style={{ transform: open ? 'rotate(90deg)' : 'rotate(0deg)' }}
-        >
-          ▶
-        </span>
-      </button>
-
-      {/* Contenido — scroll interno, solo visible cuando está abierto */}
-      {open && (
-        <div className="border-t border-zinc-800 overflow-y-auto" style={{ maxHeight: '340px' }}>
-          <div className="px-6 py-5">
-            {children}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
 
 export default function SupplyCategoryPage({ title, categoria, slug, desc, intro, guide, faqs }) {
   const { allProducts: allProds, loading } = useCatalog('supply', categoria)
   const products  = allProds.filter(p => !p.tipo || p.tipo === 'fisico')
   const afiliados = allProds.filter(p => p.tipo === 'afiliado')
   const CatIcon = CAT_ICONS[categoria] || null
+  const { prev, next } = getAdjacentCategories(slug)
+  const scrolled = useScrolled()
 
   return (
     <>
@@ -300,15 +271,54 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
       />
       <NavbarCategory pageName={title} backPath="/supply" backLabel="Supply" />
 
+      {scrolled && prev && (
+        <Link
+          to={`/supply/${prev.slug}`}
+          aria-label={`Ver ${prev.name}`}
+          className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
+        >
+          <ArrowLeft size={20} />
+        </Link>
+      )}
+      {scrolled && next && (
+        <Link
+          to={`/supply/${next.slug}`}
+          aria-label={`Ver ${next.name}`}
+          className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
+        >
+          <ArrowRight size={20} />
+        </Link>
+      )}
+
       <div className="bg-gray-950 pt-16 md:pt-24">
 
         {/* HERO — H1 + ícono de categoría en móvil */}
         <div className="relative overflow-hidden px-6 max-w-7xl mx-auto pb-5 md:pb-10">
           <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
-          <div className="relative z-10 flex items-center justify-between gap-3 mb-4">
-            <h1 className="text-3xl md:text-7xl font-black uppercase leading-none text-white">{title}</h1>
-            {CatIcon && (
-              <CatIcon size={64} className="text-zinc-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+          <div className="relative z-10 flex items-center gap-3 mb-4">
+            {prev && (
+              <Link
+                to={`/supply/${prev.slug}`}
+                aria-label={`Ver ${prev.name}`}
+                className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors"
+              >
+                <ArrowLeft size={24} />
+              </Link>
+            )}
+            <div className="flex-1 flex items-center justify-center gap-3">
+              <h1 className="text-xl md:text-4xl font-black uppercase tracking-tight leading-none text-white text-center whitespace-nowrap">{title}</h1>
+              {CatIcon && (
+                <CatIcon size={48} className="text-zinc-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+              )}
+            </div>
+            {next && (
+              <Link
+                to={`/supply/${next.slug}`}
+                aria-label={`Ver ${next.name}`}
+                className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors"
+              >
+                <ArrowRight size={24} />
+              </Link>
             )}
           </div>
           {intro && (
