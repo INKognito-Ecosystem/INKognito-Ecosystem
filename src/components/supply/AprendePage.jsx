@@ -80,76 +80,8 @@ function AfiliadoCard({ item, color, accentColor }) {
   return card
 }
 
-// ── CARD CURSOS (Hotmart) — layout horizontal en móvil ───────────────────
-function CursoCard({ item }) {
-  const card = (
-    <div className="snap-start flex-shrink-0 w-[90vw] md:w-auto border border-zinc-800 bg-zinc-950 rounded-2xl overflow-hidden flex flex-row md:flex-col h-44 md:h-auto transition-all duration-300 hover:border-orange-500/50">
-
-      {/* LEFT (móvil) / TOP (desktop): imagen + badge + CTA */}
-      <div className="w-32 md:w-full flex-shrink-0 flex flex-col">
-        {item.image_url
-          ? <img src={item.image_url} alt={item.name} className="w-32 h-32 md:w-full md:h-auto md:aspect-square object-cover flex-shrink-0" />
-          : <div className="w-32 h-32 md:w-full md:aspect-square bg-zinc-900 flex items-center justify-center flex-shrink-0">
-              <BookOpen size={28} className="text-zinc-700" strokeWidth={1} />
-            </div>
-        }
-        {/* Badge + CTA solo en móvil (el desktop los pone abajo en otra columna) */}
-        <div className="p-2 flex flex-col gap-1.5 flex-1 md:hidden">
-          <span className="text-[9px] font-black uppercase tracking-widest bg-orange-500/15 text-orange-400 border border-orange-500/30 rounded-full px-2 py-0.5 self-start">
-            Curso
-          </span>
-          {item.url_ventas && (
-            <span className="text-orange-400 text-[10px] font-bold uppercase tracking-[0.15em] flex items-center gap-1 mt-auto">
-              <ExternalLink size={10} /> Ver →
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* RIGHT (móvil): título + descripción scrolleable */}
-      <div className="flex-1 p-3 flex flex-col gap-1.5 min-w-0 overflow-hidden md:hidden">
-        <h3 className="font-black uppercase text-xs tracking-[0.08em] text-white leading-snug flex-shrink-0">
-          {item.name}
-        </h3>
-        {item.descripcion && (
-          <p className="text-zinc-500 text-[10px] leading-relaxed overflow-y-auto flex-1">
-            {item.descripcion}
-          </p>
-        )}
-      </div>
-
-      {/* DESKTOP: layout vertical igual al AfiliadoCard original */}
-      <div className="hidden md:flex flex-col p-4 gap-2 flex-1">
-        <span className="text-[9px] font-black uppercase tracking-widest bg-orange-500/15 text-orange-400 border border-orange-500/30 rounded-full px-2 py-0.5 self-start">
-          {item.categoria}
-        </span>
-        <h3 className="font-black uppercase text-xs tracking-[0.08em] text-white leading-snug">
-          {item.name}
-        </h3>
-        {item.descripcion && (
-          <p className="text-zinc-500 text-[10px] leading-relaxed flex-1">{item.descripcion}</p>
-        )}
-        {item.url_ventas && (
-          <span className="text-orange-400 text-[10px] font-bold uppercase tracking-[0.15em] flex items-center gap-1 mt-auto pt-2">
-            <ExternalLink size={10} /> Ver →
-          </span>
-        )}
-      </div>
-    </div>
-  )
-
-  if (item.url_ventas) {
-    return (
-      <a href={item.url_ventas} target="_blank" rel="noopener noreferrer" className="contents">
-        {card}
-      </a>
-    )
-  }
-  return card
-}
-
 // ── SECCIÓN GENÉRICA CON SCROLL ───────────────────────────────────────────
-function SeccionAfiliados({ id, label, titulo, subtitulo, items, loading, color, cols, CardComponent = AfiliadoCard }) {
+function SeccionAfiliados({ id, label, titulo, subtitulo, items, loading, color, cols }) {
   return (
     <>
       <section id={id} className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950 scroll-mt-20">
@@ -165,7 +97,7 @@ function SeccionAfiliados({ id, label, titulo, subtitulo, items, loading, color,
           ) : items.length > 0 ? (
             <div className={`flex md:grid md:grid-cols-2 ${cols} gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide`}>
               {items.map((item, i) => (
-                <CardComponent key={item.name + i} item={item} color={color} />
+                <AfiliadoCard key={item.name + i} item={item} color={color} />
               ))}
             </div>
           ) : (
@@ -244,7 +176,6 @@ export default function AprendePage() {
         loading={loading}
         color="orange"
         cols="lg:grid-cols-5"
-        CardComponent={CursoCard}
       />
       <SeccionAfiliados
         id="kit"
