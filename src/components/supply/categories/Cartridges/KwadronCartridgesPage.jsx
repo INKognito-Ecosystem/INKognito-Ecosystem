@@ -1,67 +1,7 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
+import BrandCatalogSection from '../../BrandCatalogSection'
 import Seo from '../../../Seo'
-import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
-
-const categories = [
-  {
-    name: 'Round Liner',
-    products: [
-      '1RL',
-      '3RL',
-      '5RL',
-      '7RL',
-      '9RL',
-      '11RL',
-      '14RL'
-    ]
-  },
-  {
-    name: 'Round Shader',
-    products: [
-      '3RS',
-      '5RS',
-      '7RS',
-      '9RS',
-      '11RS',
-      '14RS'
-    ]
-  },
-  {
-    name: 'Curved Magnum',
-    products: [
-      '7CM',
-      '9CM',
-      '11CM',
-      '13CM',
-      '15CM',
-      '17CM',
-      '23CM'
-    ]
-  },
-  {
-    name: 'Magnum',
-    products: [
-      '7M1',
-      '9M1',
-      '11M1',
-      '13M1',
-      '15M1',
-      '17M1',
-      '23M1'
-    ]
-  },
-  {
-    name: 'Bugpin Magnum',
-    products: [
-      '7BP',
-      '9BP',
-      '11BP',
-      '13BP',
-      '15BP'
-    ]
-  }
-]
 
 const faq = [
   {
@@ -87,7 +27,6 @@ const faq = [
 ]
 
 export default function KwadronCartridgesPage() {
-  const { addItem } = useSupplyCart()
   return (
     <div className="min-h-screen bg-black text-white">
       <Seo
@@ -134,66 +73,7 @@ export default function KwadronCartridgesPage() {
 
         </div>
 
-        <div className="space-y-12">
-
-          {categories.map((category) => (
-
-            <section key={category.name}>
-
-              <h2 className="text-2xl md:text-4xl font-black uppercase mb-6">
-                {category.name}
-              </h2>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-
-                {category.products.map((name) => {
-                  const product = { id: name, name, brand: 'Kwadron', price: '$XX.XXX' }
-                  return (
-                    <div
-                      key={name}
-                      className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-950 hover:border-zinc-600 transition-all duration-300"
-                    >
-
-                      <div className="aspect-square bg-zinc-900 flex items-center justify-center">
-                        <span className="text-zinc-700 uppercase tracking-[0.2em] text-xs">
-                          foto
-                        </span>
-                      </div>
-
-                      <div className="p-4">
-
-                        <h3 className="font-bold text-sm md:text-lg mb-2">
-                          {name}
-                        </h3>
-
-                        <span className="text-zinc-500 text-xs uppercase block mb-2">
-                          Kwadron
-                        </span>
-
-                        <span className="text-white font-bold text-sm block mb-3">
-                          {product.price}
-                        </span>
-
-                        <button
-                          onClick={() => addItem(product, 'cartridges-kwadron')}
-                          className="w-full py-2 border border-zinc-700 uppercase tracking-[0.15em] text-xs hover:border-blue-500 hover:text-blue-500 transition-all duration-300"
-                        >
-                          + Agregar al carrito
-                        </button>
-
-                      </div>
-
-                    </div>
-                  )
-                })}
-
-              </div>
-
-            </section>
-
-          ))}
-
-        </div>
+        <BrandCatalogSection brandName="Kwadron" />
 
         <section className="mt-24">
 
