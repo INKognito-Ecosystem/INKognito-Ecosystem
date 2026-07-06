@@ -38,19 +38,19 @@ export default function KwadronCartridgesPage() {
 
       <NavbarCategory pageName="Kwadron" />
 
-      <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">
+      <div className="pt-20 md:pt-24 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
 
-        <div className="mb-12 md:mb-16">
+        <div className="mb-6 md:mb-8">
 
-          <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm mb-3">
+          <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm mb-2">
             Kwadron Cartridges
           </p>
 
-          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-6">
+          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-3">
             Catálogo Completo
           </h1>
 
-          <div className="max-w-4xl text-zinc-400 leading-relaxed space-y-4">
+          <div className="max-w-4xl text-zinc-400 leading-relaxed space-y-2">
 
             <p>
               Kwadron es una de las marcas de cartuchos más reconocidas y utilizadas
@@ -75,9 +75,9 @@ export default function KwadronCartridgesPage() {
 
         <BrandCatalogSection brandName="Kwadron" />
 
-        <section className="mt-24">
+        <section className="mt-10 md:mt-14">
 
-          <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">
+          <h2 className="text-3xl md:text-5xl font-black uppercase mb-6">
             Preguntas frecuentes
           </h2>
 
