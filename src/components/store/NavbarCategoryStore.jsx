@@ -98,6 +98,9 @@ export default function NavbarCategoryStore({ pageName }) {
             <Link to="/supply" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
               INKognito Supply
             </Link>
+            <Link to="/gym" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
+              INKognito Gym
+            </Link>
             <Link to="/" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
               Ecosistema
             </Link>
