@@ -3,30 +3,18 @@ import FooterGym from '../FooterGym'
 import Seo from '../../Seo'
 import { FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa'
 import { BookOpen } from 'lucide-react'
+import { useCatalog } from '../../../hooks/useCatalog'
 
 const GRID_PATTERN = {
   backgroundImage:
     'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
 }
 
-const ebooks = [
-  {
-    id: 1,
-    nombre: 'Construye Lo Que Quieres Ser',
-    descripcion: 'Hábitos, identidad y disciplina para construir lo que quieres ser, una pequeña acción a la vez.',
-    imagen: null,
-    pdf: '/ebooks/construye-lo-que-quieres-ser.pdf',
-  },
-  {
-    id: 2,
-    nombre: 'Empieza Donde Estás',
-    descripcion: 'Tu primer plan de entrenamiento sin equipo, sin excusas y sin gimnasio. Incluye plan de 8 semanas.',
-    imagen: null,
-    pdf: '/ebooks/empieza-donde-estas.pdf',
-  },
-]
+const WA = '573207911013'
 
 export default function RecursosPage() {
+  const { allProducts: ebooks, loading } = useCatalog('gym', 'Recursos')
+
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Seo
@@ -63,45 +51,71 @@ export default function RecursosPage() {
 
       {/* GRID DE EBOOKS */}
       <div className="pb-8 md:pb-14 px-4 md:px-6 max-w-xl mx-auto pt-6 md:pt-8">
-        <div className="grid grid-cols-2 gap-3">
-          {ebooks.map((eb) => (
-            <div
-              key={eb.id}
-              className="border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
-            >
-              {/* PORTADA — altura fija 2x (alinea ambas cards) */}
-              <div className="relative bg-gray-800 flex items-center justify-center h-36">
-                {eb.imagen ? (
-                  <img
-                    src={eb.imagen}
-                    alt={eb.nombre}
-                    className="w-full h-full object-cover"
-                    onError={(e) => { e.target.style.display = 'none' }}
-                  />
-                ) : (
-                  <span className="text-gray-700 text-[9px] uppercase tracking-widest">Portada próximamente</span>
-                )}
-              </div>
+        {loading ? (
+          <div className="grid grid-cols-2 gap-3">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="rounded-xl bg-gray-800/40 border border-gray-800 animate-pulse h-56" />
+            ))}
+          </div>
+        ) : ebooks.length > 0 ? (
+          <div className="grid grid-cols-2 gap-3">
+            {ebooks.map((eb) => {
+              const url = eb.url_ventas || eb.url_checkout || '#'
+              return (
+                <div
+                  key={eb.name}
+                  className="border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
+                >
+                  {/* PORTADA — altura fija 2x (alinea ambas cards) */}
+                  <div className="relative bg-gray-800 flex items-center justify-center h-36">
+                    {eb.image_url ? (
+                      <img
+                        src={eb.image_url}
+                        alt={eb.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => { e.target.style.display = 'none' }}
+                      />
+                    ) : (
+                      <span className="text-gray-700 text-[9px] uppercase tracking-widest">Portada próximamente</span>
+                    )}
+                  </div>
 
-              {/* INFO — ancho completo, título arriba, botón abajo */}
-              <div className="p-2 flex flex-col flex-1 border-t border-gray-800">
-                <div className="flex-1">
-                  <h2 className="font-black uppercase text-[11px] leading-tight mb-1">{eb.nombre}</h2>
-                  <p className="text-gray-500 text-[10px] leading-relaxed line-clamp-2">{eb.descripcion}</p>
+                  {/* INFO — ancho completo, título arriba, botón abajo */}
+                  <div className="p-2 flex flex-col flex-1 border-t border-gray-800">
+                    <div className="flex-1">
+                      <h2 className="font-black uppercase text-[11px] leading-tight mb-1">{eb.name}</h2>
+                      {eb.descripcion && (
+                        <p className="text-gray-500 text-[10px] leading-relaxed line-clamp-2">{eb.descripcion}</p>
+                      )}
+                    </div>
+                    <div className="mt-2 pt-1.5 border-t border-gray-800">
+                      <a
+                        href={url}
+                        target="_blank" rel="noopener noreferrer"
+                        className="block text-center bg-white text-gray-950 font-black uppercase tracking-[0.1em] text-[10px] py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-300"
+                      >
+                        Descargar gratis
+                      </a>
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-2 pt-1.5 border-t border-gray-800">
-                  <a
-                    href={eb.pdf}
-                    download
-                    className="block text-center bg-white text-gray-950 font-black uppercase tracking-[0.1em] text-[10px] py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-300"
-                  >
-                    Descargar gratis
-                  </a>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="border border-gray-800 bg-gray-800/40 rounded-2xl p-6 text-center">
+            <p className="text-gray-400 text-sm mb-4 max-w-sm mx-auto">
+              Aún no tenemos recursos gratuitos cargados. Avísanos y te contactamos apenas tengamos algo disponible.
+            </p>
+            <a
+              href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya recursos gratuitos disponibles en INKognito Gym.')}`}
+              target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-gray-950 font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-orange-400 transition"
+            >
+              Avisarme cuando haya recursos →
+            </a>
+          </div>
+        )}
 
         {/* SECCIÓN REDES */}
         <div className="mt-8 border-t border-gray-800 pt-8 text-center max-w-xl mx-auto">
