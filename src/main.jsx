@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useLayoutEffect } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
@@ -12,7 +12,7 @@ import { GymCartProvider } from './contexts/GymCartContext'
 function ScrollToHash() {
   const { pathname, hash } = useLocation()
 
-  useEffect(() => {
+  useLayoutEffect(() => {
   if (hash) {
     setTimeout(() => {
       const el = document.querySelector(hash)

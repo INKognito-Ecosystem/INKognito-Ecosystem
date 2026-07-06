@@ -2,38 +2,52 @@ import { useState, useEffect } from 'react'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
+// Cache a nivel de módulo: evita re-fetch y el flash de "cargando" al navegar
+// entre categorías del mismo módulo (misma lógica que useSupplyVisual).
+const cache = {}
+const inflight = {}
+
+function fetchCatalog(module) {
+  if (cache[module]) return Promise.resolve(cache[module])
+  if (!inflight[module]) {
+    inflight[module] = fetch(`${PANEL_URL}/api/catalog/${module}`)
+      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
+      .then(data => { cache[module] = data; delete inflight[module]; return data })
+      .catch(e => { delete inflight[module]; throw e })
+  }
+  return inflight[module]
+}
+
 /**
  * Fetches the product catalog from the panel.
- * Returns { categorias, loading, error }
+ * Returns { categorias, allProducts, loading, error }
  * categorias = { "Tintas": [{name, image_url, variantes}], "Espumas": [...] }
  *
  * @param {string} module  'supply' | 'store' | 'suplementos' | 'gym'
  * @param {string} [categoria]  optional filter — returns only that category's products
  */
 export function useCatalog(module, categoria = null) {
-  const [categorias, setCategorias] = useState({})
-  const [loading,    setLoading]    = useState(true)
-  const [error,      setError]      = useState(null)
+  const [data, setData] = useState(() => cache[module] || null)
+  const [loading, setLoading] = useState(() => !cache[module])
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     if (!module) return
+    if (cache[module]) {
+      setData(cache[module])
+      setLoading(false)
+      return
+    }
+    let active = true
     setLoading(true); setError(null)
-    fetch(`${PANEL_URL}/api/catalog/${module}`)
-      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
-      .then(data => {
-        // API returns { "Tintas": [...], "Espumas": [...] }
-        if (categoria) {
-          // Return only one category as flat array via special key
-          setCategorias({ [categoria]: data[categoria] || [] })
-        } else {
-          setCategorias(data)
-        }
-        setLoading(false)
-      })
-      .catch(e => { setError(e.message); setLoading(false) })
-  }, [module, categoria])
+    fetchCatalog(module)
+      .then(d => { if (active) { setData(d); setLoading(false) } })
+      .catch(e => { if (active) { setError(e.message); setLoading(false) } })
+    return () => { active = false }
+  }, [module])
 
-  // Convenience: flat list of all products
+  const full = data || {}
+  const categorias = categoria ? { [categoria]: full[categoria] || [] } : full
   const allProducts = Object.values(categorias).flat()
 
   return { categorias, allProducts, loading, error }

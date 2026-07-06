@@ -39,10 +39,10 @@ export default function HeroSupply() {
           {/* BOTONES — ancho completo en móvil, flex en desktop */}
           <div className="grid grid-cols-3 md:flex md:flex-wrap gap-3 mt-6 md:mt-10">
             <Link
-              to="/supply/machines"
+              to="/supply/ink/vice-colors"
               className="text-center py-3 border border-blue-500 text-white uppercase tracking-wider text-[11px] md:text-sm md:px-6 hover:bg-blue-500 transition-all duration-300"
             >
-              Maquinas
+              Vice Colors
             </Link>
             <Link
               to="/supply/brands/tattoo-vision"
@@ -51,10 +51,10 @@ export default function HeroSupply() {
               Tattoo Vision
             </Link>
             <Link
-              to="/supply/cartridges"
+              to="/supply/brands/heaven-pro"
               className="text-center py-3 border border-blue-500 text-white uppercase tracking-wider text-[11px] md:text-sm md:px-6 hover:bg-blue-500 transition-all duration-300"
             >
-              Cartuchos
+              Heaven Pro
             </Link>
           </div>
 
