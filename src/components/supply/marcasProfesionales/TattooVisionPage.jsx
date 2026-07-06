@@ -1,9 +1,21 @@
+import { useState, useEffect } from 'react'
 import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
 import BrandCatalogSection from '../BrandCatalogSection'
 import Seo from '../../Seo'
 
+const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+
 export default function TattooVisionPage() {
+  const [logoUrl, setLogoUrl] = useState(null)
+
+  useEffect(() => {
+    fetch(`${PANEL_URL}/api/visual/supply`)
+      .then(r => r.json())
+      .then(data => setLogoUrl(data?.supply_brand_tattoo_vision || null))
+      .catch(() => {})
+  }, [])
+
   return (
     <div className="min-h-screen bg-black text-white">
       <Seo
@@ -18,13 +30,22 @@ export default function TattooVisionPage() {
 
         <div className="mb-6 md:mb-8">
 
-          <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm mb-2">
-            Marca Profesional
-          </p>
-
-          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-3">
-            Tattoo Vision
-          </h1>
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt="Tattoo Vision"
+              className="h-16 md:h-24 w-auto max-w-full object-contain mb-3"
+            />
+          ) : (
+            <>
+              <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm mb-2">
+                Marca Profesional
+              </p>
+              <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-3">
+                Tattoo Vision
+              </h1>
+            </>
+          )}
 
           <p className="max-w-3xl text-zinc-400 text-sm md:text-base leading-relaxed">
             Sistemas visuales diseñados para tatuadores profesionales.
