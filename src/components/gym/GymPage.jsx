@@ -84,20 +84,22 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL
 
 const membresiaMsg = `https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero el acceso completo a todos los planos de Gym')}`
 
-// Imágenes de muestra del plano (reemplazar con URLs reales cuando estén listas)
-const PLANO_MUESTRAS = [null, null, null]
-
 export default function GymPage() {
   const [planosModalOpen, setPlanosModalOpen]     = useState(false)
   const [historiaModalOpen, setHistoriaModalOpen] = useState(false)
   const [precioPlanos, setPrecioPlanos]           = useState(10000)
+  const [planoMuestras, setPlanoMuestras]         = useState([null, null, null])
 
   useEffect(() => {
-    fetch(`${PANEL_URL}/api/settings`)
+    fetch(`${PANEL_URL}/api/visual/gym`)
       .then(r => r.json())
-      .then(rows => {
-        const entry = rows.find(r => r.key === 'precio_planos')
-        if (entry?.value) setPrecioPlanos(Number(entry.value))
+      .then(data => {
+        if (data.precio_planos) setPrecioPlanos(Number(data.precio_planos))
+        setPlanoMuestras([
+          data.gym_plano_muestra_1 || null,
+          data.gym_plano_muestra_2 || null,
+          data.gym_plano_muestra_3 || null,
+        ])
       })
       .catch(() => {})
   }, [])
@@ -342,7 +344,7 @@ export default function GymPage() {
             className="flex flex-col md:flex-row gap-4 max-w-4xl w-full"
             onClick={e => e.stopPropagation()}
           >
-            {PLANO_MUESTRAS.map((src, i) => (
+            {planoMuestras.map((src, i) => (
               src
                 ? <img key={i} src={src} alt={`Muestra plano ${i + 1}`} className="rounded-xl object-contain max-h-[70vh] flex-1" />
                 : (
