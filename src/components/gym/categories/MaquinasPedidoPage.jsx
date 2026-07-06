@@ -18,16 +18,6 @@ const GRID_PATTERN = {
     'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
 }
 
-const productos = [
-  { id: 1, nombre: 'Banco multiángulo',      descripcion: 'Ajustable a plano, inclinado y declinado. Versátil para todo el tren superior con mancuernas o barra.', precio: null, image1: imgBancoMultiangulo, image2: null },
-  { id: 2, nombre: 'Jalones al pecho',        descripcion: 'Estructura con polea para jalón vertical. Ideal para trabajar dorsales, bíceps y espalda alta.',           precio: null, image1: null,               image2: null },
-  { id: 3, nombre: 'Remo acostado',           descripcion: 'Banco con soporte de pecho para remo horizontal con barra o mancuernas. Aísla espalda alta y media.',      precio: null, image1: imgRemoAcostado,    image2: null },
-  { id: 4, nombre: 'Barra hexagonal multifuncional', descripcion: 'Herramienta versátil para sentadillas, peso muerto y ejercicios de brazos en un solo equipo de acero.', precio: null, image1: null,           image2: null },
-  { id: 5, nombre: 'Hip thrust',              descripcion: 'Banco de empuje de cadera con soporte para barra y topes acolchados. Glúteos e isquiotibiales.',             precio: null, image1: imgHipThrust,      image2: null },
-  { id: 6, nombre: 'Estructura para dominadas y fondos', descripcion: 'Marco de acero multipropósito para dominadas amplias, neutras y fondos en paralelas.',          precio: null, image1: imgFondosDominadas, image2: null },
-  { id: 7, nombre: 'Extensión y femorales',   descripcion: 'Aislamiento específico para fortalecer cuádriceps y femorales en un solo equipo.',                           precio: null, image1: imgExtencionFemoral, image2: null },
-]
-
 const fmtPrecio = (p) => p != null ? `$${Number(p).toLocaleString('es-CO')} COP` : 'Desde $XX.000'
 
 const LOCAL_IMAGES = {
@@ -48,19 +38,17 @@ export default function MaquinasPedidoPage() {
   const gymAfiliados  = gymAllProds.filter(p => p.tipo === 'afiliado' && p.categoria !== 'Cursos')
   const { addItem } = useGymCart()
 
-  const productosFinales = catalogLoading ? [] : apiMaquinas.length > 0
-    ? apiMaquinas.map((item, i) => {
-        const key = item.name.toLowerCase()
-        return {
-          id:          i + 1,
-          nombre:      item.name,
-          descripcion: item.descripcion || '',
-          precio:      item.variantes?.[0]?.price || null,
-          image1:      item.image_url || LOCAL_IMAGES[key] || null,
-          image2:      null,
-        }
-      })
-    : productos
+  const productosFinales = catalogLoading ? [] : apiMaquinas.map((item, i) => {
+    const key = item.name.toLowerCase()
+    return {
+      id:          i + 1,
+      nombre:      item.name,
+      descripcion: item.descripcion || '',
+      precio:      item.variantes?.[0]?.price || null,
+      image1:      item.image_url || LOCAL_IMAGES[key] || null,
+      image2:      null,
+    }
+  })
 
   const handleAddToCart = (p) => {
     addItem({
@@ -121,7 +109,20 @@ export default function MaquinasPedidoPage() {
             ))}
           </div>
         )}
-        <div className={`flex md:grid md:grid-cols-3 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide ${catalogLoading ? 'hidden' : ''}`}>
+        {!catalogLoading && productosFinales.length === 0 && (
+          <div className="border border-gray-800 bg-gray-900/30 rounded-2xl py-16 text-center">
+            <p className="text-gray-500 uppercase tracking-[0.25em] text-sm mb-2">Catálogo en preparación</p>
+            <p className="text-gray-600 text-sm mb-6 max-w-sm mx-auto">Estamos cargando las máquinas disponibles. Mientras tanto, cuéntanos qué necesitas por WhatsApp.</p>
+            <a
+              href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero consultar disponibilidad de máquinas de gym bajo pedido.')}`}
+              target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-gray-950 font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-gray-200 transition"
+            >
+              Consultar por WhatsApp →
+            </a>
+          </div>
+        )}
+        <div className={`flex md:grid md:grid-cols-3 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide ${catalogLoading || productosFinales.length === 0 ? 'hidden' : ''}`}>
           {productosFinales.map((p) => {
             const hasImages = p.image1 || p.image2
             return (

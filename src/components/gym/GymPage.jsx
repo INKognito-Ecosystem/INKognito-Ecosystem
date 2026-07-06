@@ -4,7 +4,6 @@ import { GraduationCap, PlayCircle, FileText, FlaskConical, Wrench, BookOpen } f
 import NavbarGym from './NavbarGym'
 import FooterGym from './FooterGym'
 import Seo from '../Seo'
-import { creaciones, maquinasDestacadas } from '../../data/gym'
 
 const ogGym = '/og/gym.webp'
 const WA = '573207911013'
@@ -232,45 +231,10 @@ export default function GymPage() {
         <div className="border-t border-gray-800 pt-3 md:pt-8">
           <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-4 md:mb-8">Mis creaciones</h2>
 
-          {creaciones.length === 0 ? (
-            <div className="border border-gray-800 bg-gray-900/30 rounded-2xl py-20 text-center">
-              <p className="text-gray-500 uppercase tracking-[0.25em] text-sm mb-2">Próximamente</p>
-              <p className="text-gray-600 text-sm">Estamos cargando el portafolio de máquinas</p>
-            </div>
-          ) : (
-            <>
-              <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
-                {creaciones.map((item) => (
-                  <div key={item.name} className="snap-start flex-shrink-0 w-[46vw] md:w-auto border border-gray-800 bg-gray-900 rounded-xl overflow-hidden">
-                    <div className="aspect-video bg-gray-700 flex items-center justify-center">
-                      {item.video ? (
-                        <iframe
-                          src={item.video}
-                          title={item.name}
-                          className="w-full h-full"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      ) : item.image ? (
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => { e.target.style.display = 'none' }}
-                        />
-                      ) : (
-                        <span className="text-gray-600 text-xs uppercase tracking-widest text-center px-3">Imagen próximamente</span>
-                      )}
-                    </div>
-                    <div className="p-3">
-                      <p className="font-black uppercase text-xs leading-tight mb-1">{item.name}</p>
-                      <p className="text-gray-500 text-xs leading-relaxed">{item.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+          <div className="border border-gray-800 bg-gray-900/30 rounded-2xl py-20 text-center">
+            <p className="text-gray-500 uppercase tracking-[0.25em] text-sm mb-2">Próximamente</p>
+            <p className="text-gray-600 text-sm">Estamos cargando el portafolio de máquinas</p>
+          </div>
         </div>
       </section>
 
