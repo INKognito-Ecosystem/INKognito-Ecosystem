@@ -1,49 +1,9 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
+import BrandCatalogSection from '../../BrandCatalogSection'
 import Seo from '../../../Seo'
-import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
-
-const categories = [
-  {
-    name: 'Negros y grises',
-    products: ['Black Sabbath', 'Vicious Black', 'Battleship Grey', 'Brianza Grey', 'Obscure Grey', 'Grey Wash', 'Grey Wash Light', 'Sober Grey']
-  },
-  {
-    name: 'Azules',
-    products: ['Almost Blue', 'Buonasera Blue', 'Estate Blue', 'Pitufo Blue', 'Turquoise']
-  },
-  {
-    name: 'Rojos',
-    products: ['Bleeding Red', 'Burning Red', 'Criminal Red', 'First Blood', 'Red End', 'Redbenga']
-  },
-  {
-    name: 'Amarillos y naranjas',
-    products: ['Amarillo', 'Alvarillo', 'Clockwork Orange', 'Sweet Tangerine', "Tangerine's Dream", "Mellow's Gold", 'Dijon']
-  },
-  {
-    name: 'Verdes',
-    products: ['Green Hulk', 'Olives Matters']
-  },
-  {
-    name: 'Morados y rosas',
-    products: ['Deep Purple', 'Sweet Lavender', 'Magenta', "Lara's Pink", 'Pinkcheeks']
-  },
-  {
-    name: 'Blancos',
-    products: ['El Gato Blanco', 'El Gato Patrón']
-  },
-  {
-    name: 'Tonos piel y realismo',
-    products: ['Flesh', 'Medium Flesh', 'Extra Light Flesh']
-  },
-  {
-    name: 'Marrones',
-    products: ['Jackie Brown', 'Coffee Bitti', 'Expresso']
-  }
-]
 
 export default function ViceColorsPage() {
-  const { addItem } = useSupplyCart()
   return (
     <div className="min-h-screen bg-black text-white">
       <Seo
@@ -78,64 +38,7 @@ export default function ViceColorsPage() {
           </div>
         </div>
 
-        <div className="space-y-12">
-
-          {categories.map((category) => (
-            <section key={category.name}>
-
-              <h2 className="text-2xl md:text-4xl font-black uppercase mb-6">
-                {category.name}
-              </h2>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-
-                {category.products.map((name) => {
-                  const product = { id: name, name, brand: 'Vice Colors', price: '$XX.XXX' }
-                  return (
-                    <div
-                      key={name}
-                      className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-950 hover:border-zinc-600 transition-all duration-300"
-                    >
-
-                      <div className="aspect-square bg-zinc-900 flex items-center justify-center">
-                        <span className="text-zinc-700 uppercase tracking-[0.2em] text-xs">
-                          Foto
-                        </span>
-                      </div>
-
-                      <div className="p-3 md:p-4">
-
-                        <h3 className="font-bold text-sm md:text-lg mb-2">
-                          {name}
-                        </h3>
-
-                        <span className="text-zinc-400 text-xs block mb-2">
-                          Vice Colors
-                        </span>
-
-                        <span className="text-white font-bold text-sm block mb-3">
-                          {product.price}
-                        </span>
-
-                        <button
-                          onClick={() => addItem(product, 'ink-vice-colors')}
-                          className="w-full py-2 border border-zinc-700 uppercase tracking-[0.15em] text-xs hover:border-blue-500 hover:text-blue-500 transition-all duration-300"
-                        >
-                          + Agregar al carrito
-                        </button>
-
-                      </div>
-
-                    </div>
-                  )
-                })}
-
-              </div>
-
-            </section>
-          ))}
-
-        </div>
+        <BrandCatalogSection brandName="Vice Colors" />
 
         <section className="mt-24 md:mt-32">
           <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">
