@@ -75,7 +75,7 @@ export default function ProductLandingPage() {
       className={`flex items-center justify-center gap-3 py-4 bg-white text-black font-black uppercase tracking-widest rounded hover:bg-zinc-200 transition-all text-sm ${className}`}
     >
       <ExternalLink size={18} />
-      {plataformaKey === 'hotmart' ? `Comprar en ${plataformaLabel}` : `Ver en ${plataformaLabel}`}
+      {product.plataforma?.toLowerCase() === 'hotmart' ? `Comprar en ${plataformaLabel}` : `Ver en ${plataformaLabel}`}
     </a>
   ) : (
     <a
