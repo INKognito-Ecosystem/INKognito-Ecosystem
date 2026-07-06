@@ -273,7 +273,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
 
       {scrolled && prev && (
         <Link
-          to={`/supply/${prev.slug}`}
+          to={`/supply/${prev.slug}`} replace
           aria-label={`Ver ${prev.name}`}
           className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
         >
@@ -282,7 +282,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
       )}
       {scrolled && next && (
         <Link
-          to={`/supply/${next.slug}`}
+          to={`/supply/${next.slug}`} replace
           aria-label={`Ver ${next.name}`}
           className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
         >
@@ -298,7 +298,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
           <div className="relative z-10 flex items-center gap-3 mb-4">
             {prev && (
               <Link
-                to={`/supply/${prev.slug}`}
+                to={`/supply/${prev.slug}`} replace
                 aria-label={`Ver ${prev.name}`}
                 className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors"
               >
@@ -313,7 +313,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
             </div>
             {next && (
               <Link
-                to={`/supply/${next.slug}`}
+                to={`/supply/${next.slug}`} replace
                 aria-label={`Ver ${next.name}`}
                 className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors"
               >

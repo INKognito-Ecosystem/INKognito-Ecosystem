@@ -47,14 +47,14 @@ export default function HeavenProPage() {
       {scrolled && (
         <>
           <Link
-            to={prev.path}
+            to={prev.path} replace
             aria-label={`Ver ${prev.name}`}
             className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
           >
             <ArrowLeft size={20} />
           </Link>
           <Link
-            to={next.path}
+            to={next.path} replace
             aria-label={`Ver ${next.name}`}
             className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
           >
@@ -70,13 +70,13 @@ export default function HeavenProPage() {
           <div className="relative z-10">
 
           <div className="flex items-center justify-between gap-3 mb-3">
-            <Link to={prev.path} aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors">
+            <Link to={prev.path} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors">
               <ArrowLeft size={18} />
             </Link>
             <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm text-center flex-1">
               Marca Profesional
             </p>
-            <Link to={next.path} aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors">
+            <Link to={next.path} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors">
               <ArrowRight size={18} />
             </Link>
           </div>
