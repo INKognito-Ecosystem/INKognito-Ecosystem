@@ -13,7 +13,6 @@ const DOT_PATTERN = {
 }
 import { Link } from 'react-router-dom'
 import { SUPPLY_HOURS } from '../../config/business'
-import { useCatalog } from '../../hooks/useCatalog'
 
 const supplyJsonLd = {
   "@context": "https://schema.org",
@@ -33,8 +32,6 @@ const supplyJsonLd = {
 }
 
 export default function SupplyPage() {
-  const { allProducts } = useCatalog('supply')
-  const cursoDestacado = allProducts.find(p => p.tipo === 'afiliado' && p.categoria === 'Cursos') || null
 
   return (
 
@@ -74,36 +71,18 @@ export default function SupplyPage() {
           {/* CARD CURSOS */}
           <div className="snap-start flex-shrink-0 w-[80vw] md:w-auto border border-blue-500/20 bg-zinc-950 rounded-2xl p-6 md:p-7 flex flex-col hover:border-blue-500/40 transition-all duration-300">
             <h3 className="text-xl md:text-2xl font-black uppercase leading-none mb-3">
-              {cursoDestacado?.name || 'Domina tu oficio.'}<br />
-              <span className="text-zinc-500">
-                {cursoDestacado ? 'disponible ahora' : 'No lo improvises.'}
-              </span>
+              Domina tu oficio.<br />
+              <span className="text-zinc-500">No lo improvises.</span>
             </h3>
             <p className="text-zinc-400 text-sm mb-5 flex-1">
-              {cursoDestacado?.descripcion || 'Cursos grabados por tatuadores que ya viven de esto. Acceso de por vida, a tu ritmo.'}
+              Cursos grabados por tatuadores que ya viven de esto. Acceso de por vida, a tu ritmo.
             </p>
-            {cursoDestacado && (
-              <span className="inline-block mb-4 self-start text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-blue-500/30 text-blue-400 bg-blue-500/5">
-                Curso digital · Hotmart
-              </span>
-            )}
-            {cursoDestacado?.url_ventas ? (
-              <a
-                href={cursoDestacado.url_ventas}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-3 px-6 rounded-xl text-center hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
-              >
-                Ver seminario →
-              </a>
-            ) : (
-              <Link
-                to="/supply/aprende#cursos"
-                className="shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-3 px-6 rounded-xl text-center hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
-              >
-                Ver cursos →
-              </Link>
-            )}
+            <Link
+              to="/supply/aprende#cursos"
+              className="shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-3 px-6 rounded-xl text-center hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
+            >
+              Ver cursos →
+            </Link>
           </div>
 
           {/* CARD KIT */}
