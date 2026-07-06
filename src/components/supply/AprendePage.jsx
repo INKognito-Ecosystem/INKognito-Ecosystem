@@ -63,7 +63,7 @@ function AfiliadoCard({ item, color, accentColor }) {
           </div>
         ) : url ? (
           <span className={`text-${color}-400 text-[10px] font-bold uppercase tracking-[0.15em] flex items-center gap-1 mt-auto pt-2`}>
-            <ExternalLink size={10} /> Ver →
+            <ExternalLink size={10} /> {item.categoria === 'Cursos' ? 'Comprar en Hotmart →' : 'Ver →'}
           </span>
         ) : null}
       </div>
