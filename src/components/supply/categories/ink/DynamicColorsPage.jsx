@@ -14,22 +14,22 @@ export default function DynamicColorsPage() {
       />
       <NavbarCategory pageName="Dynamic" />
 
-      <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">
+      <div className="pt-20 md:pt-24 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
 
-        <div className="mb-10 md:mb-16">
-          <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm mb-3">
+        <div className="mb-6 md:mb-8">
+          <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm mb-2">
             Dynamic
           </p>
 
-          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
+          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-3">
             Catálogo Completo
           </h1>
 
-          <div className="mt-10 max-w-4xl">
-            <p className="text-zinc-400 leading-relaxed mb-5">
+          <div className="max-w-4xl">
+            <p className="text-zinc-400 leading-relaxed mb-3">
               Dynamic Colors ha sido el estándar de oro en la industria del tatuaje durante décadas, ofreciendo pigmentos de dispersión fina de calidad premium. Fabricada en los Estados Unidos, es reconocida globalmente por la fluidez excepcional de sus tintas y su curación sumamente brillante y duradera.
             </p>
-            <p className="text-zinc-400 leading-relaxed mb-5">
+            <p className="text-zinc-400 leading-relaxed mb-3">
               Nuestra selección incluye sus icónicas tintas negras como el clásico Dynamic Black (TBK) y el ultra concentrado Triple Black, favoritos indiscutibles para líneas precisas, sombreados suaves y rellenos sólidos e intensos.
             </p>
             <p className="text-zinc-400 leading-relaxed">
@@ -40,8 +40,8 @@ export default function DynamicColorsPage() {
 
         <BrandCatalogSection brandName="Dynamic" />
 
-        <section className="mt-24 md:mt-32">
-          <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">
+        <section className="mt-10 md:mt-14">
+          <h2 className="text-3xl md:text-5xl font-black uppercase mb-6">
             Preguntas frecuentes
           </h2>
 
