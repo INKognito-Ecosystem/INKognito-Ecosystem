@@ -106,27 +106,6 @@ const GRID_PATTERN = {
     'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
 }
 
-const productos = [
-  // Proteína
-  { id: 1,  categoria: 'Proteína',    nombre: 'Whey Protein 2 lb',              precioLabel: '$XXX.000', image: null },
-  { id: 2,  categoria: 'Proteína',    nombre: 'Whey Protein 5 lb',              precioLabel: '$XXX.000', image: null },
-  { id: 3,  categoria: 'Proteína',    nombre: 'Proteína vegana 2 lb',           precioLabel: '$XXX.000', image: null },
-  // Creatina
-  { id: 4,  categoria: 'Creatina',    nombre: 'Creatina monohidrato 300 g',     precioLabel: '$XXX.000', image: null },
-  { id: 5,  categoria: 'Creatina',    nombre: 'Creatina monohidrato 500 g',     precioLabel: '$XXX.000', image: null },
-  { id: 6,  categoria: 'Creatina',    nombre: 'Creatina micronizada 300 g',     precioLabel: '$XXX.000', image: null },
-  // Pre-entreno
-  { id: 7,  categoria: 'Pre-entreno', nombre: 'Pre-entreno con estimulante',    precioLabel: '$XXX.000', image: null },
-  { id: 8,  categoria: 'Pre-entreno', nombre: 'Pre-entreno sin estimulante',    precioLabel: '$XXX.000', image: null },
-  { id: 9,  categoria: 'Pre-entreno', nombre: 'Pre-entreno + creatina',         precioLabel: '$XXX.000', image: null },
-  // Vitaminas
-  { id: 10, categoria: 'Vitaminas',   nombre: 'Multivitamínico completo',       precioLabel: '$XXX.000', image: null },
-  { id: 11, categoria: 'Vitaminas',   nombre: 'Vitamina C 1000 mg',             precioLabel: '$XXX.000', image: null },
-  { id: 12, categoria: 'Vitaminas',   nombre: 'Omega 3 — 60 cápsulas',          precioLabel: '$XXX.000', image: null },
-]
-
-const CATEGORIAS = ['Todos', 'Proteína', 'Creatina', 'Pre-entreno', 'Vitaminas']
-
 export default function SuplementosPage() {
   const [filtro, setFiltro]   = useState('Todos')
   const [visible, setVisible] = useState(PAGE_SIZE)
@@ -137,18 +116,16 @@ export default function SuplementosPage() {
   const apiFisicos   = apiProds.filter(item => (item.tipo || 'fisico') !== 'afiliado')
   const apiAfiliados = apiProds.filter(item => item.tipo === 'afiliado')
 
-  const productosActivos = apiFisicos.length > 0
-    ? apiFisicos.map((item, i) => ({
-        id:          i + 1,
-        categoria:   item.categoria || 'Suplementos',
-        nombre:      item.name,
-        image:       item.image_url || item.variantes?.[0]?.image_url || null,
-        variantes:   item.variantes || [],
-        precioLabel: item.variantes?.[0]?.price
-          ? '$' + Math.round(item.variantes[0].price).toLocaleString('es-CO')
-          : 'Consultar precio',
-      }))
-    : productos
+  const productosActivos = apiFisicos.map((item, i) => ({
+    id:          i + 1,
+    categoria:   item.categoria || 'Suplementos',
+    nombre:      item.name,
+    image:       item.image_url || item.variantes?.[0]?.image_url || null,
+    variantes:   item.variantes || [],
+    precioLabel: item.variantes?.[0]?.price
+      ? '$' + Math.round(item.variantes[0].price).toLocaleString('es-CO')
+      : 'Consultar precio',
+  }))
 
   const CATEGORIAS_DIN = ['Todos', ...new Set(productosActivos.map(p => p.categoria))]
 
@@ -200,40 +177,56 @@ export default function SuplementosPage() {
 
       <div className="pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto pt-6 md:pt-8">
 
-        {/* FILTROS POR CATEGORÍA */}
-        <div className="flex gap-2 flex-wrap mb-10">
-          {CATEGORIAS_DIN.map(cat => (
-            <button
-              key={cat}
-              onClick={() => { setFiltro(cat); setVisible(PAGE_SIZE) }}
-              className={`text-xs font-bold uppercase tracking-[0.15em] px-4 py-2 rounded-full border transition-all duration-200 ${
-                filtro === cat
-                  ? 'bg-white text-gray-950 border-white'
-                  : 'border-gray-700 text-gray-400 hover:border-gray-400 hover:text-white'
-              }`}
+        {productosActivos.length === 0 ? (
+          <div className="border border-gray-800 bg-gray-900/30 rounded-2xl py-16 text-center">
+            <p className="text-gray-500 uppercase tracking-[0.25em] text-sm mb-2">Catálogo en preparación</p>
+            <p className="text-gray-600 text-sm mb-6 max-w-sm mx-auto">Estamos cargando los suplementos disponibles. Mientras tanto, cuéntanos qué necesitas por WhatsApp.</p>
+            <a
+              href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero consultar disponibilidad de suplementos en INKognito Gym.')}`}
+              target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-gray-950 font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-gray-200 transition"
             >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* GRID */}
-        <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
-          {visibles.map((p) => (
-            <SuplCard key={p.id} p={p} onAddToCart={handleAddToCart} />
-          ))}
-        </div>
-
-        {/* CARGAR MÁS */}
-        {visible < filtrados.length && (
-          <div className="text-center mt-10">
-            <button
-              onClick={() => setVisible(v => Math.min(v + PAGE_SIZE, filtrados.length))}
-              className="border border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-[0.2em] py-3 px-8 rounded-xl hover:border-gray-400 hover:text-white transition-all duration-300"
-            >
-              Cargar más ({filtrados.length - visible} restantes)
-            </button>
+              Consultar por WhatsApp →
+            </a>
           </div>
+        ) : (
+          <>
+            {/* FILTROS POR CATEGORÍA */}
+            <div className="flex gap-2 flex-wrap mb-10">
+              {CATEGORIAS_DIN.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => { setFiltro(cat); setVisible(PAGE_SIZE) }}
+                  className={`text-xs font-bold uppercase tracking-[0.15em] px-4 py-2 rounded-full border transition-all duration-200 ${
+                    filtro === cat
+                      ? 'bg-white text-gray-950 border-white'
+                      : 'border-gray-700 text-gray-400 hover:border-gray-400 hover:text-white'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* GRID */}
+            <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+              {visibles.map((p) => (
+                <SuplCard key={p.id} p={p} onAddToCart={handleAddToCart} />
+              ))}
+            </div>
+
+            {/* CARGAR MÁS */}
+            {visible < filtrados.length && (
+              <div className="text-center mt-10">
+                <button
+                  onClick={() => setVisible(v => Math.min(v + PAGE_SIZE, filtrados.length))}
+                  className="border border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-[0.2em] py-3 px-8 rounded-xl hover:border-gray-400 hover:text-white transition-all duration-300"
+                >
+                  Cargar más ({filtrados.length - visible} restantes)
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
