@@ -79,7 +79,7 @@ export default function CategoriesSupply() {
                   relative h-36 border bg-zinc-950 transition-all duration-300 overflow-hidden
                   uppercase tracking-[0.08em] font-bold text-[10px] md:text-xs flex flex-col
                   items-center justify-center gap-2 text-center px-1
-                  border-blue-500 md:hover:shadow-[0_0_25px_rgba(59,130,246,0.15)]
+                  border-blue-500 md:border-blue-500/30 md:hover:border-blue-500 md:hover:shadow-[0_0_25px_rgba(59,130,246,0.15)]
                   ${hasStock ? 'text-zinc-300' : 'text-zinc-600'}
                 `}
               >
