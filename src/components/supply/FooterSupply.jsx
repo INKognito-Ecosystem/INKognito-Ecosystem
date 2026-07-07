@@ -15,7 +15,7 @@ export default function FooterSupply() {
       <div className="bg-black border-b border-zinc-900 px-6 py-4">
         <h2 className="max-w-7xl mx-auto text-xl md:text-2xl font-black uppercase tracking-[0.15em] text-center">
           <span className="text-white">INK</span>
-          <span className="text-zinc-500">OGNITO </span>
+          <span className="text-blue-500">OGNITO </span>
           <span className="text-blue-500">SUPPLY</span>
         </h2>
       </div>

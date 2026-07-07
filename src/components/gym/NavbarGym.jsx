@@ -39,8 +39,8 @@ export default function NavbarGym() {
               <img src={logoGym} alt="INKognito Gym" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
               <span className="font-black uppercase tracking-wide md:tracking-[0.2em] text-xl md:text-2xl whitespace-nowrap">
                 <span className="text-white">INK</span>
-                <span className="text-gray-500">OGNITO </span>
-                <span className="text-gray-300">GYM</span>
+                <span className="text-gray-400">OGNITO </span>
+                <span className="text-gray-400">GYM</span>
               </span>
               <Dumbbell size={18} className="text-gray-500" />
             </Link>
