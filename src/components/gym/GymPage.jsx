@@ -43,42 +43,42 @@ const servicios = [
   {
     icon: Wrench,
     titulo: 'Máquinas',
-    texto: 'Acero, soldadura profesional, a tu medida.',
+    texto: 'Fabricadas con acero calibre grueso y soldadura profesional, a tu medida. Hechas en Chigorodó, Urabá, con acabados listos para uso intenso diario.',
     link: '/gym/maquinas-pedido',
   },
   {
     icon: FileText,
     titulo: 'Planos PDF',
-    texto: 'Medidas exactas para fabricarlas tú mismo.',
+    texto: 'Planos técnicos con medidas exactas y lista de materiales. Descárgalos y fabrica tú mismo tus máquinas, sin depender de nadie más.',
     scrollTo: 'planos',
   },
   {
     icon: FlaskConical,
     titulo: 'Suplementos',
-    texto: 'Proteína, creatina y pre-entreno.',
+    texto: 'Proteína, creatina y pre-entreno de marcas confiables, con stock real y despacho rápido para complementar tu entrenamiento.',
     link: '/gym/suplementos',
   },
   {
     icon: PlayCircle,
     titulo: 'Tutoriales',
-    texto: 'Construye máquinas caseras paso a paso.',
+    texto: 'Videos paso a paso para construir tus propias máquinas caseras, con las mismas técnicas que uso yo. Ideal si prefieres aprender haciendo.',
     link: '/gym/tutoriales',
   },
   {
     icon: GraduationCap,
     titulo: 'Cursos',
-    texto: 'Entrenamiento y nutrición en español.',
+    texto: 'Entrenamiento y nutrición en español, grabados por quienes ya viven de esto. Aprende a tu ritmo, sin salir de casa.',
     link: '/gym/cursos',
   },
   {
     icon: BookOpen,
     titulo: 'Recursos',
-    texto: 'Ebooks y guías gratuitas para empezar.',
+    texto: 'Ebooks y guías gratuitas para empezar a entrenar sin gastar en gimnasio ni equipo. Contenido real para quien arranca desde cero.',
     link: '/gym/recursos',
   },
 ]
 
-const CARD_CLASS = 'border border-gray-800 bg-gray-900/60 rounded-xl p-3 md:p-4 flex flex-col gap-2 hover:border-gray-600 hover:bg-gray-900/80 transition-all duration-300 group'
+const CARD_CLASS = 'border border-gray-800 bg-gray-900/60 rounded-xl p-3 md:p-4 flex flex-col gap-2 min-h-[170px] md:min-h-[190px] hover:border-gray-600 hover:bg-gray-900/80 transition-all duration-300 group'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL
 
@@ -147,7 +147,7 @@ export default function GymPage() {
       <section className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
         <div className="border-t border-gray-800 pt-3 md:pt-8">
           <div className="mb-4 md:mb-8">
-            <h2 className="float-left mr-6 md:mr-8 mb-2 text-2xl md:text-4xl font-black uppercase leading-none">
+            <h2 className="float-left mr-6 md:mr-8 mb-2 text-base md:text-3xl font-black uppercase leading-none whitespace-nowrap">
               Lo que puedes conseguir aquí
             </h2>
             <p className="text-gray-400 text-sm leading-relaxed text-justify [hyphens:auto]">
@@ -198,10 +198,10 @@ export default function GymPage() {
         <div className="border-t border-gray-800 pt-3 md:pt-8">
           <div className="mb-6">
             <div className="float-left flex items-center gap-3 mr-6 md:mr-8 mb-2">
-              <h2 className="text-2xl md:text-4xl font-black uppercase leading-none">
+              <h2 className="text-base md:text-3xl font-black uppercase leading-none whitespace-nowrap">
                 Planos digitales
               </h2>
-              <FileText size={40} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+              <FileText size={24} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
             </div>
             <p className="text-gray-400 text-sm md:text-base leading-relaxed text-justify [hyphens:auto]">
               Planos técnicos completos en PDF, con medidas exactas y lista de materiales — para
@@ -253,7 +253,7 @@ export default function GymPage() {
       <section className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
         <div className="border-t border-gray-800 pt-3 md:pt-8">
           <div className="mb-4 md:mb-8">
-            <h2 className="float-left mr-6 md:mr-8 mb-2 text-2xl md:text-4xl font-black uppercase leading-none">
+            <h2 className="float-left mr-6 md:mr-8 mb-2 text-base md:text-3xl font-black uppercase leading-none whitespace-nowrap">
               Mis creaciones
             </h2>
             <p className="text-gray-400 text-sm leading-relaxed text-justify [hyphens:auto]">
@@ -275,7 +275,7 @@ export default function GymPage() {
       <section className="pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto">
         <div className="border-t border-gray-800 pt-3 md:pt-8">
           <div className="mb-5 md:mb-8">
-            <h2 className="float-left mr-6 md:mr-8 mb-2 text-2xl md:text-4xl font-black uppercase leading-none">
+            <h2 className="float-left mr-6 md:mr-8 mb-2 text-base md:text-3xl font-black uppercase leading-none whitespace-nowrap">
               Máquinas bajo pedido
             </h2>
             <p className="text-gray-400 text-sm leading-relaxed text-justify [hyphens:auto]">
