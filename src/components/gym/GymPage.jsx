@@ -146,9 +146,19 @@ export default function GymPage() {
       {/* LO QUE PUEDES CONSEGUIR AQUÍ */}
       <section className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
         <div className="border-t border-gray-800 pt-3 md:pt-8">
-          <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-4 md:mb-8">
-            Lo que puedes conseguir aquí
-          </h2>
+          <div className="mb-4 md:mb-8">
+            <h2 className="float-left mr-6 md:mr-8 mb-2 text-2xl md:text-4xl font-black uppercase leading-none">
+              Lo que puedes conseguir aquí
+            </h2>
+            <p className="text-gray-400 text-sm leading-relaxed text-justify [hyphens:auto]">
+              Todo lo que necesitas para entrenar en casa sin depender de un gimnasio comercial:
+              máquinas de gym fabricadas con soldadura profesional en Chigorodó, Urabá, planos
+              técnicos para construir tu propio equipo, suplementos, tutoriales en video y
+              cursos de entrenamiento — pensado para quien quiere resultados reales sin gastar
+              lo que cuesta un gimnasio o un equipo importado.
+            </p>
+            <div className="clear-both" />
+          </div>
           {/* 2 cards visibles en móvil, 6 en desktop */}
           <div className="flex md:grid md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
             {servicios.map((s) => {
@@ -186,13 +196,21 @@ export default function GymPage() {
       {/* PLANOS DIGITALES */}
       <section id="planos" className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto scroll-mt-20">
         <div className="border-t border-gray-800 pt-3 md:pt-8">
-          <div className="flex items-center justify-between gap-4 mb-3 md:block">
-            <h2 className="text-2xl md:text-4xl font-black uppercase leading-none md:mb-3">Planos digitales</h2>
-            <FileText size={56} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+          <div className="mb-6">
+            <div className="float-left flex items-center gap-3 mr-6 md:mr-8 mb-2">
+              <h2 className="text-2xl md:text-4xl font-black uppercase leading-none">
+                Planos digitales
+              </h2>
+              <FileText size={40} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+            </div>
+            <p className="text-gray-400 text-sm md:text-base leading-relaxed text-justify [hyphens:auto]">
+              Planos técnicos completos en PDF, con medidas exactas y lista de materiales — para
+              construir tus propias máquinas de gym en casa, en cualquier ciudad de Colombia.
+              Pensados para uso personal o para quien quiere empezar su propio negocio de
+              fabricación de equipos fitness.
+            </p>
+            <div className="clear-both" />
           </div>
-          <p className="text-gray-400 leading-relaxed max-w-2xl mb-6 text-sm md:text-base">
-            Son planos técnicos completos en formato PDF, con medidas exactas y lista de materiales necesarios para construir cada equipo. Pensados para quien quiere fabricar sus propias máquinas de gym en casa — ya sea para uso personal o para empezar su propio negocio de fabricación de equipos fitness.
-          </p>
 
           {/* CARD MEMBRESÍA */}
           <div className="relative border border-gray-400/40 bg-gray-900 rounded-2xl p-8 md:p-10 overflow-hidden max-w-3xl">
@@ -234,7 +252,17 @@ export default function GymPage() {
       {/* MIS CREACIONES */}
       <section className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
         <div className="border-t border-gray-800 pt-3 md:pt-8">
-          <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-4 md:mb-8">Mis creaciones</h2>
+          <div className="mb-4 md:mb-8">
+            <h2 className="float-left mr-6 md:mr-8 mb-2 text-2xl md:text-4xl font-black uppercase leading-none">
+              Mis creaciones
+            </h2>
+            <p className="text-gray-400 text-sm leading-relaxed text-justify [hyphens:auto]">
+              Portafolio real de máquinas construidas con mis propias manos — la prueba de que
+              se puede entrenar fuerte sin gastar en equipos comerciales o importados. Cada
+              pieza fabricada con soldadura profesional, pensada para durar años de uso intenso.
+            </p>
+            <div className="clear-both" />
+          </div>
 
           <div className="border border-gray-800 bg-gray-900/30 rounded-2xl py-20 text-center">
             <p className="text-gray-500 uppercase tracking-[0.25em] text-sm mb-2">Próximamente</p>
@@ -246,13 +274,19 @@ export default function GymPage() {
       {/* MÁQUINAS BAJO PEDIDO + CONTACTO — UNIFICADO */}
       <section className="pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto">
         <div className="border-t border-gray-800 pt-3 md:pt-8">
-          <div className="flex items-end justify-between mb-5 md:mb-8">
-            <div>
-              <h2 className="text-2xl md:text-4xl font-black uppercase leading-none">Máquinas bajo pedido</h2>
-            </div>
+          <div className="mb-5 md:mb-8">
+            <h2 className="float-left mr-6 md:mr-8 mb-2 text-2xl md:text-4xl font-black uppercase leading-none">
+              Máquinas bajo pedido
+            </h2>
+            <p className="text-gray-400 text-sm leading-relaxed text-justify [hyphens:auto]">
+              Máquinas de gym fabricadas a tu medida, con acero y soldadura profesional, en
+              Chigorodó, Urabá — con envíos a toda Colombia. Cuéntanos qué necesitas construir
+              y te damos un presupuesto real, sin intermediarios.
+            </p>
+            <div className="clear-both" />
             <Link
               to="/gym/maquinas-pedido"
-              className="hidden md:block text-xs font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-white border border-gray-700 hover:border-gray-400 px-5 py-3 rounded transition-all duration-300"
+              className="hidden md:inline-block mt-4 text-xs font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-white border border-gray-700 hover:border-gray-400 px-5 py-3 rounded transition-all duration-300"
             >
               Ver catálogo →
             </Link>
