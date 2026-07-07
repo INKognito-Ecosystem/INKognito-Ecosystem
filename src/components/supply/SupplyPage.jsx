@@ -50,7 +50,7 @@ export default function SupplyPage() {
 
       <HeroSupply />
 
-<div className="max-w-7xl mx-auto px-6 mt-4 md:mt-8">
+<div className="max-w-7xl mx-auto px-6 mt-2 md:mt-8">
   <div className="border-b border-zinc-900"></div>
 </div>
 
