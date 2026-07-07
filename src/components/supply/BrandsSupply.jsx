@@ -59,7 +59,7 @@ export default function BrandsSupply() {
             <Link
               key={brand.name}
               to={brand.to}
-              className="snap-start flex-shrink-0 w-[44vw] md:w-auto h-36 border border-blue-500 bg-black flex items-center justify-center transition-all duration-300 md:hover:shadow-[0_0_25px_rgba(59,130,246,0.15)]"
+              className="snap-start flex-shrink-0 w-[44vw] md:w-auto h-36 border border-blue-500 md:border-blue-500/30 bg-black flex items-center justify-center transition-all duration-300 md:hover:border-blue-500 md:hover:shadow-[0_0_25px_rgba(59,130,246,0.15)]"
             >
               {imgs[brandKey(brand.name)]
                 ? <img src={imgs[brandKey(brand.name)]} alt={brand.name}
