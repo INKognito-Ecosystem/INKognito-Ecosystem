@@ -7,12 +7,6 @@ const DOT_PATTERN = {
 
 export default function HeroSupply() {
 
-  const featuredBrand = {
-    name: 'Tattoo Vision',
-    description: 'Precisión visual para artistas exigentes.',
-    category: 'Gafas • Iluminación • Sistemas visuales'
-  }
-
   return (
 
     <section className="relative md:min-h-screen pt-16 md:pt-32 pb-4 md:pb-0 bg-gray-950 text-white flex items-center px-6 overflow-hidden">
@@ -69,48 +63,33 @@ export default function HeroSupply() {
 
 <div className="bg-zinc-950 border border-blue-500/30 rounded-2xl p-8 hover:border-blue-500 hover:shadow-[0_0_25px_rgba(59,130,246,0.15)] transition-all duration-300">
     <p className="text-zinc-500 uppercase tracking-[0.3em] text-xs mb-4">
-      Cobertura Regional
+      Logística · Cobertura
     </p>
 
-    <h3 className="text-4xl font-black uppercase mb-8">
-      Urabá
-    </h3>
-
-    <div className="space-y-4 mb-8">
-
-      <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
-  <span className="text-zinc-300">Turbo</span>
-  <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-</div>
-
-      <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
-        <span className="text-zinc-300">Apartadó</span>
-        <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+    <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center justify-center bg-white rounded-xl p-2 flex-shrink-0 w-14 h-14">
+        <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
       </div>
-
-      <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
-        <span className="text-zinc-300">Carepa</span>
-        <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+      <div>
+        <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Eljach Transportadora</p>
+        <p className="text-zinc-500 text-xs mt-0.5">Aliado logístico · Contra entrega</p>
       </div>
+    </div>
 
-      <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
-        <span className="text-zinc-300">Chigorodó</span>
-        <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <span className="text-zinc-300">Mutata</span>
-        <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-      </div>
-
+    <div className="space-y-2.5 mb-6">
+      {[{name:'Chigorodó',time:'1–2 días'},{name:'Carepa',time:'1–2 días'},{name:'Apartadó',time:'1–2 días'},{name:'Turbo',time:'2–3 días'}].map(c => (
+        <div key={c.name} className="flex items-center justify-between border-b border-zinc-900 pb-2">
+          <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-blue-500/30 text-blue-400 bg-blue-500/5">{c.name}</span>
+          <span className="text-zinc-600 text-[10px] uppercase tracking-[0.12em]">{c.time}</span>
+        </div>
+      ))}
     </div>
 
     <div className="border-t border-zinc-800 pt-6">
-
-      <p className="text-zinc-400 leading-relaxed">
-        Distribución y soporte para tatuadores en toda la región.
+      <p className="text-zinc-400 text-sm leading-relaxed">
+        Contraentrega en toda la región de Urabá. ¿Fuera de la región? También enviamos a
+        todo Colombia — tiempo y costo se coordinan al confirmar el pedido.
       </p>
-
     </div>
 
   </div>

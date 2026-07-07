@@ -65,6 +65,12 @@ export default function SupplyPage() {
         <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-6">
           Educación · Crecimiento profesional
         </p>
+        <p className="hidden md:block text-zinc-500 text-sm leading-relaxed max-w-4xl -mt-3 mb-6">
+          Tatuar bien no es solo cuestión de pulso — es técnica, negocio y disciplina. Por eso
+          esta sección reúne cursos grabados por tatuadores que ya viven de esto, el kit básico
+          para empezar sin sobrecostos, y recursos gratuitos para seguir creciendo sin que el
+          dinero sea la barrera. Todo pensado para acompañarte más allá de la venta.
+        </p>
 
         <div className="flex md:grid md:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
 

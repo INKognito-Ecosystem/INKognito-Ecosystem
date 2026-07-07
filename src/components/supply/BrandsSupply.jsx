@@ -47,6 +47,12 @@ export default function BrandsSupply() {
           <p className="text-zinc-500 text-sm leading-relaxed">
             Calidad comprobada. Elegidas por profesionales que no dejan nada al azar.
           </p>
+          <p className="hidden md:block text-zinc-500 text-sm leading-relaxed max-w-4xl mt-3">
+            No trabajamos con cualquier proveedor. Cada marca en este catálogo pasó por un
+            filtro de calidad, consistencia y respaldo real — las mismas que usan tatuadores
+            de referencia dentro y fuera de Colombia. Si tu nombre está en juego en cada
+            sesión, tus insumos no pueden ser una apuesta.
+          </p>
         </div>
 
         <div className="flex md:grid md:grid-cols-4 lg:grid-cols-7 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
