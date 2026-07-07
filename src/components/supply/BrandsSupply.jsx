@@ -45,11 +45,11 @@ export default function BrandsSupply() {
             Marcas
           </h2>
           <p className="text-zinc-500 text-sm leading-relaxed text-justify [hyphens:auto]">
-            Calidad comprobada. Elegidas por profesionales que no dejan nada al azar. No
-            trabajamos con cualquier proveedor. Cada marca en este catálogo pasó por un filtro
-            de calidad, consistencia y respaldo real — las mismas que usan tatuadores de
-            referencia dentro y fuera de Colombia. Si tu nombre está en juego en cada sesión,
-            tus insumos no pueden ser una apuesta.
+            Marcas reconocidas en la industria del tatuaje. Esta sección es una guía de
+            referencia, no un catálogo cerrado: reunimos nombres que ya se ganaron su lugar
+            entre tatuadores dentro y fuera de Colombia, para ayudarte a identificar qué buscar
+            según tu estilo y necesidad. Escríbenos si quieres orientación sobre alguna en
+            particular.
           </p>
           <div className="clear-both" />
         </div>
