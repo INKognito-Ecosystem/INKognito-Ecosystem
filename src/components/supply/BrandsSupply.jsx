@@ -41,18 +41,17 @@ export default function BrandsSupply() {
       <div className="relative z-10 max-w-7xl mx-auto">
 
         <div className="mb-4 md:mb-8">
-          <h2 className="text-2xl md:text-4xl font-black uppercase mb-2">
+          <h2 className="float-left mr-6 md:mr-8 mb-2 text-2xl md:text-4xl font-black uppercase leading-none">
             Marcas
           </h2>
-          <p className="text-zinc-500 text-sm leading-relaxed">
-            Calidad comprobada. Elegidas por profesionales que no dejan nada al azar.
+          <p className="text-zinc-500 text-sm leading-relaxed text-justify [hyphens:auto]">
+            Calidad comprobada. Elegidas por profesionales que no dejan nada al azar. No
+            trabajamos con cualquier proveedor. Cada marca en este catálogo pasó por un filtro
+            de calidad, consistencia y respaldo real — las mismas que usan tatuadores de
+            referencia dentro y fuera de Colombia. Si tu nombre está en juego en cada sesión,
+            tus insumos no pueden ser una apuesta.
           </p>
-          <p className="hidden md:block text-zinc-500 text-sm leading-relaxed max-w-4xl mt-3">
-            No trabajamos con cualquier proveedor. Cada marca en este catálogo pasó por un
-            filtro de calidad, consistencia y respaldo real — las mismas que usan tatuadores
-            de referencia dentro y fuera de Colombia. Si tu nombre está en juego en cada
-            sesión, tus insumos no pueden ser una apuesta.
-          </p>
+          <div className="clear-both" />
         </div>
 
         <div className="flex md:grid md:grid-cols-4 lg:grid-cols-7 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
