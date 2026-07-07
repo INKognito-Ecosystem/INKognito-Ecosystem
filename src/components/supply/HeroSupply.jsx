@@ -15,7 +15,7 @@ export default function HeroSupply() {
 
   return (
 
-    <section className="relative md:min-h-screen pt-16 md:pt-32 pb-8 md:pb-0 bg-gray-950 text-white flex items-center px-6 overflow-hidden">
+    <section className="relative md:min-h-screen pt-16 md:pt-32 pb-4 md:pb-0 bg-gray-950 text-white flex items-center px-6 overflow-hidden">
       <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
 
       <div className="relative z-10 max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-16 items-center">
@@ -58,7 +58,7 @@ export default function HeroSupply() {
             </Link>
           </div>
 
-          <p className="md:hidden mt-5 text-center text-xs italic tracking-wide text-zinc-400">
+          <p className="mt-5 text-center md:text-left text-xs italic tracking-wide text-zinc-400">
             “De un tatuador, para tatuadores.”
           </p>
 
