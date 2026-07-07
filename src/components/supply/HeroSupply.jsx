@@ -9,7 +9,7 @@ export default function HeroSupply() {
 
   return (
 
-    <section className="relative md:min-h-screen pt-16 md:pt-32 pb-4 md:pb-0 bg-gray-950 text-white flex items-center px-6 overflow-hidden">
+    <section className="relative pt-16 md:pt-24 pb-4 md:pb-8 bg-gray-950 text-white flex items-center px-6 overflow-hidden">
       <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
 
       <div className="relative z-10 max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-16 items-center">
