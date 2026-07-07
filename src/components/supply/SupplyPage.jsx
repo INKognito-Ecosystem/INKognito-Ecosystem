@@ -62,15 +62,18 @@ export default function SupplyPage() {
     <section className="relative overflow-hidden bg-gray-950 border-t border-zinc-900 py-8 md:py-16">
       <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
       <div className="relative z-10 max-w-7xl mx-auto px-6">
-        <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-6">
-          Educación · Crecimiento profesional
-        </p>
-        <p className="hidden md:block text-zinc-500 text-sm leading-relaxed max-w-4xl -mt-3 mb-6">
-          Tatuar bien no es solo cuestión de pulso — es técnica, negocio y disciplina. Por eso
-          esta sección reúne cursos grabados por tatuadores que ya viven de esto, el kit básico
-          para empezar sin sobrecostos, y recursos gratuitos para seguir creciendo sin que el
-          dinero sea la barrera. Todo pensado para acompañarte más allá de la venta.
-        </p>
+        <div className="mb-6">
+          <h2 className="float-left mr-6 md:mr-8 mb-2 text-2xl md:text-4xl font-black uppercase leading-none">
+            Educación
+          </h2>
+          <p className="text-zinc-500 text-sm leading-relaxed text-justify [hyphens:auto]">
+            Tatuar bien no es solo cuestión de pulso — es técnica, negocio y disciplina. Por eso
+            esta sección reúne cursos grabados por tatuadores que ya viven de esto, el kit básico
+            para empezar sin sobrecostos, y recursos gratuitos para seguir creciendo sin que el
+            dinero sea la barrera. Todo pensado para acompañarte más allá de la venta.
+          </p>
+          <div className="clear-both" />
+        </div>
 
         <div className="flex md:grid md:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
 

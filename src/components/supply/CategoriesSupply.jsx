@@ -53,19 +53,17 @@ export default function CategoriesSupply() {
       <div className="relative z-10 max-w-7xl mx-auto">
 
         <div className="mb-4 md:mb-8">
-          <h2 className="text-2xl md:text-4xl font-black uppercase mb-2">
+          <h2 className="float-left mr-6 md:mr-8 mb-2 text-2xl md:text-4xl font-black uppercase leading-none">
             Categorías
           </h2>
-          <p className="text-zinc-500 text-sm leading-relaxed">
-            Insumos y equipos para cada etapa del trabajo profesional.
+          <p className="text-zinc-500 text-sm leading-relaxed text-justify [hyphens:auto]">
+            Insumos y equipos para cada etapa del trabajo profesional. Desde la primera aguja
+            hasta el mobiliario del estudio: cada categoría está pensada para el flujo real de
+            trabajo de un tatuador profesional. Tintas certificadas, cartuchos con membrana de
+            seguridad, fuentes estables y accesorios que no fallan a mitad de sesión — con stock
+            verificado y despacho rápido a Chigorodó, Apartadó, Turbo y Carepa.
           </p>
-          <p className="hidden md:block text-zinc-500 text-sm leading-relaxed max-w-4xl mt-3">
-            Desde la primera aguja hasta el mobiliario del estudio: cada categoría está pensada
-            para el flujo real de trabajo de un tatuador profesional. Tintas certificadas,
-            cartuchos con membrana de seguridad, fuentes estables y accesorios que no fallan a
-            mitad de sesión — con stock verificado y despacho rápido a Chigorodó, Apartadó,
-            Turbo y Carepa.
-          </p>
+          <div className="clear-both" />
         </div>
 
         <div className="flex md:grid md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
