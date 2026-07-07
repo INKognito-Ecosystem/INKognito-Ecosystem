@@ -36,8 +36,8 @@ export default function FooterGym() {
               <Dumbbell size={20} className="text-gray-400" />
               <h2 className="text-2xl font-black uppercase tracking-[0.15em]">
                 <span className="text-white">INK</span>
-                <span className="text-gray-500">OGNITO </span>
-                <span className="text-gray-300">GYM</span>
+                <span className="text-gray-400">OGNITO </span>
+                <span className="text-gray-400">GYM</span>
               </h2>
             </div>
             <p className="text-gray-500 leading-relaxed max-w-sm">
