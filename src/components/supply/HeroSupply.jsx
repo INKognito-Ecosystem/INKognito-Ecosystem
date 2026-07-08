@@ -20,7 +20,7 @@ export default function HeroSupply() {
           <h1 className="text-5xl md:text-7xl font-black uppercase leading-[0.9]">
             Professional
             <br />
-            Tattoo
+            <span className="text-blue-500">Tattoo</span>
             <br />
             Equipment
           </h1>
