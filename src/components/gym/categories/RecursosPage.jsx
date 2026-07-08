@@ -54,7 +54,7 @@ export default function RecursosPage() {
         {loading ? (
           <div className="grid grid-cols-2 gap-3">
             {[...Array(2)].map((_, i) => (
-              <div key={i} className="rounded-xl bg-gray-800/40 border border-gray-800 animate-pulse h-56" />
+              <div key={i} className="rounded-xl bg-gray-800/40 border border-gray-800 animate-pulse aspect-[3/4]" />
             ))}
           </div>
         ) : ebooks.length > 0 ? (
@@ -66,13 +66,13 @@ export default function RecursosPage() {
                   key={eb.name}
                   className="border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
                 >
-                  {/* PORTADA — altura fija 2x (alinea ambas cards) */}
-                  <div className="relative bg-gray-800 flex items-center justify-center h-36">
+                  {/* PORTADA — proporción de libro (3:4), sin recortar el contenido */}
+                  <div className="relative bg-gray-800 flex items-center justify-center aspect-[3/4]">
                     {eb.image_url ? (
                       <img
                         src={eb.image_url}
                         alt={eb.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                         onError={(e) => { e.target.style.display = 'none' }}
                       />
                     ) : (
