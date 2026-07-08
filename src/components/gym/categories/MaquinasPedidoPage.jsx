@@ -35,7 +35,7 @@ export default function MaquinasPedidoPage() {
   const [lightbox, setLightbox] = useState(null)
   const { allProducts: gymAllProds, loading: catalogLoading } = useCatalog('gym')
   const apiMaquinas   = gymAllProds.filter(p => p.tipo !== 'afiliado')
-  const gymAfiliados  = gymAllProds.filter(p => p.tipo === 'afiliado' && p.categoria !== 'Cursos')
+  const gymAfiliados  = gymAllProds.filter(p => p.tipo === 'afiliado' && p.categoria === 'Materiales')
   const { addItem } = useGymCart()
 
   const productosFinales = catalogLoading ? [] : apiMaquinas.map((item, i) => {
