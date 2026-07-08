@@ -18,9 +18,6 @@ export default function NavbarCategory({ pageName }) {
   return (
     <>
       <nav className="fixed top-0 left-0 w-full z-50 bg-black/70 backdrop-blur-md border-b border-blue-500/10 shadow-[0_1px_20px_rgba(59,130,246,0.15)]">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <span className="absolute inset-y-0 right-0 w-1/4 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-        </div>
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="h-16 md:h-20 flex items-center justify-between">
 
