@@ -17,7 +17,17 @@ export default function NavbarSupply() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full z-50 bg-black border-b border-zinc-900">
+      <style>{`
+        @keyframes navbarShineSupply {
+          0%   { transform: translateX(-150%) skewX(-20deg); }
+          100% { transform: translateX(350%) skewX(-20deg); }
+        }
+        .navbar-shine-supply {
+          animation: navbarShineSupply 2.8s ease-out 0.4s 1 forwards;
+        }
+      `}</style>
+      <nav className="fixed top-0 left-0 w-full z-50 bg-black/70 backdrop-blur-md border-b border-blue-500/10 shadow-[0_1px_20px_rgba(59,130,246,0.15)] overflow-hidden">
+        <span className="navbar-shine-supply pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
         <div className="max-w-7xl mx-auto px-6">
           <div className="h-16 md:h-20 flex items-center justify-between">
 
