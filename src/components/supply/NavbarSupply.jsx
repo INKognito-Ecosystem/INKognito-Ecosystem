@@ -26,8 +26,10 @@ export default function NavbarSupply() {
           animation: navbarShineSupply 2.8s ease-out 0.4s 1 forwards;
         }
       `}</style>
-      <nav className="fixed top-0 left-0 w-full z-50 bg-black/70 backdrop-blur-md border-b border-blue-500/10 shadow-[0_1px_20px_rgba(59,130,246,0.15)] overflow-hidden">
-        <span className="navbar-shine-supply pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+      <nav className="fixed top-0 left-0 w-full z-50 bg-black/70 backdrop-blur-md border-b border-blue-500/10 shadow-[0_1px_20px_rgba(59,130,246,0.15)]">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <span className="navbar-shine-supply absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+        </div>
         <div className="max-w-7xl mx-auto px-6">
           <div className="h-16 md:h-20 flex items-center justify-between">
 
