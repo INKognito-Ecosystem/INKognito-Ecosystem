@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { FaWhatsapp } from 'react-icons/fa'
-import { Package, ExternalLink, Truck, Shield, MessageSquare, Zap } from 'lucide-react'
+import { Package, ExternalLink, Truck, Shield, MessageSquare, Zap, Globe } from 'lucide-react'
 import Seo from '../Seo'
 import EcosystemNavbar from '../ecosystem/EcosystemNavbar'
 
@@ -256,16 +256,20 @@ export default function ProductLandingPage() {
               <CTAButton className="w-full" />
             </div>
 
-            {/* Trust signals */}
-            {!isAfiliado && (
+            {/* Trust signals — solo modulos con proveedor externo (no Gym: maquinas propias) */}
+            {!isAfiliado && ['supply', 'suplementos', 'store'].includes(product.module) && (
               <div className="border-t border-zinc-800 pt-4 space-y-2">
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
                   <Truck size={13} className="shrink-0" />
-                  <span>Envío gestionado con transportadora — seguimiento en tiempo real</span>
+                  <span>Envío con Eljach Transportadora — 1 a 2 días en Urabá (Chigorodó, Apartadó, Carepa, Turbo), con pago contraentrega</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
                   <MessageSquare size={13} className="shrink-0" />
-                  <span>Confirmación por WhatsApp en minutos — pedido directo al proveedor</span>
+                  <span>Confirmación por WhatsApp en minutos — pedido directo, sin intermediarios</span>
+                </div>
+                <div className="flex items-center gap-3 text-zinc-400 text-xs">
+                  <Globe size={13} className="shrink-0" />
+                  <span>¿Fuera de Urabá? También enviamos a toda Colombia — tiempo y costo se coordinan al confirmar (sin contraentrega fuera de la zona)</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
                   <Shield size={13} className="shrink-0" />
