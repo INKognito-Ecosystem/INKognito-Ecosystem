@@ -113,6 +113,7 @@ export default function ProductLandingPage() {
   const variant         = product.variantes[activeVariant] || product.variantes[0]
   const isAfiliado      = product.tipo === 'afiliado'
   const isSupply        = product.module === 'supply'
+  const accent          = MODULE_ACCENT[product.module] || '#A1A1AA'
   const imageUrl        = variant?.image_url || product.variantes[0]?.image_url
   const stockNum        = (!isAfiliado && variant?.stock != null) ? Number(variant.stock) : null
   const sinStock        = stockNum === 0
@@ -165,18 +166,24 @@ export default function ProductLandingPage() {
       <div className="pt-20 max-w-5xl mx-auto px-4 py-8 md:py-16">
         <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-start">
 
-          {/* COLUMNA IZQUIERDA — imagen */}
-          <div>
+          {/* COLUMNA IZQUIERDA — imagen + descripción */}
+          <div className="space-y-5">
             {imageUrl
               ? <img key={imageUrl} src={imageUrl} alt={product.name} className="w-full h-auto rounded-xl border border-zinc-800" />
               : <div className="aspect-square rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-700"><Package size={64} /></div>
             }
+
+            {/* Descripción — debajo de la imagen en desktop, se oculta en móvil (va al final) */}
+            {product.descripcion && (
+              <p className="hidden md:block text-zinc-400 text-sm leading-relaxed">{product.descripcion}</p>
+            )}
           </div>
 
           {/* COLUMNA DERECHA — decisión de compra */}
           <div className="space-y-5">
 
             <div>
+              <p className="text-zinc-500 text-[11px] uppercase tracking-widest mb-1">{product.categoria}</p>
               <div className="flex items-start justify-between gap-4">
                 <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tight leading-tight">
                   {product.name}
@@ -197,7 +204,7 @@ export default function ProductLandingPage() {
 
             {/* Tagline — solo supply */}
             {isSupply && (
-              <p className="text-xs italic tracking-wide border-l-2 border-zinc-600 pl-3 text-zinc-400">
+              <p className="text-xs italic tracking-wide border-l-2 pl-3" style={{ borderColor: accent, color: accent }}>
                 De un tatuador, para tatuadores.
               </p>
             )}
@@ -208,11 +215,6 @@ export default function ProductLandingPage() {
                 <span>{plataformaBadge.emoji}</span>
                 <span>{plataformaBadge.text}</span>
               </div>
-            )}
-
-            {/* Descripción — parte del flujo de decisión */}
-            {product.descripcion && (
-              <p className="text-zinc-400 text-sm leading-relaxed">{product.descripcion}</p>
             )}
 
             {/* Stock */}
@@ -240,9 +242,10 @@ export default function ProductLandingPage() {
                       onClick={() => setActive(i)}
                       className={`px-4 py-2 rounded border text-sm font-bold transition-all ${
                         i === activeVariant
-                          ? 'border-white bg-white text-black'
+                          ? 'text-black'
                           : 'border-zinc-700 text-zinc-300 hover:border-zinc-500'
                       }`}
+                      style={i === activeVariant ? { borderColor: accent, backgroundColor: accent } : {}}
                     >
                       {v.variant || 'Único'}
                     </button>
@@ -260,19 +263,19 @@ export default function ProductLandingPage() {
             {!isAfiliado && ['supply', 'suplementos', 'store'].includes(product.module) && (
               <div className="border-t border-zinc-800 pt-4 space-y-2">
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <Truck size={13} className="shrink-0" />
+                  <Truck size={13} className="shrink-0" style={{ color: accent }} />
                   <span>Envío con Eljach Transportadora — 1 a 2 días en Urabá (Chigorodó, Apartadó, Carepa, Turbo), con pago contraentrega</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <MessageSquare size={13} className="shrink-0" />
+                  <MessageSquare size={13} className="shrink-0" style={{ color: accent }} />
                   <span>Confirmación por WhatsApp en minutos — pedido directo, sin intermediarios</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <Globe size={13} className="shrink-0" />
+                  <Globe size={13} className="shrink-0" style={{ color: accent }} />
                   <span>¿Fuera de Urabá? También enviamos a toda Colombia — tiempo y costo se coordinan al confirmar (sin contraentrega fuera de la zona)</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <Shield size={13} className="shrink-0" />
+                  <Shield size={13} className="shrink-0" style={{ color: accent }} />
                   <span>Garantía en cada producto — si algo falla, lo resolvemos</span>
                 </div>
               </div>
@@ -291,6 +294,13 @@ export default function ProductLandingPage() {
 
           </div>
         </div>
+
+        {/* Descripción en móvil — debajo de todo */}
+        {product.descripcion && (
+          <p className="md:hidden text-zinc-400 text-sm leading-relaxed mt-8 pt-6 border-t border-zinc-800">
+            {product.descripcion}
+          </p>
+        )}
 
       </div>
 
