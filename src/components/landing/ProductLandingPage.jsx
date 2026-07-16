@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { FaWhatsapp } from 'react-icons/fa'
-import { Package, ExternalLink, Truck, Shield, ShoppingBag, Zap } from 'lucide-react'
+import { Package, ExternalLink, Truck, Shield, MessageSquare, Zap, Globe } from 'lucide-react'
 import Seo from '../Seo'
 import EcosystemNavbar from '../ecosystem/EcosystemNavbar'
 
@@ -13,13 +13,57 @@ const PLATAFORMA_LABEL = {
   aliexpress:   'AliExpress',
   mercadolibre: 'Mercado Libre',
   hotmart:      'Hotmart',
+  dropi:        'Dropi',
 }
 
-const MODULE_COLOR = {
-  supply:      '#38BDF8', // azul eléctrico
-  store:       '#FBBF24', // dorado
-  suplementos: '#A1A1AA', // gris
-  gym:         '#A1A1AA', // gris
+const PLATAFORMA_BADGE = {
+  hotmart:      { emoji: '📚', text: 'Curso digital — acceso inmediato tras la compra' },
+  amazon:       { emoji: '📦', text: 'Producto físico — entregado por Amazon' },
+  aliexpress:   { emoji: '📦', text: 'Producto físico — envío internacional desde AliExpress' },
+  mercadolibre: { emoji: '🛍️', text: 'Producto físico — disponible en Mercado Libre' },
+  dropi:        { emoji: '📦', text: 'Producto físico — pago contraentrega al recibir' },
+}
+
+const PLATAFORMA_TRUST = {
+  hotmart: [
+    { Icon: Zap,          text: 'Acceso inmediato — link directo a tu cuenta tras la compra' },
+    { Icon: Shield,       text: 'Garantía de 7 días incluida por Hotmart' },
+    { Icon: ExternalLink, text: 'Millones de estudiantes en Latinoamérica' },
+  ],
+  amazon: [
+    { Icon: Truck,        text: 'Envío gestionado directamente por Amazon' },
+    { Icon: Shield,       text: 'Compra protegida por Amazon' },
+    { Icon: ExternalLink, text: 'La tienda online más grande del mundo' },
+  ],
+  aliexpress: [
+    { Icon: Truck,        text: 'Envío internacional con seguimiento en tiempo real' },
+    { Icon: Shield,       text: 'Protección al comprador incluida por AliExpress' },
+    { Icon: ExternalLink, text: 'Millones de productos verificados' },
+  ],
+  mercadolibre: [
+    { Icon: Truck,        text: 'Envío con Mercado Envíos — seguimiento en tiempo real' },
+    { Icon: Shield,       text: 'Compra protegida por Mercado Libre' },
+    { Icon: ExternalLink, text: 'Plataforma líder de comercio en Colombia' },
+  ],
+  dropi: [
+    { Icon: Truck,        text: 'Contraentrega — pagas en efectivo solo cuando el producto llega a tu puerta' },
+    { Icon: Shield,       text: 'Compra segura respaldada por Dropi y su red de transportadoras' },
+    { Icon: Package,      text: 'Producto listo para despacho inmediato' },
+  ],
+}
+
+const PLATAFORMA_TRUST_FALLBACK = [
+  { Icon: Shield,       text: 'Compra directamente en la tienda oficial del producto' },
+  { Icon: ExternalLink, text: 'Proceso de compra 100% en línea — sin intermediarios' },
+  { Icon: Truck,        text: 'Envío y entrega gestionados por la plataforma' },
+]
+
+const MODULE_ACCENT = {
+  supply:      '#3B82F6',
+  store:       '#C9A84C',
+  suplementos: '#A1A1AA',
+  gym:         '#A1A1AA',
+  dropi:       '#EC6F2D',
 }
 
 export default function ProductLandingPage() {
@@ -47,6 +91,18 @@ export default function ProductLandingPage() {
       .catch(() => { setNotFound(true); setLoading(false) })
   }, [id])
 
+  useEffect(() => {
+    if (!product || typeof window.fbq !== 'function') return
+    const v = product.variantes[0]
+    window.fbq('track', 'ViewContent', {
+      content_name:  product.name,
+      content_ids:   [String(id)],
+      content_type:  'product',
+      value:         v?.price ?? 0,
+      currency:      'COP',
+    })
+  }, [product])
+
   if (loading)  return <div className="min-h-screen bg-black" />
   if (notFound) return (
     <div className="min-h-screen bg-black flex items-center justify-center text-zinc-500 text-sm uppercase tracking-widest">
@@ -57,11 +113,14 @@ export default function ProductLandingPage() {
   const variant         = product.variantes[activeVariant] || product.variantes[0]
   const isAfiliado      = product.tipo === 'afiliado'
   const isSupply        = product.module === 'supply'
-  const accent          = MODULE_COLOR[product.module] || '#A1A1AA'
   const imageUrl        = variant?.image_url || product.variantes[0]?.image_url
-  const stockBajo       = !isAfiliado && variant?.stock > 0 && variant?.stock <= 5
-  const sinStock        = !isAfiliado && variant?.stock === 0
-  const plataformaLabel = PLATAFORMA_LABEL[product.plataforma?.toLowerCase()] || product.plataforma || 'Tienda'
+  const stockNum        = (!isAfiliado && variant?.stock != null) ? Number(variant.stock) : null
+  const sinStock        = stockNum === 0
+  const stockBajo       = stockNum !== null && stockNum > 0 && stockNum <= 5
+  const plataformaKey   = product.plataforma?.toLowerCase().replace(/\s+/g, '')
+  const plataformaLabel = PLATAFORMA_LABEL[plataformaKey] || product.plataforma || 'Tienda'
+  const plataformaBadge = isAfiliado ? (PLATAFORMA_BADGE[plataformaKey] ?? null) : null
+  const plataformaTrust = isAfiliado ? (PLATAFORMA_TRUST[plataformaKey] ?? PLATAFORMA_TRUST_FALLBACK) : []
 
   const waMessage = encodeURIComponent(
     `Hola, quiero pedir:\n• ${product.name}${variant?.variant ? ` — ${variant.variant}` : ''}\nPrecio: $${variant?.price?.toLocaleString('es-CO') ?? '?'}`
@@ -75,7 +134,7 @@ export default function ProductLandingPage() {
       className={`flex items-center justify-center gap-3 py-4 bg-white text-black font-black uppercase tracking-widest rounded hover:bg-zinc-200 transition-all text-sm ${className}`}
     >
       <ExternalLink size={18} />
-      {product.plataforma?.toLowerCase() === 'hotmart' ? `Comprar en ${plataformaLabel}` : `Ver en ${plataformaLabel}`}
+      {plataformaKey === 'hotmart' ? `Comprar en ${plataformaLabel}` : `Ver en ${plataformaLabel}`}
     </a>
   ) : (
     <a
@@ -101,30 +160,23 @@ export default function ProductLandingPage() {
         image={imageUrl}
       />
 
-      <EcosystemNavbar tattooLabel="Jhumaneztattoo" />
+      <EcosystemNavbar tattooLabel="Jhumaneztattoo" logoFilter="brightness(0) invert(1)" />
 
       <div className="pt-20 max-w-5xl mx-auto px-4 py-8 md:py-16">
         <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-start">
 
-          {/* COLUMNA IZQUIERDA — imagen + descripción */}
-          <div className="space-y-5">
-            {/* Imagen sin contenedor fijo — se adapta al tamaño natural de la foto */}
+          {/* COLUMNA IZQUIERDA — imagen */}
+          <div>
             {imageUrl
               ? <img key={imageUrl} src={imageUrl} alt={product.name} className="w-full h-auto rounded-xl border border-zinc-800" />
               : <div className="aspect-square rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-700"><Package size={64} /></div>
             }
-
-            {/* Descripción — debajo de la imagen en desktop, se oculta en móvil (va al final) */}
-            {product.descripcion && (
-              <p className="hidden md:block text-zinc-400 text-sm leading-relaxed">{product.descripcion}</p>
-            )}
           </div>
 
           {/* COLUMNA DERECHA — decisión de compra */}
           <div className="space-y-5">
 
             <div>
-              <p className="text-zinc-500 text-[11px] uppercase tracking-widest mb-1">{product.categoria}</p>
               <div className="flex items-start justify-between gap-4">
                 <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tight leading-tight">
                   {product.name}
@@ -145,16 +197,35 @@ export default function ProductLandingPage() {
 
             {/* Tagline — solo supply */}
             {isSupply && (
-              <p className="text-xs italic tracking-wide border-l-2 pl-3" style={{ borderColor: accent, color: accent }}>
+              <p className="text-xs italic tracking-wide border-l-2 border-zinc-600 pl-3 text-zinc-400">
                 De un tatuador, para tatuadores.
               </p>
             )}
 
-            {/* Stock bajo */}
-            {stockBajo && (
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide" style={{ color: accent }}>
-                <Zap size={13} />
-                ¡Solo {variant.stock} disponibles!
+            {/* Badge de plataforma — solo afiliados */}
+            {plataformaBadge && (
+              <div className="flex items-center gap-2 text-xs text-zinc-300 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 w-fit">
+                <span>{plataformaBadge.emoji}</span>
+                <span>{plataformaBadge.text}</span>
+              </div>
+            )}
+
+            {/* Descripción — parte del flujo de decisión */}
+            {product.descripcion && (
+              <p className="text-zinc-400 text-sm leading-relaxed">{product.descripcion}</p>
+            )}
+
+            {/* Stock */}
+            {stockNum !== null && (
+              <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide ${
+                sinStock ? 'text-red-500' : stockBajo ? 'text-amber-400' : 'text-zinc-500'
+              }`}>
+                {(sinStock || stockBajo) && <Zap size={13} />}
+                {sinStock
+                  ? 'Agotado por el momento'
+                  : stockBajo
+                    ? `¡Solo ${stockNum} disponible${stockNum !== 1 ? 's' : ''}!`
+                    : `${stockNum} en stock`}
               </div>
             )}
 
@@ -169,10 +240,9 @@ export default function ProductLandingPage() {
                       onClick={() => setActive(i)}
                       className={`px-4 py-2 rounded border text-sm font-bold transition-all ${
                         i === activeVariant
-                          ? 'text-black'
+                          ? 'border-white bg-white text-black'
                           : 'border-zinc-700 text-zinc-300 hover:border-zinc-500'
                       }`}
-                    style={i === activeVariant ? { borderColor: accent, backgroundColor: accent } : {}}
                     >
                       {v.variant || 'Único'}
                     </button>
@@ -186,33 +256,41 @@ export default function ProductLandingPage() {
               <CTAButton className="w-full" />
             </div>
 
-            {/* Trust signals */}
-            {!isAfiliado && (
+            {/* Trust signals — solo modulos con proveedor externo (no Gym: maquinas propias) */}
+            {!isAfiliado && ['supply', 'suplementos', 'store'].includes(product.module) && (
               <div className="border-t border-zinc-800 pt-4 space-y-2">
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <Truck size={13} className="shrink-0" style={{ color: accent }} />
-                  <span>Envío a todo Colombia — Urabá en 1-2 días hábiles</span>
+                  <Truck size={13} className="shrink-0" />
+                  <span>Envío con Eljach Transportadora — 1 a 2 días en Urabá (Chigorodó, Apartadó, Carepa, Turbo), con pago contraentrega</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <ShoppingBag size={13} className="shrink-0" style={{ color: accent }} />
-                  <span>Contraentrega disponible en Urabá</span>
+                  <MessageSquare size={13} className="shrink-0" />
+                  <span>Confirmación por WhatsApp en minutos — pedido directo, sin intermediarios</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <Shield size={13} className="shrink-0" style={{ color: accent }} />
-                  <span>Garantía de calidad en cada producto</span>
+                  <Globe size={13} className="shrink-0" />
+                  <span>¿Fuera de Urabá? También enviamos a toda Colombia — tiempo y costo se coordinan al confirmar (sin contraentrega fuera de la zona)</span>
                 </div>
+                <div className="flex items-center gap-3 text-zinc-400 text-xs">
+                  <Shield size={13} className="shrink-0" />
+                  <span>Garantía en cada producto — si algo falla, lo resolvemos</span>
+                </div>
+              </div>
+            )}
+
+            {plataformaTrust.length > 0 && (
+              <div className="border-t border-zinc-800 pt-4 space-y-2">
+                {plataformaTrust.map(({ Icon, text }, i) => (
+                  <div key={i} className="flex items-center gap-3 text-zinc-400 text-xs">
+                    <Icon size={13} className="shrink-0" />
+                    <span>{text}</span>
+                  </div>
+                ))}
               </div>
             )}
 
           </div>
         </div>
-
-        {/* Descripción en móvil — debajo de todo */}
-        {product.descripcion && (
-          <p className="md:hidden text-zinc-400 text-sm leading-relaxed mt-8 pt-6 border-t border-zinc-800">
-            {product.descripcion}
-          </p>
-        )}
 
       </div>
 
