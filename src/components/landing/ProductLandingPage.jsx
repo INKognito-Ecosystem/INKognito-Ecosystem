@@ -161,7 +161,7 @@ export default function ProductLandingPage() {
         image={imageUrl}
       />
 
-      <EcosystemNavbar tattooLabel="Jhumaneztattoo" logoFilter="brightness(0) invert(1)" />
+      <EcosystemNavbar tattooLabel="Jhumaneztattoo" logoFilter="brightness(0) invert(1)" showTagline />
 
       <div className="pt-20 max-w-5xl mx-auto px-4 py-8 md:py-16">
         <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-start">

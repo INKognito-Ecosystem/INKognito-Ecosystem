@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import inkognitoLogo from '../../assets/ecosystem/logo.png'
 
-export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio', logoFilter = null }) {
+export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio', logoFilter = null, showTagline = false }) {
   const [menuOpen,  setMenuOpen]  = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [tattooOpen, setTattooOpen] = useState(false)
@@ -13,10 +13,11 @@ export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio', logoFil
   }, [menuOpen, aboutOpen])
 
   useEffect(() => {
+    if (!showTagline) return
     const onScroll = () => setScrolled(window.scrollY > 40)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [showTagline])
 
   const openAbout = () => {
     setMenuOpen(false)
@@ -34,13 +35,14 @@ export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio', logoFil
           style={logoFilter ? { filter: logoFilter } : {}}
         />
 
-        {/* TAGLINE central — desaparece al hacer scroll */}
-        <span
-          className="absolute left-1/2 -translate-x-1/2 text-white/80 text-[9px] tracking-[0.15em] uppercase font-bold pointer-events-none transition-opacity duration-500 whitespace-nowrap"
-          style={{ opacity: scrolled ? 0 : 1 }}
-        >
-          Disciplina. Arte. Identidad.
-        </span>
+        {showTagline && (
+          <span
+            className="absolute left-1/2 -translate-x-1/2 text-white/80 text-[9px] tracking-[0.15em] uppercase font-bold pointer-events-none transition-opacity duration-500 whitespace-nowrap"
+            style={{ opacity: scrolled ? 0 : 1 }}
+          >
+            Disciplina. Arte. Identidad.
+          </span>
+        )}
 
         <button
           onClick={() => setMenuOpen(true)}
