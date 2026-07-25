@@ -10,9 +10,10 @@ export default function PrivacidadPage() {
       <div>
         <h2>1. Responsable del tratamiento</h2>
         <p>
-          INKognito (estudio de tatuajes y tienda de insumos/ropa/suplementos), con domicilio en
-          Chigorodó, Urabá, Antioquia, Colombia, representado por Jose Cardona, es responsable del
-          tratamiento de los datos personales que se describen en esta política.
+          INKognito, con sede en Chigorodó, Urabá, Antioquia, Colombia, fundado por Jose Humanez, es
+          responsable del tratamiento de los datos personales que se describen en esta política.
+          INKognito administra este ecosistema digital (estudio de tatuajes, Supply, Store y Gym) y
+          opera además como estudio de desarrollo de software.
         </p>
         <p>
           <strong>Contacto para temas de privacidad:</strong> cardonajosejhc@gmail.com
