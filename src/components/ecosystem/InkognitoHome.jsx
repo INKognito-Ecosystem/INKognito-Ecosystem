@@ -84,6 +84,14 @@ export default function InkognitoHome() {
         <p className="text-zinc-600 text-xs tracking-widest uppercase">
           © 2026 INKOGNITO. Todos los derechos reservados.
         </p>
+        <div className="flex justify-center gap-6 mt-2">
+          <Link to="/terminos" className="text-zinc-600 hover:text-white text-xs uppercase tracking-widest transition-colors">
+            Términos
+          </Link>
+          <Link to="/privacidad" className="text-zinc-600 hover:text-white text-xs uppercase tracking-widest transition-colors">
+            Privacidad
+          </Link>
+        </div>
       </div>
 
     </section>

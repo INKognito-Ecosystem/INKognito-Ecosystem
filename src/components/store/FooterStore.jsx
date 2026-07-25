@@ -74,10 +74,19 @@ export default function FooterStore() {
         </div>
 
         {/* LÍNEA INFERIOR */}
-        <div className="border-t border-gray-200 mt-16 pt-8">
-          <p className="text-gray-500 uppercase tracking-[0.2em] text-xs text-center md:text-left">
-            © 2026 INKOGNITO. Todos los derechos reservados.
+        <div className="border-t border-gray-200 mt-16 pt-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <p className="text-gray-500 uppercase tracking-[0.2em] text-xs text-center md:text-left whitespace-nowrap">
+            © 2026 INKognito Store. Todos los derechos reservados.
           </p>
+          <div className="flex flex-wrap justify-center md:justify-end gap-x-6 gap-y-2">
+            <Link to="/terminos" className="text-gray-500 hover:text-[#C9A84C] text-xs uppercase tracking-[0.2em] transition-colors">
+              Términos
+            </Link>
+            <Link to="/privacidad" className="text-gray-500 hover:text-[#C9A84C] text-xs uppercase tracking-[0.2em] transition-colors">
+              Privacidad
+            </Link>
+            <span className="text-gray-500 text-xs uppercase tracking-[0.2em]">Desarrollado por INKognito</span>
+          </div>
         </div>
 
       </div>

@@ -17,6 +17,9 @@ import CuidadosTeaser from './components/tattoo/CuidadosTeaser'
 import ReservationForm from './components/tattoo/ReservationForm'
 import Seo from './components/Seo'
 import ComingSoonPage from './components/ecosystem/ComingSoonPage'
+import PrivacidadPage from './components/legal/PrivacidadPage'
+import TerminosPage from './components/legal/TerminosPage'
+import EnviosPage from './components/legal/EnviosPage'
 
 const ogTattoo = '/og/josefoto-og.jpg'
 const ogPortafolio = '/og/portafolio-og.jpg'
@@ -184,6 +187,11 @@ function App() {
           <Route path="/portafolio" element={<PortfolioPage />} />
           <Route path="/cuidados" element={<CuidadosPage />} />
           <Route path="/p/:id" element={<ProductLandingPage />} />
+
+          {/* Legal */}
+          <Route path="/privacidad" element={<PrivacidadPage />} />
+          <Route path="/terminos" element={<TerminosPage />} />
+          <Route path="/envios-cambios-devoluciones" element={<EnviosPage />} />
 
           {/* Supply */}
           <Route path="/supply" element={<ComingSoonPage />} />
