@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import footerBg from '../../assets/footer/footer-bg.webp'
 import { TATTOO_HOURS } from '../../config/business'
 
@@ -135,27 +136,23 @@ export default function Footer() {
         </div>
 
         {/* COPYRIGHT */}
-        <div className="border-t border-white/10 pt-8 flex flex-col items-center text-gray-500 text-xs gap-4">
+        <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row sm:justify-between items-center text-gray-500 text-xs gap-4">
 
-          <p>
-            © 2026 INKOGNITO. TODOS LOS DERECHOS RESERVADOS.
+          <p className="whitespace-nowrap">
+            © 2026 INKognito Tattoo. Todos los derechos reservados.
           </p>
 
-          <div className="flex space-x-6">
+          <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2">
 
-            <a
-              href="#"
-              className="hover:text-white transition-colors"
-            >
+            <Link to="/terminos" className="hover:text-white transition-colors">
               Términos
-            </a>
+            </Link>
 
-            <a
-              href="#"
-              className="hover:text-white transition-colors"
-            >
+            <Link to="/privacidad" className="hover:text-white transition-colors">
               Privacidad
-            </a>
+            </Link>
+
+            <span>Desarrollado por INKognito</span>
 
           </div>
 
