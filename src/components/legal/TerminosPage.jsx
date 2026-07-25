@@ -10,10 +10,15 @@ export default function TerminosPage() {
       <div>
         <h2>1. Objeto</h2>
         <p>
-          Este sitio es operado por INKognito, estudio de tatuajes ubicado en Chigorodó, Urabá,
-          Antioquia, Colombia, que además comercializa insumos de tatuaje (Supply), ropa y calzado
-          deportivo (Store), y máquinas/suplementos de gimnasio (Gym). Al usar este sitio aceptas los
-          términos descritos aquí.
+          Este sitio es operado por INKognito, con sede en Chigorodó, Urabá, Antioquia, Colombia,
+          fundado por Jose Humanez. INKognito administra este ecosistema digital completo: el estudio
+          de tatuajes, la venta de insumos de tatuaje (Supply), ropa y calzado deportivo (Store), y
+          máquinas/suplementos de gimnasio (Gym).
+        </p>
+        <p>
+          INKognito opera además como estudio de desarrollo de software, y es quien construye y
+          mantiene esta plataforma y otras propias o de aliados (como EljachWeb, la plataforma de
+          nuestro socio logístico en Urabá). Al usar este sitio aceptas los términos descritos aquí.
         </p>
       </div>
 
