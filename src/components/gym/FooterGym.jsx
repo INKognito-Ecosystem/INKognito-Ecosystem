@@ -102,17 +102,17 @@ export default function FooterGym() {
         </div>
 
         <div className="border-t border-gray-800 mt-16 pt-8 flex flex-col sm:flex-row sm:justify-between items-center gap-3">
-          <p className="text-gray-600 uppercase tracking-[0.2em] text-xs whitespace-nowrap">
+          <p className="text-gray-600 text-[9.5px] sm:text-[12px] whitespace-nowrap">
             © 2026 INKognito Gym. Todos los derechos reservados.
           </p>
-          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-            <Link to="/terminos" className="text-gray-600 hover:text-white text-xs uppercase tracking-[0.2em] transition-colors">
+          <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-[12px]">
+            <Link to="/terminos" className="text-gray-600 hover:text-white transition-colors">
               Términos
             </Link>
-            <Link to="/privacidad" className="text-gray-600 hover:text-white text-xs uppercase tracking-[0.2em] transition-colors">
+            <Link to="/privacidad" className="text-gray-600 hover:text-white transition-colors">
               Privacidad
             </Link>
-            <span className="text-gray-600 text-xs uppercase tracking-[0.2em]">Desarrollado por INKognito</span>
+            <span className="text-gray-600">Desarrollado por INKognito</span>
           </div>
         </div>
 

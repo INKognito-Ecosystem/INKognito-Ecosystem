@@ -136,9 +136,9 @@ export default function Footer() {
         </div>
 
         {/* COPYRIGHT */}
-        <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row sm:justify-between items-center text-gray-500 text-xs gap-4">
+        <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row sm:justify-between items-center text-gray-500 text-[12px] gap-4">
 
-          <p className="whitespace-nowrap">
+          <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">
             © 2026 INKognito Tattoo. Todos los derechos reservados.
           </p>
 
