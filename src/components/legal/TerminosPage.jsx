@@ -96,7 +96,7 @@ export default function TerminosPage() {
 
       <div>
         <h2>10. Contacto</h2>
-        <p>cardonajosejhc@gmail.com</p>
+        <p>inkognitoecosystem@gmail.com</p>
       </div>
     </LegalPage>
   )

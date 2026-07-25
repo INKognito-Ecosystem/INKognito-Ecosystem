@@ -16,7 +16,7 @@ export default function PrivacidadPage() {
           opera además como estudio de desarrollo de software.
         </p>
         <p>
-          <strong>Contacto para temas de privacidad:</strong> cardonajosejhc@gmail.com
+          <strong>Contacto para temas de privacidad:</strong> inkognitoecosystem@gmail.com
         </p>
       </div>
 
@@ -96,7 +96,7 @@ export default function PrivacidadPage() {
           <li>Acceder gratuitamente a tus datos.</li>
         </ul>
         <p>
-          Para ejercer cualquiera de estos derechos, escríbenos a cardonajosejhc@gmail.com o por
+          Para ejercer cualquiera de estos derechos, escríbenos a inkognitoecosystem@gmail.com o por
           WhatsApp al número de contacto del estudio.
         </p>
       </div>
