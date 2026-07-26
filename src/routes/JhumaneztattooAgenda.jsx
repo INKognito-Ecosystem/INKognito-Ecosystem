@@ -3,7 +3,7 @@ import { useLoaderData, Link } from 'react-router'
 import { FaWhatsapp } from 'react-icons/fa'
 import { MapPin, Palette, Clock } from 'lucide-react'
 import Gallery from '../components/tattoo/Gallery'
-import ReservationForm from '../components/tattoo/ReservationForm'
+import AgendaPublica from '../components/tattoo/AgendaPublica'
 import WhatsAppFloat from '../components/tattoo/WhatsAppFloat'
 import { WHATSAPP } from '../config/business'
 import heroBg from '../assets/about/about-bg.webp'
@@ -84,9 +84,6 @@ function trackLeadClick() {
 
 export default function JhumaneztattooAgenda() {
   const { heroPhoto, items } = useLoaderData()
-  const [estilo, setEstilo] = useState('')
-  const [zona, setZona] = useState('')
-  const [tamano, setTamano] = useState('')
   const [lightboxOpen, setLightboxOpen] = useState(false)
 
   return (
@@ -155,11 +152,7 @@ export default function JhumaneztattooAgenda() {
           para vivir debajo de un navbar completo (como en /portafolio) */}
       <Gallery items={items} onLightboxChange={setLightboxOpen} compact />
 
-      <ReservationForm
-        estilo={estilo} setEstilo={setEstilo}
-        zona={zona} setZona={setZona}
-        tamano={tamano} setTamano={setTamano}
-      />
+      <AgendaPublica />
 
       {/* FOOTER MÍNIMO — solo lo legalmente necesario, sin links de navegación
           que compitan con el único objetivo de esta página */}
