@@ -105,15 +105,9 @@ export default function Gallery({ items: itemsFromLoader, onLightboxChange = () 
                   esto el botón "Ver" nunca se veía (aunque el click en la
                   imagen sí abría el lightbox, por estar en el div padre).
                   Desde md: vuelve a depender de group-hover como en PC. */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                <p className="text-zinc-300 text-sm font-bold uppercase tracking-widest mb-1">
-                  {item.category}
-                </p>
-                <h3 className="text-white text-2xl font-black italic mb-3">
-                  {item.title}
-                </h3>
-                <span className="self-start inline-flex items-center gap-2 px-4 py-2 rounded bg-white/10 border border-white/30 text-white text-xs font-bold uppercase tracking-widest">
-                  <Eye size={14} />
+              <div className="absolute inset-0 bg-black/25 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-start p-3">
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-white/10 border border-white/30 text-white text-[10px] font-bold uppercase tracking-widest">
+                  <Eye size={11} />
                   Ver
                 </span>
               </div>
