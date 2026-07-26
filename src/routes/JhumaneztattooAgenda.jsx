@@ -1,11 +1,10 @@
 import { useState } from 'react'
 import { useLoaderData, Link } from 'react-router'
-import { FaWhatsapp } from 'react-icons/fa'
-import { MapPin, Palette, Clock } from 'lucide-react'
+import { MapPin, Palette, Clock, CalendarCheck, X } from 'lucide-react'
 import Gallery from '../components/tattoo/Gallery'
 import AgendaPublica from '../components/tattoo/AgendaPublica'
 import WhatsAppFloat from '../components/tattoo/WhatsAppFloat'
-import { WHATSAPP } from '../config/business'
+import { ABOUT_PARAGRAPHS, ABOUT_QUOTE } from '../components/tattoo/About'
 import heroBg from '../assets/about/about-bg.webp'
 
 const ogTattoo = '/og/josefoto-og.jpg'
@@ -72,9 +71,6 @@ export function meta() {
   ]
 }
 
-const WA_MESSAGE = encodeURIComponent('Hola Jose, quiero agendar/cotizar un tatuaje')
-const WA_LINK = `https://wa.me/${WHATSAPP}?text=${WA_MESSAGE}`
-
 // Dispara el evento de conversión en los dos pixeles ya instalados
 // globalmente (root.jsx) — mismo patrón que ProductLandingPage.jsx.
 function trackLeadClick() {
@@ -85,6 +81,7 @@ function trackLeadClick() {
 export default function JhumaneztattooAgenda() {
   const { heroPhoto, items } = useLoaderData()
   const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [sobreMiOpen, setSobreMiOpen] = useState(false)
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -98,7 +95,7 @@ export default function JhumaneztattooAgenda() {
           alt=""
           className="absolute inset-0 w-full h-full object-cover opacity-70 brightness-50 scale-105"
         />
-        <div className="relative z-10 w-full max-w-4xl mx-auto px-6 flex flex-col md:flex-row items-center gap-10 md:gap-16">
+        <div className="relative z-10 w-full max-w-4xl mx-auto px-6 flex flex-col md:flex-row items-center gap-10 md:gap-16 -translate-y-6 md:-translate-y-12">
 
           {/* FOTO */}
           <div className="flex-shrink-0 relative group">
@@ -134,19 +131,53 @@ export default function JhumaneztattooAgenda() {
             </div>
 
             <a
-              href={WA_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#contacto"
               onClick={trackLeadClick}
               className="w-full md:w-auto px-10 py-4 rounded bg-green-600 text-white font-black text-sm uppercase tracking-widest hover:bg-green-500 transition-all transform hover:-translate-y-1 text-center shadow-lg inline-flex items-center justify-center gap-2.5"
             >
-              <FaWhatsapp size={20} />
-              Agenda tu cita
+              <CalendarCheck size={20} />
+              Agenda online
             </a>
+
+            <button
+              type="button"
+              onClick={() => setSobreMiOpen(true)}
+              className="w-full md:w-auto mt-3 px-10 py-3 rounded border border-white/20 text-gray-300 font-bold text-sm uppercase tracking-widest hover:border-white/50 hover:text-white transition-all text-center"
+            >
+              Sobre mí
+            </button>
           </div>
 
         </div>
       </section>
+
+      {/* MODAL "SOBRE MÍ" — mismo texto de la sección Acerca de mí de la
+          página completa del estudio (About.jsx), sin salir de esta landing */}
+      {sobreMiOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setSobreMiOpen(false)}
+        >
+          <div
+            className="relative max-w-lg w-full bg-zinc-950 border border-white/10 rounded-xl p-8 max-h-[85vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setSobreMiOpen(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
+              aria-label="Cerrar"
+            >
+              <X size={22} />
+            </button>
+            <h2 className="text-2xl font-black uppercase italic mb-6">Sobre mí</h2>
+            <div className="space-y-5 text-gray-300 leading-relaxed font-light">
+              {ABOUT_PARAGRAPHS.map((p, i) => <p key={i}>{p}</p>)}
+              <p className="text-white italic font-semibold pt-2">"{ABOUT_QUOTE}"</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* PORTAFOLIO REAL — compacto: pegado al hero, sin el espaciado pensado
           para vivir debajo de un navbar completo (como en /portafolio) */}
@@ -159,9 +190,10 @@ export default function JhumaneztattooAgenda() {
       <footer className="border-t border-white/10 py-6 px-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-500 text-[12px] gap-3">
           <p>© {new Date().getFullYear()} INKognito Tattoo. Todos los derechos reservados.</p>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap justify-center gap-6">
             <Link to="/terminos" className="hover:text-white transition-colors">Términos</Link>
             <Link to="/privacidad" className="hover:text-white transition-colors">Privacidad</Link>
+            <span>Desarrollado por INKognito</span>
           </div>
         </div>
       </footer>

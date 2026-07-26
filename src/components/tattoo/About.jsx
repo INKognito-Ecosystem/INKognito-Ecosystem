@@ -1,5 +1,15 @@
 import aboutBg from '../../assets/about/about-bg.webp'
 
+// Compartido con el modal "Sobre mí" de la landing de pauta
+// (JhumaneztattooAgenda.jsx) — un solo lugar para editar la bio.
+export const ABOUT_PARAGRAPHS = [
+  'Soy Jose Humanez.',
+  'Vivo el arte como una extensión de quién soy. La disciplina, el entrenamiento y la creatividad hacen parte de mi proceso dentro y fuera del estudio, porque creo que cuerpo y mente también forman parte del arte que proyectamos.',
+  'Desde Chigorodó, en la región de Urabá, Antioquia — Colombia, trabajo cada pieza con intención, detalle y visión artística, buscando crear tatuajes que realmente conecten con la identidad de cada persona.',
+  'INKOGNITO Tattoo Studio nace de esa filosofía: crear arte que permanezca.',
+]
+export const ABOUT_QUOTE = 'Hago arte para no morir. Desafío cuerpo y mente.'
+
 export default function About() {
   return (
     <section id="acerca" className="relative py-8 md:py-14 px-4 overflow-hidden border-t border-white/5">
@@ -26,26 +36,10 @@ export default function About() {
         {/* TEXTO */}
         <div className="space-y-6 text-gray-300 text-lg leading-relaxed font-light">
 
-          <p>
-            Soy Jose Humanez.
-          </p>
-
-          <p>
-            Vivo el arte como una extensión de quién soy.
-            La disciplina, el entrenamiento y la creatividad hacen parte de mi proceso dentro y fuera del estudio, porque creo que cuerpo y mente también forman parte del arte que proyectamos.
-          </p>
-
-          <p>
-            Desde Chigorodó, en la región de Urabá, Antioquia — Colombia, trabajo cada pieza con intención, detalle y visión artística, buscando crear tatuajes que realmente conecten con la identidad de cada persona.
-          </p>
-
-          <p>
-            INKOGNITO Tattoo Studio nace de esa filosofía:
-            crear arte que permanezca.
-          </p>
+          {ABOUT_PARAGRAPHS.map((p, i) => <p key={i}>{p}</p>)}
 
           <p className="text-white text-xl italic font-semibold pt-4">
-            "Hago arte para no morir. Desafío cuerpo y mente."
+            "{ABOUT_QUOTE}"
           </p>
 
         </div>
