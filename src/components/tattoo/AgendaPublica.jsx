@@ -229,15 +229,14 @@ export default function AgendaPublica() {
                   <div className="relative" ref={calendarRef}>
                     <button
                       type="button"
-                      onClick={() => form.size && setCalendarOpen(o => !o)}
-                      disabled={!form.size}
-                      className="w-full flex items-center justify-between gap-2 bg-zinc-900 border border-gray-700 text-left p-3.5 rounded outline-none disabled:opacity-40 disabled:cursor-not-allowed"
+                      onClick={() => setCalendarOpen(o => !o)}
+                      className="w-full flex items-center justify-between gap-2 bg-zinc-900 border border-gray-700 text-left p-3.5 rounded outline-none"
                     >
                       <span className={selectedDate ? 'text-white' : 'text-gray-500'}>
                         <Calendar size={16} className="inline mr-2 -mt-0.5 text-gray-500" />
                         {selectedDate
                           ? selectedDate.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' })
-                          : (form.size ? 'Elige un día disponible *' : 'Elige primero el tamaño →')}
+                          : 'Elige un día disponible *'}
                       </span>
                     </button>
 
@@ -341,7 +340,7 @@ export default function AgendaPublica() {
                   ¿Ya tienes una idea en mente?
                 </h3>
                 <p className="relative text-gray-400 text-[13px] leading-relaxed">
-                  Cada proyecto empieza con una buena conversación. Cuéntame qué quieres tatuarte
+                  Cada proyecto empieza con una buena descripción. Cuéntame qué quieres tatuarte
                   y trabajemos juntos en una pieza que se vea tan bien en años como el día que saliste del estudio.
                 </p>
               </div>
@@ -436,7 +435,7 @@ export default function AgendaPublica() {
             <button
               type="submit"
               disabled={estado === 'enviando' || subiendoImagen || !formCompleto}
-              className="w-full md:w-auto flex-shrink-0 bg-green-600 text-white font-black py-4 px-10 rounded uppercase tracking-widest hover:bg-green-500 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full md:w-auto flex-shrink-0 bg-green-600 text-white font-black py-4 px-6 md:px-10 rounded uppercase tracking-normal md:tracking-widest text-sm md:text-base whitespace-nowrap hover:bg-green-500 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {estado === 'enviando' ? 'Enviando...' : subiendoImagen ? 'Subiendo imagen...' : 'Enviar solicitud de cita'}
             </button>

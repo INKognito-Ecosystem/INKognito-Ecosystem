@@ -32,9 +32,20 @@ const FALLBACK_ITEMS = [
 // la galería va pegada al hero en vez de debajo de un navbar completo como en
 // /portafolio — reduce espaciados y mete más miniaturas por fila sin tocar
 // cómo se ve /portafolio (que sigue usando los valores por defecto).
+// 4 en móvil/tablet, 5 en desktop (grid compacto es lg:grid-cols-5 — con 5
+// la última fila queda completa en vez de dejar un hueco). La 5ta se oculta
+// con CSS bajo lg: en vez de manejar el conteo en JS, así no hace falta
+// escuchar resize.
+const INICIALES = 5
+
 export default function Gallery({ items: itemsFromLoader, onLightboxChange = () => {}, compact = false }) {
   const [selected, setSelected] = useState(null)
+  const [mostrarTodas, setMostrarTodas] = useState(false)
   const items = itemsFromLoader && itemsFromLoader.length > 0 ? itemsFromLoader : FALLBACK_ITEMS
+  // Muestra solo las primeras 4-5 hasta que pidan ver más — el índice de cada
+  // una coincide con su posición real en `items` (el slice siempre arranca
+  // en 0), así que el lightbox no necesita ningún ajuste de índice.
+  const visibles = mostrarTodas ? items : items.slice(0, INICIALES)
 
   const openLightbox = (index) => { setSelected(index); onLightboxChange(true) }
   const closeLightbox = () => { setSelected(null); onLightboxChange(false) }
@@ -88,11 +99,14 @@ export default function Gallery({ items: itemsFromLoader, onLightboxChange = () 
 
         {/* GRID */}
         <div className={compact ? 'grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-3' : 'grid grid-cols-2 lg:grid-cols-3 gap-4'}>
-          {items.map((item, index) => (
+          {visibles.map((item, index) => (
             <div
               key={item.id}
               onClick={() => openLightbox(index)}
-              className={compact ? 'group relative overflow-hidden rounded aspect-square bg-gray-900 cursor-pointer' : 'group relative overflow-hidden rounded-lg aspect-square bg-gray-900 cursor-pointer'}
+              className={[
+                !mostrarTodas && index === 4 ? 'hidden lg:block' : '',
+                compact ? 'group relative overflow-hidden rounded aspect-square bg-gray-900 cursor-pointer' : 'group relative overflow-hidden rounded-lg aspect-square bg-gray-900 cursor-pointer',
+              ].join(' ')}
             >
               <img
                 src={item.img}
@@ -114,6 +128,22 @@ export default function Gallery({ items: itemsFromLoader, onLightboxChange = () 
             </div>
           ))}
         </div>
+
+        {/* En móvil/tablet solo se ven 4 (la 5ta está con hidden lg:block) —
+            el botón debe aparecer desde que sobra una más allá de esas 4,
+            aunque items.length sea apenas 5 (ahí la 5ta ya es visible en
+            desktop pero seguiría escondida en móvil sin este botón). */}
+        {!mostrarTodas && items.length > 4 && (
+          <div className="text-center mt-5 md:mt-6">
+            <button
+              type="button"
+              onClick={() => setMostrarTodas(true)}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded border border-zinc-700 text-zinc-300 text-xs font-bold uppercase tracking-widest hover:border-zinc-500 hover:text-white transition-colors"
+            >
+              Ver más ({items.length - INICIALES})
+            </button>
+          </div>
+        )}
 
         {/* CIERRE ESTRATEGICO — en compact (landing de pauta) esto vive
             fusionado con el formulario en AgendaPublica.jsx, no acá. */}

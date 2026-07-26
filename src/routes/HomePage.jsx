@@ -1,14 +1,13 @@
-import { useState } from 'react'
-import { useLoaderData } from 'react-router'
+import { useLoaderData, Link } from 'react-router'
 import { TATTOO_HOURS } from '../config/business'
 import Navbar from '../components/tattoo/Navbar'
-import Hero from '../components/tattoo/Hero'
+import HeroFicha from '../components/tattoo/HeroFicha'
 import About from '../components/tattoo/About'
 import CuidadosTeaser from '../components/tattoo/CuidadosTeaser'
 import Testimonials from '../components/tattoo/Testimonials'
+import AgendaPublica from '../components/tattoo/AgendaPublica'
 import Footer from '../components/tattoo/Footer'
 import WhatsAppFloat from '../components/tattoo/WhatsAppFloat'
-import ReservationForm from '../components/tattoo/ReservationForm'
 
 const ogTattoo = '/og/josefoto-og.jpg'
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
@@ -73,9 +72,6 @@ export function meta() {
 
 export default function HomePage() {
   const { heroPhoto } = useLoaderData()
-  const [estilo, setEstilo] = useState('')
-  const [zona, setZona] = useState('')
-  const [tamano, setTamano] = useState('')
 
   return (
     <div className="bg-black text-white">
@@ -91,16 +87,25 @@ export default function HomePage() {
           asumían un ancestro oscuro que nunca existió — se veían con fondo
           blanco y texto invisible (negro sobre negro) por esto. */}
       <Navbar />
-      <Hero heroPhoto={heroPhoto} />
+      <HeroFicha
+        heroPhoto={heroPhoto}
+        secondaryButton={
+          <Link
+            to="/portafolio"
+            className="w-full md:w-72 mt-3 px-10 py-4 rounded border border-white/20 text-gray-300 font-bold text-sm uppercase tracking-widest hover:border-white/50 hover:text-white transition-all text-center block"
+          >
+            Portafolio
+          </Link>
+        }
+      />
       <About />
       <CuidadosTeaser />
       <Testimonials />
 
-      <ReservationForm
-        estilo={estilo} setEstilo={setEstilo}
-        zona={zona} setZona={setZona}
-        tamano={tamano} setTamano={setTamano}
-      />
+      {/* Agendamiento online directo, mismo componente que la landing de
+          pauta (/jhumaneztattoo/agenda) — reemplaza el viejo ReservationForm
+          (cuestionario que solo armaba un mensaje de WhatsApp). */}
+      <AgendaPublica />
 
       <Footer />
       <WhatsAppFloat />
