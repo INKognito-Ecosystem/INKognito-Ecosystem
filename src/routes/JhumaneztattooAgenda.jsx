@@ -132,7 +132,7 @@ export default function JhumaneztattooAgenda() {
             <a
               href="#contacto"
               onClick={trackLeadClick}
-              className="w-full md:w-auto px-10 py-4 rounded bg-green-600 text-white font-black text-sm uppercase tracking-widest hover:bg-green-500 transition-all transform hover:-translate-y-1 text-center shadow-lg inline-flex items-center justify-center gap-2.5"
+              className="w-full md:w-72 px-10 py-4 rounded bg-green-600 text-white font-black text-sm uppercase tracking-widest hover:bg-green-500 transition-all transform hover:-translate-y-1 text-center shadow-lg inline-flex items-center justify-center gap-2.5"
             >
               <CalendarCheck size={20} />
               Agenda online
@@ -141,7 +141,7 @@ export default function JhumaneztattooAgenda() {
             <button
               type="button"
               onClick={() => setSobreMiOpen(true)}
-              className="w-full md:w-auto mt-3 px-10 py-3 rounded border border-white/20 text-gray-300 font-bold text-sm uppercase tracking-widest hover:border-white/50 hover:text-white transition-all text-center"
+              className="w-full md:w-72 mt-3 px-10 py-4 rounded border border-white/20 text-gray-300 font-bold text-sm uppercase tracking-widest hover:border-white/50 hover:text-white transition-all text-center"
             >
               Sobre mí
             </button>
