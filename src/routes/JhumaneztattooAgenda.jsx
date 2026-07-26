@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useLoaderData, Link } from 'react-router'
+import { FaInstagram, FaFacebookF } from 'react-icons/fa'
 import { MapPin, Palette, Clock, CalendarCheck, X } from 'lucide-react'
 import Gallery from '../components/tattoo/Gallery'
 import AgendaPublica from '../components/tattoo/AgendaPublica'
@@ -94,7 +95,11 @@ export default function JhumaneztattooAgenda() {
           alt=""
           className="absolute inset-0 w-full h-full object-cover opacity-70 brightness-50 scale-105"
         />
-        <div className="relative z-10 w-full max-w-4xl mx-auto px-6 flex flex-col md:flex-row items-center gap-10 md:gap-16 -translate-y-6 md:-translate-y-12">
+        {/* Sin corrimiento en móvil (el contenido ya ocupa toda la altura del
+            hero con redes sociales incluidas — subirlo en pantallas cortas
+            cortaba lo de abajo). El translate solo aplica en desktop, donde
+            sobra espacio vertical. */}
+        <div className="relative z-10 w-full max-w-4xl mx-auto px-6 flex flex-col md:flex-row items-center gap-10 md:gap-16 md:-translate-y-12">
 
           {/* FOTO */}
           <div className="flex-shrink-0 relative group">
@@ -145,6 +150,27 @@ export default function JhumaneztattooAgenda() {
             >
               Sobre mí
             </button>
+
+            <div className="flex items-center justify-center md:justify-start gap-4 mt-6">
+              <a
+                href="https://www.instagram.com/jhumaneztattoo?igsh=MXh4ZW9vaGZnMDVtZQ=="
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="w-11 h-11 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-gradient-to-br hover:from-pink-500 hover:to-yellow-500 hover:border-transparent transition-all duration-300"
+              >
+                <FaInstagram size={18} />
+              </a>
+              <a
+                href="https://www.facebook.com/humanezjose"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="w-11 h-11 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-blue-600 hover:border-transparent transition-all duration-300"
+              >
+                <FaFacebookF size={16} />
+              </a>
+            </div>
           </div>
 
         </div>
