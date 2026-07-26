@@ -270,7 +270,7 @@ export default function AgendaPublica() {
               type="text"
               value={form.design}
               onChange={e => update('design', e.target.value)}
-              placeholder="Describe brevemente la idea (opcional)"
+              placeholder="Describe brevemente la idea"
               className="w-full bg-zinc-900 border border-gray-700 text-white p-3.5 rounded outline-none placeholder:text-gray-600"
             />
 
@@ -294,7 +294,7 @@ export default function AgendaPublica() {
               ) : (
                 <label className="w-full flex items-center justify-center gap-2 bg-zinc-900 border border-dashed border-gray-700 text-gray-500 p-3.5 rounded cursor-pointer hover:border-gray-500 hover:text-gray-400 transition-colors">
                   <ImagePlus size={16} />
-                  <span className="text-sm">Agregar foto de referencia (opcional)</span>
+                  <span className="text-sm">Agregar foto de referencia</span>
                   <input type="file" accept="image/*" onChange={onFileChange} className="hidden" />
                 </label>
               )}
