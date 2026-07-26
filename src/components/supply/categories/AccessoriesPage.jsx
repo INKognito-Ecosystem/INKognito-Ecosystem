@@ -1,4 +1,12 @@
+import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../SupplyCategoryPage'
+import { fetchCatalogCategoria } from '../../../hooks/useCatalog'
+
+const TITLE = 'Accesorios'
+const CATEGORIA = 'Accesorios'
+const SLUG = 'accessories'
+const DESC = 'Accesorios para tatuadores en Chigorodo, Uraba. Transfer paper, bandejas, cables y mas.'
+const INTRO = 'Los detalles que hacen fluir el trabajo. Porque cuando el proceso es suave, la creatividad no se interrumpe.'
 
 const guide = [
   { icon: '🗂️', title: 'Transfer paper', text: 'Para pasar el diseno a la piel con precision. El de copiado manual con gel es el mas usado.' },
@@ -15,16 +23,34 @@ const faqs = [
   { q: 'Envios?', a: 'Si, a toda la region de Uraba y Colombia.' },
 ]
 
+export async function loader() {
+  return fetchCatalogCategoria('supply', CATEGORIA)
+}
+
+export function meta() {
+  const title = `${TITLE} para tatuadores en Urabá | INKognito Supply — Chigorodó`
+  return [
+    { title },
+    { name: 'description', content: DESC },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: DESC },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/${SLUG}` },
+  ]
+}
+
 export default function AccessoriesPage() {
+  const { products, afiliados } = useLoaderData()
   return (
     <SupplyCategoryPage
-      title="Accesorios"
-      categoria="Accesorios"
-      slug="accessories"
-      desc="Accesorios para tatuadores en Chigorodo, Uraba. Transfer paper, bandejas, cables y mas."
-      intro="Los detalles que hacen fluir el trabajo. Porque cuando el proceso es suave, la creatividad no se interrumpe."
+      title={TITLE}
+      categoria={CATEGORIA}
+      slug={SLUG}
+      desc={DESC}
+      intro={INTRO}
       guide={guide}
       faqs={faqs}
+      products={products}
+      afiliados={afiliados}
     />
   )
 }

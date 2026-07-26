@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom'
 import NavbarCategory from './NavbarCategory'
 import FooterSupply from './FooterSupply'
 import AccordionCard from './AccordionCard'
-import Seo from '../Seo'
-import { useCatalog } from '../../hooks/useCatalog'
 import { useScrolled } from '../../hooks/useScrolled'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { FaWhatsapp } from 'react-icons/fa'
@@ -210,19 +208,6 @@ function ProductCard({ item, categoria }) {
   )
 }
 
-function SkeletonCard() {
-  return (
-    <div className="border border-zinc-800 bg-zinc-950 rounded-2xl overflow-hidden animate-pulse">
-      <div className="aspect-square bg-zinc-900" />
-      <div className="p-4 flex flex-col gap-2">
-        <div className="h-4 bg-zinc-800 rounded w-3/4" />
-        <div className="h-3 bg-zinc-800 rounded w-1/2" />
-        <div className="h-8 bg-zinc-800 rounded mt-2" />
-      </div>
-    </div>
-  )
-}
-
 function AfiliadoCard({ item }) {
   const url = item.url_ventas || item.url_checkout || null
   const inner = (
@@ -253,22 +238,19 @@ function AfiliadoCard({ item }) {
 }
 
 
-export default function SupplyCategoryPage({ title, categoria, slug, desc, intro, guide, faqs }) {
-  const { allProducts: allProds, loading } = useCatalog('supply', categoria)
-  const products  = allProds.filter(p => !p.tipo || p.tipo === 'fisico')
-  const afiliados = allProds.filter(p => p.tipo === 'afiliado')
+// products/afiliados llegan resueltos por el loader de cada ruta (los ~10
+// wrapper de src/components/supply/categories/*) — ya no se llama useCatalog
+// acá adentro, así el servidor manda el catálogo real en el primer HTML.
+// meta() (título/description/canonical) también quedó en cada wrapper, no
+// acá — evita mezclar <Seo>/Helmet con meta() en la misma ruta (rompe la
+// hidratación, ver nota en HomePage.jsx).
+export default function SupplyCategoryPage({ title, categoria, slug, intro, guide, faqs, products = [], afiliados = [] }) {
   const CatIcon = CAT_ICONS[categoria] || null
   const { prev, next } = getAdjacentCategories(slug)
   const scrolled = useScrolled()
 
   return (
     <>
-      <Seo
-        title={`${title} para tatuadores en Urabá | INKognito Supply — Chigorodó`}
-        description={desc || `${title} profesionales para tatuadores en Chigorodó, Urabá. Stock real y envíos a toda la región. Pedidos por WhatsApp.`}
-        siteName="INKognito Supply"
-        canonical={`${import.meta.env.VITE_SITE_URL}/supply/${slug}`}
-      />
       <NavbarCategory pageName={title} backPath="/supply" backLabel="Supply" />
 
       {scrolled && prev && (
@@ -328,15 +310,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
 
         {/* PRODUCTOS FÍSICOS — scroll horizontal en móvil, grid en desktop */}
         <div className="pb-10 max-w-7xl mx-auto">
-          {loading ? (
-            <div className="flex gap-4 px-6 overflow-x-hidden">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="flex-shrink-0 w-[44vw] md:w-48">
-                  <SkeletonCard />
-                </div>
-              ))}
-            </div>
-          ) : products.length === 0 ? (
+          {products.length === 0 ? (
             <div className="mx-6 border border-blue-500/20 bg-zinc-950 rounded-2xl p-10 text-center">
               <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2">Sin stock por el momento</p>
               <p className="text-white text-lg font-black uppercase mb-2">Próximamente disponible</p>
@@ -364,7 +338,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, desc, intro
         </div>
 
         {/* RECURSOS DIGITALES AFILIADOS — sección fija, siempre visible */}
-        {!loading && (() => {
+        {(() => {
           const copy = AFILIADO_COPY[categoria] || { badge: `Recursos para ${title.toLowerCase()}`, title: 'Lleva tu técnica al siguiente nivel', desc: `Selección curada para dominar ${title.toLowerCase()}.` }
           return (
           <div className="pb-10 max-w-7xl mx-auto px-6">

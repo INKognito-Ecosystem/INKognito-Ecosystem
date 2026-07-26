@@ -1,19 +1,29 @@
 import EcosystemNavbar from './EcosystemNavbar'
 import { Link } from 'react-router-dom'
 import ecosystemBg from '../../assets/ecosystem/ecosystem-bg.jpg'
-import Seo from '../Seo'
+
+export function meta() {
+  const title = 'INKognito | Tattoo, Supply y Store en Urabá, Colombia'
+  const description = 'Ecosistema de servicios en Chigorodó, Urabá: estudio de tatuajes, insumos profesionales para tatuadores y tienda deportiva. Conoce todos nuestros módulos.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:site_name', content: 'INKognito Ecosystem' },
+    { property: 'og:url', content: `${import.meta.env.VITE_SITE_URL}/` },
+    { property: 'og:image', content: `${import.meta.env.VITE_SITE_URL}/og/ecosystem-og.png` },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/` },
+  ]
+}
 
 export default function InkognitoHome() {
   return (
     <section className="relative min-h-screen bg-black text-white flex flex-col items-center px-6 overflow-hidden">
 
-      <Seo
-        title="INKognito | Tattoo, Supply y Store en Urabá, Colombia"
-        description="Ecosistema de servicios en Chigorodó, Urabá: estudio de tatuajes, insumos profesionales para tatuadores y tienda deportiva. Conoce todos nuestros módulos."
-        image="/og/ecosystem-og.png"
-        siteName="INKognito Ecosystem"
-        canonical={`${import.meta.env.VITE_SITE_URL}/`}
-      />
+      {/* meta() arriba ya cubre SSR — no se renderiza <Seo>/<Helmet> para
+          evitar que las dos mecánicas escriban <head> a la vez (rompía la
+          hidratación, ver nota en HomePage.jsx). */}
 
       {/* NAVBAR */}
       <EcosystemNavbar />

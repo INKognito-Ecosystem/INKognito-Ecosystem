@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Drill, PenTool, PlugZap, Droplet, Crosshair, Hand, ShieldCheck, Toolbox, BedDouble, Package } from 'lucide-react'
-import { useCatalog } from '../../hooks/useCatalog'
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
@@ -28,8 +27,7 @@ const categories = [
   { name: 'Combos',            path: '/supply/bundles',        icon: Package,    cat: 'Combos'      },
 ]
 
-export default function CategoriesSupply() {
-  const { categorias, loading } = useCatalog('supply')
+export default function CategoriesSupply({ categorias = {} }) {
   const [imgs, setImgs] = useState({})
 
   useEffect(() => {
@@ -41,11 +39,9 @@ export default function CategoriesSupply() {
 
   // Mapa de categoría → cantidad de productos disponibles
   const stockPorCat = {}
-  if (!loading) {
-    Object.entries(categorias).forEach(([cat, items]) => {
-      stockPorCat[cat] = items.length
-    })
-  }
+  Object.entries(categorias).forEach(([cat, items]) => {
+    stockPorCat[cat] = items.length
+  })
 
   return (
     <section id="categorias" className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950">
@@ -93,35 +89,29 @@ export default function CategoriesSupply() {
                     <span className="absolute bottom-0 left-0 right-0 bg-black/65 py-1.5 text-center text-[10px] font-bold uppercase tracking-[0.08em] text-white z-10">
                       {category.name}
                     </span>
-                    {!loading && (
-                      <span className={`
-                        absolute top-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-full z-10
-                        ${hasStock
-                          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                          : 'bg-zinc-800/80 text-zinc-600 border border-zinc-700'
-                        }
-                      `}>
-                        {hasStock ? `${count} producto${count > 1 ? 's' : ''}` : 'Sin stock'}
-                      </span>
-                    )}
-                    {loading && <span className="absolute top-2 right-2 text-[9px] text-zinc-700 px-2 z-10">...</span>}
+                    <span className={`
+                      absolute top-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-full z-10
+                      ${hasStock
+                        ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                        : 'bg-zinc-800/80 text-zinc-600 border border-zinc-700'
+                      }
+                    `}>
+                      {hasStock ? `${count} producto${count > 1 ? 's' : ''}` : 'Sin stock'}
+                    </span>
                   </>
                 ) : (
                   <>
                     <category.icon size={26} className={hasStock ? 'text-blue-400' : 'text-zinc-700'} />
                     <span>{category.name}</span>
-                    {!loading && (
-                      <span className={`
-                        absolute bottom-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-full
-                        ${hasStock
-                          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                          : 'bg-zinc-800 text-zinc-600 border border-zinc-700'
-                        }
-                      `}>
-                        {hasStock ? `${count} producto${count > 1 ? 's' : ''}` : 'Sin stock'}
-                      </span>
-                    )}
-                    {loading && <span className="absolute bottom-2 right-2 text-[9px] text-zinc-700 px-2">...</span>}
+                    <span className={`
+                      absolute bottom-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-full
+                      ${hasStock
+                        ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                        : 'bg-zinc-800 text-zinc-600 border border-zinc-700'
+                      }
+                    `}>
+                      {hasStock ? `${count} producto${count > 1 ? 's' : ''}` : 'Sin stock'}
+                    </span>
                   </>
                 )}
               </Link>

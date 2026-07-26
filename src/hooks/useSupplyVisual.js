@@ -17,7 +17,13 @@ function fetchVisual() {
 }
 
 export function useSupplyVisual(key) {
-  const [url, setUrl] = useState(() => (cache ? (cache[key] || null) : undefined))
+  // Siempre arranca en undefined, sin mirar el cache de módulo — en el
+  // servidor ese cache puede seguir vivo entre requests (según cómo
+  // reutilice Vercel la instancia), y el cliente SIEMPRE arranca en
+  // undefined (módulo nuevo en el navegador). Si el servidor a veces
+  // devolviera el valor ya resuelto y el cliente no, sería un mismatch
+  // de hidratación — igual al que ya se corrigió en useScrolled/CuidadosPage.
+  const [url, setUrl] = useState(undefined)
 
   useEffect(() => {
     let active = true

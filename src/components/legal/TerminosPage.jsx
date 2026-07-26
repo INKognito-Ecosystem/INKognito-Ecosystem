@@ -1,12 +1,19 @@
 import LegalPage from './LegalPage'
 
+const TITLE = 'Términos y Condiciones'
+const DESCRIPTION = 'Términos y condiciones de uso del sitio INKognito: catálogo de productos, precios, propiedad intelectual y responsabilidad.'
+
+export function meta() {
+  return [
+    { title: `${TITLE} | INKognito` },
+    { name: 'description', content: DESCRIPTION },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/terminos` },
+  ]
+}
+
 export default function TerminosPage() {
   return (
-    <LegalPage
-      title="Términos y Condiciones"
-      updated="25 de julio de 2026"
-      description="Términos y condiciones de uso del sitio INKognito: catálogo de productos, precios, propiedad intelectual y responsabilidad."
-    >
+    <LegalPage title={TITLE} updated="25 de julio de 2026">
       <div>
         <h2>1. Objeto</h2>
         <p>

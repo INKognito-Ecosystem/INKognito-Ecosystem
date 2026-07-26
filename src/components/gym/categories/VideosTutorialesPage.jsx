@@ -1,7 +1,18 @@
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
-import Seo from '../../Seo'
 import { PlayCircle } from 'lucide-react'
+
+export function meta() {
+  const title = 'Cómo Fabricar Máquinas de Gym | Tutoriales Profesionales — Colombia'
+  const description = 'Videos de fabricación de equipos de gym con soldadura: mancuernas, discos, barras y máquinas. Canal de Jose Humanez en YouTube.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/gym/tutoriales` },
+  ]
+}
 
 const videos = [
   {
@@ -34,13 +45,6 @@ const videos = [
 export default function VideosTutorialesPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <Seo
-        title="Cómo Fabricar Máquinas de Gym | Tutoriales Profesionales — Colombia"
-        description="Videos de fabricación de equipos de gym con soldadura: mancuernas, discos, barras y máquinas. Canal de Jose Humanez en YouTube."
-        siteName="INKognito Gym"
-        canonical={`${import.meta.env.VITE_SITE_URL}/gym/tutoriales`}
-      />
-
       <NavbarGym />
 
       {/* HERO */}

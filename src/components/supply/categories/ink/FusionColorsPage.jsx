@@ -1,7 +1,18 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
-import Seo from '../../../Seo'
 import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
+
+export function meta() {
+  const title = 'Tintas Fusion Ink | INKognito Supply — Colombia'
+  const description = 'Fusion Ink: pigmentos vibrantes y stencil-friendly para color americano y neotradicional. Disponibles en Urabá, Colombia.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/ink/fusion` },
+  ]
+}
 
 const categories = [
   {
@@ -95,13 +106,6 @@ export default function FusionColorsPage() {
   const { addItem } = useSupplyCart()
   return (
     <div className="min-h-screen bg-black text-white">
-      <Seo
-        title="Tintas Fusion Ink | INKognito Supply — Colombia"
-        description="Fusion Ink: pigmentos vibrantes y stencil-friendly para color americano y neotradicional. Disponibles en Urabá, Colombia."
-        siteName="INKognito Supply"
-        canonical={`${import.meta.env.VITE_SITE_URL}/supply/ink/fusion`}
-      />
-
       <NavbarCategory pageName="Fusion Ink" />
 
       <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">

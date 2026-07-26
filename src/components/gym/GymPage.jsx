@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { GraduationCap, PlayCircle, FileText, FlaskConical, Wrench, BookOpen } from 'lucide-react'
 import NavbarGym from './NavbarGym'
 import FooterGym from './FooterGym'
-import Seo from '../Seo'
 
 const ogGym = '/og/gym.webp'
 const WA = '573207911013'
@@ -84,6 +83,20 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL
 
 const membresiaMsg = `https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero el acceso completo a todos los planos de Gym')}`
 
+export function meta() {
+  const title = 'INKognito Gym | Máquinas de Gym con Soldadura Profesional y Planos Técnicos — Colombia'
+  const description = 'Máquinas de gym construidas con soldadura profesional. Planos técnicos descargables. Envíos a toda Colombia desde Urabá, Antioquia.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: `${import.meta.env.VITE_SITE_URL}${ogGym}` },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/gym` },
+    { 'script:ld+json': gymJsonLd },
+  ]
+}
+
 export default function GymPage() {
   const [planosModalOpen, setPlanosModalOpen]     = useState(false)
   const [historiaModalOpen, setHistoriaModalOpen] = useState(false)
@@ -110,15 +123,6 @@ export default function GymPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <Seo
-        title="INKognito Gym | Máquinas de Gym con Soldadura Profesional y Planos Técnicos — Colombia"
-        description="Máquinas de gym construidas con soldadura profesional. Planos técnicos descargables. Envíos a toda Colombia desde Urabá, Antioquia."
-        image={ogGym}
-        siteName="INKognito Gym"
-        canonical={`${import.meta.env.VITE_SITE_URL}/gym`}
-        jsonLd={gymJsonLd}
-      />
-
       <NavbarGym />
 
       {/* HERO */}

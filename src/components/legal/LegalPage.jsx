@@ -1,16 +1,13 @@
 import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
-import Seo from '../Seo'
 
-export default function LegalPage({ title, updated, description, children }) {
+// El meta() de SEO ya no se maneja acá — cada página que usa LegalPage
+// (PrivacidadPage/TerminosPage/EnviosPage) exporta su propio meta() de ruta,
+// para SSR real sin mezclar con <Seo>/Helmet (ver nota en HomePage.jsx sobre
+// por qué mezclar ambos rompe la hidratación).
+export default function LegalPage({ title, updated, children }) {
   return (
     <div className="min-h-screen bg-black text-white">
-      <Seo
-        title={`${title} | INKognito`}
-        description={description}
-        canonical={`${import.meta.env.VITE_SITE_URL}${window.location.pathname}`}
-      />
-
       <div className="pt-8 px-4 max-w-3xl mx-auto">
         <Link
           to="/"

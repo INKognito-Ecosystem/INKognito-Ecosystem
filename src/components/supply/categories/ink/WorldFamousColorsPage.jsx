@@ -1,7 +1,18 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
-import Seo from '../../../Seo'
 import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
+
+export function meta() {
+  const title = 'Tintas World Famous | INKognito Supply — Colombia'
+  const description = 'World Famous Ink: alta pigmentación, cicatrización limpia y colores que retienen brillantez con el tiempo. Disponibles en Urabá, Colombia.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/ink/world-famous` },
+  ]
+}
 
 const categories = [
   {
@@ -99,13 +110,6 @@ export default function WorldFamousColorsPage() {
   const { addItem } = useSupplyCart()
   return (
     <div className="min-h-screen bg-black text-white">
-      <Seo
-        title="Tintas World Famous | INKognito Supply — Colombia"
-        description="World Famous Ink: alta pigmentación, cicatrización limpia y colores que retienen brillantez con el tiempo. Disponibles en Urabá, Colombia."
-        siteName="INKognito Supply"
-        canonical={`${import.meta.env.VITE_SITE_URL}/supply/ink/world-famous`}
-      />
-
       <NavbarCategory pageName="World Famous" />
 
       <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">

@@ -1,4 +1,12 @@
+import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../SupplyCategoryPage'
+import { fetchCatalogCategoria } from '../../../hooks/useCatalog'
+
+const TITLE = 'Guantes'
+const CATEGORIA = 'Guantes'
+const SLUG = 'gloves'
+const DESC = 'Guantes de nitrilo para tatuar en Chigorodo, Uraba. Sin latex y con excelente tacto.'
+const INTRO = 'El guante que usas tambien habla de como trabajas. Agarre exacto, proteccion real, confianza en cada movimiento.'
 
 const guide = [
   { icon: '🖤', title: 'Nitrilo negro', text: 'El estandar del sector. Sin alergias y resiste pinchazos mejor que el latex.' },
@@ -14,16 +22,34 @@ const faqs = [
   { q: 'Envios?', a: 'Si, a toda la region de Uraba y Colombia.' },
 ]
 
+export async function loader() {
+  return fetchCatalogCategoria('supply', CATEGORIA)
+}
+
+export function meta() {
+  const title = `${TITLE} para tatuadores en Urabá | INKognito Supply — Chigorodó`
+  return [
+    { title },
+    { name: 'description', content: DESC },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: DESC },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/${SLUG}` },
+  ]
+}
+
 export default function GlovesPage() {
+  const { products, afiliados } = useLoaderData()
   return (
     <SupplyCategoryPage
-      title="Guantes"
-      categoria="Guantes"
-      slug="gloves"
-      desc="Guantes de nitrilo para tatuar en Chigorodo, Uraba. Sin latex y con excelente tacto."
-      intro="El guante que usas tambien habla de como trabajas. Agarre exacto, proteccion real, confianza en cada movimiento."
+      title={TITLE}
+      categoria={CATEGORIA}
+      slug={SLUG}
+      desc={DESC}
+      intro={INTRO}
       guide={guide}
       faqs={faqs}
+      products={products}
+      afiliados={afiliados}
     />
   )
 }

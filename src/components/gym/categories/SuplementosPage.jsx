@@ -1,8 +1,8 @@
 import { useState } from 'react'
+import { useLoaderData } from 'react-router-dom'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
-import Seo from '../../Seo'
-import { useCatalog } from '../../../hooks/useCatalog'
+import { fetchCatalogFull } from '../../../hooks/useCatalog'
 import { useGymCart } from '../../../contexts/GymCartContext'
 import { FlaskConical, ExternalLink } from 'lucide-react'
 
@@ -106,11 +106,27 @@ const GRID_PATTERN = {
     'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
 }
 
+export async function loader() {
+  return fetchCatalogFull('suplementos')
+}
+
+export function meta() {
+  const title = 'Suplementos Deportivos | INKognito Gym — Urabá y Colombia'
+  const description = 'Proteína, creatina, pre-entreno y vitaminas para potenciar tu entrenamiento. Suplementos deportivos en Urabá, Chigorodó, Antioquia. Envíos a toda Colombia.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/gym/suplementos` },
+  ]
+}
+
 export default function SuplementosPage() {
   const [filtro, setFiltro]   = useState('Todos')
   const [visible, setVisible] = useState(PAGE_SIZE)
-  const { allProducts: apiProds } = useCatalog('suplementos')
-  const { addItem, count: cartCount } = useGymCart()
+  const { allProducts: apiProds } = useLoaderData()
+  const { addItem } = useGymCart()
 
   // Separar físicos de afiliados — afiliados van a su propia sección
   const apiFisicos   = apiProds.filter(item => (item.tipo || 'fisico') !== 'afiliado')
@@ -148,13 +164,6 @@ export default function SuplementosPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <Seo
-        title="Suplementos Deportivos | INKognito Gym — Urabá y Colombia"
-        description="Proteína, creatina, pre-entreno y vitaminas para potenciar tu entrenamiento. Suplementos deportivos en Urabá, Chigorodó, Antioquia. Envíos a toda Colombia."
-        siteName="INKognito Gym"
-        canonical={`${import.meta.env.VITE_SITE_URL}/gym/suplementos`}
-      />
-
       <NavbarGym />
 
       {/* HERO */}

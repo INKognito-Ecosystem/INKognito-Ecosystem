@@ -4,7 +4,7 @@ export default function Seo({ title, description, image, type = 'website', siteN
   const absoluteImage = image
     ? image.startsWith('http')
       ? image
-      : `${window.location.origin}${image}`
+      : `${import.meta.env.VITE_SITE_URL}${image}`
     : null
 
   return (

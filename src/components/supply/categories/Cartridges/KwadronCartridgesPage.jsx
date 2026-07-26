@@ -4,10 +4,21 @@ import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
 import AccordionCard from '../../AccordionCard'
-import Seo from '../../../Seo'
 import { getAdjacentBrands } from '../../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../../hooks/useScrolled'
+
+export function meta() {
+  const title = 'Cartuchos Kwadron | INKognito Supply — Colombia'
+  const description = 'Cartuchos Kwadron: el estándar profesional europeo para precisión y consistencia. Usados por artistas de todo el mundo. Disponibles en Urabá, Colombia.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/cartridges/kwadron` },
+  ]
+}
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
@@ -39,13 +50,6 @@ export default function KwadronCartridgesPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <Seo
-        title="Cartuchos Kwadron | INKognito Supply — Colombia"
-        description="Cartuchos Kwadron: el estándar profesional europeo para precisión y consistencia. Usados por artistas de todo el mundo. Disponibles en Urabá, Colombia."
-        siteName="INKognito Supply"
-        canonical={`${import.meta.env.VITE_SITE_URL}/supply/cartridges/kwadron`}
-      />
-
       <NavbarCategory pageName="Kwadron" />
 
       {scrolled && (

@@ -1,9 +1,25 @@
+import { useLoaderData } from 'react-router-dom'
 import NavbarCategoryStore from '../NavbarCategoryStore'
 import FooterStore from '../FooterStore'
 import { FaWhatsapp } from 'react-icons/fa'
 import StoreProductCard from '../StoreProductCard'
-import Seo from '../../Seo'
-import { useCatalog, toProdCard } from '../../../hooks/useCatalog'
+import { fetchCatalogCategoriaItems, toProdCard } from '../../../hooks/useCatalog'
+
+export async function loader() {
+  return fetchCatalogCategoriaItems('store', 'Ropa Dama')
+}
+
+export function meta() {
+  const title = 'Ropa deportiva para dama en Urabá | INKognito Store — Chigorodó'
+  const description = 'Sets, leggings y tops deportivos para mujer en Chigorodó y el Urabá antioqueño. Ropa para gym, running, yoga y ciclismo. Tallas XS a XXL. Pide por WhatsApp con entrega a domicilio.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/store/ropa-dama` },
+  ]
+}
 
 const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
 
@@ -27,16 +43,10 @@ const faqs = [
 ]
 
 export default function RopaDamaPage() {
-  const { allProducts: catalogItems, loading } = useCatalog('store', 'Ropa Dama')
+  const { items: catalogItems } = useLoaderData()
 
   return (
     <>
-      <Seo
-        title="Ropa deportiva para dama en Urabá | INKognito Store — Chigorodó"
-        description="Sets, leggings y tops deportivos para mujer en Chigorodó y el Urabá antioqueño. Ropa para gym, running, yoga y ciclismo. Tallas XS a XXL. Pide por WhatsApp con entrega a domicilio."
-        siteName="INKognito Store"
-        canonical={`${import.meta.env.VITE_SITE_URL}/store/ropa-dama`}
-      />
       <NavbarCategoryStore pageName="Ropa Dama" />
 
       {/* HERO */}
@@ -57,13 +67,7 @@ export default function RopaDamaPage() {
       {/* PRODUCTS */}
       <div className="bg-gray-50 pt-4 pb-8 md:pb-14 px-6">
         <div className="max-w-7xl mx-auto">
-          {loading ? (
-            <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="snap-start flex-shrink-0 w-[44vw] md:w-auto bg-gray-200 rounded-xl animate-pulse aspect-[3/4]" />
-              ))}
-            </div>
-          ) : catalogItems.length === 0 ? (
+          {catalogItems.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-400 text-lg mb-4">Catálogo actualizándose…</p>
               <p className="text-gray-400 text-sm">Escríbenos por WhatsApp para ver disponibilidad</p>

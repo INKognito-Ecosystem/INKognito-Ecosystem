@@ -4,10 +4,21 @@ import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
 import BrandCatalogSection from '../BrandCatalogSection'
 import AccordionCard from '../AccordionCard'
-import Seo from '../../Seo'
 import { getAdjacentBrands } from '../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../hooks/useScrolled'
+
+export function meta() {
+  const title = 'Heaven Pro | Cuidado de tatuajes — INKognito Supply'
+  const description = 'Heaven Pro: crema y toallitas de limpieza para usar durante la sesión, crema de cicatrización para después. Línea completa para el tatuador y para vender a tus clientes. Disponibles en Urabá, Colombia.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/brands/heaven-pro` },
+  ]
+}
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
@@ -36,12 +47,6 @@ export default function HeavenProPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <Seo
-        title="Heaven Pro | Cuidado de tatuajes — INKognito Supply"
-        description="Heaven Pro: crema y toallitas de limpieza para usar durante la sesión, crema de cicatrización para después. Línea completa para el tatuador y para vender a tus clientes. Disponibles en Urabá, Colombia."
-        siteName="INKognito Supply"
-        canonical={`${import.meta.env.VITE_SITE_URL}/supply/brands/heaven-pro`}
-      />
       <NavbarCategory pageName="Heaven Pro" />
 
       {scrolled && (

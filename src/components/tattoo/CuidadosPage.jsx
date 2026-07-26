@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
@@ -103,9 +104,15 @@ function CuidadoCard({ item, index, isFirst }) {
 
 export default function CuidadosPage() {
   // la sección activa se deriva del hash de la URL (/cuidados#antes | /cuidados#despues)
-  // cada link es de un solo sentido: muestra SOLO esa sección, no un selector entre ambas
+  // cada link es de un solo sentido: muestra SOLO esa sección, no un selector entre ambas.
+  // El servidor nunca ve el hash (no viaja en el request HTTP) — para no romper la
+  // hidratación, la primera pintada del cliente también asume 'antes' (igual que el
+  // servidor) y el efecto corrige apenas monta, cuando ya no hay comparación de por medio.
   const { hash } = useLocation()
-  const tab = hash === '#despues' ? 'despues' : 'antes'
+  const [tab, setTab] = useState('antes')
+  useEffect(() => {
+    setTab(hash === '#despues' ? 'despues' : 'antes')
+  }, [hash])
 
   const HERO_TEXT = {
     antes: {

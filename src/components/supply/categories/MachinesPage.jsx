@@ -1,4 +1,12 @@
+import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../SupplyCategoryPage'
+import { fetchCatalogCategoria } from '../../../hooks/useCatalog'
+
+const TITLE = 'Maquinas'
+const CATEGORIA = 'Maquinas'
+const SLUG = 'machines'
+const DESC = 'Maquinas de tatuar rotativas en Chigorodo, Uraba. Equipos para todos los estilos.'
+const INTRO = 'Tu maquina define tu velocidad, tu control y tu firma. Equipos en manos de tatuadores que no vuelven atras.'
 
 const guide = [
   { icon: '⚙️', title: 'Rotativa de lapiz', text: 'Ligera, silenciosa y versatil. La mas recomendada para empezar.' },
@@ -15,16 +23,34 @@ const faqs = [
   { q: 'Envios a Colombia?', a: 'Si, por transportadora desde Chigorodo.' },
 ]
 
+export async function loader() {
+  return fetchCatalogCategoria('supply', CATEGORIA)
+}
+
+export function meta() {
+  const title = `${TITLE} para tatuadores en Urabá | INKognito Supply — Chigorodó`
+  return [
+    { title },
+    { name: 'description', content: DESC },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: DESC },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/${SLUG}` },
+  ]
+}
+
 export default function MachinesPage() {
+  const { products, afiliados } = useLoaderData()
   return (
     <SupplyCategoryPage
-      title="Maquinas"
-      categoria="Maquinas"
-      slug="machines"
-      desc="Maquinas de tatuar rotativas en Chigorodo, Uraba. Equipos para todos los estilos."
-      intro="Tu maquina define tu velocidad, tu control y tu firma. Equipos en manos de tatuadores que no vuelven atras."
+      title={TITLE}
+      categoria={CATEGORIA}
+      slug={SLUG}
+      desc={DESC}
+      intro={INTRO}
       guide={guide}
       faqs={faqs}
+      products={products}
+      afiliados={afiliados}
     />
   )
 }

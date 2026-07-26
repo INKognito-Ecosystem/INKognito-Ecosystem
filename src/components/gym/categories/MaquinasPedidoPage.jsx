@@ -1,8 +1,8 @@
 import { useState } from 'react'
+import { useLoaderData } from 'react-router-dom'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
-import Seo from '../../Seo'
-import { useCatalog } from '../../../hooks/useCatalog'
+import { fetchCatalogFull } from '../../../hooks/useCatalog'
 import { useGymCart } from '../../../contexts/GymCartContext'
 import { Wrench, ExternalLink } from 'lucide-react'
 import imgBancoMultiangulo from '../../../assets/imagenesgym/bancomultiangulo.jpg'
@@ -31,14 +31,30 @@ const LOCAL_IMAGES = {
   'dominadas y fondos': imgFondosDominadas,
 }
 
+export async function loader() {
+  return fetchCatalogFull('gym')
+}
+
+export function meta() {
+  const title = 'Máquinas de Gym Bajo Pedido | Soldadura Profesional — Colombia'
+  const description = 'Máquinas de gym hechas a tu medida, con soldadura profesional. Banco multiángulo, jalones, hip thrust y más. Envíos a toda Colombia desde Urabá.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/gym/maquinas-pedido` },
+  ]
+}
+
 export default function MaquinasPedidoPage() {
   const [lightbox, setLightbox] = useState(null)
-  const { allProducts: gymAllProds, loading: catalogLoading } = useCatalog('gym')
+  const { allProducts: gymAllProds } = useLoaderData()
   const apiMaquinas   = gymAllProds.filter(p => p.tipo !== 'afiliado')
   const gymAfiliados  = gymAllProds.filter(p => p.tipo === 'afiliado' && p.categoria === 'Materiales')
   const { addItem } = useGymCart()
 
-  const productosFinales = catalogLoading ? [] : apiMaquinas.map((item, i) => {
+  const productosFinales = apiMaquinas.map((item, i) => {
     const key = item.name.toLowerCase()
     return {
       id:          i + 1,
@@ -62,13 +78,6 @@ export default function MaquinasPedidoPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <Seo
-        title="Máquinas de Gym Bajo Pedido | Soldadura Profesional — Colombia"
-        description="Máquinas de gym hechas a tu medida, con soldadura profesional. Banco multiángulo, jalones, hip thrust y más. Envíos a toda Colombia desde Urabá."
-        siteName="INKognito Gym"
-        canonical={`${import.meta.env.VITE_SITE_URL}/gym/maquinas-pedido`}
-      />
-
       <NavbarGym />
 
       {/* HERO */}
@@ -95,21 +104,7 @@ export default function MaquinasPedidoPage() {
 
       {/* GRID */}
       <div className="pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto pt-6 md:pt-8">
-        {catalogLoading && (
-          <div className="flex gap-3 overflow-x-hidden">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[46vw] md:w-64 rounded-2xl bg-gray-800/40 border border-gray-800 animate-pulse">
-                <div className="aspect-video bg-gray-700 rounded-t-2xl" />
-                <div className="p-3 flex flex-col gap-2">
-                  <div className="h-2 bg-gray-700 rounded w-3/4" />
-                  <div className="h-3 bg-gray-700 rounded w-1/2" />
-                  <div className="h-6 bg-gray-700 rounded mt-1" />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-        {!catalogLoading && productosFinales.length === 0 && (
+        {productosFinales.length === 0 && (
           <div className="border border-gray-800 bg-gray-900/30 rounded-2xl py-16 text-center">
             <p className="text-gray-500 uppercase tracking-[0.25em] text-sm mb-2">Catálogo en preparación</p>
             <p className="text-gray-600 text-sm mb-6 max-w-sm mx-auto">Estamos cargando las máquinas disponibles. Mientras tanto, cuéntanos qué necesitas por WhatsApp.</p>
@@ -122,7 +117,7 @@ export default function MaquinasPedidoPage() {
             </a>
           </div>
         )}
-        <div className={`flex md:grid md:grid-cols-3 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide ${catalogLoading || productosFinales.length === 0 ? 'hidden' : ''}`}>
+        <div className={`flex md:grid md:grid-cols-3 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide ${productosFinales.length === 0 ? 'hidden' : ''}`}>
           {productosFinales.map((p) => {
             const hasImages = p.image1 || p.image2
             return (

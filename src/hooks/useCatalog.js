@@ -53,6 +53,61 @@ export function useCatalog(module, categoria = null) {
   return { categorias, allProducts, loading, error }
 }
 
+/**
+ * Versión para loader (servidor): trae el catálogo de una sola categoría ya
+ * separado en físicos/afiliados, lista para usar directo en un route module
+ * (`export async function loader() { return fetchCatalogCategoria(...) }`).
+ * No usa el cache de módulo (ese es para el cliente) — cada request de
+ * servidor es independiente.
+ */
+export async function fetchCatalogCategoria(module, categoria) {
+  try {
+    const res = await fetch(`${PANEL_URL}/api/catalog/${module}`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const data = await res.json()
+    const items = data[categoria] || []
+    return {
+      products: items.filter(p => !p.tipo || p.tipo === 'fisico'),
+      afiliados: items.filter(p => p.tipo === 'afiliado'),
+    }
+  } catch {
+    return { products: [], afiliados: [] }
+  }
+}
+
+/**
+ * Versión para loader (servidor): trae los productos de una sola categoría,
+ * sin separar físicos/afiliados (para módulos como Store/Gym que no usan ese
+ * campo `tipo`) — shape plano `{ items }`, listo para `useLoaderData()`.
+ */
+export async function fetchCatalogCategoriaItems(module, categoria) {
+  try {
+    const res = await fetch(`${PANEL_URL}/api/catalog/${module}`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const data = await res.json()
+    return { items: data[categoria] || [] }
+  } catch {
+    return { items: [] }
+  }
+}
+
+/**
+ * Versión para loader (servidor): trae el catálogo completo de un módulo,
+ * ya agrupado por categoría, en el mismo shape que produce `useCatalog`
+ * (`{ categorias, allProducts }`) — para usar en route modules tipo
+ * `SupplyPage`/`StorePage`/`GymPage` que muestran todas las categorías juntas.
+ */
+export async function fetchCatalogFull(module) {
+  try {
+    const res = await fetch(`${PANEL_URL}/api/catalog/${module}`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const categorias = await res.json()
+    return { categorias, allProducts: Object.values(categorias).flat() }
+  } catch {
+    return { categorias: {}, allProducts: [] }
+  }
+}
+
 /** Converts a catalog item to the format StoreProductCard expects */
 export function toProdCard(item) {
   const firstPrice = item.variantes?.[0]?.price

@@ -1,7 +1,18 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
-import Seo from '../../../Seo'
 import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
+
+export function meta() {
+  const title = 'Tintas Intenze | INKognito Supply — Colombia'
+  const description = 'Intenze: alta pigmentación, fórmula estéril y vegana. Zuper Black, True Black y gama completa de colores. Disponibles en Urabá, despacho a Colombia.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/ink/intenze` },
+  ]
+}
 
 const categories = [
   {
@@ -97,13 +108,6 @@ export default function IntenzeColorsPage() {
   const { addItem } = useSupplyCart()
   return (
     <div className="min-h-screen bg-black text-white">
-      <Seo
-        title="Tintas Intenze | INKognito Supply — Colombia"
-        description="Intenze: alta pigmentación, fórmula estéril y vegana. Zuper Black, True Black y gama completa de colores. Disponibles en Urabá, despacho a Colombia."
-        siteName="INKognito Supply"
-        canonical={`${import.meta.env.VITE_SITE_URL}/supply/ink/intenze`}
-      />
-
       <NavbarCategory pageName="Intenze Ink" />
 
       <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">

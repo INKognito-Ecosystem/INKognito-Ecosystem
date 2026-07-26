@@ -1,7 +1,18 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
-import Seo from '../../../Seo'
 import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
+
+export function meta() {
+  const title = 'Cartuchos EZ Tattoo | INKognito Supply — Colombia'
+  const description = 'Cartuchos EZ en RL, RS, Magnum y Curved Magnum. Excelente relación calidad-precio para realismo, black and grey y lettering. Disponibles en Urabá, Colombia.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/cartridges/ez-tattoo` },
+  ]
+}
 
 const categories = [
   {
@@ -80,13 +91,6 @@ export default function EZCartridgesPage() {
   const { addItem } = useSupplyCart()
   return (
     <div className="min-h-screen bg-black text-white">
-      <Seo
-        title="Cartuchos EZ Tattoo | INKognito Supply — Colombia"
-        description="Cartuchos EZ en RL, RS, Magnum y Curved Magnum. Excelente relación calidad-precio para realismo, black and grey y lettering. Disponibles en Urabá, Colombia."
-        siteName="INKognito Supply"
-        canonical={`${import.meta.env.VITE_SITE_URL}/supply/cartridges/ez-tattoo`}
-      />
-
       <NavbarCategory pageName="EZ Tattoo" />
 
       <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">

@@ -1,5 +1,3 @@
-import { useCatalog } from '../../hooks/useCatalog'
-
 const WA_NUMBER = '573207911013'
 
 function ProductCard({ item }) {
@@ -82,22 +80,7 @@ function ProductCard({ item }) {
   )
 }
 
-function SkeletonCard() {
-  return (
-    <div className="border border-zinc-800 bg-zinc-950 rounded-2xl overflow-hidden animate-pulse">
-      <div className="aspect-square bg-zinc-900" />
-      <div className="p-4 flex flex-col gap-3">
-        <div className="h-4 bg-zinc-800 rounded w-3/4" />
-        <div className="h-3 bg-zinc-800 rounded w-1/2" />
-        <div className="h-8 bg-zinc-800 rounded mt-2" />
-      </div>
-    </div>
-  )
-}
-
-export default function FeaturedProductsSupply() {
-  const { categorias, allProducts, loading } = useCatalog('supply')
-
+export default function FeaturedProductsSupply({ categorias = {}, allProducts = [] }) {
   return (
     <section id="productos" className="pt-12 md:pt-16 lg:pt-20 pb-4 md:pb-6 lg:pb-8 px-6 bg-gray-950">
       <div className="max-w-7xl mx-auto">
@@ -111,11 +94,7 @@ export default function FeaturedProductsSupply() {
           </p>
         </div>
 
-        {loading ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
-          </div>
-        ) : allProducts.length === 0 ? (
+        {allProducts.length === 0 ? (
           <div className="border border-blue-500/20 bg-zinc-950 rounded-2xl p-12 text-center">
             <p className="text-zinc-400 text-lg mb-2">Catálogo en actualización</p>
             <p className="text-zinc-600 text-sm mb-6">

@@ -4,10 +4,21 @@ import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
 import AccordionCard from '../../AccordionCard'
-import Seo from '../../../Seo'
 import { getAdjacentBrands } from '../../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../../hooks/useScrolled'
+
+export function meta() {
+  const title = 'Tintas Vice Colors | INKognito Supply — Colombia'
+  const description = 'Catálogo completo de Vice Colors: negros, grises, rojos, azules, pieles y más. Tintas premium para realismo y neotradicional. Disponibles en Urabá, despacho a Colombia.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/ink/vice-colors` },
+  ]
+}
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
@@ -36,12 +47,6 @@ export default function ViceColorsPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <Seo
-        title="Tintas Vice Colors | INKognito Supply — Colombia"
-        description="Catálogo completo de Vice Colors: negros, grises, rojos, azules, pieles y más. Tintas premium para realismo y neotradicional. Disponibles en Urabá, despacho a Colombia."
-        siteName="INKognito Supply"
-        canonical={`${import.meta.env.VITE_SITE_URL}/supply/ink/vice-colors`}
-      />
       <NavbarCategory pageName="Vice Colors" />
 
       {scrolled && (

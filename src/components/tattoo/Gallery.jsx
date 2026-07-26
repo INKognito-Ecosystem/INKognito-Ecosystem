@@ -25,29 +25,12 @@ const FALLBACK_ITEMS = [
   { id: 10, title: 'Sombras', img: imgRepresentativo3, category: 'Realismo' },
 ]
 
-const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
-
-export default function Gallery({ onLightboxChange = () => {} }) {
+// items llega resuelto por el loader de la ruta (src/routes/PortfolioPage.jsx)
+// — ya no se hace fetch acá adentro. Si el panel no tenía nada cargado (o
+// falló), el loader devuelve null y acá se usa el respaldo del código.
+export default function Gallery({ items: itemsFromLoader, onLightboxChange = () => {} }) {
   const [selected, setSelected] = useState(null)
-  // Fotos editables desde el panel (pestaña "Tattoo"). Si aún no hay
-  // ninguna cargada o falla la petición, se queda con las del código.
-  const [items, setItems] = useState(FALLBACK_ITEMS)
-
-  useEffect(() => {
-    fetch(`${PANEL_URL}/api/portfolio`)
-      .then(r => r.json())
-      .then(rows => {
-        if (Array.isArray(rows) && rows.length > 0) {
-          setItems(rows.map(r => ({
-            id: r.id,
-            title: r.titulo || 'Tatuaje',
-            img: r.image_url,
-            category: r.categoria || 'Realismo',
-          })))
-        }
-      })
-      .catch(() => {})
-  }, [])
+  const items = itemsFromLoader && itemsFromLoader.length > 0 ? itemsFromLoader : FALLBACK_ITEMS
 
   const openLightbox = (index) => { setSelected(index); onLightboxChange(true) }
   const closeLightbox = () => { setSelected(null); onLightboxChange(false) }

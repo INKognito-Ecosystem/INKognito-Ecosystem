@@ -4,7 +4,17 @@ import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
 import AccordionCard from '../../AccordionCard'
-import Seo from '../../../Seo'
+export function meta() {
+  const title = 'Tintas Dynamic | INKognito Supply — Colombia'
+  const description = 'Dynamic Black, Triple Black y colores clásicos. Pigmentos densos y fluidos para black and grey y estilo tradicional. Disponibles en Urabá, despacho a Colombia.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/ink/dynamic` },
+  ]
+}
 import { getAdjacentBrands } from '../../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../../hooks/useScrolled'
@@ -36,12 +46,6 @@ export default function DynamicColorsPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <Seo
-        title="Tintas Dynamic | INKognito Supply — Colombia"
-        description="Dynamic Black, Triple Black y colores clásicos. Pigmentos densos y fluidos para black and grey y estilo tradicional. Disponibles en Urabá, despacho a Colombia."
-        siteName="INKognito Supply"
-        canonical={`${import.meta.env.VITE_SITE_URL}/supply/ink/dynamic`}
-      />
       <NavbarCategory pageName="Dynamic" />
 
       {scrolled && (

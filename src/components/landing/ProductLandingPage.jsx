@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useLoaderData } from 'react-router-dom'
 import { FaWhatsapp } from 'react-icons/fa'
 import { Package, ExternalLink, Truck, Shield, MessageSquare, Zap, Globe } from 'lucide-react'
-import Seo from '../Seo'
 import EcosystemNavbar from '../ecosystem/EcosystemNavbar'
 
 const PANEL_URL  = import.meta.env.VITE_PANEL_URL
@@ -66,11 +65,37 @@ const MODULE_ACCENT = {
   dropi:       '#EC6F2D',
 }
 
+export async function loader({ params }) {
+  try {
+    const res = await fetch(`${PANEL_URL}/api/product/${params.id}`)
+    const data = await res.json()
+    if (data.error) return { product: null }
+    return { product: data }
+  } catch {
+    return { product: null }
+  }
+}
+
+export function meta({ data }) {
+  const product = data?.product
+  if (!product) {
+    return [{ title: 'Producto no encontrado | INKognito' }]
+  }
+  const title = `${product.name} | INKognito`
+  const description = product.descripcion || `${product.name} — disponible con envío a toda Colombia`
+  const imageUrl = product.variantes?.[0]?.image_url
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    ...(imageUrl ? [{ property: 'og:image', content: imageUrl }] : []),
+  ]
+}
+
 export default function ProductLandingPage() {
   const { id } = useParams()
-  const [product, setProduct]      = useState(null)
-  const [loading, setLoading]      = useState(true)
-  const [notFound, setNotFound]    = useState(false)
+  const { product } = useLoaderData()
   const [activeVariant, setActive] = useState(0)
   const [scrolled, setScrolled]    = useState(false)
 
@@ -79,17 +104,6 @@ export default function ProductLandingPage() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
-
-  useEffect(() => {
-    fetch(`${PANEL_URL}/api/product/${id}`)
-      .then(r => r.json())
-      .then(data => {
-        if (data.error) { setNotFound(true); setLoading(false); return }
-        setProduct(data)
-        setLoading(false)
-      })
-      .catch(() => { setNotFound(true); setLoading(false) })
-  }, [id])
 
   useEffect(() => {
     if (!product || typeof window.fbq !== 'function') return
@@ -103,8 +117,7 @@ export default function ProductLandingPage() {
     })
   }, [product])
 
-  if (loading)  return <div className="min-h-screen bg-black" />
-  if (notFound) return (
+  if (!product) return (
     <div className="min-h-screen bg-black flex items-center justify-center text-zinc-500 text-sm uppercase tracking-widest">
       Producto no encontrado
     </div>
@@ -155,12 +168,6 @@ export default function ProductLandingPage() {
 
   return (
     <div className="min-h-screen bg-black text-white pb-20 md:pb-0">
-      <Seo
-        title={`${product.name} | INKognito`}
-        description={product.descripcion || `${product.name} — disponible con envío a toda Colombia`}
-        image={imageUrl}
-      />
-
       <EcosystemNavbar tattooLabel="Jhumaneztattoo" logoFilter="brightness(0) invert(1)" showTagline />
 
       <div className="pt-20 max-w-5xl mx-auto px-4 py-8 md:py-16">

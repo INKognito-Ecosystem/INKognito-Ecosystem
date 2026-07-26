@@ -1,12 +1,19 @@
 import LegalPage from './LegalPage'
 
+const TITLE = 'Política de Privacidad y Cookies'
+const DESCRIPTION = 'Política de privacidad y cookies de INKognito: qué datos recolectamos, cómo usamos Google Analytics y Meta Pixel, y tus derechos como titular de datos personales.'
+
+export function meta() {
+  return [
+    { title: `${TITLE} | INKognito` },
+    { name: 'description', content: DESCRIPTION },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/privacidad` },
+  ]
+}
+
 export default function PrivacidadPage() {
   return (
-    <LegalPage
-      title="Política de Privacidad y Cookies"
-      updated="25 de julio de 2026"
-      description="Política de privacidad y cookies de INKognito: qué datos recolectamos, cómo usamos Google Analytics y Meta Pixel, y tus derechos como titular de datos personales."
-    >
+    <LegalPage title={TITLE} updated="25 de julio de 2026">
       <div>
         <h2>1. Responsable del tratamiento</h2>
         <p>

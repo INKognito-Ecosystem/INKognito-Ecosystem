@@ -4,10 +4,21 @@ import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
 import AccordionCard from '../../AccordionCard'
-import Seo from '../../../Seo'
 import { getAdjacentBrands } from '../../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../../hooks/useScrolled'
+
+export function meta() {
+  const title = 'Cartuchos WJX | INKognito Supply — Colombia'
+  const description = 'Cartuchos WJX de alta precisión para líneas y sombras. Compatibles con máquinas tipo pen. Disponibles en Urabá, Colombia.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/cartridges/wjx` },
+  ]
+}
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
@@ -39,13 +50,6 @@ export default function WJXCartridgesPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <Seo
-        title="Cartuchos WJX | INKognito Supply — Colombia"
-        description="Cartuchos WJX de alta precisión para líneas y sombras. Compatibles con máquinas tipo pen. Disponibles en Urabá, Colombia."
-        siteName="INKognito Supply"
-        canonical={`${import.meta.env.VITE_SITE_URL}/supply/cartridges/wjx`}
-      />
-
       <NavbarCategory pageName="WJX Tattoo" />
 
       {scrolled && (

@@ -1,6 +1,12 @@
+import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../../SupplyCategoryPage'
+import { fetchCatalogCategoria } from '../../../../hooks/useCatalog'
 
-const intro = `Tintas y pigmentos de alta densidad para tatuadores profesionales en Chigorodó, Urabá. Colores con alta concentración de pigmento, formulados para definición nítida, larga duración y cicatrización limpia. Disponibles en 1oz, 2oz y 4oz según existencias.`
+const TITLE = 'Tintas'
+const CATEGORIA = 'Tintas'
+const SLUG = 'ink'
+const DESC = 'Tintas y pigmentos profesionales para tatuaje en Chigorodó, Urabá. Alta densidad, larga duración. Marcas como Vice Colors, Dynamic, Eternal. Envíos a Apartadó, Turbo y toda la región.'
+const INTRO = `Tintas y pigmentos de alta densidad para tatuadores profesionales en Chigorodó, Urabá. Colores con alta concentración de pigmento, formulados para definición nítida, larga duración y cicatrización limpia. Disponibles en 1oz, 2oz y 4oz según existencias.`
 
 const guide = [
   { icon: '🎨', title: 'Negros y grises', text: 'Esenciales para realismo y sombras. Busca alta densidad para trazo limpio y negros absolutos sin dilución. Los negros de calidad mantienen el color sin desvanecer con los años.' },
@@ -19,16 +25,34 @@ const faqs = [
   { q: '¿Puedo comprar tintas individuales o solo cajas?', a: 'Vendemos por unidad y en cantidades mayores. El precio varía según volumen. Para compras de 6 unidades o más consultamos descuento especial.' },
 ]
 
+export async function loader() {
+  return fetchCatalogCategoria('supply', CATEGORIA)
+}
+
+export function meta() {
+  const title = `${TITLE} para tatuadores en Urabá | INKognito Supply — Chigorodó`
+  return [
+    { title },
+    { name: 'description', content: DESC },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: DESC },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/${SLUG}` },
+  ]
+}
+
 export default function InkPage() {
+  const { products, afiliados } = useLoaderData()
   return (
     <SupplyCategoryPage
-      title="Tintas"
-      categoria="Tintas"
-      slug="ink"
-      desc="Tintas y pigmentos profesionales para tatuaje en Chigorodó, Urabá. Alta densidad, larga duración. Marcas como Vice Colors, Dynamic, Eternal. Envíos a Apartadó, Turbo y toda la región."
-      intro={intro}
+      title={TITLE}
+      categoria={CATEGORIA}
+      slug={SLUG}
+      desc={DESC}
+      intro={INTRO}
       guide={guide}
       faqs={faqs}
+      products={products}
+      afiliados={afiliados}
     />
   )
 }

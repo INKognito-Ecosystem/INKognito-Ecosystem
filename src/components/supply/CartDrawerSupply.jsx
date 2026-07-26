@@ -22,7 +22,6 @@ export default function CartDrawerSupply({ open, onClose }) {
 
   const buildWhatsAppMessage = () => {
     const lines = items.map(i => {
-      const subtotal = (parseInt(String(i.price).replace(/[^0-9]/g, ''), 10) || 0) * i.qty
       const variante = i.brand ? ` (${i.brand})` : ''
       return `• ${i.name}${variante} — ${i.qty} und — ${i.price} c/u`
     })

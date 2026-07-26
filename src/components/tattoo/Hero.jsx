@@ -1,22 +1,10 @@
-import { useState, useEffect } from 'react'
-import heroBg from '../../assets/hero/hero-bg.webp'
 import { Link } from 'react-router-dom'
-import imgmifoto from '../../assets/mifoto/fondoperfilweb.jpg'
+import heroBg from '../../assets/hero/hero-bg.webp'
 
-const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
-
-export default function Hero() {
-  // null = todavía cargando (muestra placeholder neutro para evitar flash de imagen antigua)
-  // string = URL a mostrar (del panel o fallback estático si falla/vacío)
-  const [heroPhoto, setHeroPhoto] = useState(null)
-
-  useEffect(() => {
-    fetch(`${PANEL_URL}/api/jhumaneztattoo/hero`)
-      .then(r => r.json())
-      .then(data => setHeroPhoto(data.image_url || imgmifoto))
-      .catch(() => setHeroPhoto(imgmifoto))
-  }, [])
-
+// heroPhoto llega resuelta por el loader de la ruta (src/routes/HomePage.jsx)
+// — ya no se hace fetch acá adentro, así el servidor manda la foto real en
+// el primer HTML en vez de un placeholder que se rellena después en cliente.
+export default function Hero({ heroPhoto }) {
   return (
     <section className="relative overflow-hidden min-h-screen bg-black flex items-center justify-center pt-24 pb-12">
 

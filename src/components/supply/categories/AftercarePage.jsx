@@ -1,4 +1,12 @@
+import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../SupplyCategoryPage'
+import { fetchCatalogCategoria } from '../../../hooks/useCatalog'
+
+const TITLE = 'Cuidados'
+const CATEGORIA = 'Cuidados'
+const SLUG = 'aftercare'
+const DESC = 'Productos de cuidado y limpieza para tatuajes en Chigorodo, Uraba. Para tatuadores profesionales.'
+const INTRO = 'Un proceso limpio no solo protege al cliente. Lo que usas para cuidar el trabajo determina lo que deja tu firma.'
 
 const guide = [
   { icon: '🧴', title: 'Espuma limpiadora', text: 'Para limpiar la zona antes y durante el tatuaje. Elimina sangre sin irritar.' },
@@ -15,16 +23,34 @@ const faqs = [
   { q: 'Envios?', a: 'Si, coordinamos por WhatsApp.' },
 ]
 
+export async function loader() {
+  return fetchCatalogCategoria('supply', CATEGORIA)
+}
+
+export function meta() {
+  const title = `${TITLE} para tatuadores en Urabá | INKognito Supply — Chigorodó`
+  return [
+    { title },
+    { name: 'description', content: DESC },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: DESC },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/${SLUG}` },
+  ]
+}
+
 export default function AftercarePage() {
+  const { products, afiliados } = useLoaderData()
   return (
     <SupplyCategoryPage
-      title="Cuidados"
-      categoria="Cuidados"
-      slug="aftercare"
-      desc="Productos de cuidado y limpieza para tatuajes en Chigorodo, Uraba. Para tatuadores profesionales."
-      intro="Un proceso limpio no solo protege al cliente. Lo que usas para cuidar el trabajo determina lo que deja tu firma."
+      title={TITLE}
+      categoria={CATEGORIA}
+      slug={SLUG}
+      desc={DESC}
+      intro={INTRO}
       guide={guide}
       faqs={faqs}
+      products={products}
+      afiliados={afiliados}
     />
   )
 }

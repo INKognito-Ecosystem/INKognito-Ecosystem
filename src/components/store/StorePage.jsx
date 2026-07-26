@@ -1,12 +1,11 @@
-import { Link } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router-dom'
 import { STORE_HOURS } from '../../config/business'
 import { FaWhatsapp } from 'react-icons/fa'
 import { Truck, Shield, Clock, Star, Award, Shirt, Footprints, Sun, Trophy, Zap } from 'lucide-react'
 import NavbarStore from './NavbarStore'
 import FooterStore from './FooterStore'
 import StoreProductCard from './StoreProductCard'
-import Seo from '../Seo'
-import { useCatalog, toProdCard } from '../../hooks/useCatalog'
+import { fetchCatalogCategoriaItems, toProdCard } from '../../hooks/useCatalog'
 const ogStore = '/og/store.webp'
 
 const STRIPE_PATTERN = {
@@ -67,15 +66,6 @@ const categories = [
 const SHOE_SIZES = ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44']
 const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
 
-const cities = [
-  { name: 'Chigorodó', time: '1–2 días' },
-  { name: 'Carepa', time: '1–2 días' },
-  { name: 'Apartadó', time: '1–2 días' },
-  { name: 'Turbo', time: '2–3 días' },
-  { name: 'Mutatá', time: '2–3 días' },
-  { name: 'Arboletes', time: '3–4 días' },
-]
-
 const guarantees = [
   {
     icon: <Shield size={26} />,
@@ -126,19 +116,29 @@ const storeJsonLd = {
   "areaServed": ["Chigorodó","Apartadó","Turbo","Carepa","Mutatá","Necoclí"]
 }
 
+export async function loader() {
+  return fetchCatalogCategoriaItems('store', 'Destacados')
+}
+
+export function meta() {
+  const title = 'INKognito Store | Ropa y zapatos deportivos en Urabá'
+  const description = 'Ropa deportiva para dama y caballero, zapatos deportivos, casuales y guayos en Chigorodó y el Urabá antioqueño. Pide por WhatsApp con entrega en la región.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: `${import.meta.env.VITE_SITE_URL}${ogStore}` },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/store` },
+    { 'script:ld+json': storeJsonLd },
+  ]
+}
+
 export default function StorePage() {
-  const { allProducts: featuredItems, loading: featuredLoading } = useCatalog('store', 'Destacados')
+  const { items: featuredItems } = useLoaderData()
 
   return (
     <main className="bg-white text-gray-900">
-
-      <Seo
-        title="INKognito Store | Ropa y zapatos deportivos en Urabá"
-        description="Ropa deportiva para dama y caballero, zapatos deportivos, casuales y guayos en Chigorodó y el Urabá antioqueño. Pide por WhatsApp con entrega en la región."
-        image={ogStore}
-        canonical={`${import.meta.env.VITE_SITE_URL}/store`}
-        jsonLd={storeJsonLd}
-      />
 
       <NavbarStore />
 
@@ -261,13 +261,7 @@ export default function StorePage() {
             </h2>
           </div>
 
-          {featuredLoading ? (
-            <div className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="snap-start flex-shrink-0 w-[44vw] md:w-auto bg-gray-200 rounded-xl animate-pulse aspect-[3/4]" />
-              ))}
-            </div>
-          ) : featuredItems.length === 0 ? (
+          {featuredItems.length === 0 ? (
             <div className="border border-gray-200 rounded-xl py-10 text-center">
               <p className="text-gray-400 text-sm mb-1">Selección en preparación</p>
               <p className="text-gray-500 text-xs">Agrega productos con categoría "Destacados" desde el panel</p>

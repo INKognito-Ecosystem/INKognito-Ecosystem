@@ -1,12 +1,44 @@
-import { Link } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router-dom'
 import NavbarCategory from './NavbarCategory'
 import FooterSupply from './FooterSupply'
-import Seo from '../Seo'
-import { useCatalog } from '../../hooks/useCatalog'
 import { ExternalLink, BookOpen, Package, PlayCircle } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa'
 
 const WA = '573207911013'
+const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+
+// Trae TODO el catálogo de supply (no una sola categoría, a diferencia de
+// SupplyCategoryPage) y separa los afiliados en sus 3 secciones — el mismo
+// filtrado que antes hacía el componente en cliente con useCatalog.
+export async function loader() {
+  try {
+    const res = await fetch(`${PANEL_URL}/api/catalog/supply`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const data = await res.json()
+    const afiliados = Object.values(data).flat().filter(p => p.tipo === 'afiliado')
+    return {
+      cursos: afiliados
+        .filter(p => p.categoria === 'Cursos')
+        .sort((a, b) => (b.descripcion?.length || 0) - (a.descripcion?.length || 0)),
+      kitExt: afiliados.filter(p => p.categoria === 'Kit Externo'),
+      recursos: afiliados.filter(p => p.categoria === 'Recursos'),
+    }
+  } catch {
+    return { cursos: [], kitExt: [], recursos: [] }
+  }
+}
+
+export function meta() {
+  const title = 'Aprende a Tatuar | Cursos, Kit y Recursos — INKognito Supply'
+  const description = 'Cursos, kit y recursos para tatuadores en cualquier etapa: desde quienes empiezan hasta quienes buscan especializarse. Formación real para el oficio, en Colombia.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/aprende` },
+  ]
+}
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
@@ -15,7 +47,7 @@ const DOT_PATTERN = {
 
 // ── CARDS ─────────────────────────────────────────────────────────────────
 
-function AfiliadoCard({ item, color, accentColor }) {
+function AfiliadoCard({ item, color }) {
   const borderHover = `hover:border-${color}-500/50`
   const url = item.url_ventas || item.url_checkout
   const card = (
@@ -125,23 +157,10 @@ function SeccionAfiliados({ id, label, titulo, subtitulo, items, loading, color,
 
 // ── PÁGINA ────────────────────────────────────────────────────────────────
 export default function AprendePage() {
-  const { allProducts, loading } = useCatalog('supply')
-  const afiliados = allProducts.filter(p => p.tipo === 'afiliado')
-
-  const cursos   = afiliados
-    .filter(p => p.categoria === 'Cursos')
-    .sort((a, b) => (b.descripcion?.length || 0) - (a.descripcion?.length || 0))
-  const kitExt   = afiliados.filter(p => p.categoria === 'Kit Externo')
-  const recursos = afiliados.filter(p => p.categoria === 'Recursos')
+  const { cursos, kitExt, recursos } = useLoaderData()
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <Seo
-        title="Aprende a Tatuar | Cursos, Kit y Recursos — INKognito Supply"
-        description="Cursos, kit y recursos para tatuadores en cualquier etapa: desde quienes empiezan hasta quienes buscan especializarse. Formación real para el oficio, en Colombia."
-        siteName="INKognito Supply"
-        canonical={`${import.meta.env.VITE_SITE_URL}/supply/aprende`}
-      />
 
       <NavbarCategory pageName="Aprende a Tatuar" backPath="/supply" backLabel="Supply" />
 
@@ -176,7 +195,7 @@ export default function AprendePage() {
         titulo="Formación que se nota en tu trazo"
         subtitulo="Desde fundamentos hasta especialización en realismo, sombras y color. Acceso de por vida, a tu ritmo."
         items={cursos}
-        loading={loading}
+        loading={false}
         color="orange"
         cols="lg:grid-cols-5"
       />
@@ -186,7 +205,7 @@ export default function AprendePage() {
         titulo="El kit que respalda tu práctica"
         subtitulo="Insumos seleccionados para trabajar con seriedad, sin sobrecostos."
         items={kitExt}
-        loading={loading}
+        loading={false}
         color="blue"
         cols="lg:grid-cols-6"
       />
@@ -196,7 +215,7 @@ export default function AprendePage() {
         titulo="Recursos gratuitos"
         subtitulo="Contenido sin costo para seguir creciendo. La práctica constante es lo que realmente marca la diferencia."
         items={recursos}
-        loading={loading}
+        loading={false}
         color="green"
         cols="lg:grid-cols-4"
       />

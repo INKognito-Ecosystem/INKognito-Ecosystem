@@ -1,12 +1,19 @@
 import LegalPage from './LegalPage'
 
+const TITLE = 'Envíos, Cambios y Devoluciones'
+const DESCRIPTION = 'Política de envíos, cambios y devoluciones de INKognito Supply, Store y Gym: métodos de pago, tiempos de despacho y derecho de retracto.'
+
+export function meta() {
+  return [
+    { title: `${TITLE} | INKognito` },
+    { name: 'description', content: DESCRIPTION },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/envios-cambios-devoluciones` },
+  ]
+}
+
 export default function EnviosPage() {
   return (
-    <LegalPage
-      title="Envíos, Cambios y Devoluciones"
-      updated="25 de julio de 2026"
-      description="Política de envíos, cambios y devoluciones de INKognito Supply, Store y Gym: métodos de pago, tiempos de despacho y derecho de retracto."
-    >
+    <LegalPage title={TITLE} updated="25 de julio de 2026">
       <div>
         <p>
           Aplica a los módulos Supply, Store y Gym/Suplementos (venta de producto físico). No aplica al

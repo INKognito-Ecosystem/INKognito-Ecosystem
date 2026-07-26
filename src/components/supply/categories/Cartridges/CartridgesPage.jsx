@@ -1,6 +1,12 @@
+import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../../SupplyCategoryPage'
+import { fetchCatalogCategoria } from '../../../../hooks/useCatalog'
 
-const intro = `Cartuchos profesionales para máquinas rotativas en Chigorodó, Urabá. Agujas encapsuladas con membrana de seguridad, flujo de tinta controlado y punta de precisión. Compatible con la mayoría de máquinas rotativas del mercado.`
+const TITLE = 'Cartuchos'
+const CATEGORIA = 'Cartuchos'
+const SLUG = 'cartridges'
+const DESC = 'Cartuchos para tatuar en Chigorodó, Urabá. Liner, shader, magnum y bugpin. Con membrana de seguridad. Compatibles con rotativas. Envíos a Apartadó, Turbo, Carepa y toda la región.'
+const INTRO = `Cartuchos profesionales para máquinas rotativas en Chigorodó, Urabá. Agujas encapsuladas con membrana de seguridad, flujo de tinta controlado y punta de precisión. Compatible con la mayoría de máquinas rotativas del mercado.`
 
 const guide = [
   { icon: '📐', title: 'Liner (RL)', text: 'Redondas en línea. Para trazos finos, contornos y trabajo en línea. Cuanto menor el número, más fino el trazo. Los RL3 y RL5 son los más versátiles.' },
@@ -19,16 +25,34 @@ const faqs = [
   { q: '¿Hacen envíos fuera de Chigorodó?', a: 'Sí, a toda la región de Urabá: Apartadó, Turbo, Carepa, Mutatá, Arboletes. Coordinamos envío por WhatsApp.' },
 ]
 
+export async function loader() {
+  return fetchCatalogCategoria('supply', CATEGORIA)
+}
+
+export function meta() {
+  const title = `${TITLE} para tatuadores en Urabá | INKognito Supply — Chigorodó`
+  return [
+    { title },
+    { name: 'description', content: DESC },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: DESC },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/${SLUG}` },
+  ]
+}
+
 export default function CartridgesPage() {
+  const { products, afiliados } = useLoaderData()
   return (
     <SupplyCategoryPage
-      title="Cartuchos"
-      categoria="Cartuchos"
-      slug="cartridges"
-      desc="Cartuchos para tatuar en Chigorodó, Urabá. Liner, shader, magnum y bugpin. Con membrana de seguridad. Compatibles con rotativas. Envíos a Apartadó, Turbo, Carepa y toda la región."
-      intro={intro}
+      title={TITLE}
+      categoria={CATEGORIA}
+      slug={SLUG}
+      desc={DESC}
+      intro={INTRO}
       guide={guide}
       faqs={faqs}
+      products={products}
+      afiliados={afiliados}
     />
   )
 }

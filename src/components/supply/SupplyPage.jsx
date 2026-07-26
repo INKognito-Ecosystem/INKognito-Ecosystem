@@ -1,10 +1,11 @@
+import { useLoaderData } from 'react-router-dom'
 import NavbarSupply from './NavbarSupply'
 import HeroSupply from './HeroSupply'
 import CategoriesSupply from './CategoriesSupply'
 import BrandsSupply from './BrandsSupply'
 import FooterSupply from './FooterSupply'
 import { FaWhatsapp } from 'react-icons/fa'
-import Seo from '../Seo'
+import { fetchCatalogFull } from '../../hooks/useCatalog'
 const ogSupply = '/og/supply.webp'
 
 const DOT_PATTERN = {
@@ -31,20 +32,30 @@ const supplyJsonLd = {
   "areaServed": ["Chigorodó","Apartadó","Turbo","Carepa","Mutatá","Colombia por solicitud"]
 }
 
+export async function loader() {
+  return fetchCatalogFull('supply')
+}
+
+export function meta() {
+  const title = 'INKognito Supply | Insumos y equipos para tatuaje en Urabá'
+  const description = 'Máquinas, cartuchos, tintas, agujas y accesorios profesionales para tatuadores. Con base en Urabá (Apartadó, Turbo, Carepa). Despacho a otras ciudades de Colombia por solicitud. Pedidos por WhatsApp.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: `${import.meta.env.VITE_SITE_URL}${ogSupply}` },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply` },
+    { 'script:ld+json': supplyJsonLd },
+  ]
+}
+
 export default function SupplyPage() {
+  const { categorias } = useLoaderData()
 
   return (
 
     <main className="bg-gray-950 text-white">
-
-    <Seo
-      title="INKognito Supply | Insumos y equipos para tatuaje en Urabá"
-      description="Máquinas, cartuchos, tintas, agujas y accesorios profesionales para tatuadores. Con base en Urabá (Apartadó, Turbo, Carepa). Despacho a otras ciudades de Colombia por solicitud. Pedidos por WhatsApp."
-      image={ogSupply}
-      siteName="INKognito Supply"
-      canonical={`${import.meta.env.VITE_SITE_URL}/supply`}
-      jsonLd={supplyJsonLd}
-    />
 
     <NavbarSupply />
 
@@ -54,7 +65,7 @@ export default function SupplyPage() {
   <div className="border-b border-zinc-900"></div>
 </div>
 
-<CategoriesSupply />
+<CategoriesSupply categorias={categorias} />
 
     <BrandsSupply />
 
@@ -290,3 +301,4 @@ export default function SupplyPage() {
   )
 
 }
+

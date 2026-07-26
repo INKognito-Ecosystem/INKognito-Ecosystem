@@ -1,7 +1,18 @@
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
-import Seo from '../../../Seo'
 import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
+
+export function meta() {
+  const title = 'Tintas Eternal Ink | INKognito Supply — Colombia'
+  const description = 'Eternal Ink: base acuosa, sin acrílicos, paleta extensa de colores y negros. Cicatrización limpia y brillo duradero. Disponibles en Urabá, despacho a Colombia.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/ink/eternal` },
+  ]
+}
 
 const categories = [
   {
@@ -80,12 +91,6 @@ export default function EternalColorsPage() {
   const { addItem } = useSupplyCart()
   return (
     <div className="min-h-screen bg-black text-white">
-      <Seo
-        title="Tintas Eternal Ink | INKognito Supply — Colombia"
-        description="Eternal Ink: base acuosa, sin acrílicos, paleta extensa de colores y negros. Cicatrización limpia y brillo duradero. Disponibles en Urabá, despacho a Colombia."
-        siteName="INKognito Supply"
-        canonical={`${import.meta.env.VITE_SITE_URL}/supply/ink/eternal`}
-      />
       <NavbarCategory pageName="Eternal Ink" />
 
       <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">

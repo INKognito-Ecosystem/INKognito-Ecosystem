@@ -1,9 +1,9 @@
+import { useLoaderData } from 'react-router-dom'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
-import Seo from '../../Seo'
 import { FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa'
 import { BookOpen } from 'lucide-react'
-import { useCatalog } from '../../../hooks/useCatalog'
+import { fetchCatalogCategoriaItems } from '../../../hooks/useCatalog'
 
 const GRID_PATTERN = {
   backgroundImage:
@@ -12,18 +12,27 @@ const GRID_PATTERN = {
 
 const WA = '573207911013'
 
+export async function loader() {
+  return fetchCatalogCategoriaItems('gym', 'Recursos')
+}
+
+export function meta() {
+  const title = 'Recursos Gratis | Ebooks de Entrenamiento y Desarrollo Personal — INKognito Gym'
+  const description = 'Descarga gratis ebooks sobre hábitos, disciplina y rutinas de entrenamiento sin equipo. Recursos de INKognito Gym.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/gym/recursos` },
+  ]
+}
+
 export default function RecursosPage() {
-  const { allProducts: ebooks, loading } = useCatalog('gym', 'Recursos')
+  const { items: ebooks } = useLoaderData()
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <Seo
-        title="Recursos Gratis | Ebooks de Entrenamiento y Desarrollo Personal — INKognito Gym"
-        description="Descarga gratis ebooks sobre hábitos, disciplina y rutinas de entrenamiento sin equipo. Recursos de INKognito Gym."
-        siteName="INKognito Gym"
-        canonical={`${import.meta.env.VITE_SITE_URL}/gym/recursos`}
-      />
-
       <NavbarGym />
 
       {/* HERO */}
@@ -51,13 +60,7 @@ export default function RecursosPage() {
 
       {/* GRID DE EBOOKS */}
       <div className="pb-8 md:pb-14 px-4 md:px-6 max-w-xl mx-auto pt-6 md:pt-8">
-        {loading ? (
-          <div className="grid grid-cols-2 gap-3">
-            {[...Array(2)].map((_, i) => (
-              <div key={i} className="rounded-xl bg-gray-800/40 border border-gray-800 animate-pulse aspect-[3/4]" />
-            ))}
-          </div>
-        ) : ebooks.length > 0 ? (
+        {ebooks.length > 0 ? (
           <div className="grid grid-cols-2 gap-3">
             {ebooks.map((eb) => {
               const url = eb.url_ventas || eb.url_checkout || '#'

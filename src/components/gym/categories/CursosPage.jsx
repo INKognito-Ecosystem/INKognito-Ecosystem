@@ -1,23 +1,32 @@
+import { useLoaderData } from 'react-router-dom'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
-import Seo from '../../Seo'
 import { GraduationCap } from 'lucide-react'
-import { useCatalog } from '../../../hooks/useCatalog'
+import { fetchCatalogCategoriaItems } from '../../../hooks/useCatalog'
 
 const WA = '573207911013'
 
+export async function loader() {
+  return fetchCatalogCategoriaItems('gym', 'Cursos')
+}
+
+export function meta() {
+  const title = 'Cursos de Entrenamiento en Casa y Fitness | Colombia'
+  const description = 'Cursos recomendados de entrenamiento en casa, nutrición y desarrollo personal. Selección de los mejores cursos en español disponibles en Hotmart.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/gym/cursos` },
+  ]
+}
+
 export default function CursosPage() {
-  const { allProducts: cursos, loading } = useCatalog('gym', 'Cursos')
+  const { items: cursos } = useLoaderData()
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <Seo
-        title="Cursos de Entrenamiento en Casa y Fitness | Colombia"
-        description="Cursos recomendados de entrenamiento en casa, nutrición y desarrollo personal. Selección de los mejores cursos en español disponibles en Hotmart."
-        siteName="INKognito Gym"
-        canonical={`${import.meta.env.VITE_SITE_URL}/gym/cursos`}
-      />
-
       <NavbarGym />
 
       {/* HERO */}
@@ -47,14 +56,7 @@ export default function CursosPage() {
       </section>
 
       <div className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto pt-6 md:pt-8">
-        {loading && (
-          <div className="flex md:grid md:grid-cols-2 gap-4 overflow-x-hidden">
-            {[...Array(2)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[72vw] md:w-auto rounded-2xl bg-gray-800/40 border border-gray-800 p-5 animate-pulse h-40" />
-            ))}
-          </div>
-        )}
-        {!loading && (cursos.length > 0 ? (
+        {cursos.length > 0 ? (
           <div className="flex md:grid md:grid-cols-2 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
             {cursos.map((curso) => {
               const url = curso.url_ventas || curso.url_checkout || '#'
@@ -103,7 +105,7 @@ export default function CursosPage() {
               Avisarme cuando haya stock →
             </a>
           </div>
-        ))}
+        )}
       </div>
 
       <FooterGym />
