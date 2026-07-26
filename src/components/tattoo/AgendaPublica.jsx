@@ -380,18 +380,17 @@ export default function AgendaPublica() {
               Esto reserva tu fecha — el precio y el anticipo se confirman contigo directamente después.
             </p>
 
-            <p className="text-gray-500 text-xs text-center pt-2 border-t border-gray-800">
-              ¿Estás enredado o prefieres explicarlo con tus palabras?{' '}
+            <div className="pt-3 border-t border-gray-800 text-center">
               <a
                 href={WA_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-green-500 hover:text-green-400 font-semibold inline-flex items-center gap-1"
+                className="text-gray-500 hover:text-green-500 text-xs font-medium inline-flex items-center gap-1.5 transition-colors"
               >
                 <FaWhatsapp size={14} />
-                Agenda por WhatsApp
+                Prefiero coordinarlo por WhatsApp
               </a>
-            </p>
+            </div>
 
         </form>
       </div>
