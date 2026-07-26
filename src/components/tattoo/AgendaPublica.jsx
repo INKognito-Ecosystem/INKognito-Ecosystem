@@ -189,7 +189,7 @@ export default function AgendaPublica() {
           Agenda tu <span className="text-zinc-600">Cita</span>
         </h2>
         <p className="text-gray-500 text-sm text-center max-w-md mx-auto mb-8">
-          Todos los campos son obligatorios: son los que nos permiten darte un precio exacto antes de tu cita, sin ida y vuelta de mensajes.
+          Todos los campos son obligatorios: son los que nos permiten darte un precio exacto antes de tu cita.
         </p>
 
         <form onSubmit={enviar} className="max-w-md mx-auto space-y-4 bg-zinc-950 border border-gray-800 rounded-xl p-6 md:p-8">
