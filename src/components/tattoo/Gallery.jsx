@@ -115,17 +115,20 @@ export default function Gallery({ items: itemsFromLoader, onLightboxChange = () 
           ))}
         </div>
 
-        {/* CIERRE ESTRATEGICO */}
-        <div className={compact ? 'text-center mt-8 md:mt-12 max-w-2xl mx-auto px-2' : 'text-center mt-12 md:mt-20 max-w-2xl mx-auto px-2'}>
-          <div className="h-1 w-20 bg-zinc-600 mx-auto mb-6"></div>
-          <h3 className="text-2xl md:text-3xl font-black uppercase italic mb-4">
-            ¿Ya tienes una idea en mente?
-          </h3>
-          <p className="text-gray-400 text-base md:text-lg leading-relaxed font-light">
-            Cada proyecto empieza con una buena conversación. Cuéntame qué quieres tatuarte
-            y trabajemos juntos en una pieza que se vea tan bien en años como el día que saliste del estudio.
-          </p>
-        </div>
+        {/* CIERRE ESTRATEGICO — en compact (landing de pauta) esto vive
+            fusionado con el formulario en AgendaPublica.jsx, no acá. */}
+        {!compact && (
+          <div className="text-center mt-12 md:mt-20 max-w-2xl mx-auto px-2">
+            <div className="h-1 w-20 bg-zinc-600 mx-auto mb-6"></div>
+            <h3 className="text-2xl md:text-3xl font-black uppercase italic mb-4">
+              ¿Ya tienes una idea en mente?
+            </h3>
+            <p className="text-gray-400 text-base md:text-lg leading-relaxed font-light">
+              Cada proyecto empieza con una buena conversación. Cuéntame qué quieres tatuarte
+              y trabajemos juntos en una pieza que se vea tan bien en años como el día que saliste del estudio.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* LIGHTBOX */}
