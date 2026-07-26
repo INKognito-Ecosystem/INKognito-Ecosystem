@@ -1,12 +1,29 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { ChevronLeft, ChevronRight, CheckCircle2, Calendar } from 'lucide-react'
+import { ChevronLeft, ChevronRight, CheckCircle2, Calendar, ImagePlus, X } from 'lucide-react'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+
+// Mismo Cloudinary (unsigned upload) que ya usa el panel para portafolio/
+// inventario — valores públicos por diseño (un preset "unsigned" está pensado
+// para vivir en un cliente, se restringe del lado de Cloudinary, no es secreto).
+const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dsywlttay'
+const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'inkognito-inventario'
 
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 const DIAS_SEMANA = ['L','M','X','J','V','S','D']
 
 const toISO = (d) => d.toISOString().split('T')[0]
+
+async function subirImagenReferencia(file) {
+  const fd = new FormData()
+  fd.append('file', file)
+  fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET)
+  fd.append('folder', 'inkognito-citas-referencias')
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: fd })
+  const data = await res.json()
+  if (!data.secure_url) throw new Error(data.error?.message || 'Error al subir la imagen')
+  return data.secure_url.includes('/upload/') ? data.secure_url.replace('/upload/', '/upload/f_auto,q_auto/') : data.secure_url
+}
 
 // Formulario de agendamiento directo desde la web — sin pasar por WhatsApp.
 // Pensado para mientras Kapso/Twilio no estén operativos (2026-07-26): la
@@ -21,7 +38,35 @@ export default function AgendaPublica() {
   const [calendarOpen, setCalendarOpen] = useState(false)
   const [estado, setEstado] = useState('idle') // idle | enviando | ok | error
   const [errorMsg, setErrorMsg] = useState('')
+  const [refImageUrl, setRefImageUrl] = useState(null)
+  const [refImagePreview, setRefImagePreview] = useState(null)
+  const [subiendoImagen, setSubiendoImagen] = useState(false)
+  const [errorImagen, setErrorImagen] = useState('')
   const calendarRef = useRef(null)
+
+  const onFileChange = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setErrorImagen('')
+    setRefImagePreview((prev) => { if (prev) URL.revokeObjectURL(prev); return URL.createObjectURL(file) })
+    setRefImageUrl(null)
+    setSubiendoImagen(true)
+    try {
+      const url = await subirImagenReferencia(file)
+      setRefImageUrl(url)
+    } catch {
+      setErrorImagen('No se pudo subir la imagen. Puedes intentar con otra foto o continuar sin ella.')
+      setRefImagePreview((prev) => { if (prev) URL.revokeObjectURL(prev); return null })
+    } finally {
+      setSubiendoImagen(false)
+    }
+  }
+
+  const quitarImagen = () => {
+    setRefImagePreview((prev) => { if (prev) URL.revokeObjectURL(prev); return null })
+    setRefImageUrl(null)
+    setErrorImagen('')
+  }
 
   // Cierra el desplegable al hacer clic afuera — mismo patrón que cualquier
   // selector tipo dropdown.
@@ -81,7 +126,7 @@ export default function AgendaPublica() {
       const res = await fetch(`${PANEL_URL}/api/appointments/publica`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, session_date: toISO(selectedDate) }),
+        body: JSON.stringify({ ...form, session_date: toISO(selectedDate), reference_image_url: refImageUrl }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
@@ -229,6 +274,33 @@ export default function AgendaPublica() {
               className="w-full bg-zinc-900 border border-gray-700 text-white p-3.5 rounded outline-none placeholder:text-gray-600"
             />
 
+            {/* FOTO DE REFERENCIA — opcional, sube directo a Cloudinary desde
+                el navegador del cliente y llega lista para verse en el panel. */}
+            <div>
+              {refImagePreview ? (
+                <div className="relative inline-block">
+                  <img src={refImagePreview} alt="Referencia" className="h-24 w-24 object-cover rounded border border-gray-700" />
+                  {subiendoImagen && (
+                    <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center text-[10px] text-gray-300">Subiendo...</div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={quitarImagen}
+                    className="absolute -top-2 -right-2 bg-zinc-800 border border-gray-600 rounded-full p-1 hover:bg-zinc-700"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ) : (
+                <label className="w-full flex items-center justify-center gap-2 bg-zinc-900 border border-dashed border-gray-700 text-gray-500 p-3.5 rounded cursor-pointer hover:border-gray-500 hover:text-gray-400 transition-colors">
+                  <ImagePlus size={16} />
+                  <span className="text-sm">Agregar foto de referencia (opcional)</span>
+                  <input type="file" accept="image/*" onChange={onFileChange} className="hidden" />
+                </label>
+              )}
+              {errorImagen && <p className="text-red-500 text-xs mt-1">{errorImagen}</p>}
+            </div>
+
             <select
               value={form.hora_preferida}
               onChange={e => update('hora_preferida', e.target.value)}
@@ -261,10 +333,10 @@ export default function AgendaPublica() {
 
             <button
               type="submit"
-              disabled={estado === 'enviando' || !selectedDate || !form.size || !form.client_name || !form.client_phone}
+              disabled={estado === 'enviando' || subiendoImagen || !selectedDate || !form.size || !form.client_name || !form.client_phone}
               className="w-full bg-green-600 text-white font-black py-4 rounded uppercase tracking-widest hover:bg-green-500 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {estado === 'enviando' ? 'Enviando...' : 'Enviar solicitud de cita'}
+              {estado === 'enviando' ? 'Enviando...' : subiendoImagen ? 'Subiendo imagen...' : 'Enviar solicitud de cita'}
             </button>
             <p className="text-gray-600 text-[11px] text-center leading-relaxed">
               Esto reserva tu fecha — el precio y el anticipo se confirman contigo directamente después.
