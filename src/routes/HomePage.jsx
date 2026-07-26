@@ -78,7 +78,7 @@ export default function HomePage() {
   const [tamano, setTamano] = useState('')
 
   return (
-    <>
+    <div className="bg-black text-white">
       {/* El meta() de arriba ya cubre SSR para esta ruta — no se renderiza
           <Seo>/<Helmet> acá para evitar que las dos mecánicas escriban el
           <head> a la vez (eso rompía la hidratación: React esperaba los tags
@@ -86,6 +86,10 @@ export default function HomePage() {
           agrega por su cuenta del lado del cliente). El resto del sitio, que
           todavía no tiene meta(), sigue usando <Seo> normalmente. */}
 
+      {/* bg-black/text-white acá (antes era un Fragment sin wrapper): About.jsx
+          y CuidadosTeaser.jsx no traen su propio color de fondo/texto completo,
+          asumían un ancestro oscuro que nunca existió — se veían con fondo
+          blanco y texto invisible (negro sobre negro) por esto. */}
       <Navbar />
       <Hero heroPhoto={heroPhoto} />
       <About />
@@ -100,6 +104,6 @@ export default function HomePage() {
 
       <Footer />
       <WhatsAppFloat />
-    </>
+    </div>
   )
 }

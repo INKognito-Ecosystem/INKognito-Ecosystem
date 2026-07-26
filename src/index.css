@@ -1,10 +1,15 @@
 @import "tailwindcss";
 
-:root {
-
---color-tattoo-dark: #121212;
---color-tattoo-accent: #d4af37;
+/* Tailwind v4: los colores custom deben ir dentro de @theme para que se
+   generen las clases (bg-tattoo-dark, text-tattoo-accent, etc). Declararlos
+   solo como variable en :root define el custom property pero NO registra
+   el token — esas clases no generaban ningún CSS y quedaban sin efecto
+   (Testimonials.jsx se veía blanco/gris por esto). */
+@theme {
+  --color-tattoo-dark: #121212;
+  --color-tattoo-accent: #d4af37;
 }
+
 html {
   scroll-behavior: smooth;
 }

@@ -144,7 +144,7 @@ export default function CuidadosPage() {
       {/* VOLVER */}
       <div className="pt-24 px-4 max-w-7xl mx-auto">
         <Link
-          to="/jhumaneztattoo"
+          to="/jhumaneztattoo#cuidados"
           className="inline-flex items-center gap-2 text-zinc-400 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors"
         >
           <ArrowLeft size={16} />
