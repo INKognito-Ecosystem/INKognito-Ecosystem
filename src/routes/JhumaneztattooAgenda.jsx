@@ -3,7 +3,6 @@ import { useLoaderData, Link } from 'react-router'
 import { MapPin, Palette, Clock, CalendarCheck, X } from 'lucide-react'
 import Gallery from '../components/tattoo/Gallery'
 import AgendaPublica from '../components/tattoo/AgendaPublica'
-import WhatsAppFloat from '../components/tattoo/WhatsAppFloat'
 import { ABOUT_PARAGRAPHS, ABOUT_QUOTE } from '../components/tattoo/About'
 import heroBg from '../assets/about/about-bg.webp'
 
@@ -80,7 +79,7 @@ function trackLeadClick() {
 
 export default function JhumaneztattooAgenda() {
   const { heroPhoto, items } = useLoaderData()
-  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [, setLightboxOpen] = useState(false)
   const [sobreMiOpen, setSobreMiOpen] = useState(false)
 
   return (
@@ -197,8 +196,6 @@ export default function JhumaneztattooAgenda() {
           </div>
         </div>
       </footer>
-
-      <WhatsAppFloat hidden={lightboxOpen} />
     </div>
   )
 }

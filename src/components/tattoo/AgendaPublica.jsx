@@ -1,5 +1,9 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { ChevronLeft, ChevronRight, CheckCircle2, Calendar, ImagePlus, X } from 'lucide-react'
+import { FaWhatsapp } from 'react-icons/fa'
+import { WHATSAPP } from '../../config/business'
+
+const WA_LINK = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola Jose, quiero agendar/cotizar un tatuaje')}`
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
@@ -33,7 +37,7 @@ async function subirImagenReferencia(file) {
 export default function AgendaPublica() {
   const [disponibilidad, setDisponibilidad] = useState({})
   const [monthOffset, setMonthOffset] = useState(0)
-  const [form, setForm] = useState({ client_name: '', client_phone: '', design: '', location: '', size: '', hora_preferida: '' })
+  const [form, setForm] = useState({ client_name: '', client_phone: '', design: '', location: '', locationOtro: '', size: '', hora_preferida: '' })
   const [selectedDate, setSelectedDate] = useState(null)
   const [calendarOpen, setCalendarOpen] = useState(false)
   const [estado, setEstado] = useState('idle') // idle | enviando | ok | error
@@ -117,16 +121,31 @@ export default function AgendaPublica() {
     return 'libre'
   }
 
+  const locationFinal = form.location === 'Otra' ? form.locationOtro.trim() : form.location
+  const formCompleto = Boolean(
+    form.client_name && form.client_phone && form.size && selectedDate
+    && locationFinal && form.design.trim() && form.hora_preferida && refImageUrl
+  )
+
   const enviar = async (e) => {
     e.preventDefault()
-    if (!form.client_name || !form.client_phone || !form.size || !selectedDate) return
+    if (!formCompleto) return
     setEstado('enviando')
     setErrorMsg('')
     try {
       const res = await fetch(`${PANEL_URL}/api/appointments/publica`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, session_date: toISO(selectedDate), reference_image_url: refImageUrl }),
+        body: JSON.stringify({
+          client_name: form.client_name,
+          client_phone: form.client_phone,
+          design: form.design,
+          location: locationFinal,
+          size: form.size,
+          hora_preferida: form.hora_preferida,
+          session_date: toISO(selectedDate),
+          reference_image_url: refImageUrl,
+        }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
@@ -166,9 +185,12 @@ export default function AgendaPublica() {
   return (
     <section id="contacto" className="py-10 md:py-16 px-4 bg-black border-t border-white/5">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl md:text-5xl font-black uppercase italic mb-8 text-center">
+        <h2 className="text-3xl md:text-5xl font-black uppercase italic mb-3 text-center">
           Agenda tu <span className="text-zinc-600">Cita</span>
         </h2>
+        <p className="text-gray-500 text-sm text-center max-w-md mx-auto mb-8">
+          Todos los campos son obligatorios: son los que nos permiten darte un precio exacto antes de tu cita, sin ida y vuelta de mensajes.
+        </p>
 
         <form onSubmit={enviar} className="max-w-md mx-auto space-y-4 bg-zinc-950 border border-gray-800 rounded-xl p-6 md:p-8">
 
@@ -257,25 +279,40 @@ export default function AgendaPublica() {
             <select
               value={form.location}
               onChange={e => update('location', e.target.value)}
+              required
               className="w-full bg-zinc-900 border border-gray-700 text-white p-3.5 rounded outline-none"
             >
-              <option value="">¿Zona del cuerpo?</option>
+              <option value="">¿Zona del cuerpo? *</option>
               <option value="Brazo">Brazo</option>
               <option value="Pierna">Pierna</option>
               <option value="Pecho">Pecho</option>
               <option value="Espalda">Espalda</option>
+              <option value="Otra">Otra</option>
             </select>
+
+            {form.location === 'Otra' && (
+              <input
+                type="text"
+                value={form.locationOtro}
+                onChange={e => update('locationOtro', e.target.value)}
+                placeholder="¿Qué zona? *"
+                required
+                className="w-full bg-zinc-900 border border-gray-700 text-white p-3.5 rounded outline-none placeholder:text-gray-600"
+              />
+            )}
 
             <input
               type="text"
               value={form.design}
               onChange={e => update('design', e.target.value)}
-              placeholder="Describe brevemente la idea"
+              placeholder="Describe brevemente la idea *"
+              required
               className="w-full bg-zinc-900 border border-gray-700 text-white p-3.5 rounded outline-none placeholder:text-gray-600"
             />
 
-            {/* FOTO DE REFERENCIA — opcional, sube directo a Cloudinary desde
-                el navegador del cliente y llega lista para verse en el panel. */}
+            {/* FOTO DE REFERENCIA — obligatoria: es la que nos permite dar un
+                precio exacto sin tener que pedirla después. Sube directo a
+                Cloudinary desde el navegador del cliente. */}
             <div>
               {refImagePreview ? (
                 <div className="relative inline-block">
@@ -294,7 +331,7 @@ export default function AgendaPublica() {
               ) : (
                 <label className="w-full flex items-center justify-center gap-2 bg-zinc-900 border border-dashed border-gray-700 text-gray-500 p-3.5 rounded cursor-pointer hover:border-gray-500 hover:text-gray-400 transition-colors">
                   <ImagePlus size={16} />
-                  <span className="text-sm">Agregar foto de referencia</span>
+                  <span className="text-sm">Agregar foto de referencia *</span>
                   <input type="file" accept="image/*" onChange={onFileChange} className="hidden" />
                 </label>
               )}
@@ -304,9 +341,10 @@ export default function AgendaPublica() {
             <select
               value={form.hora_preferida}
               onChange={e => update('hora_preferida', e.target.value)}
+              required
               className="w-full bg-zinc-900 border border-gray-700 text-white p-3.5 rounded outline-none"
             >
-              <option value="">¿Horario preferido? (opcional)</option>
+              <option value="">¿Horario preferido? *</option>
               <option value="Mañana">Mañana</option>
               <option value="Tarde">Tarde</option>
             </select>
@@ -333,13 +371,26 @@ export default function AgendaPublica() {
 
             <button
               type="submit"
-              disabled={estado === 'enviando' || subiendoImagen || !selectedDate || !form.size || !form.client_name || !form.client_phone}
+              disabled={estado === 'enviando' || subiendoImagen || !formCompleto}
               className="w-full bg-green-600 text-white font-black py-4 rounded uppercase tracking-widest hover:bg-green-500 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {estado === 'enviando' ? 'Enviando...' : subiendoImagen ? 'Subiendo imagen...' : 'Enviar solicitud de cita'}
             </button>
             <p className="text-gray-600 text-[11px] text-center leading-relaxed">
               Esto reserva tu fecha — el precio y el anticipo se confirman contigo directamente después.
+            </p>
+
+            <p className="text-gray-500 text-xs text-center pt-2 border-t border-gray-800">
+              ¿Estás enredado o prefieres explicarlo con tus palabras?{' '}
+              <a
+                href={WA_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-green-500 hover:text-green-400 font-semibold inline-flex items-center gap-1"
+              >
+                <FaWhatsapp size={14} />
+                Agenda por WhatsApp
+              </a>
             </p>
 
         </form>
