@@ -13,3 +13,13 @@
 html {
   scroll-behavior: smooth;
 }
+
+/* Barra de progreso de navegación (root.jsx NavigationProgress) — indeterminada,
+   se desliza mientras dura la transición de ruta. */
+@keyframes nav-progress-slide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+.animate-nav-progress {
+  animation: nav-progress-slide 0.9s ease-in-out infinite;
+}

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect } from 'react'
-import { Meta, Links, Outlet, Scripts, ScrollRestoration, useLocation } from 'react-router'
+import { Meta, Links, Outlet, Scripts, ScrollRestoration, useLocation, useNavigation } from 'react-router'
 import { HelmetProvider } from 'react-helmet-async'
 import { SupplyCartProvider } from './contexts/SupplyCartContext'
 import { StoreCartProvider } from './contexts/StoreCartContext'
@@ -130,6 +130,22 @@ function ScrollToHash() {
   return null
 }
 
+// Feedback inmediato al hacer clic en un <Link> — sin esto, cualquier ruta
+// con loader() que pega a la API del panel (Railway) se sentía "pegada": el
+// clic sí se registraba, pero no había NINGUNA señal visual hasta que el
+// fetch del loader terminaba, así que parecía que el botón no había hecho
+// nada. useNavigation().state cambia a 'loading' de forma síncrona apenas
+// arranca la transición, antes de que resuelva el loader.
+function NavigationProgress() {
+  const navigation = useNavigation()
+  if (navigation.state === 'idle') return null
+  return (
+    <div className="fixed top-0 left-0 right-0 h-[3px] z-[9999] overflow-hidden bg-black/10">
+      <div className="h-full w-1/3 bg-red-600 animate-nav-progress" />
+    </div>
+  )
+}
+
 // GA4 y Meta Pixel se cargan acá (efecto post-hidratación), NO como <script>
 // en Layout/<head> — el snippet del Pixel se inserta a sí mismo un
 // <script src=fbevents.js> nuevo vía document.createElement/insertBefore, y
@@ -182,6 +198,7 @@ export default function Root() {
         <StoreCartProvider>
           <GymCartProvider>
             <ScrollToHash />
+            <NavigationProgress />
             <Outlet />
           </GymCartProvider>
         </StoreCartProvider>
