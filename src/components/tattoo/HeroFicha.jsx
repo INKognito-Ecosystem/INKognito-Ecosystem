@@ -1,6 +1,7 @@
 import { FaInstagram, FaFacebookF } from 'react-icons/fa'
-import { MapPin, Palette, Clock, CalendarCheck } from 'lucide-react'
-import heroBg from '../../assets/about/about-bg.webp'
+import { MapPin, Palette, Clock, CalendarCheck, Award } from 'lucide-react'
+import heroBgMobile from '../../assets/about/about-bg.webp'
+import heroBgDesktop from '../../assets/hero/hero-bg.webp'
 
 const ANOS_EXPERIENCIA = new Date().getFullYear() - 2019 // estudio abierto desde 2019 (ver Footer.jsx)
 
@@ -20,10 +21,19 @@ function trackLeadClick() {
 export default function HeroFicha({ heroPhoto, secondaryButton }) {
   return (
     <section className="relative overflow-hidden min-h-screen bg-black flex items-center justify-center pt-12 pb-12">
+      {/* Fondo distinto en PC — la landing y /jhumaneztattoo comparten el
+          resto del hero, pero en desktop se vuelve a la imagen original de
+          /jhumaneztattoo (hero-bg.webp) en vez de la de la landing. En móvil
+          ambas páginas siguen con about-bg.webp. */}
       <img
-        src={heroBg}
+        src={heroBgMobile}
         alt=""
-        className="absolute inset-0 w-full h-full object-cover opacity-70 brightness-50 scale-105"
+        className="absolute inset-0 w-full h-full object-cover opacity-70 brightness-50 scale-105 md:hidden"
+      />
+      <img
+        src={heroBgDesktop}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover opacity-70 brightness-50 scale-105 hidden md:block"
       />
       {/* Sin corrimiento en móvil (el contenido ya ocupa toda la altura del
           hero con redes sociales incluidas — subirlo en pantallas cortas
@@ -45,9 +55,19 @@ export default function HeroFicha({ heroPhoto, secondaryButton }) {
           <h1 className="text-3xl md:text-5xl font-black uppercase italic text-white leading-tight">
             Jose Humanez
           </h1>
-          <p className="text-zinc-500 font-bold text-xs uppercase tracking-[0.3em] mt-1 mb-6">
+          <p className="text-zinc-500 font-bold text-xs uppercase tracking-[0.3em] mt-1 mb-3">
             Tatuador Profesional
           </p>
+
+          {/* BADGE DE PATROCINIO — INKognito respalda el negocio de Jose
+              Humanez, no lo posee (ver memoria de sesión, 2026-07-27). Bajo
+              perfil pero visible, junto a la presentación. */}
+          <div className="flex items-center justify-center md:justify-start mb-4">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+              <Award size={12} className="text-zinc-600" />
+              Patrocinado por INKognito
+            </span>
+          </div>
 
           <div className="flex flex-col gap-3 mb-7 items-center md:items-start">
             <div className="flex items-center gap-3">
