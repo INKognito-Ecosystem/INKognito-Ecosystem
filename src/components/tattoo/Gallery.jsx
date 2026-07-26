@@ -28,7 +28,11 @@ const FALLBACK_ITEMS = [
 // items llega resuelto por el loader de la ruta (src/routes/PortfolioPage.jsx)
 // — ya no se hace fetch acá adentro. Si el panel no tenía nada cargado (o
 // falló), el loader devuelve null y acá se usa el respaldo del código.
-export default function Gallery({ items: itemsFromLoader, onLightboxChange = () => {} }) {
+// `compact`: usado por la landing de pauta (JhumaneztattooAgenda.jsx), donde
+// la galería va pegada al hero en vez de debajo de un navbar completo como en
+// /portafolio — reduce espaciados y mete más miniaturas por fila sin tocar
+// cómo se ve /portafolio (que sigue usando los valores por defecto).
+export default function Gallery({ items: itemsFromLoader, onLightboxChange = () => {}, compact = false }) {
   const [selected, setSelected] = useState(null)
   const items = itemsFromLoader && itemsFromLoader.length > 0 ? itemsFromLoader : FALLBACK_ITEMS
 
@@ -66,28 +70,29 @@ export default function Gallery({ items: itemsFromLoader, onLightboxChange = () 
   }
 
   return (
-    <section id="galeria" className="pt-24 pb-12 md:py-24 bg-black">
+    <section id="galeria" className={compact ? 'pt-6 pb-8 md:pt-10 md:pb-12 bg-black' : 'pt-24 pb-12 md:py-24 bg-black'}>
       <div className="max-w-7xl mx-auto px-4">
 
         {/* TITULO */}
-        <div className="text-center mb-8 md:mb-16">
-          <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tighter uppercase">
+        <div className={compact ? 'text-center mb-4 md:mb-6' : 'text-center mb-8 md:mb-16'}>
+          <h2 className={compact ? 'text-2xl md:text-4xl font-black mb-2 tracking-tighter uppercase' : 'text-4xl md:text-5xl font-black mb-4 tracking-tighter uppercase'}>
             Portafolio
           </h2>
-          <div className="h-1 w-20 bg-zinc-600 mx-auto mb-6"></div>
-          <p className="text-gray-400 text-base md:text-lg max-w-xl mx-auto leading-relaxed font-light">
-            Cada tatuaje cuenta una historia distinta. Esta es una muestra real de mi trabajo
-            en realismo, sombras y línea fina, tal como queda después de cada sesión — sin filtros ni retoques.
+          {!compact && <div className="h-1 w-20 bg-zinc-600 mx-auto mb-6"></div>}
+          <p className={compact ? 'text-gray-400 text-sm md:text-base max-w-xl mx-auto leading-relaxed font-light' : 'text-gray-400 text-base md:text-lg max-w-xl mx-auto leading-relaxed font-light'}>
+            {compact
+              ? 'Una muestra real de mi trabajo'
+              : 'Cada tatuaje cuenta una historia distinta. Esta es una muestra real de mi trabajo en realismo, sombras y línea fina, tal como queda después de cada sesión — sin filtros ni retoques.'}
           </p>
         </div>
 
         {/* GRID */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className={compact ? 'grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-3' : 'grid grid-cols-2 lg:grid-cols-3 gap-4'}>
           {items.map((item, index) => (
             <div
               key={item.id}
               onClick={() => openLightbox(index)}
-              className="group relative overflow-hidden rounded-lg aspect-square bg-gray-900 cursor-pointer"
+              className={compact ? 'group relative overflow-hidden rounded aspect-square bg-gray-900 cursor-pointer' : 'group relative overflow-hidden rounded-lg aspect-square bg-gray-900 cursor-pointer'}
             >
               <img
                 src={item.img}
@@ -113,7 +118,7 @@ export default function Gallery({ items: itemsFromLoader, onLightboxChange = () 
         </div>
 
         {/* CIERRE ESTRATEGICO */}
-        <div className="text-center mt-12 md:mt-20 max-w-2xl mx-auto px-2">
+        <div className={compact ? 'text-center mt-8 md:mt-12 max-w-2xl mx-auto px-2' : 'text-center mt-12 md:mt-20 max-w-2xl mx-auto px-2'}>
           <div className="h-1 w-20 bg-zinc-600 mx-auto mb-6"></div>
           <h3 className="text-2xl md:text-3xl font-black uppercase italic mb-4">
             ¿Ya tienes una idea en mente?

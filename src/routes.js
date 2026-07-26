@@ -9,6 +9,7 @@ import { route, index } from '@react-router/dev/routes'
 export default [
   index('components/ecosystem/InkognitoHome.jsx'),
   route('jhumaneztattoo', 'routes/HomePage.jsx'),
+  route('jhumaneztattoo/agenda', 'routes/JhumaneztattooAgenda.jsx'),
   route('portafolio', 'routes/PortfolioPage.jsx'),
   route('cuidados', 'components/tattoo/CuidadosPage.jsx'),
   route('p/:id', 'components/landing/ProductLandingPage.jsx'),
