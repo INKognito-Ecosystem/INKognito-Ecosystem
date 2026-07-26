@@ -3,6 +3,7 @@ import { FaWhatsapp } from 'react-icons/fa'
 
 export default function WhatsAppFloat({ hidden = false }) {
   const [scrolled, setScrolled] = useState(false)
+  const [nearFooter, setNearFooter] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 100)
@@ -10,7 +11,17 @@ export default function WhatsAppFloat({ hidden = false }) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const visible = scrolled && !hidden
+  // Se oculta apenas el footer entra en el viewport para no taparle los links
+  // de Términos/Privacidad/Desarrollado por INKognito — reaparece al subir.
+  useEffect(() => {
+    const footer = document.querySelector('footer')
+    if (!footer) return
+    const observer = new IntersectionObserver(([entry]) => setNearFooter(entry.isIntersecting))
+    observer.observe(footer)
+    return () => observer.disconnect()
+  }, [])
+
+  const visible = scrolled && !hidden && !nearFooter
 
   return (
     <a
