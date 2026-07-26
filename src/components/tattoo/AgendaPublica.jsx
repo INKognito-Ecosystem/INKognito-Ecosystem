@@ -200,37 +200,156 @@ export default function AgendaPublica() {
 
   return (
     <section id="contacto" className="py-10 md:py-16 px-4 bg-black border-t border-white/5">
-      <div className="max-w-[1100px] mx-auto">
+      <div className="max-w-[1320px] mx-auto">
+        <h2 className="text-3xl md:text-5xl font-black uppercase italic mb-3 text-center">
+          Agenda tu <span className="text-zinc-600">Cita</span>
+        </h2>
+        <p className="text-gray-500 text-sm text-center max-w-md mx-auto mb-8">
+          Todos los campos son obligatorios: son los que nos permiten darte un precio exacto antes de tu cita.
+        </p>
 
-        {/* Fusionado con el cierre estratégico del portafolio (antes vivía
-            en Gallery.jsx) — arriba el mensaje, abajo el formulario. */}
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <div className="h-1 w-20 bg-zinc-600 mx-auto mb-6"></div>
-          <h2 className="text-2xl md:text-4xl font-black uppercase italic mb-4">
-            ¿Ya tienes una idea en mente?
-          </h2>
-          <p className="text-gray-400 text-base leading-relaxed font-light">
-            Cada proyecto empieza con una buena conversación. Cuéntame qué quieres tatuarte
-            y trabajemos juntos en una pieza que se vea tan bien en años como el día que saliste del estudio.
-          </p>
-        </div>
+        {/* Ancho completo en PC, mismo patrón que "Agendar recogida" de
+            Eljach: los dos grupos más cortos (Fecha, Tus datos) van juntos
+            a la izquierda, y el espacio que dejan libre abajo (Tu tatuaje
+            es más largo por la foto) se llena con la invitación a
+            escribir en vez de quedar vacío. */}
+        <form onSubmit={enviar} className="bg-zinc-950 border border-gray-800 rounded-xl p-6 md:p-10">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-y-8 lg:gap-y-0 divide-y divide-dashed divide-gray-800 lg:divide-y-0 lg:divide-x lg:divide-gray-800">
 
-        {/* Formulario a la izquierda, ancho acotado — a diferencia de
-            "Agendar recogida" de Eljach, acá no hay tantos datos como para
-            justificar ocupar todo el ancho de la pantalla. */}
-        <form onSubmit={enviar} className="lg:max-w-2xl bg-zinc-950 border border-gray-800 rounded-xl p-6 md:p-10">
+            {/* IZQUIERDA — Fecha + Tus datos, lado a lado, con el relleno abajo */}
+            <div className="lg:col-span-2 lg:pr-8 flex flex-col">
+              <div className="grid grid-cols-1 sm:grid-cols-2 divide-y divide-dashed divide-gray-800 sm:divide-y-0 sm:divide-x sm:divide-gray-800">
 
-          <p className="text-gray-500 text-sm mb-6">
-            Todos los campos son obligatorios: son los que nos permiten darte un precio exacto antes de tu cita.
-          </p>
+                {/* 1 — FECHA */}
+                <div className="sm:pr-6 space-y-4">
+                  <ColHead n="1" title="Fecha" sub="Cuándo quieres venir" />
 
-          {/* 2 columnas en desktop — "Tu tatuaje y fecha" agrupa lo del
-              servicio, "Tus datos" queda aparte para contacto. */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-8 lg:gap-y-0 divide-y divide-dashed divide-gray-800 lg:divide-y-0 lg:divide-x lg:divide-gray-800">
+                  {/* SELECTOR DE FECHA — botón compacto que despliega el mes
+                      al tocarlo, en vez de un calendario siempre abierto. */}
+                  <div className="relative" ref={calendarRef}>
+                    <button
+                      type="button"
+                      onClick={() => form.size && setCalendarOpen(o => !o)}
+                      disabled={!form.size}
+                      className="w-full flex items-center justify-between gap-2 bg-zinc-900 border border-gray-700 text-left p-3.5 rounded outline-none disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <span className={selectedDate ? 'text-white' : 'text-gray-500'}>
+                        <Calendar size={16} className="inline mr-2 -mt-0.5 text-gray-500" />
+                        {selectedDate
+                          ? selectedDate.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' })
+                          : (form.size ? 'Elige un día disponible *' : 'Elige primero el tamaño →')}
+                      </span>
+                    </button>
 
-            {/* 1 — TU TATUAJE Y FECHA */}
-            <div className="lg:pr-8 space-y-4">
-              <ColHead n="1" title="Tu tatuaje y fecha" sub="Qué quieres y cuándo" />
+                    {calendarOpen && (
+                      <div className="absolute z-20 mt-2 w-full bg-zinc-900 border border-zinc-700 rounded-lg p-4 shadow-2xl">
+                        <div className="flex items-center justify-between mb-3">
+                          <button type="button" onClick={() => setMonthOffset(m => Math.max(0, m - 1))} disabled={monthOffset === 0}
+                            className="text-gray-400 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed">
+                            <ChevronLeft size={20} />
+                          </button>
+                          <span className="text-white font-bold text-sm uppercase tracking-wide">
+                            {MESES[dias.month]} {dias.year}
+                          </span>
+                          <button type="button" onClick={() => setMonthOffset(m => Math.min(2, m + 1))} disabled={monthOffset === 2}
+                            className="text-gray-400 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed">
+                            <ChevronRight size={20} />
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-7 gap-1 text-center mb-1">
+                          {DIAS_SEMANA.map(d => <span key={d} className="text-gray-600 text-[10px] font-bold">{d}</span>)}
+                        </div>
+
+                        <div className="grid grid-cols-7 gap-1">
+                          {dias.celdas.map((fecha, i) => {
+                            if (!fecha) return <div key={i} />
+                            const est = estadoDia(fecha)
+                            const isSelected = selectedDate && toISO(selectedDate) === toISO(fecha)
+                            const disabled = est === 'pasado' || est === 'ocupado'
+                            return (
+                              <button
+                                type="button"
+                                key={i}
+                                disabled={disabled}
+                                onClick={() => { setSelectedDate(fecha); setCalendarOpen(false) }}
+                                className={`aspect-square rounded text-xs font-bold transition-colors ${
+                                  isSelected ? 'bg-green-600 text-white'
+                                  : disabled ? 'text-gray-700 cursor-not-allowed'
+                                  : 'text-gray-300 hover:bg-zinc-800 border border-zinc-800'
+                                }`}
+                              >
+                                {fecha.getDate()}
+                              </button>
+                            )
+                          })}
+                        </div>
+
+                        <div className="flex items-center gap-3 mt-4 text-[9px] text-gray-500 flex-wrap">
+                          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-green-600" /> Seleccionado</span>
+                          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full border border-zinc-700" /> Disponible</span>
+                          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-zinc-800" /> Ocupado</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <select
+                    value={form.hora_preferida}
+                    onChange={e => update('hora_preferida', e.target.value)}
+                    required
+                    className="w-full bg-zinc-900 border border-gray-700 text-white p-3.5 rounded outline-none"
+                  >
+                    <option value="">¿Horario preferido? *</option>
+                    <option value="Mañana">Mañana</option>
+                    <option value="Tarde">Tarde</option>
+                  </select>
+                </div>
+
+                {/* 2 — TUS DATOS */}
+                <div className="sm:pl-6 pt-6 sm:pt-0 space-y-4">
+                  <ColHead n="2" title="Tus datos" sub="Para contactarte" />
+
+                  <input
+                    type="text"
+                    value={form.client_name}
+                    onChange={e => update('client_name', e.target.value)}
+                    placeholder="Tu nombre *"
+                    required
+                    className="w-full bg-zinc-900 border border-gray-700 text-white p-3.5 rounded outline-none placeholder:text-gray-600"
+                  />
+
+                  <input
+                    type="tel"
+                    value={form.client_phone}
+                    onChange={e => update('client_phone', e.target.value)}
+                    placeholder="Tu WhatsApp o teléfono *"
+                    required
+                    className="w-full bg-zinc-900 border border-gray-700 text-white p-3.5 rounded outline-none placeholder:text-gray-600"
+                  />
+
+                  {errorMsg && <p className="text-red-500 text-sm">{errorMsg}</p>}
+                </div>
+              </div>
+
+              {/* RELLENO — llena el espacio que deja libre el largo desigual
+                  con "Tu tatuaje" (que tiene una foto de más). Mismo rol que
+                  la card azul en SolicitarRecogida.jsx de Eljach. */}
+              <div className="mt-6 flex-1 min-h-[110px] bg-gradient-to-br from-zinc-900 to-black border border-white/10 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-center">
+                <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-red-600/10" />
+                <h3 className="relative text-white text-lg font-black uppercase italic mb-2">
+                  ¿Ya tienes una idea en mente?
+                </h3>
+                <p className="relative text-gray-400 text-[13px] leading-relaxed">
+                  Cada proyecto empieza con una buena conversación. Cuéntame qué quieres tatuarte
+                  y trabajemos juntos en una pieza que se vea tan bien en años como el día que saliste del estudio.
+                </p>
+              </div>
+            </div>
+
+            {/* 3 — TU TATUAJE (a la derecha, más larga por la foto) */}
+            <div className="lg:col-span-2 lg:pl-8 pt-8 lg:pt-0 space-y-4">
+              <ColHead n="3" title="Tu tatuaje" sub="Tamaño, zona y diseño" />
 
               <select
                 value={form.size}
@@ -305,112 +424,6 @@ export default function AgendaPublica() {
                 )}
                 {errorImagen && <p className="text-red-500 text-xs mt-1">{errorImagen}</p>}
               </div>
-
-              {/* SELECTOR DE FECHA — botón compacto que despliega el mes al
-                  tocarlo, en vez de un calendario siempre abierto. */}
-              <div className="relative" ref={calendarRef}>
-                <button
-                  type="button"
-                  onClick={() => form.size && setCalendarOpen(o => !o)}
-                  disabled={!form.size}
-                  className="w-full flex items-center justify-between gap-2 bg-zinc-900 border border-gray-700 text-left p-3.5 rounded outline-none disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  <span className={selectedDate ? 'text-white' : 'text-gray-500'}>
-                    <Calendar size={16} className="inline mr-2 -mt-0.5 text-gray-500" />
-                    {selectedDate
-                      ? selectedDate.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' })
-                      : (form.size ? 'Elige un día disponible *' : 'Elige primero el tamaño arriba')}
-                  </span>
-                </button>
-
-                {calendarOpen && (
-                  <div className="absolute z-20 mt-2 w-full bg-zinc-900 border border-zinc-700 rounded-lg p-4 shadow-2xl">
-                    <div className="flex items-center justify-between mb-3">
-                      <button type="button" onClick={() => setMonthOffset(m => Math.max(0, m - 1))} disabled={monthOffset === 0}
-                        className="text-gray-400 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed">
-                        <ChevronLeft size={20} />
-                      </button>
-                      <span className="text-white font-bold text-sm uppercase tracking-wide">
-                        {MESES[dias.month]} {dias.year}
-                      </span>
-                      <button type="button" onClick={() => setMonthOffset(m => Math.min(2, m + 1))} disabled={monthOffset === 2}
-                        className="text-gray-400 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed">
-                        <ChevronRight size={20} />
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-7 gap-1 text-center mb-1">
-                      {DIAS_SEMANA.map(d => <span key={d} className="text-gray-600 text-[10px] font-bold">{d}</span>)}
-                    </div>
-
-                    <div className="grid grid-cols-7 gap-1">
-                      {dias.celdas.map((fecha, i) => {
-                        if (!fecha) return <div key={i} />
-                        const est = estadoDia(fecha)
-                        const isSelected = selectedDate && toISO(selectedDate) === toISO(fecha)
-                        const disabled = est === 'pasado' || est === 'ocupado'
-                        return (
-                          <button
-                            type="button"
-                            key={i}
-                            disabled={disabled}
-                            onClick={() => { setSelectedDate(fecha); setCalendarOpen(false) }}
-                            className={`aspect-square rounded text-xs font-bold transition-colors ${
-                              isSelected ? 'bg-green-600 text-white'
-                              : disabled ? 'text-gray-700 cursor-not-allowed'
-                              : 'text-gray-300 hover:bg-zinc-800 border border-zinc-800'
-                            }`}
-                          >
-                            {fecha.getDate()}
-                          </button>
-                        )
-                      })}
-                    </div>
-
-                    <div className="flex items-center gap-3 mt-4 text-[9px] text-gray-500 flex-wrap">
-                      <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-green-600" /> Seleccionado</span>
-                      <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full border border-zinc-700" /> Disponible</span>
-                      <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-zinc-800" /> Ocupado</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <select
-                value={form.hora_preferida}
-                onChange={e => update('hora_preferida', e.target.value)}
-                required
-                className="w-full bg-zinc-900 border border-gray-700 text-white p-3.5 rounded outline-none"
-              >
-                <option value="">¿Horario preferido? *</option>
-                <option value="Mañana">Mañana</option>
-                <option value="Tarde">Tarde</option>
-              </select>
-            </div>
-
-            {/* 2 — TUS DATOS */}
-            <div className="lg:pl-8 pt-8 lg:pt-0 space-y-4">
-              <ColHead n="2" title="Tus datos" sub="Para contactarte" />
-
-              <input
-                type="text"
-                value={form.client_name}
-                onChange={e => update('client_name', e.target.value)}
-                placeholder="Tu nombre *"
-                required
-                className="w-full bg-zinc-900 border border-gray-700 text-white p-3.5 rounded outline-none placeholder:text-gray-600"
-              />
-
-              <input
-                type="tel"
-                value={form.client_phone}
-                onChange={e => update('client_phone', e.target.value)}
-                placeholder="Tu WhatsApp o teléfono *"
-                required
-                className="w-full bg-zinc-900 border border-gray-700 text-white p-3.5 rounded outline-none placeholder:text-gray-600"
-              />
-
-              {errorMsg && <p className="text-red-500 text-sm">{errorMsg}</p>}
             </div>
           </div>
 
