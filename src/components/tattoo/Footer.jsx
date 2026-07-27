@@ -8,6 +8,9 @@ import {
   FaYoutube
 } from 'react-icons/fa'
 
+// Estructura de 3 columnas (descripción / navegación / contacto) — mismo
+// patrón que Footer.jsx de Eljach: en móvil, Navegación y Contacto quedan
+// lado a lado (grid-cols-2 md:contents) en vez de apiladas, minimalista.
 export default function Footer() {
 
   return (
@@ -38,10 +41,10 @@ export default function Footer() {
 
         </div>
 
-        {/* CONTENIDO ABAJO */}
-        <div className="flex flex-col md:flex-row justify-between gap-8 md:gap-16 mb-8 md:mb-16">
+        {/* CONTENIDO ABAJO — 3 columnas (descripción 1.4fr / navegación / contacto) */}
+        <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr_1fr] gap-8 md:gap-12 mb-8 md:mb-16">
 
-          {/* TEXTO IZQUIERDA */}
+          {/* DESCRIPCIÓN + REDES */}
           <div className="max-w-md">
 
             <p className="text-gray-300 text-sm leading-relaxed">
@@ -64,71 +67,96 @@ export default function Footer() {
 
             </p>
 
-          </div>
+            <div className="flex gap-3 mt-5">
 
-          {/* DERECHA */}
-          <div className="flex flex-col gap-12">
+              <a
+                href="https://www.instagram.com/jhumaneztattoo?igsh=MXh4ZW9vaGZnMDVtZQ=="
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="w-9 h-9 rounded-full border border-gray-700 flex items-center justify-center text-gray-400 hover:bg-gradient-to-br hover:from-pink-500 hover:to-yellow-500 hover:text-white hover:border-transparent transition-all duration-300"
+              >
+                <FaInstagram size={15} />
+              </a>
 
-            {/* HORARIO */}
-            <div>
+              <a
+                href="https://www.facebook.com/humanezjose"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="w-9 h-9 rounded-full border border-gray-700 flex items-center justify-center text-gray-400 hover:bg-blue-600 hover:text-white hover:border-transparent transition-all duration-300"
+              >
+                <FaFacebookF size={13} />
+              </a>
 
-              <h4 className="text-white font-black mb-6 uppercase tracking-[0.2em] text-xl">
-                Horario
-              </h4>
-
-              <ul className="text-gray-300 space-y-3 text-sm">
-
-                <li>{TATTOO_HOURS.weekdays.label}: {TATTOO_HOURS.weekdays.hours}</li>
-
-                <li>{TATTOO_HOURS.saturday.label}: {TATTOO_HOURS.saturday.hours}</li>
-
-                <li>{TATTOO_HOURS.sunday.label}: Cerrado</li>
-
-              </ul>
+              <a
+                href="https://youtube.com/@jhumanezz?si=9uXLRHm_QPAWo6uB"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+                className="w-9 h-9 rounded-full border border-gray-700 flex items-center justify-center text-gray-400 hover:bg-red-600 hover:text-white hover:border-transparent transition-all duration-300"
+              >
+                <FaYoutube size={15} />
+              </a>
 
             </div>
 
-            {/* SOCIAL */}
+          </div>
+
+          {/* Móvil: Navegación y Contacto lado a lado — en desktop md:contents
+              las vuelve a soltar como columnas normales del grid de arriba */}
+          <div className="grid grid-cols-2 gap-6 md:contents">
+
+            {/* NAVEGACIÓN */}
             <div>
-
-              <h4 className="text-white font-black mb-6 uppercase tracking-[0.2em] text-xl">
-                Redes Sociales
+              <h4 className="text-[13px] font-bold tracking-[1px] uppercase text-white mb-4">
+                Navegación
               </h4>
+              <ul className="flex flex-col gap-2 list-none">
+                {[
+                  ['Inicio', '/jhumaneztattoo'],
+                  ['Portafolio', '/portafolio'],
+                  ['Cuidados', '/cuidados'],
+                  ['Acerca de mí', '/jhumaneztattoo#acerca'],
+                ].map(([label, to]) => (
+                  <li key={to}>
+                    <Link to={to} className="text-[14px] text-gray-400 hover:text-white transition-colors">
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-              <div className="flex gap-5">
-
-                {/* INSTAGRAM */}
-                <a
-                  href="https://www.instagram.com/jhumaneztattoo?igsh=MXh4ZW9vaGZnMDVtZQ=="
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-14 h-14 rounded-full border border-gray-700 flex items-center justify-center text-white hover:bg-gradient-to-br hover:from-pink-500 hover:to-yellow-500 hover:border-transparent transition-all duration-300 hover:scale-110"
-                >
-                  <FaInstagram size={22} />
-                </a>
-
-                {/* FACEBOOK */}
-                <a
-                  href="https://www.facebook.com/humanezjose"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-14 h-14 rounded-full border border-gray-700 flex items-center justify-center text-white hover:bg-blue-600 hover:border-transparent transition-all duration-300 hover:scale-110"
-                >
-                  <FaFacebookF size={20} />
-                </a>
-
-                {/* YOUTUBE */}
-                <a
-                  href="https://youtube.com/@jhumanezz?si=9uXLRHm_QPAWo6uB"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-14 h-14 rounded-full border border-gray-700 flex items-center justify-center text-white hover:bg-red-600 hover:border-transparent transition-all duration-300 hover:scale-110"
-                >
-                  <FaYoutube size={22} />
-                </a>
-
-              </div>
-
+            {/* CONTACTO */}
+            <div>
+              <h4 className="text-[13px] font-bold tracking-[1px] uppercase text-white mb-4">
+                Contacto
+              </h4>
+              <ul className="flex flex-col gap-2 list-none">
+                <li>
+                  <a
+                    href="https://wa.me/573207911013?text=Hola%20Jose,%20quiero%20informaci%C3%B3n%20sobre%20un%20tatuaje"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[14px] text-gray-400 hover:text-white transition-colors"
+                  >
+                    WhatsApp: 320 791 1013
+                  </a>
+                </li>
+                <li className="text-[14px] text-gray-400">Chigorodó, Urabá</li>
+                <li className="text-[14px] text-gray-400">
+                  {TATTOO_HOURS.weekdays.label}: {TATTOO_HOURS.weekdays.hours}
+                </li>
+                <li className="text-[14px] text-gray-400">
+                  {TATTOO_HOURS.saturday.label}: {TATTOO_HOURS.saturday.hours}
+                </li>
+                <li>
+                  <Link to="/jhumaneztattoo#contacto" className="text-[14px] text-red-500 hover:text-red-400 transition-colors">
+                    Reservar ahora →
+                  </Link>
+                </li>
+              </ul>
             </div>
 
           </div>
