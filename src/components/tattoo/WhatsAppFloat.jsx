@@ -39,7 +39,7 @@ export default function WhatsAppFloat({ hidden = false }) {
 
       <Link
         to="/jhumaneztattoo#contacto"
-        className="px-3.5 py-2 rounded-full bg-green-600 text-white font-bold uppercase tracking-widest text-[11px] sm:text-xs hover:bg-green-500 transition-colors whitespace-nowrap"
+        className="px-3.5 py-2 rounded-full bg-[#25D366] text-white font-bold uppercase tracking-widest text-[11px] sm:text-xs hover:brightness-95 transition-all whitespace-nowrap"
       >
         Online
       </Link>

@@ -81,6 +81,14 @@ export function Layout({ children }) {
   return (
     <html lang="es">
       <head>
+        {/* Apaga la restauración nativa de scroll del navegador ANTES de que
+            el navegador llegue a restaurarla — hacerlo en un useEffect de
+            React (como se intentó primero, ver ScrollToHash) llega demasiado
+            tarde: el navegador ya restauró el scroll durante la carga de la
+            página, antes de que React hidrate y corra sus efectos. Por eso
+            recargar (F5) /jhumaneztattoo estando en "Cuida tu tatuaje"
+            seguía volviendo ahí en vez de al hero. */}
+        <script dangerouslySetInnerHTML={{ __html: "if ('scrollRestoration' in history) history.scrollRestoration = 'manual';" }} />
         <meta charSet="UTF-8" />
         <link rel="icon" type="image/png" href="/favicon.png" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -121,16 +129,9 @@ export function Layout({ children }) {
 function ScrollToHash() {
   const { pathname, hash } = useLocation()
 
-  // Apaga la restauración nativa del navegador (F5 / recarga) — por default
-  // el navegador recuerda el scroll con el que se fue, así que recargar
-  // /jhumaneztattoo estando parado en "Cuida tu tatuaje" volvía a esa
-  // sección en vez de al hero. Esto es aparte de <ScrollRestoration/> de
-  // react-router (que ya no usamos — peleaba con este componente en
-  // navegaciones SPA), esto es la restauración del navegador en sí.
-  useLayoutEffect(() => {
-    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual'
-  }, [])
-
+  // La restauración nativa del navegador ya se apaga antes, con el script
+  // inline en <head> (ver Layout arriba) — hacerlo acá con un efecto de
+  // React llegaba demasiado tarde para el caso de recarga (F5).
   useLayoutEffect(() => {
     if (hash) {
       setTimeout(() => {
