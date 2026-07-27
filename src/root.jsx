@@ -121,11 +121,26 @@ export function Layout({ children }) {
 function ScrollToHash() {
   const { pathname, hash } = useLocation()
 
+  // Apaga la restauración nativa del navegador (F5 / recarga) — por default
+  // el navegador recuerda el scroll con el que se fue, así que recargar
+  // /jhumaneztattoo estando parado en "Cuida tu tatuaje" volvía a esa
+  // sección en vez de al hero. Esto es aparte de <ScrollRestoration/> de
+  // react-router (que ya no usamos — peleaba con este componente en
+  // navegaciones SPA), esto es la restauración del navegador en sí.
+  useLayoutEffect(() => {
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual'
+  }, [])
+
   useLayoutEffect(() => {
     if (hash) {
       setTimeout(() => {
         const el = document.querySelector(hash)
+        // Si el hash no tiene un elemento real (ej. #antes/#despues de
+        // CuidadosPage, que son solo señales internas de tab, no anclas)
+        // se cae al tope en vez de dejar el scroll que traía la página
+        // anterior — sin esto se veía el footer de la nueva página primero.
         if (el) el.scrollIntoView({ behavior: 'smooth' })
+        else window.scrollTo({ top: 0, behavior: 'instant' })
       }, 100)
     } else {
       window.scrollTo({ top: 0, behavior: 'instant' })
