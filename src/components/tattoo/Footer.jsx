@@ -44,15 +44,15 @@ export default function Footer() {
           {/* TEXTO IZQUIERDA */}
           <div className="max-w-md">
 
-            <p className="text-gray-300 text-lg leading-relaxed">
+            <p className="text-gray-300 text-sm leading-relaxed">
 
-              Elevando el arte corporal desde 2019. 
+              Elevando el arte corporal desde 2019.
               Especialista en diseño personalizado y piezas únicas
 
               <br />
               <br />
 
-              INKOGNITO nace de la unión entre disciplina, arte y visión.
+              INKOGNITO nace de la unión entre disciplina, arte, identidad.
               Un estudio construido para crear piezas con carácter,
               detalle impecable y una presencia que perdura en el tiempo.
 
