@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect } from 'react'
-import { Meta, Links, Outlet, Scripts, ScrollRestoration, useLocation, useNavigation } from 'react-router'
+import { Meta, Links, Outlet, Scripts, useLocation, useNavigation } from 'react-router'
 import { HelmetProvider } from 'react-helmet-async'
 import { SupplyCartProvider } from './contexts/SupplyCartContext'
 import { StoreCartProvider } from './contexts/StoreCartContext'
@@ -103,7 +103,12 @@ export function Layout({ children }) {
           />
         </noscript>
         {children}
-        <ScrollRestoration />
+        {/* Sin <ScrollRestoration/> a propósito: peleaba con ScrollToHash de
+            abajo (ambos actúan en cada cambio de ruta, incluido "atrás" del
+            navegador) — a veces ganaba la posición restaurada de
+            ScrollRestoration en vez del scroll-to-top/hash determinista que
+            ScrollToHash ya maneja para todo el sitio. ScrollToHash es ahora
+            la única fuente de verdad para el scroll en cada navegación. */}
         <Scripts />
       </body>
     </html>

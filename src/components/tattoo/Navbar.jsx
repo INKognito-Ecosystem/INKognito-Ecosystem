@@ -11,14 +11,19 @@ export default function Navbar({ showInicio = false }) {
   // Sobre el hero (sin scroll): solo el botón hamburguesa, transparente, sin
   // fondo ni línea — para no tapar la foto. Al hacer scroll aparece la barra
   // blanca con logo + nombre. Mismo patrón de scroll que WhatsAppFloat.jsx.
+  // Esto SOLO aplica en /jhumaneztattoo (donde vive el hero) — showInicio
+  // es true justo en las páginas que NO tienen hero (Portafolio, Cuidados),
+  // así que ahí la barra completa se ve siempre, sin depender del scroll.
   const [scrolled, setScrolled] = useState(false)
+  const showFull = showInicio || scrolled
 
   useEffect(() => {
+    if (showInicio) return
     const onScroll = () => setScrolled(window.scrollY > 100)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [showInicio])
 
   const scrollTo = (id) => {
     const el = document.getElementById(id)
@@ -30,20 +35,20 @@ export default function Navbar({ showInicio = false }) {
 
   return (
     <>
-      <nav className={`fixed w-full z-50 transition-colors duration-300 ${scrolled ? 'bg-white shadow-sm' : 'bg-transparent'}`}>
+      <nav className={`fixed w-full z-50 transition-colors duration-300 ${showFull ? 'bg-white shadow-sm' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* grid de 3 columnas (auto / 1fr / auto): el nombre queda centrado
               en el espacio libre entre el logo y el botón hamburguesa, en
               vez de pegado al logo como antes. */}
           <div className="grid grid-cols-[auto_1fr_auto] items-center h-20 gap-3">
 
-            {scrolled ? (
-              <Link to="/jhumaneztattoo" className="flex items-center">
+            {showFull ? (
+              <Link prefetch="intent" to="/jhumaneztattoo" className="flex items-center">
                 <img src={milogo} alt="Logo" className="w-14 h-14 object-contain" />
               </Link>
             ) : <span />}
 
-            {scrolled ? (
+            {showFull ? (
               <span className="text-black font-black text-lg sm:text-2xl tracking-widest uppercase text-center">
                 JHUMANEZTATTOO
               </span>
@@ -51,7 +56,7 @@ export default function Navbar({ showInicio = false }) {
 
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className={`justify-self-end transition-colors duration-300 ${scrolled ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-200'}`}
+              className={`justify-self-end transition-colors duration-300 ${showFull ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-200'}`}
             >
               {menuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -64,7 +69,7 @@ export default function Navbar({ showInicio = false }) {
           <div className="absolute right-4 top-full bg-white border border-gray-200 shadow-xl w-56 z-50 rounded-lg overflow-hidden">
 
             {showInicio && (
-              <Link to="/jhumaneztattoo" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
+              <Link prefetch="intent" to="/jhumaneztattoo" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
                 <div className="flex items-center justify-between">
                   <span>Inicio</span>
                   <Home size={14} />
@@ -82,7 +87,7 @@ export default function Navbar({ showInicio = false }) {
             )}
 
             {!showInicio && (
-              <Link to="/portafolio" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
+              <Link prefetch="intent" to="/portafolio" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
                 <div className="flex items-center justify-between">
                   <span>Portafolio</span>
                   <ImageIcon size={14} />
@@ -99,7 +104,7 @@ export default function Navbar({ showInicio = false }) {
               </button>
             )}
 
-            <Link to="/cuidados" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
+            <Link prefetch="intent" to="/cuidados" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
               <div className="flex items-center justify-between">
                 <span>Cuidados</span>
                 <ShieldCheck size={14} />
@@ -113,28 +118,28 @@ export default function Navbar({ showInicio = false }) {
               </div>
             </button>
 
-            <Link to="/supply" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
+            <Link prefetch="intent" to="/supply" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
               <div className="flex items-center justify-between">
                 <span>INKognito Supply</span>
                 <ShoppingCart size={14} />
               </div>
             </Link>
 
-            <Link to="/store" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
+            <Link prefetch="intent" to="/store" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
               <div className="flex items-center justify-between">
                 <span>INKognito Store</span>
                 <ShoppingCart size={14} />
               </div>
             </Link>
 
-            <Link to="/gym" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
+            <Link prefetch="intent" to="/gym" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">
               <div className="flex items-center justify-between">
                 <span>INKognito Gym</span>
                 <Dumbbell size={14} />
               </div>
             </Link>
 
-            <Link to="/" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300">
+            <Link prefetch="intent" to="/" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300">
               <div className="flex items-center justify-between">
                 <span>Ecosistema</span>
                 <Globe size={14} />

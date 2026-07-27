@@ -12,6 +12,11 @@
 
 html {
   scroll-behavior: smooth;
+  /* Compensa el navbar fijo (h-20 = 80px) al saltar a una sección por hash
+     o scrollIntoView — sin esto el título de la sección quedaba tapado/
+     "mocho" bajo la barra (Cuidados era el caso reportado, pero afecta a
+     cualquier ancla bajo un navbar fijo, ej. Acerca de mí, Testimonios). */
+  scroll-padding-top: 96px;
 }
 
 /* Barra de progreso de navegación (root.jsx NavigationProgress) — indeterminada,
