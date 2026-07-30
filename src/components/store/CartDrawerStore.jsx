@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { X, Minus, Plus, Trash2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { X, Minus, Plus, Trash2, CalendarCheck } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 
@@ -181,6 +182,16 @@ export default function CartDrawerStore({ open, onClose }) {
                 ${total.toLocaleString('es-CO')}
               </p>
             </div>
+
+            {/* AGENDAR EN LÍNEA — alternativa al WhatsApp, no lo reemplaza */}
+            <Link
+              to="/pedido/store"
+              onClick={onClose}
+              className="flex items-center justify-center gap-3 w-full py-4 rounded-xl bg-green-600 text-white uppercase tracking-[0.2em] text-xs font-bold transition-all duration-300 hover:bg-green-500"
+            >
+              <CalendarCheck size={18} />
+              Agendar Pedido en Línea
+            </Link>
 
             {/* WHATSAPP */}
             <a

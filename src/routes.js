@@ -13,6 +13,7 @@ export default [
   route('portafolio', 'routes/PortfolioPage.jsx'),
   route('cuidados', 'components/tattoo/CuidadosPage.jsx'),
   route('p/:id', 'components/landing/ProductLandingPage.jsx'),
+  route('pedido/:module', 'components/pedido/PedidoOnlinePage.jsx'),
 
   // Legal
   route('privacidad', 'components/legal/PrivacidadPage.jsx'),
