@@ -192,7 +192,15 @@ function ProductCard({ item, categoria }) {
           <p className="text-yellow-500 text-[9px] font-bold">⚠️ Últimas {totalStock}</p>
         )}
         <div className="mt-auto pt-1">
-          <VariantSelectorSupply variantObjs={variantObjs} selIdx={selIdx} onChange={setSelIdx} />
+          {/* Con una sola variante, VariantSelectorSupply no renderiza nada
+              (no hay entre qué elegir) — pero el cliente igual necesita saber
+              qué trae la caja (ej. calibre de agujas), así que se muestra
+              como texto simple en vez de perderse. */}
+          {variantObjs.length === 1 ? (
+            <p className="text-[9px] font-bold text-zinc-400 uppercase truncate">{variantObjs[0].variant}</p>
+          ) : (
+            <VariantSelectorSupply variantObjs={variantObjs} selIdx={selIdx} onChange={setSelIdx} />
+          )}
         </div>
       </div>
 

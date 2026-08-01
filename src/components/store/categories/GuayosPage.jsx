@@ -30,7 +30,7 @@ const STRIPE_PATTERN = {
 const faqs = [
   {
     q: '¿Cómo llegan los guayos a mi municipio?',
-    a: 'Despachamos con Eljach Transportadora, ruta diaria a toda la zona de Urabá. Entrega estimada de 1 a 2 días hábiles a Chigorodó, Carepa, Apartadó y Turbo. Pago contraentrega: pagas cuando recibes el paquete en tu puerta, sin adelantos.',
+    a: 'Despachamos con Eljach Mensajería Express, ruta diaria a toda la zona de Urabá. Entrega estimada de 1 a 2 días hábiles a Chigorodó, Carepa, Apartadó y Turbo. Pago contraentrega: pagas cuando recibes el paquete en tu puerta, sin adelantos.',
   },
   {
     q: '¿Qué tipo de guayo sirve para las canchas de Urabá?',
@@ -119,7 +119,7 @@ export default function GuayosPage() {
             <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
           </div>
           <div className="flex flex-col justify-center bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 flex-1">
-            <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Eljach Transportadora</p>
+            <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Eljach Mensajería Express</p>
             <p className="text-zinc-500 text-[10px] mt-0.5">Entregas locales y contra entrega</p>
           </div>
         </div>

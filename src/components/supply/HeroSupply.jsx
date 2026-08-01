@@ -71,7 +71,7 @@ export default function HeroSupply() {
         <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
       </div>
       <div>
-        <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Eljach Transportadora</p>
+        <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Eljach Mensajería Express</p>
         <p className="text-zinc-500 text-xs mt-0.5">Aliado logístico · Contra entrega</p>
       </div>
     </div>

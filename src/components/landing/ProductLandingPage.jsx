@@ -271,7 +271,7 @@ export default function ProductLandingPage() {
               <div className="border-t border-zinc-800 pt-4 space-y-2">
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
                   <Truck size={13} className="shrink-0" style={{ color: accent }} />
-                  <span>Envío con Eljach Transportadora — 1 a 2 días en Urabá (Chigorodó, Apartadó, Carepa, Turbo), con pago contraentrega</span>
+                  <span>Envío con Eljach Mensajería Express — 1 a 2 días en Urabá (Chigorodó, Apartadó, Carepa, Turbo), con pago contraentrega</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
                   <MessageSquare size={13} className="shrink-0" style={{ color: accent }} />

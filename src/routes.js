@@ -6,6 +6,15 @@ import { route, index } from '@react-router/dev/routes'
 // App.jsx viejo — mismo comportamiento de hoy (fetch client-side con
 // useCatalog), solo movidas al nuevo sistema de rutas. Se convierten a
 // loader en los próximos bloques del plan (Supply → Store → Gym → producto).
+//
+// ComingSoon retirado de /supply, /store, /gym (2026-07-30) — Jose ya está
+// hablando con proveedores y necesita las páginas reales visibles. Las 3
+// páginas (SupplyPage/StorePage/GymPage) ya existían completas en el
+// código, solo estaban desconectadas de routes.js — no hizo falta traer
+// nada de la rama master (que sigue desactualizada, pre-migración SSR).
+// Categorías con poco/sin inventario ya muestran "Próximamente disponible"
+// automáticamente (ver SupplyCategoryPage.jsx) — no es un bug, es el estado
+// esperado mientras se sigue cargando catálogo real.
 export default [
   index('components/ecosystem/InkognitoHome.jsx'),
   route('jhumaneztattoo', 'routes/HomePage.jsx'),
@@ -20,10 +29,8 @@ export default [
   route('terminos', 'components/legal/TerminosPage.jsx'),
   route('envios-cambios-devoluciones', 'components/legal/EnviosPage.jsx'),
 
-  // Supply — /supply muestra ComingSoonPage en esta rama (main), igual que hoy.
-  // id explícito porque Store y Gym reusan el mismo archivo más abajo — sin
-  // id, RRv7 deriva el id de la ruta a partir del archivo y choca (duplicado).
-  route('supply', 'components/ecosystem/ComingSoonPage.jsx', { id: 'supply-coming-soon' }),
+  // Supply
+  route('supply', 'components/supply/SupplyPage.jsx'),
   route('supply/machines', 'components/supply/categories/MachinesPage.jsx'),
   route('supply/cartridges', 'components/supply/categories/Cartridges/CartridgesPage.jsx'),
   route('supply/cartridges/ez-tattoo', 'components/supply/categories/Cartridges/EZCartridgesPage.jsx'),
@@ -49,8 +56,8 @@ export default [
   route('supply/brands/royal-three', 'components/supply/marcasProfesionales/RoyalThreePage.jsx'),
   route('supply/aprende', 'components/supply/AprendePage.jsx'),
 
-  // Store — /store muestra ComingSoonPage en esta rama (main), igual que hoy
-  route('store', 'components/ecosystem/ComingSoonPage.jsx', { id: 'store-coming-soon' }),
+  // Store
+  route('store', 'components/store/StorePage.jsx'),
   route('store/ropa-dama', 'components/store/categories/RopaDamaPage.jsx'),
   route('store/ropa-caballeros', 'components/store/categories/RopaCaballerosPage.jsx'),
   route('store/zapatos-deportivos', 'components/store/categories/ZapatosDeportivosPage.jsx'),
@@ -58,8 +65,8 @@ export default [
   route('store/guayos', 'components/store/categories/GuayosPage.jsx'),
   route('store/tenis-guayo', 'components/store/categories/TenisGuayoPage.jsx'),
 
-  // Gym — /gym muestra ComingSoonPage en esta rama (main), igual que hoy
-  route('gym', 'components/ecosystem/ComingSoonPage.jsx', { id: 'gym-coming-soon' }),
+  // Gym
+  route('gym', 'components/gym/GymPage.jsx'),
   route('gym/maquinas-pedido', 'components/gym/categories/MaquinasPedidoPage.jsx'),
   route('gym/tutoriales', 'components/gym/categories/VideosTutorialesPage.jsx'),
   route('gym/cursos', 'components/gym/categories/CursosPage.jsx'),
