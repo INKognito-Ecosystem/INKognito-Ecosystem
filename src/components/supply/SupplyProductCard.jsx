@@ -67,6 +67,7 @@ export function VariantSelectorSupply({ variantObjs, selIdx, onChange }) {
 export default function SupplyProductCard({ item, categoria }) {
   const { items: cartItems, addItem } = useSupplyCart()
   const [selIdx, setSelIdx] = useState(0)
+  const [showDesc, setShowDesc] = useState(false)
 
   // variantObjs (con nombre) es solo para el selector — si el producto tiene
   // una única variante SIN nombre (ej. mobiliario, no todo necesita un
@@ -123,13 +124,27 @@ export default function SupplyProductCard({ item, categoria }) {
       </div>
 
       <div className="p-3 flex flex-col flex-1 gap-1.5 min-h-0">
-        {item.descripcion && (
-          <p className="text-zinc-500 uppercase tracking-[0.2em] text-[9px] leading-none">{item.descripcion}</p>
-        )}
         <h3 className="text-xs font-black uppercase leading-tight text-white">{item.name}</h3>
         {resolvedPrice && <p className="text-white font-bold text-sm">{resolvedPrice}</p>}
         {totalStock <= 3 && totalStock > 0 && (
           <p className="text-yellow-500 text-[9px] font-bold">⚠️ Últimas {totalStock}</p>
+        )}
+        {item.descripcion && (
+          <>
+            {/* Escritorio — texto completo, debajo de nombre/precio */}
+            <p className="hidden md:block text-zinc-500 text-[9.5px] leading-snug">{item.descripcion}</p>
+            {/* Móvil — botón que abre modal, en vez de estirar la card
+                (descripción de mobiliario es un párrafo largo, no la
+                etiqueta corta de una palabra que este campo tenía antes;
+                2026-08-01). */}
+            <button
+              type="button"
+              onClick={() => setShowDesc(true)}
+              className="md:hidden self-start text-zinc-500 text-[9px] font-bold uppercase tracking-[0.15em] underline underline-offset-2"
+            >
+              Ver descripción
+            </button>
+          </>
         )}
         <div className="mt-auto pt-1">
           {variantObjs.length === 1 ? (
@@ -148,6 +163,24 @@ export default function SupplyProductCard({ item, categoria }) {
       >
         {enCarrito ? '✓ Agregado' : '+ Agregar al carrito'}
       </button>
+
+      {showDesc && (
+        <div
+          className="md:hidden fixed inset-0 z-50 bg-black/70 flex items-end justify-center"
+          onClick={() => setShowDesc(false)}
+        >
+          <div
+            className="w-full max-w-md bg-zinc-950 border-t border-zinc-800 rounded-t-2xl p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-xs font-black uppercase tracking-widest text-white">Descripción</h4>
+              <button onClick={() => setShowDesc(false)} className="text-zinc-500 text-lg leading-none px-1">✕</button>
+            </div>
+            <p className="text-zinc-400 text-sm leading-relaxed">{item.descripcion}</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

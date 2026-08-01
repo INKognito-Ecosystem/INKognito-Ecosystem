@@ -45,7 +45,12 @@ const faq = [
   {
     question: '¿Cómo pido una cotización?',
     answer:
-      'Escríbenos por WhatsApp contándonos qué necesitas para tu estudio y te ayudamos a coordinar el pedido con Industrias Warlock.'
+      'Agenda online o Escríbenos por WhatsApp contándonos qué necesitas para tu estudio y te ayudamos a coordinar el pedido con Industrias Warlock.'
+  },
+  {
+    question: '¿De dónde es la marca Industrias Warlock?',
+    answer:
+      'Industrias Warlock fabrica su mobiliario en Bogotá y envía a toda Colombia — no es un proveedor local de Urabá como el resto del catálogo Supply.'
   },
 ]
 
@@ -168,7 +173,7 @@ export default function IndustriasWarlockPage() {
         <BrandCatalogSection
           brandName="Industrias Warlock"
           products={products}
-          supplierBadge="Producto de Industrias Warlock — mobiliario fabricado para estudios de tatuaje"
+          supplierBadge="Productos fabricados por Industrias Warlock — mobiliario para estudios de tatuaje"
         />
 
         <section className="mt-10 md:mt-14">
