@@ -259,27 +259,54 @@ export default function ProductLandingPage() {
 
             <div>
               <p className="text-zinc-500 text-[11px] uppercase tracking-widest mb-1">{product.categoria}</p>
-              <div className="flex items-start justify-between gap-4">
-                <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tight leading-tight">
+
+              {/* MÓVIL — nombre, precio y stock en una sola línea horizontal
+                  (antes cada uno en su propio bloque, apilados, y la
+                  descripción quedaba hasta el final de la página sin que
+                  casi nadie llegara a leerla con scroll). Estructura pedida
+                  2026-08-01: nombre | precio | stock, letra más chica para
+                  que quepa, descripción justo debajo, frase de marca al final. */}
+              <div className="flex md:hidden items-center justify-between gap-3">
+                <h1 className="text-base font-black uppercase tracking-tight leading-tight truncate shrink min-w-0">
                   {product.name}
                 </h1>
-                {/* Flecha de scroll — desaparece al bajar */}
-                <span
-                  className={`md:hidden mt-1 text-zinc-600 text-lg transition-opacity duration-500 animate-bounce shrink-0 ${scrolled ? 'opacity-0' : 'opacity-100'}`}
-                >
-                  ↓
-                </span>
+                {variant?.price != null && (
+                  <span className="text-sm font-black whitespace-nowrap shrink-0">${variant.price.toLocaleString('es-CO')}</span>
+                )}
+                {stockNum !== null && (
+                  <span className={`text-[11px] font-bold uppercase tracking-wide whitespace-nowrap shrink-0 ${
+                    sinStock ? 'text-red-500' : stockBajo ? 'text-amber-400' : 'text-zinc-500'
+                  }`}>
+                    {sinStock ? 'Agotado' : stockBajo ? `¡${stockNum}!` : `${stockNum} stock`}
+                  </span>
+                )}
+              </div>
+              {product.descripcion && (
+                <p className="md:hidden text-zinc-400 text-xs leading-relaxed mt-2">{product.descripcion}</p>
+              )}
+              {isSupply && (
+                <p className="md:hidden text-xs italic tracking-wide border-l-2 pl-3 mt-3" style={{ borderColor: accent, color: accent }}>
+                  De un tatuador, para tatuadores.
+                </p>
+              )}
+
+              {/* ESCRITORIO — layout original, sin cambios */}
+              <div className="hidden md:flex md:items-start md:justify-between md:gap-4">
+                <h1 className="text-4xl font-black uppercase tracking-tight leading-tight">
+                  {product.name}
+                </h1>
               </div>
               {variant?.price != null && (
-                <p className="text-3xl font-black mt-3">
+                <p className="hidden md:block text-3xl font-black mt-3">
                   ${variant.price.toLocaleString('es-CO')}
                 </p>
               )}
             </div>
 
-            {/* Tagline — solo supply */}
+            {/* Tagline — solo supply, solo escritorio (en móvil ya se movió
+                debajo de la descripción, ver arriba) */}
             {isSupply && (
-              <p className="text-xs italic tracking-wide border-l-2 pl-3" style={{ borderColor: accent, color: accent }}>
+              <p className="hidden md:block text-xs italic tracking-wide border-l-2 pl-3" style={{ borderColor: accent, color: accent }}>
                 De un tatuador, para tatuadores.
               </p>
             )}
@@ -292,9 +319,9 @@ export default function ProductLandingPage() {
               </div>
             )}
 
-            {/* Stock */}
+            {/* Stock — solo escritorio en móvil ya va en la línea compacta de arriba */}
             {stockNum !== null && (
-              <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide ${
+              <div className={`hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-wide ${
                 sinStock ? 'text-red-500' : stockBajo ? 'text-amber-400' : 'text-zinc-500'
               }`}>
                 {(sinStock || stockBajo) && <Zap size={13} />}
@@ -375,7 +402,7 @@ export default function ProductLandingPage() {
                 )}
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
                   <MessageSquare size={13} className="shrink-0" style={{ color: accent }} />
-                  <span>Confirmación por WhatsApp en minutos — pedido directo, sin intermediarios</span>
+                  <span>Agenda tu pedido en línea o por WhatsApp — tú eliges, sin intermediarios</span>
                 </div>
                 {/* Ya dice "envío a toda Colombia" en la línea de arriba para
                     mobiliario — esta línea sería redundante/confusa ahí. */}
@@ -406,19 +433,17 @@ export default function ProductLandingPage() {
           </div>
         </div>
 
-        {/* Descripción en móvil — debajo de todo */}
-        {product.descripcion && (
-          <p className="md:hidden text-zinc-400 text-sm leading-relaxed mt-8 pt-6 border-t border-zinc-800">
-            {product.descripcion}
-          </p>
-        )}
-
       </div>
 
       {/* FOOTER MÍNIMO — mismo patrón que /jhumaneztattoo/agenda y
           /pedido/:module. Faltaba del todo, se notó al revisar todas las
-          landing pages standalone del sitio (2026-07-30). */}
-      <footer className={`border-t border-white/10 py-6 px-4 md:pb-6 ${!isAfiliado && cart ? 'pb-40' : 'pb-24'}`}>
+          landing pages standalone del sitio (2026-07-30). El espacio para
+          que la barra fija de botones no tape contenido ya lo reserva el
+          wrapper exterior (pb-36/pb-20, ver abajo) — este footer NO debe
+          sumar su propio padding extra encima, o queda el doble del
+          espacio necesario entre el copyright y los botones fijos (bug
+          reportado 2026-08-01). */}
+      <footer className="border-t border-white/10 py-6 px-4">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-500 text-[12px] gap-3">
           <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} INKognito. Todos los derechos reservados.</p>
           <div className="flex flex-wrap justify-center gap-6">
