@@ -23,7 +23,7 @@ const categories = [
   { name: 'Cuidados',          path: '/supply/aftercare',      icon: ShieldCheck, cat: 'Cuidados'    },
   { name: 'Fuentes',           path: '/supply/power-supplies', icon: PlugZap,    cat: 'Fuentes'     },
   { name: 'Accesorios',        path: '/supply/accessories',    icon: Toolbox,    cat: 'Accesorios'  },
-  { name: 'Mobiliario',        path: '/supply/furniture',      icon: BedDouble,  cat: 'Muebles'     },
+  { name: 'Mobiliario',        path: '/supply/furniture',      icon: BedDouble,  cat: 'Mobiliario'  },
   { name: 'Combos',            path: '/supply/bundles',        icon: Package,    cat: 'Combos'      },
 ]
 

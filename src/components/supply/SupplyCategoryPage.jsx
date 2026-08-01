@@ -17,7 +17,7 @@ const CAT_ICONS = {
   'Cuidados':  ShieldCheck,
   'Fuentes':   PlugZap,
   'Accesorios':Toolbox,
-  'Muebles':   BedDouble,
+  'Mobiliario':BedDouble,
   'Combos':    Package,
 }
 
@@ -62,7 +62,7 @@ const AFILIADO_COPY = {
     title: 'Accesorios de estudio que no llegan al mercado local',
     desc:  'Organizadores, racks y accesorios de marcas internacionales que no circulan en Colombia. Importados bajo pedido según lo que necesites para completar tu set.',
   },
-  'Muebles': {
+  'Mobiliario': {
     badge: 'Importación internacional · bajo pedido',
     title: 'Mobiliario de estándar internacional, importado',
     desc:  'Camillas y mobiliario profesional de nivel internacional, disponibles para importar. Los tiempos de entrega son mayores que el stock local — consulta condiciones antes de pedir.',
@@ -79,12 +79,12 @@ const WA = '573207911013'
 // Insignia de proveedor por categoría — por defecto Tommy Tattoo Supply
 // (todas las categorías de ink/cartuchos/agujas/etc. vienen de ahí).
 // Combos mezcla productos de varias categorías/proveedores, no es
-// atribuible a uno solo (null = no mostrar insignia). Muebles es Industrias
-// Warlock (mobiliario), no Tommy — mismo criterio que supplierBadge en
+// atribuible a uno solo (null = no mostrar insignia). Mobiliario es
+// Industrias Warlock, no Tommy — mismo criterio que supplierBadge en
 // BrandCatalogSection.jsx.
 const DEFAULT_BADGE = 'Suministrado por Tommy Tattoo Supply — marca reconocida en Urabá'
 const CATEGORY_BADGE = {
-  Muebles: 'Producto de Industrias Warlock — mobiliario fabricado en Bogotá, envío a toda Colombia',
+  Mobiliario: 'Producto de Industrias Warlock — mobiliario fabricado en Bogotá, envío a toda Colombia',
   Combos: null,
 }
 

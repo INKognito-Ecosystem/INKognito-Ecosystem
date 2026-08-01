@@ -141,7 +141,7 @@ export default function PedidoOnlinePage() {
   // Mobiliario (Industrias Warlock) no tiene contraentrega confirmada —
   // fabrican en Bogotá y envían a todo el país, así que fuerza Nequi sin
   // importar si el destino está en la ruta de Eljach (2026-08-01).
-  const tieneMobiliario = items.some(i => i.category === 'Muebles')
+  const tieneMobiliario = items.some(i => i.category === 'Mobiliario')
   const enCobertura = municipioSeleccionado && !tieneMobiliario
   const metodoPago = enCobertura ? 'contraentrega' : 'nequi'
   const precioFlete = enCobertura && fleteTabla ? fleteTabla[fleteOrigen]?.[form.municipioSel] : null

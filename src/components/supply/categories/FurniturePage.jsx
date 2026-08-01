@@ -7,8 +7,8 @@ import { fetchCatalogCategoria } from '../../../hooks/useCatalog'
 // esta categoría (a diferencia de las demás) no promete Urabá/Chigorodó ni
 // contraentrega — Jose aún no ha confirmado esa opción con ellos
 // (2026-08-01, ver project_proveedor_warlock_mobiliario).
-const TITLE = 'Muebles'
-const CATEGORIA = 'Muebles'
+const TITLE = 'Mobiliario'
+const CATEGORIA = 'Mobiliario'
 const SLUG = 'furniture'
 const DESC = 'Mobiliario profesional para estudios de tatuaje — Industrias Warlock. Camillas, sillas y almacenamiento, con envío a toda Colombia.'
 const INTRO = 'Tu espacio dice más de ti que cualquier otro elemento. La diferencia entre un cuarto y un estudio empieza por el mueble que el cliente toca primero. Mobiliario de Industrias Warlock, fabricado en Bogotá con envío a todo el país.'

@@ -10,7 +10,7 @@ import { useGymCart } from '../../contexts/GymCartContext'
 // Marcas que NO vienen de Tommy Tattoo Supply — confirmado por Jose
 // (2026-08-01). Mismo criterio que supplierBadge={null} en
 // TattooVisionPage.jsx/HeavenProPage.jsx y SIN_INSIGNIA_TOMMY en
-// SupplyCategoryPage.jsx (ese excluye por categoría — Muebles/Combos — este
+// SupplyCategoryPage.jsx (ese excluye por categoría — Mobiliario/Combos — este
 // por marca, porque Tattoo Vision y Heaven Pro comparten categoría con
 // productos que sí son de Tommy).
 const MARCAS_SIN_TOMMY = new Set(['tattoo-vision', 'heaven-pro', 'kwadron'])
@@ -154,7 +154,7 @@ export default function ProductLandingPage() {
   // Mobiliario (Industrias Warlock) no comparte la logística de Urabá/Eljach
   // del resto de Supply — fabrican en Bogotá, envío nacional, sin
   // contraentrega confirmada aún (2026-08-01).
-  const esMobiliario     = isSupply && product.categoria === 'Muebles'
+  const esMobiliario     = isSupply && product.categoria === 'Mobiliario'
   const accent          = MODULE_ACCENT[product.module] || '#A1A1AA'
   const imageUrl        = variant?.image_url || product.variantes[0]?.image_url
   const stockNum        = (!isAfiliado && variant?.stock != null) ? Number(variant.stock) : null
@@ -277,7 +277,7 @@ export default function ProductLandingPage() {
                   <span className={`text-[11px] font-bold uppercase tracking-wide whitespace-nowrap shrink-0 ${
                     sinStock ? 'text-red-500' : stockBajo ? 'text-amber-400' : 'text-zinc-500'
                   }`}>
-                    {sinStock ? 'Agotado' : stockBajo ? `¡${stockNum}!` : `${stockNum} stock`}
+                    {sinStock ? 'Agotado' : stockBajo ? `¡${stockNum}!` : `${stockNum} en stock`}
                   </span>
                 )}
               </div>
