@@ -117,7 +117,7 @@ function AfiliadoCard({ item, color }) {
 function SeccionAfiliados({ id, label, titulo, subtitulo, items, loading, color, cols }) {
   return (
     <>
-      <section id={id} className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950 scroll-mt-20">
+      <section id={id} className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950">
         <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
           <div className="mb-4 md:mb-8">

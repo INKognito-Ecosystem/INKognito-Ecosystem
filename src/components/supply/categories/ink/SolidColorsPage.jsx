@@ -1,6 +1,12 @@
+import { useLoaderData } from 'react-router-dom'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
-import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
+import BrandCatalogSection from '../../BrandCatalogSection'
+import { fetchCatalogMarca } from '../../../../hooks/useCatalog'
+
+export async function loader() {
+  return fetchCatalogMarca('supply', 'solid-ink')
+}
 
 export function meta() {
   const title = 'Tintas Solid Ink | INKognito Supply — Colombia'
@@ -14,98 +20,11 @@ export function meta() {
   ]
 }
 
-const categories = [
-  {
-    name: 'Negros y grises',
-    products: [
-      'Lining Black',
-      'Triple Black',
-      'Black Label Grey',
-      'Medium Grey',
-      'Light Grey'
-    ]
-  },
-  {
-    name: 'Rojos',
-    products: [
-      'Blood Red',
-      'Red',
-      'Burgundy',
-      'Dark Red',
-      'El Dorado Red'
-    ]
-  },
-  {
-    name: 'Azules',
-    products: [
-      'Blue',
-      'Sky Blue',
-      'Dark Blue',
-      'Blue Concentrate',
-      'Teal'
-    ]
-  },
-  {
-    name: 'Verdes',
-    products: [
-      'Green',
-      'Dark Green',
-      'Olive',
-      'Lime Green',
-      'Jungle Green'
-    ]
-  },
-  {
-    name: 'Amarillos y naranjas',
-    products: [
-      'Yellow',
-      'Golden Yellow',
-      'Orange',
-      'Tangerine',
-      'El Dorado'
-    ]
-  },
-  {
-    name: 'Morados y rosas',
-    products: [
-      'Purple',
-      'Violet',
-      'Magenta',
-      'Hot Pink',
-      'Bubblegum Pink'
-    ]
-  },
-  {
-    name: 'Marrones',
-    products: [
-      'Brown',
-      'Dark Brown',
-      'Chocolate',
-      'Burnt Umber',
-      'Mocha'
-    ]
-  },
-  {
-    name: 'Blancos',
-    products: [
-      'White',
-      'White Label'
-    ]
-  },
-  {
-    name: 'Tonos piel',
-    products: [
-      'Flesh',
-      'Light Flesh',
-      'Medium Flesh',
-      'Dark Flesh',
-      'Peach'
-    ]
-  }
-]
-
+// Reescrito 2026-07-30 — antes mostraba una grilla de colores y precios
+// inventados ("$XX.XXX") con un botón que sí agregaba al carrito real. Ahora
+// usa BrandCatalogSection con productos reales filtrados por `marca='solid-ink'`.
 export default function SolidColorsPage() {
-  const { addItem } = useSupplyCart()
+  const { products } = useLoaderData()
   return (
     <div className="min-h-screen bg-black text-white">
       <NavbarCategory pageName="Solid Ink" />
@@ -134,66 +53,7 @@ export default function SolidColorsPage() {
           </div>
         </div>
 
-        <div className="space-y-10">
-
-          {categories.map((category) => (
-
-            <section key={category.name}>
-
-              <h2 className="text-2xl md:text-4xl font-black uppercase mb-6">
-                {category.name}
-              </h2>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-
-                {category.products.map((name) => {
-                  const product = { id: name, name, brand: 'Solid Ink', price: '$XX.XXX' }
-                  return (
-                    <div
-                      key={name}
-                      className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-950 hover:border-zinc-600 transition-all duration-300"
-                    >
-
-                      <div className="aspect-square bg-zinc-900 flex items-center justify-center">
-                        <span className="text-zinc-700 uppercase tracking-[0.2em] text-xs">
-                          Foto
-                        </span>
-                      </div>
-
-                      <div className="p-3 md:p-4">
-
-                        <h3 className="font-bold text-sm md:text-lg mb-2">
-                          {name}
-                        </h3>
-
-                        <span className="text-zinc-500 text-xs uppercase block mb-2">
-                          Solid Ink
-                        </span>
-
-                        <span className="text-white font-bold text-sm block mb-3">
-                          {product.price}
-                        </span>
-
-                        <button
-                          onClick={() => addItem(product, 'ink-solid-ink')}
-                          className="w-full py-2 border border-zinc-700 uppercase tracking-[0.15em] text-xs hover:border-blue-500 hover:text-blue-500 transition-all duration-300"
-                        >
-                          + Agregar al carrito
-                        </button>
-
-                      </div>
-
-                    </div>
-                  )
-                })}
-
-              </div>
-
-            </section>
-
-          ))}
-
-        </div>
+        <BrandCatalogSection brandName="Solid Ink" products={products} />
 
         <section className="mt-24 md:mt-32">
           <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">

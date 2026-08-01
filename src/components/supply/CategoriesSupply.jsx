@@ -63,7 +63,7 @@ export default function CategoriesSupply({ categorias = {} }) {
         </div>
 
         <div className="flex md:grid md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
-          {categories.map((category) => {
+          {categories.map((category, i) => {
             const count = stockPorCat[category.cat]
             const hasStock = count > 0
             return (
@@ -79,6 +79,11 @@ export default function CategoriesSupply({ categorias = {} }) {
                   ${hasStock ? 'text-zinc-300' : 'text-zinc-600'}
                 `}
               >
+                {i === 0 && (
+                  <span className="md:hidden absolute top-1.5 left-1.5 z-20 flex items-center gap-1 text-white text-[8px] font-bold uppercase tracking-widest bg-black/70 rounded-full px-2 py-1">
+                    Desliza <span className="animate-bounce">→</span>
+                  </span>
+                )}
                 {imgs[catKey(category.cat)] ? (
                   <>
                     <img

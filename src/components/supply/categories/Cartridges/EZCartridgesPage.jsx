@@ -1,6 +1,12 @@
+import { useLoaderData } from 'react-router-dom'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
-import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
+import BrandCatalogSection from '../../BrandCatalogSection'
+import { fetchCatalogMarca } from '../../../../hooks/useCatalog'
+
+export async function loader() {
+  return fetchCatalogMarca('supply', 'ez-tattoo')
+}
 
 export function meta() {
   const title = 'Cartuchos EZ Tattoo | INKognito Supply — Colombia'
@@ -13,56 +19,6 @@ export function meta() {
     { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/cartridges/ez-tattoo` },
   ]
 }
-
-const categories = [
-  {
-    name: 'Round Liner',
-    products: [
-      'EZ 1RL',
-      'EZ 3RL',
-      'EZ 5RL',
-      'EZ 7RL',
-      'EZ 9RL',
-      'EZ 11RL',
-      'EZ 14RL'
-    ]
-  },
-  {
-    name: 'Round Shader',
-    products: [
-      'EZ 3RS',
-      'EZ 5RS',
-      'EZ 7RS',
-      'EZ 9RS',
-      'EZ 11RS',
-      'EZ 14RS'
-    ]
-  },
-  {
-    name: 'Magnum',
-    products: [
-      'EZ 7M1',
-      'EZ 9M1',
-      'EZ 11M1',
-      'EZ 13M1',
-      'EZ 15M1',
-      'EZ 17M1',
-      'EZ 23M1'
-    ]
-  },
-  {
-    name: 'Curved Magnum',
-    products: [
-      'EZ 7RM',
-      'EZ 9RM',
-      'EZ 11RM',
-      'EZ 13RM',
-      'EZ 15RM',
-      'EZ 17RM',
-      'EZ 23RM'
-    ]
-  }
-]
 
 const faqs = [
   {
@@ -87,8 +43,13 @@ const faqs = [
   }
 ]
 
+// Reescrito 2026-07-30 — antes mostraba una grilla de productos y precios
+// inventados ("$XX.XXX") con un botón que sí agregaba al carrito real, sin
+// stock ni precio de verdad detrás. Ahora usa el mismo BrandCatalogSection
+// que el resto de páginas de marca, con productos reales filtrados por
+// `marca='ez-tattoo'` desde el inventario del panel.
 export default function EZCartridgesPage() {
-  const { addItem } = useSupplyCart()
+  const { products } = useLoaderData()
   return (
     <div className="min-h-screen bg-black text-white">
       <NavbarCategory pageName="EZ Tattoo" />
@@ -116,66 +77,7 @@ export default function EZCartridgesPage() {
 
         </div>
 
-        <div className="space-y-12">
-
-          {categories.map((category) => (
-
-            <section key={category.name}>
-
-              <h2 className="text-2xl md:text-4xl font-black uppercase mb-6">
-                {category.name}
-              </h2>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-
-                {category.products.map((name) => {
-                  const product = { id: name, name, brand: 'EZ Tattoo', price: '$XX.XXX' }
-                  return (
-                    <div
-                      key={name}
-                      className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-950 hover:border-zinc-600 transition-all duration-300"
-                    >
-
-                      <div className="aspect-square bg-zinc-900 flex items-center justify-center">
-                        <span className="text-zinc-700 uppercase tracking-[0.2em] text-xs">
-                          Foto
-                        </span>
-                      </div>
-
-                      <div className="p-3 md:p-4">
-
-                        <h3 className="font-bold text-sm md:text-lg mb-2">
-                          {name}
-                        </h3>
-
-                        <span className="text-zinc-500 text-xs uppercase block mb-2">
-                          EZ Tattoo
-                        </span>
-
-                        <span className="text-white font-bold text-sm block mb-3">
-                          {product.price}
-                        </span>
-
-                        <button
-                          onClick={() => addItem(product, 'cartridges-ez')}
-                          className="w-full py-2 border border-zinc-700 uppercase tracking-[0.15em] text-xs hover:border-blue-500 hover:text-blue-500 transition-all duration-300"
-                        >
-                          + Agregar al carrito
-                        </button>
-
-                      </div>
-
-                    </div>
-                  )
-                })}
-
-              </div>
-
-            </section>
-
-          ))}
-
-        </div>
+        <BrandCatalogSection brandName="EZ Tattoo" products={products} />
 
         <section className="mt-20 border-t border-zinc-800 pt-12">
 

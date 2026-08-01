@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router-dom'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
@@ -7,6 +7,11 @@ import AccordionCard from '../AccordionCard'
 import { getAdjacentBrands } from '../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../hooks/useScrolled'
+import { fetchCatalogMarca } from '../../../hooks/useCatalog'
+
+export async function loader() {
+  return fetchCatalogMarca('supply', 'royal-three')
+}
 
 export function meta() {
   const title = 'Royal Three | Insumos para tatuadores — INKognito Supply'
@@ -41,6 +46,7 @@ const faq = [
 ]
 
 export default function RoyalThreePage() {
+  const { products } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_royal_three')
   const { prev, next } = getAdjacentBrands(5)
   const scrolled = useScrolled()
@@ -120,7 +126,7 @@ export default function RoyalThreePage() {
           </div>
         </div>
 
-        <BrandCatalogSection brandName="Royal Three" />
+        <BrandCatalogSection brandName="Royal Three" products={products} />
 
         <section className="mt-10 md:mt-14">
           <AccordionCard

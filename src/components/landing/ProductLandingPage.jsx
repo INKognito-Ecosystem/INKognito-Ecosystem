@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react'
-import { useParams, useLoaderData } from 'react-router-dom'
+import { Link, useParams, useLoaderData, useNavigate } from 'react-router-dom'
 import { FaWhatsapp } from 'react-icons/fa'
-import { Package, ExternalLink, Truck, Shield, MessageSquare, Zap, Globe } from 'lucide-react'
+import { Package, ExternalLink, Truck, Shield, ShieldCheck, MessageSquare, Zap, Globe, CalendarCheck } from 'lucide-react'
 import EcosystemNavbar from '../ecosystem/EcosystemNavbar'
+import { useSupplyCart } from '../../contexts/SupplyCartContext'
+import { useStoreCart } from '../../contexts/StoreCartContext'
+import { useGymCart } from '../../contexts/GymCartContext'
 
 const PANEL_URL  = import.meta.env.VITE_PANEL_URL
 const WA_NUMBER  = import.meta.env.VITE_WHATSAPP_NUMBER || '573207911013'
@@ -93,9 +96,18 @@ export function meta({ data }) {
   ]
 }
 
+// Módulo de inventario → contexto de carrito real. "suplementos" no tiene
+// su propio carrito — sus productos ya se agregan al de Gym (ver
+// SuplementosPage.jsx), así que su pedido online también vive en /pedido/gym.
+const CART_MODULE = { supply: 'supply', store: 'store', gym: 'gym', suplementos: 'gym' }
+
 export default function ProductLandingPage() {
   const { id } = useParams()
   const { product } = useLoaderData()
+  const navigate = useNavigate()
+  const supplyCart = useSupplyCart()
+  const storeCart = useStoreCart()
+  const gymCart = useGymCart()
   const [activeVariant, setActive] = useState(0)
   const [scrolled, setScrolled]    = useState(false)
 
@@ -118,8 +130,13 @@ export default function ProductLandingPage() {
   }, [product])
 
   if (!product) return (
-    <div className="min-h-screen bg-black flex items-center justify-center text-zinc-500 text-sm uppercase tracking-widest">
-      Producto no encontrado
+    <div className="min-h-screen bg-black flex flex-col">
+      <div className="flex-1 flex items-center justify-center text-zinc-500 text-sm uppercase tracking-widest">
+        Producto no encontrado
+      </div>
+      <footer className="border-t border-white/10 py-6 px-4 text-center">
+        <span className="text-gray-500 text-[12px]">Desarrollado por INKognito</span>
+      </footer>
     </div>
   )
 
@@ -138,6 +155,44 @@ export default function ProductLandingPage() {
 
   const waMessage = encodeURIComponent(
     `Hola, quiero pedir:\n• ${product.name}${variant?.variant ? ` — ${variant.variant}` : ''}\nPrecio: $${variant?.price?.toLocaleString('es-CO') ?? '?'}`
+  )
+
+  // Pedido online — alternativa al WhatsApp, misma lógica que ya usan los
+  // CartDrawer de Supply/Store/Gym: agrega el producto al carrito real y
+  // manda a /pedido/:module, que lee ese mismo carrito y solo pide datos de
+  // entrega. Antes esta landing (pensada para publicidad/compartir un link
+  // directo) solo ofrecía WhatsApp — no tenía forma de generar el pedido sin
+  // salir a otra app (2026-07-30).
+  const cartModule = CART_MODULE[product.module]
+  const cart = { supply: supplyCart, store: storeCart, gym: gymCart }[cartModule]
+  const handlePedidoOnline = () => {
+    if (sinStock || !cart) return
+    const productId = product.name + (variant?.variant ? '-' + variant.variant : '')
+    cart.addItem({
+      id:    productId,
+      name:  product.name + (variant?.variant ? ` (${variant.variant})` : ''),
+      price: variant?.price ? '$' + Math.round(variant.price).toLocaleString('es-CO') : '—',
+      brand: product.descripcion || product.categoria || '',
+      image: imageUrl || '',
+    }, product.categoria)
+    navigate(`/pedido/${cartModule}`)
+  }
+
+  const PedidoOnlineButton = ({ className = '' }) => (
+    <button
+      type="button"
+      onClick={handlePedidoOnline}
+      disabled={sinStock}
+      className={`flex items-center justify-center gap-3 py-4 font-black uppercase tracking-widest rounded transition-all text-sm ${
+        sinStock
+          ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+          : 'border-2 text-white hover:bg-white/5'
+      } ${className}`}
+      style={sinStock ? {} : { borderColor: accent }}
+    >
+      <CalendarCheck size={18} />
+      Agendar Pedido en Línea
+    </button>
   )
 
   const CTAButton = ({ className = '' }) => isAfiliado ? (
@@ -167,7 +222,7 @@ export default function ProductLandingPage() {
   )
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20 md:pb-0">
+    <div className={`min-h-screen bg-black text-white md:pb-0 ${!isAfiliado && cart ? 'pb-36' : 'pb-20'}`}>
       <EcosystemNavbar tattooLabel="Jhumaneztattoo" logoFilter="brightness(0) invert(1)" showTagline />
 
       <div className="pt-20 max-w-5xl mx-auto px-4 py-8 md:py-16">
@@ -261,14 +316,22 @@ export default function ProductLandingPage() {
               </div>
             )}
 
-            {/* CTA desktop */}
-            <div className="hidden md:block">
+            {/* CTA desktop — pedido online primero (queda nuestro), WhatsApp
+                como alternativa, igual que en los CartDrawer */}
+            <div className="hidden md:flex md:flex-col md:gap-3">
+              {!isAfiliado && cart && <PedidoOnlineButton className="w-full" />}
               <CTAButton className="w-full" />
             </div>
 
             {/* Trust signals — solo modulos con proveedor externo (no Gym: maquinas propias) */}
             {!isAfiliado && ['supply', 'suplementos', 'store'].includes(product.module) && (
               <div className="border-t border-zinc-800 pt-4 space-y-2">
+                {isSupply && (
+                  <div className="flex items-center gap-3 text-zinc-400 text-xs">
+                    <ShieldCheck size={13} className="shrink-0" style={{ color: accent }} />
+                    <span>Suministrado por Tommy Tattoo Supply — marca reconocida en Urabá</span>
+                  </div>
+                )}
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
                   <Truck size={13} className="shrink-0" style={{ color: accent }} />
                   <span>Envío con Eljach Mensajería Express — 1 a 2 días en Urabá (Chigorodó, Apartadó, Carepa, Turbo), con pago contraentrega</span>
@@ -311,8 +374,23 @@ export default function ProductLandingPage() {
 
       </div>
 
-      {/* CTA fijo móvil */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-black/95 backdrop-blur-sm border-t border-white/10 px-4 py-3">
+      {/* FOOTER MÍNIMO — mismo patrón que /jhumaneztattoo/agenda y
+          /pedido/:module. Faltaba del todo, se notó al revisar todas las
+          landing pages standalone del sitio (2026-07-30). */}
+      <footer className={`border-t border-white/10 py-6 px-4 md:pb-6 ${!isAfiliado && cart ? 'pb-40' : 'pb-24'}`}>
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-500 text-[12px] gap-3">
+          <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} INKognito. Todos los derechos reservados.</p>
+          <div className="flex flex-wrap justify-center gap-6">
+            <Link to="/terminos" className="hover:text-white transition-colors">Términos</Link>
+            <Link to="/privacidad" className="hover:text-white transition-colors">Privacidad</Link>
+            <span>Desarrollado por INKognito</span>
+          </div>
+        </div>
+      </footer>
+
+      {/* CTA fijo móvil — pedido online + WhatsApp apiladas, igual que desktop */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-black/95 backdrop-blur-sm border-t border-white/10 px-4 py-3 flex flex-col gap-2">
+        {!isAfiliado && cart && <PedidoOnlineButton className="w-full" />}
         <CTAButton className="w-full" />
       </div>
 

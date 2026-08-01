@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect } from 'react'
-import { Meta, Links, Outlet, Scripts, useLocation, useNavigation } from 'react-router'
+import { Meta, Links, Outlet, Scripts, useLocation, useNavigation, useNavigationType } from 'react-router'
 import { HelmetProvider } from 'react-helmet-async'
 import { SupplyCartProvider } from './contexts/SupplyCartContext'
 import { StoreCartProvider } from './contexts/StoreCartContext'
@@ -123,16 +123,44 @@ export function Layout({ children }) {
   )
 }
 
+// Recuerda el scroll de cada entrada del historial (por location.key) para
+// poder restaurarlo en navegación "atrás/adelante" — ver nota abajo sobre
+// por qué no se usa el <ScrollRestoration/> nativo de react-router.
+const scrollPositions = new Map()
+
 // Antes vivía en main.jsx envolviendo <App/> — ahora tiene que estar DENTRO
 // del árbol de rutas (necesita useLocation, que exige contexto de router), así
 // que se mueve acá como hermano de <Outlet/> en vez de wrapper desde afuera.
 function ScrollToHash() {
-  const { pathname, hash } = useLocation()
+  const { pathname, hash, key } = useLocation()
+  const navigationType = useNavigationType() // 'PUSH' | 'POP' | 'REPLACE'
+
+  // Guarda continuamente el scroll de la página actual bajo su propia key,
+  // para tenerlo disponible si el usuario vuelve a ella con "atrás".
+  useEffect(() => {
+    const onScroll = () => scrollPositions.set(key, window.scrollY)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [key])
 
   // La restauración nativa del navegador ya se apaga antes, con el script
   // inline en <head> (ver Layout arriba) — hacerlo acá con un efecto de
-  // React llegaba demasiado tarde para el caso de recarga (F5).
+  // React llegaba demasiado tarde para el caso de recarga (F5). Por eso este
+  // componente es la única fuente de verdad para el scroll — pero antes
+  // forzaba scroll-to-top/hash en TODA navegación, incluida "atrás", lo que
+  // mandaba al usuario al hero en vez de dejarlo donde estaba (reportado en
+  // Supply, pero el bug es de todo el sitio). Ahora "atrás/adelante" (POP)
+  // restaura la posición guardada arriba en vez de forzar nada.
   useLayoutEffect(() => {
+    if (navigationType === 'POP') {
+      const saved = scrollPositions.get(key)
+      if (saved != null) {
+        window.scrollTo({ top: saved, behavior: 'instant' })
+        return
+      }
+      // Sin posición guardada (ej. "atrás" hacia una entrada de antes de
+      // cargar la página, como tras un F5) — cae al comportamiento normal.
+    }
     if (hash) {
       setTimeout(() => {
         const el = document.querySelector(hash)
@@ -146,7 +174,7 @@ function ScrollToHash() {
     } else {
       window.scrollTo({ top: 0, behavior: 'instant' })
     }
-  }, [pathname, hash])
+  }, [pathname, hash, key, navigationType])
 
   return null
 }

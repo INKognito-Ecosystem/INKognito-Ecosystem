@@ -5,6 +5,7 @@ import CategoriesSupply from './CategoriesSupply'
 import BrandsSupply from './BrandsSupply'
 import FooterSupply from './FooterSupply'
 import { FaWhatsapp } from 'react-icons/fa'
+import { ShieldCheck } from 'lucide-react'
 import { fetchCatalogFull } from '../../hooks/useCatalog'
 const ogSupply = '/og/supply.webp'
 
@@ -160,6 +161,15 @@ export default function SupplyPage() {
           <p className="text-zinc-500 text-[10px] mt-0.5">Aliado logístico · Contra entrega</p>
         </div>
       </div>
+      <div className="flex gap-2 mb-5">
+        <div className="flex items-center justify-center bg-blue-500/10 border border-blue-500/30 rounded-xl flex-shrink-0 aspect-square w-16">
+          <ShieldCheck className="text-blue-400" size={26} />
+        </div>
+        <div className="flex flex-col justify-center bg-black border border-zinc-800 rounded-xl px-3 py-2 flex-1">
+          <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Tommy Tattoo Supply</p>
+          <p className="text-zinc-500 text-[10px] mt-0.5">Aliado comercial · Punto físico en Carepa</p>
+        </div>
+      </div>
       <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">Urabá — Entrega directa</p>
       <div className="flex flex-col gap-1 mb-3">
         {[{n:'Chigorodó',t:'1–2 días'},{n:'Carepa',t:'1–2 días'},{n:'Apartadó',t:'1–2 días'},{n:'Turbo',t:'2–3 días'}].map(c => (
@@ -214,6 +224,15 @@ export default function SupplyPage() {
               <p className="text-zinc-500 text-xs mt-0.5">Aliado logístico · Contra entrega</p>
             </div>
           </div>
+          <div className="flex gap-3 mb-4">
+            <div className="flex items-center justify-center bg-blue-500/10 border border-blue-500/30 rounded-xl flex-shrink-0 w-14 h-14">
+              <ShieldCheck className="text-blue-400" size={28} />
+            </div>
+            <div className="flex flex-col justify-center bg-black border border-zinc-800 rounded-xl px-4 py-2.5 flex-1">
+              <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Tommy Tattoo Supply</p>
+              <p className="text-zinc-500 text-xs mt-0.5">Aliado comercial · Punto físico en Carepa</p>
+            </div>
+          </div>
           <p className="text-zinc-500 text-[10px] uppercase tracking-widest mb-3">Urabá — Entrega directa</p>
           <div className="flex flex-col gap-1.5 mb-3">
             {[{name:'Chigorodó',time:'1–2 días'},{name:'Carepa',time:'1–2 días'},{name:'Apartadó',time:'1–2 días'},{name:'Turbo',time:'2–3 días'}].map(c => (
@@ -244,7 +263,7 @@ export default function SupplyPage() {
           <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Compra con Confianza</h2>
           <div className="flex flex-col gap-4">
             {[
-              {t:'Proveedores verificados',     d:'Trabajamos con distribuidores reconocidos y de confianza para el sector del tatuaje.'},
+              {t:'Proveedor verificado',         d:'Tommy Tattoo Supply, productos para Urabá, envío nacional, con punto físico en Carepa, Antioquia, Colombia.'},
               {t:'Productos originales',         d:'Tintas, cartuchos y agujas de marcas certificadas. Calidad garantizada en cada pedido.'},
               {t:'Pago contraentrega',           d:'Paga cuando recibas tu pedido en Urabá. Sin riesgos, sin adelantos innecesarios.'},
               {t:'Soporte por WhatsApp',         d:'Asesoría personalizada antes, durante y después de tu compra.'},

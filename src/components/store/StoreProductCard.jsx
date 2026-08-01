@@ -56,11 +56,15 @@ function SizeSelector({ sizes, selIdx, onChange }) {
 }
 
 export default function StoreProductCard({ product, category, sizes }) {
-  const { addItem } = useStoreCart()
+  const { items, addItem } = useStoreCart()
   const [selIdx, setSelIdx] = useState(0)
-  const [added, setAdded]   = useState(false)
 
   const selectedSize = sizes?.[selIdx] || ''
+  // El botón refleja el carrito real, no un timer — antes decía "Agregado"
+  // por 1.5s y volvía a "Agregar al carrito" aunque el producto siguiera
+  // adentro, dando la impresión falsa de que no se había agregado.
+  const cartKey = `${category}-${product.id}-${selectedSize}`
+  const enCarrito = items.some(i => i.key === cartKey)
 
   const activeImage = (() => {
     if (selectedSize && product._item?.variantes) {
@@ -72,8 +76,6 @@ export default function StoreProductCard({ product, category, sizes }) {
 
   const handleAdd = () => {
     addItem(product, category, selectedSize)
-    setAdded(true)
-    setTimeout(() => setAdded(false), 1500)
   }
 
   return (
@@ -113,11 +115,11 @@ export default function StoreProductCard({ product, category, sizes }) {
       <button
         onClick={handleAdd}
         className={`w-full py-2.5 font-bold uppercase tracking-[0.1em] text-[10px] md:text-xs flex-shrink-0 transition-all duration-300 ${
-          added ? 'bg-green-500 text-white' : 'text-black hover:brightness-90'
+          enCarrito ? 'bg-green-500 text-white' : 'text-black hover:brightness-90'
         }`}
-        style={added ? {} : { backgroundColor: '#C9A84C' }}
+        style={enCarrito ? {} : { backgroundColor: '#C9A84C' }}
       >
-        {added ? '✓ Agregado' : '+ Agregar al carrito'}
+        {enCarrito ? '✓ Agregado' : '+ Agregar al carrito'}
       </button>
 
     </div>

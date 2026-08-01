@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router-dom'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
@@ -7,6 +7,11 @@ import AccordionCard from '../AccordionCard'
 import { getAdjacentBrands } from '../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../hooks/useScrolled'
+import { fetchCatalogMarca } from '../../../hooks/useCatalog'
+
+export async function loader() {
+  return fetchCatalogMarca('supply', 'heaven-pro')
+}
 
 export function meta() {
   const title = 'Heaven Pro | Cuidado de tatuajes — INKognito Supply'
@@ -41,6 +46,7 @@ const faq = [
 ]
 
 export default function HeavenProPage() {
+  const { products } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_heaven_pro')
   const { prev, next } = getAdjacentBrands(4)
   const scrolled = useScrolled()
@@ -122,7 +128,7 @@ export default function HeavenProPage() {
           </div>
         </div>
 
-        <BrandCatalogSection brandName="Heaven Pro" />
+        <BrandCatalogSection brandName="Heaven Pro" products={products} />
 
         <section className="mt-10 md:mt-14">
           <AccordionCard

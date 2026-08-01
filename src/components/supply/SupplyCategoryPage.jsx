@@ -1,10 +1,9 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import NavbarCategory from './NavbarCategory'
 import FooterSupply from './FooterSupply'
 import AccordionCard from './AccordionCard'
+import SupplyProductCard from './SupplyProductCard'
 import { useScrolled } from '../../hooks/useScrolled'
-import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { FaWhatsapp } from 'react-icons/fa'
 import { ExternalLink, Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package, ArrowLeft, ArrowRight } from 'lucide-react'
 import { getAdjacentCategories } from '../../data/supplyCategoriesOrder'
@@ -76,144 +75,15 @@ const AFILIADO_COPY = {
 }
 
 const WA = '573207911013'
-const VAR_THRESHOLD = 3
+
+// Categorías que NO se atribuyen a Tommy Tattoo Supply:
+// - Muebles: proveedor distinto en negociación (Warlock), ver project_proveedor_warlock_mobiliario
+// - Combos: mezcla productos de distintas categorías/proveedores, no es atribuible a uno solo
+const SIN_INSIGNIA_TOMMY = ['Muebles', 'Combos']
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
   backgroundSize: '18px 18px',
-}
-
-function VariantSelectorSupply({ variantObjs, selIdx, onChange }) {
-  const [open, setOpen] = useState(false)
-  if (!variantObjs || variantObjs.length <= 1) return null
-
-  if (variantObjs.length <= VAR_THRESHOLD) {
-    return (
-      <div className="grid gap-1 w-full" style={{ gridTemplateColumns: `repeat(${variantObjs.length}, 1fr)` }}>
-        {variantObjs.map((v, i) => (
-          <button
-            key={i}
-            onClick={() => onChange(i)}
-            className={`text-[9px] font-bold py-1 rounded border transition-all duration-200 text-center truncate ${
-              selIdx === i
-                ? 'bg-blue-500 text-white border-blue-500'
-                : 'border-zinc-700 text-zinc-500 hover:border-blue-400 hover:text-white'
-            }`}
-          >
-            {v.variant}
-          </button>
-        ))}
-      </div>
-    )
-  }
-
-  return (
-    <div className="w-full">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between py-1.5 px-2 rounded border border-zinc-700 text-[9px] font-bold text-zinc-300 hover:border-blue-400 transition-all duration-200"
-      >
-        <span className="truncate">{variantObjs[selIdx]?.variant || '—'}</span>
-        <span className={`ml-1 flex-shrink-0 transition-transform duration-200 ${open ? 'rotate-90' : ''}`}>▶</span>
-      </button>
-      {open && (
-        <div className="mt-1 grid grid-cols-2 gap-1">
-          {variantObjs.map((v, i) => (
-            <button
-              key={i}
-              onClick={() => { onChange(i); setOpen(false) }}
-              className={`text-[9px] font-bold py-1.5 px-1 rounded border transition-all duration-200 text-center truncate ${
-                selIdx === i
-                  ? 'bg-blue-500 text-white border-blue-500'
-                  : 'border-zinc-700 text-zinc-500 hover:border-blue-400 hover:text-white'
-              }`}
-            >
-              {v.variant}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function ProductCard({ item, categoria }) {
-  const { addItem } = useSupplyCart()
-  const [selIdx, setSelIdx] = useState(0)
-  const [added, setAdded]   = useState(false)
-
-  const variantObjs = item.variantes?.filter(v => v.variant) ?? []
-  const totalStock  = item.variantes?.reduce((s, v) => s + (v.stock || 0), 0) ?? 0
-  const sel         = variantObjs[selIdx] || variantObjs[0] || {}
-
-  const resolvedPrice = sel.price
-    ? '$' + Math.round(sel.price).toLocaleString('es-CO')
-    : null
-  const activeImage = sel.image_url || item.image_url || null
-
-  const handleAdd = () => {
-    addItem({
-      id:    item.name + (sel.variant ? '-' + sel.variant : ''),
-      name:  item.name + (sel.variant ? ` (${sel.variant})` : ''),
-      price: resolvedPrice || '—',
-      brand: item.descripcion || item.categoria || '',
-      image: activeImage || '',
-    }, categoria)
-    setAdded(true)
-    setTimeout(() => setAdded(false), 1500)
-  }
-
-  return (
-    <div className="border border-blue-500/40 bg-zinc-950 rounded-2xl overflow-hidden hover:border-blue-500 hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-300 flex flex-col h-full">
-
-      <div className="aspect-square w-full bg-zinc-900 overflow-hidden flex-shrink-0">
-        {activeImage ? (
-          <img
-            key={activeImage}
-            src={activeImage}
-            alt={`${item.name}${sel.variant ? ' ' + sel.variant : ''}`}
-            className="w-full h-full object-cover transition-opacity duration-200"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <p className="text-zinc-700 uppercase tracking-[0.3em] text-[10px] text-center px-3">{item.name}</p>
-          </div>
-        )}
-      </div>
-
-      <div className="p-3 flex flex-col flex-1 gap-1.5 min-h-0">
-        {item.descripcion && (
-          <p className="text-zinc-500 uppercase tracking-[0.2em] text-[9px] leading-none">{item.descripcion}</p>
-        )}
-        <h3 className="text-xs font-black uppercase leading-tight text-white">{item.name}</h3>
-        {resolvedPrice && <p className="text-white font-bold text-sm">{resolvedPrice}</p>}
-        {totalStock <= 3 && totalStock > 0 && (
-          <p className="text-yellow-500 text-[9px] font-bold">⚠️ Últimas {totalStock}</p>
-        )}
-        <div className="mt-auto pt-1">
-          {/* Con una sola variante, VariantSelectorSupply no renderiza nada
-              (no hay entre qué elegir) — pero el cliente igual necesita saber
-              qué trae la caja (ej. calibre de agujas), así que se muestra
-              como texto simple en vez de perderse. */}
-          {variantObjs.length === 1 ? (
-            <p className="text-[9px] font-bold text-zinc-400 uppercase truncate">{variantObjs[0].variant}</p>
-          ) : (
-            <VariantSelectorSupply variantObjs={variantObjs} selIdx={selIdx} onChange={setSelIdx} />
-          )}
-        </div>
-      </div>
-
-      <button
-        onClick={handleAdd}
-        className={`w-full py-2.5 font-bold uppercase tracking-[0.1em] text-[10px] flex-shrink-0 transition-all duration-300 ${
-          added ? 'bg-green-500 text-white' : 'bg-blue-500 text-white hover:bg-blue-600'
-        }`}
-      >
-        {added ? '✓ Agregado' : '+ Agregar al carrito'}
-      </button>
-    </div>
-  )
 }
 
 function AfiliadoCard({ item }) {
@@ -314,6 +184,12 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
           {intro && (
             <p className="relative z-10 text-zinc-400 text-base md:text-lg leading-relaxed max-w-3xl">{intro}</p>
           )}
+          {products.length > 0 && !SIN_INSIGNIA_TOMMY.includes(categoria) && (
+            <div className="relative z-10 flex items-center gap-2 text-xs text-zinc-400 bg-zinc-900/60 border border-zinc-800 rounded-lg px-3 py-2 w-fit mt-4">
+              <ShieldCheck size={14} className="shrink-0 text-blue-400" />
+              <span>Suministrado por Tommy Tattoo Supply — marca reconocida en Urabá</span>
+            </div>
+          )}
         </div>
 
         {/* PRODUCTOS FÍSICOS — scroll horizontal en móvil, grid en desktop */}
@@ -338,7 +214,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
             <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-0 px-6 md:px-6 pb-3 md:pb-0 scrollbar-hide">
               {products.map(item => (
                 <div key={item.name} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">
-                  <ProductCard item={item} categoria={categoria} />
+                  <SupplyProductCard item={item} categoria={categoria} />
                 </div>
               ))}
             </div>

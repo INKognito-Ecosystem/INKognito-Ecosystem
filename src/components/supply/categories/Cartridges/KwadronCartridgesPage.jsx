@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router-dom'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
@@ -7,6 +7,11 @@ import AccordionCard from '../../AccordionCard'
 import { getAdjacentBrands } from '../../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../../hooks/useScrolled'
+import { fetchCatalogMarca } from '../../../../hooks/useCatalog'
+
+export async function loader() {
+  return fetchCatalogMarca('supply', 'kwadron')
+}
 
 export function meta() {
   const title = 'Cartuchos Kwadron | INKognito Supply — Colombia'
@@ -44,6 +49,7 @@ const faq = [
 ]
 
 export default function KwadronCartridgesPage() {
+  const { products } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_kwadron')
   const { prev, next } = getAdjacentBrands(6)
   const scrolled = useScrolled()
@@ -152,7 +158,7 @@ export default function KwadronCartridgesPage() {
           </div>
         </div>
 
-        <BrandCatalogSection brandName="Kwadron" />
+        <BrandCatalogSection brandName="Kwadron" products={products} />
 
         <section className="mt-10 md:mt-14">
           <AccordionCard

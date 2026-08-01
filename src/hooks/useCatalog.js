@@ -108,6 +108,18 @@ export async function fetchCatalogFull(module) {
   }
 }
 
+/**
+ * Versión para loader (servidor): productos de un módulo filtrados por
+ * `marca` (el mismo slug que usa la ruta de esa marca, ej. 'wjx') — para las
+ * páginas de "Marca Profesional" en Supply (WJX, Kwadron, Vice Colors...).
+ * Reusa fetchCatalogFull en vez de pegarle a un endpoint aparte — el filtro
+ * por marca vive acá, no en el panel.
+ */
+export async function fetchCatalogMarca(module, marca) {
+  const { allProducts } = await fetchCatalogFull(module)
+  return { products: allProducts.filter(p => p.marca === marca) }
+}
+
 /** Converts a catalog item to the format StoreProductCard expects */
 export function toProdCard(item) {
   const firstPrice = item.variantes?.[0]?.price

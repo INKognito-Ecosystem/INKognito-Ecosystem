@@ -12,6 +12,11 @@ const DOT_PATTERN = {
   backgroundSize: '18px 18px',
 }
 
+// Decisión de Jose (2026-07-30): reducir a estas 7 marcas destacadas en el
+// hub — las otras 6 (EZ Tattoo, Eternal, Intenze, Fusion, World Famous,
+// Solid Ink) siguen existiendo como páginas reales, ya conectadas a
+// inventario real y sin productos/precios inventados, solo que no se listan
+// acá. Si se necesitan de nuevo, sus rutas ya funcionan.
 const brands = [
   { name: 'TATTOO VISION', to: '/supply/brands/tattoo-vision' },
   { name: 'WJX', to: '/supply/cartridges/wjx' },
@@ -55,12 +60,17 @@ export default function BrandsSupply() {
         </div>
 
         <div className="flex md:grid md:grid-cols-4 lg:grid-cols-7 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
-          {brands.map((brand) => (
+          {brands.map((brand, i) => (
             <Link
               key={brand.name}
               to={brand.to}
-              className="snap-start flex-shrink-0 w-[44vw] md:w-auto h-36 border border-blue-500 md:border-blue-500/30 bg-black flex items-center justify-center transition-all duration-300 md:hover:border-blue-500 md:hover:shadow-[0_0_25px_rgba(59,130,246,0.15)]"
+              className="relative snap-start flex-shrink-0 w-[44vw] md:w-auto h-36 border border-blue-500 md:border-blue-500/30 bg-black flex items-center justify-center transition-all duration-300 md:hover:border-blue-500 md:hover:shadow-[0_0_25px_rgba(59,130,246,0.15)]"
             >
+              {i === 0 && (
+                <span className="md:hidden absolute top-1.5 left-1.5 z-20 flex items-center gap-1 text-white text-[8px] font-bold uppercase tracking-widest bg-black/70 rounded-full px-2 py-1">
+                  Desliza <span className="animate-bounce">→</span>
+                </span>
+              )}
               {imgs[brandKey(brand.name)]
                 ? <img src={imgs[brandKey(brand.name)]} alt={brand.name}
                     className="max-h-full max-w-full object-contain p-3" />

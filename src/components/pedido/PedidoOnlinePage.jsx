@@ -63,6 +63,24 @@ async function subirComprobante(file) {
 
 const inputCls = 'w-full bg-zinc-900 border border-gray-700 text-white p-3.5 rounded outline-none placeholder:text-gray-600'
 
+// Footer mínimo — mismo patrón que /jhumaneztattoo/agenda (solo lo
+// legalmente necesario, sin links de navegación que compitan con el único
+// objetivo de la página). Antes faltaba acá del todo — se notó al probar.
+function MiniFooter({ moduleLabel }) {
+  return (
+    <footer className="border-t border-white/10 py-6 px-4 bg-black">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-500 text-[12px] gap-3">
+        <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} {moduleLabel || 'INKognito'}. Todos los derechos reservados.</p>
+        <div className="flex flex-wrap justify-center gap-6">
+          <Link to="/terminos" className="hover:text-white transition-colors">Términos</Link>
+          <Link to="/privacidad" className="hover:text-white transition-colors">Privacidad</Link>
+          <span>Desarrollado por INKognito</span>
+        </div>
+      </div>
+    </footer>
+  )
+}
+
 // Landing pública única para los 3 módulos con carrito (Supply/Store/Gym) —
 // alternativa al pedido por WhatsApp, no lo reemplaza (ver CartDrawer*.jsx,
 // que sigue ofreciendo el botón de WhatsApp). El carrito se lee directo del
@@ -103,12 +121,15 @@ export default function PedidoOnlinePage() {
 
   if (!cart || !MODULE_LABELS[module]) {
     return (
-      <section className="min-h-[60vh] flex items-center justify-center py-16 px-4 bg-black">
-        <div className="text-center">
-          <p className="text-gray-400">Esta página no existe.</p>
-          <Link to="/" className="text-green-500 hover:text-green-400 text-sm font-semibold">Volver al inicio</Link>
-        </div>
-      </section>
+      <>
+        <section className="min-h-[60vh] flex items-center justify-center py-16 px-4 bg-black">
+          <div className="text-center">
+            <p className="text-gray-400">Esta página no existe.</p>
+            <Link to="/" className="text-green-500 hover:text-green-400 text-sm font-semibold">Volver al inicio</Link>
+          </div>
+        </section>
+        <MiniFooter />
+      </>
     )
   }
 
@@ -187,38 +208,45 @@ export default function PedidoOnlinePage() {
 
   if (estado === 'ok') {
     return (
-      <section className="min-h-[60vh] flex items-center justify-center py-16 px-4 bg-black">
-        <div className="max-w-md mx-auto text-center">
-          <CheckCircle2 size={48} className="text-green-500 mx-auto mb-4" />
-          <h3 className="text-2xl font-black uppercase italic mb-3 text-white">¡Pedido recibido!</h3>
-          <p className="text-gray-400 leading-relaxed">
-            {metodoPago === 'contraentrega'
-              ? 'El proveedor y Eljach se pondrán a coordinar la entrega de tu paquete. Te contactamos por WhatsApp para confirmar los últimos detalles.'
-              : 'En cuanto verifiquemos tu comprobante, tu pedido entra directo a empaque. Te contactamos por WhatsApp para confirmar.'}
-          </p>
-          <Link to={`/${module}`} className="inline-block mt-6 text-green-500 hover:text-green-400 text-sm font-semibold">
-            Volver a {MODULE_LABELS[module]}
-          </Link>
-        </div>
-      </section>
+      <>
+        <section className="min-h-[60vh] flex items-center justify-center py-16 px-4 bg-black">
+          <div className="max-w-md mx-auto text-center">
+            <CheckCircle2 size={48} className="text-green-500 mx-auto mb-4" />
+            <h3 className="text-2xl font-black uppercase italic mb-3 text-white">¡Pedido recibido!</h3>
+            <p className="text-gray-400 leading-relaxed">
+              {metodoPago === 'contraentrega'
+                ? 'El proveedor y Eljach se pondrán a coordinar la entrega de tu paquete. Te contactamos por WhatsApp para confirmar los últimos detalles.'
+                : 'En cuanto verifiquemos tu comprobante, tu pedido entra directo a empaque. Te contactamos por WhatsApp para confirmar.'}
+            </p>
+            <Link to={`/${module}`} className="inline-block mt-6 text-green-500 hover:text-green-400 text-sm font-semibold">
+              Volver a {MODULE_LABELS[module]}
+            </Link>
+          </div>
+        </section>
+        <MiniFooter moduleLabel={MODULE_LABELS[module]} />
+      </>
     )
   }
 
   if (items.length === 0) {
     return (
-      <section className="min-h-[60vh] flex items-center justify-center py-16 px-4 bg-black">
-        <div className="text-center">
-          <ShoppingBag size={40} className="text-gray-700 mx-auto mb-4" />
-          <p className="text-gray-400 mb-2">Tu carrito de {MODULE_LABELS[module]} está vacío.</p>
-          <Link to={`/${module}`} className="text-green-500 hover:text-green-400 text-sm font-semibold">
-            Ir a {MODULE_LABELS[module]} →
-          </Link>
-        </div>
-      </section>
+      <>
+        <section className="min-h-[60vh] flex items-center justify-center py-16 px-4 bg-black">
+          <div className="text-center">
+            <ShoppingBag size={40} className="text-gray-700 mx-auto mb-4" />
+            <p className="text-gray-400 mb-2">Tu carrito de {MODULE_LABELS[module]} está vacío.</p>
+            <Link to={`/${module}`} className="text-green-500 hover:text-green-400 text-sm font-semibold">
+              Ir a {MODULE_LABELS[module]} →
+            </Link>
+          </div>
+        </section>
+        <MiniFooter moduleLabel={MODULE_LABELS[module]} />
+      </>
     )
   }
 
   return (
+    <>
     <section className="py-10 md:py-16 px-4 bg-black border-t border-white/5">
       <div className="max-w-[1320px] mx-auto">
         <p className="text-gray-500 text-xs uppercase tracking-[0.25em] text-center mb-2">{MODULE_LABELS[module]}</p>
@@ -413,5 +441,7 @@ export default function PedidoOnlinePage() {
         </form>
       </div>
     </section>
+    <MiniFooter moduleLabel={MODULE_LABELS[module]} />
+    </>
   )
 }

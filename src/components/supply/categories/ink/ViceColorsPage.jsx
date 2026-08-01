@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router-dom'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
@@ -7,6 +7,11 @@ import AccordionCard from '../../AccordionCard'
 import { getAdjacentBrands } from '../../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../../hooks/useScrolled'
+import { fetchCatalogMarca } from '../../../../hooks/useCatalog'
+
+export async function loader() {
+  return fetchCatalogMarca('supply', 'vice-colors')
+}
 
 export function meta() {
   const title = 'Tintas Vice Colors | INKognito Supply — Colombia'
@@ -41,6 +46,7 @@ const faq = [
 ]
 
 export default function ViceColorsPage() {
+  const { products } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_vice_colors')
   const { prev, next } = getAdjacentBrands(2)
   const scrolled = useScrolled()
@@ -129,7 +135,7 @@ export default function ViceColorsPage() {
           </div>
         </div>
 
-        <BrandCatalogSection brandName="Vice Colors" />
+        <BrandCatalogSection brandName="Vice Colors" products={products} />
 
         <section className="mt-10 md:mt-14">
           <AccordionCard

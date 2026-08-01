@@ -198,7 +198,7 @@ export default function GymPage() {
       </section>
 
       {/* PLANOS DIGITALES */}
-      <section id="planos" className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto scroll-mt-20">
+      <section id="planos" className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
         <div className="border-t border-gray-800 pt-3 md:pt-8">
           <div className="mb-6">
             <div className="float-left flex items-center gap-3 mr-6 md:mr-8 mb-2">

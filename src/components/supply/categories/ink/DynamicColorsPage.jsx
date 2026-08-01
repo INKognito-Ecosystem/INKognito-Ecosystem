@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router-dom'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
@@ -18,6 +18,11 @@ export function meta() {
 import { getAdjacentBrands } from '../../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../../hooks/useScrolled'
+import { fetchCatalogMarca } from '../../../../hooks/useCatalog'
+
+export async function loader() {
+  return fetchCatalogMarca('supply', 'dynamic')
+}
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
@@ -40,6 +45,7 @@ const faq = [
 ]
 
 export default function DynamicColorsPage() {
+  const { products } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_dynamic')
   const { prev, next } = getAdjacentBrands(3)
   const scrolled = useScrolled()
@@ -128,7 +134,7 @@ export default function DynamicColorsPage() {
           </div>
         </div>
 
-        <BrandCatalogSection brandName="Dynamic" />
+        <BrandCatalogSection brandName="Dynamic" products={products} />
 
         <section className="mt-10 md:mt-14">
           <AccordionCard
