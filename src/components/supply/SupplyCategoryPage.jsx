@@ -76,10 +76,17 @@ const AFILIADO_COPY = {
 
 const WA = '573207911013'
 
-// Categorías que NO se atribuyen a Tommy Tattoo Supply:
-// - Muebles: proveedor distinto en negociación (Warlock), ver project_proveedor_warlock_mobiliario
-// - Combos: mezcla productos de distintas categorías/proveedores, no es atribuible a uno solo
-const SIN_INSIGNIA_TOMMY = ['Muebles', 'Combos']
+// Insignia de proveedor por categoría — por defecto Tommy Tattoo Supply
+// (todas las categorías de ink/cartuchos/agujas/etc. vienen de ahí).
+// Combos mezcla productos de varias categorías/proveedores, no es
+// atribuible a uno solo (null = no mostrar insignia). Muebles es Industrias
+// Warlock (mobiliario), no Tommy — mismo criterio que supplierBadge en
+// BrandCatalogSection.jsx.
+const DEFAULT_BADGE = 'Suministrado por Tommy Tattoo Supply — marca reconocida en Urabá'
+const CATEGORY_BADGE = {
+  Muebles: 'Producto de Industrias Warlock — mobiliario fabricado en Bogotá, envío a toda Colombia',
+  Combos: null,
+}
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
@@ -184,10 +191,10 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
           {intro && (
             <p className="relative z-10 text-zinc-400 text-base md:text-lg leading-relaxed max-w-3xl">{intro}</p>
           )}
-          {products.length > 0 && !SIN_INSIGNIA_TOMMY.includes(categoria) && (
+          {products.length > 0 && (categoria in CATEGORY_BADGE ? CATEGORY_BADGE[categoria] : DEFAULT_BADGE) && (
             <div className="relative z-10 flex items-center gap-2 text-xs text-zinc-400 bg-zinc-900/60 border border-zinc-800 rounded-lg px-3 py-2 w-fit mt-4">
               <ShieldCheck size={14} className="shrink-0 text-blue-400" />
-              <span>Suministrado por Tommy Tattoo Supply — marca reconocida en Urabá</span>
+              <span>{categoria in CATEGORY_BADGE ? CATEGORY_BADGE[categoria] : DEFAULT_BADGE}</span>
             </div>
           )}
         </div>

@@ -151,6 +151,10 @@ export default function ProductLandingPage() {
   const variant         = product.variantes[activeVariant] || product.variantes[0]
   const isAfiliado      = product.tipo === 'afiliado'
   const isSupply        = product.module === 'supply'
+  // Mobiliario (Industrias Warlock) no comparte la logística de Urabá/Eljach
+  // del resto de Supply — fabrican en Bogotá, envío nacional, sin
+  // contraentrega confirmada aún (2026-08-01).
+  const esMobiliario     = isSupply && product.categoria === 'Muebles'
   const accent          = MODULE_ACCENT[product.module] || '#A1A1AA'
   const imageUrl        = variant?.image_url || product.variantes[0]?.image_url
   const stockNum        = (!isAfiliado && variant?.stock != null) ? Number(variant.stock) : null
@@ -340,30 +344,47 @@ export default function ProductLandingPage() {
                     (ver IndustriasWarlockPage.jsx). El resto de marcas sin
                     Tommy (Tattoo Vision, Heaven Pro) simplemente no muestran
                     insignia de proveedor, igual que en su página de marca. */}
-                {isSupply && product.marca === 'kwadron' && (
-                  <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                    <ShieldCheck size={13} className="shrink-0" style={{ color: accent }} />
-                    <span>Producto de Industrias Warlock — mobiliario fabricado para estudios de tatuaje</span>
-                  </div>
+                {esMobiliario ? (
+                  <>
+                    <div className="flex items-center gap-3 text-zinc-400 text-xs">
+                      <ShieldCheck size={13} className="shrink-0" style={{ color: accent }} />
+                      <span>Producto de Industrias Warlock — mobiliario fabricado para estudios de tatuaje</span>
+                    </div>
+                    {/* Warlock fabrica en Bogotá y envía a todo el país — no
+                        aplica la cobertura/contraentrega de Eljach (esa es
+                        solo Urabá). Contraentrega para mobiliario aún no
+                        está confirmada con ellos (2026-08-01). */}
+                    <div className="flex items-center gap-3 text-zinc-400 text-xs">
+                      <Truck size={13} className="shrink-0" style={{ color: accent }} />
+                      <span>Envío a toda Colombia desde Bogotá — pago por Nequi antes del despacho, aún sin contraentrega para mobiliario</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {isSupply && !MARCAS_SIN_TOMMY.has(product.marca) && (
+                      <div className="flex items-center gap-3 text-zinc-400 text-xs">
+                        <ShieldCheck size={13} className="shrink-0" style={{ color: accent }} />
+                        <span>Suministrado por Tommy Tattoo Supply — marca reconocida en Urabá</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 text-zinc-400 text-xs">
+                      <Truck size={13} className="shrink-0" style={{ color: accent }} />
+                      <span>Envío con Eljach Mensajería Express — 1 a 2 días en Urabá (Chigorodó, Apartadó, Carepa, Turbo), con pago contraentrega</span>
+                    </div>
+                  </>
                 )}
-                {isSupply && !MARCAS_SIN_TOMMY.has(product.marca) && (
-                  <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                    <ShieldCheck size={13} className="shrink-0" style={{ color: accent }} />
-                    <span>Suministrado por Tommy Tattoo Supply — marca reconocida en Urabá</span>
-                  </div>
-                )}
-                <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <Truck size={13} className="shrink-0" style={{ color: accent }} />
-                  <span>Envío con Eljach Mensajería Express — 1 a 2 días en Urabá (Chigorodó, Apartadó, Carepa, Turbo), con pago contraentrega</span>
-                </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
                   <MessageSquare size={13} className="shrink-0" style={{ color: accent }} />
                   <span>Confirmación por WhatsApp en minutos — pedido directo, sin intermediarios</span>
                 </div>
-                <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                  <Globe size={13} className="shrink-0" style={{ color: accent }} />
-                  <span>¿Fuera de Urabá? También enviamos a toda Colombia — tiempo y costo se coordinan al confirmar (sin contraentrega fuera de la zona)</span>
-                </div>
+                {/* Ya dice "envío a toda Colombia" en la línea de arriba para
+                    mobiliario — esta línea sería redundante/confusa ahí. */}
+                {!esMobiliario && (
+                  <div className="flex items-center gap-3 text-zinc-400 text-xs">
+                    <Globe size={13} className="shrink-0" style={{ color: accent }} />
+                    <span>¿Fuera de Urabá? También enviamos a toda Colombia — tiempo y costo se coordinan al confirmar (sin contraentrega fuera de la zona)</span>
+                  </div>
+                )}
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
                   <Shield size={13} className="shrink-0" style={{ color: accent }} />
                   <span>Garantía en cada producto — si algo falla, lo resolvemos</span>

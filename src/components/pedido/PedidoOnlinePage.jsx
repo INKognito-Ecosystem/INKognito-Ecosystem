@@ -136,8 +136,13 @@ export default function PedidoOnlinePage() {
   const { items, total, clearCart } = cart
   const update = (campo, valor) => setForm(f => ({ ...f, [campo]: valor }))
 
-  const enCobertura = Boolean(form.municipioSel && form.municipioSel !== 'otra')
-  const ciudadFinal = enCobertura ? MUNICIPIO_LABELS[form.municipioSel] : form.ciudadOtra.trim()
+  const municipioSeleccionado = Boolean(form.municipioSel && form.municipioSel !== 'otra')
+  const ciudadFinal = municipioSeleccionado ? MUNICIPIO_LABELS[form.municipioSel] : form.ciudadOtra.trim()
+  // Mobiliario (Industrias Warlock) no tiene contraentrega confirmada —
+  // fabrican en Bogotá y envían a todo el país, así que fuerza Nequi sin
+  // importar si el destino está en la ruta de Eljach (2026-08-01).
+  const tieneMobiliario = items.some(i => i.category === 'Muebles')
+  const enCobertura = municipioSeleccionado && !tieneMobiliario
   const metodoPago = enCobertura ? 'contraentrega' : 'nequi'
   const precioFlete = enCobertura && fleteTabla ? fleteTabla[fleteOrigen]?.[form.municipioSel] : null
 
@@ -173,7 +178,7 @@ export default function PedidoOnlinePage() {
 
   const formCompleto = Boolean(
     items.length > 0 && form.nombre && form.telefono && form.direccion && form.municipioSel
-    && (enCobertura || form.ciudadOtra.trim())
+    && (municipioSeleccionado || form.ciudadOtra.trim())
     && (metodoPago === 'contraentrega' || comprobanteUrl)
   )
 
@@ -331,16 +336,35 @@ export default function PedidoOnlinePage() {
               </div>
 
               {/* RELLENO — explica la alianza con Eljach y por qué cambia el
-                  método de pago según la ciudad, en vez de dejarlo vacío. */}
+                  método de pago según la ciudad, en vez de dejarlo vacío.
+                  Mobiliario tiene su propio texto: aunque la ciudad esté en
+                  la ruta de Eljach, ese pedido igual va por Nequi (Warlock
+                  envía por su cuenta desde Bogotá), así que el texto
+                  genérico de "contraentrega si estás en la ruta" sería
+                  engañoso para ese caso. */}
               <div className="mt-6 flex-1 min-h-[110px] bg-gradient-to-br from-zinc-900 to-black border border-white/10 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-center">
                 <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-green-600/10" />
-                <h3 className="relative text-white text-lg font-black uppercase italic mb-2">
-                  Entrega con Eljach Mensajería
-                </h3>
-                <p className="relative text-gray-400 text-[13px] leading-relaxed">
-                  Si estás en la ruta de Eljach (Chigorodó a Turbo) puedes pagar contraentrega, sin adelantos.
-                  Fuera de esa zona coordinamos por Nequi antes de despachar tu pedido a cualquier parte de Colombia.
-                </p>
+                {tieneMobiliario ? (
+                  <>
+                    <h3 className="relative text-white text-lg font-black uppercase italic mb-2">
+                      Envío de Industrias Warlock
+                    </h3>
+                    <p className="relative text-gray-400 text-[13px] leading-relaxed">
+                      El mobiliario se fabrica y despacha desde Bogotá a cualquier parte de Colombia.
+                      Se paga por Nequi antes del despacho — aún no tenemos contraentrega para estos productos.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="relative text-white text-lg font-black uppercase italic mb-2">
+                      Entrega con Eljach Mensajería
+                    </h3>
+                    <p className="relative text-gray-400 text-[13px] leading-relaxed">
+                      Si estás en la ruta de Eljach (Chigorodó a Turbo) puedes pagar contraentrega, sin adelantos.
+                      Fuera de esa zona coordinamos por Nequi antes de despachar tu pedido a cualquier parte de Colombia.
+                    </p>
+                  </>
+                )}
               </div>
             </div>
 
@@ -388,7 +412,9 @@ export default function PedidoOnlinePage() {
                       <div>
                         <p className="text-white text-sm font-bold">Pago por Nequi</p>
                         <p className="text-gray-400 text-[13px] leading-relaxed">
-                          Fuera de la ruta de Eljach se paga antes de despachar
+                          {tieneMobiliario
+                            ? 'El mobiliario se envía a todo el país desde Bogotá y se paga antes de despachar'
+                            : 'Fuera de la ruta de Eljach se paga antes de despachar'}
                           {nequi.numero ? ` — al ${nequi.numero}${nequi.nombre ? `, a nombre de ${nequi.nombre}` : ''}` : ''}.
                         </p>
                       </div>

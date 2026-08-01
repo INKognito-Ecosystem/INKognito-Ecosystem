@@ -2,11 +2,16 @@ import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../SupplyCategoryPage'
 import { fetchCatalogCategoria } from '../../../hooks/useCatalog'
 
+// Mobiliario es Industrias Warlock — fabrican en Bogotá y envían a todo el
+// país, no es un proveedor local de Urabá como el resto de Supply. Por eso
+// esta categoría (a diferencia de las demás) no promete Urabá/Chigorodó ni
+// contraentrega — Jose aún no ha confirmado esa opción con ellos
+// (2026-08-01, ver project_proveedor_warlock_mobiliario).
 const TITLE = 'Muebles'
 const CATEGORIA = 'Muebles'
 const SLUG = 'furniture'
-const DESC = 'Muebles para estudio de tatuajes en Uraba. Camillas, bancos y almacenamiento profesional.'
-const INTRO = 'Tu espacio dice mas de ti que cualquier otro elemento. La diferencia entre un cuarto y un estudio empieza por el mueble que el cliente toca primero.'
+const DESC = 'Mobiliario profesional para estudios de tatuaje — Industrias Warlock. Camillas, sillas y almacenamiento, con envío a toda Colombia.'
+const INTRO = 'Tu espacio dice más de ti que cualquier otro elemento. La diferencia entre un cuarto y un estudio empieza por el mueble que el cliente toca primero. Mobiliario de Industrias Warlock, fabricado en Bogotá con envío a todo el país.'
 
 const guide = [
   { icon: '🛏️', title: 'Camilla reclinable', text: 'Altura regulable, tapizado resistente y reclinacion para distintas zonas del cuerpo.' },
@@ -19,7 +24,7 @@ const guide = [
 const faqs = [
   { q: 'Las camillas resisten cualquier peso?', a: 'Entre 150 y 200kg segun modelo. Confirmamos capacidad antes de vender.' },
   { q: 'Que tapizado es mas facil de limpiar?', a: 'Polipiel (cuero sintetico). Evita telas o materiales porosos.' },
-  { q: 'Hacen envios de muebles?', a: 'Si, coordinamos embalaje y envio. El flete varia segun peso y destino.' },
+  { q: '¿Desde dónde envían y cómo pago?', a: 'Industrias Warlock fabrica en Bogotá y envía a toda Colombia. El pago es por Nequi antes del despacho — por ahora no manejamos pago contraentrega para mobiliario.' },
   { q: 'Opciones para espacios pequenos?', a: 'Si. Escribenos con las medidas de tu espacio.' },
 ]
 
@@ -28,7 +33,7 @@ export async function loader() {
 }
 
 export function meta() {
-  const title = `${TITLE} para tatuadores en Urabá | INKognito Supply — Chigorodó`
+  const title = `${TITLE} para tatuadores | Industrias Warlock — INKognito Supply`
   return [
     { title },
     { name: 'description', content: DESC },
