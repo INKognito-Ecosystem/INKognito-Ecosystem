@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
+import ProductImageGallery from '../ProductImageGallery'
 
 const VAR_THRESHOLD = 3
 
@@ -82,6 +83,11 @@ export default function SupplyProductCard({ item, categoria }) {
     ? '$' + Math.round(sel.price).toLocaleString('es-CO')
     : null
   const activeImage = sel.image_url || item.image_url || null
+  const images = [sel.image_url, sel.image_url_2, sel.image_url_3].filter(Boolean)
+  if (images.length === 0 && item.image_url) {
+    images.push(item.image_url, item.image_url_2, item.image_url_3)
+  }
+  const galleryImages = images.filter(Boolean)
 
   const productId = item.name + (sel.variant ? '-' + sel.variant : '')
   const cartKey = `${categoria}-${productId}`
@@ -102,13 +108,12 @@ export default function SupplyProductCard({ item, categoria }) {
     <div className="border border-blue-500/40 bg-zinc-950 rounded-2xl overflow-hidden hover:border-blue-500 hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-300 flex flex-col h-full">
 
       <div className="aspect-square w-full bg-zinc-900 overflow-hidden flex-shrink-0">
-        {activeImage ? (
-          <img
-            key={activeImage}
-            src={activeImage}
+        {galleryImages.length > 0 ? (
+          <ProductImageGallery
+            images={galleryImages}
             alt={`${item.name}${sel.variant ? ' ' + sel.variant : ''}`}
-            className="w-full h-full object-cover transition-opacity duration-200"
-            loading="lazy"
+            containerClassName="w-full h-full"
+            imgClassName="w-full h-full object-cover"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

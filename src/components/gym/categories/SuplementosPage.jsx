@@ -4,6 +4,7 @@ import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import { fetchCatalogFull } from '../../../hooks/useCatalog'
 import { useGymCart } from '../../../contexts/GymCartContext'
+import ProductImageGallery from '../../ProductImageGallery'
 import { FlaskConical, ExternalLink } from 'lucide-react'
 
 const VAR_THRESHOLD = 3
@@ -70,13 +71,15 @@ function SuplCard({ p, onAddToCart }) {
   const precio = sel.price
     ? '$' + Math.round(sel.price).toLocaleString('es-CO')
     : p.precioLabel || 'Consultar precio'
-  const imagen = sel.image_url || p.image || null
+  const galleryImages = sel.image_url
+    ? [sel.image_url, sel.image_url_2, sel.image_url_3].filter(Boolean)
+    : (p.images?.length ? p.images : [p.image].filter(Boolean))
 
   return (
     <div className="snap-start flex-shrink-0 w-[40vw] md:w-auto border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300">
       <div className="relative w-full aspect-square bg-gray-800 flex items-center justify-center flex-shrink-0">
-        {imagen
-          ? <img key={imagen} src={imagen} alt={p.nombre} className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none' }} />
+        {galleryImages.length > 0
+          ? <ProductImageGallery images={galleryImages} alt={p.nombre} containerClassName="w-full h-full" imgClassName="w-full h-full object-cover" onImgError={e => { e.target.style.display = 'none' }} />
           : <span className="text-gray-700 text-[10px] uppercase tracking-widest text-center px-2">Imagen próx.</span>
         }
       </div>
@@ -137,6 +140,9 @@ export default function SuplementosPage() {
     categoria:   item.categoria || 'Suplementos',
     nombre:      item.name,
     image:       item.image_url || item.variantes?.[0]?.image_url || null,
+    images:      [item.image_url, item.image_url_2, item.image_url_3].filter(Boolean).length
+      ? [item.image_url, item.image_url_2, item.image_url_3].filter(Boolean)
+      : [item.variantes?.[0]?.image_url, item.variantes?.[0]?.image_url_2, item.variantes?.[0]?.image_url_3].filter(Boolean),
     variantes:   item.variantes || [],
     precioLabel: item.variantes?.[0]?.price
       ? '$' + Math.round(item.variantes[0].price).toLocaleString('es-CO')

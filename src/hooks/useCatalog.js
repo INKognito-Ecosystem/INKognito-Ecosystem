@@ -124,11 +124,12 @@ export async function fetchCatalogMarca(module, marca) {
 export function toProdCard(item) {
   const firstPrice = item.variantes?.[0]?.price
   return {
-    id:    item.name,
-    name:  item.name,
-    image: item.image_url || '',
-    price: firstPrice ? '$' + Math.round(firstPrice).toLocaleString('es-CO') : '—',
-    tag:   item.descripcion || '',
-    _item: item,
+    id:     item.name,
+    name:   item.name,
+    image:  item.image_url || '',
+    images: [item.image_url, item.image_url_2, item.image_url_3].filter(Boolean),
+    price:  firstPrice ? '$' + Math.round(firstPrice).toLocaleString('es-CO') : '—',
+    tag:    item.descripcion || '',
+    _item:  item,
   }
 }

@@ -3,6 +3,7 @@ import { Link, useParams, useLoaderData, useNavigate } from 'react-router-dom'
 import { FaWhatsapp } from 'react-icons/fa'
 import { Package, ExternalLink, Truck, Shield, ShieldCheck, MessageSquare, Zap, Globe, CalendarCheck } from 'lucide-react'
 import EcosystemNavbar from '../ecosystem/EcosystemNavbar'
+import ProductImageGallery from '../ProductImageGallery'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import { useGymCart } from '../../contexts/GymCartContext'
@@ -117,6 +118,7 @@ export default function ProductLandingPage() {
   const storeCart = useStoreCart()
   const gymCart = useGymCart()
   const [activeVariant, setActive] = useState(0)
+  const [imgIdx, setImgIdx]        = useState(0)
   const [scrolled, setScrolled]    = useState(false)
 
   useEffect(() => {
@@ -124,6 +126,11 @@ export default function ProductLandingPage() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // Cambiar de variante vuelve a la foto de portada de esa variante — si no
+  // se resetea, el índice de la variante anterior podía apuntar a un slot
+  // vacío en la nueva.
+  useEffect(() => { setImgIdx(0) }, [activeVariant])
 
   useEffect(() => {
     if (!product || typeof window.fbq !== 'function') return
@@ -157,6 +164,9 @@ export default function ProductLandingPage() {
   const esMobiliario     = isSupply && product.categoria === 'Mobiliario'
   const accent          = MODULE_ACCENT[product.module] || '#A1A1AA'
   const imageUrl        = variant?.image_url || product.variantes[0]?.image_url
+  const images           = variant?.image_url
+    ? [variant.image_url, variant.image_url_2, variant.image_url_3].filter(Boolean)
+    : [product.variantes[0]?.image_url, product.variantes[0]?.image_url_2, product.variantes[0]?.image_url_3].filter(Boolean)
   const stockNum        = (!isAfiliado && variant?.stock != null) ? Number(variant.stock) : null
   const sinStock        = stockNum === 0
   const stockBajo       = stockNum !== null && stockNum > 0 && stockNum <= 5
@@ -243,8 +253,36 @@ export default function ProductLandingPage() {
 
           {/* COLUMNA IZQUIERDA — imagen + descripción */}
           <div className="space-y-5">
-            {imageUrl
-              ? <img key={imageUrl} src={imageUrl} alt={product.name} className="w-full h-auto rounded-xl border border-zinc-800" />
+            {images.length > 0
+              ? (
+                <>
+                  <ProductImageGallery
+                    images={images}
+                    alt={product.name}
+                    activeIndex={imgIdx}
+                    onIndexChange={setImgIdx}
+                    containerClassName="rounded-xl border border-zinc-800 overflow-hidden"
+                    imgClassName="w-full h-auto"
+                    eager
+                  />
+                  {images.length > 1 && (
+                    <div className="hidden md:flex gap-2">
+                      {images.map((src, i) => (
+                        <button
+                          key={src}
+                          type="button"
+                          onClick={() => setImgIdx(i)}
+                          className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${
+                            i === imgIdx ? 'border-white' : 'border-zinc-800 hover:border-zinc-600'
+                          }`}
+                        >
+                          <img src={src} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )
               : <div className="aspect-square rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-700"><Package size={64} /></div>
             }
 

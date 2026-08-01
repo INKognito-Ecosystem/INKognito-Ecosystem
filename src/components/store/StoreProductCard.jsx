@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useStoreCart } from '../../contexts/StoreCartContext'
+import ProductImageGallery from '../ProductImageGallery'
 
 const VAR_THRESHOLD = 3
 
@@ -66,13 +67,13 @@ export default function StoreProductCard({ product, category, sizes }) {
   const cartKey = `${category}-${product.id}-${selectedSize}`
   const enCarrito = items.some(i => i.key === cartKey)
 
-  const activeImage = (() => {
-    if (selectedSize && product._item?.variantes) {
-      const v = product._item.variantes.find(v => v.variant === selectedSize)
-      if (v?.image_url) return v.image_url
-    }
-    return product.image || null
-  })()
+  const selectedVariant = selectedSize && product._item?.variantes
+    ? product._item.variantes.find(v => v.variant === selectedSize)
+    : null
+
+  const galleryImages = selectedVariant?.image_url
+    ? [selectedVariant.image_url, selectedVariant.image_url_2, selectedVariant.image_url_3].filter(Boolean)
+    : (product.images?.length ? product.images : [product.image].filter(Boolean))
 
   const handleAdd = () => {
     const variantId = product._item?.variantes?.find(v => v.variant === selectedSize)?.id
@@ -84,13 +85,13 @@ export default function StoreProductCard({ product, category, sizes }) {
     <div className="bg-white border border-gray-200 rounded-xl md:rounded-2xl overflow-hidden hover:border-[#C9A84C] hover:shadow-md transition-all duration-300 flex flex-col h-full">
 
       <div className="aspect-square w-full overflow-hidden bg-gray-100 relative flex-shrink-0">
-        {activeImage ? (
-          <img
-            key={activeImage}
-            src={activeImage}
+        {galleryImages.length > 0 ? (
+          <ProductImageGallery
+            images={galleryImages}
             alt={`${product.name}${selectedSize ? ' ' + selectedSize : ''}`}
-            className="w-full h-full object-cover transition-opacity duration-200"
-            onError={(e) => { e.currentTarget.style.display = 'none' }}
+            containerClassName="w-full h-full"
+            imgClassName="w-full h-full object-cover"
+            onImgError={(e) => { e.currentTarget.style.display = 'none' }}
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
