@@ -146,6 +146,13 @@ export default function PedidoOnlinePage() {
     return `${i.qty}x ${i.name}${detalle}`
   }).join(', ')
 
+  // Para que el panel pueda descontar stock automáticamente al entregar
+  // (PATCH /api/orders/:id) — antes solo se mandaba el texto libre de arriba,
+  // que no sirve para identificar de qué fila de inventario descontar.
+  const productosJson = items
+    .filter(i => i.inventoryId != null)
+    .map(i => ({ inventory_id: i.inventoryId, cantidad: i.qty }))
+
   const onFileChange = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -182,6 +189,7 @@ export default function PedidoOnlinePage() {
         body: JSON.stringify({
           module,
           products: productosStr,
+          productos_json: productosJson,
           total_price: total,
           metodo_pago: metodoPago,
           client_phone: form.telefono,

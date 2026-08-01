@@ -67,9 +67,16 @@ export default function SupplyProductCard({ item, categoria }) {
   const { items: cartItems, addItem } = useSupplyCart()
   const [selIdx, setSelIdx] = useState(0)
 
-  const variantObjs = item.variantes?.filter(v => v.variant) ?? []
-  const totalStock  = item.variantes?.reduce((s, v) => s + (v.stock || 0), 0) ?? 0
-  const sel         = variantObjs[selIdx] || variantObjs[0] || {}
+  // variantObjs (con nombre) es solo para el selector — si el producto tiene
+  // una única variante SIN nombre (ej. mobiliario, no todo necesita un
+  // "sabor"/talla), antes quedaba filtrada por completo y sel caía en {},
+  // perdiendo precio/stock/imagen aunque el producto sí los tuviera (la
+  // landing individual de producto sí los mostraba, porque no filtra por
+  // nombre — de ahí la inconsistencia reportada 2026-08-01).
+  const allVariants = item.variantes ?? []
+  const variantObjs = allVariants.filter(v => v.variant)
+  const totalStock  = allVariants.reduce((s, v) => s + (v.stock || 0), 0)
+  const sel         = variantObjs[selIdx] || variantObjs[0] || allVariants[0] || {}
 
   const resolvedPrice = sel.price
     ? '$' + Math.round(sel.price).toLocaleString('es-CO')
@@ -82,11 +89,12 @@ export default function SupplyProductCard({ item, categoria }) {
 
   const handleAdd = () => {
     addItem({
-      id:    productId,
-      name:  item.name + (sel.variant ? ` (${sel.variant})` : ''),
-      price: resolvedPrice || '—',
-      brand: item.descripcion || item.categoria || '',
-      image: activeImage || '',
+      id:          productId,
+      inventoryId: sel.id ?? null,
+      name:        item.name + (sel.variant ? ` (${sel.variant})` : ''),
+      price:       resolvedPrice || '—',
+      brand:       item.descripcion || item.categoria || '',
+      image:       activeImage || '',
     }, categoria)
   }
 

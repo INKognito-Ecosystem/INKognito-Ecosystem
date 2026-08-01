@@ -75,7 +75,9 @@ export default function StoreProductCard({ product, category, sizes }) {
   })()
 
   const handleAdd = () => {
-    addItem(product, category, selectedSize)
+    const variantId = product._item?.variantes?.find(v => v.variant === selectedSize)?.id
+      ?? product._item?.variantes?.[0]?.id ?? null
+    addItem({ ...product, inventoryId: variantId }, category, selectedSize)
   }
 
   return (

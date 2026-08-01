@@ -48,7 +48,7 @@ const faq = [
 export default function ViceColorsPage() {
   const { products } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_vice_colors')
-  const { prev, next } = getAdjacentBrands(2)
+  const { prev, next } = getAdjacentBrands(3)
   const scrolled = useScrolled()
 
   return (

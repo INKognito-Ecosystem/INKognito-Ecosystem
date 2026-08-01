@@ -67,23 +67,17 @@ export default function CategoriesSupply({ categorias = {} }) {
             const count = stockPorCat[category.cat]
             const hasStock = count > 0
             return (
+              <div key={category.name} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">
               <Link
-                key={category.name}
                 to={category.path}
                 className={`
-                  snap-start flex-shrink-0 w-[44vw] md:w-auto
-                  relative h-36 border bg-zinc-950 transition-all duration-300 overflow-hidden
+                  relative h-36 w-full border bg-zinc-950 transition-all duration-300 overflow-hidden
                   uppercase tracking-[0.08em] font-bold text-[10px] md:text-xs flex flex-col
                   items-center justify-center gap-2 text-center px-1
                   border-blue-500 md:border-blue-500/30 md:hover:border-blue-500 md:hover:shadow-[0_0_25px_rgba(59,130,246,0.15)]
                   ${hasStock ? 'text-zinc-300' : 'text-zinc-600'}
                 `}
               >
-                {i === 0 && (
-                  <span className="md:hidden absolute top-1.5 left-1.5 z-20 flex items-center gap-1 text-white text-[8px] font-bold uppercase tracking-widest bg-black/70 rounded-full px-2 py-1">
-                    Desliza <span className="animate-bounce">→</span>
-                  </span>
-                )}
                 {imgs[catKey(category.cat)] ? (
                   <>
                     <img
@@ -120,6 +114,13 @@ export default function CategoriesSupply({ categorias = {} }) {
                   </>
                 )}
               </Link>
+              {i === 0 && (
+                <div className="md:hidden mt-1.5 flex items-center justify-end gap-1 text-zinc-500 text-[9px] font-bold uppercase tracking-widest">
+                  <span>Desliza</span>
+                  <span className="animate-bounce">→</span>
+                </div>
+              )}
+              </div>
             )
           })}
         </div>

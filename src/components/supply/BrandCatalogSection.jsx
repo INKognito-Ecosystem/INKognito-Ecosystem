@@ -11,7 +11,13 @@ const WA = '573207911013'
 // desde el loader() de cada página — ver cómo cada archivo en
 // marcasProfesionales/ y categories/{ink,Cartridges}/ llama fetchCatalogFull
 // y filtra por `p.marca === '<slug>'`.
-export default function BrandCatalogSection({ brandName, products = [] }) {
+// supplierBadge: texto de la insignia de confianza sobre el proveedor —
+// cada página de marca puede pasar la suya (ver IndustriasWarlockPage.jsx).
+// Por defecto asume Tommy Tattoo Supply porque hoy todas las marcas de
+// ink/cartuchos vienen de ahí; pasar null para no mostrar ninguna insignia.
+const TOMMY_BADGE = 'Suministrado por Tommy Tattoo Supply — marca reconocida en Urabá'
+
+export default function BrandCatalogSection({ brandName, products = [], supplierBadge = TOMMY_BADGE }) {
   if (products.length === 0) {
     return (
       <div className="border border-zinc-800 bg-zinc-950 rounded-2xl p-10 md:p-16 text-center">
@@ -37,14 +43,12 @@ export default function BrandCatalogSection({ brandName, products = [] }) {
 
   return (
     <>
-      {/* Todas las marcas actuales (ink/cartuchos) vienen de Tommy Tattoo
-          Supply. Si Warlock (mobiliario) llega a tener su propia página de
-          marca más adelante, esta insignia no debe aplicarle — revisar aquí
-          cuando eso pase. */}
-      <div className="flex items-center gap-2 text-xs text-zinc-400 bg-zinc-900/60 border border-zinc-800 rounded-lg px-3 py-2 w-fit mb-4">
-        <ShieldCheck size={14} className="shrink-0 text-blue-400" />
-        <span>Suministrado por Tommy Tattoo Supply — marca reconocida en Urabá</span>
-      </div>
+      {supplierBadge && (
+        <div className="flex items-center gap-2 text-xs text-zinc-400 bg-zinc-900/60 border border-zinc-800 rounded-lg px-3 py-2 w-fit mb-4">
+          <ShieldCheck size={14} className="shrink-0 text-blue-400" />
+          <span>{supplierBadge}</span>
+        </div>
+      )}
       <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide">
         {products.map(item => (
           <div key={item.name} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">

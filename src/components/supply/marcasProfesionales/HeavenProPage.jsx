@@ -48,7 +48,7 @@ const faq = [
 export default function HeavenProPage() {
   const { products } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_heaven_pro')
-  const { prev, next } = getAdjacentBrands(4)
+  const { prev, next } = getAdjacentBrands(5)
   const scrolled = useScrolled()
 
   return (
@@ -128,7 +128,10 @@ export default function HeavenProPage() {
           </div>
         </div>
 
-        <BrandCatalogSection brandName="Heaven Pro" products={products} />
+        {/* supplierBadge={null}: Heaven Pro no viene de Tommy Tattoo Supply
+            (excepción confirmada por Jose, 2026-08-01, junto con Tattoo
+            Vision e Industrias Warlock). */}
+        <BrandCatalogSection brandName="Heaven Pro" products={products} supplierBadge={null} />
 
         <section className="mt-10 md:mt-14">
           <AccordionCard

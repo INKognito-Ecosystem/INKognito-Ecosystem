@@ -48,7 +48,7 @@ const faq = [
 export default function RoyalThreePage() {
   const { products } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_royal_three')
-  const { prev, next } = getAdjacentBrands(5)
+  const { prev, next } = getAdjacentBrands(6)
   const scrolled = useScrolled()
 
   return (

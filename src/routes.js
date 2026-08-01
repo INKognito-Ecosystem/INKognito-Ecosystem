@@ -35,7 +35,6 @@ export default [
   route('supply/cartridges', 'components/supply/categories/Cartridges/CartridgesPage.jsx'),
   route('supply/cartridges/ez-tattoo', 'components/supply/categories/Cartridges/EZCartridgesPage.jsx'),
   route('supply/cartridges/wjx', 'components/supply/categories/Cartridges/WJXCartridgesPage.jsx'),
-  route('supply/cartridges/kwadron', 'components/supply/categories/Cartridges/KwadronCartridgesPage.jsx'),
   route('supply/power-supplies', 'components/supply/categories/PowerSuppliesPage.jsx'),
   route('supply/ink', 'components/supply/categories/ink/InkPage.jsx'),
   route('supply/ink/vice-colors', 'components/supply/categories/ink/ViceColorsPage.jsx'),
@@ -54,6 +53,7 @@ export default [
   route('supply/brands/tattoo-vision', 'components/supply/marcasProfesionales/TattooVisionPage.jsx'),
   route('supply/brands/heaven-pro', 'components/supply/marcasProfesionales/HeavenProPage.jsx'),
   route('supply/brands/royal-three', 'components/supply/marcasProfesionales/RoyalThreePage.jsx'),
+  route('supply/mobiliario/warlock', 'components/supply/marcasProfesionales/IndustriasWarlockPage.jsx'),
   route('supply/aprende', 'components/supply/AprendePage.jsx'),
 
   // Store

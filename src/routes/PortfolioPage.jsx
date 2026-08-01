@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useLoaderData } from 'react-router'
 import Navbar from '../components/tattoo/Navbar'
 import Gallery from '../components/tattoo/Gallery'
-import ReservationForm from '../components/tattoo/ReservationForm'
+import AgendaPublica from '../components/tattoo/AgendaPublica'
 import Footer from '../components/tattoo/Footer'
 import WhatsAppFloat from '../components/tattoo/WhatsAppFloat'
 
@@ -49,9 +49,6 @@ export function meta() {
 
 export default function PortfolioPage() {
   const { items } = useLoaderData()
-  const [estilo, setEstilo] = useState('')
-  const [zona, setZona] = useState('')
-  const [tamano, setTamano] = useState('')
   const [lightboxOpen, setLightboxOpen] = useState(false)
 
   return (
@@ -64,13 +61,7 @@ export default function PortfolioPage() {
 
       <Gallery items={items} onLightboxChange={setLightboxOpen} />
 
-      <ReservationForm
-        estilo={estilo} setEstilo={setEstilo}
-        zona={zona} setZona={setZona}
-        tamano={tamano} setTamano={setTamano}
-        imageOpacity={0.2}
-        showBackLink
-      />
+      <AgendaPublica />
 
       <Footer />
       <WhatsAppFloat hidden={lightboxOpen} />

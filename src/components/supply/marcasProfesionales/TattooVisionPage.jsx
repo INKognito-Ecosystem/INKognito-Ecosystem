@@ -128,7 +128,10 @@ export default function TattooVisionPage() {
           </div>
         </div>
 
-        <BrandCatalogSection brandName="Tattoo Vision" products={products} />
+        {/* supplierBadge={null}: Tattoo Vision no viene de Tommy Tattoo
+            Supply (excepción confirmada por Jose, 2026-08-01, junto con
+            Heaven Pro e Industrias Warlock). */}
+        <BrandCatalogSection brandName="Tattoo Vision" products={products} supplierBadge={null} />
 
         <section className="mt-10 md:mt-14">
           <AccordionCard

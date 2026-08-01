@@ -154,11 +154,12 @@ export default function SuplementosPage() {
       : p.precioLabel
     const nombre = sel.variant ? `${p.nombre} — ${sel.variant}` : p.nombre
     addItem({
-      id:    p.id,
-      name:  nombre,
-      price: precio,
-      brand: p.categoria,
-      image: sel.image_url || p.image || '',
+      id:          p.id,
+      inventoryId: sel.id ?? null,
+      name:        nombre,
+      price:       precio,
+      brand:       p.categoria,
+      image:       sel.image_url || p.image || '',
     }, 'suplementos')
   }
 

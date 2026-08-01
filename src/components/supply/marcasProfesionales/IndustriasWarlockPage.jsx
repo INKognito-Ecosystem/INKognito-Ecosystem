@@ -1,27 +1,33 @@
 import { Link, useLoaderData } from 'react-router-dom'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import FooterSupply from '../../FooterSupply'
-import NavbarCategory from '../../NavbarCategory'
-import BrandCatalogSection from '../../BrandCatalogSection'
-import AccordionCard from '../../AccordionCard'
-import { getAdjacentBrands } from '../../../../data/supplyBrandsOrder'
-import { useSupplyVisual } from '../../../../hooks/useSupplyVisual'
-import { useScrolled } from '../../../../hooks/useScrolled'
-import { fetchCatalogMarca } from '../../../../hooks/useCatalog'
+import FooterSupply from '../FooterSupply'
+import NavbarCategory from '../NavbarCategory'
+import BrandCatalogSection from '../BrandCatalogSection'
+import AccordionCard from '../AccordionCard'
+import { getAdjacentBrands } from '../../../data/supplyBrandsOrder'
+import { useSupplyVisual } from '../../../hooks/useSupplyVisual'
+import { useScrolled } from '../../../hooks/useScrolled'
+import { fetchCatalogMarca } from '../../../hooks/useCatalog'
 
+// Antes esta página era de Kwadron (cartuchos, /supply/cartridges/kwadron,
+// components/supply/categories/Cartridges/KwadronCartridgesPage.jsx).
+// Reemplazada por Industrias Warlock (mobiliario) y movida acá — decisión
+// de Jose (2026-08-01). El slug de marca interno sigue siendo 'kwadron' a
+// propósito: el logo ya se subió en el panel bajo esa misma clave
+// (supply_brand_kwadron) y cambiarla rompería esa imagen.
 export async function loader() {
   return fetchCatalogMarca('supply', 'kwadron')
 }
 
 export function meta() {
-  const title = 'Cartuchos Kwadron | INKognito Supply — Colombia'
-  const description = 'Cartuchos Kwadron: el estándar profesional europeo para precisión y consistencia. Usados por artistas de todo el mundo. Disponibles en Urabá, Colombia.'
+  const title = 'Industrias Warlock | INKognito Supply — Colombia'
+  const description = 'Industrias Warlock: mobiliario profesional para estudios de tatuaje — camillas, sillas y equipamiento para tu espacio de trabajo. Disponible en Urabá, Colombia.'
   return [
     { title },
     { name: 'description', content: description },
     { property: 'og:title', content: title },
     { property: 'og:description', content: description },
-    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/cartridges/kwadron` },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/mobiliario/warlock` },
   ]
 }
 
@@ -32,31 +38,26 @@ const DOT_PATTERN = {
 
 const faq = [
   {
-    question: '¿Por qué los cartuchos Kwadron son tan populares?',
+    question: '¿Qué tipo de mobiliario ofrece Industrias Warlock?',
     answer:
-      'Kwadron es reconocida mundialmente por la precisión de sus agujas, la estabilidad de sus agrupaciones y la consistencia de fabricación entre cartuchos.'
+      'Mobiliario profesional para estudios de tatuaje — camillas, sillas y equipamiento pensado para el flujo real de trabajo de un tatuador.'
   },
   {
-    question: '¿Kwadron sirve para realismo?',
+    question: '¿Cómo pido una cotización?',
     answer:
-      'Sí. Muchos artistas especializados en realismo utilizan Kwadron por la precisión de sus agujas y la suavidad de sus magnums curvas.'
-  },
-  {
-    question: '¿Qué configuración es mejor para líneas?',
-    answer:
-      'Las Round Liner son ideales para líneas. La elección depende del grosor deseado y del estilo de tatuaje.'
+      'Escríbenos por WhatsApp contándonos qué necesitas para tu estudio y te ayudamos a coordinar el pedido con Industrias Warlock.'
   },
 ]
 
-export default function KwadronCartridgesPage() {
+export default function IndustriasWarlockPage() {
   const { products } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_kwadron')
-  const { prev, next } = getAdjacentBrands(6)
+  const { prev, next } = getAdjacentBrands(1)
   const scrolled = useScrolled()
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <NavbarCategory pageName="Kwadron" />
+      <NavbarCategory pageName="Industrias Warlock" />
 
       {scrolled && (
         <>
@@ -99,29 +100,35 @@ export default function KwadronCartridgesPage() {
             <div className="h-20 md:h-32" />
           ) : logoUrl ? (
             <div className="text-zinc-400 leading-relaxed text-justify [hyphens:auto] space-y-2">
-              <div className="float-left w-[180px] mr-6 md:mr-8 mb-2">
+              {/* Mismo tamaño de caja que el resto de marcas (w-180px,
+                  h-20/h-32) — el archivo subido tiene fondo negro sólido (no
+                  transparente) alrededor del logo. object-cover recorta un
+                  poco el piñón del diseño pero llena el espacio parejo con
+                  las demás marcas — decisión de Jose, prefiere esto a que
+                  se vea chico con object-contain. */}
+              <div className="float-left w-[180px] h-20 md:h-32 mr-6 md:mr-8 mb-2 overflow-hidden">
                 <img
                   src={logoUrl}
-                  alt="Kwadron"
-                  className="h-20 md:h-32 w-auto max-w-full object-contain"
+                  alt="Industrias Warlock"
+                  className="w-full h-full object-cover"
                 />
               </div>
 
               <p>
-                Kwadron es una de las marcas de cartuchos más reconocidas y utilizadas
-                por artistas profesionales alrededor del mundo. Su reputación se basa
-                en la precisión, consistencia y calidad de fabricación de cada aguja.
+                Industrias Warlock es un fabricante de mobiliario profesional para
+                estudios de tatuaje — camillas, sillas y equipamiento pensado para
+                el trabajo diario de un tatuador.
               </p>
 
               <p>
-                Gracias a sus agrupaciones perfectamente alineadas y a la estabilidad
-                de sus cartuchos, Kwadron se ha convertido en una referencia para
-                trabajos de línea, realismo, black and grey y color.
+                Un buen mobiliario no solo es comodidad para el cliente: también es
+                postura, resistencia y durabilidad para quien trabaja horas seguidas
+                en cada sesión.
               </p>
 
               <p>
-                En esta sección encontrarás las configuraciones más utilizadas por los
-                artistas para líneas, sombras, rellenos y trabajos de alta precisión.
+                En esta sección encontrarás el mobiliario disponible de Industrias
+                Warlock para equipar tu estudio.
               </p>
 
               <div className="clear-both" />
@@ -129,26 +136,26 @@ export default function KwadronCartridgesPage() {
           ) : (
             <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8">
               <h1 className="text-4xl md:text-7xl font-black uppercase leading-none flex-shrink-0">
-                Kwadron
+                Industrias Warlock
               </h1>
 
               <div className="max-w-xl text-zinc-400 leading-relaxed text-justify [hyphens:auto] space-y-2 sm:border-l sm:border-zinc-800 sm:pl-8">
 
                 <p>
-                  Kwadron es una de las marcas de cartuchos más reconocidas y utilizadas
-                  por artistas profesionales alrededor del mundo. Su reputación se basa
-                  en la precisión, consistencia y calidad de fabricación de cada aguja.
+                  Industrias Warlock es un fabricante de mobiliario profesional para
+                  estudios de tatuaje — camillas, sillas y equipamiento pensado para
+                  el trabajo diario de un tatuador.
                 </p>
 
                 <p>
-                  Gracias a sus agrupaciones perfectamente alineadas y a la estabilidad
-                  de sus cartuchos, Kwadron se ha convertido en una referencia para
-                  trabajos de línea, realismo, black and grey y color.
+                  Un buen mobiliario no solo es comodidad para el cliente: también es
+                  postura, resistencia y durabilidad para quien trabaja horas seguidas
+                  en cada sesión.
                 </p>
 
                 <p>
-                  En esta sección encontrarás las configuraciones más utilizadas por los
-                  artistas para líneas, sombras, rellenos y trabajos de alta precisión.
+                  En esta sección encontrarás el mobiliario disponible de Industrias
+                  Warlock para equipar tu estudio.
                 </p>
 
               </div>
@@ -158,13 +165,17 @@ export default function KwadronCartridgesPage() {
           </div>
         </div>
 
-        <BrandCatalogSection brandName="Kwadron" products={products} />
+        <BrandCatalogSection
+          brandName="Industrias Warlock"
+          products={products}
+          supplierBadge="Producto de Industrias Warlock — mobiliario fabricado para estudios de tatuaje"
+        />
 
         <section className="mt-10 md:mt-14">
           <AccordionCard
             icon="❓"
             title="Preguntas frecuentes"
-            subtitle="Todo lo que necesitas saber sobre Kwadron antes de tu pedido. Toca para ver las respuestas."
+            subtitle="Todo lo que necesitas saber sobre Industrias Warlock antes de tu pedido. Toca para ver las respuestas."
           >
             <div className="flex flex-col gap-5">
               {faq.map((item, i) => (

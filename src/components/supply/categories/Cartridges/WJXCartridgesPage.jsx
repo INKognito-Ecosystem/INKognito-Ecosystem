@@ -51,7 +51,7 @@ const faq = [
 export default function WJXCartridgesPage() {
   const { products } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_wjx')
-  const { prev, next } = getAdjacentBrands(1)
+  const { prev, next } = getAdjacentBrands(2)
   const scrolled = useScrolled()
 
   return (

@@ -7,6 +7,14 @@ import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import { useGymCart } from '../../contexts/GymCartContext'
 
+// Marcas que NO vienen de Tommy Tattoo Supply — confirmado por Jose
+// (2026-08-01). Mismo criterio que supplierBadge={null} en
+// TattooVisionPage.jsx/HeavenProPage.jsx y SIN_INSIGNIA_TOMMY en
+// SupplyCategoryPage.jsx (ese excluye por categoría — Muebles/Combos — este
+// por marca, porque Tattoo Vision y Heaven Pro comparten categoría con
+// productos que sí son de Tommy).
+const MARCAS_SIN_TOMMY = new Set(['tattoo-vision', 'heaven-pro', 'kwadron'])
+
 const PANEL_URL  = import.meta.env.VITE_PANEL_URL
 const WA_NUMBER  = import.meta.env.VITE_WHATSAPP_NUMBER || '573207911013'
 
@@ -169,11 +177,12 @@ export default function ProductLandingPage() {
     if (sinStock || !cart) return
     const productId = product.name + (variant?.variant ? '-' + variant.variant : '')
     cart.addItem({
-      id:    productId,
-      name:  product.name + (variant?.variant ? ` (${variant.variant})` : ''),
-      price: variant?.price ? '$' + Math.round(variant.price).toLocaleString('es-CO') : '—',
-      brand: product.descripcion || product.categoria || '',
-      image: imageUrl || '',
+      id:          productId,
+      inventoryId: variant?.id ?? null,
+      name:        product.name + (variant?.variant ? ` (${variant.variant})` : ''),
+      price:       variant?.price ? '$' + Math.round(variant.price).toLocaleString('es-CO') : '—',
+      brand:       product.descripcion || product.categoria || '',
+      image:       imageUrl || '',
     }, product.categoria)
     navigate(`/pedido/${cartModule}`)
   }
@@ -326,7 +335,18 @@ export default function ProductLandingPage() {
             {/* Trust signals — solo modulos con proveedor externo (no Gym: maquinas propias) */}
             {!isAfiliado && ['supply', 'suplementos', 'store'].includes(product.module) && (
               <div className="border-t border-zinc-800 pt-4 space-y-2">
-                {isSupply && (
+                {/* Industrias Warlock (mobiliario) tiene su propia insignia —
+                    mismo criterio que supplierBadge en BrandCatalogSection.jsx
+                    (ver IndustriasWarlockPage.jsx). El resto de marcas sin
+                    Tommy (Tattoo Vision, Heaven Pro) simplemente no muestran
+                    insignia de proveedor, igual que en su página de marca. */}
+                {isSupply && product.marca === 'kwadron' && (
+                  <div className="flex items-center gap-3 text-zinc-400 text-xs">
+                    <ShieldCheck size={13} className="shrink-0" style={{ color: accent }} />
+                    <span>Producto de Industrias Warlock — mobiliario fabricado para estudios de tatuaje</span>
+                  </div>
+                )}
+                {isSupply && !MARCAS_SIN_TOMMY.has(product.marca) && (
                   <div className="flex items-center gap-3 text-zinc-400 text-xs">
                     <ShieldCheck size={13} className="shrink-0" style={{ color: accent }} />
                     <span>Suministrado por Tommy Tattoo Supply — marca reconocida en Urabá</span>

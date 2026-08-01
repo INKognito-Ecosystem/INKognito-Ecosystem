@@ -47,7 +47,7 @@ const faq = [
 export default function DynamicColorsPage() {
   const { products } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_dynamic')
-  const { prev, next } = getAdjacentBrands(3)
+  const { prev, next } = getAdjacentBrands(4)
   const scrolled = useScrolled()
 
   return (
