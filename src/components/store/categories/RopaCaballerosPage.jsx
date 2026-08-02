@@ -95,8 +95,8 @@ export default function RopaCaballerosPage() {
               </Link>
             )}
           </div>
-          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-2 text-gray-900">
-            Ropa Deportiva<br />Caballeros
+          <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none mb-2 text-gray-900 text-center md:text-left">
+            Ropa Deportiva Caballeros
           </h1>
           <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4">
             Gym • Running • Ciclismo • Urbano

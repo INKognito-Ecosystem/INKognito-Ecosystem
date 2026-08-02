@@ -59,12 +59,11 @@ export default function VideosTutorialesPage() {
         />
         <div className="relative z-10 max-w-7xl mx-auto">
         <div className="mb-0">
-          <div className="flex items-center justify-between gap-4 mb-4">
-            <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
-              Tutoriales<br />
-              <span className="text-gray-400">en video</span>
+          <div className="flex items-center justify-center md:justify-between gap-3 md:gap-4 mb-4">
+            <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none text-center md:text-left">
+              Tutoriales <span className="text-gray-400">en video</span>
             </h1>
-            <PlayCircle size={80} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+            <PlayCircle size={56} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
           </div>
           <div className="flex flex-col md:flex-row md:items-end gap-6">
             <p className="text-gray-400 leading-relaxed max-w-2xl">

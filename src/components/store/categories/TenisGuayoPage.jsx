@@ -94,7 +94,7 @@ export default function TenisGuayoPage() {
               </Link>
             )}
           </div>
-          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-2 text-gray-900">Tenis<br />y Guayo</h1>
+          <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none mb-2 text-gray-900 text-center md:text-left">Tenis y Guayo</h1>
           <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4">Multisuperficie • Sintético • Calle</p>
           <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg">
             El calzado más versátil de Urabá: rinde en sintético, polvo de ladrillo y calle sin cambiar de par. La opción inteligente para quien juega donde se pueda y quiere un solo calzado para todo. Despachamos con Eljach a toda la región — pago contraentrega.

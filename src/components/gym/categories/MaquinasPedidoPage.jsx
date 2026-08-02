@@ -49,6 +49,11 @@ export function meta() {
 
 export default function MaquinasPedidoPage() {
   const [lightbox, setLightbox] = useState(null)
+  // Qué máquina tiene su modal de descripción abierto en móvil — mismo
+  // patrón que StoreProductCard/SupplyProductCard/SuplCard, pero como estas
+  // cards se renderizan inline (no en un sub-componente propio) alcanza con
+  // guardar el id en vez de un estado local por card (2026-08-02).
+  const [showDescId, setShowDescId] = useState(null)
   const { allProducts: gymAllProds } = useLoaderData()
   const apiMaquinas   = gymAllProds.filter(p => p.tipo !== 'afiliado')
   const gymAfiliados  = gymAllProds.filter(p => p.tipo === 'afiliado' && p.categoria === 'Materiales')
@@ -91,12 +96,11 @@ export default function MaquinasPedidoPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
-          <div className="flex items-center justify-between gap-4 mb-4">
-            <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
-              Máquinas<br />
-              <span className="text-gray-400">bajo pedido</span>
+          <div className="flex items-center justify-center md:justify-between gap-3 md:gap-4 mb-4">
+            <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none text-center md:text-left">
+              Máquinas <span className="text-gray-400">bajo pedido</span>
             </h1>
-            <Wrench size={80} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+            <Wrench size={56} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
           </div>
           <div className="border border-gray-700 bg-gray-800/50 rounded-xl p-4 max-w-2xl">
             <p className="text-gray-300 text-sm leading-relaxed">
@@ -155,7 +159,23 @@ export default function MaquinasPedidoPage() {
                     <span className="text-[9px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-2 py-0.5">Envío nacional</span>
                   </div>
                   <h3 className="font-black uppercase text-xs leading-tight mb-1">{p.nombre}</h3>
-                  <p className="text-white text-xs font-black mt-auto">{fmtPrecio(p.precio)}</p>
+                  <p className="text-white text-xs font-black">{fmtPrecio(p.precio)}</p>
+                  {p.descripcion && (
+                    <>
+                      {/* Escritorio — texto completo, mismo patrón que
+                          Store/Supply/Suplementos (2026-08-02) */}
+                      <p className="hidden md:block text-gray-500 text-[9.5px] leading-snug mt-1.5">{p.descripcion}</p>
+                      {/* Móvil — botón que abre modal */}
+                      <button
+                        type="button"
+                        onClick={() => setShowDescId(p.id)}
+                        className="md:hidden self-start mt-1.5 text-gray-500 text-[9px] font-bold uppercase tracking-[0.15em] underline underline-offset-2"
+                      >
+                        Ver descripción
+                      </button>
+                    </>
+                  )}
+                  <div className="mt-auto" />
                 </div>
 
                 {/* BOTÓN — flush al borde inferior */}
@@ -167,6 +187,24 @@ export default function MaquinasPedidoPage() {
                 >
                   {enCarrito ? '✓ Agregado' : '+ Agregar al carrito'}
                 </button>
+
+                {showDescId === p.id && (
+                  <div
+                    className="md:hidden fixed inset-0 z-50 bg-black/70 flex items-end justify-center"
+                    onClick={() => setShowDescId(null)}
+                  >
+                    <div
+                      className="w-full max-w-md bg-gray-900 border-t border-gray-800 rounded-t-2xl p-5"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-xs font-black uppercase tracking-widest text-white">Descripción</h4>
+                        <button onClick={() => setShowDescId(null)} className="text-gray-500 text-lg leading-none px-1">✕</button>
+                      </div>
+                      <p className="text-gray-400 text-sm leading-relaxed">{p.descripcion}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             )
           })}

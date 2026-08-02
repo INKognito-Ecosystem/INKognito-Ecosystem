@@ -230,12 +230,11 @@ export default function SuplementosPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
-          <div className="flex items-center justify-between gap-4 mb-4">
-            <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
-              Suple<br />
-              <span className="text-gray-400">mentos</span>
+          <div className="flex items-center justify-center md:justify-between gap-3 md:gap-4 mb-4">
+            <h1 className="text-xl md:text-7xl font-black uppercase leading-none text-center md:text-left">
+              Suple<span className="text-gray-400">mentos</span>
             </h1>
-            <FlaskConical size={80} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+            <FlaskConical size={56} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
           </div>
           <p className="text-gray-400 leading-relaxed max-w-2xl">
             Proteína, creatina, pre-entreno y vitaminas para potenciar tu entrenamiento. Selección de productos de calidad con envíos a toda Colombia desde Urabá, Antioquia.

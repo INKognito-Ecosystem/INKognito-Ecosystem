@@ -41,13 +41,12 @@ export default function RecursosPage() {
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
           {/* H1 + icono grande a la derecha en móvil */}
-          <div className="flex items-center justify-between gap-4 mb-4">
-            <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
-              Recursos<br />
-              <span className="text-gray-400">gratuitos</span>
+          <div className="flex items-center justify-center md:justify-between gap-3 md:gap-4 mb-4">
+            <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none text-center md:text-left">
+              Recursos <span className="text-gray-400">gratuitos</span>
             </h1>
             <BookOpen
-              size={80}
+              size={56}
               className="text-gray-800 flex-shrink-0 md:hidden"
               strokeWidth={1}
             />

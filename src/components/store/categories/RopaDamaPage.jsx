@@ -95,8 +95,8 @@ export default function RopaDamaPage() {
               </Link>
             )}
           </div>
-          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-2 text-gray-900">
-            Ropa Deportiva<br />Dama
+          <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none mb-2 text-gray-900 text-center md:text-left">
+            Ropa Deportiva Dama
           </h1>
           <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4">Gym • Running • Yoga • Ciclismo</p>
           <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg">

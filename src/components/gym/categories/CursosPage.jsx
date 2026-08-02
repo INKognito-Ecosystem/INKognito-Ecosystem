@@ -41,10 +41,9 @@ export default function CursosPage() {
         />
         <div className="relative z-10 max-w-7xl mx-auto">
         <div className="mb-0">
-          <div className="flex items-center justify-between gap-4 mb-4">
-            <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
-              Cursos<br />
-              <span className="text-gray-400">recomendados</span>
+          <div className="flex items-center justify-center md:justify-between gap-3 md:gap-4 mb-4">
+            <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none text-center md:text-left">
+              Cursos <span className="text-gray-400">recomendados</span>
             </h1>
             <GraduationCap size={56} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
           </div>
