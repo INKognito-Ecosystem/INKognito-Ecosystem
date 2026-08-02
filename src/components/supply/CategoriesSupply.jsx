@@ -23,7 +23,11 @@ const categories = [
   { name: 'Cuidados',          path: '/supply/aftercare',      icon: ShieldCheck, cat: 'Cuidados'    },
   { name: 'Fuentes',           path: '/supply/power-supplies', icon: PlugZap,    cat: 'Fuentes'     },
   { name: 'Accesorios',        path: '/supply/accessories',    icon: Toolbox,    cat: 'Accesorios'  },
-  { name: 'Mobiliario',        path: '/supply/furniture',      icon: BedDouble,  cat: 'Mobiliario'  },
+  // imgKey fijo: la clave de la imagen subida en el panel sigue siendo
+  // supply_cat_muebles (no se re-subió nada al renombrar la categoría a
+  // "Mobiliario" 2026-08-01) — sin esto, catKey() derivaba una clave nueva
+  // a partir del nombre y la card perdía la foto ya subida.
+  { name: 'Mobiliario',        path: '/supply/furniture',      icon: BedDouble,  cat: 'Mobiliario', imgKey: 'supply_cat_muebles' },
   { name: 'Combos',            path: '/supply/bundles',        icon: Package,    cat: 'Combos'      },
 ]
 
@@ -66,6 +70,7 @@ export default function CategoriesSupply({ categorias = {} }) {
           {categories.map((category, i) => {
             const count = stockPorCat[category.cat]
             const hasStock = count > 0
+            const imgKey = category.imgKey || catKey(category.cat)
             return (
               <div key={category.name} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">
               <Link
@@ -78,10 +83,10 @@ export default function CategoriesSupply({ categorias = {} }) {
                   ${hasStock ? 'text-zinc-300' : 'text-zinc-600'}
                 `}
               >
-                {imgs[catKey(category.cat)] ? (
+                {imgs[imgKey] ? (
                   <>
                     <img
-                      src={imgs[catKey(category.cat)]}
+                      src={imgs[imgKey]}
                       alt={category.name}
                       className="absolute inset-0 w-full h-full object-cover"
                     />

@@ -195,7 +195,7 @@ export default function ProductLandingPage() {
       inventoryId: variant?.id ?? null,
       name:        product.name + (variant?.variant ? ` (${variant.variant})` : ''),
       price:       variant?.price ? '$' + Math.round(variant.price).toLocaleString('es-CO') : '—',
-      brand:       product.descripcion || product.categoria || '',
+      brand:       product.categoria || '',
       image:       imageUrl || '',
     }, product.categoria)
     navigate(`/pedido/${cartModule}`)

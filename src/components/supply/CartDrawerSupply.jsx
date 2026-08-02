@@ -99,7 +99,7 @@ export default function CartDrawerSupply({ open, onClose }) {
                         <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] mb-0.5">
                           {item.brand}
                         </p>
-                        <p className="font-black uppercase text-sm leading-tight truncate">
+                        <p className="font-black uppercase text-sm leading-tight truncate text-white">
                           {item.name}
                         </p>
                       </div>

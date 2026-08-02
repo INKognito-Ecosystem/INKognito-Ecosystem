@@ -100,7 +100,7 @@ export default function SupplyProductCard({ item, categoria }) {
       inventoryId: sel.id ?? null,
       name:        item.name + (sel.variant ? ` (${sel.variant})` : ''),
       price:       resolvedPrice || '—',
-      brand:       item.descripcion || item.categoria || '',
+      brand:       item.categoria || '',
       image:       activeImage || '',
     }, categoria)
   }

@@ -389,6 +389,11 @@ export default function PedidoOnlinePage() {
                   <span className="text-white">${total.toLocaleString('es-CO')}</span>
                 </div>
               </div>
+              {tieneMobiliario && (
+                <p className="text-amber-500/90 text-[12px] leading-relaxed">
+                  El envío del mobiliario corre por cuenta del cliente — se coordina y paga aparte con la transportadora al momento del despacho.
+                </p>
+              )}
               <Link to={`/${module}`} className="inline-block text-gray-500 hover:text-gray-300 text-xs">
                 + Seguir agregando productos
               </Link>
