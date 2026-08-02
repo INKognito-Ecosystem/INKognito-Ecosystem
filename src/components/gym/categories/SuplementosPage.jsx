@@ -11,7 +11,18 @@ const VAR_THRESHOLD = 3
 
 function VariantSelectorSupl({ variantes, selIdx, onChange }) {
   const [open, setOpen] = useState(false)
-  if (!variantes || variantes.length <= 1) return null
+  if (!variantes || variantes.length === 0) return null
+
+  // Presentación única (ej. "2lb") — no hay nada que elegir, pero igual debe
+  // verse cuál es, en vez de desaparecer por completo (mismo criterio que
+  // SizeSelector en StoreProductCard.jsx, reportado 2026-08-02).
+  if (variantes.length === 1) {
+    return variantes[0].variant ? (
+      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wide">
+        Presentación: {variantes[0].variant}
+      </p>
+    ) : null
+  }
 
   if (variantes.length <= VAR_THRESHOLD) {
     return (
@@ -65,6 +76,7 @@ function VariantSelectorSupl({ variantes, selIdx, onChange }) {
 
 function SuplCard({ p, onAddToCart, enCarrito }) {
   const [selIdx, setSelIdx] = useState(0)
+  const [showDesc, setShowDesc] = useState(false)
   const variantes = p.variantes || []
   const sel       = variantes[selIdx] || {}
 
@@ -75,6 +87,11 @@ function SuplCard({ p, onAddToCart, enCarrito }) {
     ? [sel.image_url, sel.image_url_2, sel.image_url_3].filter(Boolean)
     : (p.images?.length ? p.images : [p.image].filter(Boolean))
 
+  // Descripción de la presentación seleccionada si tiene la suya propia; si
+  // no, la del producto — mismo criterio que Store/Supply. Antes no se
+  // mostraba en absoluto acá (reportado 2026-08-02).
+  const description = sel.descripcion || p.descripcion
+
   return (
     <div className="snap-start flex-shrink-0 w-[40vw] md:w-auto border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300">
       <div className="relative w-full aspect-square bg-gray-800 flex items-center justify-center flex-shrink-0">
@@ -84,12 +101,26 @@ function SuplCard({ p, onAddToCart, enCarrito }) {
         }
       </div>
       <div className="p-3 flex flex-col flex-1 gap-1.5">
-        <span className="text-[9px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-2 py-0.5 self-start">
-          {p.categoria}
-        </span>
         <h3 className="font-black uppercase text-xs leading-tight">{p.nombre}</h3>
-        <VariantSelectorSupl variantes={variantes} selIdx={selIdx} onChange={setSelIdx} />
-        <span className="text-white font-black text-sm mt-auto">{precio}</span>
+        <span className="text-white font-black text-sm">{precio}</span>
+        {description && (
+          <>
+            {/* Escritorio — texto completo, debajo de nombre/precio */}
+            <p className="hidden md:block text-gray-500 text-[9.5px] leading-snug">{description}</p>
+            {/* Móvil — botón que abre modal, mismo patrón que
+                StoreProductCard.jsx/SupplyProductCard.jsx (2026-08-02) */}
+            <button
+              type="button"
+              onClick={() => setShowDesc(true)}
+              className="md:hidden self-start text-gray-500 text-[9px] font-bold uppercase tracking-[0.15em] underline underline-offset-2"
+            >
+              Ver descripción
+            </button>
+          </>
+        )}
+        <div className="mt-auto pt-1">
+          <VariantSelectorSupl variantes={variantes} selIdx={selIdx} onChange={setSelIdx} />
+        </div>
       </div>
       <button
         onClick={() => onAddToCart(p, sel)}
@@ -99,6 +130,24 @@ function SuplCard({ p, onAddToCart, enCarrito }) {
       >
         {enCarrito ? '✓ Agregado' : '+ Agregar al carrito'}
       </button>
+
+      {showDesc && (
+        <div
+          className="md:hidden fixed inset-0 z-50 bg-black/70 flex items-end justify-center"
+          onClick={() => setShowDesc(false)}
+        >
+          <div
+            className="w-full max-w-md bg-gray-900 border-t border-gray-800 rounded-t-2xl p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-xs font-black uppercase tracking-widest text-white">Descripción</h4>
+              <button onClick={() => setShowDesc(false)} className="text-gray-500 text-lg leading-none px-1">✕</button>
+            </div>
+            <p className="text-gray-400 text-sm leading-relaxed">{description}</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -140,6 +189,7 @@ export default function SuplementosPage() {
   const productosActivos = apiFisicos.map((item, i) => ({
     id:          i + 1,
     categoria:   item.categoria || 'Suplementos',
+    descripcion: item.descripcion || null,
     nombre:      item.name,
     image:       item.image_url || item.variantes?.[0]?.image_url || null,
     images:      [item.image_url, item.image_url_2, item.image_url_3].filter(Boolean).length

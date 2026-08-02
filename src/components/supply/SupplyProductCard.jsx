@@ -97,6 +97,12 @@ export default function SupplyProductCard({ item, categoria }) {
       : [item.image_url, item.image_url_2, item.image_url_3].filter(Boolean)
   const galleryImages = images.filter(Boolean)
 
+  // Descripción de la variante seleccionada si tiene la suya propia; si no,
+  // la del producto — mismo criterio que StoreProductCard.jsx. Antes
+  // siempre mostraba item.descripcion (la de la primera fila en la base),
+  // nunca cambiaba al cambiar de variante (reportado 2026-08-02).
+  const description = sel.descripcion || item.descripcion
+
   const productId = item.name + (sel.variant ? '-' + sel.variant : '')
   const cartKey = `${categoria}-${productId}`
   const enCarrito = cartItems.some(i => i.key === cartKey)
@@ -136,10 +142,10 @@ export default function SupplyProductCard({ item, categoria }) {
         {totalStock <= 3 && totalStock > 0 && (
           <p className="text-yellow-500 text-[9px] font-bold">⚠️ Últimas {totalStock}</p>
         )}
-        {item.descripcion && (
+        {description && (
           <>
             {/* Escritorio — texto completo, debajo de nombre/precio */}
-            <p className="hidden md:block text-zinc-500 text-[9.5px] leading-snug">{item.descripcion}</p>
+            <p className="hidden md:block text-zinc-500 text-[9.5px] leading-snug">{description}</p>
             {/* Móvil — botón que abre modal, en vez de estirar la card
                 (descripción de mobiliario es un párrafo largo, no la
                 etiqueta corta de una palabra que este campo tenía antes;
@@ -184,7 +190,7 @@ export default function SupplyProductCard({ item, categoria }) {
               <h4 className="text-xs font-black uppercase tracking-widest text-white">Descripción</h4>
               <button onClick={() => setShowDesc(false)} className="text-zinc-500 text-lg leading-none px-1">✕</button>
             </div>
-            <p className="text-zinc-400 text-sm leading-relaxed">{item.descripcion}</p>
+            <p className="text-zinc-400 text-sm leading-relaxed">{description}</p>
           </div>
         </div>
       )}

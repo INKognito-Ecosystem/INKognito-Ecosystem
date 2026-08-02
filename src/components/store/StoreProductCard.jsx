@@ -95,6 +95,14 @@ export default function StoreProductCard({ product, category, sizes }) {
     ? [imageSource.image_url, imageSource.image_url_2, imageSource.image_url_3].filter(Boolean)
     : (product.images?.length ? product.images : [product.image].filter(Boolean))
 
+  // Descripción de la talla seleccionada si la tiene propia; si no, la del
+  // producto (product.tag) — así, si todas las tallas comparten la misma
+  // descripción (o solo el producto tiene una), se ve igual sin importar
+  // cuál esté seleccionada; si cada talla tiene la suya, cambia con ella.
+  // Antes siempre mostraba la del producto, nunca la de la variante
+  // (reportado 2026-08-02).
+  const description = selectedVariant?.descripcion || product.tag
+
   const handleAdd = () => {
     const variantId = product._item?.variantes?.find(v => v.variant === selectedSize)?.id
       ?? product._item?.variantes?.[0]?.id ?? null
@@ -125,11 +133,11 @@ export default function StoreProductCard({ product, category, sizes }) {
           {product.name}
         </h3>
         <span className="text-gray-900 font-bold text-sm">{product.price}</span>
-        {product.tag && (
+        {description && (
           <>
             {/* Escritorio — texto completo, debajo de nombre/precio (antes
                 iba arriba del nombre, reportado 2026-08-02) */}
-            <p className="hidden md:block text-gray-500 text-[9.5px] leading-snug">{product.tag}</p>
+            <p className="hidden md:block text-gray-500 text-[9.5px] leading-snug">{description}</p>
             {/* Móvil — botón que abre modal, mismo patrón que
                 SupplyProductCard.jsx (2026-08-02) */}
             <button
@@ -169,7 +177,7 @@ export default function StoreProductCard({ product, category, sizes }) {
               <h4 className="text-xs font-black uppercase tracking-widest text-gray-900">Descripción</h4>
               <button onClick={() => setShowDesc(false)} className="text-gray-400 text-lg leading-none px-1">✕</button>
             </div>
-            <p className="text-gray-600 text-sm leading-relaxed">{product.tag}</p>
+            <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
           </div>
         </div>
       )}
