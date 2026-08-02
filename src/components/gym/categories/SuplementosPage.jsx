@@ -256,24 +256,23 @@ export default function SuplementosPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-4">
             {prev && (
               <Link to={`/gym/${prev.slug}`} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
-                <ArrowLeft size={18} />
+                <ArrowLeft size={24} />
               </Link>
             )}
-            <p className="flex-1 text-center uppercase tracking-[0.25em] text-gray-500 text-xs">Categoría</p>
+            <div className="flex-1 flex items-center justify-center md:justify-between gap-3 md:gap-4">
+              <h1 className="text-xl md:text-7xl font-black uppercase leading-none text-center md:text-left">
+                Suple<span className="text-gray-400">mentos</span>
+              </h1>
+              <FlaskConical size={40} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+            </div>
             {next && (
               <Link to={`/gym/${next.slug}`} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
-                <ArrowRight size={18} />
+                <ArrowRight size={24} />
               </Link>
             )}
-          </div>
-          <div className="flex items-center justify-center md:justify-between gap-3 md:gap-4 mb-4">
-            <h1 className="text-xl md:text-7xl font-black uppercase leading-none text-center md:text-left">
-              Suple<span className="text-gray-400">mentos</span>
-            </h1>
-            <FlaskConical size={56} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
           </div>
           <p className="text-gray-400 leading-relaxed max-w-2xl">
             Proteína, creatina, pre-entreno y vitaminas para potenciar tu entrenamiento. Selección de productos de calidad con envíos a toda Colombia desde Urabá, Antioquia.
