@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import inkognitoLogo from '../../assets/ecosystem/logo.png'
 
-export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio', logoFilter = null, showTagline = false }) {
+export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio', logoFilter = null, showTagline = false, showTattooSection = true }) {
   const [menuOpen,  setMenuOpen]  = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [tattooOpen, setTattooOpen] = useState(false)
@@ -37,7 +37,7 @@ export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio', logoFil
 
         {showTagline && (
           <span
-            className="absolute left-1/2 -translate-x-1/2 text-white/80 text-[9px] tracking-[0.15em] uppercase font-bold pointer-events-none transition-opacity duration-500 whitespace-nowrap"
+            className="absolute left-1/2 -translate-x-1/2 text-white/35 text-[9px] tracking-[0.15em] uppercase font-bold pointer-events-none transition-opacity duration-500 whitespace-nowrap"
             style={{ opacity: scrolled ? 0 : 1 }}
           >
             Disciplina. Arte. Identidad.
@@ -83,30 +83,36 @@ export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio', logoFil
         <nav className="flex flex-col gap-1">
           <MenuLink label="About" onClick={openAbout} />
 
-          {/* TATTOO STUDIO — desplegable con solo redes sociales */}
-          <div>
-            <button
-              onClick={() => setTattooOpen(o => !o)}
-              className="w-full text-left px-4 py-[14px] text-white/85 bg-transparent border-none cursor-pointer uppercase tracking-[0.25em] text-[13px] font-bold rounded hover:bg-white/[0.06] hover:text-white transition-all duration-200 flex items-center justify-between"
-            >
-              {tattooLabel}
-              <span
-                className="text-white/40 text-[10px] transition-transform duration-300"
-                style={{ display: 'inline-block', transform: tattooOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+          {/* TATTOO STUDIO — desplegable con solo redes sociales. Solo en
+              páginas donde tiene sentido navegar hacia el estudio de tatuajes
+              (ej. el hub /); en landings de producto de otros módulos
+              (Supply/Store/Gym) no aplica y solo distraía del "About"
+              (2026-08-02). */}
+          {showTattooSection && (
+            <div>
+              <button
+                onClick={() => setTattooOpen(o => !o)}
+                className="w-full text-left px-4 py-[14px] text-white/85 bg-transparent border-none cursor-pointer uppercase tracking-[0.25em] text-[13px] font-bold rounded hover:bg-white/[0.06] hover:text-white transition-all duration-200 flex items-center justify-between"
               >
-                ▾
-              </span>
-            </button>
-            <div
-              className="overflow-hidden transition-all duration-300 ease-in-out"
-              style={{ maxHeight: tattooOpen ? '120px' : '0px', opacity: tattooOpen ? 1 : 0 }}
-            >
-              <div className="flex flex-col pb-1">
-                <SocialLink href="https://www.instagram.com/jhumaneztattoo?igsh=MXh4ZW9vaGZnMDVtZQ==" label="Instagram" />
-                <SocialLink href="https://www.facebook.com/humanezjose" label="Facebook" />
+                {tattooLabel}
+                <span
+                  className="text-white/40 text-[10px] transition-transform duration-300"
+                  style={{ display: 'inline-block', transform: tattooOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                >
+                  ▾
+                </span>
+              </button>
+              <div
+                className="overflow-hidden transition-all duration-300 ease-in-out"
+                style={{ maxHeight: tattooOpen ? '120px' : '0px', opacity: tattooOpen ? 1 : 0 }}
+              >
+                <div className="flex flex-col pb-1">
+                  <SocialLink href="https://www.instagram.com/jhumaneztattoo?igsh=MXh4ZW9vaGZnMDVtZQ==" label="Instagram" />
+                  <SocialLink href="https://www.facebook.com/humanezjose" label="Facebook" />
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </nav>
 
         <div className="mt-auto border-t border-white/[0.08] pt-6">
@@ -124,9 +130,14 @@ export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio', logoFil
         />
       )}
 
-      {/* MODAL ABOUT */}
+      {/* MODAL ABOUT — estructura de secciones cortas (label + párrafo),
+          mismo criterio editorial que las páginas legales (TerminosPage.jsx/
+          PrivacidadPage.jsx): preciso y directo, no una lista genérica de
+          nombres de módulo (reescrito 2026-08-02, la versión anterior era
+          muy vaga/poética y luego enumeraba "Supply · Store · Gym ·
+          Jhumaneztattoo" como tags sueltos sin explicar nada). */}
       <div
-        className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[80] w-[90%] max-w-[480px] bg-[rgba(10,10,10,0.97)] backdrop-blur-3xl border border-white/[0.08] rounded-lg px-9 py-10 transition-all duration-300 ease-in-out ${
+        className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[80] w-[90%] max-w-[480px] max-h-[85vh] overflow-y-auto bg-[rgba(10,10,10,0.97)] backdrop-blur-3xl border border-white/[0.08] rounded-lg px-9 py-10 transition-all duration-300 ease-in-out ${
           aboutOpen ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'
         }`}
       >
@@ -140,13 +151,30 @@ export default function EcosystemNavbar({ tattooLabel = 'Tattoo Studio', logoFil
 
         <p className="text-white/40 text-[10px] tracking-[0.3em] uppercase mb-6">About</p>
 
-        <p className="text-white text-xl font-bold tracking-[0.05em] uppercase mb-5 leading-[1.3]">
+        <p className="text-white text-xl font-bold tracking-[0.05em] uppercase mb-7 leading-[1.3]">
           INKognito.<br />Una forma de ver el mundo.
         </p>
 
-        <p className="text-white/65 text-sm leading-[1.8] tracking-[0.03em]">
-          Disciplina, arte, identidad. Nace de alguien que pregunta demasiado. Que quiere construir algo real, desde cero, con intención.
-        </p>
+        <div className="mb-5">
+          <p className="text-white/45 text-[10px] font-bold tracking-[0.25em] uppercase mb-2">Origen</p>
+          <p className="text-white/65 text-sm leading-[1.8] tracking-[0.03em]">
+            Disciplina, arte, identidad. Nace de alguien que pregunta demasiado — que quiso construir algo real, desde cero, con intención.
+          </p>
+        </div>
+
+        <div className="mb-5">
+          <p className="text-white/45 text-[10px] font-bold tracking-[0.25em] uppercase mb-2">Qué es hoy</p>
+          <p className="text-white/65 text-sm leading-[1.8] tracking-[0.03em]">
+            Un ecosistema digital que nació del tatuaje y creció hacia el comercio: catálogos en línea con proveedores locales y nacionales verificados, para que Urabá tenga acceso a productos y servicios reales en línea.
+          </p>
+        </div>
+
+        <div>
+          <p className="text-white/45 text-[10px] font-bold tracking-[0.25em] uppercase mb-2">Visión</p>
+          <p className="text-white/65 text-sm leading-[1.8] tracking-[0.03em]">
+            Construir, desde Urabá, la infraestructura digital que conecte proveedores y compradores de todas partes de Colombia de manera online.
+          </p>
+        </div>
 
         <p className="text-white/90 text-[13px] font-bold tracking-[0.2em] uppercase mt-7">
           Una visión. Dejar marca.

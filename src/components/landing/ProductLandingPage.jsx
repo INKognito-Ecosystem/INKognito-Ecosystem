@@ -4,7 +4,6 @@ import { FaWhatsapp } from 'react-icons/fa'
 import { Package, ExternalLink, Truck, Shield, ShieldCheck, MessageSquare, Zap, Globe, CalendarCheck } from 'lucide-react'
 import EcosystemNavbar from '../ecosystem/EcosystemNavbar'
 import ProductImageGallery from '../ProductImageGallery'
-import { useSupplyVisual } from '../../hooks/useSupplyVisual'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import { useGymCart } from '../../contexts/GymCartContext'
@@ -82,10 +81,27 @@ export async function loader({ params }) {
   try {
     const res = await fetch(`${PANEL_URL}/api/product/${params.id}`)
     const data = await res.json()
-    if (data.error) return { product: null }
-    return { product: data }
+    if (data.error) return { product: null, warlockLogo: null }
+
+    // Logo de Industrias Warlock — se resuelve en el loader (SSR) en vez de
+    // con useSupplyVisual (fetch en el navegador tras montar) para que
+    // aparezca desde el primer render en vez de "aparecer" un instante
+    // después (reportado 2026-08-02). Solo se pide para Mobiliario, el
+    // resto de productos no lo necesita.
+    let warlockLogo = null
+    if (data.module === 'supply' && data.categoria === 'Mobiliario') {
+      try {
+        const visualRes = await fetch(`${PANEL_URL}/api/visual/supply`)
+        const visualData = await visualRes.json()
+        warlockLogo = visualData.supply_brand_kwadron || null
+      } catch {
+        warlockLogo = null
+      }
+    }
+
+    return { product: data, warlockLogo }
   } catch {
-    return { product: null }
+    return { product: null, warlockLogo: null }
   }
 }
 
@@ -113,7 +129,7 @@ const CART_MODULE = { supply: 'supply', store: 'store', gym: 'gym', suplementos:
 
 export default function ProductLandingPage() {
   const { id } = useParams()
-  const { product } = useLoaderData()
+  const { product, warlockLogo } = useLoaderData()
   const navigate = useNavigate()
   const supplyCart = useSupplyCart()
   const storeCart = useStoreCart()
@@ -121,11 +137,6 @@ export default function ProductLandingPage() {
   const [activeVariant, setActive] = useState(0)
   const [imgIdx, setImgIdx]        = useState(0)
   const [scrolled, setScrolled]    = useState(false)
-  // Mismo logo que ya usa la página de marca (IndustriasWarlockPage.jsx) —
-  // clave 'supply_brand_kwadron' a propósito, ver nota ahí (2026-08-02).
-  // Se llama siempre (antes del early-return de abajo) para no romper el
-  // orden de hooks entre renders.
-  const warlockLogo = useSupplyVisual('supply_brand_kwadron')
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -252,7 +263,7 @@ export default function ProductLandingPage() {
 
   return (
     <div className={`min-h-screen bg-black text-white md:pb-0 ${!isAfiliado && cart ? 'pb-36' : 'pb-20'}`}>
-      <EcosystemNavbar tattooLabel="Jhumaneztattoo" logoFilter="brightness(0) invert(1)" showTagline />
+      <EcosystemNavbar logoFilter="brightness(0) invert(1)" showTagline showTattooSection={false} />
 
       <div className="pt-20 max-w-5xl mx-auto px-4 py-8 md:py-16">
         <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-start">
