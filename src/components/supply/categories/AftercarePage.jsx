@@ -6,7 +6,7 @@ const TITLE = 'Cuidados'
 const CATEGORIA = 'Cuidados'
 const SLUG = 'aftercare'
 const DESC = 'Productos de cuidado y limpieza para tatuajes en Chigorodo, Uraba. Para tatuadores profesionales.'
-const INTRO = 'Un proceso limpio no solo protege al cliente. Lo que usas para cuidar el trabajo determina lo que deja tu firma.'
+const INTRO = 'Cremas, jabones y productos de limpieza para antes, durante y después de tatuar. Un proceso limpio no solo protege al cliente — lo que usas para cuidar el trabajo es parte de lo que deja tu firma en cada sesión.'
 
 const guide = [
   { icon: '🧴', title: 'Espuma limpiadora', text: 'Para limpiar la zona antes y durante el tatuaje. Elimina sangre sin irritar.' },

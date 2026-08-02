@@ -162,30 +162,31 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
         {/* HERO — H1 + ícono de categoría en móvil */}
         <div className="relative overflow-hidden px-6 max-w-7xl mx-auto pb-5 md:pb-10">
           <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
-          <div className="relative z-10 flex items-center gap-3 mb-4">
+          <div className="relative z-10 flex items-center gap-3 mb-2">
             {prev && (
               <Link
                 to={`/supply/${prev.slug}`} replace
                 aria-label={`Ver ${prev.name}`}
                 className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors"
               >
-                <ArrowLeft size={24} />
+                <ArrowLeft size={20} />
               </Link>
             )}
-            <div className="flex-1 flex items-center justify-center gap-3">
-              <h1 className="text-xl md:text-4xl font-black uppercase tracking-tight leading-none text-white text-center whitespace-nowrap">{title}</h1>
-              {CatIcon && (
-                <CatIcon size={48} className="text-zinc-800 flex-shrink-0 md:hidden" strokeWidth={1} />
-              )}
-            </div>
+            <p className="flex-1 text-center uppercase tracking-[0.25em] text-zinc-500 text-xs">Categoría</p>
             {next && (
               <Link
                 to={`/supply/${next.slug}`} replace
                 aria-label={`Ver ${next.name}`}
                 className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors"
               >
-                <ArrowRight size={24} />
+                <ArrowRight size={20} />
               </Link>
+            )}
+          </div>
+          <div className="relative z-10 flex items-center justify-center gap-3 mb-4">
+            <h1 className="text-xl md:text-4xl font-black uppercase tracking-tight leading-none text-white text-center whitespace-nowrap">{title}</h1>
+            {CatIcon && (
+              <CatIcon size={48} className="text-zinc-800 flex-shrink-0 md:hidden" strokeWidth={1} />
             )}
           </div>
           {intro && (

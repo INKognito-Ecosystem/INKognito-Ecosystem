@@ -6,7 +6,7 @@ const TITLE = 'Fuentes de poder'
 const CATEGORIA = 'Fuentes'
 const SLUG = 'power-supplies'
 const DESC = 'Fuentes de poder para maquinas de tatuar en Chigorodo, Uraba. Voltaje estable y control preciso.'
-const INTRO = 'La fuente que no falla es la que nunca piensas en ella mientras tatuas. Voltaje estable, mente libre para crear.'
+const INTRO = 'Fuentes de poder con voltaje estable y control preciso para tu máquina. La fuente que no falla es la que nunca piensas en ella mientras tatúas — mente libre para crear, sin interrupciones.'
 
 const guide = [
   { icon: '🎛️', title: 'Control de voltaje', text: 'Incrementos de 0.1V. La diferencia entre 6V y 6.5V cambia el comportamiento de tu maquina.' },

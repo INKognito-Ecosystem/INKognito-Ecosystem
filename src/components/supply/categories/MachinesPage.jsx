@@ -6,7 +6,7 @@ const TITLE = 'Maquinas'
 const CATEGORIA = 'Maquinas'
 const SLUG = 'machines'
 const DESC = 'Maquinas de tatuar rotativas en Chigorodo, Uraba. Equipos para todos los estilos.'
-const INTRO = 'Tu maquina define tu velocidad, tu control y tu firma. Equipos en manos de tatuadores que no vuelven atras.'
+const INTRO = 'Máquinas rotativas para todos los estilos, del realismo al lineal. Tu máquina define tu velocidad, tu control y tu firma — equipos que ya están en manos de tatuadores que probaron y no volvieron atrás.'
 
 const guide = [
   { icon: '⚙️', title: 'Rotativa de lapiz', text: 'Ligera, silenciosa y versatil. La mas recomendada para empezar.' },

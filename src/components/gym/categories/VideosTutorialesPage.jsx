@@ -84,27 +84,28 @@ export default function VideosTutorialesPage() {
         />
         <div className="relative z-10 max-w-7xl mx-auto">
         <div className="mb-0">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-2">
             {prev && (
               <Link to={`/gym/${prev.slug}`} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
-                <ArrowLeft size={24} />
+                <ArrowLeft size={18} />
               </Link>
             )}
-            <div className="flex-1 flex items-center justify-center md:justify-between gap-3 md:gap-4">
-              <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none text-center md:text-left">
-                Tutoriales <span className="text-gray-400">en video</span>
-              </h1>
-              <PlayCircle size={40} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
-            </div>
+            <p className="flex-1 text-center uppercase tracking-[0.25em] text-gray-500 text-xs">Categoría</p>
             {next && (
               <Link to={`/gym/${next.slug}`} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
-                <ArrowRight size={24} />
+                <ArrowRight size={18} />
               </Link>
             )}
           </div>
+          <div className="flex items-center justify-center md:justify-between gap-3 md:gap-4 mb-4">
+            <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none text-center md:text-left">
+              Tutoriales <span className="text-gray-400">en video</span>
+            </h1>
+            <PlayCircle size={40} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+          </div>
           <div className="flex flex-col md:flex-row md:items-end gap-6">
             <p className="text-gray-400 leading-relaxed max-w-2xl">
-              Videos paso a paso de cómo construir equipos de gym caseros. Los videos se reproducen directamente desde YouTube.
+              Videos paso a paso de cómo construir equipos de gym caseros, con las mismas técnicas que uso yo — mancuernas, discos y máquinas hechas con materiales accesibles. Se reproducen directo desde YouTube, sin costo ni registro.
             </p>
             <a
               href="https://www.youtube.com/@JhumanezZ"

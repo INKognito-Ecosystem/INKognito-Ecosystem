@@ -64,26 +64,27 @@ export default function CursosPage() {
         />
         <div className="relative z-10 max-w-7xl mx-auto">
         <div className="mb-0">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-2">
             {prev && (
               <Link to={`/gym/${prev.slug}`} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
-                <ArrowLeft size={24} />
+                <ArrowLeft size={18} />
               </Link>
             )}
-            <div className="flex-1 flex items-center justify-center md:justify-between gap-3 md:gap-4">
-              <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none text-center md:text-left">
-                Cursos <span className="text-gray-400">recomendados</span>
-              </h1>
-              <GraduationCap size={40} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
-            </div>
+            <p className="flex-1 text-center uppercase tracking-[0.25em] text-gray-500 text-xs">Categoría</p>
             {next && (
               <Link to={`/gym/${next.slug}`} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
-                <ArrowRight size={24} />
+                <ArrowRight size={18} />
               </Link>
             )}
           </div>
+          <div className="flex items-center justify-center md:justify-between gap-3 md:gap-4 mb-4">
+            <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none text-center md:text-left">
+              Cursos <span className="text-gray-400">recomendados</span>
+            </h1>
+            <GraduationCap size={40} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+          </div>
           <p className="text-gray-400 leading-relaxed max-w-2xl">
-            Selección de los mejores cursos en español para entrenarte en casa, mejorar tu alimentación y aprender a fabricar tus propios equipos.
+            Selección de los mejores cursos en español para entrenarte en casa, mejorar tu alimentación y aprender a fabricar tus propios equipos — grabados por quienes ya viven de esto, para que aprendas a tu ritmo, sin salir de casa.
           </p>
         </div>
         </div>

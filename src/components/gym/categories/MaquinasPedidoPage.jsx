@@ -119,26 +119,27 @@ export default function MaquinasPedidoPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-2">
             {prev && (
               <Link to={`/gym/${prev.slug}`} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
-                <ArrowLeft size={24} />
+                <ArrowLeft size={18} />
               </Link>
             )}
-            <div className="flex-1 flex items-center justify-center md:justify-between gap-3 md:gap-4">
-              <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none text-center md:text-left">
-                Máquinas <span className="text-gray-400">bajo pedido</span>
-              </h1>
-              <Wrench size={40} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
-            </div>
+            <p className="flex-1 text-center uppercase tracking-[0.25em] text-gray-500 text-xs">Categoría</p>
             {next && (
               <Link to={`/gym/${next.slug}`} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
-                <ArrowRight size={24} />
+                <ArrowRight size={18} />
               </Link>
             )}
           </div>
+          <div className="flex items-center justify-center md:justify-between gap-3 md:gap-4 mb-4">
+            <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none text-center md:text-left">
+              Máquinas <span className="text-gray-400">bajo pedido</span>
+            </h1>
+            <Wrench size={40} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+          </div>
           <p className="text-gray-400 leading-relaxed max-w-2xl">
-            Cada máquina sale de Chigorodó, hecha a mano con soldadura profesional. La tuya puede llegar a cualquier rincón de Colombia — cuéntanos dónde estás.
+            Cada máquina sale de Chigorodó, hecha a mano con soldadura profesional y acero calibre grueso, lista para uso intenso diario. La tuya puede llegar a cualquier rincón de Colombia — cuéntanos qué necesitas y dónde estás.
           </p>
         </div>
       </section>

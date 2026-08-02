@@ -6,7 +6,7 @@ const TITLE = 'Combos'
 const CATEGORIA = 'Combos'
 const SLUG = 'bundles'
 const DESC = 'Combos y paquetes de insumos para tatuadores en Uraba. Kits para iniciar y reposicion.'
-const INTRO = 'Todo lo que necesitas, seleccionado para que te enfoques en tatuar. Sin buscar, sin improvisar, sin excusas.'
+const INTRO = 'Combos y paquetes de insumos armados para iniciar o reponer sin complicarte — todo lo que necesitas, seleccionado para que te enfoques en tatuar. Sin buscar producto por producto, sin improvisar, sin excusas.'
 
 const guide = [
   { icon: '🎯', title: 'Kit de inicio', text: 'Lo esencial para empezar: maquina, fuente, cartuchos, guantes y limpieza.' },

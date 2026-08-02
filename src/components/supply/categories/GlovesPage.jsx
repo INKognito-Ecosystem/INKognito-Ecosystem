@@ -6,7 +6,7 @@ const TITLE = 'Guantes'
 const CATEGORIA = 'Guantes'
 const SLUG = 'gloves'
 const DESC = 'Guantes de nitrilo para tatuar en Chigorodo, Uraba. Sin latex y con excelente tacto.'
-const INTRO = 'El guante que usas tambien habla de como trabajas. Agarre exacto, proteccion real, confianza en cada movimiento.'
+const INTRO = 'Guantes de nitrilo sin látex, con el tacto exacto para trabajar con precisión. El guante que usas también habla de cómo trabajas — agarre exacto, protección real y confianza en cada movimiento de la sesión.'
 
 const guide = [
   { icon: '🖤', title: 'Nitrilo negro', text: 'El estandar del sector. Sin alergias y resiste pinchazos mejor que el latex.' },

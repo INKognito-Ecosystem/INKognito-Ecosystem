@@ -6,7 +6,7 @@ const TITLE = 'Accesorios'
 const CATEGORIA = 'Accesorios'
 const SLUG = 'accessories'
 const DESC = 'Accesorios para tatuadores en Chigorodo, Uraba. Transfer paper, bandejas, cables y mas.'
-const INTRO = 'Los detalles que hacen fluir el trabajo. Porque cuando el proceso es suave, la creatividad no se interrumpe.'
+const INTRO = 'Transfer paper, bandejas, cables y todo lo que hace fluir el trabajo — los detalles que casi nadie nota, pero que definen si el proceso es suave o se interrumpe. Porque la creatividad necesita que lo demás funcione sin pensarlo.'
 
 const guide = [
   { icon: '🗂️', title: 'Transfer paper', text: 'Para pasar el diseno a la piel con precision. El de copiado manual con gel es el mas usado.' },

@@ -6,7 +6,7 @@ const TITLE = 'Agujas'
 const CATEGORIA = 'Agujas'
 const SLUG = 'needles'
 const DESC = 'Agujas de tatuaje profesionales en Chigorodo, Uraba. RL, RS, M1, CM para todos los estilos.'
-const INTRO = 'La aguja correcta no es un detalle. Es la diferencia entre un trabajo limpio y uno que duele dos veces.'
+const INTRO = 'RL, RS, M1 y CM para cada estilo de trabajo. La aguja correcta no es un detalle — es la diferencia entre un trabajo limpio y uno que duele dos veces, para ti y para el cliente.'
 
 const guide = [
   { icon: '📐', title: 'RL Liner', text: 'Para contornos y trazos finos. Las RL3 y RL5 son las mas versatiles.' },
