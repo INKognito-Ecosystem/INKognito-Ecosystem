@@ -103,6 +103,7 @@ export default function PedidoOnlinePage() {
   const [fleteTabla, setFleteTabla] = useState(null)
   const [fleteOrigen, setFleteOrigen] = useState('chigorodo')
   const [nequi, setNequi] = useState({ numero: '', nombre: '' })
+  const [pagarProductoAhora, setPagarProductoAhora] = useState(false)
   const submitted = useRef(false)
 
   useEffect(() => {
@@ -143,7 +144,12 @@ export default function PedidoOnlinePage() {
   // importar si el destino está en la ruta de Eljach (2026-08-01).
   const tieneMobiliario = items.some(i => i.category === 'Mobiliario')
   const enCobertura = municipioSeleccionado && !tieneMobiliario
-  const metodoPago = enCobertura ? 'contraentrega' : 'nequi'
+  // Dentro de cobertura, el cliente elige: contraentrega total, o pagar el
+  // producto de una vez por Nequi y dejar solo el flete para pagar en
+  // efectivo al repartidor (2026-08-01) — ver getPayBadgeRepartidor() en el
+  // panel, ya tenía la rama lista para este caso (metodo_pago='nequi' con
+  // flete_monto>0), solo faltaba esta opción en el checkout.
+  const metodoPago = enCobertura ? (pagarProductoAhora ? 'nequi' : 'contraentrega') : 'nequi'
   const precioFlete = enCobertura && fleteTabla ? fleteTabla[fleteOrigen]?.[form.municipioSel] : null
 
   const productosStr = items.map(i => {
@@ -384,9 +390,15 @@ export default function PedidoOnlinePage() {
                     </div>
                   )
                 })}
+                {enCobertura && precioFlete != null && (
+                  <div className="flex items-center justify-between px-4 py-2.5 text-sm">
+                    <span className="text-gray-300">Flete</span>
+                    <span className="text-gray-500">${precioFlete.toLocaleString('es-CO')}</span>
+                  </div>
+                )}
                 <div className="flex items-center justify-between px-4 py-3 font-bold">
                   <span className="text-white text-sm uppercase tracking-wide">Total</span>
-                  <span className="text-white">${total.toLocaleString('es-CO')}</span>
+                  <span className="text-white">${(total + (enCobertura && precioFlete != null ? precioFlete : 0)).toLocaleString('es-CO')}</span>
                 </div>
               </div>
               {tieneMobiliario && (
@@ -394,38 +406,71 @@ export default function PedidoOnlinePage() {
                   El envío del mobiliario corre por cuenta del cliente — se coordina y paga aparte con la transportadora al momento del despacho.
                 </p>
               )}
+              {enCobertura && pagarProductoAhora && (
+                <p className="text-amber-500/90 text-[12px] leading-relaxed">
+                  Pagas ${total.toLocaleString('es-CO')} ahora por Nequi{precioFlete != null ? ` — el flete de $${precioFlete.toLocaleString('es-CO')} se paga en efectivo al recibir` : ' — el flete se paga en efectivo al recibir'}.
+                </p>
+              )}
               <Link to={`/${module}`} className="inline-block text-gray-500 hover:text-gray-300 text-xs">
                 + Seguir agregando productos
               </Link>
 
-              {/* MÉTODO DE PAGO — se decide solo según la ciudad elegida arriba */}
+              {/* MÉTODO DE PAGO — se decide según la ciudad elegida arriba;
+                  dentro de cobertura el cliente puede elegir entre las 2
+                  opciones (2026-08-01, antes solo existía contraentrega). */}
               {form.municipioSel && (
-                enCobertura ? (
-                  <div className="bg-zinc-900 border border-green-600/30 rounded-lg p-4 flex items-start gap-3">
-                    <span className="text-lg leading-none flex-shrink-0">🏍️</span>
-                    <div>
-                      <p className="text-white text-sm font-bold">Contraentrega</p>
-                      <p className="text-gray-400 text-[13px] leading-relaxed">
-                        Pagas al recibir{precioFlete != null ? ` — flete de $${precioFlete.toLocaleString('es-CO')}` : ''}. Sin adelantos.
-                      </p>
+                <>
+                  {enCobertura && (
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setPagarProductoAhora(false)}
+                        className={`flex-1 py-2.5 rounded-lg border text-[11px] font-bold uppercase tracking-wide transition-colors ${
+                          !pagarProductoAhora ? 'border-green-500 bg-green-600/10 text-white' : 'border-gray-700 text-gray-500 hover:border-gray-500'
+                        }`}
+                      >
+                        🏍️ Contraentrega
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPagarProductoAhora(true)}
+                        className={`flex-1 py-2.5 rounded-lg border text-[11px] font-bold uppercase tracking-wide transition-colors ${
+                          pagarProductoAhora ? 'border-amber-500 bg-amber-500/10 text-white' : 'border-gray-700 text-gray-500 hover:border-gray-500'
+                        }`}
+                      >
+                        🏦 Producto por Nequi
+                      </button>
                     </div>
-                  </div>
-                ) : (
-                  <div className="bg-zinc-900 border border-amber-500/30 rounded-lg p-4 space-y-3">
-                    <div className="flex items-start gap-3">
-                      <Landmark size={18} className="text-amber-500 flex-shrink-0 mt-0.5" />
+                  )}
+
+                  {metodoPago === 'contraentrega' ? (
+                    <div className="bg-zinc-900 border border-green-600/30 rounded-lg p-4 flex items-start gap-3">
+                      <span className="text-lg leading-none flex-shrink-0">🏍️</span>
                       <div>
-                        <p className="text-white text-sm font-bold">Pago por Nequi</p>
+                        <p className="text-white text-sm font-bold">Contraentrega</p>
                         <p className="text-gray-400 text-[13px] leading-relaxed">
-                          {tieneMobiliario
-                            ? 'El mobiliario se envía a todo el país desde Bogotá y se paga antes de despachar'
-                            : 'Fuera de la ruta de Eljach se paga antes de despachar'}
-                          {nequi.numero ? ` — al ${nequi.numero}${nequi.nombre ? `, a nombre de ${nequi.nombre}` : ''}` : ''}.
+                          Pagas al recibir{precioFlete != null ? ` — flete de $${precioFlete.toLocaleString('es-CO')}` : ''}. Sin adelantos.
                         </p>
                       </div>
                     </div>
+                  ) : (
+                    <div className="bg-zinc-900 border border-amber-500/30 rounded-lg p-4 space-y-3">
+                      <div className="flex items-start gap-3">
+                        <Landmark size={18} className="text-amber-500 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-white text-sm font-bold">Pago por Nequi</p>
+                          <p className="text-gray-400 text-[13px] leading-relaxed">
+                            {enCobertura
+                              ? `Pagas el producto ahora — el flete${precioFlete != null ? ` de $${precioFlete.toLocaleString('es-CO')}` : ''} se paga en efectivo al repartidor`
+                              : tieneMobiliario
+                                ? 'El mobiliario se envía a todo el país desde Bogotá y se paga antes de despachar'
+                                : 'Fuera de la ruta de Eljach se paga antes de despachar'}
+                            {nequi.numero ? ` — al ${nequi.numero}${nequi.nombre ? `, a nombre de ${nequi.nombre}` : ''}` : ''}.
+                          </p>
+                        </div>
+                      </div>
 
-                    {comprobantePreview ? (
+                      {comprobantePreview ? (
                       <div className="relative inline-block">
                         <img src={comprobantePreview} alt="Comprobante" className="h-20 w-20 object-cover rounded border border-gray-700" />
                         {subiendoComprobante && (
@@ -448,7 +493,8 @@ export default function PedidoOnlinePage() {
                     )}
                     {errorComprobante && <p className="text-red-500 text-xs">{errorComprobante}</p>}
                   </div>
-                )
+                  )}
+                </>
               )}
             </div>
           </div>
