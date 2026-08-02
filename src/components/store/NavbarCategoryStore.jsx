@@ -92,7 +92,7 @@ export default function NavbarCategoryStore({ pageName }) {
               Guayos
             </Link>
             <Link to="/store/tenis-guayo" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
-              Tenis Guayo
+              Teniguayos
             </Link>
             <button onClick={() => { scrollTo('contacto'); setMenuOpen(false) }} className="block w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
               Contacto

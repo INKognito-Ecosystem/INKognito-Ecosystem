@@ -54,7 +54,7 @@ export const categories = [
   },
   {
     id: 6,
-    name: 'Tenis Guayo',
+    name: 'Teniguayos',
     tag: 'Multisuperficie',
     description: 'El calzado más versátil de Urabá: rinde en sintético, polvo de ladrillo y calle sin cambiar de par. La opción inteligente para quien juega donde se pueda. Llega con Eljach, contraentrega.',
     link: '/store/tenis-guayo',

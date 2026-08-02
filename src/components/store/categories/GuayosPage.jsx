@@ -95,7 +95,7 @@ export default function GuayosPage() {
             )}
           </div>
           <h1 className="text-xl md:text-7xl font-black uppercase leading-none mb-2 text-gray-900 text-center md:text-left">Guayos</h1>
-          <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4">Fútbol • Cancha • Terreno Firme</p>
+          <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4 text-center md:text-left">Fútbol • Cancha • Terreno Firme</p>
           <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg">
             Control, tracción y durabilidad para jugar en las canchas de la región. Terreno firme y canchita de sintético. Diseños de marcas reconocidas a precio accesible — despachados con Eljach a Chigorodó, Apartadó, Carepa, Turbo y municipios cercanos. Pago contraentrega.
           </p>

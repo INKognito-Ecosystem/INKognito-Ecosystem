@@ -1,6 +1,9 @@
+import { Link } from 'react-router-dom'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
-import { PlayCircle } from 'lucide-react'
+import { PlayCircle, ArrowLeft, ArrowRight } from 'lucide-react'
+import { getAdjacentCategories } from '../../../data/gymCategoriesOrder'
+import { useScrolled } from '../../../hooks/useScrolled'
 
 export function meta() {
   const title = 'Cómo Fabricar Máquinas de Gym | Tutoriales Profesionales — Colombia'
@@ -43,9 +46,31 @@ const videos = [
 ]
 
 export default function VideosTutorialesPage() {
+  const { prev, next } = getAdjacentCategories('tutoriales')
+  const scrolled = useScrolled()
+
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <NavbarGym />
+
+      {scrolled && prev && (
+        <Link
+          to={`/gym/${prev.slug}`} replace
+          aria-label={`Ver ${prev.name}`}
+          className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-gray-400 hover:text-white bg-black/60 backdrop-blur-sm border border-gray-800 rounded-full p-2 transition-colors"
+        >
+          <ArrowLeft size={20} />
+        </Link>
+      )}
+      {scrolled && next && (
+        <Link
+          to={`/gym/${next.slug}`} replace
+          aria-label={`Ver ${next.name}`}
+          className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-gray-400 hover:text-white bg-black/60 backdrop-blur-sm border border-gray-800 rounded-full p-2 transition-colors"
+        >
+          <ArrowRight size={20} />
+        </Link>
+      )}
 
       {/* HERO */}
       <section className="relative pt-16 md:pt-24 pb-6 md:pb-10 px-4 md:px-6 overflow-hidden">
@@ -59,6 +84,19 @@ export default function VideosTutorialesPage() {
         />
         <div className="relative z-10 max-w-7xl mx-auto">
         <div className="mb-0">
+          <div className="flex items-center gap-3 mb-2">
+            {prev && (
+              <Link to={`/gym/${prev.slug}`} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
+                <ArrowLeft size={18} />
+              </Link>
+            )}
+            <p className="flex-1 text-center uppercase tracking-[0.25em] text-gray-500 text-xs">Categoría</p>
+            {next && (
+              <Link to={`/gym/${next.slug}`} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
+                <ArrowRight size={18} />
+              </Link>
+            )}
+          </div>
           <div className="flex items-center justify-center md:justify-between gap-3 md:gap-4 mb-4">
             <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none text-center md:text-left">
               Tutoriales <span className="text-gray-400">en video</span>

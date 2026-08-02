@@ -14,7 +14,7 @@ export async function loader() {
 }
 
 export function meta() {
-  const title = 'Tenis y guayo | INKognito Store — Urabá'
+  const title = 'Teniguayos | INKognito Store — Urabá'
   const description = 'Tenis multideporte para sintético, polvo de ladrillo y calle en Urabá. Versatilidad total, despacho con Eljach a toda la región. Pago contraentrega.'
   return [
     { title },
@@ -57,7 +57,7 @@ export default function TenisGuayoPage() {
 
   return (
     <>
-      <NavbarCategoryStore pageName="Tenis y Guayo" />
+      <NavbarCategoryStore pageName="Teniguayos" />
 
       {scrolled && prev && (
         <Link
@@ -94,8 +94,8 @@ export default function TenisGuayoPage() {
               </Link>
             )}
           </div>
-          <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none mb-2 text-gray-900 text-center md:text-left">Tenis y Guayo</h1>
-          <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4">Multisuperficie • Sintético • Calle</p>
+          <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none mb-2 text-gray-900 text-center md:text-left">Teniguayos</h1>
+          <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4 text-center md:text-left">Multisuperficie • Sintético • Calle</p>
           <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg">
             El calzado más versátil de Urabá: rinde en sintético, polvo de ladrillo y calle sin cambiar de par. La opción inteligente para quien juega donde se pueda y quiere un solo calzado para todo. Despachamos con Eljach a toda la región — pago contraentrega.
           </p>
@@ -109,10 +109,10 @@ export default function TenisGuayoPage() {
               <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-2">Sin stock por el momento</p>
               <p className="text-gray-900 text-lg font-black uppercase mb-2">Catálogo actualizándose</p>
               <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
-                Déjanos tu número y te avisamos cuando tengamos Tenis y Guayo disponible. Sé el primero en saber.
+                Déjanos tu número y te avisamos cuando tengamos Teniguayos disponible. Sé el primero en saber.
               </p>
               <a
-                href={`https://wa.me/573207911013?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya Tenis y Guayo disponible en INKognito Store.')}`}
+                href={`https://wa.me/573207911013?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya Teniguayos disponible en INKognito Store.')}`}
                 target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 text-white font-bold uppercase tracking-[0.15em] text-sm rounded hover:brightness-90 transition"
                 style={{ backgroundColor: '#C9A84C' }}

@@ -67,7 +67,7 @@ export default function FooterStore() {
                 Guayos
               </Link>
               <Link to="/store/tenis-guayo" className="uppercase text-sm tracking-[0.2em] text-gray-600 hover:text-[#C9A84C] transition-all duration-300">
-                Tenis Guayo
+                Teniguayos
               </Link>
             </div>
           </div>

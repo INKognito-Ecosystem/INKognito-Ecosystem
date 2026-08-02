@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router-dom'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import { fetchCatalogFull } from '../../../hooks/useCatalog'
 import { useGymCart } from '../../../contexts/GymCartContext'
-import { Wrench, ExternalLink } from 'lucide-react'
+import { Wrench, ExternalLink, ArrowLeft, ArrowRight } from 'lucide-react'
+import { getAdjacentCategories } from '../../../data/gymCategoriesOrder'
+import { useScrolled } from '../../../hooks/useScrolled'
 import imgBancoMultiangulo from '../../../assets/imagenesgym/bancomultiangulo.jpg'
 import imgRemoAcostado     from '../../../assets/imagenesgym/remoacostado.jpg'
 import imgHipThrust        from '../../../assets/imagenesgym/hipthrust.jpg'
@@ -58,6 +60,8 @@ export default function MaquinasPedidoPage() {
   const apiMaquinas   = gymAllProds.filter(p => p.tipo !== 'afiliado')
   const gymAfiliados  = gymAllProds.filter(p => p.tipo === 'afiliado' && p.categoria === 'Materiales')
   const { addItem, items: cartItems } = useGymCart()
+  const { prev, next } = getAdjacentCategories('maquinas-pedido')
+  const scrolled = useScrolled()
 
   const productosFinales = apiMaquinas.map((item, i) => {
     const key = item.name.toLowerCase()
@@ -91,11 +95,43 @@ export default function MaquinasPedidoPage() {
     <div className="min-h-screen bg-gray-950 text-white">
       <NavbarGym />
 
+      {scrolled && prev && (
+        <Link
+          to={`/gym/${prev.slug}`} replace
+          aria-label={`Ver ${prev.name}`}
+          className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-gray-400 hover:text-white bg-black/60 backdrop-blur-sm border border-gray-800 rounded-full p-2 transition-colors"
+        >
+          <ArrowLeft size={20} />
+        </Link>
+      )}
+      {scrolled && next && (
+        <Link
+          to={`/gym/${next.slug}`} replace
+          aria-label={`Ver ${next.name}`}
+          className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-gray-400 hover:text-white bg-black/60 backdrop-blur-sm border border-gray-800 rounded-full p-2 transition-colors"
+        >
+          <ArrowRight size={20} />
+        </Link>
+      )}
+
       {/* HERO */}
       <section className="relative pt-16 md:pt-24 pb-6 md:pb-10 px-4 md:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
+          <div className="flex items-center gap-3 mb-2">
+            {prev && (
+              <Link to={`/gym/${prev.slug}`} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
+                <ArrowLeft size={18} />
+              </Link>
+            )}
+            <p className="flex-1 text-center uppercase tracking-[0.25em] text-gray-500 text-xs">Categoría</p>
+            {next && (
+              <Link to={`/gym/${next.slug}`} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
+                <ArrowRight size={18} />
+              </Link>
+            )}
+          </div>
           <div className="flex items-center justify-center md:justify-between gap-3 md:gap-4 mb-4">
             <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none text-center md:text-left">
               Máquinas <span className="text-gray-400">bajo pedido</span>
