@@ -28,3 +28,19 @@ html {
 .animate-nav-progress {
   animation: nav-progress-slide 0.9s ease-in-out infinite;
 }
+
+/* CoverflowRow.jsx (carrusel tipo "coverflow", solo móvil) — Swiper ya
+   resuelve la escala/profundidad vía su propio módulo EffectCoverflow
+   (transform, compuesto por el navegador). Acá solo se agrega opacidad y un
+   desenfoque leve a las cards que NO están centradas — mucho más barato que
+   recalcular blur() en JS por cada frame de scroll, que es lo que se sentía
+   tosco en la versión anterior hecha a mano (2026-08-02). */
+.coverflow-row .swiper-slide {
+  opacity: 0.55;
+  filter: blur(1.5px);
+  transition: opacity 0.35s ease, filter 0.35s ease;
+}
+.coverflow-row .swiper-slide-active {
+  opacity: 1;
+  filter: blur(0);
+}

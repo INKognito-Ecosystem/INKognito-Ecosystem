@@ -5,6 +5,7 @@ import { Truck, Shield, Clock, Star, Award } from 'lucide-react'
 import NavbarStore from './NavbarStore'
 import FooterStore from './FooterStore'
 import StoreProductCard from './StoreProductCard'
+import CoverflowRow from '../CoverflowRow'
 import { fetchCatalogCategoriaItems, toProdCard } from '../../hooks/useCatalog'
 import { CATEGORY_GROUPS } from '../../data/storeCategories'
 const ogStore = '/og/store.webp'
@@ -12,6 +13,16 @@ const ogStore = '/og/store.webp'
 const STRIPE_PATTERN = {
   backgroundImage: 'repeating-linear-gradient(45deg,transparent,transparent 19px,rgba(201,168,76,1) 19px,rgba(201,168,76,1) 20px)',
 }
+
+// Estilo de las 2 card grandes de "Nuestras Categorías" — el "estilo Eljach"
+// que pidió Jose no es un patrón de fondo, es la card en sí (ver
+// EljachWeb/src/components/Packages.jsx): fondo claro con degradé sutil de
+// color hacia blanco, badge de ícono en cuadro con esquinas redondeadas y
+// fondo/borde tintado, borde delgado que se pinta de color al hover, y
+// glow de sombra coloreada (no negra) al levantar la card. Acá recoloreada
+// por card en vez del azul de Eljach: gris acero para Deportiva (paleta de
+// INKognito Gym, ver GymPage.jsx) y dorado (#C9A84C) para Casual
+// (2026-08-02, corrige el intento anterior con patrones geométricos de fondo).
 
 // La sección "Nuestras Categorías" del hub ya no lista las 6 categorías
 // reales una por una — ahora muestra las 2 agrupaciones (Deportiva/Casual,
@@ -176,32 +187,53 @@ export default function StorePage() {
             </h2>
           </div>
 
+          {/* Mismo espíritu "sólido" que las card de Educación en Supply
+              (SupplyPage.jsx) pero no idéntico: fondo más claro que
+              zinc-900/black (gris acero medio para Deportiva, bronce oscuro
+              con más presencia dorada para Casual) y el círculo decorativo
+              en otra esquina/tamaño para que no se lean como copia-pega
+              (2026-08-02, ajuste sobre el primer intento). */}
           <div className="flex md:grid md:grid-cols-2 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
-            {categoryGroups.map((group) => (
-              <Link
-                key={group.link}
-                to={group.link}
-                className="group snap-start flex-shrink-0 w-[75vw] md:w-auto bg-white border border-gray-200 rounded-2xl p-5 hover:border-[#C9A84C] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[160px] md:min-h-[140px]"
-              >
-                <div className="text-center md:text-left">
-                  <div className="mb-3 text-[#C9A84C] mx-auto md:mx-0 w-fit">{group.icon}</div>
-                  <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-[10px] mb-2 font-semibold">
+            {categoryGroups.map((group) => {
+              const isGym = group.key === 'deportiva'
+              return (
+                <Link
+                  key={group.link}
+                  to={group.link}
+                  className={`group relative overflow-hidden snap-start flex-shrink-0 w-[80vw] md:w-auto rounded-2xl border bg-gradient-to-br p-6 md:p-7 flex flex-col transition-all duration-300 hover:-translate-y-1 min-h-[240px] md:min-h-[280px] ${
+                    isGym
+                      ? 'from-zinc-600 to-zinc-900 border-zinc-400/30 hover:border-zinc-300/50 hover:shadow-[0_12px_35px_rgba(161,161,170,0.2)]'
+                      : 'from-[#4a350f] to-black border-[#C9A84C]/40 hover:border-[#C9A84C]/70 hover:shadow-[0_12px_35px_rgba(201,168,76,0.3)]'
+                  }`}
+                >
+                  <div className={isGym
+                    ? 'absolute -top-12 -right-12 w-40 h-40 rounded-full bg-white/10'
+                    : 'absolute -bottom-14 -right-14 w-44 h-44 rounded-full bg-[#C9A84C]/15'
+                  } />
+                  <div className={`relative w-12 h-12 rounded-full border flex items-center justify-center mb-4 group-hover:scale-110 transition-transform ${
+                    isGym ? 'bg-zinc-900/60 border-zinc-300/30 text-zinc-200' : 'bg-black/40 border-[#C9A84C]/50 text-[#C9A84C]'
+                  }`}>
+                    {group.icon}
+                  </div>
+                  <p className={`relative uppercase tracking-[0.25em] text-[10px] mb-2 font-semibold ${isGym ? 'text-zinc-300' : 'text-[#C9A84C]'}`}>
                     {group.tag}
                   </p>
-                  <h3 className="text-sm md:text-3xl font-black uppercase mb-2 text-gray-900 group-hover:text-[#C9A84C] transition-colors duration-300">
+                  <h3 className="relative text-lg md:text-2xl font-black uppercase leading-tight mb-3 text-white">
                     {group.name}
                   </h3>
-                  <p className="text-gray-500 text-xs md:text-sm leading-relaxed text-justify [hyphens:auto]">
+                  <p className={`relative text-xs md:text-sm leading-relaxed mb-5 flex-1 text-justify [hyphens:auto] ${isGym ? 'text-zinc-200' : 'text-zinc-400'}`}>
                     {group.description}
                   </p>
-                </div>
-                <div className="mt-4 md:mt-6 text-center md:text-left">
-                  <span className="uppercase tracking-[0.2em] text-xs text-gray-400 group-hover:text-[#C9A84C] transition-colors duration-300">
+                  <span className={`relative shrink-0 border text-xs md:text-sm font-black uppercase tracking-[0.2em] py-3 px-6 rounded-xl text-center transition-all duration-300 ${
+                    isGym
+                      ? 'border-zinc-300/40 text-zinc-100 group-hover:border-zinc-100 group-hover:bg-white/10'
+                      : 'border-[#C9A84C]/50 text-[#C9A84C] group-hover:border-[#C9A84C] group-hover:bg-[#C9A84C]/15'
+                  }`}>
                     Ver categorías →
                   </span>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -224,22 +256,21 @@ export default function StorePage() {
               <p className="text-gray-500 text-xs">Agrega productos con categoría "Destacados" desde el panel</p>
             </div>
           ) : (
-            <div className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+            <CoverflowRow desktopClassName="md:grid md:grid-cols-4 gap-4">
               {featuredItems.map(item => {
                 const prod = toProdCard(item)
                 const sizes = item.variantes.map(v => v.variant).filter(Boolean)
                 const isClothing = item.descripcion?.toLowerCase().includes('ropa') || item.name?.toLowerCase().includes('ropa')
                 return (
-                  <div key={item.name} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">
-                    <StoreProductCard
-                      product={prod}
-                      category="destacados"
-                      sizes={sizes.length ? sizes : (isClothing ? CLOTHING_SIZES : SHOE_SIZES)}
-                    />
-                  </div>
+                  <StoreProductCard
+                    key={item.name}
+                    product={prod}
+                    category="destacados"
+                    sizes={sizes.length ? sizes : (isClothing ? CLOTHING_SIZES : SHOE_SIZES)}
+                  />
                 )
               })}
-            </div>
+            </CoverflowRow>
           )}
         </div>
       </section>

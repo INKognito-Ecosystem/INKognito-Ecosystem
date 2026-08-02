@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { GraduationCap, PlayCircle, FileText, FlaskConical, Wrench, BookOpen } from 'lucide-react'
 import NavbarGym from './NavbarGym'
 import FooterGym from './FooterGym'
+import CoverflowRow from '../CoverflowRow'
 
 const ogGym = '/og/gym.webp'
 const WA = '573207911013'
@@ -77,7 +78,7 @@ const servicios = [
   },
 ]
 
-const CARD_CLASS = 'border border-gray-800 bg-gray-900/60 rounded-xl p-3 md:p-4 flex flex-col gap-2 min-h-[170px] md:min-h-[190px] hover:border-gray-600 hover:bg-gray-900/80 transition-all duration-300 group'
+const CARD_CLASS = 'border border-gray-800 bg-gray-900/60 rounded-xl p-4 md:p-5 flex flex-col gap-3 min-h-[190px] md:min-h-[210px] hover:border-gray-600 hover:bg-gray-900/80 transition-all duration-300 group'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL
 
@@ -126,9 +127,13 @@ export default function GymPage() {
       <NavbarGym />
 
       {/* HERO */}
-      <section className="relative pt-16 md:pt-24 pb-8 md:pb-14 px-4 md:px-6 overflow-hidden">
+      <section className="relative pt-24 md:pt-32 pb-8 md:pb-14 px-4 md:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
+        {/* Resplandor debajo del navbar — mismo recurso que ya usan Store/
+            Eljach en sus hero, acá en blanco/gris porque Gym no tiene color
+            de acento (2026-08-02). */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] max-w-[90vw] h-[280px] rounded-full bg-white/10 blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-7xl mx-auto text-center md:text-left">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase leading-none mb-5">
             Construyo mi<br />
@@ -163,37 +168,51 @@ export default function GymPage() {
             </p>
             <div className="clear-both" />
           </div>
-          {/* 2 cards visibles en móvil, 6 en desktop */}
-          <div className="flex md:grid md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
-            {servicios.map((s) => {
+          {/* Mismo carrusel coverflow de Categorías/Marcas en Supply, pero
+              estático — sin autoplay, el usuario mueve con el dedo desde el
+              inicio, con la flechita "Desliza" siempre visible (pedido
+              explícito: estas card de Gym no hacen la vuelta automática al
+              entrar, 2026-08-02). */}
+          <CoverflowRow desktopClassName="md:grid md:grid-cols-3 lg:grid-cols-6 gap-3" autoplay={false}>
+            {servicios.map((s, i) => {
               const Icon = s.icon
               const inner = (
                 <>
-                  <div className="flex items-center justify-center md:justify-between gap-1.5">
-                    <h3 className="text-[10px] md:text-xs font-black uppercase tracking-wide leading-tight text-center md:text-left">{s.titulo}</h3>
-                    {Icon && <Icon size={16} className="text-gray-500 group-hover:text-white transition-colors duration-300 flex-shrink-0 md:w-[18px] md:h-[18px]" />}
-                  </div>
-                  <p className="text-xs leading-snug text-gray-500 group-hover:text-gray-400 transition-colors duration-300 text-justify [hyphens:auto]">{s.texto}</p>
+                  {Icon && (
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gray-800/80 border border-gray-700 flex items-center justify-center mx-auto md:mx-0 group-hover:border-gray-500 group-hover:scale-105 transition-all duration-300">
+                      <Icon size={20} className="text-gray-400 group-hover:text-white transition-colors duration-300" />
+                    </div>
+                  )}
+                  <h3 className="text-sm md:text-base font-black uppercase tracking-wide leading-tight text-center md:text-left">{s.titulo}</h3>
+                  <p className="text-xs md:text-sm leading-relaxed text-gray-500 group-hover:text-gray-400 transition-colors duration-300 flex-1 text-justify [hyphens:auto] text-center md:text-left">{s.texto}</p>
                 </>
               )
-              const cardCls = `${CARD_CLASS} snap-start flex-shrink-0 w-[44vw] md:w-auto`
-              return s.scrollTo
-                ? (
-                    <button
-                      key={s.titulo}
-                      onClick={() => scrollToSection(s.scrollTo)}
-                      className={`${cardCls} text-left`}
-                    >
-                      {inner}
-                    </button>
-                  )
-                : (
-                    <Link key={s.titulo} to={s.link} className={cardCls}>
-                      {inner}
-                    </Link>
-                  )
+              return (
+                <div key={s.titulo} className="w-full">
+                  {s.scrollTo
+                    ? (
+                        <button
+                          onClick={() => scrollToSection(s.scrollTo)}
+                          className={`${CARD_CLASS} text-left w-full`}
+                        >
+                          {inner}
+                        </button>
+                      )
+                    : (
+                        <Link to={s.link} className={`${CARD_CLASS} w-full`}>
+                          {inner}
+                        </Link>
+                      )}
+                  {i === 0 && (
+                    <div className="md:hidden mt-1.5 flex items-center justify-end gap-1 text-gray-500 text-[9px] font-bold uppercase tracking-widest">
+                      <span>Desliza</span>
+                      <span className="animate-bounce">→</span>
+                    </div>
+                  )}
+                </div>
+              )
             })}
-          </div>
+          </CoverflowRow>
         </div>
       </section>
 
@@ -216,18 +235,25 @@ export default function GymPage() {
             <div className="clear-both" />
           </div>
 
-          {/* CARD MEMBRESÍA */}
-          <div className="relative border border-gray-400/40 bg-gray-900 rounded-2xl p-8 md:p-10 overflow-hidden max-w-3xl">
+          {/* CARD MEMBRESÍA — mismo patrón "sólido" aplicado recientemente
+              en Store (StorePage.jsx): degradé gris acero, círculo
+              decorativo difuminado y badge de ícono circular, en la paleta
+              propia de Gym (blanco/gris, sin color de acento). */}
+          <div className="group relative border border-zinc-400/30 bg-gradient-to-br from-zinc-600 to-zinc-900 rounded-2xl p-8 md:p-10 overflow-hidden max-w-3xl hover:border-zinc-300/50 hover:shadow-[0_12px_35px_rgba(161,161,170,0.2)] transition-all duration-300">
             <div className="absolute inset-0 opacity-[0.025]" style={GRID_PATTERN} />
+            <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-white/10" />
             <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div className="flex-1">
+                <div className="w-12 h-12 rounded-full bg-zinc-900/60 border border-zinc-300/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <FileText size={22} className="text-zinc-200" />
+                </div>
                 <span className="inline-block text-[10px] font-black uppercase tracking-[0.25em] bg-white text-gray-950 rounded-full px-3 py-1 mb-4">
                   Acceso total
                 </span>
                 <h3 className="text-2xl md:text-3xl font-black uppercase leading-tight mb-3">
                   Membresía de por vida
                 </h3>
-                <p className="text-gray-400 leading-relaxed text-sm md:text-base">
+                <p className="text-zinc-200 leading-relaxed text-sm md:text-base">
                   Paga una sola vez y obtén acceso a todos los planos disponibles, incluyendo los que se agreguen en el futuro.
                 </p>
               </div>
@@ -243,7 +269,7 @@ export default function GymPage() {
                 </a>
                 <button
                   onClick={() => setPlanosModalOpen(true)}
-                  className="border border-gray-600 text-gray-400 font-bold uppercase tracking-[0.15em] text-xs py-3 px-6 rounded-xl hover:border-gray-300 hover:text-white transition-all duration-300"
+                  className="border border-zinc-300/40 text-zinc-100 font-bold uppercase tracking-[0.15em] text-xs py-3 px-6 rounded-xl hover:border-zinc-100 hover:bg-white/10 transition-all duration-300"
                 >
                   Ver muestra
                 </button>
@@ -296,16 +322,24 @@ export default function GymPage() {
             </Link>
           </div>
 
-          <div className="bg-gray-900/60 border border-gray-700 rounded-2xl p-8 md:p-14 hover:border-gray-600 transition-all duration-300">
-            <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-4">Contacto directo</p>
-            <h3 className="text-2xl md:text-4xl font-black uppercase leading-none mb-4">
+          {/* Mismo patrón "sólido" aplicado en Store/Planos digitales:
+              degradé gris acero, círculo decorativo (acá abajo-derecha, más
+              grande, para no ser idéntico al de la card de Planos) y badge
+              de ícono circular con Wrench (contexto: sección de Máquinas). */}
+          <div className="group relative overflow-hidden bg-gradient-to-br from-zinc-600 to-zinc-900 border border-zinc-400/30 rounded-2xl p-8 md:p-14 hover:border-zinc-300/50 hover:shadow-[0_12px_35px_rgba(161,161,170,0.2)] transition-all duration-300">
+            <div className="absolute -bottom-14 -right-14 w-44 h-44 rounded-full bg-white/10" />
+            <div className="relative z-10 w-12 h-12 rounded-full bg-zinc-900/60 border border-zinc-300/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <Wrench size={22} className="text-zinc-200" />
+            </div>
+            <p className="relative z-10 uppercase tracking-[0.25em] text-zinc-300 text-xs mb-4">Contacto directo</p>
+            <h3 className="relative z-10 text-2xl md:text-4xl font-black uppercase leading-none mb-4">
               ¿Tienes alguna<br />
-              <span className="text-gray-400">idea en mente?</span>
+              <span className="text-zinc-300">idea en mente?</span>
             </h3>
-            <p className="text-gray-300 leading-relaxed text-base max-w-2xl mb-8">
+            <p className="relative z-10 text-zinc-200 leading-relaxed text-base max-w-2xl mb-8">
               Fabrico máquinas de gym a tu medida, con soldadura profesional y a precios muy accesibles. ¿Tienes alguna idea en mente? Cuéntanos qué máquina necesitas y te damos un presupuesto personalizado.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative z-10 flex flex-col sm:flex-row gap-4">
               <a
                 href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, me interesa una máquina de gym personalizada')}`}
                 target="_blank"
@@ -316,7 +350,7 @@ export default function GymPage() {
               </a>
               <Link
                 to="/gym/maquinas-pedido"
-                className="inline-block text-center border border-gray-700 text-gray-400 font-bold uppercase tracking-[0.2em] text-sm py-4 px-8 rounded-xl hover:border-gray-400 hover:text-white transition-all duration-300"
+                className="inline-block text-center border border-zinc-300/40 text-zinc-100 font-bold uppercase tracking-[0.2em] text-sm py-4 px-8 rounded-xl hover:border-zinc-100 hover:bg-white/10 transition-all duration-300"
               >
                 Ver catálogo completo →
               </Link>

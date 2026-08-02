@@ -79,17 +79,19 @@ export const categories = [
 // mismo grupo, sin el paso extra de elegir una card (2026-08-02).
 export const CATEGORY_GROUPS = {
   deportiva: {
+    key: 'deportiva',
     name: 'Zapatos y Ropa Deportiva',
     tag: 'Todo lo deportivo',
     description: 'Ropa y calzado para entrenar, correr y jugar — sets, camisetas dry-fit, tenis de running, guayos y multisuperficie.',
     link: categories.find(c => c.group === 'deportiva').link,
-    icon: <Zap size={28} />,
+    icon: <Zap size={22} />,
   },
   casual: {
+    key: 'casual',
     name: 'Ropa y Zapatos Casuales',
     tag: 'Día a Día',
     description: 'Ropa y calzado para el día a día, con comodidad y buena mano de obra que se nota a simple vista — la opción ideal para completar tu look en cualquier plan.',
     link: categories.find(c => c.group === 'casual').link,
-    icon: <Sun size={28} />,
+    icon: <Sun size={22} />,
   },
 }
