@@ -58,6 +58,11 @@ export default function MaquinasPedidoPage() {
     const key = item.name.toLowerCase()
     return {
       id:          i + 1,
+      // id real de inventory (no el índice de arriba) — sin esto el pedido
+      // nunca queda ligado a la fila real, y la validación server-side de
+      // "Eljach no transporta máquinas" no tiene cómo verificar la
+      // categoría real del producto (2026-08-02).
+      inventoryId: item.variantes?.[0]?.id ?? null,
       nombre:      item.name,
       descripcion: item.descripcion || '',
       precio:      item.variantes?.[0]?.price || null,
@@ -68,11 +73,12 @@ export default function MaquinasPedidoPage() {
 
   const handleAddToCart = (p) => {
     addItem({
-      id:    p.id,
-      name:  p.nombre,
-      price: fmtPrecio(p.precio),
-      brand: 'Bajo pedido',
-      image: p.image1 || '',
+      id:          p.id,
+      inventoryId: p.inventoryId,
+      name:        p.nombre,
+      price:       fmtPrecio(p.precio),
+      brand:       'Bajo pedido',
+      image:       p.image1 || '',
     }, 'maquinas')
   }
 

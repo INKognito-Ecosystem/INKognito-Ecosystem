@@ -20,8 +20,9 @@ export default function FooterStore() {
               <span className="text-[#C9A84C]">OGNITO STORE</span>
             </h2>
             <p className="text-gray-600 leading-relaxed max-w-sm mb-6">
-              Ropa y calzado deportivo para la región de Urabá. Réplicas premium
-              con entrega a domicilio en los 4 municipios de la región.
+              Tienda online de ropa y calzado, con proveedores verificados.
+              Réplicas premium con entrega a domicilio en los 4 municipios
+              de la región.
             </p>
             <div className="flex gap-5">
               <a

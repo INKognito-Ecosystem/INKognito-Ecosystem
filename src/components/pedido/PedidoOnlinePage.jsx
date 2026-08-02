@@ -143,7 +143,12 @@ export default function PedidoOnlinePage() {
   // fabrican en Bogotá y envían a todo el país, así que fuerza Nequi sin
   // importar si el destino está en la ruta de Eljach (2026-08-01).
   const tieneMobiliario = items.some(i => i.category === 'Mobiliario')
-  const enCobertura = municipioSeleccionado && !tieneMobiliario
+  // Máquinas de Gym (bajo pedido, soldadas en Chigorodó): Eljach solo cubre
+  // Suplementos dentro del módulo Gym, no transporta máquinas — envío
+  // nacional con otra transportadora, mismo criterio que Mobiliario
+  // (2026-08-02).
+  const tieneMaquinaGym = items.some(i => i.category === 'maquinas')
+  const enCobertura = municipioSeleccionado && !tieneMobiliario && !tieneMaquinaGym
   // Dentro de cobertura, el cliente elige: contraentrega total, o pagar el
   // producto de una vez por Nequi y dejar solo el flete para pagar en
   // efectivo al repartidor (2026-08-01) — ver getPayBadgeRepartidor() en el
@@ -360,6 +365,16 @@ export default function PedidoOnlinePage() {
                       Se paga por Nequi antes del despacho — aún no tenemos contraentrega para estos productos.
                     </p>
                   </>
+                ) : tieneMaquinaGym ? (
+                  <>
+                    <h3 className="relative text-white text-lg font-black uppercase italic mb-2">
+                      Envío de tu máquina
+                    </h3>
+                    <p className="relative text-gray-400 text-[13px] leading-relaxed">
+                      Cada máquina se fabrica a mano en Chigorodó y se envía a cualquier parte de Colombia con transportadora nacional.
+                      Eljach solo cubre Suplementos dentro de Gym, no transporta máquinas — se paga por Nequi antes del despacho.
+                    </p>
+                  </>
                 ) : (
                   <>
                     <h3 className="relative text-white text-lg font-black uppercase italic mb-2">
@@ -404,6 +419,11 @@ export default function PedidoOnlinePage() {
               {tieneMobiliario && (
                 <p className="text-amber-500/90 text-[12px] leading-relaxed">
                   El envío del mobiliario corre por cuenta del cliente — Industrias Warlock coordina el despacho y la transportadora que lleve el producto cobra el flete directamente al entregar.
+                </p>
+              )}
+              {tieneMaquinaGym && (
+                <p className="text-amber-500/90 text-[12px] leading-relaxed">
+                  El envío de la máquina corre por cuenta del cliente — se fabrica en Chigorodó y se coordina con una transportadora nacional al momento del despacho (Eljach no cubre este envío).
                 </p>
               )}
               {enCobertura && pagarProductoAhora && (
@@ -464,7 +484,9 @@ export default function PedidoOnlinePage() {
                               ? `Pagas el producto ahora — el flete${precioFlete != null ? ` de $${precioFlete.toLocaleString('es-CO')}` : ''} se paga en efectivo al repartidor`
                               : tieneMobiliario
                                 ? 'El mobiliario se envía a todo el país desde Bogotá y se paga antes de despachar'
-                                : 'Fuera de la ruta de Eljach se paga antes de despachar'}
+                                : tieneMaquinaGym
+                                  ? 'Tu máquina se fabrica en Chigorodó y se envía a todo el país — se paga antes de despachar'
+                                  : 'Fuera de la ruta de Eljach se paga antes de despachar'}
                             {nequi.numero ? ` — al ${nequi.numero}${nequi.nombre ? `, a nombre de ${nequi.nombre}` : ''}` : ''}.
                           </p>
                         </div>

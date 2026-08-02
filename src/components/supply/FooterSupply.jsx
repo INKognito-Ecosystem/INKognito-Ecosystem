@@ -32,7 +32,7 @@ export default function FooterSupply() {
           <div>
 
             <p className="text-zinc-500 leading-relaxed max-w-sm text-sm">
-              Equipamiento profesional para artistas que trabajan con precisión, identidad y disciplina.
+              Tienda online de insumos para tatuadores — productos de proveedores locales y nacionales verificados y reconocidos.
             </p>
 
           </div>

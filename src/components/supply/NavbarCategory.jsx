@@ -17,17 +17,22 @@ export default function NavbarCategory({ pageName }) {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full z-50 bg-black/70 backdrop-blur-md border-b border-blue-500/10 shadow-[0_1px_20px_rgba(59,130,246,0.15)]">
+      <nav className="fixed top-0 left-0 w-full z-50 bg-black/70 backdrop-blur-md border-b border-blue-500/20 shadow-[0_6px_35px_rgba(59,130,246,0.25)]">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="h-16 md:h-20 flex items-center justify-between">
 
             {/* LOGO */}
             <Link to="/supply" className="flex items-center gap-2">
               <img src={logoSupply} alt="INKognito Supply" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
-              <span className="text-xl md:text-2xl font-black uppercase tracking-wide md:tracking-[0.2em] whitespace-nowrap">
-                <span className="text-white">INK</span>
-                <span className="text-blue-500">OGNITO </span>
-                <span className="text-blue-500">SUPPLY</span>
+              <span>
+                <span className="block text-xl md:text-2xl font-black uppercase tracking-wide md:tracking-[0.2em] whitespace-nowrap leading-tight">
+                  <span className="text-white">INK</span>
+                  <span className="text-blue-500">OGNITO </span>
+                  <span className="text-blue-500">SUPPLY</span>
+                </span>
+                <span className="block text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-500 whitespace-nowrap">
+                  Tattoo Supply Online
+                </span>
               </span>
             </Link>
 

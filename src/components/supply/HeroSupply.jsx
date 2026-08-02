@@ -26,8 +26,9 @@ export default function HeroSupply() {
           </h1>
 
           <p className="mt-3 text-zinc-400 text-lg leading-relaxed max-w-xl">
-            Equipamiento profesional para tatuadores en Urabá. Stock real,
-            calidad verificada y el respaldo que tu trabajo exige.
+            Tienda online que reúne productos de proveedores locales y
+            nacionales, verificados y reconocidos. Stock real, calidad
+            garantizada y el respaldo que tu trabajo exige.
           </p>
 
           {/* BOTONES — ancho completo en móvil, flex en desktop */}

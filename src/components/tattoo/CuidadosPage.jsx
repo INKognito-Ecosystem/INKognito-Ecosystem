@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
-import { Helmet } from 'react-helmet-async'
 import { FaInstagram, FaFacebookF, FaWhatsapp } from 'react-icons/fa'
 import {
   Moon, Droplets, Ban, Pill, Utensils, Sun, Shirt, Sparkles,
@@ -10,8 +9,27 @@ import {
 import Navbar from './Navbar'
 import Footer from './Footer'
 import WhatsAppFloat from './WhatsAppFloat'
-import Seo from '../Seo'
 const ogCuidados = '/og/josefoto-og.jpg'
+
+// meta() reemplaza al <Seo>/Helmet que usaba esta página antes (pendiente
+// desde el cierre de la migración SSR, cerrado 2026-08-02) — el título no
+// puede depender del hash #antes/#despues porque el servidor nunca lo ve
+// (no viaja en el request HTTP), así que queda el mismo título genérico que
+// ya usaba el <Seo> anterior, no uno por pestaña.
+export function meta() {
+  const title = 'Cuidados antes y después de tu tatuaje | Jose Humanez Tattoo'
+  const description = 'Guía completa de cuidados para tu tatuaje: qué hacer antes de tatuarte y cómo cuidar un tatuaje recién hecho para una cicatrización perfecta. Recomendaciones de Jose Humanez, tatuador en Chigorodó, Antioquia.'
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:type', content: 'article' },
+    { property: 'og:image', content: `${import.meta.env.VITE_SITE_URL}${ogCuidados}` },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/cuidados` },
+    { 'script:ld+json': FAQ_JSONLD },
+  ]
+}
 
 const ANTES = [
   { icon: Moon, title: 'Descansa bien', text: 'Duerme al menos 7-8 horas la noche anterior para que tu cuerpo esté en óptimas condiciones.' },
@@ -127,17 +145,6 @@ export default function CuidadosPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-
-      <Seo
-        title="Cuidados antes y después de tu tatuaje | Jose Humanez Tattoo"
-        description="Guía completa de cuidados para tu tatuaje: qué hacer antes de tatuarte y cómo cuidar un tatuaje recién hecho para una cicatrización perfecta. Recomendaciones de Jose Humanez, tatuador en Chigorodó, Antioquia."
-        image={ogCuidados}
-        type="article"
-        canonical={`${import.meta.env.VITE_SITE_URL}/cuidados`}
-      />
-      <Helmet>
-        <script type="application/ld+json">{JSON.stringify(FAQ_JSONLD)}</script>
-      </Helmet>
 
       <Navbar showInicio={true} />
 

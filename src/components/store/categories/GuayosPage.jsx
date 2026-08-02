@@ -1,9 +1,13 @@
-import { useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router-dom'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import NavbarCategoryStore from '../NavbarCategoryStore'
 import FooterStore from '../FooterStore'
+import AccordionCardStore from '../AccordionCardStore'
 import { FaWhatsapp } from 'react-icons/fa'
 import StoreProductCard from '../StoreProductCard'
 import { fetchCatalogCategoriaItems, toProdCard } from '../../../hooks/useCatalog'
+import { getAdjacentCategories } from '../../../data/storeCategoriesOrder'
+import { useScrolled } from '../../../hooks/useScrolled'
 
 export async function loader() {
   return fetchCatalogCategoriaItems('store', 'Guayos')
@@ -29,6 +33,10 @@ const STRIPE_PATTERN = {
 
 const faqs = [
   {
+    q: '¿Los productos son de proveedores confiables?',
+    a: 'Sí. INKognito Store es una tienda online que trabaja con proveedores verificados y reconocidos, no reventa sin control. Cada producto se revisa antes de despacharse.',
+  },
+  {
     q: '¿Cómo llegan los guayos a mi municipio?',
     a: 'Despachamos con Eljach Mensajería Express, ruta diaria a toda la zona de Urabá. Entrega estimada de 1 a 2 días hábiles a Chigorodó, Carepa, Apartadó y Turbo. Pago contraentrega: pagas cuando recibes el paquete en tu puerta, sin adelantos.',
   },
@@ -44,15 +52,48 @@ const faqs = [
 
 export default function GuayosPage() {
   const { items: catalogItems } = useLoaderData()
+  const { prev, next } = getAdjacentCategories('guayos')
+  const scrolled = useScrolled()
 
   return (
     <>
       <NavbarCategoryStore pageName="Guayos" />
 
+      {scrolled && prev && (
+        <Link
+          to={`/store/${prev.slug}`} replace
+          aria-label={`Ver ${prev.name}`}
+          className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-gray-500 hover:text-gray-900 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full p-2 transition-colors"
+        >
+          <ArrowLeft size={20} />
+        </Link>
+      )}
+      {scrolled && next && (
+        <Link
+          to={`/store/${next.slug}`} replace
+          aria-label={`Ver ${next.name}`}
+          className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-gray-500 hover:text-gray-900 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full p-2 transition-colors"
+        >
+          <ArrowRight size={20} />
+        </Link>
+      )}
+
       <div className="relative overflow-hidden bg-gray-50 pt-20 md:pt-24">
         <div className="absolute inset-0 opacity-[0.13]" style={STRIPE_PATTERN} />
         <div className="relative z-10 pb-4 px-6 max-w-7xl mx-auto">
-          <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs mb-2">Categoría</p>
+          <div className="flex items-center gap-3 mb-2">
+            {prev && (
+              <Link to={`/store/${prev.slug}`} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-gray-400 hover:text-gray-900 transition-colors">
+                <ArrowLeft size={20} />
+              </Link>
+            )}
+            <p className="flex-1 text-center uppercase tracking-[0.25em] text-[#C9A84C] text-xs">Categoría</p>
+            {next && (
+              <Link to={`/store/${next.slug}`} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-gray-400 hover:text-gray-900 transition-colors">
+                <ArrowRight size={20} />
+              </Link>
+            )}
+          </div>
           <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-2 text-gray-900">Guayos</h1>
           <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4">Fútbol • Cancha • Terreno Firme</p>
           <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg">
@@ -64,9 +105,21 @@ export default function GuayosPage() {
       <div className="bg-gray-50 pt-4 pb-8 md:pb-14 px-6">
         <div className="max-w-7xl mx-auto">
           {catalogItems.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-400 text-lg mb-4">Catálogo actualizándose…</p>
-              <p className="text-gray-400 text-sm">Escríbenos por WhatsApp para ver disponibilidad</p>
+            <div className="border border-[#C9A84C]/30 bg-white rounded-2xl p-10 text-center">
+              <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-2">Sin stock por el momento</p>
+              <p className="text-gray-900 text-lg font-black uppercase mb-2">Catálogo actualizándose</p>
+              <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
+                Déjanos tu número y te avisamos cuando tengamos Guayos disponible. Sé el primero en saber.
+              </p>
+              <a
+                href={`https://wa.me/573207911013?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya Guayos disponible en INKognito Store.')}`}
+                target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 text-white font-bold uppercase tracking-[0.15em] text-sm rounded hover:brightness-90 transition"
+                style={{ backgroundColor: '#C9A84C' }}
+              >
+                <FaWhatsapp size={18} />
+                Avisarme cuando haya stock →
+              </a>
             </div>
           ) : (
             <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
@@ -96,15 +149,20 @@ export default function GuayosPage() {
       {/* FAQ */}
       <div className="bg-white py-10 md:py-20 px-6">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl md:text-5xl font-black uppercase mb-6 md:mb-10 text-gray-900">Preguntas Frecuentes</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, i) => (
-              <div key={i} className="border border-gray-200 rounded-xl p-5 hover:border-[#C9A84C] transition-all duration-300 bg-white">
-                <h3 className="font-bold text-sm md:text-lg mb-2 text-gray-900">{faq.q}</h3>
-                <p className="text-gray-500 leading-relaxed text-sm">{faq.a}</p>
-              </div>
-            ))}
-          </div>
+          <AccordionCardStore
+            icon="❓"
+            title="Preguntas frecuentes"
+            subtitle="Envíos, tallas y todo lo que necesitas saber antes de tu pedido. Toca para ver las respuestas."
+          >
+            <div className="flex flex-col gap-5">
+              {faqs.map((faq, i) => (
+                <div key={i} className={i < faqs.length - 1 ? 'pb-5 border-b border-gray-200' : ''}>
+                  <p className="font-bold text-gray-900 text-sm mb-2">{faq.q}</p>
+                  <p className="text-gray-500 text-sm leading-relaxed">{faq.a}</p>
+                </div>
+              ))}
+            </div>
+          </AccordionCardStore>
         </div>
       </div>
 

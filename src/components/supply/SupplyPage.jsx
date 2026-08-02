@@ -5,7 +5,7 @@ import CategoriesSupply from './CategoriesSupply'
 import BrandsSupply from './BrandsSupply'
 import FooterSupply from './FooterSupply'
 import { FaWhatsapp } from 'react-icons/fa'
-import { ShieldCheck } from 'lucide-react'
+import { ShieldCheck, GraduationCap, Package, BookOpen } from 'lucide-react'
 import { fetchCatalogFull } from '../../hooks/useCatalog'
 const ogSupply = '/og/supply.webp'
 
@@ -21,7 +21,7 @@ const supplyJsonLd = {
   "@type": "Store",
   "@id": `${import.meta.env.VITE_SITE_URL}/supply#business`,
   "name": "INKognito Supply",
-  "description": "Insumos y equipos profesionales para tatuadores en Urabá, Antioquia. Máquinas, tintas, cartuchos, agujas y accesorios. Despacho a toda Colombia por solicitud.",
+  "description": "Tienda online de insumos y equipos profesionales para tatuadores, con productos de proveedores locales y nacionales verificados. Máquinas, tintas, cartuchos, agujas y accesorios. Con base en Urabá, Antioquia. Despacho a toda Colombia por solicitud.",
   "url": `${import.meta.env.VITE_SITE_URL}/supply`,
   "telephone": "+57-320-791-1013",
   "address": {
@@ -39,7 +39,7 @@ export async function loader() {
 
 export function meta() {
   const title = 'INKognito Supply | Insumos y equipos para tatuaje en Urabá'
-  const description = 'Máquinas, cartuchos, tintas, agujas y accesorios profesionales para tatuadores. Con base en Urabá (Apartadó, Turbo, Carepa). Despacho a otras ciudades de Colombia por solicitud. Pedidos por WhatsApp.'
+  const description = 'Tienda online de insumos para tatuadores — máquinas, cartuchos, tintas, agujas y accesorios de proveedores locales y nacionales verificados y reconocidos. Con base en Urabá (Apartadó, Turbo, Carepa), despacho a toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },
@@ -89,52 +89,70 @@ export default function SupplyPage() {
 
         <div className="flex md:grid md:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
 
-          {/* CARD CURSOS */}
-          <div className="snap-start flex-shrink-0 w-[80vw] md:w-auto border border-blue-500/20 bg-zinc-950 rounded-2xl p-6 md:p-7 flex flex-col hover:border-blue-500/40 transition-all duration-300">
-            <h3 className="text-xl md:text-2xl font-black uppercase leading-none mb-3">
+          {/* CARD CURSOS — mismo patrón de card usado en Eljach (Packages.jsx:
+              fondo en degradado, no plano + hover con elevación/sombra) y en
+              jhumaneztattoo (CuidadosTeaser.jsx: círculo decorativo difuminado
+              detrás del contenido + ícono que crece en hover), adaptado a la
+              paleta azul de Supply. */}
+          <div className="group relative overflow-hidden snap-start flex-shrink-0 w-[80vw] md:w-auto border border-blue-500/20 bg-gradient-to-br from-zinc-900 to-black rounded-2xl p-6 md:p-7 flex flex-col hover:border-blue-500/40 hover:-translate-y-1 hover:shadow-[0_12px_35px_rgba(59,130,246,0.15)] transition-all duration-300">
+            <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-blue-600/10" />
+            <div className="relative w-12 h-12 rounded-full bg-zinc-900 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-4 group-hover:scale-110 transition-transform">
+              <GraduationCap size={22} />
+            </div>
+            <h3 className="relative text-xl md:text-2xl font-black uppercase leading-none mb-3">
               Domina tu oficio.<br />
               <span className="text-zinc-500">No lo improvises.</span>
             </h3>
-            <p className="text-zinc-400 text-sm mb-5 flex-1">
+            <p className="relative text-zinc-400 text-sm mb-5 flex-1">
               Cursos grabados por tatuadores que ya viven de esto. Acceso de por vida, a tu ritmo.
             </p>
             <Link
               to="/supply/aprende#cursos"
-              className="shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-3 px-6 rounded-xl text-center hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
+              className="relative shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-3 px-6 rounded-xl text-center hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
             >
               Ver cursos →
             </Link>
           </div>
 
-          {/* CARD KIT */}
-          <div className="snap-start flex-shrink-0 w-[80vw] md:w-auto border border-blue-500/20 bg-zinc-950 rounded-2xl p-6 md:p-7 flex flex-col hover:border-blue-500/40 transition-all duration-300">
-            <h3 className="text-xl md:text-2xl font-black uppercase leading-none mb-3">
+          {/* CARD KIT — mismo patrón, acento ámbar en vez de azul para que las
+              3 cards no se lean idénticas (variación ya vista en el propio
+              Packages.jsx de Eljach entre su card "featured" y las normales). */}
+          <div className="group relative overflow-hidden snap-start flex-shrink-0 w-[80vw] md:w-auto border border-amber-500/20 bg-gradient-to-br from-zinc-900 to-black rounded-2xl p-6 md:p-7 flex flex-col hover:border-amber-500/40 hover:-translate-y-1 hover:shadow-[0_12px_35px_rgba(245,158,11,0.15)] transition-all duration-300">
+            <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-amber-500/10" />
+            <div className="relative w-12 h-12 rounded-full bg-zinc-900 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-4 group-hover:scale-110 transition-transform">
+              <Package size={22} />
+            </div>
+            <h3 className="relative text-xl md:text-2xl font-black uppercase leading-none mb-3">
               Equípate bien<br />
               <span className="text-zinc-500">desde el día uno.</span>
             </h3>
-            <p className="text-zinc-400 text-sm mb-5 flex-1">
+            <p className="relative text-zinc-400 text-sm mb-5 flex-1">
               Insumos básicos seleccionados en Amazon y AliExpress para empezar a tatuar con seriedad, sin sobrecostos.
             </p>
             <Link
               to="/supply/aprende#kit"
-              className="shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-3 px-6 rounded-xl text-center hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
+              className="relative shrink-0 border border-amber-500/40 text-amber-400 text-sm font-black uppercase tracking-[0.2em] py-3 px-6 rounded-xl text-center hover:border-amber-500 hover:bg-amber-500/10 transition-all duration-300"
             >
               Ver kit recomendado →
             </Link>
           </div>
 
-          {/* CARD RECURSOS */}
-          <div className="snap-start flex-shrink-0 w-[80vw] md:w-auto border border-blue-500/20 bg-zinc-950 rounded-2xl p-6 md:p-7 flex flex-col hover:border-blue-500/40 transition-all duration-300">
-            <h3 className="text-xl md:text-2xl font-black uppercase leading-none mb-3">
+          {/* CARD RECURSOS — acento esmeralda (tercer color, gratis/crecimiento). */}
+          <div className="group relative overflow-hidden snap-start flex-shrink-0 w-[80vw] md:w-auto border border-emerald-500/20 bg-gradient-to-br from-zinc-900 to-black rounded-2xl p-6 md:p-7 flex flex-col hover:border-emerald-500/40 hover:-translate-y-1 hover:shadow-[0_12px_35px_rgba(16,185,129,0.15)] transition-all duration-300">
+            <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-emerald-500/10" />
+            <div className="relative w-12 h-12 rounded-full bg-zinc-900 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-110 transition-transform">
+              <BookOpen size={22} />
+            </div>
+            <h3 className="relative text-xl md:text-2xl font-black uppercase leading-none mb-3">
               Conocimiento<br />
               <span className="text-zinc-500">que no cuesta nada.</span>
             </h3>
-            <p className="text-zinc-400 text-sm mb-5 flex-1">
+            <p className="relative text-zinc-400 text-sm mb-5 flex-1">
               Contenido gratuito para seguir creciendo. La práctica constante es lo que realmente marca la diferencia.
             </p>
             <Link
               to="/supply/aprende#recursos"
-              className="shrink-0 border border-blue-500/40 text-blue-400 text-sm font-black uppercase tracking-[0.2em] py-3 px-6 rounded-xl text-center hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
+              className="relative shrink-0 border border-emerald-500/40 text-emerald-400 text-sm font-black uppercase tracking-[0.2em] py-3 px-6 rounded-xl text-center hover:border-emerald-500 hover:bg-emerald-500/10 transition-all duration-300"
             >
               Ver recursos gratuitos →
             </Link>

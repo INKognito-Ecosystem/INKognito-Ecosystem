@@ -104,7 +104,7 @@ const storeJsonLd = {
   "@type": "Store",
   "@id": `${import.meta.env.VITE_SITE_URL}/store#business`,
   "name": "INKognito Store",
-  "description": "Tienda de ropa deportiva, zapatos y guayos en Urabá, Antioquia. Nike, Adidas, Puma y más. Chigorodó, Apartadó, Turbo, Carepa. Envío regional.",
+  "description": "Tienda online de ropa, zapatos y guayos, con proveedores verificados. Nike, Adidas, Puma y más. Chigorodó, Apartadó, Turbo, Carepa, Antioquia. Envío regional.",
   "url": `${import.meta.env.VITE_SITE_URL}/store`,
   "telephone": "+57-320-791-1013",
   "address": {
@@ -121,8 +121,8 @@ export async function loader() {
 }
 
 export function meta() {
-  const title = 'INKognito Store | Ropa y zapatos deportivos en Urabá'
-  const description = 'Ropa deportiva para dama y caballero, zapatos deportivos, casuales y guayos en Chigorodó y el Urabá antioqueño. Pide por WhatsApp con entrega en la región.'
+  const title = 'INKognito Store | Ropa y calzado en Urabá'
+  const description = 'Tienda online de ropa para dama y caballero, zapatos deportivos, casuales y guayos, con proveedores verificados. En Chigorodó y el Urabá antioqueño. Pide por WhatsApp con entrega en la región.'
   return [
     { title },
     { name: 'description', content: description },
@@ -166,8 +166,9 @@ export default function StorePage() {
           </h1>
 
           <p className="text-gray-700 text-base md:text-xl leading-relaxed max-w-2xl mx-auto mb-8 md:mb-12">
-            Calidad premium, precio accesible. Diseños inspirados en las mejores marcas,
-            fabricados para el ritmo de Urabá.
+            Tienda online de ropa y calzado, con proveedores verificados.
+            Calidad premium, precio accesible y diseños inspirados en las
+            mejores marcas, fabricados para el ritmo de Urabá.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
