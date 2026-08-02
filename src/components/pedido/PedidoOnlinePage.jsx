@@ -234,7 +234,7 @@ export default function PedidoOnlinePage() {
             <h3 className="text-2xl font-black uppercase italic mb-3 text-white">¡Pedido recibido!</h3>
             <p className="text-gray-400 leading-relaxed">
               {metodoPago === 'contraentrega'
-                ? 'El proveedor y Eljach se pondrán a coordinar la entrega de tu paquete. Te contactamos por WhatsApp para confirmar los últimos detalles.'
+                ? `${module === 'supply' ? 'Tommy Supply Tattoo y Eljach mensajería express' : 'El proveedor y Eljach'} coordinarán la entrega de tu paquete. Te contactamos por WhatsApp para confirmar los últimos detalles.`
                 : 'En cuanto verifiquemos tu comprobante, tu pedido entra directo a empaque. Te contactamos por WhatsApp para confirmar.'}
             </p>
             <Link to={`/${module}`} className="inline-block mt-6 text-green-500 hover:text-green-400 text-sm font-semibold">
