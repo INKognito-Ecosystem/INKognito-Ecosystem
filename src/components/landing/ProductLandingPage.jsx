@@ -4,6 +4,7 @@ import { FaWhatsapp } from 'react-icons/fa'
 import { Package, ExternalLink, Truck, Shield, ShieldCheck, MessageSquare, Zap, Globe, CalendarCheck } from 'lucide-react'
 import EcosystemNavbar from '../ecosystem/EcosystemNavbar'
 import ProductImageGallery from '../ProductImageGallery'
+import { useSupplyVisual } from '../../hooks/useSupplyVisual'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import { useGymCart } from '../../contexts/GymCartContext'
@@ -120,6 +121,11 @@ export default function ProductLandingPage() {
   const [activeVariant, setActive] = useState(0)
   const [imgIdx, setImgIdx]        = useState(0)
   const [scrolled, setScrolled]    = useState(false)
+  // Mismo logo que ya usa la página de marca (IndustriasWarlockPage.jsx) —
+  // clave 'supply_brand_kwadron' a propósito, ver nota ahí (2026-08-02).
+  // Se llama siempre (antes del early-return de abajo) para no romper el
+  // orden de hooks entre renders.
+  const warlockLogo = useSupplyVisual('supply_brand_kwadron')
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -256,15 +262,29 @@ export default function ProductLandingPage() {
             {images.length > 0
               ? (
                 <>
-                  <ProductImageGallery
-                    images={images}
-                    alt={product.name}
-                    activeIndex={imgIdx}
-                    onIndexChange={setImgIdx}
-                    containerClassName="rounded-xl border border-zinc-800 overflow-hidden"
-                    imgClassName="w-full h-auto"
-                    eager
-                  />
+                  <div className="relative">
+                    <ProductImageGallery
+                      images={images}
+                      alt={product.name}
+                      activeIndex={imgIdx}
+                      onIndexChange={setImgIdx}
+                      containerClassName="rounded-xl border border-zinc-800 overflow-hidden"
+                      imgClassName="w-full h-auto"
+                      eager
+                    />
+                    {/* Insignia de marca sobre la foto — mismo logo que
+                        IndustriasWarlockPage.jsx, solo Mobiliario/Warlock
+                        (2026-08-02). Vive fuera del contenedor overflow-hidden
+                        de la galería para no quedar recortada. */}
+                    {esMobiliario && warlockLogo && (
+                      <div
+                        className="absolute bottom-3 right-3 w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden border-2 border-white shadow-lg"
+                        title="Fabricado por Industrias Warlock"
+                      >
+                        <img src={warlockLogo} alt="Industrias Warlock" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                  </div>
                   {images.length > 1 && (
                     <div className="hidden md:flex gap-2">
                       {images.map((src, i) => (
@@ -283,7 +303,19 @@ export default function ProductLandingPage() {
                   )}
                 </>
               )
-              : <div className="aspect-square rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-700"><Package size={64} /></div>
+              : (
+                <div className="relative aspect-square rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-700">
+                  <Package size={64} />
+                  {esMobiliario && warlockLogo && (
+                    <div
+                      className="absolute bottom-3 right-3 w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden border-2 border-white shadow-lg"
+                      title="Fabricado por Industrias Warlock"
+                    >
+                      <img src={warlockLogo} alt="Industrias Warlock" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+              )
             }
 
             {/* Descripción — debajo de la imagen en desktop, se oculta en móvil (va al final) */}
@@ -296,36 +328,51 @@ export default function ProductLandingPage() {
           <div className="space-y-5">
 
             <div>
-              <p className="text-zinc-500 text-[11px] uppercase tracking-widest mb-1">{product.categoria}</p>
+              <p className="hidden md:block text-zinc-500 text-[11px] uppercase tracking-widest mb-1">{product.categoria}</p>
 
-              {/* MÓVIL — nombre, precio y stock en una sola línea horizontal
-                  (antes cada uno en su propio bloque, apilados, y la
-                  descripción quedaba hasta el final de la página sin que
-                  casi nadie llegara a leerla con scroll). Estructura pedida
-                  2026-08-01: nombre | precio | stock, letra más chica para
-                  que quepa, descripción justo debajo, frase de marca al final. */}
-              <div className="flex md:hidden items-center justify-between gap-3">
-                <h1 className="text-base font-black uppercase tracking-tight leading-tight truncate shrink min-w-0">
-                  {product.name}
-                </h1>
-                {variant?.price != null && (
-                  <span className="text-sm font-black whitespace-nowrap shrink-0">${variant.price.toLocaleString('es-CO')}</span>
-                )}
-                {stockNum !== null && (
-                  <span className={`text-[11px] font-bold uppercase tracking-wide whitespace-nowrap shrink-0 ${
-                    sinStock ? 'text-red-500' : stockBajo ? 'text-amber-400' : 'text-zinc-500'
-                  }`}>
-                    {sinStock ? 'Agotado' : stockBajo ? `¡${stockNum}!` : `${stockNum} en stock`}
-                  </span>
-                )}
+              {/* MÓVIL — dos filas flex justify-between independientes.
+                  Clave para que el precio quede repartido entre nombre y
+                  stock (ni pegado al nombre ni pegado al stock, sin importar
+                  cuán largo sea el nombre): nombre/precio/stock son 3 hijos
+                  directos del mismo flex row — justify-between reparte el
+                  espacio sobrante en 2 huecos iguales, así que el precio cae
+                  a medio camino entre ambos según el ancho real del nombre,
+                  no según una columna reservada de tamaño fijo (eso fue lo
+                  que pegaba el precio a la derecha con CSS Grid + 1fr).
+                  El stock ("5" arriba / "disponibles" abajo) usa el mismo
+                  ancho fijo (w-16) en ambas filas para que el texto quede
+                  centrado en la misma posición horizontal en las dos filas,
+                  ya que son flex containers separados y no comparten columna
+                  de grid (2026-08-02). */}
+              <div className="md:hidden">
+                <div className="flex items-baseline justify-between gap-3">
+                  <p className="text-zinc-500 text-[11px] uppercase tracking-widest">{product.categoria}</p>
+                  {stockNum !== null && stockBajo && (
+                    <span className="w-16 shrink-0 text-center text-sm font-black text-amber-400">{stockNum}</span>
+                  )}
+                </div>
+                <div className="flex items-baseline justify-between gap-3 mt-1">
+                  <h1 className="text-base font-black uppercase tracking-tight leading-tight truncate shrink min-w-0">
+                    {product.name}
+                  </h1>
+                  {variant?.price != null && (
+                    <span className="shrink-0 text-sm font-black whitespace-nowrap">${variant.price.toLocaleString('es-CO')}</span>
+                  )}
+                  {stockNum !== null && (
+                    stockBajo ? (
+                      <span className="w-16 shrink-0 text-center text-[8px] font-bold uppercase tracking-wide text-amber-400">disponibles</span>
+                    ) : (
+                      <span className={`shrink-0 whitespace-nowrap text-[11px] font-bold uppercase tracking-wide ${
+                        sinStock ? 'text-red-500' : 'text-zinc-500'
+                      }`}>
+                        {sinStock ? 'Agotado' : `${stockNum} en stock`}
+                      </span>
+                    )
+                  )}
+                </div>
               </div>
               {product.descripcion && (
                 <p className="md:hidden text-zinc-400 text-xs leading-relaxed mt-2">{product.descripcion}</p>
-              )}
-              {isSupply && (
-                <p className="md:hidden text-xs italic tracking-wide border-l-2 pl-3 mt-3" style={{ borderColor: accent, color: accent }}>
-                  De un tatuador, para tatuadores.
-                </p>
               )}
 
               {/* ESCRITORIO — layout original, sin cambios */}
@@ -341,10 +388,37 @@ export default function ProductLandingPage() {
               )}
             </div>
 
-            {/* Tagline — solo supply, solo escritorio (en móvil ya se movió
-                debajo de la descripción, ver arriba) */}
+            {/* Variantes — arriba de la frase de marca y del badge/stock de
+                escritorio, para que se vea de inmediato junto a nombre/precio
+                sin tener que bajar más (reportado 2026-08-02, quedaba muy
+                abajo en productos con variantes tipo WJX). */}
+            {product.variantes.length > 1 && (
+              <div>
+                <p className="text-zinc-500 text-[11px] uppercase tracking-widest mb-2">Variante</p>
+                <div className="flex flex-wrap gap-2">
+                  {product.variantes.map((v, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActive(i)}
+                      className={`px-4 py-2 rounded border text-sm font-bold transition-all ${
+                        i === activeVariant
+                          ? 'text-black'
+                          : 'border-zinc-700 text-zinc-300 hover:border-zinc-500'
+                      }`}
+                      style={i === activeVariant ? { borderColor: accent, backgroundColor: accent } : {}}
+                    >
+                      {v.variant || 'Único'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Tagline — una sola copia para móvil y escritorio, ya no hay
+                versión duplicada md:hidden porque las Variantes ahora van
+                antes que esta frase en ambos layouts (ver nota arriba). */}
             {isSupply && (
-              <p className="hidden md:block text-xs italic tracking-wide border-l-2 pl-3" style={{ borderColor: accent, color: accent }}>
+              <p className="text-xs italic tracking-wide border-l-2 pl-3" style={{ borderColor: accent, color: accent }}>
                 De un tatuador, para tatuadores.
               </p>
             )}
@@ -368,29 +442,6 @@ export default function ProductLandingPage() {
                   : stockBajo
                     ? `¡Solo ${stockNum} disponible${stockNum !== 1 ? 's' : ''}!`
                     : `${stockNum} en stock`}
-              </div>
-            )}
-
-            {/* Variantes */}
-            {product.variantes.length > 1 && (
-              <div>
-                <p className="text-zinc-500 text-[11px] uppercase tracking-widest mb-2">Variante</p>
-                <div className="flex flex-wrap gap-2">
-                  {product.variantes.map((v, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setActive(i)}
-                      className={`px-4 py-2 rounded border text-sm font-bold transition-all ${
-                        i === activeVariant
-                          ? 'text-black'
-                          : 'border-zinc-700 text-zinc-300 hover:border-zinc-500'
-                      }`}
-                      style={i === activeVariant ? { borderColor: accent, backgroundColor: accent } : {}}
-                    >
-                      {v.variant || 'Único'}
-                    </button>
-                  ))}
-                </div>
               </div>
             )}
 

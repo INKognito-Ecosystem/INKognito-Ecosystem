@@ -30,7 +30,7 @@ export default function NavbarStore() {
                   <span className="text-[#C9A84C]">OGNITO STORE</span>
                 </span>
                 <span className="block text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-500 whitespace-nowrap">
-                  Tienda en línea
+                  Tienda Online
                 </span>
               </span>
             </Link>

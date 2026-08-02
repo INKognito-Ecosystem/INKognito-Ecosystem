@@ -371,8 +371,8 @@ export default function PedidoOnlinePage() {
                       Envío de tu máquina
                     </h3>
                     <p className="relative text-gray-400 text-[13px] leading-relaxed">
-                      Cada máquina se fabrica a mano en Chigorodó y se envía a cualquier parte de Colombia con transportadora nacional.
-                      Eljach solo cubre Suplementos dentro de Gym, no transporta máquinas — se paga por Nequi antes del despacho.
+                      Cada máquina se fabrica en nuestro taller de Chigorodó bajo estándares de calidad y se envía a cualquier parte de Colombia con transportadora nacional.
+                      Se paga el valor completo por Nequi y subes el comprobante — el flete lo pagas aparte, directamente a la transportadora cuando te entregue.
                     </p>
                   </>
                 ) : (
@@ -423,7 +423,7 @@ export default function PedidoOnlinePage() {
               )}
               {tieneMaquinaGym && (
                 <p className="text-amber-500/90 text-[12px] leading-relaxed">
-                  El envío de la máquina corre por cuenta del cliente — se fabrica en Chigorodó y se coordina con una transportadora nacional al momento del despacho (Eljach no cubre este envío).
+                  El envío de la máquina corre por cuenta del cliente — se fabrica en nuestro taller de Chigorodó y se coordina con una transportadora nacional que cobra el envío directamente al entregar (Eljach no cubre este envío).
                 </p>
               )}
               {enCobertura && pagarProductoAhora && (

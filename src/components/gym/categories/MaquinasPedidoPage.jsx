@@ -52,7 +52,7 @@ export default function MaquinasPedidoPage() {
   const { allProducts: gymAllProds } = useLoaderData()
   const apiMaquinas   = gymAllProds.filter(p => p.tipo !== 'afiliado')
   const gymAfiliados  = gymAllProds.filter(p => p.tipo === 'afiliado' && p.categoria === 'Materiales')
-  const { addItem } = useGymCart()
+  const { addItem, items: cartItems } = useGymCart()
 
   const productosFinales = apiMaquinas.map((item, i) => {
     const key = item.name.toLowerCase()
@@ -126,6 +126,7 @@ export default function MaquinasPedidoPage() {
         <div className={`flex md:grid md:grid-cols-3 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide ${productosFinales.length === 0 ? 'hidden' : ''}`}>
           {productosFinales.map((p) => {
             const hasImages = p.image1 || p.image2
+            const enCarrito = cartItems.some(i => i.key === `maquinas-${p.id}`)
             return (
               <div
                 key={p.id}
@@ -160,9 +161,11 @@ export default function MaquinasPedidoPage() {
                 {/* BOTÓN — flush al borde inferior */}
                 <button
                   onClick={() => handleAddToCart(p)}
-                  className="w-full text-[10px] font-bold uppercase tracking-[0.12em] py-2.5 bg-white text-gray-950 hover:bg-gray-200 transition-all duration-300 flex-shrink-0"
+                  className={`w-full text-[10px] font-bold uppercase tracking-[0.12em] py-2.5 transition-all duration-300 flex-shrink-0 ${
+                    enCarrito ? 'bg-green-500 text-white' : 'bg-white text-gray-950 hover:bg-gray-200'
+                  }`}
                 >
-                  + Agregar al carrito
+                  {enCarrito ? '✓ Agregado' : '+ Agregar al carrito'}
                 </button>
               </div>
             )

@@ -31,7 +31,7 @@ export default function NavbarCategory({ pageName }) {
                   <span className="text-blue-500">SUPPLY</span>
                 </span>
                 <span className="block text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-500 whitespace-nowrap">
-                  Tattoo Supply Online
+                  Tienda Online
                 </span>
               </span>
             </Link>

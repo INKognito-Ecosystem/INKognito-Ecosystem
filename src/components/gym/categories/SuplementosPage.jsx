@@ -63,7 +63,7 @@ function VariantSelectorSupl({ variantes, selIdx, onChange }) {
   )
 }
 
-function SuplCard({ p, onAddToCart }) {
+function SuplCard({ p, onAddToCart, enCarrito }) {
   const [selIdx, setSelIdx] = useState(0)
   const variantes = p.variantes || []
   const sel       = variantes[selIdx] || {}
@@ -93,9 +93,11 @@ function SuplCard({ p, onAddToCart }) {
       </div>
       <button
         onClick={() => onAddToCart(p, sel)}
-        className="w-full py-2.5 font-bold uppercase tracking-[0.1em] text-[10px] bg-white text-gray-950 hover:bg-gray-200 transition-all duration-300 flex-shrink-0"
+        className={`w-full py-2.5 font-bold uppercase tracking-[0.1em] text-[10px] transition-all duration-300 flex-shrink-0 ${
+          enCarrito ? 'bg-green-500 text-white' : 'bg-white text-gray-950 hover:bg-gray-200'
+        }`}
       >
-        + Agregar al carrito
+        {enCarrito ? '✓ Agregado' : '+ Agregar al carrito'}
       </button>
     </div>
   )
@@ -129,7 +131,7 @@ export default function SuplementosPage() {
   const [filtro, setFiltro]   = useState('Todos')
   const [visible, setVisible] = useState(PAGE_SIZE)
   const { allProducts: apiProds } = useLoaderData()
-  const { addItem } = useGymCart()
+  const { addItem, items: cartItems } = useGymCart()
 
   // Separar físicos de afiliados — afiliados van a su propia sección
   const apiFisicos   = apiProds.filter(item => (item.tipo || 'fisico') !== 'afiliado')
@@ -227,7 +229,7 @@ export default function SuplementosPage() {
             {/* GRID */}
             <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
               {visibles.map((p) => (
-                <SuplCard key={p.id} p={p} onAddToCart={handleAddToCart} />
+                <SuplCard key={p.id} p={p} onAddToCart={handleAddToCart} enCarrito={cartItems.some(i => i.key === `suplementos-${p.id}`)} />
               ))}
             </div>
 
