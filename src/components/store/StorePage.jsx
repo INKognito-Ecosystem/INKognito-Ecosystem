@@ -183,19 +183,19 @@ export default function StorePage() {
                 to={group.link}
                 className="group snap-start flex-shrink-0 w-[75vw] md:w-auto bg-white border border-gray-200 rounded-2xl p-5 hover:border-[#C9A84C] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[160px] md:min-h-[140px]"
               >
-                <div>
-                  <div className="mb-3 text-[#C9A84C]">{group.icon}</div>
+                <div className="text-center md:text-left">
+                  <div className="mb-3 text-[#C9A84C] mx-auto md:mx-0 w-fit">{group.icon}</div>
                   <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-[10px] mb-2 font-semibold">
                     {group.tag}
                   </p>
-                  <h3 className="text-xl md:text-3xl font-black uppercase mb-2 text-gray-900 group-hover:text-[#C9A84C] transition-colors duration-300">
+                  <h3 className="text-sm md:text-3xl font-black uppercase mb-2 text-gray-900 group-hover:text-[#C9A84C] transition-colors duration-300">
                     {group.name}
                   </h3>
                   <p className="text-gray-500 text-xs md:text-sm leading-relaxed">
                     {group.description}
                   </p>
                 </div>
-                <div className="mt-4 md:mt-6">
+                <div className="mt-4 md:mt-6 text-center md:text-left">
                   <span className="uppercase tracking-[0.2em] text-xs text-gray-400 group-hover:text-[#C9A84C] transition-colors duration-300">
                     Ver categorías →
                   </span>

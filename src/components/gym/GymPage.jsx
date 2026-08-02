@@ -169,9 +169,9 @@ export default function GymPage() {
               const Icon = s.icon
               const inner = (
                 <>
-                  <div className="flex items-center justify-between gap-1">
-                    <h3 className="text-xs md:text-xs font-black uppercase tracking-wide leading-tight">{s.titulo}</h3>
-                    {Icon && <Icon size={18} className="text-gray-500 group-hover:text-white transition-colors duration-300 flex-shrink-0" />}
+                  <div className="flex items-center justify-center md:justify-between gap-1.5">
+                    <h3 className="text-[10px] md:text-xs font-black uppercase tracking-wide leading-tight text-center md:text-left">{s.titulo}</h3>
+                    {Icon && <Icon size={16} className="text-gray-500 group-hover:text-white transition-colors duration-300 flex-shrink-0 md:w-[18px] md:h-[18px]" />}
                   </div>
                   <p className="text-xs leading-snug text-gray-500 group-hover:text-gray-400 transition-colors duration-300">{s.texto}</p>
                 </>
