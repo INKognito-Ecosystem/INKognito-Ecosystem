@@ -57,7 +57,7 @@ export default function CartDrawerSupply({ open, onClose }) {
             <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-0.5">
               INKognito Supply
             </p>
-            <h2 className="font-black uppercase tracking-[0.2em] text-lg flex items-center gap-2">
+            <h2 className="font-black uppercase tracking-[0.2em] text-lg flex items-center gap-2 text-white">
               Carrito
               {count > 0 && (
                 <span className="bg-blue-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">
