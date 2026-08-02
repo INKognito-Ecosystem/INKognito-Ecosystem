@@ -104,7 +104,7 @@ export default function VideosTutorialesPage() {
             <PlayCircle size={40} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
           </div>
           <div className="flex flex-col md:flex-row md:items-end gap-6">
-            <p className="text-gray-400 leading-relaxed max-w-2xl">
+            <p className="text-gray-400 leading-relaxed max-w-2xl text-justify [hyphens:auto]">
               Videos paso a paso de cómo construir equipos de gym caseros, con las mismas técnicas que uso yo — mancuernas, discos y máquinas hechas con materiales accesibles. Se reproducen directo desde YouTube, sin costo ni registro.
             </p>
             <a

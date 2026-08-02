@@ -86,7 +86,7 @@ export default function RecursosPage() {
               strokeWidth={1}
             />
           </div>
-          <p className="text-gray-400 leading-relaxed max-w-2xl">
+          <p className="text-gray-400 leading-relaxed max-w-2xl text-justify [hyphens:auto]">
             Ebooks y guías gratuitas nacidas de mi propia experiencia — construyendo mi gym desde cero, entrenando sin equipo y aprendiendo a base de prueba y error. Si a mí me sirvió, puede servirte a ti. Descárgalos y empieza donde estás.
           </p>
         </div>

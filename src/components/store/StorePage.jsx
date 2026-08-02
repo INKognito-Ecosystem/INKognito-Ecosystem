@@ -191,7 +191,7 @@ export default function StorePage() {
                   <h3 className="text-sm md:text-3xl font-black uppercase mb-2 text-gray-900 group-hover:text-[#C9A84C] transition-colors duration-300">
                     {group.name}
                   </h3>
-                  <p className="text-gray-500 text-xs md:text-sm leading-relaxed">
+                  <p className="text-gray-500 text-xs md:text-sm leading-relaxed text-justify [hyphens:auto]">
                     {group.description}
                   </p>
                 </div>

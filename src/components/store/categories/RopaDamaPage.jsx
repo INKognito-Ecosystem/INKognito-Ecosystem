@@ -99,7 +99,7 @@ export default function RopaDamaPage() {
             Ropa Deportiva Dama
           </h1>
           <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4 text-center md:text-left">Gym • Running • Yoga • Ciclismo</p>
-          <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg">
+          <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg text-justify [hyphens:auto]">
             Sets de compresión, leggings y tops para mujer activa. Diseños de marcas reconocidas, fabricados con telas técnicas que resisten el calor y el uso intenso. Despacho con Eljach a toda la región de Urabá — pagas cuando recibes.
           </p>
         </div>

@@ -83,7 +83,7 @@ export default function CursosPage() {
             </h1>
             <GraduationCap size={40} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
           </div>
-          <p className="text-gray-400 leading-relaxed max-w-2xl">
+          <p className="text-gray-400 leading-relaxed max-w-2xl text-justify [hyphens:auto]">
             Selección de los mejores cursos en español para entrenarte en casa, mejorar tu alimentación y aprender a fabricar tus propios equipos — grabados por quienes ya viven de esto, para que aprendas a tu ritmo, sin salir de casa.
           </p>
         </div>

@@ -99,7 +99,7 @@ export default function RopaGeneralPage() {
             Ropa Casual Día a Día
           </h1>
           <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4 text-center md:text-left">Pantalones • Camisetas • Camisas • Urbana</p>
-          <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg">
+          <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg text-justify [hyphens:auto]">
             Prendas cómodas y versátiles para el día a día — pantalones, camisetas, camisas y ropa de estilo urbano, con la misma calidad que ya conoces en INKognito Store. Despacho con Eljach a toda la región de Urabá — pagas cuando recibes.
           </p>
         </div>

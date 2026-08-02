@@ -138,7 +138,7 @@ export default function MaquinasPedidoPage() {
             </h1>
             <Wrench size={40} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
           </div>
-          <p className="text-gray-400 leading-relaxed max-w-2xl">
+          <p className="text-gray-400 leading-relaxed max-w-2xl text-justify [hyphens:auto]">
             Cada máquina sale de Chigorodó, hecha a mano con soldadura profesional y acero calibre grueso, lista para uso intenso diario. La tuya puede llegar a cualquier rincón de Colombia — cuéntanos qué necesitas y dónde estás.
           </p>
         </div>

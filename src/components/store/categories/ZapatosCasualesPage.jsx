@@ -96,7 +96,7 @@ export default function ZapatosCasualesPage() {
           </div>
           <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none mb-2 text-gray-900 text-center md:text-left">Zapatos Casuales</h1>
           <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4 text-center md:text-left">Estilo • Comodidad • Urabá</p>
-          <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg">
+          <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg text-justify [hyphens:auto]">
             Modelos icónicos para el día a día — frescos, cómodos y con actitud. Del parque a la calle sin esfuerzo. Diseños inspirados en las marcas más reconocidas del mercado, con despacho con Eljach a cualquier municipio de Urabá. Pago contraentrega.
           </p>
         </div>

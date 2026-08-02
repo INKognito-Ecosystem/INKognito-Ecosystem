@@ -275,7 +275,7 @@ export default function SuplementosPage() {
             </h1>
             <FlaskConical size={40} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
           </div>
-          <p className="text-gray-400 leading-relaxed max-w-2xl">
+          <p className="text-gray-400 leading-relaxed max-w-2xl text-justify [hyphens:auto]">
             Proteína, creatina, pre-entreno y vitaminas de marcas confiables, con stock real y despacho rápido para complementar tu entrenamiento — selección de calidad con envíos a toda Colombia desde Urabá, Antioquia.
           </p>
         </div>

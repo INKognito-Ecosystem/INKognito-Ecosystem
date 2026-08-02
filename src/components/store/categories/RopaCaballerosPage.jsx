@@ -101,7 +101,7 @@ export default function RopaCaballerosPage() {
           <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4 text-center md:text-left">
             Gym • Running • Ciclismo • Urbano
           </p>
-          <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg">
+          <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg text-justify [hyphens:auto]">
             Camisetas dry-fit, shorts y joggers para el hombre activo. Diseños de marcas reconocidas con telas que resisten el sudor y el calor de Urabá. Despacho con Eljach a toda la región — pago contraentrega, sin adelantos.
           </p>
         </div>

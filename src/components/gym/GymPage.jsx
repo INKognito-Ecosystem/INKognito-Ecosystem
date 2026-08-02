@@ -173,7 +173,7 @@ export default function GymPage() {
                     <h3 className="text-[10px] md:text-xs font-black uppercase tracking-wide leading-tight text-center md:text-left">{s.titulo}</h3>
                     {Icon && <Icon size={16} className="text-gray-500 group-hover:text-white transition-colors duration-300 flex-shrink-0 md:w-[18px] md:h-[18px]" />}
                   </div>
-                  <p className="text-xs leading-snug text-gray-500 group-hover:text-gray-400 transition-colors duration-300">{s.texto}</p>
+                  <p className="text-xs leading-snug text-gray-500 group-hover:text-gray-400 transition-colors duration-300 text-justify [hyphens:auto]">{s.texto}</p>
                 </>
               )
               const cardCls = `${CARD_CLASS} snap-start flex-shrink-0 w-[44vw] md:w-auto`

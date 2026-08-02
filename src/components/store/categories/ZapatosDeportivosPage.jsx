@@ -101,7 +101,7 @@ export default function ZapatosDeportivosPage() {
           <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4 text-center md:text-left">
             Running • Entrenamiento • Gym
           </p>
-          <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg">
+          <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg text-justify [hyphens:auto]">
             Las siluetas de running y gym más buscadas del mercado. Réplica premium con amortiguación y acabados de nivel — a un precio que tiene sentido para Urabá. Despacho con Eljach a Chigorodó, Apartadó, Carepa, Turbo y municipios cercanos. Pago contraentrega.
           </p>
         </div>
