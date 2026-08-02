@@ -1,9 +1,27 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
 
 const GymCartContext = createContext(null)
+const STORAGE_KEY = 'inkognito-cart-gym'
 
 export function GymCartProvider({ children }) {
   const [items, setItems] = useState([])
+  // Persistencia en localStorage (2026-08-01) — ver mismo patrón/comentario
+  // en SupplyCartContext.jsx (hidrata en efecto, no en el useState inicial,
+  // por el SSR).
+  const [hydrated, setHydrated] = useState(false)
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+      if (Array.isArray(stored)) setItems(stored)
+    } catch {}
+    setHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    if (!hydrated) return
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)) } catch {}
+  }, [items, hydrated])
 
   const addItem = useCallback((product, category) => {
     const key = `${category}-${product.id}`

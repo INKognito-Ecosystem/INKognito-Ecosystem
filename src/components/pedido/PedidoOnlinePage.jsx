@@ -403,7 +403,7 @@ export default function PedidoOnlinePage() {
               </div>
               {tieneMobiliario && (
                 <p className="text-amber-500/90 text-[12px] leading-relaxed">
-                  El envío del mobiliario corre por cuenta del cliente — se coordina y paga aparte con la transportadora al momento del despacho.
+                  El envío del mobiliario corre por cuenta del cliente — Industrias Warlock coordina el despacho y la transportadora que lleve el producto cobra el flete directamente al entregar.
                 </p>
               )}
               {enCobertura && pagarProductoAhora && (
@@ -438,7 +438,7 @@ export default function PedidoOnlinePage() {
                           pagarProductoAhora ? 'border-amber-500 bg-amber-500/10 text-white' : 'border-gray-700 text-gray-500 hover:border-gray-500'
                         }`}
                       >
-                        🏦 Producto por Nequi
+                        🏦 Pagar producto
                       </button>
                     </div>
                   )}

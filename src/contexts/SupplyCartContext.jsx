@@ -1,9 +1,29 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
 
 const SupplyCartContext = createContext(null)
+const STORAGE_KEY = 'inkognito-cart-supply'
 
 export function SupplyCartProvider({ children }) {
   const [items, setItems] = useState([])
+  // Persistencia en localStorage (2026-08-01) — antes el carrito era solo
+  // estado en memoria y se perdía al recargar. Se hidrata en un efecto (no
+  // en el useState inicial) porque el render de servidor no tiene
+  // localStorage — leerlo directo en el initializer causaría un mismatch de
+  // hidratación entre el HTML del servidor y el primer render del cliente.
+  const [hydrated, setHydrated] = useState(false)
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+      if (Array.isArray(stored)) setItems(stored)
+    } catch {}
+    setHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    if (!hydrated) return
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)) } catch {}
+  }, [items, hydrated])
 
   const addItem = useCallback((product, category) => {
     const key = `${category}-${product.id}`
