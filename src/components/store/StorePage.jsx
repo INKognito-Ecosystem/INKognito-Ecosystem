@@ -153,7 +153,7 @@ export default function StorePage() {
               <p className="text-gray-600 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Municipios</p>
             </div>
             <div className="text-center border-x border-gray-300">
-              <p className="text-3xl md:text-5xl font-black text-[#C9A84C]">6</p>
+              <p className="text-3xl md:text-5xl font-black text-[#C9A84C]">+6</p>
               <p className="text-gray-600 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Categorías</p>
             </div>
             <div className="text-center">
