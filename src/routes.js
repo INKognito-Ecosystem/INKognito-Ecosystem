@@ -59,6 +59,7 @@ export default [
   // Store
   route('store', 'components/store/StorePage.jsx'),
   route('store/ropa-dama', 'components/store/categories/RopaDamaPage.jsx'),
+  route('store/ropa-general', 'components/store/categories/RopaGeneralPage.jsx'),
   route('store/ropa-caballeros', 'components/store/categories/RopaCaballerosPage.jsx'),
   route('store/zapatos-deportivos', 'components/store/categories/ZapatosDeportivosPage.jsx'),
   route('store/zapatos-casuales', 'components/store/categories/ZapatosCasualesPage.jsx'),

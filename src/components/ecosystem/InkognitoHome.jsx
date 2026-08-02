@@ -19,7 +19,7 @@ export function meta() {
 
 export default function InkognitoHome() {
   return (
-    <section className="relative min-h-screen bg-black text-white flex flex-col items-center px-6 overflow-hidden">
+    <section className="relative h-dvh bg-black text-white flex flex-col items-center px-6 overflow-hidden">
 
       {/* meta() arriba ya cubre SSR — no se renderiza <Seo>/<Helmet> para
           evitar que las dos mecánicas escriban <head> a la vez (rompía la
@@ -38,40 +38,46 @@ export default function InkognitoHome() {
       {/* OVERLAY OSCURO */}
       <div className="absolute inset-0 bg-black/60"></div>
 
-      {/* CONTENIDO — ocupa todo el espacio disponible entre navbar y copyright */}
-      <div className="relative z-10 flex flex-col items-center justify-center w-full flex-1 py-20">
+      {/* CONTENIDO — ocupa todo el espacio disponible entre navbar y copyright.
+          Todo compactado (paddings/gaps/tamaños de letra reducidos) para que
+          la pantalla completa (logo + módulos + copyright) quepa en un solo
+          viewport sin scroll — antes con py-20 + gap-6 + py-5 por botón el
+          bloque se pasaba de la altura disponible en pantallas de laptop
+          típicas y obligaba a hacer scroll para ver el copyright
+          (reportado 2026-08-02). */}
+      <div className="relative z-10 flex flex-col items-center justify-center w-full flex-1 py-2 md:py-3 min-h-0">
 
-        <h1 className="text-5xl sm:text-6xl md:text-9xl font-black uppercase italic tracking-[0.12em] text-center">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black uppercase italic tracking-[0.12em] text-center">
           <span className="text-white">INK</span>
           <span className="text-zinc-300">OGNITO</span>
         </h1>
 
-        <p className="mt-2 mb-4 sm:mb-10 text-zinc-300 uppercase tracking-[0.15em] sm:tracking-[0.5em] text-sm md:text-base font-semibold text-center whitespace-nowrap px-2">
+        <p className="mt-1 mb-2 sm:mb-4 text-zinc-300 uppercase tracking-[0.15em] sm:tracking-[0.5em] text-sm md:text-base font-semibold text-center whitespace-nowrap px-2">
           Disciplina • Arte • Identidad
         </p>
 
-        <p className="text-white uppercase tracking-[0.45em] text-sm text-center mb-4 sm:mb-10 font-medium">
+        <p className="text-white uppercase tracking-[0.45em] text-sm text-center mb-2 sm:mb-4 font-medium">
           Select Module
         </p>
 
-        <div className="flex flex-col gap-6 w-full max-w-md">
+        <div className="flex flex-col gap-2.5 sm:gap-3 w-full max-w-md">
           <Link
             to="/jhumaneztattoo"
-            className="w-full py-5 bg-zinc-700 rounded text-center uppercase tracking-[0.3em] font-black hover:bg-red-600 transition-all duration-300"
+            className="w-full py-3 sm:py-4 bg-zinc-700 rounded text-center uppercase tracking-[0.3em] font-black hover:bg-red-600 transition-all duration-300"
           >
             Tattoo Studio
           </Link>
 
           <Link
             to="/supply"
-            className="w-full py-5 bg-zinc-700 rounded text-center uppercase tracking-[0.3em] font-black hover:bg-blue-600 transition-all duration-300"
+            className="w-full py-3 sm:py-4 bg-zinc-700 rounded text-center uppercase tracking-[0.3em] font-black hover:bg-blue-600 transition-all duration-300"
           >
             Tattoo Supply
           </Link>
 
           <Link
             to="/store"
-            className="w-full py-5 bg-zinc-700 rounded text-center uppercase tracking-[0.3em] font-black transition-all duration-300"
+            className="w-full py-3 sm:py-4 bg-zinc-700 rounded text-center uppercase tracking-[0.3em] font-black transition-all duration-300"
             style={{ color: 'white' }}
             onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#C9A84C'; e.currentTarget.style.color = '#000' }}
             onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#3f3f46'; e.currentTarget.style.color = '#fff' }}
@@ -81,7 +87,7 @@ export default function InkognitoHome() {
 
           <Link
             to="/gym"
-            className="w-full py-5 bg-zinc-700 rounded text-center uppercase tracking-[0.3em] font-black hover:bg-gray-500 transition-all duration-300"
+            className="w-full py-3 sm:py-4 bg-zinc-700 rounded text-center uppercase tracking-[0.3em] font-black hover:bg-gray-500 transition-all duration-300"
           >
             Gym
           </Link>
@@ -90,7 +96,7 @@ export default function InkognitoHome() {
       </div>
 
       {/* COPYRIGHT */}
-      <div className="relative z-10 w-full text-center pb-4">
+      <div className="relative z-10 w-full text-center pb-2 sm:pb-3 shrink-0">
         <p className="text-zinc-600 text-xs tracking-widest uppercase">
           © 2026 INKOGNITO. Todos los derechos reservados.
         </p>

@@ -83,11 +83,18 @@ export default function SupplyProductCard({ item, categoria }) {
   const resolvedPrice = sel.price
     ? '$' + Math.round(sel.price).toLocaleString('es-CO')
     : null
-  const activeImage = sel.image_url || item.image_url || null
-  const images = [sel.image_url, sel.image_url_2, sel.image_url_3].filter(Boolean)
-  if (images.length === 0 && item.image_url) {
-    images.push(item.image_url, item.image_url_2, item.image_url_3)
-  }
+  // Si la variante seleccionada no tiene foto propia, sigue siendo el mismo
+  // producto — antes caía a item.image_url, que es solo la de la primera
+  // variante en orden alfabético y podía estar igual de vacía. Ahora busca
+  // cualquier otra variante que sí tenga foto (mismo criterio aplicado en
+  // StoreProductCard.jsx, reportado 2026-08-02).
+  const fallbackVariant = allVariants.find(v => v.image_url)
+  const activeImage = sel.image_url || fallbackVariant?.image_url || item.image_url || null
+  const images = sel.image_url
+    ? [sel.image_url, sel.image_url_2, sel.image_url_3].filter(Boolean)
+    : fallbackVariant
+      ? [fallbackVariant.image_url, fallbackVariant.image_url_2, fallbackVariant.image_url_3].filter(Boolean)
+      : [item.image_url, item.image_url_2, item.image_url_3].filter(Boolean)
   const galleryImages = images.filter(Boolean)
 
   const productId = item.name + (sel.variant ? '-' + sel.variant : '')

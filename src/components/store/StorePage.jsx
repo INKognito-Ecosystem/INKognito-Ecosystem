@@ -1,67 +1,23 @@
 import { Link, useLoaderData } from 'react-router-dom'
 import { STORE_HOURS } from '../../config/business'
 import { FaWhatsapp } from 'react-icons/fa'
-import { Truck, Shield, Clock, Star, Award, Shirt, Footprints, Sun, Trophy, Zap } from 'lucide-react'
+import { Truck, Shield, Clock, Star, Award } from 'lucide-react'
 import NavbarStore from './NavbarStore'
 import FooterStore from './FooterStore'
 import StoreProductCard from './StoreProductCard'
 import { fetchCatalogCategoriaItems, toProdCard } from '../../hooks/useCatalog'
+import { CATEGORY_GROUPS } from '../../data/storeCategories'
 const ogStore = '/og/store.webp'
 
 const STRIPE_PATTERN = {
   backgroundImage: 'repeating-linear-gradient(45deg,transparent,transparent 19px,rgba(201,168,76,1) 19px,rgba(201,168,76,1) 20px)',
 }
 
-const categories = [
-  {
-    id: 1,
-    name: 'Ropa Dama',
-    tag: 'Deportiva Femenina',
-    description: 'Sets de compresión, leggings y tops para mujer activa. Telas técnicas resistentes al calor de Urabá. Despacho con Eljach a Chigorodó, Apartadó, Carepa y Turbo — pago contraentrega.',
-    link: '/store/ropa-dama',
-    icon: <Shirt size={28} />,
-  },
-  {
-    id: 2,
-    name: 'Ropa Caballeros',
-    tag: 'Deportiva Masculina',
-    description: 'Camisetas dry-fit, shorts y joggers para el hombre activo. Diseños de marcas reconocidas, fabricados para entrenar en el clima cálido de la región. Llegan a tu puerta con Eljach.',
-    link: '/store/ropa-caballeros',
-    icon: <Shirt size={28} />,
-  },
-  {
-    id: 3,
-    name: 'Zapatos Deportivos',
-    tag: 'Running & Gym',
-    description: 'Las siluetas de running y entrenamiento más buscadas del mercado. Réplica premium con amortiguación y acabados de nivel. Ruta diaria con Eljach — entrega en 1 a 2 días hábiles en Chigorodó, Carepa, Apartadó y Turbo.',
-    link: '/store/zapatos-deportivos',
-    icon: <Footprints size={28} />,
-  },
-  {
-    id: 4,
-    name: 'Zapatos Casuales',
-    tag: 'Estilo Urbano',
-    description: 'Modelos icónicos para el día a día — frescos, cómodos y con actitud. Del parque a la calle sin esfuerzo. Despacho a cualquier municipio del Urabá antioqueño con pago contraentrega.',
-    link: '/store/zapatos-casuales',
-    icon: <Sun size={28} />,
-  },
-  {
-    id: 5,
-    name: 'Guayos',
-    tag: 'Fútbol',
-    description: 'Control, tracción y durabilidad para jugar en canchas de la región. Terreno firme y canchita de sintético. Despacho con Eljach a Chigorodó, Carepa, Apartadó, Turbo y municipios cercanos.',
-    link: '/store/guayos',
-    icon: <Trophy size={28} />,
-  },
-  {
-    id: 6,
-    name: 'Tenis Guayo',
-    tag: 'Multisuperficie',
-    description: 'El calzado más versátil de Urabá: rinde en sintético, polvo de ladrillo y calle sin cambiar de par. La opción inteligente para quien juega donde se pueda. Llega con Eljach, contraentrega.',
-    link: '/store/tenis-guayo',
-    icon: <Zap size={28} />,
-  },
-]
+// La sección "Nuestras Categorías" del hub ya no lista las 6 categorías
+// reales una por una — ahora muestra las 2 agrupaciones (Deportiva/Casual,
+// ver storeCategories.jsx) y cada una lleva a su propia página con las
+// sub-categorías correspondientes (decisión de Jose, 2026-08-02).
+const categoryGroups = [CATEGORY_GROUPS.deportiva, CATEGORY_GROUPS.casual]
 
 const SHOE_SIZES = ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44']
 const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
@@ -220,28 +176,28 @@ export default function StorePage() {
             </h2>
           </div>
 
-          <div className="flex md:grid md:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
-            {categories.map((cat) => (
+          <div className="flex md:grid md:grid-cols-2 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+            {categoryGroups.map((group) => (
               <Link
-                key={cat.id}
-                to={cat.link}
+                key={group.link}
+                to={group.link}
                 className="group snap-start flex-shrink-0 w-[75vw] md:w-auto bg-white border border-gray-200 rounded-2xl p-5 hover:border-[#C9A84C] hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[160px] md:min-h-[140px]"
               >
                 <div>
-                  <div className="mb-3 text-[#C9A84C]">{cat.icon}</div>
+                  <div className="mb-3 text-[#C9A84C]">{group.icon}</div>
                   <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-[10px] mb-2 font-semibold">
-                    {cat.tag}
+                    {group.tag}
                   </p>
                   <h3 className="text-xl md:text-3xl font-black uppercase mb-2 text-gray-900 group-hover:text-[#C9A84C] transition-colors duration-300">
-                    {cat.name}
+                    {group.name}
                   </h3>
                   <p className="text-gray-500 text-xs md:text-sm leading-relaxed">
-                    {cat.description}
+                    {group.description}
                   </p>
                 </div>
                 <div className="mt-4 md:mt-6">
                   <span className="uppercase tracking-[0.2em] text-xs text-gray-400 group-hover:text-[#C9A84C] transition-colors duration-300">
-                    Ver categoría →
+                    Ver categorías →
                   </span>
                 </div>
               </Link>

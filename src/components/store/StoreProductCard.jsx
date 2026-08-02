@@ -6,7 +6,17 @@ const VAR_THRESHOLD = 3
 
 function SizeSelector({ sizes, selIdx, onChange }) {
   const [open, setOpen] = useState(false)
-  if (!sizes || sizes.length <= 1) return null
+  if (!sizes || sizes.length === 0) return null
+
+  // Talla única — no hay nada que seleccionar, pero igual debe verse cuál
+  // es (antes desaparecía por completo, reportado 2026-08-02).
+  if (sizes.length === 1) {
+    return (
+      <p className="text-[9px] font-bold text-gray-500 uppercase tracking-wide">
+        Talla disponible: T {sizes[0]}
+      </p>
+    )
+  }
 
   if (sizes.length <= VAR_THRESHOLD) {
     return (
@@ -59,6 +69,7 @@ function SizeSelector({ sizes, selIdx, onChange }) {
 export default function StoreProductCard({ product, category, sizes }) {
   const { items, addItem } = useStoreCart()
   const [selIdx, setSelIdx] = useState(0)
+  const [showDesc, setShowDesc] = useState(false)
 
   const selectedSize = sizes?.[selIdx] || ''
   // El botón refleja el carrito real, no un timer — antes decía "Agregado"
@@ -71,8 +82,17 @@ export default function StoreProductCard({ product, category, sizes }) {
     ? product._item.variantes.find(v => v.variant === selectedSize)
     : null
 
-  const galleryImages = selectedVariant?.image_url
-    ? [selectedVariant.image_url, selectedVariant.image_url_2, selectedVariant.image_url_3].filter(Boolean)
+  // Si la talla seleccionada no tiene foto propia, sigue siendo el mismo
+  // producto — mostramos la foto de cualquier otra talla que sí tenga, en
+  // vez de dejar la card sin imagen. Antes caía a product.images (la
+  // "primera" variante según el orden alfabético en la base), que podía
+  // estar igual de vacía si esa variante puntual no tenía foto
+  // (reportado 2026-08-02).
+  const fallbackVariant = product._item?.variantes?.find(v => v.image_url)
+  const imageSource = selectedVariant?.image_url ? selectedVariant : fallbackVariant
+
+  const galleryImages = imageSource?.image_url
+    ? [imageSource.image_url, imageSource.image_url_2, imageSource.image_url_3].filter(Boolean)
     : (product.images?.length ? product.images : [product.image].filter(Boolean))
 
   const handleAdd = () => {
@@ -101,15 +121,26 @@ export default function StoreProductCard({ product, category, sizes }) {
       </div>
 
       <div className="p-3 flex flex-col flex-1 gap-1.5 min-h-0">
-        {(product.brand || product.tag) && (
-          <p className="text-[#C9A84C] uppercase tracking-[0.2em] text-[9px] md:text-[10px] leading-none">
-            {product.brand}{product.tag ? ` — ${product.tag}` : ''}
-          </p>
-        )}
         <h3 className="text-xs md:text-sm font-black uppercase leading-tight text-gray-900">
           {product.name}
         </h3>
         <span className="text-gray-900 font-bold text-sm">{product.price}</span>
+        {product.tag && (
+          <>
+            {/* Escritorio — texto completo, debajo de nombre/precio (antes
+                iba arriba del nombre, reportado 2026-08-02) */}
+            <p className="hidden md:block text-gray-500 text-[9.5px] leading-snug">{product.tag}</p>
+            {/* Móvil — botón que abre modal, mismo patrón que
+                SupplyProductCard.jsx (2026-08-02) */}
+            <button
+              type="button"
+              onClick={() => setShowDesc(true)}
+              className="md:hidden self-start text-gray-500 text-[9px] font-bold uppercase tracking-[0.15em] underline underline-offset-2"
+            >
+              Ver descripción
+            </button>
+          </>
+        )}
         <div className="mt-auto pt-1">
           <SizeSelector sizes={sizes} selIdx={selIdx} onChange={setSelIdx} />
         </div>
@@ -124,6 +155,24 @@ export default function StoreProductCard({ product, category, sizes }) {
       >
         {enCarrito ? '✓ Agregado' : '+ Agregar al carrito'}
       </button>
+
+      {showDesc && (
+        <div
+          className="md:hidden fixed inset-0 z-50 bg-black/70 flex items-end justify-center"
+          onClick={() => setShowDesc(false)}
+        >
+          <div
+            className="w-full max-w-md bg-white border-t border-gray-200 rounded-t-2xl p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-xs font-black uppercase tracking-widest text-gray-900">Descripción</h4>
+              <button onClick={() => setShowDesc(false)} className="text-gray-400 text-lg leading-none px-1">✕</button>
+            </div>
+            <p className="text-gray-600 text-sm leading-relaxed">{product.tag}</p>
+          </div>
+        </div>
+      )}
 
     </div>
   )
