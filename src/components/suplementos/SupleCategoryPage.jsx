@@ -7,7 +7,7 @@ import { useSupleCart } from '../../contexts/SupleCartContext'
 import { FaWhatsapp } from 'react-icons/fa'
 import { ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react'
 import { getAdjacentSupleCategories } from '../../data/supleCategoriesOrder'
-import logoNutriHouse from '../../assets/milogo/nutrihouse.png'
+import logoNutriHouse from '../../assets/milogo/nutrihouse.webp'
 
 const WA = '573207911013'
 

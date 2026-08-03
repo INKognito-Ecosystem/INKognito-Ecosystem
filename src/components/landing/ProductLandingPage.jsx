@@ -7,6 +7,8 @@ import ProductImageGallery from '../ProductImageGallery'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import { useGymCart } from '../../contexts/GymCartContext'
+import { useSupleCart } from '../../contexts/SupleCartContext'
+import logoNutriHouse from '../../assets/milogo/nutrihouse.webp'
 
 // Marcas que NO vienen de Tommy Tattoo Supply — confirmado por Jose
 // (2026-08-01). Mismo criterio que supplierBadge={null} en
@@ -72,7 +74,7 @@ const PLATAFORMA_TRUST_FALLBACK = [
 const MODULE_ACCENT = {
   supply:      '#3B82F6',
   store:       '#C9A84C',
-  suplementos: '#A1A1AA',
+  suplementos: '#9E9E9E',
   gym:         '#A1A1AA',
   dropi:       '#EC6F2D',
 }
@@ -122,10 +124,11 @@ export function meta({ data }) {
   ]
 }
 
-// Módulo de inventario → contexto de carrito real. "suplementos" no tiene
-// su propio carrito — sus productos ya se agregan al de Gym (ver
-// SuplementosPage.jsx), así que su pedido online también vive en /pedido/gym.
-const CART_MODULE = { supply: 'supply', store: 'store', gym: 'gym', suplementos: 'gym' }
+// Módulo de inventario → contexto de carrito real. "suplementos" tiene su
+// propio carrito desde que Suple se independizó de Gym como módulo propio
+// (2026-08-02, ver SupleCartContext.jsx) — antes mandaba todo al carrito de
+// Gym, bug detectado al agregar la insignia de Nutri House acá (2026-08-03).
+const CART_MODULE = { supply: 'supply', store: 'store', gym: 'gym', suplementos: 'suplementos' }
 
 export default function ProductLandingPage() {
   const { id } = useParams()
@@ -134,6 +137,7 @@ export default function ProductLandingPage() {
   const supplyCart = useSupplyCart()
   const storeCart = useStoreCart()
   const gymCart = useGymCart()
+  const supleCart = useSupleCart()
   const [activeVariant, setActive] = useState(0)
   const [imgIdx, setImgIdx]        = useState(0)
   const [scrolled, setScrolled]    = useState(false)
@@ -179,6 +183,10 @@ export default function ProductLandingPage() {
   // del resto de Supply — fabrican en Bogotá, envío nacional, sin
   // contraentrega confirmada aún (2026-08-01).
   const esMobiliario     = isSupply && product.categoria === 'Mobiliario'
+  // Nutri House suministra las 5 categorías de Suple (2026-08-03, confirmado
+  // por Jose, incluida Accesorios) — a diferencia de Warlock/Tommy no hay
+  // exclusiones por categoría/marca.
+  const esNutriHouse     = product.module === 'suplementos'
   const accent          = MODULE_ACCENT[product.module] || '#A1A1AA'
   const imageUrl        = variant?.image_url || product.variantes[0]?.image_url
   const images           = variant?.image_url
@@ -203,7 +211,7 @@ export default function ProductLandingPage() {
   // directo) solo ofrecía WhatsApp — no tenía forma de generar el pedido sin
   // salir a otra app (2026-07-30).
   const cartModule = CART_MODULE[product.module]
-  const cart = { supply: supplyCart, store: storeCart, gym: gymCart }[cartModule]
+  const cart = { supply: supplyCart, store: storeCart, gym: gymCart, suplementos: supleCart }[cartModule]
   const handlePedidoOnline = () => {
     if (sinStock || !cart) return
     const productId = product.name + (variant?.variant ? '-' + variant.variant : '')
@@ -295,6 +303,18 @@ export default function ProductLandingPage() {
                         <img src={warlockLogo} alt="Industrias Warlock" className="w-full h-full object-cover" />
                       </div>
                     )}
+                    {/* Mismo patrón para Nutri House (Suple) — el logo es un
+                        PNG/webp con fondo transparente (no una foto sólida
+                        como Warlock), así que la insignia lleva bg-white
+                        detrás para que no se vea "flotando" sobre la foto. */}
+                    {esNutriHouse && (
+                      <div
+                        className="absolute bottom-3 right-3 w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden border-2 border-white shadow-lg bg-white p-1.5"
+                        title="Suministrado por Nutri House"
+                      >
+                        <img src={logoNutriHouse} alt="Nutri House" className="w-full h-full object-contain" />
+                      </div>
+                    )}
                   </div>
                   {images.length > 1 && (
                     <div className="hidden md:flex gap-2">
@@ -323,6 +343,14 @@ export default function ProductLandingPage() {
                       title="Fabricado por Industrias Warlock"
                     >
                       <img src={warlockLogo} alt="Industrias Warlock" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  {esNutriHouse && (
+                    <div
+                      className="absolute bottom-3 right-3 w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden border-2 border-white shadow-lg bg-white p-1.5"
+                      title="Suministrado por Nutri House"
+                    >
+                      <img src={logoNutriHouse} alt="Nutri House" className="w-full h-full object-contain" />
                     </div>
                   )}
                 </div>
@@ -492,6 +520,12 @@ export default function ProductLandingPage() {
                       <div className="flex items-center gap-3 text-zinc-400 text-xs">
                         <ShieldCheck size={13} className="shrink-0" style={{ color: accent }} />
                         <span>Suministrado por Tommy Tattoo Supply — marca reconocida en Urabá</span>
+                      </div>
+                    )}
+                    {esNutriHouse && (
+                      <div className="flex items-center gap-3 text-zinc-400 text-xs">
+                        <ShieldCheck size={13} className="shrink-0" style={{ color: accent }} />
+                        <span>Suministrado por Nutri House — punto físico en Chigorodó</span>
                       </div>
                     )}
                     <div className="flex items-center gap-3 text-zinc-400 text-xs">
