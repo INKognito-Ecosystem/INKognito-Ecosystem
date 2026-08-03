@@ -164,7 +164,7 @@ export async function loader() {
 
 export function meta() {
   const title = 'Suplementos Deportivos | INKognito Suple — Urabá y Colombia'
-  const description = 'Proteína, creatina, pre-entreno y vitaminas para potenciar tu entrenamiento. Suplementos deportivos en Urabá, Chigorodó, Antioquia. Envíos a toda Colombia.'
+  const description = 'Tienda online de proteína, creatina, pre-entreno y vitaminas para potenciar tu entrenamiento. Suplementos deportivos en Urabá, Chigorodó, Antioquia. Envíos a toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },
@@ -242,7 +242,7 @@ export default function SuplePage() {
             <span className="block text-[#9E9E9E]">Para Rendir</span>
           </h1>
           <p className="text-gray-300 text-base md:text-xl leading-relaxed max-w-2xl mx-auto md:mx-0 mb-8 md:mb-12">
-            Proteína, creatina y pre-entreno de marcas confiables, con stock real y despacho rápido — selección de calidad con envíos desde Urabá a toda Colombia.
+            Tienda online de proteína, creatina y pre-entreno de marcas confiables, con stock real y despacho rápido — selección de calidad con envíos desde Urabá a toda Colombia.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
             <button
