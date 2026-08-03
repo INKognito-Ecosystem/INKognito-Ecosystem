@@ -15,25 +15,43 @@ import { motion } from 'motion/react'
 // propio `x` explícito sincronizado con el mismo estado/transition — así
 // los dos se mueven a la vez, con la misma curva de tiempo, en un solo
 // gesto continuo en vez de que el nombre del módulo solo "salte" a su
-// lugar por el reflow pasivo del hermano encogiéndose (pedido de Jose:
-// "suple, store y supply también deberán deslizarse suave como la
-// palabra inkognito").
+// lugar por el reflow pasivo del hermano encogiéndose.
 //
-// Se dispara una vez por montaje del componente — como cada Navbar* vive
-// dentro de la página (no en un layout persistente en root.jsx), esto
-// significa que la animación se repite en cada navegación a una página que
-// use este wordmark, no solo "la primera vez que se entra al módulo" en
-// sentido estricto de sesión. Si se siente repetitivo, se puede acotar con
-// sessionStorage más adelante.
+// v3 (2026-08-02) — cada Navbar* vive dentro de la página (no en un layout
+// persistente en root.jsx), así que sin esto la animación se repetía en
+// CADA navegación dentro del mismo módulo (ej. Store → Store/ropa-dama
+// volvía a mostrar "INKOGNITO STORE" completo) — Jose lo reportó: una vez
+// que "INKOGNITO" se esconde, debe quedar escondido en todas las rutas del
+// módulo, no solo en la página principal. Se guarda en sessionStorage,
+// una key por nombre de módulo, para que la intro solo se vea una vez por
+// sesión y de ahí en adelante cada Navbar* monte ya colapsado (sin
+// animar) en cualquier página de ese módulo.
 export default function AnimatedWordmark({ moduleWord, accentClassName = 'text-white', className = '' }) {
+  const storageKey = `inkognito-wordmark-seen-${moduleWord}`
   const [collapsed, setCollapsed] = useState(false)
+  // Cuando ya se vio antes en esta sesión, la transición pasa a duración 0
+  // — colapsa de inmediato en el primer efecto post-hidratación en vez de
+  // animar, evitando repetir el gesto en cada página nueva.
+  const [skipAnimation, setSkipAnimation] = useState(false)
 
   useEffect(() => {
-    const t = setTimeout(() => setCollapsed(true), 550)
-    return () => clearTimeout(t)
-  }, [])
+    let seen = false
+    try { seen = sessionStorage.getItem(storageKey) === '1' } catch {}
 
-  const transition = { duration: 0.6, ease: [0.65, 0, 0.35, 1] }
+    if (seen) {
+      setSkipAnimation(true)
+      setCollapsed(true)
+      return
+    }
+
+    const t = setTimeout(() => {
+      setCollapsed(true)
+      try { sessionStorage.setItem(storageKey, '1') } catch {}
+    }, 550)
+    return () => clearTimeout(t)
+  }, [storageKey])
+
+  const transition = skipAnimation ? { duration: 0 } : { duration: 0.6, ease: [0.65, 0, 0.35, 1] }
 
   return (
     <span className={`inline-flex items-baseline ${className}`}>
