@@ -1,17 +1,18 @@
 import { useState } from 'react'
 import { useLoaderData } from 'react-router-dom'
-import NavbarCategory from '../NavbarCategory'
-import FooterSupply from '../FooterSupply'
+import NavbarCategory from '../../NavbarCategory'
+import FooterSupply from '../../FooterSupply'
 import { Minus, Plus, ShoppingCart } from 'lucide-react'
-import { fetchCatalogCategoria } from '../../../hooks/useCatalog'
-import { useSupplyCart } from '../../../contexts/SupplyCartContext'
+import { fetchCatalogCategoria } from '../../../../hooks/useCatalog'
+import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
 
 const WA = '573207911013'
 const BOX_SIZE = 20
 
-// Mismos 5 calibres que ya explica NeedlesPage.jsx (guide) — la caja
-// surtida se arma con estos, no con toda la variedad de agujas del
-// catálogo (2026-08-02).
+// Mismos calibres que ya explica CartridgesPage.jsx (guide) — la caja
+// surtida se arma con estos, no con toda la variedad de cartuchos del
+// catálogo (2026-08-02, corregido de Agujas a Cartuchos por pedido
+// explícito de Jose).
 const CALIBRES = [
   { key: 'RL',     label: 'RL Liner',          sub: 'Contornos y trazos finos' },
   { key: 'RS',     label: 'RS Shader',         sub: 'Rellenos pequeños' },
@@ -27,8 +28,8 @@ const DOT_PATTERN = {
 
 const fmtPrecio = (p) => p != null ? `$${Number(p).toLocaleString('es-CO')} COP` : null
 
-// Busca el producto/variante "surtida" dentro de la categoría Agujas — Jose
-// la crea desde el panel como cualquier otro producto (una fila más de
+// Busca el producto/variante "surtida" dentro de la categoría Cartuchos —
+// Jose la crea desde el panel como cualquier otro producto (una fila más de
 // inventory), solo que el nombre de la variante o del producto debe
 // contener "surtida" para que esta página la detecte. Sin eso, no hace
 // falta ningún cambio de esquema ni de backend (2026-08-02).
@@ -45,23 +46,23 @@ function findCajaSurtida(products) {
 }
 
 export async function loader() {
-  const { products } = await fetchCatalogCategoria('supply', 'Agujas')
+  const { products } = await fetchCatalogCategoria('supply', 'Cartuchos')
   return { caja: findCajaSurtida(products) }
 }
 
 export function meta() {
-  const title = 'Arma tu Caja Surtida de Agujas | INKognito Supply — Chigorodó'
-  const description = 'Caja de 20 agujas de tatuaje surtida a tu gusto — elige la mezcla de calibres (RL, RS, M1, CM, Bugpin) que necesitas para tu trabajo. Envíos a Urabá y Colombia.'
+  const title = 'Arma tu Caja Surtida de Cartuchos | INKognito Supply — Chigorodó'
+  const description = 'Caja de 20 cartuchos de tatuaje surtida a tu gusto — elige la mezcla de calibres (RL, RS, M1, CM, Bugpin) que necesitas para tu trabajo. Envíos a Urabá y Colombia.'
   return [
     { title },
     { name: 'description', content: description },
     { property: 'og:title', content: title },
     { property: 'og:description', content: description },
-    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/agujas-surtidas` },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/cartuchos-surtidos` },
   ]
 }
 
-export default function AgujasSurtidasPage() {
+export default function CartuchosSurtidosPage() {
   const { caja } = useLoaderData()
   const { addItem } = useSupplyCart()
   const [counts, setCounts] = useState(() => Object.fromEntries(CALIBRES.map(c => [c.key, 0])))
@@ -91,29 +92,29 @@ export default function AgujasSurtidasPage() {
     addItem({
       id: `surtida-${Date.now()}`,
       inventoryId: caja.id,
-      name: caja.productName || 'Caja Surtida x20 — Agujas',
+      name: caja.productName || 'Caja Surtida x20 — Cartuchos',
       price: fmtPrecio(caja.price) || 'Consultar',
       brand: 'Bajo pedido',
       mixLabel,
-    }, 'agujas-surtidas')
+    }, 'cartuchos-surtidos')
     setCounts(Object.fromEntries(CALIBRES.map(c => [c.key, 0])))
     setAdded(true)
   }
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <NavbarCategory pageName="Agujas Surtidas" />
+      <NavbarCategory pageName="Cartuchos Surtidos" />
 
       {/* HERO */}
       <section className="relative pt-24 md:pt-32 pb-8 md:pb-12 px-4 md:px-6 overflow-hidden">
         <div className="absolute inset-0 opacity-[0.08]" style={DOT_PATTERN} />
         <div className="relative z-10 max-w-3xl mx-auto text-center md:text-left">
-          <p className="uppercase tracking-[0.25em] text-blue-500 text-xs mb-3">Agujas · A tu medida</p>
+          <p className="uppercase tracking-[0.25em] text-blue-500 text-xs mb-3">Cartuchos · A tu medida</p>
           <h1 className="text-3xl md:text-5xl font-black uppercase leading-tight mb-4">
             Arma tu <span className="text-blue-500">Caja Surtida</span>
           </h1>
           <p className="text-zinc-400 leading-relaxed text-justify [hyphens:auto]">
-            Una caja trae {BOX_SIZE} agujas — tú eliges cuántas de cada calibre según lo que estés trabajando. Mismo precio de caja, mezcla a tu gusto.
+            Una caja trae {BOX_SIZE} cartuchos — tú eliges cuántos de cada calibre según lo que estés trabajando. Mismo precio de caja, mezcla a tu gusto.
           </p>
         </div>
       </section>
@@ -124,7 +125,7 @@ export default function AgujasSurtidasPage() {
             <p className="text-zinc-400 uppercase tracking-[0.2em] text-sm mb-2">Aún estamos cargando esta opción</p>
             <p className="text-zinc-600 text-sm mb-6 max-w-sm mx-auto">Escríbenos y armamos tu caja surtida manualmente mientras la activamos en el catálogo.</p>
             <a
-              href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero una caja surtida de agujas (20 unidades, mezcla de calibres).')}`}
+              href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero una caja surtida de cartuchos (20 unidades, mezcla de calibres).')}`}
               target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-black font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-blue-400 transition"
             >
@@ -142,7 +143,7 @@ export default function AgujasSurtidasPage() {
               <p className="text-white font-black text-xl">{fmtPrecio(caja.price) || 'Consultar'}</p>
             </div>
             <div className="text-right">
-              <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] mb-1">Agujas elegidas</p>
+              <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] mb-1">Cartuchos elegidos</p>
               <p className={`font-black text-xl ${completa ? 'text-green-500' : 'text-white'}`}>{total}/{BOX_SIZE}</p>
             </div>
           </div>
@@ -182,7 +183,7 @@ export default function AgujasSurtidasPage() {
 
           {!completa && (
             <p className="text-zinc-500 text-xs text-center mb-4">
-              Faltan <span className="text-white font-bold">{restantes}</span> aguja{restantes !== 1 ? 's' : ''} para completar la caja.
+              Faltan <span className="text-white font-bold">{restantes}</span> cartucho{restantes !== 1 ? 's' : ''} para completar la caja.
             </p>
           )}
 
