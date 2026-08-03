@@ -2,24 +2,25 @@ import { useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import NavbarCategory from '../../NavbarCategory'
 import FooterSupply from '../../FooterSupply'
-import { Minus, Plus, ShoppingCart } from 'lucide-react'
+import { Minus, Plus, ShoppingCart, X } from 'lucide-react'
 import { fetchCatalogCategoria } from '../../../../hooks/useCatalog'
 import { useSupplyCart } from '../../../../contexts/SupplyCartContext'
 
 const WA = '573207911013'
 const BOX_SIZE = 20
 
-// Mismos calibres que ya explica CartridgesPage.jsx (guide) — la caja
-// surtida se arma con estos, no con toda la variedad de cartuchos del
-// catálogo (2026-08-02, corregido de Agujas a Cartuchos por pedido
-// explícito de Jose).
-const CALIBRES = [
-  { key: 'RL',     label: 'RL Liner',          sub: 'Contornos y trazos finos' },
-  { key: 'RS',     label: 'RS Shader',         sub: 'Rellenos pequeños' },
-  { key: 'M1',     label: 'M1 Magnum',         sub: 'Fondos y sombras' },
-  { key: 'CM',     label: 'CM Curved Magnum',  sub: 'Degradados sin bordes' },
-  { key: 'Bugpin', label: 'Bugpin',            sub: 'Detalle extremo' },
-]
+// Cada calibre trae varias referencias numeradas (RL3, RL5, RL7...), no es
+// un solo tamaño — corregido 2026-08-02 tras reportarlo Jose ("hay mucha
+// variedad por referencia"). Rangos estándar de la industria, extendidos
+// según lo que aclaró Jose: las curvas (CM/RM) llegan hasta la 25.
+const CALIBRES = {
+  RL:     { label: 'RL Liner',         sub: 'Contornos y trazos finos', refs: ['1','3','5','7','9','11','13','15'] },
+  RS:     { label: 'RS Shader',        sub: 'Rellenos pequeños',        refs: ['3','5','7','9','11','13','15'] },
+  M1:     { label: 'M1 Magnum',        sub: 'Fondos y sombras',         refs: ['5','7','9','11','13','15','17','19','21'] },
+  CM:     { label: 'CM Curved Magnum', sub: 'Degradados sin bordes',    refs: ['5','7','9','11','13','15','17','19','21','23','25'] },
+  Bugpin: { label: 'Bugpin',           sub: 'Detalle extremo',          refs: ['3','5','7','9','11','13'] },
+}
+const CALIBRE_KEYS = Object.keys(CALIBRES)
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
@@ -50,12 +51,30 @@ function findCajaSurtida(products) {
 
 export async function loader() {
   const { products } = await fetchCatalogCategoria('supply', 'Cartuchos')
-  return { caja: findCajaSurtida(products) }
+  // Marcas detectadas con stock real en la categoría Cartuchos (campo
+  // `marca` que ya trae /api/catalog/:module por producto) — solo se
+  // ofrecen las que existen en inventario ahora mismo, para no prometer
+  // una marca que no hay (2026-08-02, pedido de Jose).
+  const marcas = [...new Set(products.map(p => p.marca).filter(Boolean))].sort()
+  // Precio representativo por marca (primera variante del primer producto
+  // de esa marca) — la caja surtida hereda el mismo precio que esa marca
+  // ya tiene publicado en la web, sin inventar un precio aparte. Jose ya
+  // cobra por caja según su propia política (ver FAQ de CartridgesPage:
+  // "por caja de 10 o 20 unidades según la referencia"), así que no hace
+  // falta un producto "Caja Surtida" separado cuando hay marca elegida
+  // (2026-08-02, pedido de Jose).
+  const preciosPorMarca = {}
+  products.forEach(p => {
+    if (!p.marca || preciosPorMarca[p.marca]) return
+    const v = p.variantes?.[0]
+    if (v) preciosPorMarca[p.marca] = { id: v.id, price: v.price, productName: p.name }
+  })
+  return { caja: findCajaSurtida(products), marcas, preciosPorMarca }
 }
 
 export function meta() {
   const title = 'Arma tu Caja Surtida de Cartuchos | INKognito Supply — Chigorodó'
-  const description = 'Caja de 20 cartuchos de tatuaje surtida a tu gusto — elige la mezcla de calibres (RL, RS, M1, CM, Bugpin) que necesitas para tu trabajo. Envíos a Urabá y Colombia.'
+  const description = 'Caja de 20 cartuchos de tatuaje surtida a tu gusto — elige la referencia exacta (RL, RS, M1, CM, Bugpin) que necesitas para tu trabajo. Envíos a Urabá y Colombia.'
   return [
     { title },
     { name: 'description', content: description },
@@ -66,45 +85,75 @@ export function meta() {
 }
 
 export default function CartuchosSurtidosPage() {
-  const { caja } = useLoaderData()
+  const { caja, marcas, preciosPorMarca } = useLoaderData()
   const { addItem } = useSupplyCart()
-  const [counts, setCounts] = useState(() => Object.fromEntries(CALIBRES.map(c => [c.key, 0])))
+
+  // null = "Cualquier marca disponible" (default) — solo se listan marcas
+  // que hoy tienen stock real en Cartuchos, ver loader().
+  const [marcaSel, setMarcaSel] = useState(null)
+  // Mezcla ya agregada a la caja: [{ calibre, numero, qty }] — un renglón
+  // por cada combinación calibre+referencia distinta que el cliente eligió.
+  const [mezcla, setMezcla] = useState([])
+  const [calibreSel, setCalibreSel] = useState('RL')
+  const [numeroSel, setNumeroSel] = useState(CALIBRES.RL.refs[0])
+  const [qtySel, setQtySel] = useState(1)
   const [added, setAdded] = useState(false)
 
-  const total = Object.values(counts).reduce((a, b) => a + b, 0)
+  const stepBase = marcas.length > 0 ? 1 : 0
+  const total = mezcla.reduce((a, m) => a + m.qty, 0)
   const restantes = BOX_SIZE - total
   const completa = total === BOX_SIZE
-  const precioMostrado = fmtPrecio(caja?.price)
+  // Con marca elegida, el precio/id vienen del producto real de esa marca
+  // en inventory — sin marca (o si esa marca no trajo precio), cae al
+  // producto "surtida" si existe, y si tampoco hay eso, queda "a cotizar".
+  const cajaMarca = marcaSel ? preciosPorMarca[marcaSel] : null
+  const fuentePrecio = cajaMarca || caja
+  const precioMostrado = fmtPrecio(fuentePrecio?.price)
 
-  const inc = (key) => {
-    if (total >= BOX_SIZE) return
-    setAdded(false)
-    setCounts(c => ({ ...c, [key]: c[key] + 1 }))
-  }
-  const dec = (key) => {
-    if (counts[key] <= 0) return
-    setAdded(false)
-    setCounts(c => ({ ...c, [key]: c[key] - 1 }))
+  const elegirCalibre = (key) => {
+    setCalibreSel(key)
+    setNumeroSel(CALIBRES[key].refs[0])
+    setQtySel(1)
   }
 
-  const handleAgregar = () => {
+  const agregarReferencia = () => {
+    if (restantes <= 0) return
+    const qty = Math.min(qtySel, restantes)
+    setAdded(false)
+    setMezcla(prev => {
+      const idx = prev.findIndex(m => m.calibre === calibreSel && m.numero === numeroSel)
+      if (idx >= 0) {
+        const copy = [...prev]
+        copy[idx] = { ...copy[idx], qty: copy[idx].qty + qty }
+        return copy
+      }
+      return [...prev, { calibre: calibreSel, numero: numeroSel, qty }]
+    })
+    setQtySel(1)
+  }
+
+  const quitarReferencia = (calibre, numero) => {
+    setAdded(false)
+    setMezcla(prev => prev.filter(m => !(m.calibre === calibre && m.numero === numero)))
+  }
+
+  const handleAgregarCaja = () => {
     if (!completa) return
-    const mixLabel = CALIBRES
-      .filter(c => counts[c.key] > 0)
-      .map(c => `${counts[c.key]} ${c.key}`)
-      .join(', ')
-    // inventoryId queda null cuando no hay producto real en inventory — el
-    // panel simplemente no descuenta stock automático para esta línea,
-    // igual que cualquier otro ítem "bajo pedido" sin ficha propia.
+    const calibresLabel = mezcla.map(m => `${m.qty} ${m.calibre}${m.numero}`).join(', ')
+    const mixLabel = marcaSel ? `Marca: ${marcaSel} — ${calibresLabel}` : calibresLabel
+    // inventoryId queda null cuando no hay producto real en inventory (ni
+    // de la marca elegida ni "surtida") — el panel simplemente no descuenta
+    // stock automático para esta línea, igual que cualquier otro ítem
+    // "bajo pedido" sin ficha propia.
     addItem({
       id: `surtida-${Date.now()}`,
-      inventoryId: caja?.id ?? null,
-      name: caja?.productName || 'Caja Surtida x20 — Cartuchos',
+      inventoryId: fuentePrecio?.id ?? null,
+      name: fuentePrecio?.productName || 'Caja Surtida x20 — Cartuchos',
       price: precioMostrado || 'A cotizar',
-      brand: 'Bajo pedido',
+      brand: marcaSel || 'Bajo pedido',
       mixLabel,
     }, 'cartuchos-surtidos')
-    setCounts(Object.fromEntries(CALIBRES.map(c => [c.key, 0])))
+    setMezcla([])
     setAdded(true)
   }
 
@@ -121,7 +170,7 @@ export default function CartuchosSurtidosPage() {
             Arma tu <span className="text-blue-500">Caja Surtida</span>
           </h1>
           <p className="text-zinc-400 leading-relaxed text-justify [hyphens:auto]">
-            Una caja trae {BOX_SIZE} cartuchos — tú eliges cuántos de cada calibre según lo que estés trabajando. La agregamos a tu carrito y puedes seguir comprando otros insumos: todo se pide junto, en un solo pedido.
+            Una caja trae {BOX_SIZE} cartuchos — elige calibre, referencia exacta y cantidad, una por una, hasta completar la caja. La agregamos a tu carrito y puedes seguir comprando otros insumos: todo se pide junto, en un solo pedido.
           </p>
         </div>
       </section>
@@ -131,7 +180,9 @@ export default function CartuchosSurtidosPage() {
         {/* PRECIO + PROGRESO */}
         <div className="flex items-center justify-between mb-6 border border-zinc-800 bg-zinc-900/40 rounded-2xl px-5 py-4">
           <div>
-            <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] mb-1">Precio de la caja</p>
+            <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] mb-1">
+              Precio de la caja{marcaSel ? ` — ${marcaSel}` : ''}
+            </p>
             <p className="text-white font-black text-xl">{precioMostrado || 'Se confirma contigo'}</p>
           </div>
           <div className="text-right">
@@ -140,38 +191,125 @@ export default function CartuchosSurtidosPage() {
           </div>
         </div>
 
-        {/* SELECTOR POR CALIBRE */}
-        <div className="space-y-3 mb-6">
-          {CALIBRES.map(c => (
-            <div key={c.key} className="flex items-center justify-between gap-3 border border-zinc-800 bg-zinc-900/40 rounded-xl px-4 py-3">
-              <div className="min-w-0">
-                <p className="font-black uppercase text-sm text-white truncate">{c.label}</p>
-                <p className="text-zinc-500 text-xs truncate">{c.sub}</p>
-              </div>
-              <div className="flex items-center gap-0 border border-zinc-700 rounded flex-shrink-0">
+        {/* PASO 1 — MARCA (opcional, solo si hay marcas con stock detectadas) */}
+        {marcas.length > 0 && (
+          <>
+            <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] mb-2">1. Elige la marca (opcional)</p>
+            <div className="flex gap-1.5 flex-wrap mb-6">
+              <button
+                type="button"
+                onClick={() => setMarcaSel(null)}
+                className={`px-3.5 py-2 rounded-lg text-xs font-black uppercase tracking-wide transition-all duration-200 ${
+                  marcaSel === null ? 'bg-blue-500 text-black' : 'bg-zinc-900 text-zinc-400 border border-zinc-700 hover:border-zinc-500'
+                }`}
+              >
+                Cualquier marca
+              </button>
+              {marcas.map(m => (
                 <button
+                  key={m}
                   type="button"
-                  onClick={() => dec(c.key)}
-                  disabled={counts[c.key] <= 0}
-                  className="px-3 py-2 text-zinc-400 hover:text-white hover:bg-zinc-800 disabled:opacity-30 disabled:hover:bg-transparent transition-all duration-200"
+                  onClick={() => setMarcaSel(m)}
+                  className={`px-3.5 py-2 rounded-lg text-xs font-black uppercase tracking-wide transition-all duration-200 ${
+                    marcaSel === m ? 'bg-blue-500 text-black' : 'bg-zinc-900 text-zinc-400 border border-zinc-700 hover:border-zinc-500'
+                  }`}
                 >
-                  <Minus size={14} />
+                  {m}
                 </button>
-                <span className="px-3 py-2 text-sm font-bold text-white border-x border-zinc-700 min-w-[2.5rem] text-center">
-                  {counts[c.key]}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => inc(c.key)}
-                  disabled={total >= BOX_SIZE}
-                  className="px-3 py-2 text-zinc-400 hover:text-white hover:bg-zinc-800 disabled:opacity-30 disabled:hover:bg-transparent transition-all duration-200"
-                >
-                  <Plus size={14} />
-                </button>
-              </div>
+              ))}
             </div>
+          </>
+        )}
+
+        {/* PASO — CALIBRE */}
+        <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] mb-2">{stepBase + 1}. Elige el calibre</p>
+        <div className="flex gap-1.5 flex-wrap mb-4">
+          {CALIBRE_KEYS.map(key => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => elegirCalibre(key)}
+              className={`px-3.5 py-2 rounded-lg text-xs font-black uppercase tracking-wide transition-all duration-200 ${
+                calibreSel === key ? 'bg-blue-500 text-black' : 'bg-zinc-900 text-zinc-400 border border-zinc-700 hover:border-zinc-500'
+              }`}
+            >
+              {key}
+            </button>
           ))}
         </div>
+        <p className="text-zinc-500 text-xs mb-4 -mt-2">{CALIBRES[calibreSel].label} — {CALIBRES[calibreSel].sub}</p>
+
+        {/* PASO — REFERENCIA */}
+        <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] mb-2">{stepBase + 2}. Elige la referencia</p>
+        <div className="flex gap-1.5 flex-wrap mb-4">
+          {CALIBRES[calibreSel].refs.map(n => (
+            <button
+              key={n}
+              type="button"
+              onClick={() => setNumeroSel(n)}
+              className={`w-10 h-10 rounded-lg text-sm font-black transition-all duration-200 ${
+                numeroSel === n ? 'bg-blue-500 text-black' : 'bg-zinc-900 text-zinc-400 border border-zinc-700 hover:border-zinc-500'
+              }`}
+            >
+              {n}
+            </button>
+          ))}
+        </div>
+
+        {/* PASO — CANTIDAD + AGREGAR */}
+        <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] mb-2">{stepBase + 3}. Cantidad de {calibreSel}{numeroSel}</p>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center gap-0 border border-zinc-700 rounded flex-shrink-0">
+            <button
+              type="button"
+              onClick={() => setQtySel(q => Math.max(1, q - 1))}
+              className="px-3 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all duration-200"
+            >
+              <Minus size={14} />
+            </button>
+            <span className="px-4 py-2.5 text-sm font-bold text-white border-x border-zinc-700 min-w-[3rem] text-center">
+              {qtySel}
+            </span>
+            <button
+              type="button"
+              onClick={() => setQtySel(q => Math.min(restantes, q + 1))}
+              disabled={qtySel >= restantes}
+              className="px-3 py-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800 disabled:opacity-30 disabled:hover:bg-transparent transition-all duration-200"
+            >
+              <Plus size={14} />
+            </button>
+          </div>
+          <button
+            type="button"
+            onClick={agregarReferencia}
+            disabled={restantes <= 0}
+            className="flex-1 py-2.5 rounded-lg bg-zinc-800 border border-zinc-700 text-white font-bold uppercase tracking-[0.1em] text-xs hover:border-blue-500 hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
+          >
+            + Agregar a la caja
+          </button>
+        </div>
+
+        {/* TU MEZCLA */}
+        {mezcla.length > 0 && (
+          <div className="mb-6">
+            <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] mb-2">Tu mezcla</p>
+            <div className="space-y-2">
+              {mezcla.map(m => (
+                <div key={`${m.calibre}-${m.numero}`} className="flex items-center justify-between gap-3 border border-zinc-800 bg-zinc-900/40 rounded-lg px-4 py-2.5">
+                  <span className="text-sm font-bold text-white">{m.qty}x {m.calibre}{m.numero}</span>
+                  <button
+                    type="button"
+                    onClick={() => quitarReferencia(m.calibre, m.numero)}
+                    className="text-zinc-600 hover:text-red-500 transition-colors duration-200"
+                    aria-label={`Quitar ${m.calibre}${m.numero}`}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {!completa && (
           <p className="text-zinc-500 text-xs text-center mb-4">
@@ -181,7 +319,7 @@ export default function CartuchosSurtidosPage() {
 
         <button
           type="button"
-          onClick={handleAgregar}
+          onClick={handleAgregarCaja}
           disabled={!completa}
           className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-blue-500 text-black font-black uppercase tracking-[0.15em] text-sm hover:bg-blue-400 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-blue-500"
         >
@@ -214,7 +352,7 @@ export default function CartuchosSurtidosPage() {
         <p className="text-center text-zinc-600 text-xs mt-6">
           ¿Prefieres coordinarlo por chat?{' '}
           <a
-            href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero una caja surtida de cartuchos (20 unidades, mezcla de calibres).')}`}
+            href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero una caja surtida de cartuchos (20 unidades, mezcla de calibres y referencias).')}`}
             target="_blank" rel="noopener noreferrer"
             className="text-blue-400 hover:text-blue-300 underline underline-offset-2"
           >
