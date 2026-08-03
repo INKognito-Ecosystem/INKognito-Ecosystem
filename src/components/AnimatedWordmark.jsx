@@ -1,36 +1,37 @@
 import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion } from 'motion/react'
 
 // Animación de entrada del logo de cada módulo (Store/Supply/Gym/Suple):
 // "INKOGNITO" se desliza hacia la izquierda y desaparece (como si se
 // incrustara en el logo, a su izquierda), mientras el nombre del módulo
-// se desliza a la izquierda para ocupar su lugar — un solo gesto fluido.
+// ocupa su lugar.
 //
-// v4 (2026-08-02) — probamos 2 enfoques que no quedaron bien:
-//   v2: AnimatePresence (sin popLayout) + `layout` en el hermano — el
-//       hermano solo empieza a reacomodarse DESPUÉS de que termina de
-//       salir "INKOGNITO" (son dos animaciones en serie, no en paralelo),
-//       se sentía brusco.
-//   v3: animar el `width` del contenedor de "INKOGNITO " de 'auto' a 0 —
-//       el texto se recorta con overflow:hidden mientras se encoge, lo
-//       cual se ve mal (texto "cortado"/pegado) en vez de deslizarse.
-// Acá con `AnimatePresence mode="popLayout"`: al desmontar "INKOGNITO",
-// Motion lo saca del flujo (position:absolute) de inmediato para que el
-// hermano con `layout` reaccione y se deslice EN PARALELO, no después —
-// ambos son animaciones de transform puras (x/opacity), sin recorte de
-// texto ni tranco. Este es el patrón que Framer Motion documenta
-// específicamente para "un ítem sale, los hermanos se deslizan a la vez
-// para llenar el espacio".
+// v2 (2026-08-02) — la primera versión usaba AnimatePresence + `layout` en
+// el span vecino: eso anima en DOS pasos (primero termina de salir
+// "INKOGNITO", RECIÉN AHÍ arranca el reflow del nombre del módulo), lo que
+// se sentía "brusco" en vez de un solo movimiento fluido. Acá en cambio se
+// anima el `width` del contenedor de "INKOGNITO " de 'auto' a 0 (motion
+// soporta animar hacia/desde 'auto'), Y el nombre del módulo trae su
+// propio `x` explícito sincronizado con el mismo estado/transition — así
+// los dos se mueven a la vez, con la misma curva de tiempo, en un solo
+// gesto continuo en vez de que el nombre del módulo solo "salte" a su
+// lugar por el reflow pasivo del hermano encogiéndose.
 //
-// El wordmark solo se anima una vez por módulo por sesión — cada Navbar*
-// vive dentro de la página (no en un layout persistente en root.jsx), así
-// que sin esto la intro se repetía en cada navegación dentro del mismo
-// módulo. Se guarda en sessionStorage (una key por nombre de módulo): una
-// vez visto, el wordmark monta directamente colapsado (sin animar) en
-// cualquier otra ruta de ese módulo.
+// v3 (2026-08-02) — cada Navbar* vive dentro de la página (no en un layout
+// persistente en root.jsx), así que sin esto la animación se repetía en
+// CADA navegación dentro del mismo módulo (ej. Store → Store/ropa-dama
+// volvía a mostrar "INKOGNITO STORE" completo) — Jose lo reportó: una vez
+// que "INKOGNITO" se esconde, debe quedar escondido en todas las rutas del
+// módulo, no solo en la página principal. Se guarda en sessionStorage,
+// una key por nombre de módulo, para que la intro solo se vea una vez por
+// sesión y de ahí en adelante cada Navbar* monte ya colapsado (sin
+// animar) en cualquier página de ese módulo.
 export default function AnimatedWordmark({ moduleWord, accentClassName = 'text-white', className = '' }) {
   const storageKey = `inkognito-wordmark-seen-${moduleWord}`
   const [collapsed, setCollapsed] = useState(false)
+  // Cuando ya se vio antes en esta sesión, la transición pasa a duración 0
+  // — colapsa de inmediato en el primer efecto post-hidratación en vez de
+  // animar, evitando repetir el gesto en cada página nueva.
   const [skipAnimation, setSkipAnimation] = useState(false)
 
   useEffect(() => {
@@ -54,22 +55,17 @@ export default function AnimatedWordmark({ moduleWord, accentClassName = 'text-w
 
   return (
     <span className={`inline-flex items-baseline ${className}`}>
-      <AnimatePresence mode="popLayout" initial={false}>
-        {!collapsed && (
-          <motion.span
-            key="prefix"
-            exit={{ opacity: 0, x: -20 }}
-            transition={transition}
-            className="whitespace-nowrap"
-          >
-            <span className="text-white">INK</span>
-            <span className={accentClassName}>OGNITO</span>
-            {' '}
-          </motion.span>
-        )}
-      </AnimatePresence>
       <motion.span
-        layout
+        animate={{ width: collapsed ? 0 : 'auto', opacity: collapsed ? 0 : 1 }}
+        transition={transition}
+        style={{ display: 'inline-block', overflow: 'hidden', whiteSpace: 'nowrap' }}
+      >
+        <span className="text-white">INK</span>
+        <span className={accentClassName}>OGNITO</span>
+        {' '}
+      </motion.span>
+      <motion.span
+        animate={{ x: collapsed ? 0 : 18 }}
         transition={transition}
         className={`${accentClassName} whitespace-nowrap`}
       >
