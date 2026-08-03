@@ -52,7 +52,7 @@ export default function CartDrawerSuple({ open, onClose }) {
             <h2 className="font-black uppercase tracking-[0.2em] text-lg text-white flex items-center gap-2">
               Carrito
               {count > 0 && (
-                <span className="bg-green-500 text-gray-950 text-[10px] font-black px-2 py-0.5 rounded-full">
+                <span className="bg-white text-gray-950 text-[10px] font-black px-2 py-0.5 rounded-full">
                   {count}
                 </span>
               )}

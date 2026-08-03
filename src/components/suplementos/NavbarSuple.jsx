@@ -25,7 +25,7 @@ export default function NavbarSuple() {
               <span>
                 <AnimatedWordmark
                   moduleWord="SUPLE"
-                  accentClassName="text-green-500"
+                  accentClassName="text-[#9E9E9E]"
                   className="font-black uppercase tracking-wide md:tracking-[0.2em] text-xl md:text-2xl"
                 />
                 <span className="block text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-500 whitespace-nowrap">
@@ -43,7 +43,7 @@ export default function NavbarSuple() {
               >
                 <ShoppingCart size={20} />
                 {count > 0 && (
-                  <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] rounded-full bg-green-500 text-gray-950 text-[9px] font-black flex items-center justify-center px-0.5">
+                  <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] rounded-full bg-white text-gray-950 text-[9px] font-black flex items-center justify-center px-0.5">
                     {count > 99 ? '99+' : count}
                   </span>
                 )}

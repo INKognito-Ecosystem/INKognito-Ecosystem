@@ -20,10 +20,10 @@ export default function FooterSuple() {
           {/* IZQUIERDA */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <FlaskConical size={20} className="text-green-500" />
+              <FlaskConical size={20} className="text-[#9E9E9E]" />
               <h2 className="text-2xl font-black uppercase tracking-[0.15em]">
                 <span className="text-white">INK</span>
-                <span className="text-green-500">OGNITO SUPLE</span>
+                <span className="text-[#9E9E9E]">OGNITO SUPLE</span>
               </h2>
             </div>
             <p className="text-gray-500 leading-relaxed max-w-sm">

@@ -5,7 +5,7 @@ import FooterSuple from './FooterSuple'
 import { fetchCatalogFull } from '../../hooks/useCatalog'
 import { useSupleCart } from '../../contexts/SupleCartContext'
 import ProductImageGallery from '../ProductImageGallery'
-import { FlaskConical, ExternalLink } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 
 const VAR_THRESHOLD = 3
 
@@ -151,6 +151,13 @@ const GRID_PATTERN = {
     'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
 }
 
+// Mismo patrón punteado que ya usan las secciones de cobertura/contacto de
+// Supply y Store (2026-08-02, "mismo patrón que las demás páginas").
+const DOT_PATTERN = {
+  backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
+  backgroundSize: '18px 18px',
+}
+
 export async function loader() {
   return fetchCatalogFull('suplementos')
 }
@@ -215,24 +222,65 @@ export default function SuplePage() {
     <div className="min-h-screen bg-gray-950 text-white">
       <NavbarSuple />
 
-      {/* HERO */}
-      <section className="relative pt-24 md:pt-32 pb-6 md:pb-10 px-4 md:px-6 overflow-hidden">
+      {/* HERO — misma presentación de módulo que Store/Supply/Gym (eyebrow +
+          título grande + descripción + CTAs + stats), en vez de la card
+          de categoría heredada de cuando esto era una página de Gym
+          (2026-08-02, pedido explícito de Jose: "vamos a darle su
+          presentación, como los demás módulos"). Resplandor gris (#9E9E9E,
+          el color propio de Suple) bajo el navbar, mismo recurso que
+          usan Gym/Store. */}
+      <section className="relative min-h-[55vh] md:min-h-[75vh] flex flex-col justify-start overflow-hidden pt-24 md:pt-32 pb-8 md:pb-14 px-4 md:px-6">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
-        <div className="relative z-10 max-w-7xl mx-auto">
-          <div className="flex items-center justify-center md:justify-between gap-3 md:gap-4 mb-4">
-            <h1 className="text-2xl md:text-7xl font-black uppercase leading-none text-center md:text-left">
-              Suple<span className="text-gray-400">mentos</span>
-            </h1>
-            <FlaskConical size={40} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
-          </div>
-          <p className="text-gray-400 leading-relaxed max-w-2xl text-justify [hyphens:auto]">
-            Proteína, creatina, pre-entreno y vitaminas de marcas confiables, con stock real y despacho rápido para complementar tu entrenamiento — selección de calidad con envíos a toda Colombia desde Urabá, Antioquia.
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] max-w-[90vw] h-[280px] rounded-full bg-[#9E9E9E]/10 blur-3xl pointer-events-none" />
+        <div className="relative z-10 max-w-7xl mx-auto text-center md:text-left">
+          <p className="uppercase tracking-[0.4em] text-[#9E9E9E] text-xs md:text-sm mb-4 md:mb-6 font-semibold">
+            INKognito Suple — Urabá, Antioquia
           </p>
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-black uppercase leading-[0.9] mb-6 md:mb-8">
+            <span className="block text-white">Suplementos</span>
+            <span className="block text-[#9E9E9E]">Para Rendir</span>
+          </h1>
+          <p className="text-gray-300 text-base md:text-xl leading-relaxed max-w-2xl mx-auto md:mx-0 mb-8 md:mb-12">
+            Proteína, creatina y pre-entreno de marcas confiables, con stock real y despacho rápido — selección de calidad con envíos desde Urabá a toda Colombia.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+            <button
+              onClick={() => document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-10 py-4 uppercase tracking-[0.25em] font-black text-sm text-black transition-all duration-300 hover:brightness-90"
+              style={{ backgroundColor: '#9E9E9E' }}
+            >
+              Ver Catálogo
+            </button>
+            <a
+              href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero ver el catálogo de INKognito Suple')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:flex px-10 py-4 uppercase tracking-[0.25em] font-bold text-sm border border-gray-700 text-gray-300 hover:border-[#9E9E9E] hover:text-[#9E9E9E] transition-all duration-300 items-center justify-center gap-2"
+            >
+              WhatsApp
+            </a>
+          </div>
+
+          {/* STATS */}
+          <div className="mt-8 md:mt-16 grid grid-cols-3 gap-6 max-w-xl mx-auto md:mx-0">
+            <div className="text-center md:text-left">
+              <p className="text-3xl md:text-5xl font-black text-[#9E9E9E]">4</p>
+              <p className="text-gray-500 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Municipios</p>
+            </div>
+            <div className="text-center md:text-left border-x md:border-x-0 md:border-l border-gray-800 md:pl-6">
+              <p className="text-3xl md:text-5xl font-black text-[#9E9E9E]">100%</p>
+              <p className="text-gray-500 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Stock real</p>
+            </div>
+            <div className="text-center md:text-left">
+              <p className="text-3xl md:text-5xl font-black text-[#9E9E9E]">24h</p>
+              <p className="text-gray-500 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Respuesta</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      <div className="pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto pt-6 md:pt-8">
+      <div id="catalogo" className="pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto pt-6 md:pt-8 scroll-mt-20">
 
         {productosActivos.length === 0 ? (
           <div className="border border-gray-800 bg-gray-900/30 rounded-2xl py-16 text-center">
@@ -285,9 +333,9 @@ export default function SuplePage() {
       </div>
 
       {/* ── SUPLEMENTOS AFILIADOS — sección fija, siempre visible ── */}
-      <section className="border-t-2 border-green-500/20 bg-[#0c0c0c] px-4 md:px-6 py-10 md:py-14">
+      <section className="border-t-2 border-[#9E9E9E]/20 bg-[#0c0c0c] px-4 md:px-6 py-10 md:py-14">
         <div className="max-w-7xl mx-auto">
-          <p className="text-green-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ Las marcas que no llegan al local, disponibles para ti</p>
+          <p className="text-[#9E9E9E] text-[10px] font-bold uppercase tracking-widest mb-1">✦ Las marcas que no llegan al local, disponibles para ti</p>
           <h2 className="text-2xl md:text-3xl font-black uppercase leading-none mb-2 text-white">
             Los suplementos que ya usan los que van en serio
           </h2>
@@ -299,7 +347,7 @@ export default function SuplePage() {
               {apiAfiliados.map((item, i) => {
                 const url = item.url_ventas || item.url_checkout || null
                 const inner = (
-                  <div className="border border-green-500/15 bg-gray-950 rounded-2xl overflow-hidden flex flex-col h-full hover:border-green-500/40 hover:shadow-[0_0_16px_rgba(34,197,94,0.08)] transition-all duration-300">
+                  <div className="border border-gray-700 bg-gray-950 rounded-2xl overflow-hidden flex flex-col h-full hover:border-gray-500 hover:shadow-[0_0_16px_rgba(158,158,158,0.15)] transition-all duration-300">
                     <div className="aspect-square w-full bg-gray-900 overflow-hidden flex-shrink-0 flex items-center justify-center">
                       {item.image_url
                         ? <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" loading="lazy" />
@@ -307,13 +355,13 @@ export default function SuplePage() {
                       }
                     </div>
                     <div className="p-3 flex flex-col gap-1.5 flex-1">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-green-400/70">Recurso externo · {item.plataforma || item.categoria}</span>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">Recurso externo · {item.plataforma || item.categoria}</span>
                       <h3 className="text-xs font-black uppercase leading-tight text-white">{item.name}</h3>
                       {item.descripcion && (
                         <p className="text-gray-500 text-[10px] leading-relaxed flex-1">{item.descripcion}</p>
                       )}
                       {url && (
-                        <span className="mt-auto pt-1 text-[9px] font-bold uppercase tracking-widest text-green-400 flex items-center gap-1">
+                        <span className="mt-auto pt-1 text-[9px] font-bold uppercase tracking-widest text-gray-300 flex items-center gap-1">
                           Ver producto <ExternalLink size={9} />
                         </span>
                       )}
@@ -326,14 +374,15 @@ export default function SuplePage() {
               })}
             </div>
           ) : (
-            <div className="border border-green-500/15 bg-gray-950 rounded-2xl p-6 text-center">
+            <div className="border border-gray-700 bg-gray-950 rounded-2xl p-6 text-center">
               <p className="text-gray-500 text-sm mb-4 max-w-sm mx-auto">
                 Aún no tenemos suplementos importados cargados. Avísanos y te contactamos apenas tengamos opciones disponibles.
               </p>
               <a
                 href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya suplementos disponibles en INKognito Suple.')}`}
                 target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 text-gray-950 font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-green-400 transition"
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-gray-950 font-bold uppercase tracking-[0.15em] text-xs rounded hover:brightness-90 transition"
+                style={{ backgroundColor: '#9E9E9E' }}
               >
                 Avisarme cuando haya stock →
               </a>
@@ -343,7 +392,9 @@ export default function SuplePage() {
       </section>
 
       {/* COBERTURA + CONTACTO — solo móvil */}
-      <section className="md:hidden border-t border-gray-800 bg-gray-950 px-4 py-8">
+      <section id="contacto" className="relative overflow-hidden md:hidden border-t border-gray-800 bg-gray-950 px-4 py-8">
+        <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+        <div className="relative z-10">
         <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">Llegamos donde estás</h2>
         <p className="text-gray-400 text-sm leading-relaxed mb-5">
           Contamos con transportadora aliada para entregas seguras y con pago contraentrega en toda la región de Urabá.
@@ -353,7 +404,7 @@ export default function SuplePage() {
             <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
           </div>
           <div className="flex flex-col justify-center bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 flex-1">
-            <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Eljach Transportadora</p>
+            <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Eljach Mensajería Express</p>
             <p className="text-gray-500 text-[10px] mt-0.5">Aliado logístico · Contra entrega</p>
           </div>
         </div>
@@ -390,22 +441,24 @@ export default function SuplePage() {
         >
           📱 Hacer mi pedido ahora
         </a>
+        </div>
       </section>
 
       {/* ── LOGÍSTICA + GARANTÍAS + CONTACTO — solo desktop ── */}
-      <section className="hidden md:block bg-gray-950 border-t border-gray-800 px-6 py-14">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-12">
+      <section id="contacto-desktop" className="relative overflow-hidden hidden md:block bg-gray-950 border-t border-gray-800 px-6 py-14">
+        <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+        <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-3 gap-12">
 
           {/* COL 1: LOGÍSTICA */}
           <div>
-            <p className="uppercase tracking-[0.25em] text-gray-500 text-[10px] mb-4">Logística · Cobertura</p>
+            <p className="uppercase tracking-[0.25em] text-[#9E9E9E] text-[10px] mb-4">Logística · Cobertura</p>
             <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Llegamos donde estás</h2>
             <div className="flex gap-3 mb-4">
               <div className="flex items-center justify-center bg-white rounded-xl p-2 flex-shrink-0 w-14 h-14">
                 <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
               </div>
               <div className="flex flex-col justify-center bg-black border border-gray-800 rounded-xl px-4 py-2.5 flex-1">
-                <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Eljach Transportadora</p>
+                <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Eljach Mensajería Express</p>
                 <p className="text-gray-500 text-xs mt-0.5">Aliado logístico · Contra entrega</p>
               </div>
             </div>
@@ -435,7 +488,7 @@ export default function SuplePage() {
 
           {/* COL 2: GARANTÍAS */}
           <div>
-            <p className="uppercase tracking-[0.25em] text-gray-500 text-[10px] mb-4">Garantías</p>
+            <p className="uppercase tracking-[0.25em] text-[#9E9E9E] text-[10px] mb-4">Garantías</p>
             <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Compra con Confianza</h2>
             <div className="flex flex-col gap-4">
               {[
@@ -458,7 +511,7 @@ export default function SuplePage() {
 
           {/* COL 3: CONTACTO */}
           <div>
-            <p className="uppercase tracking-[0.25em] text-gray-500 text-[10px] mb-4">Contacto</p>
+            <p className="uppercase tracking-[0.25em] text-[#9E9E9E] text-[10px] mb-4">Contacto</p>
             <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Hablemos</h2>
             <p className="text-gray-400 text-base leading-relaxed mb-7">
               ¿Tienes dudas sobre qué suplemento elegir o cómo combinarlo? Escríbenos y te asesoramos en minutos.
