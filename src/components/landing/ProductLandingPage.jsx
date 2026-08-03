@@ -303,17 +303,17 @@ export default function ProductLandingPage() {
                         <img src={warlockLogo} alt="Industrias Warlock" className="w-full h-full object-cover" />
                       </div>
                     )}
-                    {/* Mismo patrón para Nutri House (Suple) — el logo es un
-                        PNG/webp con fondo transparente (no una foto sólida
-                        como Warlock), así que la insignia lleva bg-white
-                        detrás para que no se vea "flotando" sobre la foto. */}
+                    {/* Nutri House (Suple) — el logo es un webp con fondo
+                        transparente, se deja libre sin círculo/plate (Jose,
+                        2026-08-03), con drop-shadow para que no se pierda
+                        sobre fotos claras. */}
                     {esNutriHouse && (
-                      <div
-                        className="absolute bottom-3 right-3 w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden border-2 border-white shadow-lg bg-white p-1.5"
+                      <img
+                        src={logoNutriHouse}
+                        alt="Nutri House"
                         title="Suministrado por Nutri House"
-                      >
-                        <img src={logoNutriHouse} alt="Nutri House" className="w-full h-full object-contain" />
-                      </div>
+                        className="absolute bottom-3 right-3 h-14 md:h-16 w-auto drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
+                      />
                     )}
                   </div>
                   {images.length > 1 && (
@@ -346,12 +346,12 @@ export default function ProductLandingPage() {
                     </div>
                   )}
                   {esNutriHouse && (
-                    <div
-                      className="absolute bottom-3 right-3 w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden border-2 border-white shadow-lg bg-white p-1.5"
+                    <img
+                      src={logoNutriHouse}
+                      alt="Nutri House"
                       title="Suministrado por Nutri House"
-                    >
-                      <img src={logoNutriHouse} alt="Nutri House" className="w-full h-full object-contain" />
-                    </div>
+                      className="absolute bottom-3 right-3 h-14 md:h-16 w-auto drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
+                    />
                   )}
                 </div>
               )
