@@ -1,0 +1,91 @@
+import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Menu, X, ShoppingCart } from 'lucide-react'
+import logoSuple from '../../assets/milogo/milogo.webp'
+import AnimatedWordmark from '../AnimatedWordmark'
+import { useSupleCart } from '../../contexts/SupleCartContext'
+import CartDrawerSuple from './CartDrawerSuple'
+
+export default function NavbarSuple() {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const { count } = useSupleCart()
+
+  const close = () => setMenuOpen(false)
+
+  return (
+    <>
+      <nav className="fixed top-0 left-0 w-full z-50 bg-gray-950 border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="h-16 md:h-20 flex items-center justify-between">
+
+            {/* LOGO */}
+            <Link to="/suplementos" className="flex items-center gap-2">
+              <img src={logoSuple} alt="INKognito Suple" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
+              <span>
+                <AnimatedWordmark
+                  moduleWord="SUPLE"
+                  accentClassName="text-green-500"
+                  className="font-black uppercase tracking-wide md:tracking-[0.2em] text-xl md:text-2xl"
+                />
+                <span className="block text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-500 whitespace-nowrap">
+                  Tienda Online
+                </span>
+              </span>
+            </Link>
+
+            {/* CARRITO + HAMBURGUESA */}
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setDrawerOpen(true)}
+                className="relative text-gray-400 hover:text-white transition-all duration-300"
+                aria-label="Abrir carrito"
+              >
+                <ShoppingCart size={20} />
+                {count > 0 && (
+                  <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] rounded-full bg-green-500 text-gray-950 text-[9px] font-black flex items-center justify-center px-0.5">
+                    {count > 99 ? '99+' : count}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="text-gray-400 hover:text-white transition-all duration-300"
+              >
+                {menuOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* DROPDOWN MÓVIL */}
+        {menuOpen && (
+          <div className="absolute right-4 top-16 md:top-20 bg-gray-950 border border-gray-700 w-56 z-50">
+            <Link to="/suplementos" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
+              Inicio
+            </Link>
+            <div className="border-t border-gray-800 mt-1 pt-1">
+              <Link to="/jhumaneztattoo" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
+                JHumanezTattoo
+              </Link>
+              <Link to="/supply" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
+                INKognito Supply
+              </Link>
+              <Link to="/store" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
+                INKognito Store
+              </Link>
+              <Link to="/gym" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
+                INKognito Gym
+              </Link>
+              <Link to="/" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
+                Ecosistema
+              </Link>
+            </div>
+          </div>
+        )}
+      </nav>
+
+      <CartDrawerSuple open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+    </>
+  )
+}

@@ -4,6 +4,7 @@ import { HelmetProvider } from 'react-helmet-async'
 import { SupplyCartProvider } from './contexts/SupplyCartContext'
 import { StoreCartProvider } from './contexts/StoreCartContext'
 import { GymCartProvider } from './contexts/GymCartContext'
+import { SupleCartProvider } from './contexts/SupleCartContext'
 import './index.css'
 
 const ORGANIZATION_JSONLD = {
@@ -246,9 +247,11 @@ export default function Root() {
       <SupplyCartProvider>
         <StoreCartProvider>
           <GymCartProvider>
-            <ScrollToHash />
-            <NavigationProgress />
-            <Outlet />
+            <SupleCartProvider>
+              <ScrollToHash />
+              <NavigationProgress />
+              <Outlet />
+            </SupleCartProvider>
           </GymCartProvider>
         </StoreCartProvider>
       </SupplyCartProvider>

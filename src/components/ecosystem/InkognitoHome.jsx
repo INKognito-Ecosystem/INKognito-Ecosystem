@@ -91,6 +91,13 @@ export default function InkognitoHome() {
           >
             Gym
           </Link>
+
+          <Link
+            to="/suplementos"
+            className="w-full py-3 sm:py-4 bg-zinc-700 rounded text-center uppercase tracking-[0.3em] font-black hover:bg-green-600 transition-all duration-300"
+          >
+            Suple
+          </Link>
         </div>
 
       </div>

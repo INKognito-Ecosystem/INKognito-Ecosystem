@@ -1,13 +1,11 @@
 import { useState } from 'react'
-import { Link, useLoaderData } from 'react-router-dom'
-import NavbarGym from '../NavbarGym'
-import FooterGym from '../FooterGym'
-import { fetchCatalogFull } from '../../../hooks/useCatalog'
-import { useGymCart } from '../../../contexts/GymCartContext'
-import ProductImageGallery from '../../ProductImageGallery'
-import { FlaskConical, ExternalLink, ArrowLeft, ArrowRight } from 'lucide-react'
-import { getAdjacentCategories } from '../../../data/gymCategoriesOrder'
-import { useScrolled } from '../../../hooks/useScrolled'
+import { useLoaderData } from 'react-router-dom'
+import NavbarSuple from './NavbarSuple'
+import FooterSuple from './FooterSuple'
+import { fetchCatalogFull } from '../../hooks/useCatalog'
+import { useSupleCart } from '../../contexts/SupleCartContext'
+import ProductImageGallery from '../ProductImageGallery'
+import { FlaskConical, ExternalLink } from 'lucide-react'
 
 const VAR_THRESHOLD = 3
 
@@ -15,9 +13,6 @@ function VariantSelectorSupl({ variantes, selIdx, onChange }) {
   const [open, setOpen] = useState(false)
   if (!variantes || variantes.length === 0) return null
 
-  // Presentación única (ej. "2lb") — no hay nada que elegir, pero igual debe
-  // verse cuál es, en vez de desaparecer por completo (mismo criterio que
-  // SizeSelector en StoreProductCard.jsx, reportado 2026-08-02).
   if (variantes.length === 1) {
     return variantes[0].variant ? (
       <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wide">
@@ -89,9 +84,6 @@ function SuplCard({ p, onAddToCart, enCarrito }) {
     ? [sel.image_url, sel.image_url_2, sel.image_url_3].filter(Boolean)
     : (p.images?.length ? p.images : [p.image].filter(Boolean))
 
-  // Descripción de la presentación seleccionada si tiene la suya propia; si
-  // no, la del producto — mismo criterio que Store/Supply. Antes no se
-  // mostraba en absoluto acá (reportado 2026-08-02).
   const description = sel.descripcion || p.descripcion
 
   return (
@@ -107,10 +99,7 @@ function SuplCard({ p, onAddToCart, enCarrito }) {
         <span className="text-white font-black text-sm">{precio}</span>
         {description && (
           <>
-            {/* Escritorio — texto completo, debajo de nombre/precio */}
             <p className="hidden md:block text-gray-500 text-[9.5px] leading-snug">{description}</p>
-            {/* Móvil — botón que abre modal, mismo patrón que
-                StoreProductCard.jsx/SupplyProductCard.jsx (2026-08-02) */}
             <button
               type="button"
               onClick={() => setShowDesc(true)}
@@ -167,26 +156,23 @@ export async function loader() {
 }
 
 export function meta() {
-  const title = 'Suplementos Deportivos | INKognito Gym — Urabá y Colombia'
+  const title = 'Suplementos Deportivos | INKognito Suple — Urabá y Colombia'
   const description = 'Proteína, creatina, pre-entreno y vitaminas para potenciar tu entrenamiento. Suplementos deportivos en Urabá, Chigorodó, Antioquia. Envíos a toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },
     { property: 'og:title', content: title },
     { property: 'og:description', content: description },
-    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/gym/suplementos` },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/suplementos` },
   ]
 }
 
-export default function SuplementosPage() {
+export default function SuplePage() {
   const [filtro, setFiltro]   = useState('Todos')
   const [visible, setVisible] = useState(PAGE_SIZE)
   const { allProducts: apiProds } = useLoaderData()
-  const { addItem, items: cartItems } = useGymCart()
-  const { prev, next } = getAdjacentCategories('suplementos')
-  const scrolled = useScrolled()
+  const { addItem, items: cartItems } = useSupleCart()
 
-  // Separar físicos de afiliados — afiliados van a su propia sección
   const apiFisicos   = apiProds.filter(item => (item.tipo || 'fisico') !== 'afiliado')
   const apiAfiliados = apiProds.filter(item => item.tipo === 'afiliado')
 
@@ -227,50 +213,15 @@ export default function SuplementosPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <NavbarGym />
-
-      {/* Flechas flotantes — aparecen al hacer scroll, mismo patrón que
-          Store/Supply, para navegar entre las páginas de Gym sin volver
-          atrás (2026-08-02). */}
-      {scrolled && prev && (
-        <Link
-          to={`/gym/${prev.slug}`} replace
-          aria-label={`Ver ${prev.name}`}
-          className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-gray-400 hover:text-white bg-black/60 backdrop-blur-sm border border-gray-800 rounded-full p-2 transition-colors"
-        >
-          <ArrowLeft size={20} />
-        </Link>
-      )}
-      {scrolled && next && (
-        <Link
-          to={`/gym/${next.slug}`} replace
-          aria-label={`Ver ${next.name}`}
-          className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-gray-400 hover:text-white bg-black/60 backdrop-blur-sm border border-gray-800 rounded-full p-2 transition-colors"
-        >
-          <ArrowRight size={20} />
-        </Link>
-      )}
+      <NavbarSuple />
 
       {/* HERO */}
-      <section className="relative pt-16 md:pt-24 pb-6 md:pb-10 px-4 md:px-6 overflow-hidden">
+      <section className="relative pt-24 md:pt-32 pb-6 md:pb-10 px-4 md:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
-            {prev && (
-              <Link to={`/gym/${prev.slug}`} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
-                <ArrowLeft size={18} />
-              </Link>
-            )}
-            <p className="flex-1 text-center uppercase tracking-[0.25em] text-gray-500 text-xs">Categoría</p>
-            {next && (
-              <Link to={`/gym/${next.slug}`} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
-                <ArrowRight size={18} />
-              </Link>
-            )}
-          </div>
           <div className="flex items-center justify-center md:justify-between gap-3 md:gap-4 mb-4">
-            <h1 className="text-xl md:text-7xl font-black uppercase leading-none text-center md:text-left">
+            <h1 className="text-2xl md:text-7xl font-black uppercase leading-none text-center md:text-left">
               Suple<span className="text-gray-400">mentos</span>
             </h1>
             <FlaskConical size={40} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
@@ -288,7 +239,7 @@ export default function SuplementosPage() {
             <p className="text-gray-500 uppercase tracking-[0.25em] text-sm mb-2">Catálogo en preparación</p>
             <p className="text-gray-600 text-sm mb-6 max-w-sm mx-auto">Estamos cargando los suplementos disponibles. Mientras tanto, cuéntanos qué necesitas por WhatsApp.</p>
             <a
-              href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero consultar disponibilidad de suplementos en INKognito Gym.')}`}
+              href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero consultar disponibilidad de suplementos en INKognito Suple.')}`}
               target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-gray-950 font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-gray-200 transition"
             >
@@ -297,7 +248,6 @@ export default function SuplementosPage() {
           </div>
         ) : (
           <>
-            {/* FILTROS POR CATEGORÍA */}
             <div className="flex gap-2 flex-wrap mb-10">
               {CATEGORIAS_DIN.map(cat => (
                 <button
@@ -314,14 +264,12 @@ export default function SuplementosPage() {
               ))}
             </div>
 
-            {/* GRID */}
             <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
               {visibles.map((p) => (
                 <SuplCard key={p.id} p={p} onAddToCart={handleAddToCart} enCarrito={cartItems.some(i => i.key === `suplementos-${p.id}`)} />
               ))}
             </div>
 
-            {/* CARGAR MÁS */}
             {visible < filtrados.length && (
               <div className="text-center mt-10">
                 <button
@@ -383,7 +331,7 @@ export default function SuplementosPage() {
                 Aún no tenemos suplementos importados cargados. Avísanos y te contactamos apenas tengamos opciones disponibles.
               </p>
               <a
-                href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya suplementos disponibles en INKognito Suplementos.')}`}
+                href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya suplementos disponibles en INKognito Suple.')}`}
                 target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 text-gray-950 font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-green-400 transition"
               >
@@ -436,7 +384,7 @@ export default function SuplementosPage() {
           ))}
         </div>
         <a
-          href="https://wa.me/573207911013?text=Hola%2C%20quiero%20hacer%20un%20pedido%20de%20suplementos%20en%20INKognito%20Gym"
+          href="https://wa.me/573207911013?text=Hola%2C%20quiero%20hacer%20un%20pedido%20de%20suplementos%20en%20INKognito%20Suple"
           target="_blank" rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 w-full py-4 rounded-xl border border-green-500/40 bg-gray-950 text-white font-bold uppercase tracking-[0.15em] text-sm hover:border-green-500 hover:shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all duration-300"
         >
@@ -516,12 +464,12 @@ export default function SuplementosPage() {
               ¿Tienes dudas sobre qué suplemento elegir o cómo combinarlo? Escríbenos y te asesoramos en minutos.
             </p>
             <a
-              href="https://wa.me/573207911013?text=Hola%2C%20quiero%20asesor%C3%ADa%20sobre%20suplementos%20en%20INKognito%20Gym"
+              href="https://wa.me/573207911013?text=Hola%2C%20quiero%20asesor%C3%ADa%20sobre%20suplementos%20en%20INKognito%20Suple"
               target="_blank" rel="noopener noreferrer"
               className="flex items-center justify-center gap-3 w-full py-4 px-6 rounded-xl border border-green-500/30 bg-black text-white uppercase tracking-[0.2em] font-semibold transition-all duration-300 hover:border-green-500 hover:shadow-[0_0_30px_rgba(34,197,94,0.3)] mb-5"
             >
               <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" className="text-green-500"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-              Hablar con INKognito Gym
+              Hablar con INKognito Suple
             </a>
             <div className="flex flex-col gap-3">
               {['Suplementos de calidad para tu rendimiento','Asesoría técnica personalizada','Con base en Urabá, envíos a Colombia','Pago contraentrega disponible en la región'].map(item => (
@@ -536,7 +484,7 @@ export default function SuplementosPage() {
         </div>
       </section>
 
-      <FooterGym />
+      <FooterSuple />
     </div>
   )
 }

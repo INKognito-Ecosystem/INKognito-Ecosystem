@@ -5,6 +5,7 @@ import { FaWhatsapp } from 'react-icons/fa'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import { useGymCart } from '../../contexts/GymCartContext'
+import { useSupleCart } from '../../contexts/SupleCartContext'
 import { WHATSAPP } from '../../config/business'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
@@ -34,7 +35,7 @@ const MUNICIPIO_LABELS = {
 }
 const MUNICIPIOS = Object.keys(MUNICIPIO_LABELS)
 
-const MODULE_LABELS = { supply: 'INKognito Supply', store: 'INKognito Store', gym: 'INKognito Gym' }
+const MODULE_LABELS = { supply: 'INKognito Supply', store: 'INKognito Store', gym: 'INKognito Gym', suplementos: 'INKognito Suple' }
 
 function ColHead({ n, title, sub }) {
   return (
@@ -91,7 +92,8 @@ export default function PedidoOnlinePage() {
   const supplyCart = useSupplyCart()
   const storeCart = useStoreCart()
   const gymCart = useGymCart()
-  const cart = { supply: supplyCart, store: storeCart, gym: gymCart }[module]
+  const supleCart = useSupleCart()
+  const cart = { supply: supplyCart, store: storeCart, gym: gymCart, suplementos: supleCart }[module]
 
   const [form, setForm] = useState({ nombre: '', telefono: '', direccion: '', municipioSel: '', ciudadOtra: '' })
   const [estado, setEstado] = useState('idle') // idle | enviando | ok | error

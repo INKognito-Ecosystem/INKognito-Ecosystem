@@ -72,6 +72,11 @@ export default [
   route('gym/maquinas-pedido', 'components/gym/categories/MaquinasPedidoPage.jsx'),
   route('gym/tutoriales', 'components/gym/categories/VideosTutorialesPage.jsx'),
   route('gym/cursos', 'components/gym/categories/CursosPage.jsx'),
-  route('gym/suplementos', 'components/gym/categories/SuplementosPage.jsx'),
   route('gym/recursos', 'components/gym/categories/RecursosPage.jsx'),
+  // Suplementos era una página de Gym — se independizó como módulo propio
+  // (2026-08-02). Redirect preserva links/SEO viejos de /gym/suplementos.
+  route('gym/suplementos', 'routes/RedirectGymSuplementos.jsx'),
+
+  // Suple (INKognito Suple — suplementos deportivos, módulo propio)
+  route('suplementos', 'components/suplementos/SuplePage.jsx'),
 ]

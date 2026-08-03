@@ -4,6 +4,7 @@ import { Menu, ShoppingCart, X } from 'lucide-react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import logoSupply from '../../assets/milogo/supply.webp'
+import AnimatedWordmark from '../AnimatedWordmark'
 
 export default function NavbarSupply() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -26,9 +27,7 @@ export default function NavbarSupply() {
               <img src={logoSupply} alt="INKognito Supply" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
               <div>
                 <h1 className="text-xl md:text-2xl font-black uppercase tracking-wide md:tracking-[0.2em] whitespace-nowrap leading-tight">
-                  <span className="text-white">INK</span>
-                  <span className="text-blue-500">OGNITO </span>
-                  <span className="text-blue-500">SUPPLY</span>
+                  <AnimatedWordmark moduleWord="SUPPLY" accentClassName="text-blue-500" />
                 </h1>
                 <span className="block text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-500 whitespace-nowrap">
                   Tienda Online

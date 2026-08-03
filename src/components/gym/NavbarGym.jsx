@@ -4,6 +4,7 @@ import { Menu, X, Dumbbell, ShoppingCart } from 'lucide-react'
 import logoGym from '../../assets/milogo/gym.webp'
 import { useGymCart } from '../../contexts/GymCartContext'
 import CartDrawerGym from './CartDrawerGym'
+import AnimatedWordmark from '../AnimatedWordmark'
 
 const LINK = 'uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300'
 const MOBILE_LINK = 'block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300'
@@ -37,11 +38,11 @@ export default function NavbarGym() {
             {/* LOGO */}
             <Link to="/gym" className="flex items-center gap-2">
               <img src={logoGym} alt="INKognito Gym" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
-              <span className="font-black uppercase tracking-wide md:tracking-[0.2em] text-xl md:text-2xl whitespace-nowrap">
-                <span className="text-white">INK</span>
-                <span className="text-gray-400">OGNITO </span>
-                <span className="text-gray-400">GYM</span>
-              </span>
+              <AnimatedWordmark
+                moduleWord="GYM"
+                accentClassName="text-gray-400"
+                className="font-black uppercase tracking-wide md:tracking-[0.2em] text-xl md:text-2xl"
+              />
               <Dumbbell size={18} className="text-gray-500" />
             </Link>
 
@@ -49,10 +50,10 @@ export default function NavbarGym() {
             <div className="hidden md:flex items-center gap-8">
               <Link to="/gym/maquinas-pedido" className={LINK}>Máquinas</Link>
               <button onClick={goToPlanos} className={LINK}>Planos</button>
-              <Link to="/gym/suplementos" className={LINK}>Suplementos</Link>
               <Link to="/gym/tutoriales" className={LINK}>Tutoriales</Link>
               <Link to="/gym/cursos" className={LINK}>Cursos</Link>
               <Link to="/gym/recursos" className={LINK}>Recursos</Link>
+              <Link to="/suplementos" className={LINK}>Suplementos</Link>
             </div>
 
             {/* CARRITO + HAMBURGUESA */}
@@ -85,7 +86,6 @@ export default function NavbarGym() {
             <Link to="/gym"                 onClick={close} className={MOBILE_LINK}>Inicio</Link>
             <Link to="/gym/maquinas-pedido" onClick={close} className={MOBILE_LINK}>Máquinas</Link>
             <button                         onClick={goToPlanos} className={MOBILE_BTN}>Planos</button>
-            <Link to="/gym/suplementos"     onClick={close} className={MOBILE_LINK}>Suplementos</Link>
             <Link to="/gym/tutoriales"      onClick={close} className={MOBILE_LINK}>Tutoriales</Link>
             <Link to="/gym/cursos"          onClick={close} className={MOBILE_LINK}>Cursos</Link>
             <Link to="/gym/recursos"        onClick={close} className={MOBILE_LINK}>Recursos</Link>
@@ -93,6 +93,7 @@ export default function NavbarGym() {
               <Link to="/jhumaneztattoo" onClick={close} className={MOBILE_LINK}>JHumanezTattoo</Link>
               <Link to="/supply"         onClick={close} className={MOBILE_LINK}>INKognito Supply</Link>
               <Link to="/store"          onClick={close} className={MOBILE_LINK}>INKognito Store</Link>
+              <Link to="/suplementos"    onClick={close} className={MOBILE_LINK}>INKognito Suple</Link>
               <Link to="/"               onClick={close} className={MOBILE_LINK}>Ecosistema</Link>
             </div>
           </div>

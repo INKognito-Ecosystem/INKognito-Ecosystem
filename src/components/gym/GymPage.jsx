@@ -56,7 +56,10 @@ const servicios = [
     icon: FlaskConical,
     titulo: 'Suplementos',
     texto: 'Proteína, creatina y pre-entreno de marcas confiables, con stock real y despacho rápido para complementar tu entrenamiento.',
-    link: '/gym/suplementos',
+    // Suplementos ahora es su propio módulo (INKognito Suple) — esta card
+    // sigue viviendo en Gym como estaba, solo cambia a dónde lleva
+    // (2026-08-02).
+    link: '/suplementos',
   },
   {
     icon: PlayCircle,

@@ -1,21 +1,8 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa'
-import { Dumbbell } from 'lucide-react'
+import { FlaskConical } from 'lucide-react'
 
-export default function FooterGym() {
-  const navigate = useNavigate()
-  const { pathname } = useLocation()
-
-  const goToPlanos = (e) => {
-    e.preventDefault()
-    if (pathname === '/gym') {
-      document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' })
-    } else {
-      navigate('/gym')
-      setTimeout(() => document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' }), 400)
-    }
-  }
-
+export default function FooterSuple() {
   return (
     <footer className="relative border-t border-gray-800 bg-gray-950 px-6 py-10 md:py-16 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
@@ -33,15 +20,14 @@ export default function FooterGym() {
           {/* IZQUIERDA */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Dumbbell size={20} className="text-gray-400" />
+              <FlaskConical size={20} className="text-green-500" />
               <h2 className="text-2xl font-black uppercase tracking-[0.15em]">
                 <span className="text-white">INK</span>
-                <span className="text-gray-400">OGNITO </span>
-                <span className="text-gray-400">GYM</span>
+                <span className="text-green-500">OGNITO SUPLE</span>
               </h2>
             </div>
             <p className="text-gray-500 leading-relaxed max-w-sm">
-              Máquinas fabricadas a mano, planos digitales y recursos para entrenar en casa sin gastar una fortuna.
+              Proteína, creatina, pre-entreno y vitaminas de marcas confiables, con despacho rápido desde Urabá a toda Colombia.
             </p>
           </div>
 
@@ -51,23 +37,17 @@ export default function FooterGym() {
               Navegación
             </p>
             <div className="flex flex-col gap-4">
-              <Link to="/gym/maquinas-pedido" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
-                Máquinas bajo pedido
-              </Link>
-              <a href="/gym#planos" onClick={goToPlanos} className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
-                Planos digitales
-              </a>
-              <Link to="/gym/tutoriales" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
-                Tutoriales en video
-              </Link>
-              <Link to="/gym/cursos" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
-                Cursos
-              </Link>
-              <Link to="/gym/recursos" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
-                Recursos gratis
-              </Link>
               <Link to="/suplementos" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
-                INKognito Suple
+                Catálogo
+              </Link>
+              <Link to="/gym" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
+                INKognito Gym
+              </Link>
+              <Link to="/supply" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
+                INKognito Supply
+              </Link>
+              <Link to="/store" className="uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
+                INKognito Store
               </Link>
             </div>
           </div>
@@ -103,7 +83,7 @@ export default function FooterGym() {
 
         <div className="border-t border-gray-800 mt-16 pt-8 flex flex-col sm:flex-row sm:justify-between items-center gap-3">
           <p className="text-gray-600 text-[9.5px] sm:text-[12px] whitespace-nowrap">
-            © 2026 INKognito Gym. Todos los derechos reservados.
+            © 2026 INKognito Suple. Todos los derechos reservados.
           </p>
           <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-[12px]">
             <Link to="/terminos" className="text-gray-600 hover:text-white transition-colors">
