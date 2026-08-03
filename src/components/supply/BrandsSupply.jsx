@@ -41,15 +41,8 @@ const brands = [
   { name: 'ROYAL THREE', to: '/supply/brands/royal-three' },
 ]
 
-// Índice donde el autoplay de CoverflowRow se detiene solo (Industrias
-// Warlock) — el hint "Desliza" debe aparecer bajo esa card, no bajo la
-// primera (Tattoo Vision), porque solo se muestra una vez el carrusel ya
-// paró ahí.
-const STOP_INDEX = 1
-
 export default function BrandsSupply() {
   const [imgs, setImgs] = useState({})
-  const [showHint, setShowHint] = useState(false)
 
   useEffect(() => {
     fetch(`${PANEL_URL}/api/visual/supply`)
@@ -80,7 +73,7 @@ export default function BrandsSupply() {
           <div className="clear-both" />
         </div>
 
-        <CoverflowRow desktopClassName="md:grid md:grid-cols-4 lg:grid-cols-7 gap-4" stopAtIndex={STOP_INDEX} onAutoplayStop={() => setShowHint(true)}>
+        <CoverflowRow desktopClassName="md:grid md:grid-cols-4 lg:grid-cols-7 gap-4" autoplay={false}>
           {brands.map((brand, i) => {
             const key = brand.imgKey || brandKey(brand.name)
             return (
@@ -99,7 +92,7 @@ export default function BrandsSupply() {
                   </p>
               }
             </Link>
-            {i === STOP_INDEX && showHint && (
+            {i === 0 && (
               <div className="md:hidden mt-1.5 flex items-center justify-end gap-1 text-zinc-500 text-[9px] font-bold uppercase tracking-widest">
                 <span>Desliza</span>
                 <span className="animate-bounce">→</span>

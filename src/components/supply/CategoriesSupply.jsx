@@ -32,14 +32,8 @@ const categories = [
   { name: 'Combos',            path: '/supply/bundles',        icon: Package,    cat: 'Combos'      },
 ]
 
-// Índice donde el autoplay de CoverflowRow se detiene solo (Cartuchos) — el
-// hint "Desliza" debe aparecer bajo esa card, no bajo la primera (Tintas),
-// porque solo se muestra una vez el carrusel ya paró ahí.
-const STOP_INDEX = 1
-
 export default function CategoriesSupply({ categorias = {} }) {
   const [imgs, setImgs] = useState({})
-  const [showHint, setShowHint] = useState(false)
 
   useEffect(() => {
     fetch(`${PANEL_URL}/api/visual/supply`)
@@ -73,7 +67,7 @@ export default function CategoriesSupply({ categorias = {} }) {
           <div className="clear-both" />
         </div>
 
-        <CoverflowRow desktopClassName="md:grid md:grid-cols-3 lg:grid-cols-5 gap-4" stopAtIndex={STOP_INDEX} onAutoplayStop={() => setShowHint(true)}>
+        <CoverflowRow desktopClassName="md:grid md:grid-cols-3 lg:grid-cols-5 gap-4" autoplay={false}>
           {categories.map((category, i) => {
             const count = stockPorCat[category.cat]
             const hasStock = count > 0
@@ -126,7 +120,7 @@ export default function CategoriesSupply({ categorias = {} }) {
                   </>
                 )}
               </Link>
-              {i === STOP_INDEX && showHint && (
+              {i === 0 && (
                 <div className="md:hidden mt-1.5 flex items-center justify-end gap-1 text-zinc-500 text-[9px] font-bold uppercase tracking-widest">
                   <span>Desliza</span>
                   <span className="animate-bounce">→</span>

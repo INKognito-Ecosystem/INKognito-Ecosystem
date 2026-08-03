@@ -1,6 +1,6 @@
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { EffectCoverflow, Autoplay } from 'swiper/modules'
-import { Children, useRef } from 'react'
+import { Children } from 'react'
 import 'swiper/css'
 import 'swiper/css/effect-coverflow'
 
@@ -17,51 +17,15 @@ import 'swiper/css/effect-coverflow'
 // Solo aplica en móvil — en desktop se oculta y se muestra `desktopChildren`
 // (el grid normal de siempre) sin ningún efecto, igual que antes.
 //
-// `stopAtIndex` (opcional): si se pasa, el autoplay no gira infinito para
-// siempre — avanza exactamente una vuelta completa (items.length pasos)
-// más el offset necesario para terminar posado en ese índice real, y ahí se
-// detiene solo (swiper.autoplay.stop()), dejando la card elegida al centro.
-// Pasa una sola vez por sesión de la página porque el contador vive en un
-// ref que nace en 0 en cada montaje del componente — "el usuario entra,
-// ve la vuelta una sola vez" (2026-08-02, pedido para Categorías→Cartuchos y
-// Marcas→Warlock, "no sería justo tenerlo girando todo el tiempo").
-//
-// El conteo de pasos usa `swiper.realIndex` (deduplicado contra el último
-// valor visto) en vez de contar eventos `slideChange` en crudo — con
-// `loop:true` Swiper dispara `slideChange` de más al hacer el salto interno
-// entre el set real y los clones, así que contar eventos crudos infla el
-// contador y hace que se detenga antes de tiempo, en una card equivocada
-// (bug real reportado: en Marcas paraba en WJX en vez de Warlock). Al
-// comparar contra el índice real anterior, esos eventos duplicados se
-// ignoran y el conteo queda fiel a los avances visuales de verdad.
-//
-// `onAutoplayStop` (opcional): se llama una vez, justo cuando el autoplay
-// se detiene — así el padre puede mostrar la flechita de "Desliza" recién
-// en ese momento en vez de desde el primer render.
-//
 // `autoplay` (default true): en `false` el carrusel no se mueve solo al
-// entrar — queda estático, controlado 100% por el usuario (swipe/drag),
-// pedido explícito para las card de categorías de Gym, a diferencia de
-// Categorías/Marcas de Supply que sí hacen su vuelta automática
-// (2026-08-02).
-export default function CoverflowRow({ children, desktopClassName = '', slidesPerView = 1.6, autoplayDelay = 2800, autoplay = true, stopAtIndex, onAutoplayStop }) {
+// entrar — queda estático, controlado 100% por el usuario (swipe/drag).
+// Destacados en Store sigue con autoplay en loop continuo; Categorías y
+// Marcas de Supply y las card de categorías de Gym quedaron estáticas
+// (2026-08-02 — se probó primero con autoplay + parada automática en una
+// card específica ahí, pero se descartó por pedido explícito de Jose a
+// favor de dejarlas siempre estáticas, igual que Gym).
+export default function CoverflowRow({ children, desktopClassName = '', slidesPerView = 1.6, autoplayDelay = 2800, autoplay = true }) {
   const items = Children.toArray(children)
-  const stepsRef = useRef(0)
-  const lastRealIndexRef = useRef(0)
-  const stoppedRef = useRef(false)
-  const targetSteps = stopAtIndex != null ? items.length + stopAtIndex : null
-
-  const handleSlideChange = (swiper) => {
-    if (targetSteps == null || stoppedRef.current) return
-    if (swiper.realIndex === lastRealIndexRef.current) return
-    lastRealIndexRef.current = swiper.realIndex
-    stepsRef.current += 1
-    if (stepsRef.current >= targetSteps) {
-      stoppedRef.current = true
-      swiper.autoplay.stop()
-      onAutoplayStop?.()
-    }
-  }
 
   return (
     <>
@@ -76,7 +40,6 @@ export default function CoverflowRow({ children, desktopClassName = '', slidesPe
         coverflowEffect={{ rotate: 0, stretch: 0, depth: 140, modifier: 1.4, slideShadows: false }}
         autoplay={autoplay ? { delay: autoplayDelay, disableOnInteraction: false, pauseOnMouseEnter: true } : false}
         speed={700}
-        onSlideChange={handleSlideChange}
         className="coverflow-row md:hidden"
       >
         {items.map((child, i) => (
