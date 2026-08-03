@@ -1,150 +1,11 @@
-import { useState } from 'react'
 import { useLoaderData } from 'react-router-dom'
 import NavbarSuple from './NavbarSuple'
 import FooterSuple from './FooterSuple'
+import CategoriesSuple from './CategoriesSuple'
 import { fetchCatalogFull } from '../../hooks/useCatalog'
-import { useSupleCart } from '../../contexts/SupleCartContext'
-import ProductImageGallery from '../ProductImageGallery'
 import { ExternalLink } from 'lucide-react'
 
-const VAR_THRESHOLD = 3
-
-function VariantSelectorSupl({ variantes, selIdx, onChange }) {
-  const [open, setOpen] = useState(false)
-  if (!variantes || variantes.length === 0) return null
-
-  if (variantes.length === 1) {
-    return variantes[0].variant ? (
-      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wide">
-        Presentación: {variantes[0].variant}
-      </p>
-    ) : null
-  }
-
-  if (variantes.length <= VAR_THRESHOLD) {
-    return (
-      <div className="grid gap-1 w-full" style={{ gridTemplateColumns: `repeat(${variantes.length}, 1fr)` }}>
-        {variantes.map((v, i) => (
-          <button
-            key={i}
-            onClick={() => onChange(i)}
-            className={`text-[9px] font-bold py-1 rounded border transition-all duration-200 text-center truncate ${
-              selIdx === i
-                ? 'bg-white text-gray-950 border-white'
-                : 'border-gray-700 text-gray-500 hover:border-gray-400 hover:text-white'
-            }`}
-          >
-            {v.variant || `Opc. ${i + 1}`}
-          </button>
-        ))}
-      </div>
-    )
-  }
-
-  return (
-    <div className="w-full">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between py-1.5 px-2 rounded border border-gray-700 text-[9px] font-bold text-gray-300 hover:border-gray-400 transition-all duration-200"
-      >
-        <span className="truncate">{variantes[selIdx]?.variant || 'Elegir variante'}</span>
-        <span className={`ml-1 flex-shrink-0 transition-transform duration-200 ${open ? 'rotate-90' : ''}`}>▶</span>
-      </button>
-      {open && (
-        <div className="mt-1 grid grid-cols-2 gap-1">
-          {variantes.map((v, i) => (
-            <button
-              key={i}
-              onClick={() => { onChange(i); setOpen(false) }}
-              className={`text-[9px] font-bold py-1.5 px-1 rounded border transition-all duration-200 text-center truncate ${
-                selIdx === i
-                  ? 'bg-white text-gray-950 border-white'
-                  : 'border-gray-700 text-gray-500 hover:border-gray-400 hover:text-white'
-              }`}
-            >
-              {v.variant || `Opc. ${i + 1}`}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function SuplCard({ p, onAddToCart, enCarrito }) {
-  const [selIdx, setSelIdx] = useState(0)
-  const [showDesc, setShowDesc] = useState(false)
-  const variantes = p.variantes || []
-  const sel       = variantes[selIdx] || {}
-
-  const precio = sel.price
-    ? '$' + Math.round(sel.price).toLocaleString('es-CO')
-    : p.precioLabel || 'Consultar precio'
-  const galleryImages = sel.image_url
-    ? [sel.image_url, sel.image_url_2, sel.image_url_3].filter(Boolean)
-    : (p.images?.length ? p.images : [p.image].filter(Boolean))
-
-  const description = sel.descripcion || p.descripcion
-
-  return (
-    <div className="snap-start flex-shrink-0 w-[40vw] md:w-auto border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300">
-      <div className="relative w-full aspect-square bg-gray-800 flex items-center justify-center flex-shrink-0">
-        {galleryImages.length > 0
-          ? <ProductImageGallery images={galleryImages} alt={p.nombre} containerClassName="w-full h-full" imgClassName="w-full h-full object-cover" onImgError={e => { e.target.style.display = 'none' }} />
-          : <span className="text-gray-700 text-[10px] uppercase tracking-widest text-center px-2">Imagen próx.</span>
-        }
-      </div>
-      <div className="p-3 flex flex-col flex-1 gap-1.5">
-        <h3 className="font-black uppercase text-xs leading-tight">{p.nombre}</h3>
-        <span className="text-white font-black text-sm">{precio}</span>
-        {description && (
-          <>
-            <p className="hidden md:block text-gray-500 text-[9.5px] leading-snug">{description}</p>
-            <button
-              type="button"
-              onClick={() => setShowDesc(true)}
-              className="md:hidden self-start text-gray-500 text-[9px] font-bold uppercase tracking-[0.15em] underline underline-offset-2"
-            >
-              Ver descripción
-            </button>
-          </>
-        )}
-        <div className="mt-auto pt-1">
-          <VariantSelectorSupl variantes={variantes} selIdx={selIdx} onChange={setSelIdx} />
-        </div>
-      </div>
-      <button
-        onClick={() => onAddToCart(p, sel)}
-        className={`w-full py-2.5 font-bold uppercase tracking-[0.1em] text-[10px] transition-all duration-300 flex-shrink-0 ${
-          enCarrito ? 'bg-green-500 text-white' : 'bg-white text-gray-950 hover:bg-gray-200'
-        }`}
-      >
-        {enCarrito ? '✓ Agregado' : '+ Agregar al carrito'}
-      </button>
-
-      {showDesc && (
-        <div
-          className="md:hidden fixed inset-0 z-50 bg-black/70 flex items-end justify-center"
-          onClick={() => setShowDesc(false)}
-        >
-          <div
-            className="w-full max-w-md bg-gray-900 border-t border-gray-800 rounded-t-2xl p-5"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-black uppercase tracking-widest text-white">Descripción</h4>
-              <button onClick={() => setShowDesc(false)} className="text-gray-500 text-lg leading-none px-1">✕</button>
-            </div>
-            <p className="text-gray-400 text-sm leading-relaxed">{description}</p>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
 const WA = '573207911013'
-const PAGE_SIZE = 6
 
 const GRID_PATTERN = {
   backgroundImage:
@@ -175,48 +36,8 @@ export function meta() {
 }
 
 export default function SuplePage() {
-  const [filtro, setFiltro]   = useState('Todos')
-  const [visible, setVisible] = useState(PAGE_SIZE)
-  const { allProducts: apiProds } = useLoaderData()
-  const { addItem, items: cartItems } = useSupleCart()
-
-  const apiFisicos   = apiProds.filter(item => (item.tipo || 'fisico') !== 'afiliado')
+  const { allProducts: apiProds, categorias } = useLoaderData()
   const apiAfiliados = apiProds.filter(item => item.tipo === 'afiliado')
-
-  const productosActivos = apiFisicos.map((item, i) => ({
-    id:          i + 1,
-    categoria:   item.categoria || 'Suplementos',
-    descripcion: item.descripcion || null,
-    nombre:      item.name,
-    image:       item.image_url || item.variantes?.[0]?.image_url || null,
-    images:      [item.image_url, item.image_url_2, item.image_url_3].filter(Boolean).length
-      ? [item.image_url, item.image_url_2, item.image_url_3].filter(Boolean)
-      : [item.variantes?.[0]?.image_url, item.variantes?.[0]?.image_url_2, item.variantes?.[0]?.image_url_3].filter(Boolean),
-    variantes:   item.variantes || [],
-    precioLabel: item.variantes?.[0]?.price
-      ? '$' + Math.round(item.variantes[0].price).toLocaleString('es-CO')
-      : 'Consultar precio',
-  }))
-
-  const CATEGORIAS_DIN = ['Todos', ...new Set(productosActivos.map(p => p.categoria))]
-
-  const filtrados = filtro === 'Todos' ? productosActivos : productosActivos.filter(p => p.categoria === filtro)
-  const visibles  = filtrados.slice(0, visible)
-
-  const handleAddToCart = (p, sel = {}) => {
-    const precio = sel.price
-      ? '$' + Math.round(sel.price).toLocaleString('es-CO')
-      : p.precioLabel
-    const nombre = sel.variant ? `${p.nombre} — ${sel.variant}` : p.nombre
-    addItem({
-      id:          p.id,
-      inventoryId: sel.id ?? null,
-      name:        nombre,
-      price:       precio,
-      brand:       p.categoria,
-      image:       sel.image_url || p.image || '',
-    }, 'suplementos')
-  }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -250,7 +71,7 @@ export default function SuplePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                 <button
-                  onClick={() => document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' })}
+                  onClick={() => document.getElementById('categorias')?.scrollIntoView({ behavior: 'smooth' })}
                   className="px-10 py-4 uppercase tracking-[0.25em] font-black text-sm text-black transition-all duration-300 hover:brightness-90"
                   style={{ backgroundColor: '#9E9E9E' }}
                 >
@@ -321,57 +142,7 @@ export default function SuplePage() {
         </div>
       </section>
 
-      <div id="catalogo" className="pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto pt-6 md:pt-8 scroll-mt-20">
-
-        {productosActivos.length === 0 ? (
-          <div className="border border-gray-800 bg-gray-900/30 rounded-2xl py-16 text-center">
-            <p className="text-gray-500 uppercase tracking-[0.25em] text-sm mb-2">Catálogo en preparación</p>
-            <p className="text-gray-600 text-sm mb-6 max-w-sm mx-auto">Estamos cargando los suplementos disponibles. Mientras tanto, cuéntanos qué necesitas por WhatsApp.</p>
-            <a
-              href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero consultar disponibilidad de suplementos en INKognito Suple.')}`}
-              target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-gray-950 font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-gray-200 transition"
-            >
-              Consultar por WhatsApp →
-            </a>
-          </div>
-        ) : (
-          <>
-            <div className="flex gap-2 flex-wrap mb-10">
-              {CATEGORIAS_DIN.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => { setFiltro(cat); setVisible(PAGE_SIZE) }}
-                  className={`text-xs font-bold uppercase tracking-[0.15em] px-4 py-2 rounded-full border transition-all duration-200 ${
-                    filtro === cat
-                      ? 'bg-white text-gray-950 border-white'
-                      : 'border-gray-700 text-gray-400 hover:border-gray-400 hover:text-white'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
-              {visibles.map((p) => (
-                <SuplCard key={p.id} p={p} onAddToCart={handleAddToCart} enCarrito={cartItems.some(i => i.key === `suplementos-${p.id}`)} />
-              ))}
-            </div>
-
-            {visible < filtrados.length && (
-              <div className="text-center mt-10">
-                <button
-                  onClick={() => setVisible(v => Math.min(v + PAGE_SIZE, filtrados.length))}
-                  className="border border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-[0.2em] py-3 px-8 rounded-xl hover:border-gray-400 hover:text-white transition-all duration-300"
-                >
-                  Cargar más ({filtrados.length - visible} restantes)
-                </button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+      <CategoriesSuple categorias={categorias} />
 
       {/* ── SUPLEMENTOS AFILIADOS — sección fija, siempre visible ── */}
       <section className="border-t-2 border-[#9E9E9E]/20 bg-[#0c0c0c] px-4 md:px-6 py-10 md:py-14">

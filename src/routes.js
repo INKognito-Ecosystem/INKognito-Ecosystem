@@ -79,4 +79,9 @@ export default [
 
   // Suple (INKognito Suple — suplementos deportivos, módulo propio)
   route('suplementos', 'components/suplementos/SuplePage.jsx'),
+  route('suplementos/proteinas', 'components/suplementos/categories/ProteinasPage.jsx'),
+  route('suplementos/creatina', 'components/suplementos/categories/CreatinaPage.jsx'),
+  route('suplementos/pre-entreno', 'components/suplementos/categories/PreEntrenoPage.jsx'),
+  route('suplementos/vitaminas', 'components/suplementos/categories/VitaminasPage.jsx'),
+  route('suplementos/accesorios', 'components/suplementos/categories/AccesoriosPage.jsx'),
 ]
