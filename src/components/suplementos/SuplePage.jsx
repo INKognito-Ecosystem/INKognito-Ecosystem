@@ -233,49 +233,90 @@ export default function SuplePage() {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] max-w-[90vw] h-[280px] rounded-full bg-[#9E9E9E]/10 blur-3xl pointer-events-none" />
-        <div className="relative z-10 max-w-7xl mx-auto text-center md:text-left">
-          <p className="uppercase tracking-[0.4em] text-[#9E9E9E] text-xs md:text-sm mb-4 md:mb-6 font-semibold">
-            INKognito Suple — Urabá, Antioquia
-          </p>
-          <h1 className="text-4xl sm:text-6xl md:text-8xl font-black uppercase leading-[0.9] mb-6 md:mb-8">
-            <span className="block text-white">Potencia tus</span>
-            <span className="block text-[#9E9E9E]">Entrenamientos</span>
-          </h1>
-          <p className="text-gray-300 text-base md:text-xl leading-relaxed max-w-2xl mx-auto md:mx-0 mb-8 md:mb-12">
-            Tienda online de suplementos y accesorios para entrenar — proteína, creatina, pre-entreno y más, con stock real y despacho rápido. Optimiza tus resultados con marcas confiables y envíos desde Urabá a toda Colombia.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-            <button
-              onClick={() => document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-10 py-4 uppercase tracking-[0.25em] font-black text-sm text-black transition-all duration-300 hover:brightness-90"
-              style={{ backgroundColor: '#9E9E9E' }}
-            >
-              Ver Catálogo
-            </button>
-            <a
-              href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero ver el catálogo de INKognito Suple')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden sm:flex px-10 py-4 uppercase tracking-[0.25em] font-bold text-sm border border-gray-700 text-gray-300 hover:border-[#9E9E9E] hover:text-[#9E9E9E] transition-all duration-300 items-center justify-center gap-2"
-            >
-              WhatsApp
-            </a>
-          </div>
+        <div className="relative z-10 max-w-7xl mx-auto">
+          <div className="md:grid md:grid-cols-2 md:gap-16 md:items-center">
 
-          {/* STATS */}
-          <div className="mt-8 md:mt-16 grid grid-cols-3 gap-6 max-w-xl mx-auto md:mx-0">
+            {/* IZQUIERDA */}
             <div className="text-center md:text-left">
-              <p className="text-3xl md:text-5xl font-black text-[#9E9E9E]">4</p>
-              <p className="text-gray-500 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Municipios</p>
+              <p className="uppercase tracking-[0.4em] text-[#9E9E9E] text-xs md:text-sm mb-4 md:mb-6 font-semibold">
+                INKognito Suple — Urabá, Antioquia
+              </p>
+              <h1 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase leading-[0.9] mb-6 md:mb-8">
+                <span className="block text-white">Potencia tus</span>
+                <span className="block text-[#9E9E9E]">Entrenamientos</span>
+              </h1>
+              <p className="text-gray-300 text-base md:text-xl leading-relaxed max-w-2xl mx-auto md:mx-0 mb-8 md:mb-12">
+                Tienda online de suplementos y accesorios para entrenar — proteína, creatina, pre-entreno y más, con stock real y despacho rápido. Optimiza tus resultados con marcas confiables y envíos desde Urabá a toda Colombia.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <button
+                  onClick={() => document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="px-10 py-4 uppercase tracking-[0.25em] font-black text-sm text-black transition-all duration-300 hover:brightness-90"
+                  style={{ backgroundColor: '#9E9E9E' }}
+                >
+                  Ver Catálogo
+                </button>
+                <a
+                  href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero ver el catálogo de INKognito Suple')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hidden sm:flex px-10 py-4 uppercase tracking-[0.25em] font-bold text-sm border border-gray-700 text-gray-300 hover:border-[#9E9E9E] hover:text-[#9E9E9E] transition-all duration-300 items-center justify-center gap-2"
+                >
+                  WhatsApp
+                </a>
+              </div>
+
+              {/* STATS */}
+              <div className="mt-8 md:mt-16 grid grid-cols-3 gap-6 max-w-xl mx-auto md:mx-0">
+                <div className="text-center md:text-left">
+                  <p className="text-3xl md:text-5xl font-black text-[#9E9E9E]">4</p>
+                  <p className="text-gray-500 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Municipios</p>
+                </div>
+                <div className="text-center md:text-left border-x md:border-x-0 md:border-l border-gray-800 md:pl-6">
+                  <p className="text-3xl md:text-5xl font-black text-[#9E9E9E]">100%</p>
+                  <p className="text-gray-500 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Stock real</p>
+                </div>
+                <div className="text-center md:text-left">
+                  <p className="text-3xl md:text-5xl font-black text-[#9E9E9E]">24h</p>
+                  <p className="text-gray-500 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Respuesta</p>
+                </div>
+              </div>
             </div>
-            <div className="text-center md:text-left border-x md:border-x-0 md:border-l border-gray-800 md:pl-6">
-              <p className="text-3xl md:text-5xl font-black text-[#9E9E9E]">100%</p>
-              <p className="text-gray-500 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Stock real</p>
+
+            {/* DERECHA — solo desktop, mismo cuadro de Eljach que ya tiene
+                Supply en su hero (HeroSupply.jsx), recoloreado a gris
+                (2026-08-02, pedido de Jose). */}
+            <div className="hidden md:flex justify-center">
+              <div className="bg-gray-900 border border-[#9E9E9E]/30 rounded-2xl p-8 hover:border-[#9E9E9E] hover:shadow-[0_0_25px_rgba(158,158,158,0.15)] transition-all duration-300 w-full max-w-md">
+                <p className="text-zinc-500 uppercase tracking-[0.3em] text-xs mb-4">
+                  Logística · Cobertura
+                </p>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex items-center justify-center bg-white rounded-xl p-2 flex-shrink-0 w-14 h-14">
+                    <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
+                  </div>
+                  <div>
+                    <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Eljach Mensajería Express</p>
+                    <p className="text-zinc-500 text-xs mt-0.5">Aliado logístico · Contra entrega</p>
+                  </div>
+                </div>
+                <div className="space-y-2.5 mb-6">
+                  {[{name:'Chigorodó',time:'1–2 días'},{name:'Carepa',time:'1–2 días'},{name:'Apartadó',time:'1–2 días'},{name:'Turbo',time:'2–3 días'}].map(c => (
+                    <div key={c.name} className="flex items-center justify-between border-b border-zinc-800 pb-2">
+                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#9E9E9E]/30 text-[#9E9E9E] bg-[#9E9E9E]/5">{c.name}</span>
+                      <span className="text-zinc-500 text-[10px] uppercase tracking-[0.12em]">{c.time}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="border-t border-zinc-800 pt-6">
+                  <p className="text-zinc-400 text-sm leading-relaxed">
+                    Contraentrega en toda la región de Urabá. ¿Fuera de la región? También enviamos a
+                    todo Colombia — tiempo y costo se coordinan al confirmar el pedido.
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="text-center md:text-left">
-              <p className="text-3xl md:text-5xl font-black text-[#9E9E9E]">24h</p>
-              <p className="text-gray-500 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Respuesta</p>
-            </div>
+
           </div>
         </div>
       </section>
