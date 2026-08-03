@@ -110,7 +110,7 @@ export default function StorePage() {
       <NavbarStore />
 
       {/* ── HERO ── */}
-      <section className="relative min-h-[65vh] md:min-h-screen flex flex-col justify-start overflow-hidden pt-16 bg-gray-50">
+      <section className="relative flex flex-col justify-start overflow-hidden pt-16 md:pt-20 bg-gray-50">
         <div
           className="absolute inset-0"
           style={{

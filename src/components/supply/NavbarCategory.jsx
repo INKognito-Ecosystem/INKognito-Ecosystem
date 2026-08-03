@@ -4,6 +4,7 @@ import { ShoppingCart, Menu, X } from 'lucide-react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import logoSupply from '../../assets/milogo/supply.webp'
+import AnimatedWordmark from '../AnimatedWordmark'
 
 export default function NavbarCategory({ pageName }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -25,11 +26,11 @@ export default function NavbarCategory({ pageName }) {
             <Link to="/supply" className="flex items-center gap-2">
               <img src={logoSupply} alt="INKognito Supply" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
               <span>
-                <span className="block text-xl md:text-2xl font-black uppercase tracking-wide md:tracking-[0.2em] whitespace-nowrap leading-tight">
-                  <span className="text-white">INK</span>
-                  <span className="text-blue-500">OGNITO </span>
-                  <span className="text-blue-500">SUPPLY</span>
-                </span>
+                <AnimatedWordmark
+                  moduleWord="SUPPLY"
+                  accentClassName="text-blue-500"
+                  className="text-xl md:text-2xl font-black uppercase tracking-wide md:tracking-[0.2em] leading-tight"
+                />
                 <span className="block text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-500 whitespace-nowrap">
                   Tienda Online
                 </span>

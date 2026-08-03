@@ -229,7 +229,7 @@ export default function SuplePage() {
           presentación, como los demás módulos"). Resplandor gris (#9E9E9E,
           el color propio de Suple) bajo el navbar, mismo recurso que
           usan Gym/Store. */}
-      <section className="relative min-h-[55vh] md:min-h-[75vh] flex flex-col justify-start overflow-hidden pt-20 md:pt-32 pb-8 md:pb-14 px-4 md:px-6">
+      <section className="relative flex flex-col justify-start overflow-hidden pt-20 md:pt-20 pb-8 md:pb-14 px-4 md:px-6">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] max-w-[90vw] h-[280px] rounded-full bg-[#9E9E9E]/10 blur-3xl pointer-events-none" />
