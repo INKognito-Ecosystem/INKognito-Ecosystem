@@ -163,8 +163,8 @@ export async function loader() {
 }
 
 export function meta() {
-  const title = 'Suplementos Deportivos | INKognito Suple — Urabá y Colombia'
-  const description = 'Tienda online de proteína, creatina, pre-entreno y vitaminas para potenciar tu entrenamiento. Suplementos deportivos en Urabá, Chigorodó, Antioquia. Envíos a toda Colombia.'
+  const title = 'Suplementos y Accesorios para Entrenar | INKognito Suple — Urabá y Colombia'
+  const description = 'Tienda online de proteína, creatina, pre-entreno y accesorios para entrenar. Potencia tus entrenamientos y optimiza tus resultados. Suplementos deportivos en Urabá, Chigorodó, Antioquia. Envíos a toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },
@@ -229,7 +229,7 @@ export default function SuplePage() {
           presentación, como los demás módulos"). Resplandor gris (#9E9E9E,
           el color propio de Suple) bajo el navbar, mismo recurso que
           usan Gym/Store. */}
-      <section className="relative min-h-[55vh] md:min-h-[75vh] flex flex-col justify-start overflow-hidden pt-24 md:pt-32 pb-8 md:pb-14 px-4 md:px-6">
+      <section className="relative min-h-[55vh] md:min-h-[75vh] flex flex-col justify-start overflow-hidden pt-20 md:pt-32 pb-8 md:pb-14 px-4 md:px-6">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] max-w-[90vw] h-[280px] rounded-full bg-[#9E9E9E]/10 blur-3xl pointer-events-none" />
@@ -238,11 +238,11 @@ export default function SuplePage() {
             INKognito Suple — Urabá, Antioquia
           </p>
           <h1 className="text-4xl sm:text-6xl md:text-8xl font-black uppercase leading-[0.9] mb-6 md:mb-8">
-            <span className="block text-white">Suplementos</span>
-            <span className="block text-[#9E9E9E]">Para Rendir</span>
+            <span className="block text-white">Potencia tus</span>
+            <span className="block text-[#9E9E9E]">Entrenamientos</span>
           </h1>
           <p className="text-gray-300 text-base md:text-xl leading-relaxed max-w-2xl mx-auto md:mx-0 mb-8 md:mb-12">
-            Tienda online de proteína, creatina y pre-entreno de marcas confiables, con stock real y despacho rápido — selección de calidad con envíos desde Urabá a toda Colombia.
+            Tienda online de suplementos y accesorios para entrenar — proteína, creatina, pre-entreno y más, con stock real y despacho rápido. Optimiza tus resultados con marcas confiables y envíos desde Urabá a toda Colombia.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
             <button
