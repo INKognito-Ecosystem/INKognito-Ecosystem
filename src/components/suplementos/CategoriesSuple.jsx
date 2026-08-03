@@ -7,7 +7,10 @@ const DOT_PATTERN = {
   backgroundSize: '18px 18px',
 }
 
-const CAT_ICONS = {
+// Exportado para que el hero (SuplePage.jsx) reuse el mismo set de íconos
+// en su panel "Compra en línea" — un solo lugar define qué ícono va con
+// cada categoría.
+export const CAT_ICONS = {
   'Proteínas':   Beef,
   'Creatina':    Zap,
   'Pre-entreno': Flame,

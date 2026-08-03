@@ -7,16 +7,16 @@ import { useSupleCart } from '../../contexts/SupleCartContext'
 import { FaWhatsapp } from 'react-icons/fa'
 import { ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react'
 import { getAdjacentSupleCategories } from '../../data/supleCategoriesOrder'
+import logoNutriHouse from '../../assets/milogo/nutrihouse.png'
 
 const WA = '573207911013'
 
-// Insignia de proveedor por categoría — por defecto Nutri House (punto
-// físico en Chigorodó, mismo patrón que Tommy Tattoo Supply en Supply).
-// Accesorios es equipo de gimnasio, no suplementos — no es de Nutri House.
+// Insignia de proveedor — Nutri House (punto físico en Chigorodó, mismo
+// patrón que Tommy Tattoo Supply en Supply) suministra las 5 categorías,
+// incluida Accesorios (2026-08-03, confirmado por Jose) — un solo
+// DEFAULT_BADGE alcanza, sin overrides por categoría.
 const DEFAULT_BADGE = 'Suministrado por Nutri House — punto físico en Chigorodó'
-const CATEGORY_BADGE = {
-  Accesorios: null,
-}
+const CATEGORY_BADGE = {}
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
@@ -117,6 +117,14 @@ export default function SupleCategoryPage({ title, categoria, slug, intro, produ
             <div className="relative z-10 flex items-center gap-2 text-xs text-gray-400 bg-gray-900/60 border border-gray-800 rounded-lg px-3 py-2 w-fit mt-4">
               <ShieldCheck size={14} className="shrink-0 text-[#9E9E9E]" />
               <span>{badge}</span>
+              {/* Logo de Nutri House al final de la insignia — versión PNG
+                  con fondo transparente (2026-08-03), sin círculo/recorte:
+                  se deja libre, solo con una altura fija. */}
+              <img
+                src={logoNutriHouse}
+                alt="Nutri House"
+                className="shrink-0 h-14 w-auto ml-1 -my-4"
+              />
             </div>
           )}
         </div>

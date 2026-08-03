@@ -1,16 +1,12 @@
-import { useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router-dom'
 import NavbarSuple from './NavbarSuple'
 import FooterSuple from './FooterSuple'
-import CategoriesSuple from './CategoriesSuple'
+import CategoriesSuple, { CAT_ICONS } from './CategoriesSuple'
+import { SUPLE_CATEGORIES_ORDER } from '../../data/supleCategoriesOrder'
 import { fetchCatalogFull } from '../../hooks/useCatalog'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Dumbbell } from 'lucide-react'
 
 const WA = '573207911013'
-
-const GRID_PATTERN = {
-  backgroundImage:
-    'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
-}
 
 // Mismo patrón punteado que ya usan las secciones de cobertura/contacto de
 // Supply y Store (2026-08-02, "mismo patrón que las demás páginas").
@@ -43,28 +39,42 @@ export default function SuplePage() {
     <div className="min-h-screen bg-gray-950 text-white">
       <NavbarSuple />
 
-      {/* HERO — misma presentación de módulo que Store/Supply/Gym (eyebrow +
-          título grande + descripción + CTAs + stats), en vez de la card
-          de categoría heredada de cuando esto era una página de Gym
-          (2026-08-02, pedido explícito de Jose: "vamos a darle su
-          presentación, como los demás módulos"). Resplandor gris (#9E9E9E,
-          el color propio de Suple) bajo el navbar, mismo recurso que
-          usan Gym/Store. */}
-      <section className="relative flex flex-col justify-start overflow-hidden pt-20 md:pt-32 pb-8 md:pb-14 px-4 md:px-6">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
-        <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] max-w-[90vw] h-[280px] rounded-full bg-[#9E9E9E]/10 blur-3xl pointer-events-none" />
+      {/* HERO — (2026-08-03) rediseñado a pedido de Jose: la versión anterior
+          era estructuralmente la misma fórmula de Store/Supply (eyebrow +
+          h1 apilado + párrafo + CTAs + 3 stats en grid + card de Eljach a
+          la derecha), solo recoloreada a gris — "creo que deberia... darle
+          un aire totalmente diferente y propio". Se mantiene la paleta
+          (#9E9E9E) y el párrafo descriptivo que a Jose ya le gustaba
+          (agregado un cierre mencionando la compra en línea), pero la
+          composición cambia: grid asimétrico 3/2 en vez de 2 columnas
+          simétricas, título con "Entrenamientos" resaltado tipo marcador
+          en vez de solo coloreado, silueta de mancuerna de fondo (propia
+          del rubro, nadie más en el sitio la usa) en vez del blur circular
+          genérico, stats como ticker horizontal con bordes en vez de grid
+          suelto, y la card de la derecha deja de ser el mismo cuadro de
+          Eljach copiado de Supply — ahora es un panel "Compra en línea"
+          con acceso directo a las 5 categorías (mismo ícono que sus cards
+          más abajo, vía CAT_ICONS) y Eljach queda como nota al pie, no
+          como protagonista. */}
+      <section className="relative overflow-hidden pt-20 md:pt-28 pb-10 md:pb-16 px-4 md:px-6 bg-gray-950">
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-950 to-gray-900" />
+        <Dumbbell
+          className="hidden md:block absolute -right-10 top-1/2 -translate-y-1/2 text-[#9E9E9E]/[0.06] pointer-events-none"
+          style={{ transform: 'translateY(-50%) rotate(-20deg)' }}
+          size={480}
+          strokeWidth={1}
+        />
         <div className="relative z-10 max-w-7xl mx-auto">
-          <div className="md:grid md:grid-cols-2 md:gap-16 md:items-start">
+          <div className="md:grid md:grid-cols-5 md:gap-12 md:items-end">
 
-            {/* IZQUIERDA */}
-            <div className="text-center md:text-left">
+            {/* IZQUIERDA — 3/5 */}
+            <div className="md:col-span-3 text-center md:text-left">
               <p className="uppercase tracking-[0.4em] text-[#9E9E9E] text-xs md:text-sm mb-4 md:mb-6 font-semibold">
                 INKognito Suple — Urabá, Antioquia
               </p>
-              <h1 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase leading-[0.9] mb-6 md:mb-8">
+              <h1 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase leading-[1.05] mb-6 md:mb-8">
                 <span className="block text-white">Potencia tus</span>
-                <span className="block text-[#9E9E9E]">Entrenamientos</span>
+                <span className="inline-block bg-[#9E9E9E] text-gray-950 px-2 -mx-2 md:px-3 md:-mx-3">Entrenamientos</span>
               </h1>
               <p className="text-gray-300 text-base md:text-xl leading-relaxed max-w-2xl mx-auto md:mx-0 mb-8 md:mb-12">
                 Tienda online de suplementos y accesorios para entrenar — proteína, creatina, pre-entreno y más, con stock real y despacho rápido. Optimiza tus resultados con marcas confiables y envíos desde Urabá a toda Colombia.
@@ -87,53 +97,69 @@ export default function SuplePage() {
                 </a>
               </div>
 
-              {/* STATS */}
-              <div className="mt-8 md:mt-16 grid grid-cols-3 gap-6 max-w-xl mx-auto md:mx-0">
-                <div className="text-center md:text-left">
-                  <p className="text-3xl md:text-5xl font-black text-[#9E9E9E]">4</p>
-                  <p className="text-gray-500 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Municipios</p>
-                </div>
-                <div className="text-center md:text-left border-x md:border-x-0 md:border-l border-gray-800 md:pl-6">
-                  <p className="text-3xl md:text-5xl font-black text-[#9E9E9E]">100%</p>
-                  <p className="text-gray-500 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Stock real</p>
-                </div>
-                <div className="text-center md:text-left">
-                  <p className="text-3xl md:text-5xl font-black text-[#9E9E9E]">24h</p>
-                  <p className="text-gray-500 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Respuesta</p>
-                </div>
+              {/* POR OBJETIVO — mismo lugar/formato que las 3 marcas de
+                  HeroSupply.jsx, pero con contenido propio de Suple: no hay
+                  marcas propias todavía (Nutri House sin cerrar), así que en
+                  vez de forzar 3 marcas vacías, son 3 objetivos de
+                  entrenamiento, cada uno a la categoría más relevante
+                  (2026-08-03, pedido de Jose). */}
+              <div className="grid grid-cols-3 md:flex md:flex-wrap gap-3 mt-6 md:mt-8">
+                <Link
+                  to="/suplementos/proteinas"
+                  className="text-center py-3 border border-[#9E9E9E] text-white uppercase tracking-wider text-[11px] md:text-sm md:px-6 hover:bg-[#9E9E9E] hover:text-gray-950 transition-all duration-300"
+                >
+                  Ganar Masa
+                </Link>
+                <Link
+                  to="/suplementos/vitaminas"
+                  className="text-center py-3 border border-[#9E9E9E] text-white uppercase tracking-wider text-[11px] md:text-sm md:px-6 hover:bg-[#9E9E9E] hover:text-gray-950 transition-all duration-300"
+                >
+                  Definición
+                </Link>
+                <Link
+                  to="/suplementos/pre-entreno"
+                  className="text-center py-3 border border-[#9E9E9E] text-white uppercase tracking-wider text-[11px] md:text-sm md:px-6 hover:bg-[#9E9E9E] hover:text-gray-950 transition-all duration-300"
+                >
+                  Rendimiento
+                </Link>
+              </div>
+
+              {/* STATS — ticker horizontal con bordes, no el grid suelto de Store */}
+              <div className="mt-8 md:mt-14 flex justify-center md:justify-start divide-x divide-gray-800 border-y border-gray-800 max-w-md mx-auto md:mx-0">
+                {[{n:'4',l:'Municipios'},{n:'100%',l:'Stock real'},{n:'24h',l:'Respuesta'}].map(s => (
+                  <div key={s.l} className="flex-1 px-4 md:px-6 py-4 text-center md:text-left">
+                    <p className="text-2xl md:text-4xl font-black text-[#9E9E9E] [font-variant-numeric:tabular-nums]">{s.n}</p>
+                    <p className="text-gray-500 uppercase tracking-[0.2em] text-[9px] md:text-[10px] mt-1">{s.l}</p>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* DERECHA — solo desktop, mismo cuadro de Eljach que ya tiene
-                Supply en su hero (HeroSupply.jsx), recoloreado a gris
-                (2026-08-02, pedido de Jose). */}
-            <div className="hidden md:flex justify-center">
-              <div className="bg-gray-900 border border-[#9E9E9E]/30 rounded-2xl p-8 hover:border-[#9E9E9E] hover:shadow-[0_0_25px_rgba(158,158,158,0.15)] transition-all duration-300 w-full max-w-md">
-                <p className="text-zinc-500 uppercase tracking-[0.3em] text-xs mb-4">
-                  Logística · Cobertura
-                </p>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="flex items-center justify-center bg-white rounded-xl p-2 flex-shrink-0 w-14 h-14">
-                    <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
-                  </div>
-                  <div>
-                    <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Eljach Mensajería Express</p>
-                    <p className="text-zinc-500 text-xs mt-0.5">Aliado logístico · Contra entrega</p>
-                  </div>
+            {/* DERECHA — 2/5, solo desktop: panel "Compra en línea" con
+                acceso directo a las 5 categorías, Eljach como nota al pie. */}
+            <div className="hidden md:block md:col-span-2">
+              <div className="bg-gray-900/70 border border-gray-800 rounded-2xl p-6 backdrop-blur-sm">
+                <p className="text-[#9E9E9E] uppercase tracking-[0.3em] text-xs mb-1">Compra en línea</p>
+                <p className="text-gray-500 text-xs mb-5">Elige tu categoría y arma tu pedido en minutos.</p>
+                <div className="flex flex-col gap-2">
+                  {SUPLE_CATEGORIES_ORDER.map(cat => {
+                    const Icon = CAT_ICONS[cat.name]
+                    return (
+                      <Link
+                        key={cat.slug}
+                        to={`/suplementos/${cat.slug}`}
+                        className="group flex items-center gap-3 px-3 py-2.5 rounded-lg border border-gray-800 hover:border-[#9E9E9E] transition-all duration-300"
+                      >
+                        {Icon && <Icon size={16} className="text-[#9E9E9E] flex-shrink-0" />}
+                        <span className="text-xs font-bold uppercase tracking-wide text-gray-300 group-hover:text-white flex-1">{cat.name}</span>
+                        <span className="text-gray-600 group-hover:text-[#9E9E9E] group-hover:translate-x-0.5 transition-all duration-300">→</span>
+                      </Link>
+                    )
+                  })}
                 </div>
-                <div className="space-y-2.5 mb-6">
-                  {[{name:'Chigorodó',time:'1–2 días'},{name:'Carepa',time:'1–2 días'},{name:'Apartadó',time:'1–2 días'},{name:'Turbo',time:'2–3 días'}].map(c => (
-                    <div key={c.name} className="flex items-center justify-between border-b border-zinc-800 pb-2">
-                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#9E9E9E]/30 text-[#9E9E9E] bg-[#9E9E9E]/5">{c.name}</span>
-                      <span className="text-zinc-500 text-[10px] uppercase tracking-[0.12em]">{c.time}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="border-t border-zinc-800 pt-6">
-                  <p className="text-zinc-400 text-sm leading-relaxed">
-                    Contraentrega en toda la región de Urabá. ¿Fuera de la región? También enviamos a
-                    todo Colombia — tiempo y costo se coordinan al confirmar el pedido.
-                  </p>
+                <div className="mt-5 pt-5 border-t border-gray-800 flex items-center gap-2">
+                  <img src="/eljach.png" alt="" className="w-4 h-4 object-contain opacity-70" />
+                  <span className="text-gray-500 text-[10px] uppercase tracking-[0.15em]">Envíos con Eljach a toda la región</span>
                 </div>
               </div>
             </div>

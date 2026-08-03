@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa'
 import { FlaskConical } from 'lucide-react'
 
 export default function FooterSuple() {
@@ -55,22 +54,8 @@ export default function FooterSuple() {
           {/* DERECHA */}
           <div className="md:text-right">
             <p className="uppercase tracking-[0.25em] text-gray-400 text-sm mb-6 font-semibold">
-              Redes sociales
+              Ecosistema
             </p>
-            <div className="flex md:justify-end gap-5 mb-8">
-              <a href="#" target="_blank" rel="noopener noreferrer"
-                className="text-gray-500 hover:text-white transition-all duration-300">
-                <FaYoutube size={20} />
-              </a>
-              <a href="#" target="_blank" rel="noopener noreferrer"
-                className="text-gray-500 hover:text-white transition-all duration-300">
-                <FaInstagram size={20} />
-              </a>
-              <a href="#" target="_blank" rel="noopener noreferrer"
-                className="text-gray-500 hover:text-white transition-all duration-300">
-                <FaFacebookF size={20} />
-              </a>
-            </div>
             <Link
               to="/"
               className="inline-block border border-gray-700 px-6 py-3 uppercase tracking-[0.2em] text-sm text-gray-300 hover:border-gray-400 hover:text-white transition-all duration-300"

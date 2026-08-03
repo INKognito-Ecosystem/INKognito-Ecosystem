@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { FaWhatsapp, FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa'
+import { FaWhatsapp } from 'react-icons/fa'
 
 const STRIPE_PATTERN = {
   backgroundImage: 'repeating-linear-gradient(45deg,transparent,transparent 19px,rgba(201,168,76,1) 19px,rgba(201,168,76,1) 20px)',
@@ -32,15 +32,6 @@ export default function FooterStore() {
                 className="text-gray-500 hover:text-[#C9A84C] transition-all duration-300"
               >
                 <FaWhatsapp size={20} />
-              </a>
-              <a href="#" className="text-gray-500 hover:text-[#C9A84C] transition-all duration-300">
-                <FaInstagram size={20} />
-              </a>
-              <a href="#" className="text-gray-500 hover:text-[#C9A84C] transition-all duration-300">
-                <FaFacebookF size={20} />
-              </a>
-              <a href="#" className="text-gray-500 hover:text-[#C9A84C] transition-all duration-300">
-                <FaYoutube size={20} />
               </a>
             </div>
           </div>
