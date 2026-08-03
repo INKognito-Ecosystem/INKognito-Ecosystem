@@ -7,17 +7,22 @@ const DOT_PATTERN = {
 
 export default function HeroSupply() {
 
-  // pt-24 fijo (antes pt-16 en móvil, igual a la altura del navbar h-16 — el
-  // título quedaba pegado al borde, reportado por Jose 2026-08-03)
+  // pt-20 (antes pt-16 en móvil, igual a la altura del navbar h-16 — el
+  // título quedaba pegado al borde; pt-24 quedó muy separado, reportado por
+  // Jose 2026-08-03)
   return (
 
-    <section className="relative pt-24 pb-4 md:pb-8 bg-gray-950 text-white flex items-center px-6 overflow-hidden">
+    <section className="relative pt-20 pb-4 md:pb-8 bg-gray-950 text-white flex items-center px-6 overflow-hidden">
       <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
 
       <div className="relative z-10 max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-16 items-center">
 
-        {/* IZQUIERDA */}
-        <div>
+        {/* IZQUIERDA — centrado en móvil, igual que Store/Suple (2026-08-03) */}
+        <div className="text-center md:text-left">
+
+          <p className="uppercase tracking-[0.4em] text-blue-500 text-xs md:text-sm mb-4 md:mb-6 font-semibold">
+            INKognito Supply — Urabá, Antioquia
+          </p>
 
           <h1 className="text-5xl md:text-7xl font-black uppercase leading-[0.9]">
             Professional
@@ -27,7 +32,7 @@ export default function HeroSupply() {
             Equipment
           </h1>
 
-          <p className="mt-3 text-zinc-400 text-lg leading-relaxed max-w-xl">
+          <p className="mt-3 text-zinc-400 text-lg leading-relaxed max-w-xl mx-auto md:mx-0">
             Tienda online que reúne productos de proveedores locales y
             nacionales, verificados y reconocidos. Stock real, calidad
             garantizada y el respaldo que tu trabajo exige.
