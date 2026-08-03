@@ -29,7 +29,7 @@ export default function NavbarCategoryStore({ pageName }) {
                 <AnimatedWordmark
                   moduleWord="STORE"
                   accentClassName="text-[#C9A84C]"
-                  className="text-base md:text-2xl font-black uppercase tracking-wide md:tracking-[0.2em] leading-tight"
+                  className="text-xl md:text-2xl font-black uppercase tracking-wide md:tracking-[0.2em] leading-tight"
                 />
                 <span className="block text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-500 whitespace-nowrap">
                   Tienda Online
