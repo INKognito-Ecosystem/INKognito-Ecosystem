@@ -23,7 +23,10 @@ export default function CartDrawerSupply({ open, onClose }) {
 
   const buildWhatsAppMessage = () => {
     const lines = items.map(i => {
-      const variante = i.brand ? ` (${i.brand})` : ''
+      // mixLabel: mezcla de calibres de una caja surtida armada a medida
+      // (ver AgujasSurtidasPage.jsx) — sin esto el mensaje de WhatsApp no
+      // decía qué combinación pidió el cliente (2026-08-02).
+      const variante = i.mixLabel ? ` (${i.mixLabel})` : i.brand ? ` (${i.brand})` : ''
       return `• ${i.name}${variante} — ${i.qty} und — ${i.price} c/u`
     })
     const msg = [
@@ -102,6 +105,9 @@ export default function CartDrawerSupply({ open, onClose }) {
                         <p className="font-black uppercase text-sm leading-tight truncate text-white">
                           {item.name}
                         </p>
+                        {item.mixLabel && (
+                          <p className="text-zinc-500 text-[11px] mt-0.5 truncate">{item.mixLabel}</p>
+                        )}
                       </div>
                       <button
                         onClick={() => removeItem(item.key)}

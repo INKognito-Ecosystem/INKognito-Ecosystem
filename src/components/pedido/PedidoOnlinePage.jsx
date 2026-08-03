@@ -158,7 +158,11 @@ export default function PedidoOnlinePage() {
   const precioFlete = enCobertura && fleteTabla ? fleteTabla[fleteOrigen]?.[form.municipioSel] : null
 
   const productosStr = items.map(i => {
-    const detalle = i.size ? ` (Talla ${i.size})` : i.brand ? ` (${i.brand})` : ''
+    // mixLabel: desglose de calibres de una caja surtida armada a medida
+    // (ver AgujasSurtidasPage.jsx) — sin esto, el pedido llegaba al panel
+    // solo como "1x Caja Surtida x20", sin decir qué mezcla pidió el
+    // cliente (2026-08-02).
+    const detalle = i.size ? ` (Talla ${i.size})` : i.mixLabel ? ` (${i.mixLabel})` : i.brand ? ` (${i.brand})` : ''
     return `${i.qty}x ${i.name}${detalle}`
   }).join(', ')
 
@@ -399,7 +403,7 @@ export default function PedidoOnlinePage() {
                   return (
                     <div key={item.key} className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm">
                       <span className="text-gray-300 truncate">
-                        {item.qty}x {item.name}{item.size ? ` (T. ${item.size})` : ''}
+                        {item.qty}x {item.name}{item.size ? ` (T. ${item.size})` : item.mixLabel ? ` (${item.mixLabel})` : ''}
                       </span>
                       <span className="text-gray-500 flex-shrink-0">${(unitPrice * item.qty).toLocaleString('es-CO')}</span>
                     </div>

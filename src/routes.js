@@ -45,6 +45,7 @@ export default [
   route('supply/ink/world-famous', 'components/supply/categories/ink/WorldFamousColorsPage.jsx'),
   route('supply/ink/solid-ink', 'components/supply/categories/ink/SolidColorsPage.jsx'),
   route('supply/needles', 'components/supply/categories/NeedlesPage.jsx'),
+  route('supply/agujas-surtidas', 'components/supply/categories/AgujasSurtidasPage.jsx'),
   route('supply/gloves', 'components/supply/categories/GlovesPage.jsx'),
   route('supply/aftercare', 'components/supply/categories/AftercarePage.jsx'),
   route('supply/accessories', 'components/supply/categories/AccessoriesPage.jsx'),

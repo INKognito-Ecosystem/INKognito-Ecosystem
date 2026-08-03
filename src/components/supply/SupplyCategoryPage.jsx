@@ -129,7 +129,7 @@ function AfiliadoCard({ item }) {
 // meta() (título/description/canonical) también quedó en cada wrapper, no
 // acá — evita mezclar <Seo>/Helmet con meta() en la misma ruta (rompe la
 // hidratación, ver nota en HomePage.jsx).
-export default function SupplyCategoryPage({ title, categoria, slug, intro, guide, faqs, products = [], afiliados = [] }) {
+export default function SupplyCategoryPage({ title, categoria, slug, intro, guide, faqs, products = [], afiliados = [], extraCTA = null }) {
   const CatIcon = CAT_ICONS[categoria] || null
   const { prev, next } = getAdjacentCategories(slug)
   const scrolled = useScrolled()
@@ -197,6 +197,9 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
               <ShieldCheck size={14} className="shrink-0 text-blue-400" />
               <span>{categoria in CATEGORY_BADGE ? CATEGORY_BADGE[categoria] : DEFAULT_BADGE}</span>
             </div>
+          )}
+          {extraCTA && (
+            <div className="relative z-10 mt-4">{extraCTA}</div>
           )}
         </div>
 

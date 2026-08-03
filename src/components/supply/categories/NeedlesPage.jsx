@@ -1,4 +1,5 @@
-import { useLoaderData } from 'react-router'
+import { useLoaderData, Link } from 'react-router'
+import { Package } from 'lucide-react'
 import SupplyCategoryPage from '../SupplyCategoryPage'
 import { fetchCatalogCategoria } from '../../../hooks/useCatalog'
 
@@ -51,6 +52,17 @@ export default function NeedlesPage() {
       faqs={faqs}
       products={products}
       afiliados={afiliados}
+      extraCTA={
+        <Link
+          to="/supply/agujas-surtidas"
+          className="flex items-center gap-3 border border-blue-500/30 bg-blue-500/5 rounded-lg px-4 py-3 hover:border-blue-500/60 hover:bg-blue-500/10 transition-all duration-300 w-fit"
+        >
+          <Package size={18} className="text-blue-400 flex-shrink-0" />
+          <span className="text-sm text-zinc-300">
+            <span className="font-bold text-white">¿Necesitas variedad de calibres?</span> Arma tu caja surtida de 20 agujas a tu gusto →
+          </span>
+        </Link>
+      }
     />
   )
 }
