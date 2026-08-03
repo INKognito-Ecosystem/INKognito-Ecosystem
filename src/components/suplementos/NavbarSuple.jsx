@@ -1,7 +1,11 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { Menu, X, ShoppingCart } from 'lucide-react'
-import logoSuple from '../../assets/milogo/milogo.webp'
+// Mismo logo que ya usaba Gym (gris, coherente con el color de marca de
+// Suple) — no existe todavía un logo propio subido para el módulo, así
+// que se reusa el de Gym mientras tanto (2026-08-02, pedido de Jose:
+// "así como estaban en gym").
+import logoSuple from '../../assets/milogo/gym.webp'
 import AnimatedWordmark from '../AnimatedWordmark'
 import { useSupleCart } from '../../contexts/SupleCartContext'
 import CartDrawerSuple from './CartDrawerSuple'
