@@ -7,9 +7,11 @@ const DOT_PATTERN = {
 
 export default function HeroSupply() {
 
+  // pt-24 fijo (antes pt-16 en móvil, igual a la altura del navbar h-16 — el
+  // título quedaba pegado al borde, reportado por Jose 2026-08-03)
   return (
 
-    <section className="relative pt-16 md:pt-24 pb-4 md:pb-8 bg-gray-950 text-white flex items-center px-6 overflow-hidden">
+    <section className="relative pt-24 pb-4 md:pb-8 bg-gray-950 text-white flex items-center px-6 overflow-hidden">
       <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
 
       <div className="relative z-10 max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-16 items-center">

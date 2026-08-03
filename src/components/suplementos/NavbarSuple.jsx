@@ -7,6 +7,7 @@ import { Menu, X, ShoppingCart } from 'lucide-react'
 // "así como estaban en gym").
 import logoSuple from '../../assets/milogo/gym.webp'
 import AnimatedWordmark from '../AnimatedWordmark'
+import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import { useSupleCart } from '../../contexts/SupleCartContext'
 import CartDrawerSuple from './CartDrawerSuple'
 
@@ -19,7 +20,11 @@ export default function NavbarSuple() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full z-50 bg-gray-950 border-b border-gray-800">
+      {/* shadow-[...] es el mismo "resplandor" que ya usa NavbarSupply.jsx
+          bajo su barra (shadow-[0_6px_35px_rgba(59,130,246,0.25)], en azul)
+          para separar visualmente el navbar del hero — acá en gris, el
+          color propio de Suple (2026-08-03, pedido de Jose). */}
+      <nav className="fixed top-0 left-0 w-full z-50 bg-gray-950 border-b border-gray-800 shadow-[0_6px_35px_rgba(158,158,158,0.20)]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="h-16 md:h-20 flex items-center justify-between">
 
@@ -69,18 +74,11 @@ export default function NavbarSuple() {
               Inicio
             </Link>
             <div className="border-t border-gray-800 mt-1 pt-1">
-              <Link to="/jhumaneztattoo" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
-                JHumanezTattoo
-              </Link>
-              <Link to="/supply" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
-                INKognito Supply
-              </Link>
-              <Link to="/store" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
-                INKognito Store
-              </Link>
-              <Link to="/gym" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
-                INKognito Gym
-              </Link>
+              <InkognitoModuleMenu
+                current="suple"
+                textClassName="text-gray-400 hover:text-white hover:bg-gray-900"
+                onNavigate={close}
+              />
               <Link to="/" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300">
                 Ecosistema
               </Link>

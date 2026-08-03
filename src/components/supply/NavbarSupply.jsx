@@ -5,6 +5,7 @@ import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import logoSupply from '../../assets/milogo/supply.webp'
 import AnimatedWordmark from '../AnimatedWordmark'
+import InkognitoModuleMenu from '../InkognitoModuleMenu'
 
 export default function NavbarSupply() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -94,18 +95,11 @@ export default function NavbarSupply() {
                   className="block w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
                   Contacto
                 </button>
-                <Link to="/jhumaneztattoo" onClick={() => setMenuOpen(false)}
-                  className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
-                  JHumanezTattoo
-                </Link>
-                <Link to="/store" onClick={() => setMenuOpen(false)}
-                  className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
-                  INKognito Store
-                </Link>
-                <Link to="/gym" onClick={() => setMenuOpen(false)}
-                  className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
-                  INKognito Gym
-                </Link>
+                <InkognitoModuleMenu
+                  current="supply"
+                  textClassName="text-zinc-400 hover:text-white hover:bg-zinc-900"
+                  onNavigate={() => setMenuOpen(false)}
+                />
                 <Link to="/" onClick={() => setMenuOpen(false)}
                   className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
                   Ecosistema

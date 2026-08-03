@@ -126,7 +126,7 @@ export default function SuplePage() {
 
               {/* STATS — ticker horizontal con bordes, no el grid suelto de Store */}
               <div className="mt-8 md:mt-14 flex justify-center md:justify-start divide-x divide-gray-800 border-y border-gray-800 max-w-md mx-auto md:mx-0">
-                {[{n:'4',l:'Municipios'},{n:'100%',l:'Stock real'},{n:'24h',l:'Respuesta'}].map(s => (
+                {[{n:'4',l:'Municipios'},{n:'100%',l:'Stock real'}].map(s => (
                   <div key={s.l} className="flex-1 px-4 md:px-6 py-4 text-center md:text-left">
                     <p className="text-2xl md:text-4xl font-black text-[#9E9E9E] [font-variant-numeric:tabular-nums]">{s.n}</p>
                     <p className="text-gray-500 uppercase tracking-[0.2em] text-[9px] md:text-[10px] mt-1">{s.l}</p>

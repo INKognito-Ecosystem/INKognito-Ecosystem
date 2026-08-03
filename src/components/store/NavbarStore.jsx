@@ -5,6 +5,7 @@ import { useStoreCart } from '../../contexts/StoreCartContext'
 import CartDrawerStore from './CartDrawerStore'
 import logoStore from '../../assets/milogo/store.webp'
 import AnimatedWordmark from '../AnimatedWordmark'
+import InkognitoModuleMenu from '../InkognitoModuleMenu'
 
 export default function NavbarStore() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -95,15 +96,11 @@ export default function NavbarStore() {
                 <button onClick={() => { scrollTo('contacto'); setMenuOpen(false) }} className="block w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
                   Contacto
                 </button>
-                <Link to="/jhumaneztattoo" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
-                  JHumanezTattoo
-                </Link>
-                <Link to="/supply" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
-                  INKognito Supply
-                </Link>
-                <Link to="/gym" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
-                  INKognito Gym
-                </Link>
+                <InkognitoModuleMenu
+                  current="store"
+                  textClassName="text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900"
+                  onNavigate={() => setMenuOpen(false)}
+                />
                 <Link to="/" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
                   Ecosistema
                 </Link>
