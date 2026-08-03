@@ -234,7 +234,7 @@ export default function SuplePage() {
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] max-w-[90vw] h-[280px] rounded-full bg-[#9E9E9E]/10 blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-7xl mx-auto">
-          <div className="md:grid md:grid-cols-2 md:gap-16 md:items-center">
+          <div className="md:grid md:grid-cols-2 md:gap-16 md:items-start">
 
             {/* IZQUIERDA */}
             <div className="text-center md:text-left">

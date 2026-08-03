@@ -122,7 +122,7 @@ export default function StorePage() {
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C9A84C]/25 to-transparent" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 pt-4 pb-8 md:pt-8 md:pb-12">
-          <div className="md:grid md:grid-cols-2 md:gap-16 md:items-center">
+          <div className="md:grid md:grid-cols-2 md:gap-16 md:items-start">
 
             {/* IZQUIERDA */}
             <div className="text-center md:text-left">
