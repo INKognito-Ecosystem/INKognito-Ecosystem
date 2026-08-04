@@ -56,6 +56,14 @@ export default function ArtistaLandingPage() {
     ? `https://wa.me/${artista.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${artista.nombre}, te encontré en Tattoo Artist Urabá y quiero preguntarte por una cita.`)}`
     : null
 
+  // El contacto es directo por WhatsApp — no hay forma de saber si se
+  // volvió una venta real (decisión 2026-08-04, ver debate sobre modelo
+  // Tattoodo vs suscripción). Este conteo de clics es la métrica de valor
+  // que se le mostrará al artista para justificar la suscripción.
+  const trackWhatsappClick = () => {
+    fetch(`${PANEL_URL}/api/artistas/${artista.id}/click-whatsapp`, { method: 'POST' }).catch(() => {})
+  }
+
   const tieneContacto = Boolean(waLink)
   const trabajos = [artista.foto_trabajo_1, artista.foto_trabajo_2, artista.foto_trabajo_3].filter(Boolean)
 
@@ -110,6 +118,14 @@ export default function ArtistaLandingPage() {
                   <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-gray-500">
                     <Palette size={13} />
                     {artista.estilo}
+                  </span>
+                )}
+                {artista.precio_nivel && (
+                  <span className="text-xs font-bold tracking-widest text-gray-500">{'$'.repeat(artista.precio_nivel)}</span>
+                )}
+                {artista.disponibilidad && (
+                  <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ backgroundColor: `${ACCENT}12`, color: ACCENT }}>
+                    {artista.disponibilidad}
                   </span>
                 )}
               </div>
@@ -192,6 +208,29 @@ export default function ArtistaLandingPage() {
           </div>
         )}
 
+        {/* INFO ADICIONAL — límites y preguntas frecuentes, autoreportadas
+            por el artista (sin verificación, mismo criterio que las
+            reseñas — ver debate 2026-08-04). Todo opcional, no cambia nada
+            de lo que ya existía arriba. (Se descartó "Especialidades"
+            aparte de "Estilo" — Jose notó que se repetiría el mismo
+            contenido, ej. "Realismo, línea fina" ya vive en Estilo.) */}
+        {(artista.no_tatua || artista.faq) && (
+          <div className="max-w-3xl mx-auto px-4 mt-6 space-y-4">
+            {artista.no_tatua && (
+              <div>
+                <p className="text-gray-400 text-[11px] uppercase tracking-widest mb-1">No tatúa</p>
+                <p className="text-gray-700 text-sm leading-relaxed">{artista.no_tatua}</p>
+              </div>
+            )}
+            {artista.faq && (
+              <div>
+                <p className="text-gray-400 text-[11px] uppercase tracking-widest mb-1">Preguntas frecuentes</p>
+                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">{artista.faq}</p>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="max-w-3xl mx-auto px-4">
           <div className="border-t border-gray-200 pt-5 mt-6 pb-10">
             <Link to="/tattoo-artist-uraba" className="text-gray-400 hover:text-gray-900 text-xs uppercase tracking-widest transition-colors">
@@ -219,6 +258,7 @@ export default function ArtistaLandingPage() {
               href={waLink}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={trackWhatsappClick}
               className="flex items-center justify-center gap-2.5 py-3 bg-green-600 text-white font-black uppercase tracking-widest rounded hover:bg-green-500 transition-all text-sm"
             >
               <FaWhatsapp size={18} />
