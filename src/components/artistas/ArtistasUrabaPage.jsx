@@ -84,21 +84,43 @@ function esArtistaNuevo(createdAt) {
   return dias >= 0 && dias <= DIAS_ARTISTA_NUEVO
 }
 
+// Umbral de largo de texto para decidir si "especialidades"/"sobre mí"
+// caben en la fila compacta de una card o se vuelven un botón que abre el
+// modal inferior (Jose, 2026-08-05: "si las especialidades son varias, y
+// no caben en la card, deberán volverse un boton... lo mismo pasara con
+// el sobre mi, si el texto es muy largo"). Compartido entre ArtistaCercanoCard
+// y ListingRow — sin medir el DOM real, un umbral de caracteres alcanza.
+const ESTILO_BOTON_MIN = 18
+const BIO_BOTON_MIN = 45
+
 // Card ancha del carrusel "Artistas más cercanos" (2026-08-05, pedido de
 // Jose tras ver cómo Tattoodo sugiere artistas cercanos sin que el
 // visitante busque nada — "como sugerencias parecido a cuando facebook
 // las muestra"). Deliberadamente más grande que ListingRow (fotos de
 // trabajo primero, como una vitrina) — ListingRow sigue siendo la fila
 // compacta de RESULTADOS DE BÚSQUEDA, esta es la de descubrimiento.
-function ArtistaCercanoCard({ a, distanciaTexto }) {
+//
+// v2 (2026-08-05) — v1 montaba el avatar con margen negativo para que
+// "flotara" sobre las fotos de trabajo, estilo portada de Facebook — pero
+// con fotos reales (no el placeholder de letra que se usó al verificar
+// v1) el avatar quedaba parcialmente tapado por ellas (Jose: "las fotos
+// de arriba mocharon el circulo"). Se cambia a un layout más simple y sin
+// solapamientos: avatar en línea junto al nombre, como ya hace
+// ListingRow — mismo patrón en todo el módulo, cero riesgo de que una
+// imagen tape a otra. También se agregan estilo/bio (antes solo mostraba
+// municipio+departamento), reusando el mismo botón-que-abre-modal que ya
+// existe en ListingRow en vez de duplicar esa lógica.
+function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo }) {
   const fotos = [a.foto_trabajo_1, a.foto_trabajo_2].filter(Boolean)
   const nuevo = esArtistaNuevo(a.created_at)
+  const abrirInfo = (e) => { e.preventDefault(); e.stopPropagation(); onVerInfo() }
+
   return (
     <Link
       to={`/artista/${a.id}`}
       className="flex-shrink-0 w-56 snap-start rounded-xl border border-gray-200 hover:border-gray-300 bg-white overflow-hidden transition-colors"
     >
-      <div className="relative h-32 bg-gray-100 flex gap-0.5">
+      <div className="relative h-28 bg-gray-100 flex gap-0.5">
         {fotos.length > 0 ? fotos.map((f, i) => (
           <img key={i} src={f} alt="" className="flex-1 h-full object-cover" loading="lazy" />
         )) : (
@@ -116,11 +138,11 @@ function ArtistaCercanoCard({ a, distanciaTexto }) {
         )}
       </div>
       <div className="p-3">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center border border-white -mt-6 shadow-sm">
+        <div className="flex items-center gap-2 flex-nowrap">
+          <div className="w-7 h-7 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
             {a.foto_url
               ? <img src={a.foto_url} alt={a.nombre} className="w-full h-full object-cover" loading="lazy" />
-              : <span className="text-gray-300 text-xs font-black">{a.nombre?.[0]?.toUpperCase() || '?'}</span>}
+              : <span className="text-gray-300 text-[10px] font-black">{a.nombre?.[0]?.toUpperCase() || '?'}</span>}
           </div>
           <p className="font-black uppercase text-xs leading-tight truncate text-gray-900 min-w-0 flex-1">{a.nombre}</p>
           <BadgeCheck size={13} style={{ color: ACCENT }} className="flex-shrink-0" />
@@ -128,8 +150,26 @@ function ArtistaCercanoCard({ a, distanciaTexto }) {
         <p className="text-gray-500 text-[10px] uppercase tracking-wide mt-1.5 truncate">
           {a.municipio}{a.departamento ? `, ${a.departamento}` : ''}
         </p>
+        {a.estilo && (
+          a.estilo.length > ESTILO_BOTON_MIN ? (
+            <button type="button" onClick={abrirInfo} className="text-[10px] font-bold uppercase tracking-wide underline underline-offset-2 mt-1" style={{ color: ACCENT }}>
+              Especialidades
+            </button>
+          ) : (
+            <p className="text-gray-500 text-[10px] uppercase tracking-wide mt-1 truncate">{a.estilo}</p>
+          )
+        )}
+        {a.bio && (
+          a.bio.length > BIO_BOTON_MIN ? (
+            <button type="button" onClick={abrirInfo} className="block w-full text-left text-gray-400 text-[10px] mt-1 truncate underline underline-offset-2 decoration-gray-300">
+              {a.bio}
+            </button>
+          ) : (
+            <p className="text-gray-400 text-[10px] mt-1 truncate">{a.bio}</p>
+          )
+        )}
         {distanciaTexto && (
-          <p className="text-gray-400 text-[10px] mt-0.5">A {distanciaTexto} km de distancia</p>
+          <p className="text-gray-400 text-[10px] mt-1">A {distanciaTexto} km de distancia</p>
         )}
       </div>
     </Link>
@@ -142,7 +182,7 @@ function ArtistaCercanoCard({ a, distanciaTexto }) {
 // cumple ese rol de "sé el primero" sin duplicar mensajes vacíos acá.
 // "Ver todo" activa `onVerTodo`, que muestra el listado completo abajo
 // sin necesidad de escribir nada en el buscador.
-function SeccionCercanos({ artistas, misCoords, onVerTodo }) {
+function SeccionCercanos({ artistas, misCoords, onVerTodo, onVerInfo }) {
   if (artistas.length === 0) return null
   const ordenados = ordenarPorCercania(artistas, misCoords).slice(0, 10)
   return (
@@ -163,7 +203,7 @@ function SeccionCercanos({ artistas, misCoords, onVerTodo }) {
         {ordenados.map((a) => {
           const c = coordsDeArtista(a)
           const distanciaTexto = misCoords && c ? distanciaKm(misCoords.lat, misCoords.lng, c.lat, c.lng).toFixed(1) : null
-          return <ArtistaCercanoCard key={a.id} a={a} distanciaTexto={distanciaTexto} />
+          return <ArtistaCercanoCard key={a.id} a={a} distanciaTexto={distanciaTexto} onVerInfo={() => onVerInfo(a)} />
         })}
       </div>
     </div>
@@ -185,16 +225,6 @@ function VerifiedBadge() {
     </span>
   )
 }
-
-// Umbral de largo de texto para decidir si "especialidades"/"sobre mí"
-// caben en la fila compacta de la card o se vuelven un botón que abre el
-// modal inferior (Jose, 2026-08-05: "si las especialidades son varias, y
-// no caben en la card, deberán volverse un boton... lo mismo pasara con
-// el sobre mi, si el texto es muy largo"). Sin medir el DOM real (la card
-// es angosta y de alto fijo, un umbral de caracteres es suficiente y no
-// depende de esperar al montaje en cliente).
-const ESTILO_BOTON_MIN = 18
-const BIO_BOTON_MIN = 45
 
 function ListingRow({ to, nombre, municipio, estilo, bio, foto, onVerInfo }) {
   // Los botones de "ver más" viven DENTRO de un <Link> que navega al
@@ -273,7 +303,7 @@ function TarjetaReclutamiento({ query, total, compartir }) {
       ? `Todavía no hay tatuadores para "${query}"`
       : `Ya hay ${total} artista${total !== 1 ? 's' : ''} en "${query}"`
   const subtitulo = !query
-    ? 'Este es el buscador que conecta clientes con tatuadores de todo el país.'
+    ? 'Este es el buscador que conecta personas con tatuadores de todo el país.'
     : total === 0
       ? 'Sé el primero en aparecer aquí.'
       : 'Súmate y aparece junto a ellos.'
@@ -560,12 +590,18 @@ export default function ArtistasUrabaPage() {
           )}
         </div>
 
-        {/* "Artistas más cercanos" — sugerencia proactiva, siempre visible,
-            sin requerir búsqueda (Jose, 2026-08-05: "como sugerencias
-            parecido a cuando facebook las muestra"). Gratis y ordenado por
-            cercanía real para TODOS los artistas — la prioridad paga es
-            "aparecer primero" dentro de esto, no el acceso a aparecer. */}
-        <SeccionCercanos artistas={artistas} misCoords={misCoords} onVerTodo={verTodo} />
+        {/* "Artistas más cercanos" — sugerencia proactiva, visible mientras
+            NO se está buscando activamente (Jose, 2026-08-05: "como
+            sugerencias parecido a cuando facebook las muestra", y luego:
+            "esa card de recomendacion, debera desaparecer cuando empiecen
+            a escribir en el buscador" — apenas hay texto, los resultados
+            reales de abajo ya cumplen ese rol, mantener la sugerencia
+            visible sería redundante). Gratis y ordenado por cercanía real
+            para TODOS los artistas — la prioridad paga es "aparecer
+            primero" dentro de esto, no el acceso a aparecer. */}
+        {!query && (
+          <SeccionCercanos artistas={artistas} misCoords={misCoords} onVerTodo={verTodo} onVerInfo={setModalArtista} />
+        )}
       </section>
 
       <section ref={listadoRef} className="flex-1 px-4 md:px-6 pb-16 max-w-3xl mx-auto scroll-mt-20 w-full">
