@@ -8,8 +8,6 @@ import { Menu, X } from 'lucide-react'
 import inkognitoLogo from '../../assets/artistas-logo-mark.png'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 
-const ACCENT = '#B3202F'
-
 // Navbar propio del módulo (2026-08-03) — antes usaba el EcosystemNavbar
 // genérico (pensado para landings sueltas de producto), pero al pasar a
 // paleta blanco/rojo/gris y llevar el texto "Tattoo Artist Urabá" acá
@@ -24,7 +22,7 @@ export default function NavbarArtistas() {
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-gray-800 border-b border-gray-700">
       <div className="relative max-w-6xl mx-auto px-4 md:px-6">
-        <div className="h-16 md:h-20 flex items-center justify-between">
+        <div className="h-16 md:h-20 flex items-center justify-center">
 
           <Link to="/tattoo-artist-uraba" className="flex items-center gap-2.5">
             {/* Medido contra el navbar de Supply con Playwright+sharp: su
@@ -38,13 +36,13 @@ export default function NavbarArtistas() {
             </div>
             <span className="text-base md:text-xl font-black uppercase tracking-wide leading-tight whitespace-nowrap">
               <span className="text-gray-100">Tattoo Artist</span>{' '}
-              <span style={{ color: ACCENT }}>Urabá</span>
+              <span className="text-gray-300">Urabá</span>
             </span>
           </Link>
 
           <button
             onClick={() => setMenuOpen(o => !o)}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="absolute right-4 md:right-6 text-gray-400 hover:text-white transition-colors"
           >
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>

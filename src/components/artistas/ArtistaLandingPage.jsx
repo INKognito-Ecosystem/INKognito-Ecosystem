@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
-import { FaInstagram, FaWhatsapp } from 'react-icons/fa'
+import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 
@@ -56,7 +56,7 @@ export default function ArtistaLandingPage() {
     ? `https://wa.me/${artista.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${artista.nombre}, te encontré en Tattoo Artist Urabá y quiero preguntarte por una cita.`)}`
     : null
 
-  const tieneContacto = Boolean(waLink || artista.instagram)
+  const tieneContacto = Boolean(waLink)
   const trabajos = [artista.foto_trabajo_1, artista.foto_trabajo_2, artista.foto_trabajo_3].filter(Boolean)
 
   const irA = (delta) => setLightbox(i => (i + delta + trabajos.length) % trabajos.length)
@@ -97,7 +97,7 @@ export default function ArtistaLandingPage() {
             </div>
           </div>
 
-          <div className="mt-4 space-y-5 pb-10">
+          <div className="mt-4 space-y-5">
 
             <div>
               <h1 className="text-2xl md:text-4xl font-black uppercase leading-tight">{artista.nombre}</h1>
@@ -119,6 +119,44 @@ export default function ArtistaLandingPage() {
               <p className="text-gray-600 text-sm leading-relaxed max-w-xl">{artista.bio}</p>
             )}
 
+          </div>
+        </div>
+
+        {/* REDES SOCIALES — Facebook e Instagram, siempre visibles a todo el
+            ancho de pantalla en 2 bloques (pedido de Jose, 2026-08-03). Si
+            el artista todavía no tiene el link cargado, el bloque se queda
+            visible pero deshabilitado con un aviso, nunca se oculta. */}
+        <div className="mt-6">
+          <p className="max-w-3xl mx-auto px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-2">Redes sociales</p>
+          <div className="grid grid-cols-2 w-full border-y border-gray-200">
+            <a
+              href={artista.facebook || undefined}
+              target={artista.facebook ? '_blank' : undefined}
+              rel={artista.facebook ? 'noopener noreferrer' : undefined}
+              onClick={artista.facebook ? undefined : (e) => e.preventDefault()}
+              aria-disabled={!artista.facebook}
+              className={`flex flex-col items-center justify-center gap-1.5 py-6 border-r border-gray-200 transition-colors ${
+                artista.facebook ? 'text-gray-700 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-default'
+              }`}
+            >
+              <FaFacebook size={22} />
+              <span className="text-xs font-bold uppercase tracking-widest">Facebook</span>
+              {!artista.facebook && <span className="text-[10px] normal-case tracking-normal">Aún no se ha subido</span>}
+            </a>
+            <a
+              href={artista.instagram || undefined}
+              target={artista.instagram ? '_blank' : undefined}
+              rel={artista.instagram ? 'noopener noreferrer' : undefined}
+              onClick={artista.instagram ? undefined : (e) => e.preventDefault()}
+              aria-disabled={!artista.instagram}
+              className={`flex flex-col items-center justify-center gap-1.5 py-6 transition-colors ${
+                artista.instagram ? 'text-gray-700 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-default'
+              }`}
+            >
+              <FaInstagram size={22} />
+              <span className="text-xs font-bold uppercase tracking-widest">Instagram</span>
+              {!artista.instagram && <span className="text-[10px] normal-case tracking-normal">Aún no se ha subido</span>}
+            </a>
           </div>
         </div>
 
@@ -163,35 +201,22 @@ export default function ArtistaLandingPage() {
         </div>
       </footer>
 
-      {/* CONTACTO FIJO — WhatsApp/Instagram siempre alcanzables sin importar
-          cuánto se haya scrolleado (pedido de Jose, 2026-08-03): antes vivían
-          en el flujo normal, justo debajo de la bio, y quedaban lejos si
-          había foto extra + footer debajo. */}
+      {/* CONTACTO FIJO — WhatsApp siempre alcanzable sin importar cuánto se
+          haya scrolleado (pedido de Jose, 2026-08-03). Instagram/Facebook
+          ya no van acá — se movieron al bloque "Redes sociales" fijo debajo
+          de la bio, siempre visible con o sin link cargado. */}
       {tieneContacto && (
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-t border-gray-200 px-4 py-3">
-          <div className="max-w-3xl mx-auto flex gap-3">
-            {waLink && (
-              <a
-                href={waLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2.5 py-3 bg-green-600 text-white font-black uppercase tracking-widest rounded hover:bg-green-500 transition-all text-xs sm:text-sm"
-              >
-                <FaWhatsapp size={18} />
-                WhatsApp
-              </a>
-            )}
-            {artista.instagram && (
-              <a
-                href={artista.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2.5 py-3 border border-gray-300 text-gray-700 font-bold uppercase tracking-widest rounded hover:border-gray-900 hover:text-gray-900 transition-all text-xs sm:text-sm"
-              >
-                <FaInstagram size={16} />
-                Instagram
-              </a>
-            )}
+          <div className="max-w-3xl mx-auto">
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2.5 py-3 bg-green-600 text-white font-black uppercase tracking-widest rounded hover:bg-green-500 transition-all text-sm"
+            >
+              <FaWhatsapp size={18} />
+              WhatsApp
+            </a>
           </div>
         </div>
       )}
