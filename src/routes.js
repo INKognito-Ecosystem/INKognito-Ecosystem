@@ -84,4 +84,10 @@ export default [
   route('suplementos/pre-entreno', 'components/suplementos/categories/PreEntrenoPage.jsx'),
   route('suplementos/vitaminas', 'components/suplementos/categories/VitaminasPage.jsx'),
   route('suplementos/accesorios', 'components/suplementos/categories/AccesoriosPage.jsx'),
+
+  // Tattoo Artist Urabá — directorio de artistas (2026-08-03). Desplegado
+  // sin exponer aún: sin link desde InkognitoHome.jsx ni ningún navbar,
+  // adrede — ver plan "Directorio de artistas de tatuaje en Urabá".
+  route('tattoo-artist-uraba', 'components/artistas/ArtistasUrabaPage.jsx'),
+  route('artista/:id', 'components/artistas/ArtistaLandingPage.jsx'),
 ]
