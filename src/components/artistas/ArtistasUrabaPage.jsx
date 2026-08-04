@@ -1,7 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { Search, MapPin, Palette, BadgeCheck, ChevronRight, Navigation, LoaderCircle } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
+
+// Sin esto, escribir "apartado"/"chigorodo" (sin tilde, lo normal al
+// escribir rápido en el teléfono) NO matcheaba "Apartadó"/"Chigorodó" —
+// solo funcionaban substrings casuales que no tocaban la sílaba
+// acentuada ("apart", "chigo"). Se normalizan tildes en ambos lados
+// antes de comparar (Jose, 2026-08-03).
+const normalize = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const ACCENT = '#B3202F'
@@ -139,9 +146,11 @@ export default function ArtistasUrabaPage() {
   const [query, setQuery] = useState('')
   const [ubicando, setUbicando] = useState(false)
   const [ubicacionError, setUbicacionError] = useState(null)
+  const listadoRef = useRef(null)
+  const prevVacioRef = useRef(true)
 
-  const q = query.trim().toLowerCase()
-  const matches = (...campos) => q === '' || campos.some(c => c && c.toLowerCase().includes(q))
+  const q = normalize(query.trim())
+  const matches = (...campos) => q === '' || campos.some(c => c && normalize(c).includes(q))
 
   // Sin búsqueda activa no se lista NINGÚN artista, fundador incluido —
   // por ahora se comporta igual que los demás, solo aparece al buscar su
@@ -151,6 +160,17 @@ export default function ArtistasUrabaPage() {
   const filtrados = q === '' ? [] : artistas.filter(a => matches(a.nombre, a.municipio, a.estilo))
   const fundadorVisible = q !== '' && matches('Jose Humanez', 'Chigorodó')
   const total = filtrados.length + (fundadorVisible ? 1 : 0)
+
+  // Al iniciar la búsqueda (primera letra escrita) el teclado del celular
+  // tapa las cards que aparecen debajo — scroll automático hacia el
+  // listado apenas se empieza a escribir (Jose, 2026-08-03).
+  useEffect(() => {
+    const vacio = q === ''
+    if (prevVacioRef.current && !vacio) {
+      listadoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+    prevVacioRef.current = vacio
+  }, [q])
 
   const usarMiUbicacion = () => {
     setUbicacionError(null)
@@ -228,7 +248,7 @@ export default function ArtistasUrabaPage() {
         </div>
       </section>
 
-      <section className="px-4 md:px-6 pb-16 max-w-3xl mx-auto">
+      <section ref={listadoRef} className="px-4 md:px-6 pb-16 max-w-3xl mx-auto scroll-mt-20">
 
         {/* CONTADOR — solo tiene sentido con búsqueda activa, ningún
             artista (fundador incluido) se lista por defecto. */}
