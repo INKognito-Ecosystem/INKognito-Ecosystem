@@ -15,39 +15,27 @@ const DOT_PATTERN = {
 }
 
 export async function loader({ request }) {
-  // Geolocalización por IP (2026-08-04, sugerencia de Jose sobre cómo lo
-  // hace Tattoodo con IP2Location) — pero mejor: Vercel ya inyecta el
-  // header x-vercel-ip-city en cada request de producción, gratis y sin
-  // pedirle permiso al visitante (a diferencia del botón "Cerca de ti",
-  // que sí requiere el prompt del navegador). En local (sin Vercel
-  // delante) el header no existe, así que esto degrada solo — el visitante
-  // sigue teniendo el botón de geolocalización manual. Expansión nacional
-  // (2026-08-04): antes solo reconocía los 4 municipios de Urabá — ahora
-  // matchea contra los ~1120 municipios reales del país.
+  // Geolocalización por IP vía el header x-vercel-ip-city que Vercel
+  // inyecta en producción. Diagnosticado 2026-08-04: para pueblos chicos
+  // (ej. Chigorodó) el proveedor de geolocalización de Vercel/MaxMind no
+  // siempre resuelve una IP a nivel de ciudad — llega vacío. Cuando eso
+  // pasa, esto degrada solo (el navbar se queda en "Colombia" fijo) y el
+  // visitante sigue teniendo el botón "Cerca de ti" (GPS real del
+  // navegador), que no depende de esto y siempre funciona si da permiso.
   let ciudadDetectada = null
-  let ipCityRaw = null
   try {
-    ipCityRaw = request.headers.get('x-vercel-ip-city')
-    if (ipCityRaw) ciudadDetectada = municipioDesdeNombreIP(decodeURIComponent(ipCityRaw))
+    const ipCity = request.headers.get('x-vercel-ip-city')
+    if (ipCity) ciudadDetectada = municipioDesdeNombreIP(decodeURIComponent(ipCity))
   } catch {
     ciudadDetectada = null
   }
-  // Diagnóstico temporal (2026-08-04): Jose reportó que la animación del
-  // navbar no se dispara — con ?debug=1 se muestra en pantalla el valor
-  // crudo que Vercel está mandando en x-vercel-ip-city (o "null" si no
-  // manda nada), para saber si el problema es que Vercel no geolocaliza su
-  // IP a nivel de ciudad, o si el nombre que manda no matchea el dataset.
-  // Quitar este bloque una vez diagnosticado.
-  const debug = new URL(request.url).searchParams.get('debug') === '1'
-    ? { ipCityRaw, ciudadDetectada }
-    : null
 
   try {
     const res = await fetch(`${PANEL_URL}/api/artistas`)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    return { artistas: await res.json(), ciudadDetectada, debug }
+    return { artistas: await res.json(), ciudadDetectada }
   } catch {
-    return { artistas: [], ciudadDetectada, debug }
+    return { artistas: [], ciudadDetectada }
   }
 }
 
@@ -63,44 +51,89 @@ export function meta() {
   ]
 }
 
+// Insignia sola-ícono en la esquina de la card (2026-08-05, antes era un
+// pill con texto "Verificado" en la misma fila que el nombre — Jose pidió
+// que vaya "en el estremo de la card" solo con el ícono). Se posiciona
+// absoluta sobre la card, que ahora necesita `relative`.
 function VerifiedBadge() {
   return (
-    <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full flex-shrink-0" style={{ backgroundColor: `${ACCENT}15`, color: ACCENT, border: `1px solid ${ACCENT}40` }}>
-      <BadgeCheck size={11} />
-      Verificado
+    <span
+      className="absolute top-2 right-2 flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0"
+      style={{ backgroundColor: ACCENT }}
+      title="Verificado"
+    >
+      <BadgeCheck size={11} className="text-white" />
     </span>
   )
 }
 
-function ListingRow({ to, nombre, municipio, estilo, bio, foto }) {
+// Umbral de largo de texto para decidir si "especialidades"/"sobre mí"
+// caben en la fila compacta de la card o se vuelven un botón que abre el
+// modal inferior (Jose, 2026-08-05: "si las especialidades son varias, y
+// no caben en la card, deberán volverse un boton... lo mismo pasara con
+// el sobre mi, si el texto es muy largo"). Sin medir el DOM real (la card
+// es angosta y de alto fijo, un umbral de caracteres es suficiente y no
+// depende de esperar al montaje en cliente).
+const ESTILO_BOTON_MIN = 18
+const BIO_BOTON_MIN = 45
+
+function ListingRow({ to, nombre, municipio, estilo, bio, foto, onVerInfo }) {
+  // Los botones de "ver más" viven DENTRO de un <Link> que navega al
+  // perfil completo — sin esto, tocarlos también dispara la navegación.
+  const abrirInfo = (e) => { e.preventDefault(); e.stopPropagation(); onVerInfo() }
+
   return (
     <Link
       to={to}
-      className="group flex items-center gap-4 p-3 md:p-4 rounded-lg border border-gray-200 hover:border-gray-300 bg-gray-50/60 hover:bg-gray-50 transition-all duration-200"
+      className="group relative flex items-center gap-4 p-3 md:p-4 rounded-lg border border-gray-200 hover:border-gray-300 bg-gray-50/60 hover:bg-gray-50 transition-all duration-200"
     >
+      <VerifiedBadge />
       <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
         {foto
           ? <img src={foto} alt={nombre} className="w-full h-full object-cover" loading="lazy" />
           : <span className="text-gray-300 text-2xl font-black">{nombre?.[0]?.toUpperCase() || '?'}</span>}
       </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <p className="font-black uppercase text-sm leading-tight truncate text-gray-900">{nombre}</p>
-          <VerifiedBadge />
-        </div>
-        <div className="flex items-center gap-3 mt-0.5 flex-wrap">
-          <span className="flex items-center gap-1 text-gray-500 text-[11px] uppercase tracking-wide leading-snug">
+      <div className="flex-1 min-w-0 pr-5">
+        {/* pr-5 en el contenedor de texto le deja espacio a la insignia de
+            la esquina — sin esto el nombre largo quedaba debajo del ícono. */}
+        <p className="font-black uppercase text-sm leading-tight truncate text-gray-900">{nombre}</p>
+        <div className="flex items-center gap-3 mt-0.5 flex-nowrap min-w-0">
+          <span className="flex items-center gap-1 text-gray-500 text-[11px] uppercase tracking-wide leading-snug flex-shrink-0">
             <MapPin size={11} />
             {municipio}
           </span>
           {estilo && (
-            <span className="flex items-center gap-1 text-gray-500 text-[11px] uppercase tracking-wide leading-snug">
-              <Palette size={11} />
-              {estilo}
-            </span>
+            estilo.length > ESTILO_BOTON_MIN ? (
+              <button
+                type="button"
+                onClick={abrirInfo}
+                className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wide flex-shrink-0 underline underline-offset-2"
+                style={{ color: ACCENT }}
+              >
+                <Palette size={11} />
+                Especialidades
+              </button>
+            ) : (
+              <span className="flex items-center gap-1 text-gray-500 text-[11px] uppercase tracking-wide leading-snug min-w-0">
+                <Palette size={11} className="flex-shrink-0" />
+                <span className="truncate">{estilo}</span>
+              </span>
+            )
           )}
         </div>
-        {bio && <p className="text-gray-400 text-xs mt-0.5 leading-snug truncate">{bio}</p>}
+        {bio && (
+          bio.length > BIO_BOTON_MIN ? (
+            <button
+              type="button"
+              onClick={abrirInfo}
+              className="text-gray-400 text-xs mt-0.5 leading-snug truncate text-left underline underline-offset-2 decoration-gray-300 block w-full"
+            >
+              {bio}
+            </button>
+          ) : (
+            <p className="text-gray-400 text-xs mt-0.5 leading-snug truncate">{bio}</p>
+          )
+        )}
       </div>
       <ChevronRight size={18} className="text-gray-300 group-hover:text-gray-500 flex-shrink-0 transition-colors" />
     </Link>
@@ -177,6 +210,41 @@ function TarjetaReclutamiento({ query, total, compartir }) {
   )
 }
 
+// Modal inferior compartido — "Sobre mí" + "Especialidades" completos de
+// un artista (2026-08-05, pedido de Jose: cuando el estilo/bio no caben en
+// la card compacta de resultados, un botón abre esto en vez de estirar la
+// card). Mismo patrón bottom-sheet ya usado en Supply/Store/Suple
+// (overlay + panel que sube desde abajo, ver SupplyProductCard.jsx), acá
+// en la paleta blanco/rojo/gris del módulo en vez del negro de Supply.
+function ModalInfoArtista({ artista, onClose }) {
+  if (!artista) return null
+  return (
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-end justify-center" onClick={onClose}>
+      <div
+        className="w-full max-w-md bg-white border-t border-gray-200 rounded-t-2xl p-5 max-h-[75vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="text-xs font-black uppercase tracking-widest text-gray-900">{artista.nombre}</h4>
+          <button onClick={onClose} aria-label="Cerrar" className="text-gray-400 text-lg leading-none px-1">✕</button>
+        </div>
+        {artista.bio && (
+          <div className="mb-4">
+            <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-1">Sobre mí</p>
+            <p className="text-gray-700 text-sm leading-relaxed">{artista.bio}</p>
+          </div>
+        )}
+        {artista.estilo && (
+          <div>
+            <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-1">Especialidades</p>
+            <p className="text-gray-700 text-sm leading-relaxed">{artista.estilo}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // Módulo nuevo (2026-08-03), desplegado sin exponer aún — ver plan de
 // "Directorio de artistas de tatuaje en Urabá". Tercera vuelta de diseño
 // el mismo día: v1 (grid de fotos negro) genérica; v2 (pills municipio +
@@ -186,10 +254,11 @@ function TarjetaReclutamiento({ query, total, compartir }) {
 // "Tattoo Artist Urabá" que vivía arriba del H1 alejaba demasiado el
 // título del navbar.
 export default function ArtistasUrabaPage() {
-  const { artistas, ciudadDetectada, debug } = useLoaderData()
+  const { artistas, ciudadDetectada } = useLoaderData()
   const [query, setQuery] = useState('')
   const [ubicando, setUbicando] = useState(false)
   const [ubicacionError, setUbicacionError] = useState(null)
+  const [modalArtista, setModalArtista] = useState(null)
   // Coordenadas reales del visitante — de la geolocalización precisa del
   // navegador si tocó "Cerca de ti", o si no, del centroide de la ciudad
   // detectada por IP (menos preciso, pero mejor que nada). Con esto se
@@ -215,12 +284,19 @@ export default function ArtistasUrabaPage() {
   // aparecer en el directorio, se registra igual que cualquier artista.
   let filtrados = q === '' ? [] : artistas.filter(a => matches(a.nombre, a.municipio, a.estilo))
   if (misCoords && filtrados.length > 1) {
-    // Sort estable: los artistas sin departamento guardado (cargados antes
-    // de la expansión nacional, o registrados sin ese dato) quedan al
-    // final del todo, sin alterar el orden relativo entre ellos.
+    // Preferir el punto EXACTO del artista (lat/lng propios, capturados al
+    // registrarse con su permiso) sobre el centroide de su municipio — es
+    // lo que realmente distingue a dos artistas "del mismo municipio"
+    // dentro de una ciudad grande (2026-08-05, ver ComboboxBuscable.jsx /
+    // usarMiUbicacion en ArtistaRegistroPage.jsx). Si el artista no dio su
+    // ubicación, cae al centroide como antes.
+    const coordsDe = (a) => (a.lat != null && a.lng != null) ? { lat: a.lat, lng: a.lng } : getCoordsMunicipio(a.departamento, a.municipio)
+    // Sort estable: los artistas sin ningún dato de ubicación (ni lat/lng
+    // propios ni departamento guardado — registros de antes de la
+    // expansión nacional) quedan al final, sin alterar su orden relativo.
     filtrados = [...filtrados].sort((a, b) => {
-      const ca = getCoordsMunicipio(a.departamento, a.municipio)
-      const cb = getCoordsMunicipio(b.departamento, b.municipio)
+      const ca = coordsDe(a)
+      const cb = coordsDe(b)
       if (!ca && !cb) return 0
       if (!ca) return 1
       if (!cb) return -1
@@ -282,11 +358,6 @@ export default function ArtistasUrabaPage() {
     // corresponde" (Jose). NavbarArtistas es fixed, no participa del flex.
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
       <NavbarArtistas ciudadDetectada={ciudadDetectada} />
-      {debug && (
-        <div className="bg-black text-green-400 text-[11px] font-mono p-2 break-all">
-          DEBUG — x-vercel-ip-city crudo: {JSON.stringify(debug.ipCityRaw)} · ciudadDetectada: {JSON.stringify(debug.ciudadDetectada)}
-        </div>
-      )}
 
       <section className="relative overflow-hidden pt-20 pb-8 md:pb-10 px-4 md:px-6">
         <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
@@ -394,6 +465,7 @@ export default function ArtistasUrabaPage() {
               estilo={a.estilo}
               bio={a.bio}
               foto={a.foto_url}
+              onVerInfo={() => setModalArtista(a)}
             />
           ))}
 
@@ -417,6 +489,8 @@ export default function ArtistasUrabaPage() {
           <span className="text-gray-300">Desarrollado por INKognito</span>
         </div>
       </footer>
+
+      <ModalInfoArtista artista={modalArtista} onClose={() => setModalArtista(null)} />
     </div>
   )
 }

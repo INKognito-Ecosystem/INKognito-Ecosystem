@@ -63,8 +63,15 @@ export default function ArtistaLandingPage() {
     </div>
   )
 
-  const waLink = artista.whatsapp
-    ? `https://wa.me/${artista.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${artista.nombre}, te encontré en Tattoo Artist Colombia y quiero preguntarte por una cita.`)}`
+  // Bug real reportado por Jose (2026-08-05): el botón daba "número
+  // inválido" porque el número guardado eran los 10 dígitos locales sin
+  // el indicativo de país (57) que wa.me exige — el panel ahora normaliza
+  // esto al guardar, pero se repite acá como respaldo por si queda algún
+  // registro viejo guardado antes de ese fix.
+  const digitos = artista.whatsapp ? artista.whatsapp.replace(/\D/g, '') : ''
+  const waNumero = digitos.length === 10 && digitos.startsWith('3') ? `57${digitos}` : digitos
+  const waLink = waNumero
+    ? `https://wa.me/${waNumero}?text=${encodeURIComponent(`Hola ${artista.nombre}, te encontré en Tattoo Artist Colombia y quiero preguntarte por una cita.`)}`
     : null
 
   // El contacto es directo por WhatsApp — no hay forma de saber si se

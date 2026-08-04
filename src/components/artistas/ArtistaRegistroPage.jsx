@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
-import { CheckCircle2, Camera, MapPin, Palette, LoaderCircle } from 'lucide-react'
+import { CheckCircle2, Camera, MapPin, Palette, LoaderCircle, Navigation, Check } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
+import ComboboxBuscable from './ComboboxBuscable'
 import { DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO, municipioDesdeNombreIP } from '../../data/colombiaGeo'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
@@ -60,13 +61,15 @@ const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb
 export default function ArtistaRegistroPage() {
   const { cloud_name, upload_preset, ciudadDetectada } = useLoaderData()
   const [form, setForm] = useState({
-    nombre: '', departamento: '', municipio: '', estilo: '', bio: '', instagram: '', facebook: '', whatsapp: '', no_tatua: '',
+    nombre: '', departamento: '', municipio: '', lat: null, lng: null, estilo: '', bio: '', instagram: '', facebook: '', whatsapp: '', no_tatua: '',
     foto_url: '', foto_url_2: '', foto_trabajo_1: '', foto_trabajo_2: '', foto_trabajo_3: '',
   })
   const [subiendo, setSubiendo] = useState(null)
   const [enviando, setEnviando] = useState(false)
   const [enviado, setEnviado] = useState(false)
   const [error, setError] = useState(null)
+  const [ubicando, setUbicando] = useState(false)
+  const [ubicacionError, setUbicacionError] = useState(null)
   const fileInputs = useRef({})
 
   const set = (campo) => (e) => setForm((f) => ({ ...f, [campo]: e.target.value }))
@@ -74,7 +77,35 @@ export default function ArtistaRegistroPage() {
   // Cambiar de departamento invalida el municipio ya elegido (son ~1120
   // municipios en total, agrupados por departamento — un municipio de
   // Antioquia no tiene sentido si se cambia a Valle del Cauca).
-  const setDepartamento = (e) => setForm((f) => ({ ...f, departamento: e.target.value, municipio: '' }))
+  const setDepartamento = (nuevoDepartamento) => setForm((f) => ({ ...f, departamento: nuevoDepartamento, municipio: '' }))
+  const setMunicipio = (nuevoMunicipio) => setForm((f) => ({ ...f, municipio: nuevoMunicipio }))
+
+  // Ubicación EXACTA y opcional (2026-08-05, respuesta directa a "como se
+  // supone que se va a detectar quien esta mas cerca? no sera necesario
+  // poner barrio?"): en vez de pedir barrio (no hay dataset de barrios con
+  // coordenadas), se pide el GPS real del navegador — mismo patrón/botón
+  // "Cerca de ti" que ya existe en el buscador. Si el artista no da
+  // permiso, el registro sigue funcionando igual, solo que el buscador usa
+  // el centroide de su municipio en vez de su punto exacto.
+  const usarMiUbicacion = () => {
+    setUbicacionError(null)
+    if (!navigator.geolocation) {
+      setUbicacionError('Tu navegador no soporta geolocalización — no pasa nada, tu perfil funciona igual.')
+      return
+    }
+    setUbicando(true)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setForm((f) => ({ ...f, lat: pos.coords.latitude, lng: pos.coords.longitude }))
+        setUbicando(false)
+      },
+      () => {
+        setUbicacionError('No pudimos acceder a tu ubicación — actívala en el navegador, o simplemente sigue sin ella.')
+        setUbicando(false)
+      },
+      { timeout: 8000 }
+    )
+  }
   const municipiosDisponibles = MUNICIPIOS_POR_DEPARTAMENTO[form.departamento] || []
 
   const elegirFoto = (slot) => fileInputs.current[slot]?.click()
@@ -298,18 +329,49 @@ export default function ArtistaRegistroPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className={labelClass}>Departamento *</label>
-                    <select required className={inputClass} value={form.departamento} onChange={setDepartamento}>
-                      <option value="">Selecciona</option>
-                      {DEPARTAMENTOS.map((d) => <option key={d} value={d}>{d}</option>)}
-                    </select>
+                    <ComboboxBuscable
+                      value={form.departamento}
+                      onChange={setDepartamento}
+                      options={DEPARTAMENTOS}
+                      placeholder="Escribe para buscar..."
+                      inputClassName={inputClass}
+                    />
                   </div>
                   <div>
                     <label className={labelClass}>Municipio *</label>
-                    <select required disabled={!form.departamento} className={inputClass} value={form.municipio} onChange={set('municipio')}>
-                      <option value="">{form.departamento ? 'Selecciona' : 'Elige antes el departamento'}</option>
-                      {municipiosDisponibles.map((m) => <option key={m} value={m}>{m}</option>)}
-                    </select>
+                    <ComboboxBuscable
+                      value={form.municipio}
+                      onChange={setMunicipio}
+                      options={municipiosDisponibles}
+                      disabled={!form.departamento}
+                      placeholder={form.departamento ? 'Escribe para buscar...' : 'Elige antes el departamento'}
+                      inputClassName={inputClass}
+                    />
                   </div>
+                </div>
+
+                {/* Ubicación exacta opcional (2026-08-05): "municipio" no
+                    alcanza para saber quién está más cerca dentro de una
+                    ciudad grande — esto le da al buscador tu punto real en
+                    vez de solo el centro de tu municipio. No es
+                    obligatorio, el registro funciona igual sin esto. */}
+                <div>
+                  <button
+                    type="button"
+                    onClick={usarMiUbicacion}
+                    disabled={ubicando}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60"
+                    style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: ACCENT, color: ACCENT }}
+                  >
+                    {ubicando
+                      ? <LoaderCircle size={14} className="animate-spin" />
+                      : form.lat ? <Check size={14} /> : <Navigation size={14} />}
+                    {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación exacta agregada' : 'Agregar mi ubicación exacta (opcional)'}
+                  </button>
+                  <p className="text-gray-400 text-[10px] mt-1.5 text-center leading-relaxed">
+                    Ayuda a que clientes cerca de ti te encuentren primero, sobre todo en ciudades grandes. Es opcional — sin esto, igual apareces en tu municipio.
+                  </p>
+                  {ubicacionError && <p className="text-gray-400 text-[10px] mt-1 text-center">{ubicacionError}</p>}
                 </div>
 
                 <div>
