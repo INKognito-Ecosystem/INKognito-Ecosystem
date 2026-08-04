@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { CheckCircle2, Camera, MapPin, Palette, LoaderCircle } from 'lucide-react'
+import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
@@ -52,7 +53,7 @@ const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb
 export default function ArtistaRegistroPage() {
   const { cloud_name, upload_preset } = useLoaderData()
   const [form, setForm] = useState({
-    nombre: '', municipio: '', estilo: '', bio: '', instagram: '', facebook: '', whatsapp: '',
+    nombre: '', municipio: '', estilo: '', bio: '', instagram: '', facebook: '', whatsapp: '', no_tatua: '',
     foto_url: '', foto_url_2: '', foto_trabajo_1: '', foto_trabajo_2: '', foto_trabajo_3: '',
   })
   const [subiendo, setSubiendo] = useState(null)
@@ -210,10 +211,34 @@ export default function ArtistaRegistroPage() {
                         </span>
                       )}
                     </div>
-                    {form.bio && <p className="text-gray-600 text-xs leading-relaxed mt-2">{form.bio}</p>}
+                    {form.bio && (
+                      <div className="mt-2">
+                        <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-0.5">Sobre mí</p>
+                        <p className="text-gray-600 text-xs leading-relaxed">{form.bio}</p>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="grid grid-cols-3 gap-0.5">
+                  {/* Redes sociales — mismo componente en miniatura que la
+                      landing real: siempre visibles, deshabilitadas si
+                      falta el link (2026-08-04, pedido de Jose de que la
+                      preview refleje también esto, no solo nombre/
+                      municipio/estilo). */}
+                  <div className="grid grid-cols-2 border-t border-gray-200">
+                    <div className={`flex items-center justify-center gap-1.5 py-2.5 border-r border-gray-200 text-[10px] font-bold uppercase ${form.facebook ? 'text-gray-700' : 'text-gray-300'}`}>
+                      <FaFacebook size={12} /> Facebook
+                    </div>
+                    <div className={`flex items-center justify-center gap-1.5 py-2.5 text-[10px] font-bold uppercase ${form.instagram ? 'text-gray-700' : 'text-gray-300'}`}>
+                      <FaInstagram size={12} /> Instagram
+                    </div>
+                  </div>
+                  {form.whatsapp && (
+                    <div className="flex items-center justify-center gap-1.5 py-2.5 border-t border-gray-200 bg-green-600 text-white text-[10px] font-bold uppercase">
+                      <FaWhatsapp size={12} /> Contactar al artista
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-3 gap-0.5 border-t border-gray-200">
                     {SLOTS.slice(2).map(({ key, label }) => (
                       <button
                         key={key}
@@ -232,6 +257,13 @@ export default function ArtistaRegistroPage() {
                       </button>
                     ))}
                   </div>
+
+                  {form.no_tatua && (
+                    <div className="px-4 py-3 border-t border-gray-200">
+                      <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-0.5">No tatúa</p>
+                      <p className="text-gray-600 text-xs leading-relaxed">{form.no_tatua}</p>
+                    </div>
+                  )}
                 </div>
                 <p className="text-gray-400 text-[11px] mt-2 text-center">Toca las fotos para subirlas — es opcional, puedes hacerlo ahora o cuando te contactemos.</p>
               </div>
@@ -274,6 +306,11 @@ export default function ArtistaRegistroPage() {
                 <div>
                   <label className={labelClass}>Facebook</label>
                   <input className={inputClass} value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." />
+                </div>
+
+                <div>
+                  <label className={labelClass}>No tatúas (opcional)</label>
+                  <input className={inputClass} value={form.no_tatua} onChange={set('no_tatua')} placeholder="Ej: rostro, manos, zonas genitales" />
                 </div>
 
                 {error && <p className="text-sm" style={{ color: ACCENT }}>{error}</p>}

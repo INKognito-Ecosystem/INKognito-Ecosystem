@@ -49,17 +49,6 @@ const DOT_PATTERN = {
 }
 
 export async function loader({ request }) {
-  // La foto del fundador (Jose Humanez) reusa la misma que ya tiene subida
-  // en jhumaneztattoo (Configuración > Imágenes > Hero) — no hace falta
-  // subirla de nuevo, ni el módulo tiene su propia fila en `artistas`.
-  let fundadorFoto = null
-  try {
-    const heroRes = await fetch(`${PANEL_URL}/api/jhumaneztattoo/hero`)
-    if (heroRes.ok) fundadorFoto = (await heroRes.json()).image_url || null
-  } catch {
-    fundadorFoto = null
-  }
-
   // Geolocalización por IP (2026-08-04, sugerencia de Jose sobre cómo lo
   // hace Tattoodo con IP2Location) — pero mejor: Vercel ya inyecta el
   // header x-vercel-ip-city en cada request de producción, gratis y sin
@@ -81,9 +70,9 @@ export async function loader({ request }) {
   try {
     const res = await fetch(`${PANEL_URL}/api/artistas`)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    return { artistas: await res.json(), fundadorFoto, municipioDetectado }
+    return { artistas: await res.json(), municipioDetectado }
   } catch {
-    return { artistas: [], fundadorFoto, municipioDetectado }
+    return { artistas: [], municipioDetectado }
   }
 }
 
@@ -108,14 +97,11 @@ function VerifiedBadge() {
   )
 }
 
-function ListingRow({ to, nombre, municipio, estilo, bio, foto, featured }) {
+function ListingRow({ to, nombre, municipio, estilo, bio, foto }) {
   return (
     <Link
       to={to}
-      className={`group flex items-center gap-4 p-3 md:p-4 rounded-lg border transition-all duration-200 ${
-        featured ? 'bg-white' : 'border-gray-200 hover:border-gray-300 bg-gray-50/60 hover:bg-gray-50'
-      }`}
-      style={featured ? { borderColor: ACCENT } : {}}
+      className="group flex items-center gap-4 p-3 md:p-4 rounded-lg border border-gray-200 hover:border-gray-300 bg-gray-50/60 hover:bg-gray-50 transition-all duration-200"
     >
       <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
         {foto
@@ -125,13 +111,7 @@ function ListingRow({ to, nombre, municipio, estilo, bio, foto, featured }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <p className="font-black uppercase text-sm leading-tight truncate text-gray-900">{nombre}</p>
-          {featured ? (
-            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full flex-shrink-0" style={{ backgroundColor: ACCENT, color: 'white' }}>
-              Fundador
-            </span>
-          ) : (
-            <VerifiedBadge />
-          )}
+          <VerifiedBadge />
         </div>
         <div className="flex items-center gap-3 mt-0.5 flex-wrap">
           <span className="flex items-center gap-1 text-gray-500 text-[11px] uppercase tracking-wide leading-snug">
@@ -227,7 +207,7 @@ function TarjetaReclutamiento({ query, total, compartir }) {
 // "Tattoo Artist Urabá" que vivía arriba del H1 alejaba demasiado el
 // título del navbar.
 export default function ArtistasUrabaPage() {
-  const { artistas, fundadorFoto, municipioDetectado } = useLoaderData()
+  const { artistas, municipioDetectado } = useLoaderData()
   const [query, setQuery] = useState('')
   const [ubicando, setUbicando] = useState(false)
   const [ubicacionError, setUbicacionError] = useState(null)
@@ -237,14 +217,13 @@ export default function ArtistasUrabaPage() {
   const q = normalize(query.trim())
   const matches = (...campos) => q === '' || campos.some(c => c && normalize(c).includes(q))
 
-  // Sin búsqueda activa no se lista NINGÚN artista, fundador incluido —
-  // por ahora se comporta igual que los demás, solo aparece al buscar su
-  // nombre o "Chigorodó" (Jose, 2026-08-03: "de momento dejala como las
-  // demas... ya veremos como hacemos par ponerla fija visible" — fijarlo
-  // queda pendiente para una vuelta futura).
+  // Sin búsqueda activa no se lista ningún artista — solo aparece al
+  // buscar (Jose, 2026-08-03). El fundador (Jose Humanez) ya NO tiene
+  // trato especial: se quitó el perfil fijo/destacado — "vamos a usar la
+  // plataforma como cualquier tatuador más" (Jose, 2026-08-04). Si quiere
+  // aparecer en el directorio, se registra igual que cualquier artista.
   const filtrados = q === '' ? [] : artistas.filter(a => matches(a.nombre, a.municipio, a.estilo))
-  const fundadorVisible = q !== '' && matches('Jose Humanez', 'Chigorodó')
-  const total = filtrados.length + (fundadorVisible ? 1 : 0)
+  const total = filtrados.length
 
   // Al iniciar la búsqueda (primera letra escrita) el teclado del celular
   // tapa las cards que aparecen debajo — scroll automático hacia el
@@ -302,12 +281,21 @@ export default function ArtistasUrabaPage() {
       <section className="relative overflow-hidden pt-20 pb-8 md:pb-10 px-4 md:px-6">
         <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
         <div className="relative z-10 max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl sm:text-6xl font-black uppercase leading-[0.95] mb-5">
-            Encuentra tu <span style={{ color: ACCENT }}>tatuador</span>
-          </h1>
-          <p className="text-gray-500 text-base md:text-lg leading-relaxed max-w-2xl mx-auto mb-8">
-            El buscador que conecta clientes con tatuadores de Urabá, respaldados por INKognito. Busca por nombre, municipio o estilo — o deja que detectemos dónde estás.
-          </p>
+          {/* Título + descripción dentro de una card, mismo lenguaje visual
+              que TarjetaReclutamiento (Jose, 2026-08-04). "tatuador" pasa
+              de texto rojo suelto a una card roja con texto blanco, y el
+              título ahora cabe en una sola línea (antes ocupaba dos). */}
+          <div className="rounded-xl border-2 p-5 md:p-7 mb-6 overflow-hidden" style={{ borderColor: `${ACCENT}30`, backgroundColor: `${ACCENT}06` }}>
+            <h1 className="text-lg sm:text-4xl md:text-5xl font-black uppercase leading-tight whitespace-nowrap">
+              Encuentra tu{' '}
+              <span className="inline-block px-2 sm:px-3 py-0.5 rounded-lg text-white" style={{ backgroundColor: ACCENT }}>
+                tatuador
+              </span>
+            </h1>
+            <p className="text-gray-500 text-sm md:text-lg leading-relaxed max-w-2xl mx-auto mt-4">
+              El buscador que conecta clientes con tatuadores de Urabá. Busca por nombre, municipio o estilo — o deja que detectemos dónde estás.
+            </p>
+          </div>
 
           {/* BARRA DE BÚSQUEDA + GEOLOCALIZACIÓN — sin listar municipios/
               estilos como botones: si uno no tiene artista registrado
@@ -373,10 +361,6 @@ export default function ArtistasUrabaPage() {
 
         {/* LISTADO */}
         <div className={`flex flex-col gap-3 ${query ? '' : 'mt-1'}`}>
-          {fundadorVisible && (
-            <ListingRow to="/jhumaneztattoo" nombre="Jose Humanez" municipio="Chigorodó" foto={fundadorFoto} featured />
-          )}
-
           {filtrados.map(a => (
             <ListingRow
               key={a.id}

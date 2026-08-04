@@ -134,7 +134,10 @@ export default function ArtistaLandingPage() {
             </div>
 
             {artista.bio && (
-              <p className="text-gray-600 text-sm leading-relaxed max-w-xl">{artista.bio}</p>
+              <div>
+                <p className="text-gray-400 text-[11px] uppercase tracking-widest mb-1">Sobre mí</p>
+                <p className="text-gray-600 text-sm leading-relaxed max-w-xl">{artista.bio}</p>
+              </div>
             )}
 
           </div>
