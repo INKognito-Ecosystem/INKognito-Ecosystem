@@ -51,6 +51,125 @@ export function meta() {
   ]
 }
 
+// Coordenadas reales de un artista: prioriza su punto EXACTO (lat/lng
+// propios, capturados con permiso al registrarse) sobre el centroide de
+// su municipio — es lo que distingue a dos artistas "del mismo municipio"
+// dentro de una ciudad grande (2026-08-05). Se usa tanto para ordenar el
+// listado de búsqueda como el carrusel "Artistas más cercanos".
+function coordsDeArtista(a) {
+  return (a.lat != null && a.lng != null) ? { lat: a.lat, lng: a.lng } : getCoordsMunicipio(a.departamento, a.municipio)
+}
+
+// Ordena una lista de artistas por cercanía real a un punto — devuelve una
+// copia nueva, estable (sin coords conocidas quedan al final, sin alterar
+// su orden relativo). Si no hay `desde` (ubicación del visitante
+// desconocida), devuelve la lista tal cual llegó.
+function ordenarPorCercania(lista, desde) {
+  if (!desde) return lista
+  return [...lista].sort((a, b) => {
+    const ca = coordsDeArtista(a)
+    const cb = coordsDeArtista(b)
+    if (!ca && !cb) return 0
+    if (!ca) return 1
+    if (!cb) return -1
+    return distanciaKm(desde.lat, desde.lng, ca.lat, ca.lng) - distanciaKm(desde.lat, desde.lng, cb.lat, cb.lng)
+  })
+}
+
+const DIAS_ARTISTA_NUEVO = 14
+
+function esArtistaNuevo(createdAt) {
+  if (!createdAt) return false
+  const dias = (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24)
+  return dias >= 0 && dias <= DIAS_ARTISTA_NUEVO
+}
+
+// Card ancha del carrusel "Artistas más cercanos" (2026-08-05, pedido de
+// Jose tras ver cómo Tattoodo sugiere artistas cercanos sin que el
+// visitante busque nada — "como sugerencias parecido a cuando facebook
+// las muestra"). Deliberadamente más grande que ListingRow (fotos de
+// trabajo primero, como una vitrina) — ListingRow sigue siendo la fila
+// compacta de RESULTADOS DE BÚSQUEDA, esta es la de descubrimiento.
+function ArtistaCercanoCard({ a, distanciaTexto }) {
+  const fotos = [a.foto_trabajo_1, a.foto_trabajo_2].filter(Boolean)
+  const nuevo = esArtistaNuevo(a.created_at)
+  return (
+    <Link
+      to={`/artista/${a.id}`}
+      className="flex-shrink-0 w-56 snap-start rounded-xl border border-gray-200 hover:border-gray-300 bg-white overflow-hidden transition-colors"
+    >
+      <div className="relative h-32 bg-gray-100 flex gap-0.5">
+        {fotos.length > 0 ? fotos.map((f, i) => (
+          <img key={i} src={f} alt="" className="flex-1 h-full object-cover" loading="lazy" />
+        )) : (
+          <div className="flex-1 h-full flex items-center justify-center text-gray-300 text-3xl font-black">
+            {a.nombre?.[0]?.toUpperCase() || '?'}
+          </div>
+        )}
+        {nuevo && (
+          <span
+            className="absolute top-2 left-2 flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full text-white"
+            style={{ backgroundColor: ACCENT }}
+          >
+            Nuevo artista
+          </span>
+        )}
+      </div>
+      <div className="p-3">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center border border-white -mt-6 shadow-sm">
+            {a.foto_url
+              ? <img src={a.foto_url} alt={a.nombre} className="w-full h-full object-cover" loading="lazy" />
+              : <span className="text-gray-300 text-xs font-black">{a.nombre?.[0]?.toUpperCase() || '?'}</span>}
+          </div>
+          <p className="font-black uppercase text-xs leading-tight truncate text-gray-900 min-w-0 flex-1">{a.nombre}</p>
+          <BadgeCheck size={13} style={{ color: ACCENT }} className="flex-shrink-0" />
+        </div>
+        <p className="text-gray-500 text-[10px] uppercase tracking-wide mt-1.5 truncate">
+          {a.municipio}{a.departamento ? `, ${a.departamento}` : ''}
+        </p>
+        {distanciaTexto && (
+          <p className="text-gray-400 text-[10px] mt-0.5">A {distanciaTexto} km de distancia</p>
+        )}
+      </div>
+    </Link>
+  )
+}
+
+// Sección "Artistas más cercanos" — carrusel horizontal siempre visible
+// (no requiere buscar), reservado para cuando SÍ hay al menos un artista
+// activo — con 0 artistas en todo el país, la card de reclutamiento ya
+// cumple ese rol de "sé el primero" sin duplicar mensajes vacíos acá.
+// "Ver todo" activa `onVerTodo`, que muestra el listado completo abajo
+// sin necesidad de escribir nada en el buscador.
+function SeccionCercanos({ artistas, misCoords, onVerTodo }) {
+  if (artistas.length === 0) return null
+  const ordenados = ordenarPorCercania(artistas, misCoords).slice(0, 10)
+  return (
+    <div className="mt-6 max-w-3xl mx-auto text-left">
+      <div className="flex items-center justify-between mb-3 px-1">
+        <h2 className="font-black uppercase text-sm text-gray-900">
+          {misCoords ? 'Artistas más cercanos' : 'Artistas en el directorio'}
+        </h2>
+        <button
+          onClick={onVerTodo}
+          className="text-xs font-bold uppercase tracking-wide hover:opacity-70 transition-opacity"
+          style={{ color: ACCENT }}
+        >
+          Ver todo
+        </button>
+      </div>
+      <div className="flex gap-3 overflow-x-auto pb-2 px-1 snap-x snap-mandatory scrollbar-hide">
+        {ordenados.map((a) => {
+          const c = coordsDeArtista(a)
+          const distanciaTexto = misCoords && c ? distanciaKm(misCoords.lat, misCoords.lng, c.lat, c.lng).toFixed(1) : null
+          return <ArtistaCercanoCard key={a.id} a={a} distanciaTexto={distanciaTexto} />
+        })}
+      </div>
+    </div>
+  )
+}
+
 // Insignia sola-ícono en la esquina de la card (2026-08-05, antes era un
 // pill con texto "Verificado" en la misma fila que el nombre — Jose pidió
 // que vaya "en el estremo de la card" solo con el ícono). Se posiciona
@@ -259,6 +378,10 @@ export default function ArtistasUrabaPage() {
   const [ubicando, setUbicando] = useState(false)
   const [ubicacionError, setUbicacionError] = useState(null)
   const [modalArtista, setModalArtista] = useState(null)
+  // "Ver todo" del carrusel "Artistas más cercanos" activa esto — muestra
+  // el listado completo (ordenado por cercanía) sin necesidad de escribir
+  // nada en el buscador (2026-08-05).
+  const [mostrarTodos, setMostrarTodos] = useState(false)
   // Coordenadas reales del visitante — de la geolocalización precisa del
   // navegador si tocó "Cerca de ti", o si no, del centroide de la ciudad
   // detectada por IP (menos preciso, pero mejor que nada). Con esto se
@@ -277,32 +400,14 @@ export default function ArtistasUrabaPage() {
   const q = normalize(query.trim())
   const matches = (...campos) => q === '' || campos.some(c => c && normalize(c).includes(q))
 
-  // Sin búsqueda activa no se lista ningún artista — solo aparece al
-  // buscar (Jose, 2026-08-03). El fundador (Jose Humanez) ya NO tiene
-  // trato especial: se quitó el perfil fijo/destacado — "vamos a usar la
-  // plataforma como cualquier tatuador más" (Jose, 2026-08-04). Si quiere
-  // aparecer en el directorio, se registra igual que cualquier artista.
-  let filtrados = q === '' ? [] : artistas.filter(a => matches(a.nombre, a.municipio, a.estilo))
-  if (misCoords && filtrados.length > 1) {
-    // Preferir el punto EXACTO del artista (lat/lng propios, capturados al
-    // registrarse con su permiso) sobre el centroide de su municipio — es
-    // lo que realmente distingue a dos artistas "del mismo municipio"
-    // dentro de una ciudad grande (2026-08-05, ver ComboboxBuscable.jsx /
-    // usarMiUbicacion en ArtistaRegistroPage.jsx). Si el artista no dio su
-    // ubicación, cae al centroide como antes.
-    const coordsDe = (a) => (a.lat != null && a.lng != null) ? { lat: a.lat, lng: a.lng } : getCoordsMunicipio(a.departamento, a.municipio)
-    // Sort estable: los artistas sin ningún dato de ubicación (ni lat/lng
-    // propios ni departamento guardado — registros de antes de la
-    // expansión nacional) quedan al final, sin alterar su orden relativo.
-    filtrados = [...filtrados].sort((a, b) => {
-      const ca = coordsDe(a)
-      const cb = coordsDe(b)
-      if (!ca && !cb) return 0
-      if (!ca) return 1
-      if (!cb) return -1
-      return distanciaKm(misCoords.lat, misCoords.lng, ca.lat, ca.lng) - distanciaKm(misCoords.lat, misCoords.lng, cb.lat, cb.lng)
-    })
-  }
+  // Sin búsqueda activa no se lista ningún artista, A MENOS que "Ver
+  // todo" del carrusel esté activo (2026-08-05) — el fundador (Jose
+  // Humanez) ya NO tiene trato especial: se quitó el perfil fijo/
+  // destacado — "vamos a usar la plataforma como cualquier tatuador más"
+  // (Jose, 2026-08-04). Si quiere aparecer en el directorio, se registra
+  // igual que cualquier artista.
+  let filtrados = q === '' ? (mostrarTodos ? artistas : []) : artistas.filter(a => matches(a.nombre, a.municipio, a.estilo))
+  filtrados = ordenarPorCercania(filtrados, misCoords)
   const total = filtrados.length
 
   // Al iniciar la búsqueda (primera letra escrita) el teclado del celular
@@ -338,6 +443,12 @@ export default function ArtistasUrabaPage() {
     )
   }
 
+  const verTodo = () => {
+    setMostrarTodos(true)
+    setQuery('')
+    listadoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   // Web Share API con fallback a WhatsApp — pedido de Jose (2026-08-04):
   // si quien busca NO es tatuador, se le invita a compartir la app en vez
   // de dejarlo sin ninguna acción posible.
@@ -360,7 +471,13 @@ export default function ArtistasUrabaPage() {
       <NavbarArtistas ciudadDetectada={ciudadDetectada} />
 
       <section className="relative overflow-hidden pt-20 pb-8 md:pb-10 px-4 md:px-6">
-        <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
+        {/* pointer-events-none (2026-08-05): este fondo decorativo estaba
+            tapando los clics del botón "Ver todo" de SeccionCercanos, que
+            vive fuera del div `relative z-10` de más abajo — sin esto,
+            cualquier elemento nuevo que se agregue como hermano directo de
+            esta sección corre el mismo riesgo de quedar debajo del overlay
+            en el orden de pintado. */}
+        <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={DOT_PATTERN} />
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           {/* Título + descripción dentro de una card, mismo lenguaje visual
               que TarjetaReclutamiento (Jose, 2026-08-04). "tatuador" pasa
@@ -374,7 +491,7 @@ export default function ArtistasUrabaPage() {
               </span>
             </h1>
             <p className="text-gray-700 text-sm md:text-lg leading-relaxed max-w-2xl mx-auto mt-1.5">
-              El buscador que conecta clientes con tatuadores de toda Colombia. Busca por nombre, municipio o estilo — o deja que detectemos dónde estás.
+              El buscador que conecta personas con tatuadores de toda Colombia. Busca por nombre, municipio o estilo — o deja que detectemos dónde estás.
             </p>
 
             {/* Señales de confianza, mismo patrón que ya vimos en Tattoodo
@@ -442,6 +559,13 @@ export default function ArtistasUrabaPage() {
             </button>
           )}
         </div>
+
+        {/* "Artistas más cercanos" — sugerencia proactiva, siempre visible,
+            sin requerir búsqueda (Jose, 2026-08-05: "como sugerencias
+            parecido a cuando facebook las muestra"). Gratis y ordenado por
+            cercanía real para TODOS los artistas — la prioridad paga es
+            "aparecer primero" dentro de esto, no el acceso a aparecer. */}
+        <SeccionCercanos artistas={artistas} misCoords={misCoords} onVerTodo={verTodo} />
       </section>
 
       <section ref={listadoRef} className="flex-1 px-4 md:px-6 pb-16 max-w-3xl mx-auto scroll-mt-20 w-full">
