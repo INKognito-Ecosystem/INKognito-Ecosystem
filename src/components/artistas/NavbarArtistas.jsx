@@ -8,6 +8,7 @@ import { Menu, X } from 'lucide-react'
 import inkognitoLogo from '../../assets/artistas-logo-mark.png'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import AnimatedCityWordmark from './AnimatedCityWordmark'
+import LogoLupaIntro from './LogoLupaIntro'
 
 // Navbar propio del módulo (2026-08-03) — antes usaba el EcosystemNavbar
 // genérico (pensado para landings sueltas de producto), pero al pasar a
@@ -47,8 +48,9 @@ export default function NavbarArtistas({ ciudadDetectada = null }) {
                 <img> se achica al 57% dentro de la misma caja para igualar
                 el tamaño real en pantalla, no solo el de la caja
                 (2026-08-03). */}
-            <div className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center flex-shrink-0">
+            <div className="relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center flex-shrink-0">
               <img src={inkognitoLogo} alt="INKognito" className="w-7 h-7 md:w-8 md:h-8 object-contain" style={{ filter: 'brightness(0) invert(1)' }} />
+              <LogoLupaIntro />
             </div>
           </Link>
 
@@ -62,11 +64,27 @@ export default function NavbarArtistas({ ciudadDetectada = null }) {
               : <span className="text-gray-300">Colombia</span>}
           </Link>
 
+          {/* Hamburguesa tricolor — pedido de Jose (2026-08-05), colores de
+              la bandera de Colombia de arriba a abajo (amarillo/azul/rojo),
+              acorde a la expansión nacional del módulo ("Tattoo Artist
+              Colombia"). El ícono de lucide-react (Menu) es un solo trazo
+              de un color — no se puede pintar cada línea por separado, así
+              que se reemplaza por 3 barras propias solo en el estado
+              cerrado; la X de cerrar se queda como estaba. */}
           <button
             onClick={() => setMenuOpen(o => !o)}
-            className="text-gray-400 hover:text-white transition-colors flex-shrink-0"
+            aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+            className="flex-shrink-0 flex items-center justify-center w-[22px] h-[22px]"
           >
-            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+            {menuOpen ? (
+              <X size={22} className="text-gray-400 hover:text-white transition-colors" />
+            ) : (
+              <span className="flex flex-col gap-[3px] w-[22px]">
+                <span className="h-[2.5px] w-full rounded-full" style={{ backgroundColor: '#FCD116' }} />
+                <span className="h-[2.5px] w-full rounded-full" style={{ backgroundColor: '#003893' }} />
+                <span className="h-[2.5px] w-full rounded-full" style={{ backgroundColor: '#CE1126' }} />
+              </span>
+            )}
           </button>
         </div>
       </div>
