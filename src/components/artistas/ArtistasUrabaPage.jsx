@@ -436,7 +436,13 @@ export default function ArtistasUrabaPage() {
   // destacado — "vamos a usar la plataforma como cualquier tatuador más"
   // (Jose, 2026-08-04). Si quiere aparecer en el directorio, se registra
   // igual que cualquier artista.
-  let filtrados = q === '' ? (mostrarTodos ? artistas : []) : artistas.filter(a => matches(a.nombre, a.municipio, a.estilo))
+  // La bio SÍ entra en la búsqueda (2026-08-05, Jose preguntó directo si
+  // ayudaba o si solo contaba el municipio — antes NO se incluía, así que
+  // era puramente informativa). Por eso el campo del formulario dejó de
+  // decir "bio corta, 1-2 líneas sobre ti" — ahora si un artista escribe
+  // "puntillismo" o "acuarela" en su bio, alguien que busque esa palabra
+  // sí lo va a encontrar, no solo por nombre/municipio/estilo.
+  let filtrados = q === '' ? (mostrarTodos ? artistas : []) : artistas.filter(a => matches(a.nombre, a.municipio, a.estilo, a.bio))
   filtrados = ordenarPorCercania(filtrados, misCoords)
   const total = filtrados.length
 

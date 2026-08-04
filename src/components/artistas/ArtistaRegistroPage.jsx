@@ -380,8 +380,8 @@ export default function ArtistaRegistroPage() {
                 </div>
 
                 <div>
-                  <label className={labelClass}>Bio corta</label>
-                  <textarea rows={3} className={inputClass} value={form.bio} onChange={set('bio')} placeholder="1-2 líneas sobre ti y tu trabajo" />
+                  <label className={labelClass}>Bio</label>
+                  <textarea rows={3} className={inputClass} value={form.bio} onChange={set('bio')} placeholder="Cuenta tus técnicas, estilos y materiales — esto ayuda a que te encuentren en la búsqueda" />
                 </div>
 
                 <div>
