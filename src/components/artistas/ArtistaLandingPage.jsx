@@ -97,11 +97,11 @@ export default function ArtistaLandingPage() {
             </div>
           </div>
 
-          <div className="mt-4 space-y-5">
+          <div className="mt-4 space-y-2">
 
             <div>
               <h1 className="text-2xl md:text-4xl font-black uppercase leading-tight">{artista.nombre}</h1>
-              <div className="flex items-center gap-3 mt-2 flex-wrap">
+              <div className="flex items-center gap-3 mt-1 flex-wrap">
                 <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-gray-500">
                   <MapPin size={13} />
                   {artista.municipio}
@@ -125,8 +125,11 @@ export default function ArtistaLandingPage() {
         {/* REDES SOCIALES — Facebook e Instagram, siempre visibles a todo el
             ancho de pantalla en 2 bloques (pedido de Jose, 2026-08-03). Si
             el artista todavía no tiene el link cargado, el bloque se queda
-            visible pero deshabilitado con un aviso, nunca se oculta. */}
-        <div className="mt-6">
+            visible pero deshabilitado con un aviso, nunca se oculta.
+            Delgadas como el botón de WhatsApp (corrección de Jose: las
+            primeras quedaron muy grandes/cuadradas, apiladas verticalmente
+            — ahora ícono + texto en fila, misma altura que WhatsApp). */}
+        <div className="mt-5">
           <p className="max-w-3xl mx-auto px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-2">Redes sociales</p>
           <div className="grid grid-cols-2 w-full border-y border-gray-200">
             <a
@@ -135,13 +138,15 @@ export default function ArtistaLandingPage() {
               rel={artista.facebook ? 'noopener noreferrer' : undefined}
               onClick={artista.facebook ? undefined : (e) => e.preventDefault()}
               aria-disabled={!artista.facebook}
-              className={`flex flex-col items-center justify-center gap-1.5 py-6 border-r border-gray-200 transition-colors ${
+              className={`flex items-center justify-center gap-2.5 py-3.5 border-r border-gray-200 transition-colors ${
                 artista.facebook ? 'text-gray-700 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-default'
               }`}
             >
-              <FaFacebook size={22} />
-              <span className="text-xs font-bold uppercase tracking-widest">Facebook</span>
-              {!artista.facebook && <span className="text-[10px] normal-case tracking-normal">Aún no se ha subido</span>}
+              <FaFacebook size={18} />
+              <span className="flex flex-col items-start leading-tight">
+                <span className="text-xs sm:text-sm font-bold uppercase tracking-widest">Facebook</span>
+                {!artista.facebook && <span className="text-[9px] font-medium normal-case tracking-normal text-gray-300">Aún no se ha subido</span>}
+              </span>
             </a>
             <a
               href={artista.instagram || undefined}
@@ -149,13 +154,15 @@ export default function ArtistaLandingPage() {
               rel={artista.instagram ? 'noopener noreferrer' : undefined}
               onClick={artista.instagram ? undefined : (e) => e.preventDefault()}
               aria-disabled={!artista.instagram}
-              className={`flex flex-col items-center justify-center gap-1.5 py-6 transition-colors ${
+              className={`flex items-center justify-center gap-2.5 py-3.5 transition-colors ${
                 artista.instagram ? 'text-gray-700 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-default'
               }`}
             >
-              <FaInstagram size={22} />
-              <span className="text-xs font-bold uppercase tracking-widest">Instagram</span>
-              {!artista.instagram && <span className="text-[10px] normal-case tracking-normal">Aún no se ha subido</span>}
+              <FaInstagram size={18} />
+              <span className="flex flex-col items-start leading-tight">
+                <span className="text-xs sm:text-sm font-bold uppercase tracking-widest">Instagram</span>
+                {!artista.instagram && <span className="text-[9px] font-medium normal-case tracking-normal text-gray-300">Aún no se ha subido</span>}
+              </span>
             </a>
           </div>
         </div>

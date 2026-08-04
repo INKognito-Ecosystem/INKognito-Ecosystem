@@ -114,19 +114,19 @@ function ListingRow({ to, nombre, municipio, estilo, bio, foto, featured }) {
             <VerifiedBadge />
           )}
         </div>
-        <div className="flex items-center gap-3 mt-1 flex-wrap">
-          <span className="flex items-center gap-1 text-gray-500 text-[11px] uppercase tracking-wide">
+        <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+          <span className="flex items-center gap-1 text-gray-500 text-[11px] uppercase tracking-wide leading-snug">
             <MapPin size={11} />
             {municipio}
           </span>
           {estilo && (
-            <span className="flex items-center gap-1 text-gray-500 text-[11px] uppercase tracking-wide">
+            <span className="flex items-center gap-1 text-gray-500 text-[11px] uppercase tracking-wide leading-snug">
               <Palette size={11} />
               {estilo}
             </span>
           )}
         </div>
-        {bio && <p className="text-gray-400 text-xs mt-1 truncate">{bio}</p>}
+        {bio && <p className="text-gray-400 text-xs mt-0.5 leading-snug truncate">{bio}</p>}
       </div>
       <ChevronRight size={18} className="text-gray-300 group-hover:text-gray-500 flex-shrink-0 transition-colors" />
     </Link>

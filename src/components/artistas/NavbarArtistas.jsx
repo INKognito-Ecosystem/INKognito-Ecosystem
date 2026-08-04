@@ -22,9 +22,15 @@ export default function NavbarArtistas() {
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-gray-800 border-b border-gray-700">
       <div className="relative max-w-6xl mx-auto px-4 md:px-6">
-        <div className="h-16 md:h-20 flex items-center justify-center">
+        <div className="h-16 md:h-20 flex items-center justify-between">
 
-          <Link to="/tattoo-artist-uraba" className="flex items-center gap-2.5">
+          {/* Logo pegado a la izquierda, tal cual estaba — lo que se centra
+              es solo el texto, no el logo (Jose, 2026-08-03: "era centrar
+              el texto no mover el logo"). El texto se centra en TODO el
+              navbar (absolute + left-1/2), no en el espacio libre entre
+              logo y hamburguesa, para que quede alineado con el centro
+              real de la barra sin importar el ancho de cada lado. */}
+          <Link to="/tattoo-artist-uraba" className="flex items-center flex-shrink-0">
             {/* Medido contra el navbar de Supply con Playwright+sharp: su
                 logo ocupa ~57% de su caja de w-12/w-14 (el archivo trae aire
                 de fábrica) — acá el archivo ya viene recortado, así que el
@@ -34,15 +40,19 @@ export default function NavbarArtistas() {
             <div className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center flex-shrink-0">
               <img src={inkognitoLogo} alt="INKognito" className="w-7 h-7 md:w-8 md:h-8 object-contain" style={{ filter: 'brightness(0) invert(1)' }} />
             </div>
-            <span className="text-base md:text-xl font-black uppercase tracking-wide leading-tight whitespace-nowrap">
-              <span className="text-gray-100">Tattoo Artist</span>{' '}
-              <span className="text-gray-300">Urabá</span>
-            </span>
+          </Link>
+
+          <Link
+            to="/tattoo-artist-uraba"
+            className="absolute left-1/2 -translate-x-1/2 text-base md:text-xl font-black uppercase tracking-wide leading-tight whitespace-nowrap"
+          >
+            <span className="text-gray-100">Tattoo Artist</span>{' '}
+            <span className="text-gray-300">Urabá</span>
           </Link>
 
           <button
             onClick={() => setMenuOpen(o => !o)}
-            className="absolute right-4 md:right-6 text-gray-400 hover:text-white transition-colors"
+            className="text-gray-400 hover:text-white transition-colors flex-shrink-0"
           >
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
