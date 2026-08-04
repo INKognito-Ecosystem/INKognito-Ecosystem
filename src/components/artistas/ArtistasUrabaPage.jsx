@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
-import { Search, MapPin, Palette, BadgeCheck, ChevronRight, Navigation, LoaderCircle, Share2 } from 'lucide-react'
+import { Search, MapPin, Palette, BadgeCheck, ChevronRight, Navigation, LoaderCircle, Share2, Sparkles, Check } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 
 // Sin esto, escribir "apartado"/"chigorodo" (sin tilde, lo normal al
@@ -152,6 +152,72 @@ function ListingRow({ to, nombre, municipio, estilo, bio, foto, featured }) {
   )
 }
 
+// Tarjeta de reclutamiento persuasiva (2026-08-04, pedido de Jose: "muy
+// básicas... deberán aparecer siempre debajo en la búsqueda, pero en una
+// card, como lo hace tattoodo, con informaciones persuasivas"). Antes
+// eran dos bloques de texto plano que solo aparecían con búsqueda activa
+// — ahora es una sola card, siempre visible, con puntos de valor + ambos
+// CTA (unirse / compartir). El encabezado cambia según el estado de la
+// búsqueda, pero la card en sí nunca se oculta.
+function TarjetaReclutamiento({ query, total, compartir }) {
+  const encabezado = !query
+    ? '¿Eres tatuador en Urabá?'
+    : total === 0
+      ? `Todavía no hay tatuadores para "${query}"`
+      : `Ya hay ${total} artista${total !== 1 ? 's' : ''} en "${query}"`
+  const subtitulo = !query
+    ? 'Este es el buscador que conecta clientes con tatuadores de la región.'
+    : total === 0
+      ? 'Sé el primero en aparecer aquí.'
+      : 'Súmate y aparece junto a ellos.'
+
+  return (
+    <div className="mt-6 rounded-xl border-2 p-5 md:p-6" style={{ borderColor: `${ACCENT}30`, backgroundColor: `${ACCENT}06` }}>
+      <div className="flex items-start gap-4">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: ACCENT }}>
+          <Sparkles size={18} className="text-white" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-black uppercase text-sm text-gray-900 leading-tight">{encabezado}</p>
+          <p className="text-gray-500 text-xs mt-0.5">{subtitulo}</p>
+
+          <ul className="mt-3 space-y-1.5">
+            <li className="flex items-center gap-2 text-xs text-gray-600">
+              <Check size={13} style={{ color: ACCENT }} className="flex-shrink-0" />
+              Apareces en las búsquedas de tu municipio
+            </li>
+            <li className="flex items-center gap-2 text-xs text-gray-600">
+              <Check size={13} style={{ color: ACCENT }} className="flex-shrink-0" />
+              Contacto directo por WhatsApp, sin intermediarios
+            </li>
+            <li className="flex items-center gap-2 text-xs text-gray-600">
+              <Check size={13} style={{ color: ACCENT }} className="flex-shrink-0" />
+              Sin costo por ahora — sin tarjeta, sin compromiso
+            </li>
+          </ul>
+
+          <div className="mt-4 flex flex-col sm:flex-row gap-2">
+            <Link
+              to="/tattoo-artist-uraba/unete"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
+              style={{ backgroundColor: ACCENT }}
+            >
+              Unirme como artista
+            </Link>
+            <button
+              onClick={compartir}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-gray-300 text-gray-600 text-xs font-bold uppercase tracking-widest hover:border-gray-500 transition-colors"
+            >
+              <Share2 size={13} />
+              Compartir
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Módulo nuevo (2026-08-03), desplegado sin exponer aún — ver plan de
 // "Directorio de artistas de tatuaje en Urabá". Tercera vuelta de diseño
 // el mismo día: v1 (grid de fotos negro) genérica; v2 (pills municipio +
@@ -226,7 +292,11 @@ export default function ArtistasUrabaPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    // flex flex-col + flex-1 en el contenido (2026-08-04): sin esto, en
+    // búsquedas con pocos resultados el footer quedaba flotando a media
+    // pantalla en vez de pegado abajo — "pongamos el copyright abajo como
+    // corresponde" (Jose). NavbarArtistas es fixed, no participa del flex.
+    <div className="min-h-screen bg-white text-gray-900 flex flex-col">
       <NavbarArtistas />
 
       <section className="relative overflow-hidden pt-20 pb-8 md:pb-10 px-4 md:px-6">
@@ -291,7 +361,7 @@ export default function ArtistasUrabaPage() {
         </div>
       </section>
 
-      <section ref={listadoRef} className="px-4 md:px-6 pb-16 max-w-3xl mx-auto scroll-mt-20">
+      <section ref={listadoRef} className="flex-1 px-4 md:px-6 pb-16 max-w-3xl mx-auto scroll-mt-20 w-full">
 
         {/* CONTADOR — solo tiene sentido con búsqueda activa, ningún
             artista (fundador incluido) se lista por defecto. */}
@@ -319,47 +389,18 @@ export default function ArtistasUrabaPage() {
             />
           ))}
 
-          {/* RECLUTAMIENTO — mensaje distinto según si ya hay artistas o
-              no (Jose, 2026-08-04): "sé el primero" solo tiene sentido
-              cuando de verdad no hay nadie; si ya hay artistas, el ángulo
-              es sumarse a ellos, no ser "el primero" (sería falso). Ambos
-              casos incluyen la invitación a compartir para quien no es
-              tatuador — mismo patrón de Tattoodo, en su propio tono. */}
           {query && total === 0 && (
-            <div className="text-center py-10 px-4">
-              <p className="text-gray-500 text-sm leading-relaxed max-w-sm mx-auto">
-                Todavía no hay ningún tatuador registrado para "{query}" — sé el primero en aparecer en el buscador que conecta clientes con artistas en Urabá.
-              </p>
-              <div className="mt-5 flex flex-col sm:flex-row gap-2 justify-center">
-                <Link
-                  to="/tattoo-artist-uraba/unete"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
-                  style={{ backgroundColor: ACCENT }}
-                >
-                  ¿Eres tatuador? Únete
-                </Link>
-                <button
-                  onClick={compartir}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-gray-300 text-gray-600 text-xs font-bold uppercase tracking-widest hover:border-gray-500 transition-colors"
-                >
-                  <Share2 size={13} />
-                  Compartir
-                </button>
-              </div>
-            </div>
-          )}
-
-          {query && total > 0 && (
-            <div className="mt-6 pt-5 border-t border-gray-200 text-center">
-              <p className="text-gray-400 text-xs">
-                ¿Eres tatuador en Urabá y no apareces aquí?{' '}
-                <Link to="/tattoo-artist-uraba/unete" className="font-bold" style={{ color: ACCENT }}>
-                  {total === 1 ? 'Únete al artista que ya está' : `Únete a los ${total} artistas que ya están`}
-                </Link>
-              </p>
+            <div className="text-center py-6 text-gray-400 text-sm">
+              No hay artistas con esa búsqueda por ahora.
             </div>
           )}
         </div>
+
+        {/* RECLUTAMIENTO — siempre visible debajo de la búsqueda, sea cual
+            sea el estado (Jose, 2026-08-04: "deberán aparecer siempre
+            debajo en la búsqueda, pero en una card... con informaciones
+            persuasivas"). Antes solo aparecía con búsqueda activa. */}
+        <TarjetaReclutamiento query={query} total={total} compartir={compartir} />
       </section>
 
       <footer className="border-t border-gray-200 py-6 px-4">

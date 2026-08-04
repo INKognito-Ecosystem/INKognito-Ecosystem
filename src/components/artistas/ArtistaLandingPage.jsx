@@ -77,10 +77,13 @@ export default function ArtistaLandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    // flex flex-col + flex-1 (2026-08-04): footer siempre pegado abajo,
+    // incluso en perfiles con poco contenido (Jose: "pongamos el copyright
+    // abajo como corresponde"). NavbarArtistas es fixed, no participa.
+    <div className="min-h-screen bg-white text-gray-900 flex flex-col">
       <NavbarArtistas />
 
-      <div className="pt-16 md:pt-20">
+      <div className="flex-1 pt-16 md:pt-20">
 
         {/* PORTADA */}
         <div className="w-full h-40 sm:h-56 md:h-72 bg-gray-100 overflow-hidden">
