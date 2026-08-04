@@ -3,10 +3,10 @@ import { Link, useLoaderData } from 'react-router-dom'
 import { CheckCircle2, Camera, MapPin, Palette, LoaderCircle } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
+import { DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO, municipioDesdeNombreIP } from '../../data/colombiaGeo'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const ACCENT = '#B3202F'
-const MUNICIPIOS = ['Chigorodó', 'Apartadó', 'Turbo', 'Carepa']
 
 // Los mismos 5 slots que ya maneja el admin en el panel (perfil, portada,
 // 3 trabajos) — acá el artista los sube él mismo, directo a Cloudinary
@@ -19,19 +19,26 @@ const SLOTS = [
   { key: 'foto_trabajo_3', label: 'Trabajo 3' },
 ]
 
-export async function loader() {
+export async function loader({ request }) {
+  let ciudadDetectada = null
+  try {
+    const ipCity = request.headers.get('x-vercel-ip-city')
+    if (ipCity) ciudadDetectada = municipioDesdeNombreIP(decodeURIComponent(ipCity))
+  } catch {
+    ciudadDetectada = null
+  }
   try {
     const res = await fetch(`${PANEL_URL}/api/upload-config`)
-    if (res.ok) return await res.json()
+    if (res.ok) return { ...(await res.json()), ciudadDetectada }
   } catch {
     // sigue abajo con el fallback
   }
-  return { cloud_name: null, upload_preset: null }
+  return { cloud_name: null, upload_preset: null, ciudadDetectada }
 }
 
 export function meta() {
-  const title = 'Únete como artista | Tattoo Artist Urabá'
-  const description = 'Registra tu perfil en el buscador que conecta clientes con tatuadores de Urabá.'
+  const title = 'Únete como artista | Tattoo Artist Colombia'
+  const description = 'Registra tu perfil en el buscador que conecta clientes con tatuadores de toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },
@@ -51,9 +58,9 @@ const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb
 // aprueba con un clic. La curación sigue siendo esa aprobación manual,
 // no la subida de fotos en sí.
 export default function ArtistaRegistroPage() {
-  const { cloud_name, upload_preset } = useLoaderData()
+  const { cloud_name, upload_preset, ciudadDetectada } = useLoaderData()
   const [form, setForm] = useState({
-    nombre: '', municipio: '', estilo: '', bio: '', instagram: '', facebook: '', whatsapp: '', no_tatua: '',
+    nombre: '', departamento: '', municipio: '', estilo: '', bio: '', instagram: '', facebook: '', whatsapp: '', no_tatua: '',
     foto_url: '', foto_url_2: '', foto_trabajo_1: '', foto_trabajo_2: '', foto_trabajo_3: '',
   })
   const [subiendo, setSubiendo] = useState(null)
@@ -63,6 +70,12 @@ export default function ArtistaRegistroPage() {
   const fileInputs = useRef({})
 
   const set = (campo) => (e) => setForm((f) => ({ ...f, [campo]: e.target.value }))
+
+  // Cambiar de departamento invalida el municipio ya elegido (son ~1120
+  // municipios en total, agrupados por departamento — un municipio de
+  // Antioquia no tiene sentido si se cambia a Valle del Cauca).
+  const setDepartamento = (e) => setForm((f) => ({ ...f, departamento: e.target.value, municipio: '' }))
+  const municipiosDisponibles = MUNICIPIOS_POR_DEPARTAMENTO[form.departamento] || []
 
   const elegirFoto = (slot) => fileInputs.current[slot]?.click()
 
@@ -92,8 +105,8 @@ export default function ArtistaRegistroPage() {
 
   const enviar = async (e) => {
     e.preventDefault()
-    if (!form.nombre.trim() || !form.municipio || !form.whatsapp.trim()) {
-      setError('Nombre, municipio y WhatsApp son obligatorios.')
+    if (!form.nombre.trim() || !form.departamento || !form.municipio || !form.whatsapp.trim()) {
+      setError('Nombre, departamento, municipio y WhatsApp son obligatorios.')
       return
     }
     setError(null)
@@ -117,9 +130,9 @@ export default function ArtistaRegistroPage() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
-      <NavbarArtistas />
+      <NavbarArtistas ciudadDetectada={ciudadDetectada} />
 
-      <div className="flex-1 pt-24 md:pt-28 max-w-5xl mx-auto px-4 pb-16 w-full">
+      <div className="flex-1 pt-20 md:pt-24 max-w-5xl mx-auto px-4 pb-16 w-full">
 
         {enviado ? (
           <div className="text-center py-16">
@@ -134,12 +147,19 @@ export default function ArtistaRegistroPage() {
           </div>
         ) : (
           <>
-            <div className="text-center mb-8">
-              <h1 className="text-3xl md:text-4xl font-black uppercase leading-tight mb-3">
-                Únete al <span style={{ color: ACCENT }}>buscador</span>
+            {/* Mismo tratamiento visual que el hero del buscador (Jose,
+                2026-08-04): card gris sólida, palabra clave en su propia
+                card roja con texto blanco, espaciado compacto entre
+                título y descripción. */}
+            <div className="rounded-xl border border-gray-300 p-5 md:p-7 mb-8 overflow-hidden bg-gray-300 text-center">
+              <h1 className="text-xl sm:text-3xl md:text-4xl font-black uppercase leading-tight whitespace-nowrap">
+                Únete al{' '}
+                <span className="inline-block px-2 sm:px-3 py-0.5 rounded-lg text-white" style={{ backgroundColor: ACCENT }}>
+                  buscador
+                </span>
               </h1>
-              <p className="text-gray-500 text-sm leading-relaxed max-w-md mx-auto">
-                Tattoo Artist Urabá conecta clientes con tatuadores de la región. Llena tus datos y mira tu perfil tomar forma en tiempo real.
+              <p className="text-gray-700 text-sm md:text-base leading-relaxed max-w-md mx-auto mt-1.5">
+                Tattoo Artist Colombia conecta clientes con tatuadores de todo el país. Llena tus datos y mira tu perfil tomar forma en tiempo real.
               </p>
             </div>
 
@@ -202,7 +222,7 @@ export default function ArtistaRegistroPage() {
                     <div className="flex items-center gap-3 mt-1 flex-wrap">
                       <span className="flex items-center gap-1 text-gray-500 text-[10px] uppercase tracking-wide">
                         <MapPin size={10} />
-                        {form.municipio || 'Municipio'}
+                        {form.municipio ? `${form.municipio}${form.departamento ? ', ' + form.departamento : ''}` : 'Municipio'}
                       </span>
                       {form.estilo && (
                         <span className="flex items-center gap-1 text-gray-500 text-[10px] uppercase tracking-wide">
@@ -265,7 +285,7 @@ export default function ArtistaRegistroPage() {
                     </div>
                   )}
                 </div>
-                <p className="text-gray-400 text-[11px] mt-2 text-center">Toca las fotos para subirlas — es opcional, puedes hacerlo ahora o cuando te contactemos.</p>
+                <p className="text-gray-500 text-[11px] mt-2 text-center font-medium">Sube tus fotos y completa tu información ahora — un perfil completo y presentable capta más clientes.</p>
               </div>
 
               {/* FORMULARIO */}
@@ -275,12 +295,21 @@ export default function ArtistaRegistroPage() {
                   <input required className={inputClass} value={form.nombre} onChange={set('nombre')} placeholder="Tu nombre o el de tu estudio" />
                 </div>
 
-                <div>
-                  <label className={labelClass}>Municipio *</label>
-                  <select required className={inputClass} value={form.municipio} onChange={set('municipio')}>
-                    <option value="">Selecciona tu municipio</option>
-                    {MUNICIPIOS.map((m) => <option key={m} value={m}>{m}</option>)}
-                  </select>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className={labelClass}>Departamento *</label>
+                    <select required className={inputClass} value={form.departamento} onChange={setDepartamento}>
+                      <option value="">Selecciona</option>
+                      {DEPARTAMENTOS.map((d) => <option key={d} value={d}>{d}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className={labelClass}>Municipio *</label>
+                    <select required disabled={!form.departamento} className={inputClass} value={form.municipio} onChange={set('municipio')}>
+                      <option value="">{form.departamento ? 'Selecciona' : 'Elige antes el departamento'}</option>
+                      {municipiosDisponibles.map((m) => <option key={m} value={m}>{m}</option>)}
+                    </select>
+                  </div>
                 </div>
 
                 <div>
@@ -331,7 +360,7 @@ export default function ArtistaRegistroPage() {
 
       <footer className="border-t border-gray-200 py-6 px-4">
         <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-400 text-[12px] gap-3">
-          <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Urabá — INKognito. Todos los derechos reservados.</p>
+          <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Colombia — INKognito. Todos los derechos reservados.</p>
           <span className="text-gray-300">Desarrollado por INKognito</span>
         </div>
       </footer>

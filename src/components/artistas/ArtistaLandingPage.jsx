@@ -3,25 +3,36 @@ import { Link, useLoaderData } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
+import { municipioDesdeNombreIP } from '../../data/colombiaGeo'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const ACCENT = '#B3202F'
 
-export async function loader({ params }) {
+export async function loader({ params, request }) {
+  // Mismo detector de ciudad por IP que usa la página madre — el navbar es
+  // compartido, así que también acá hay que resolver ciudadDetectada
+  // (2026-08-04, expansión nacional).
+  let ciudadDetectada = null
+  try {
+    const ipCity = request.headers.get('x-vercel-ip-city')
+    if (ipCity) ciudadDetectada = municipioDesdeNombreIP(decodeURIComponent(ipCity))
+  } catch {
+    ciudadDetectada = null
+  }
   try {
     const res = await fetch(`${PANEL_URL}/api/artistas/${params.id}`)
-    if (!res.ok) return { artista: null }
-    return { artista: await res.json() }
+    if (!res.ok) return { artista: null, ciudadDetectada }
+    return { artista: await res.json(), ciudadDetectada }
   } catch {
-    return { artista: null }
+    return { artista: null, ciudadDetectada }
   }
 }
 
 export function meta({ data }) {
   const artista = data?.artista
-  if (!artista) return [{ title: 'Artista no encontrado | Tattoo Artist Urabá' }]
-  const title = `${artista.nombre} — Tatuador en ${artista.municipio} | Tattoo Artist Urabá`
-  const description = artista.bio || `${artista.nombre}, tatuador en ${artista.municipio}, Urabá. Portafolio y contacto directo por WhatsApp.`
+  if (!artista) return [{ title: 'Artista no encontrado | Tattoo Artist Colombia' }]
+  const title = `${artista.nombre} — Tatuador en ${artista.municipio} | Tattoo Artist Colombia`
+  const description = artista.bio || `${artista.nombre}, tatuador en ${artista.municipio}${artista.departamento ? ', ' + artista.departamento : ''}. Portafolio y contacto directo por WhatsApp.`
   return [
     { title },
     { name: 'description', content: description },
@@ -39,13 +50,13 @@ export function meta({ data }) {
 // mismos 3 slots para ambos roles: "la idea es subir perfil, portada, y
 // aun asi las tres fotos [de trabajos]", 5 fotos en total.
 export default function ArtistaLandingPage() {
-  const { artista } = useLoaderData()
+  const { artista, ciudadDetectada } = useLoaderData()
   const [lightbox, setLightbox] = useState(null)
   const touchStartX = useRef(null)
 
   if (!artista) return (
     <div className="min-h-screen bg-white flex flex-col">
-      <NavbarArtistas />
+      <NavbarArtistas ciudadDetectada={ciudadDetectada} />
       <div className="flex-1 flex items-center justify-center text-gray-400 text-sm uppercase tracking-widest pt-20">
         Artista no encontrado
       </div>
@@ -53,7 +64,7 @@ export default function ArtistaLandingPage() {
   )
 
   const waLink = artista.whatsapp
-    ? `https://wa.me/${artista.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${artista.nombre}, te encontré en Tattoo Artist Urabá y quiero preguntarte por una cita.`)}`
+    ? `https://wa.me/${artista.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${artista.nombre}, te encontré en Tattoo Artist Colombia y quiero preguntarte por una cita.`)}`
     : null
 
   // El contacto es directo por WhatsApp — no hay forma de saber si se
@@ -81,7 +92,7 @@ export default function ArtistaLandingPage() {
     // incluso en perfiles con poco contenido (Jose: "pongamos el copyright
     // abajo como corresponde"). NavbarArtistas es fixed, no participa.
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
-      <NavbarArtistas />
+      <NavbarArtistas ciudadDetectada={ciudadDetectada} />
 
       <div className="flex-1 pt-16 md:pt-20">
 
@@ -114,7 +125,7 @@ export default function ArtistaLandingPage() {
               <div className="flex items-center gap-3 mt-1 flex-wrap">
                 <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-gray-500">
                   <MapPin size={13} />
-                  {artista.municipio}
+                  {artista.municipio}{artista.departamento ? `, ${artista.departamento}` : ''}
                 </span>
                 {artista.estilo && (
                   <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-gray-500">
@@ -253,7 +264,7 @@ export default function ArtistaLandingPage() {
         <div className="max-w-3xl mx-auto px-4">
           <div className="border-t border-gray-200 pt-5 mt-6 pb-10">
             <Link to="/tattoo-artist-uraba" className="text-gray-400 hover:text-gray-900 text-xs uppercase tracking-widest transition-colors">
-              ← Ver más artistas en Urabá
+              ← Ver más artistas
             </Link>
           </div>
         </div>
@@ -261,7 +272,7 @@ export default function ArtistaLandingPage() {
 
       <footer className="border-t border-gray-200 py-6 px-4 mt-8">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-400 text-[12px] gap-3">
-          <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Urabá — INKognito. Todos los derechos reservados.</p>
+          <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Colombia — INKognito. Todos los derechos reservados.</p>
           <span className="text-gray-300">Desarrollado por INKognito</span>
         </div>
       </footer>

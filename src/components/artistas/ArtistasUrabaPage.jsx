@@ -2,44 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { Search, MapPin, Palette, BadgeCheck, ChevronRight, Navigation, LoaderCircle, Share2, Sparkles, Check } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
-
-// Sin esto, escribir "apartado"/"chigorodo" (sin tilde, lo normal al
-// escribir rápido en el teléfono) NO matcheaba "Apartadó"/"Chigorodó" —
-// solo funcionaban substrings casuales que no tocaban la sílaba
-// acentuada ("apart", "chigo"). Se normalizan tildes en ambos lados
-// antes de comparar (Jose, 2026-08-03).
-const normalize = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+import { normalize, municipioMasCercanoNacional, municipioDesdeNombreIP, getCoordsMunicipio, distanciaKm } from '../../data/colombiaGeo'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const ACCENT = '#B3202F'
-
-// Centros aproximados de los 4 municipios de Urabá donde opera el
-// directorio — solo se usan para "¿cuál está más cerca?" (geolocalización),
-// no hace falta precisión de catastro.
-const MUNICIPIO_COORDS = {
-  'Chigorodó': { lat: 7.668, lng: -76.681 },
-  'Carepa':    { lat: 7.754, lng: -76.656 },
-  'Apartadó':  { lat: 7.882, lng: -76.625 },
-  'Turbo':     { lat: 8.093, lng: -76.729 },
-}
-
-function distanciaKm(lat1, lng1, lat2, lng2) {
-  const R = 6371
-  const dLat = (lat2 - lat1) * Math.PI / 180
-  const dLng = (lng2 - lng1) * Math.PI / 180
-  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-}
-
-function municipioMasCercano(lat, lng) {
-  let mejor = null
-  let mejorDist = Infinity
-  for (const [nombre, c] of Object.entries(MUNICIPIO_COORDS)) {
-    const d = distanciaKm(lat, lng, c.lat, c.lng)
-    if (d < mejorDist) { mejorDist = d; mejor = nombre }
-  }
-  return mejor
-}
 
 // Puntitos oscuros y muy sutiles sobre fondo blanco (antes eran claros
 // sobre negro) — mismo recurso visual, paleta invertida.
@@ -55,30 +21,29 @@ export async function loader({ request }) {
   // pedirle permiso al visitante (a diferencia del botón "Cerca de ti",
   // que sí requiere el prompt del navegador). En local (sin Vercel
   // delante) el header no existe, así que esto degrada solo — el visitante
-  // sigue teniendo el botón de geolocalización manual.
-  let municipioDetectado = null
+  // sigue teniendo el botón de geolocalización manual. Expansión nacional
+  // (2026-08-04): antes solo reconocía los 4 municipios de Urabá — ahora
+  // matchea contra los ~1120 municipios reales del país.
+  let ciudadDetectada = null
   try {
     const ipCity = request.headers.get('x-vercel-ip-city')
-    if (ipCity) {
-      const norm = normalize(decodeURIComponent(ipCity))
-      municipioDetectado = Object.keys(MUNICIPIO_COORDS).find(m => normalize(m) === norm) || null
-    }
+    if (ipCity) ciudadDetectada = municipioDesdeNombreIP(decodeURIComponent(ipCity))
   } catch {
-    municipioDetectado = null
+    ciudadDetectada = null
   }
 
   try {
     const res = await fetch(`${PANEL_URL}/api/artistas`)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    return { artistas: await res.json(), municipioDetectado }
+    return { artistas: await res.json(), ciudadDetectada }
   } catch {
-    return { artistas: [], municipioDetectado }
+    return { artistas: [], ciudadDetectada }
   }
 }
 
 export function meta() {
-  const title = 'Tattoo Artist Urabá | Directorio de tatuadores — INKognito'
-  const description = 'Encuentra tatuadores en Urabá — Chigorodó, Apartadó, Turbo y Carepa. Portafolio, estilo y contacto directo por WhatsApp.'
+  const title = 'Tattoo Artist Colombia | Directorio de tatuadores — INKognito'
+  const description = 'Encuentra tatuadores en toda Colombia. Portafolio, estilo y contacto directo por WhatsApp.'
   return [
     { title },
     { name: 'description', content: description },
@@ -141,58 +106,62 @@ function ListingRow({ to, nombre, municipio, estilo, bio, foto }) {
 // búsqueda, pero la card en sí nunca se oculta.
 function TarjetaReclutamiento({ query, total, compartir }) {
   const encabezado = !query
-    ? '¿Eres tatuador en Urabá?'
+    ? '¿Eres tatuador?'
     : total === 0
       ? `Todavía no hay tatuadores para "${query}"`
       : `Ya hay ${total} artista${total !== 1 ? 's' : ''} en "${query}"`
   const subtitulo = !query
-    ? 'Este es el buscador que conecta clientes con tatuadores de la región.'
+    ? 'Este es el buscador que conecta clientes con tatuadores de todo el país.'
     : total === 0
       ? 'Sé el primero en aparecer aquí.'
       : 'Súmate y aparece junto a ellos.'
 
   return (
     <div className="mt-6 rounded-xl border-2 p-5 md:p-6" style={{ borderColor: `${ACCENT}30`, backgroundColor: `${ACCENT}06` }}>
-      <div className="flex items-start gap-4">
+      {/* El ícono solo ocupa la fila del encabezado — antes envolvía
+          también el checklist y los botones, dejando un espacio vacío a
+          la izquierda en cada línea de esos bloques (Jose, 2026-08-04).
+          Checklist y botones ahora van a todo el ancho de la card. */}
+      <div className="flex items-center gap-4">
         <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: ACCENT }}>
           <Sparkles size={18} className="text-white" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-black uppercase text-sm text-gray-900 leading-tight">{encabezado}</p>
           <p className="text-gray-500 text-xs mt-0.5">{subtitulo}</p>
-
-          <ul className="mt-3 space-y-1.5">
-            <li className="flex items-center gap-2 text-xs text-gray-600">
-              <Check size={13} style={{ color: ACCENT }} className="flex-shrink-0" />
-              Apareces en las búsquedas de tu municipio
-            </li>
-            <li className="flex items-center gap-2 text-xs text-gray-600">
-              <Check size={13} style={{ color: ACCENT }} className="flex-shrink-0" />
-              Contacto directo por WhatsApp, sin intermediarios
-            </li>
-            <li className="flex items-center gap-2 text-xs text-gray-600">
-              <Check size={13} style={{ color: ACCENT }} className="flex-shrink-0" />
-              Sin costo por ahora — sin tarjeta, sin compromiso
-            </li>
-          </ul>
-
-          <div className="mt-4 flex flex-col sm:flex-row gap-2">
-            <Link
-              to="/tattoo-artist-uraba/unete"
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
-              style={{ backgroundColor: ACCENT }}
-            >
-              Unirme como artista
-            </Link>
-            <button
-              onClick={compartir}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-gray-300 text-gray-600 text-xs font-bold uppercase tracking-widest hover:border-gray-500 transition-colors"
-            >
-              <Share2 size={13} />
-              Compartir
-            </button>
-          </div>
         </div>
+      </div>
+
+      <ul className="mt-3 space-y-1.5">
+        <li className="flex items-center gap-2 text-xs text-gray-600">
+          <Check size={13} style={{ color: ACCENT }} className="flex-shrink-0" />
+          Apareces en las búsquedas de tu municipio
+        </li>
+        <li className="flex items-center gap-2 text-xs text-gray-600">
+          <Check size={13} style={{ color: ACCENT }} className="flex-shrink-0" />
+          Contacto directo por WhatsApp, sin intermediarios
+        </li>
+        <li className="flex items-center gap-2 text-xs text-gray-600">
+          <Check size={13} style={{ color: ACCENT }} className="flex-shrink-0" />
+          Sin costo por ahora — sin tarjeta, sin compromiso
+        </li>
+      </ul>
+
+      <div className="mt-4 flex flex-col sm:flex-row gap-2">
+        <Link
+          to="/tattoo-artist-uraba/unete"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
+          style={{ backgroundColor: ACCENT }}
+        >
+          Unirme como artista
+        </Link>
+        <button
+          onClick={compartir}
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-gray-300 text-gray-600 text-xs font-bold uppercase tracking-widest hover:border-gray-500 transition-colors"
+        >
+          <Share2 size={13} />
+          Compartir
+        </button>
       </div>
     </div>
   )
@@ -207,10 +176,22 @@ function TarjetaReclutamiento({ query, total, compartir }) {
 // "Tattoo Artist Urabá" que vivía arriba del H1 alejaba demasiado el
 // título del navbar.
 export default function ArtistasUrabaPage() {
-  const { artistas, municipioDetectado } = useLoaderData()
+  const { artistas, ciudadDetectada } = useLoaderData()
   const [query, setQuery] = useState('')
   const [ubicando, setUbicando] = useState(false)
   const [ubicacionError, setUbicacionError] = useState(null)
+  // Coordenadas reales del visitante — de la geolocalización precisa del
+  // navegador si tocó "Cerca de ti", o si no, del centroide de la ciudad
+  // detectada por IP (menos preciso, pero mejor que nada). Con esto se
+  // ordenan los resultados por cercanía real en vez de solo agrupar por
+  // coincidencia de texto — es lo que resuelve el problema de precisión en
+  // ciudades grandes (2026-08-04, ver informe de viabilidad): dos
+  // artistas que "coinciden en municipio" con Bogotá pueden estar a 30km
+  // de distancia entre sí, así que ordenar por distancia real importa más
+  // que agruparlos como si fueran igual de cercanos.
+  const [misCoords, setMisCoords] = useState(() =>
+    ciudadDetectada ? getCoordsMunicipio(ciudadDetectada.departamento, ciudadDetectada.municipio) : null
+  )
   const listadoRef = useRef(null)
   const prevVacioRef = useRef(true)
 
@@ -222,7 +203,20 @@ export default function ArtistasUrabaPage() {
   // trato especial: se quitó el perfil fijo/destacado — "vamos a usar la
   // plataforma como cualquier tatuador más" (Jose, 2026-08-04). Si quiere
   // aparecer en el directorio, se registra igual que cualquier artista.
-  const filtrados = q === '' ? [] : artistas.filter(a => matches(a.nombre, a.municipio, a.estilo))
+  let filtrados = q === '' ? [] : artistas.filter(a => matches(a.nombre, a.municipio, a.estilo))
+  if (misCoords && filtrados.length > 1) {
+    // Sort estable: los artistas sin departamento guardado (cargados antes
+    // de la expansión nacional, o registrados sin ese dato) quedan al
+    // final del todo, sin alterar el orden relativo entre ellos.
+    filtrados = [...filtrados].sort((a, b) => {
+      const ca = getCoordsMunicipio(a.departamento, a.municipio)
+      const cb = getCoordsMunicipio(b.departamento, b.municipio)
+      if (!ca && !cb) return 0
+      if (!ca) return 1
+      if (!cb) return -1
+      return distanciaKm(misCoords.lat, misCoords.lng, ca.lat, ca.lng) - distanciaKm(misCoords.lat, misCoords.lng, cb.lat, cb.lng)
+    })
+  }
   const total = filtrados.length
 
   // Al iniciar la búsqueda (primera letra escrita) el teclado del celular
@@ -245,8 +239,9 @@ export default function ArtistasUrabaPage() {
     setUbicando(true)
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const cercano = municipioMasCercano(pos.coords.latitude, pos.coords.longitude)
-        setQuery(cercano)
+        setMisCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        const cercano = municipioMasCercanoNacional(pos.coords.latitude, pos.coords.longitude)
+        if (cercano) setQuery(cercano.municipio)
         setUbicando(false)
       },
       () => {
@@ -261,10 +256,10 @@ export default function ArtistasUrabaPage() {
   // si quien busca NO es tatuador, se le invita a compartir la app en vez
   // de dejarlo sin ninguna acción posible.
   const compartir = () => {
-    const texto = 'Encuentra tatuadores en Urabá — el buscador que conecta clientes con artistas de tatuaje.'
+    const texto = 'Encuentra tatuadores en toda Colombia — el buscador que conecta clientes con artistas de tatuaje.'
     const url = 'https://inkognito-ecosystem.com/tattoo-artist-uraba'
     if (navigator.share) {
-      navigator.share({ title: 'Tattoo Artist Urabá', text: texto, url }).catch(() => {})
+      navigator.share({ title: 'Tattoo Artist Colombia', text: texto, url }).catch(() => {})
     } else {
       window.open(`https://wa.me/?text=${encodeURIComponent(`${texto} ${url}`)}`, '_blank')
     }
@@ -276,7 +271,7 @@ export default function ArtistasUrabaPage() {
     // pantalla en vez de pegado abajo — "pongamos el copyright abajo como
     // corresponde" (Jose). NavbarArtistas es fixed, no participa del flex.
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
-      <NavbarArtistas />
+      <NavbarArtistas ciudadDetectada={ciudadDetectada} />
 
       <section className="relative overflow-hidden pt-20 pb-8 md:pb-10 px-4 md:px-6">
         <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
@@ -285,16 +280,30 @@ export default function ArtistasUrabaPage() {
               que TarjetaReclutamiento (Jose, 2026-08-04). "tatuador" pasa
               de texto rojo suelto a una card roja con texto blanco, y el
               título ahora cabe en una sola línea (antes ocupaba dos). */}
-          <div className="rounded-xl border-2 p-5 md:p-7 mb-6 overflow-hidden" style={{ borderColor: `${ACCENT}30`, backgroundColor: `${ACCENT}06` }}>
+          <div className="rounded-xl border border-gray-300 p-5 md:p-7 mb-6 overflow-hidden bg-gray-300">
             <h1 className="text-lg sm:text-4xl md:text-5xl font-black uppercase leading-tight whitespace-nowrap">
               Encuentra tu{' '}
               <span className="inline-block px-2 sm:px-3 py-0.5 rounded-lg text-white" style={{ backgroundColor: ACCENT }}>
                 tatuador
               </span>
             </h1>
-            <p className="text-gray-500 text-sm md:text-lg leading-relaxed max-w-2xl mx-auto mt-4">
-              El buscador que conecta clientes con tatuadores de Urabá. Busca por nombre, municipio o estilo — o deja que detectemos dónde estás.
+            <p className="text-gray-700 text-sm md:text-lg leading-relaxed max-w-2xl mx-auto mt-1.5">
+              El buscador que conecta clientes con tatuadores de toda Colombia. Busca por nombre, municipio o estilo — o deja que detectemos dónde estás.
             </p>
+
+            {/* Señales de confianza, mismo patrón que ya vimos en Tattoodo
+                ("Verified artists · Easy booking") — Jose pidió agregarlas
+                al pie de la card (2026-08-04). */}
+            <div className="flex items-center justify-center gap-4 mt-4 text-gray-600 text-xs md:text-sm font-bold uppercase tracking-wide">
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: ACCENT }} />
+                Artistas verificados
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: ACCENT }} />
+                Reserva fácil
+              </span>
+            </div>
           </div>
 
           {/* BARRA DE BÚSQUEDA + GEOLOCALIZACIÓN — sin listar municipios/
@@ -337,13 +346,13 @@ export default function ArtistasUrabaPage() {
           )}
           {/* Sugerencia por geolocalización de IP (silenciosa, sin pedir
               permiso) — solo aparece antes de que la persona busque algo. */}
-          {municipioDetectado && !query && (
+          {ciudadDetectada && !query && (
             <button
-              onClick={() => setQuery(municipioDetectado)}
+              onClick={() => setQuery(ciudadDetectada.municipio)}
               className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 transition-colors mt-3"
             >
               <MapPin size={12} />
-              ¿Buscas tatuadores en {municipioDetectado}?
+              ¿Buscas tatuadores en {ciudadDetectada.municipio}?
             </button>
           )}
         </div>
@@ -389,7 +398,7 @@ export default function ArtistasUrabaPage() {
 
       <footer className="border-t border-gray-200 py-6 px-4">
         <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-400 text-[12px] gap-3">
-          <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Urabá — INKognito. Todos los derechos reservados.</p>
+          <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Colombia — INKognito. Todos los derechos reservados.</p>
           <span className="text-gray-300">Desarrollado por INKognito</span>
         </div>
       </footer>

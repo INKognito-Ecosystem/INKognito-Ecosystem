@@ -7,15 +7,25 @@ import { Menu, X } from 'lucide-react'
 // midiera lo mismo (2026-08-03, reportado por Jose).
 import inkognitoLogo from '../../assets/artistas-logo-mark.png'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
+import AnimatedCityWordmark from './AnimatedCityWordmark'
 
 // Navbar propio del módulo (2026-08-03) — antes usaba el EcosystemNavbar
 // genérico (pensado para landings sueltas de producto), pero al pasar a
-// paleta blanco/rojo/gris y llevar el texto "Tattoo Artist Urabá" acá
-// (antes vivía como eyebrow en el hero, quedaba muy lejos del navbar),
-// necesitaba su propio navbar — mismo patrón que NavbarSuple.jsx/
-// NavbarStore.jsx (logo + nombre del módulo + menú hamburguesa con
-// InkognitoModuleMenu).
-export default function NavbarArtistas() {
+// paleta blanco/rojo/gris y llevar el texto del módulo acá (antes vivía
+// como eyebrow en el hero, quedaba muy lejos del navbar), necesitaba su
+// propio navbar — mismo patrón que NavbarSuple.jsx/NavbarStore.jsx (logo +
+// nombre del módulo + menú hamburguesa con InkognitoModuleMenu).
+//
+// "Urabá" → "Colombia" (2026-08-04, expansión nacional aprobada por Jose
+// — ver informe de viabilidad): el registro ya no restringe la ciudad de
+// origen del artista, así que el navbar tampoco debía seguir anclado a
+// Urabá. `ciudadDetectada` (opcional, viene del loader de cada página vía
+// geolocalización por IP de Vercel) hace que "Colombia" se encoja y el
+// nombre de la ciudad detectada aparezca en su lugar — mismo mecanismo que
+// ya usa AnimatedWordmark.jsx para "INKOGNITO" → nombre del módulo, pero
+// en su propio componente (AnimatedCityWordmark) porque acá la palabra que
+// desaparece es dinámica según si hubo detección o no.
+export default function NavbarArtistas({ ciudadDetectada = null }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const close = () => setMenuOpen(false)
 
@@ -47,7 +57,9 @@ export default function NavbarArtistas() {
             className="absolute left-1/2 -translate-x-1/2 text-base md:text-xl font-black uppercase tracking-wide leading-tight whitespace-nowrap"
           >
             <span className="text-gray-100">Tattoo Artist</span>{' '}
-            <span className="text-gray-300">Urabá</span>
+            {ciudadDetectada
+              ? <AnimatedCityWordmark ciudad={ciudadDetectada.municipio} />
+              : <span className="text-gray-300">Colombia</span>}
           </Link>
 
           <button
