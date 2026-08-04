@@ -25,19 +25,29 @@ export async function loader({ request }) {
   // (2026-08-04): antes solo reconocía los 4 municipios de Urabá — ahora
   // matchea contra los ~1120 municipios reales del país.
   let ciudadDetectada = null
+  let ipCityRaw = null
   try {
-    const ipCity = request.headers.get('x-vercel-ip-city')
-    if (ipCity) ciudadDetectada = municipioDesdeNombreIP(decodeURIComponent(ipCity))
+    ipCityRaw = request.headers.get('x-vercel-ip-city')
+    if (ipCityRaw) ciudadDetectada = municipioDesdeNombreIP(decodeURIComponent(ipCityRaw))
   } catch {
     ciudadDetectada = null
   }
+  // Diagnóstico temporal (2026-08-04): Jose reportó que la animación del
+  // navbar no se dispara — con ?debug=1 se muestra en pantalla el valor
+  // crudo que Vercel está mandando en x-vercel-ip-city (o "null" si no
+  // manda nada), para saber si el problema es que Vercel no geolocaliza su
+  // IP a nivel de ciudad, o si el nombre que manda no matchea el dataset.
+  // Quitar este bloque una vez diagnosticado.
+  const debug = new URL(request.url).searchParams.get('debug') === '1'
+    ? { ipCityRaw, ciudadDetectada }
+    : null
 
   try {
     const res = await fetch(`${PANEL_URL}/api/artistas`)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    return { artistas: await res.json(), ciudadDetectada }
+    return { artistas: await res.json(), ciudadDetectada, debug }
   } catch {
-    return { artistas: [], ciudadDetectada }
+    return { artistas: [], ciudadDetectada, debug }
   }
 }
 
@@ -176,7 +186,7 @@ function TarjetaReclutamiento({ query, total, compartir }) {
 // "Tattoo Artist Urabá" que vivía arriba del H1 alejaba demasiado el
 // título del navbar.
 export default function ArtistasUrabaPage() {
-  const { artistas, ciudadDetectada } = useLoaderData()
+  const { artistas, ciudadDetectada, debug } = useLoaderData()
   const [query, setQuery] = useState('')
   const [ubicando, setUbicando] = useState(false)
   const [ubicacionError, setUbicacionError] = useState(null)
@@ -272,6 +282,11 @@ export default function ArtistasUrabaPage() {
     // corresponde" (Jose). NavbarArtistas es fixed, no participa del flex.
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
       <NavbarArtistas ciudadDetectada={ciudadDetectada} />
+      {debug && (
+        <div className="bg-black text-green-400 text-[11px] font-mono p-2 break-all">
+          DEBUG — x-vercel-ip-city crudo: {JSON.stringify(debug.ipCityRaw)} · ciudadDetectada: {JSON.stringify(debug.ciudadDetectada)}
+        </div>
+      )}
 
       <section className="relative overflow-hidden pt-20 pb-8 md:pb-10 px-4 md:px-6">
         <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
