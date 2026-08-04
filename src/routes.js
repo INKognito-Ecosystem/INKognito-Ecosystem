@@ -89,5 +89,6 @@ export default [
   // sin exponer aún: sin link desde InkognitoHome.jsx ni ningún navbar,
   // adrede — ver plan "Directorio de artistas de tatuaje en Urabá".
   route('tattoo-artist-uraba', 'components/artistas/ArtistasUrabaPage.jsx'),
+  route('tattoo-artist-uraba/unete', 'components/artistas/ArtistaRegistroPage.jsx'),
   route('artista/:id', 'components/artistas/ArtistaLandingPage.jsx'),
 ]

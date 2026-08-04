@@ -64,7 +64,6 @@ export default function ArtistaLandingPage() {
     fetch(`${PANEL_URL}/api/artistas/${artista.id}/click-whatsapp`, { method: 'POST' }).catch(() => {})
   }
 
-  const tieneContacto = Boolean(waLink)
   const trabajos = [artista.foto_trabajo_1, artista.foto_trabajo_2, artista.foto_trabajo_3].filter(Boolean)
 
   const irA = (delta) => setLightbox(i => (i + delta + trabajos.length) % trabajos.length)
@@ -78,7 +77,7 @@ export default function ArtistaLandingPage() {
   }
 
   return (
-    <div className={`min-h-screen bg-white text-gray-900 ${tieneContacto ? 'pb-20' : ''}`}>
+    <div className="min-h-screen bg-white text-gray-900">
       <NavbarArtistas />
 
       <div className="pt-16 md:pt-20">
@@ -142,12 +141,10 @@ export default function ArtistaLandingPage() {
             ancho de pantalla en 2 bloques (pedido de Jose, 2026-08-03). Si
             el artista todavía no tiene el link cargado, el bloque se queda
             visible pero deshabilitado con un aviso, nunca se oculta.
-            Delgadas como el botón de WhatsApp (corrección de Jose: las
-            primeras quedaron muy grandes/cuadradas, apiladas verticalmente
-            — ahora ícono + texto en fila, misma altura que WhatsApp). */}
+            Delgadas, mismo alto que el botón de contacto de abajo. */}
         <div className="mt-5">
           <p className="max-w-3xl mx-auto px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-2">Redes sociales</p>
-          <div className="grid grid-cols-2 w-full border-y border-gray-200">
+          <div className={`grid grid-cols-2 w-full border-t border-gray-200 ${waLink ? '' : 'border-b'}`}>
             <a
               href={artista.facebook || undefined}
               target={artista.facebook ? '_blank' : undefined}
@@ -181,6 +178,22 @@ export default function ArtistaLandingPage() {
               </span>
             </a>
           </div>
+
+          {/* CONTACTAR AL ARTISTA — antes vivía fijo en la parte inferior de
+              la pantalla; Jose pidió que ya no quede fijo y que se ubique
+              justo debajo de redes sociales (2026-08-04). */}
+          {waLink && (
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={trackWhatsappClick}
+              className="flex items-center justify-center gap-2.5 py-3.5 border-b border-gray-200 bg-green-600 text-white font-black uppercase tracking-widest hover:bg-green-500 transition-colors text-sm"
+            >
+              <FaWhatsapp size={18} />
+              Contactar al artista
+            </a>
+          )}
         </div>
 
         {/* TRABAJOS — fila horizontal a todo el ancho de la pantalla (pedido
@@ -246,27 +259,6 @@ export default function ArtistaLandingPage() {
           <span className="text-gray-300">Desarrollado por INKognito</span>
         </div>
       </footer>
-
-      {/* CONTACTO FIJO — WhatsApp siempre alcanzable sin importar cuánto se
-          haya scrolleado (pedido de Jose, 2026-08-03). Instagram/Facebook
-          ya no van acá — se movieron al bloque "Redes sociales" fijo debajo
-          de la bio, siempre visible con o sin link cargado. */}
-      {tieneContacto && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-t border-gray-200 px-4 py-3">
-          <div className="max-w-3xl mx-auto">
-            <a
-              href={waLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={trackWhatsappClick}
-              className="flex items-center justify-center gap-2.5 py-3 bg-green-600 text-white font-black uppercase tracking-widest rounded hover:bg-green-500 transition-all text-sm"
-            >
-              <FaWhatsapp size={18} />
-              WhatsApp
-            </a>
-          </div>
-        </div>
-      )}
 
       {/* LIGHTBOX — abre al tocar "Ver" en cualquier trabajo, navegable con
           flechas (desktop) o swipe (móvil) entre las 3 fotos. */}

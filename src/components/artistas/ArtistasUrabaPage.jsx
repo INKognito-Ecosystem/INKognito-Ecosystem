@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
-import { Search, MapPin, Palette, BadgeCheck, ChevronRight, Navigation, LoaderCircle } from 'lucide-react'
+import { Search, MapPin, Palette, BadgeCheck, ChevronRight, Navigation, LoaderCircle, Share2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 
 // Sin esto, escribir "apartado"/"chigorodo" (sin tilde, lo normal al
@@ -48,7 +48,7 @@ const DOT_PATTERN = {
   backgroundSize: '18px 18px',
 }
 
-export async function loader() {
+export async function loader({ request }) {
   // La foto del fundador (Jose Humanez) reusa la misma que ya tiene subida
   // en jhumaneztattoo (Configuración > Imágenes > Hero) — no hace falta
   // subirla de nuevo, ni el módulo tiene su propia fila en `artistas`.
@@ -59,12 +59,31 @@ export async function loader() {
   } catch {
     fundadorFoto = null
   }
+
+  // Geolocalización por IP (2026-08-04, sugerencia de Jose sobre cómo lo
+  // hace Tattoodo con IP2Location) — pero mejor: Vercel ya inyecta el
+  // header x-vercel-ip-city en cada request de producción, gratis y sin
+  // pedirle permiso al visitante (a diferencia del botón "Cerca de ti",
+  // que sí requiere el prompt del navegador). En local (sin Vercel
+  // delante) el header no existe, así que esto degrada solo — el visitante
+  // sigue teniendo el botón de geolocalización manual.
+  let municipioDetectado = null
+  try {
+    const ipCity = request.headers.get('x-vercel-ip-city')
+    if (ipCity) {
+      const norm = normalize(decodeURIComponent(ipCity))
+      municipioDetectado = Object.keys(MUNICIPIO_COORDS).find(m => normalize(m) === norm) || null
+    }
+  } catch {
+    municipioDetectado = null
+  }
+
   try {
     const res = await fetch(`${PANEL_URL}/api/artistas`)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    return { artistas: await res.json(), fundadorFoto }
+    return { artistas: await res.json(), fundadorFoto, municipioDetectado }
   } catch {
-    return { artistas: [], fundadorFoto }
+    return { artistas: [], fundadorFoto, municipioDetectado }
   }
 }
 
@@ -142,7 +161,7 @@ function ListingRow({ to, nombre, municipio, estilo, bio, foto, featured }) {
 // "Tattoo Artist Urabá" que vivía arriba del H1 alejaba demasiado el
 // título del navbar.
 export default function ArtistasUrabaPage() {
-  const { artistas, fundadorFoto } = useLoaderData()
+  const { artistas, fundadorFoto, municipioDetectado } = useLoaderData()
   const [query, setQuery] = useState('')
   const [ubicando, setUbicando] = useState(false)
   const [ubicacionError, setUbicacionError] = useState(null)
@@ -193,6 +212,19 @@ export default function ArtistasUrabaPage() {
     )
   }
 
+  // Web Share API con fallback a WhatsApp — pedido de Jose (2026-08-04):
+  // si quien busca NO es tatuador, se le invita a compartir la app en vez
+  // de dejarlo sin ninguna acción posible.
+  const compartir = () => {
+    const texto = 'Encuentra tatuadores en Urabá — el buscador que conecta clientes con artistas de tatuaje.'
+    const url = 'https://inkognito-ecosystem.com/tattoo-artist-uraba'
+    if (navigator.share) {
+      navigator.share({ title: 'Tattoo Artist Urabá', text: texto, url }).catch(() => {})
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(`${texto} ${url}`)}`, '_blank')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <NavbarArtistas />
@@ -204,7 +236,7 @@ export default function ArtistasUrabaPage() {
             Encuentra tu <span style={{ color: ACCENT }}>tatuador</span>
           </h1>
           <p className="text-gray-500 text-base md:text-lg leading-relaxed max-w-2xl mx-auto mb-8">
-            Artistas de tatuaje respaldados por INKognito en toda la región de Urabá. Busca por nombre, municipio o estilo — o deja que detectemos dónde estás.
+            El buscador que conecta clientes con tatuadores de Urabá, respaldados por INKognito. Busca por nombre, municipio o estilo — o deja que detectemos dónde estás.
           </p>
 
           {/* BARRA DE BÚSQUEDA + GEOLOCALIZACIÓN — sin listar municipios/
@@ -245,6 +277,17 @@ export default function ArtistasUrabaPage() {
           {ubicacionError && (
             <p className="text-gray-400 text-xs mt-3 max-w-md mx-auto">{ubicacionError}</p>
           )}
+          {/* Sugerencia por geolocalización de IP (silenciosa, sin pedir
+              permiso) — solo aparece antes de que la persona busque algo. */}
+          {municipioDetectado && !query && (
+            <button
+              onClick={() => setQuery(municipioDetectado)}
+              className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 transition-colors mt-3"
+            >
+              <MapPin size={12} />
+              ¿Buscas tatuadores en {municipioDetectado}?
+            </button>
+          )}
         </div>
       </section>
 
@@ -276,9 +319,44 @@ export default function ArtistasUrabaPage() {
             />
           ))}
 
-          {total === 0 && (
-            <div className="text-center py-10 text-gray-400 text-sm">
-              No hay artistas con esa búsqueda por ahora.
+          {/* RECLUTAMIENTO — mensaje distinto según si ya hay artistas o
+              no (Jose, 2026-08-04): "sé el primero" solo tiene sentido
+              cuando de verdad no hay nadie; si ya hay artistas, el ángulo
+              es sumarse a ellos, no ser "el primero" (sería falso). Ambos
+              casos incluyen la invitación a compartir para quien no es
+              tatuador — mismo patrón de Tattoodo, en su propio tono. */}
+          {query && total === 0 && (
+            <div className="text-center py-10 px-4">
+              <p className="text-gray-500 text-sm leading-relaxed max-w-sm mx-auto">
+                Todavía no hay ningún tatuador registrado para "{query}" — sé el primero en aparecer en el buscador que conecta clientes con artistas en Urabá.
+              </p>
+              <div className="mt-5 flex flex-col sm:flex-row gap-2 justify-center">
+                <Link
+                  to="/tattoo-artist-uraba/unete"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
+                  style={{ backgroundColor: ACCENT }}
+                >
+                  ¿Eres tatuador? Únete
+                </Link>
+                <button
+                  onClick={compartir}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-gray-300 text-gray-600 text-xs font-bold uppercase tracking-widest hover:border-gray-500 transition-colors"
+                >
+                  <Share2 size={13} />
+                  Compartir
+                </button>
+              </div>
+            </div>
+          )}
+
+          {query && total > 0 && (
+            <div className="mt-6 pt-5 border-t border-gray-200 text-center">
+              <p className="text-gray-400 text-xs">
+                ¿Eres tatuador en Urabá y no apareces aquí?{' '}
+                <Link to="/tattoo-artist-uraba/unete" className="font-bold" style={{ color: ACCENT }}>
+                  {total === 1 ? 'Únete al artista que ya está' : `Únete a los ${total} artistas que ya están`}
+                </Link>
+              </p>
             </div>
           )}
         </div>
