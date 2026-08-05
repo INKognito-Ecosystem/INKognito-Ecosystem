@@ -5,7 +5,12 @@ import NavbarArtistas from './NavbarArtistas'
 import { normalize, municipioMasCercanoNacional, municipioDesdeNombreIP, getCoordsMunicipio, distanciaKm } from '../../data/colombiaGeo'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
-const ACCENT = '#B3202F'
+// Rojo → gris (2026-08-05, prueba visual pedida por Jose: "pasalos todos a
+// gris para ver que tal" — pills de INK/tatuador, ícono de la card de
+// reclutamiento, checkmarks, insignias, puntos de confianza). Queda todo
+// controlado por este único valor — volver a '#B3202F' revierte todo el
+// acento rojo de una vez si no convence.
+const ACCENT = '#4B5563'
 
 // Puntitos oscuros y muy sutiles sobre fondo blanco (antes eran claros
 // sobre negro) — mismo recurso visual, paleta invertida.
@@ -152,7 +157,7 @@ function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo }) {
         </p>
         {a.estilo && (
           a.estilo.length > ESTILO_BOTON_MIN ? (
-            <button type="button" onClick={abrirInfo} className="text-[10px] font-bold uppercase tracking-wide underline underline-offset-2 mt-1" style={{ color: ACCENT }}>
+            <button type="button" onClick={abrirInfo} className="text-[10px] font-bold uppercase tracking-wide underline underline-offset-2 mt-1 text-gray-600">
               Especialidades
             </button>
           ) : (
@@ -193,8 +198,7 @@ function SeccionCercanos({ artistas, misCoords, onVerTodo, onVerInfo }) {
         </h2>
         <button
           onClick={onVerTodo}
-          className="text-xs font-bold uppercase tracking-wide hover:opacity-70 transition-opacity"
-          style={{ color: ACCENT }}
+          className="text-xs font-bold uppercase tracking-wide hover:opacity-70 transition-opacity text-gray-600"
         >
           Ver todo
         </button>
@@ -256,8 +260,7 @@ function ListingRow({ to, nombre, municipio, estilo, bio, foto, onVerInfo }) {
               <button
                 type="button"
                 onClick={abrirInfo}
-                className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wide flex-shrink-0 underline underline-offset-2"
-                style={{ color: ACCENT }}
+                className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wide flex-shrink-0 underline underline-offset-2 text-gray-600"
               >
                 <Palette size={11} />
                 Especialidades
@@ -298,12 +301,12 @@ function ListingRow({ to, nombre, municipio, estilo, bio, foto, onVerInfo }) {
 // búsqueda, pero la card en sí nunca se oculta.
 function TarjetaReclutamiento({ query, total, compartir }) {
   const encabezado = !query
-    ? '¿Eres tatuador?'
+    ? '¿Eres tatuador? Únete gratis'
     : total === 0
       ? `Todavía no hay tatuadores para "${query}"`
       : `Ya hay ${total} artista${total !== 1 ? 's' : ''} en "${query}"`
   const subtitulo = !query
-    ? 'Este es el buscador que conecta personas con tatuadores de todo el país.'
+    ? 'Crea tu perfil en minutos y empieza a aparecer en las búsquedas de tu zona.'
     : total === 0
       ? 'Sé el primero en aparecer aquí.'
       : 'Súmate y aparece junto a ellos.'
@@ -342,8 +345,7 @@ function TarjetaReclutamiento({ query, total, compartir }) {
       <div className="mt-4 flex flex-col sm:flex-row gap-2">
         <Link
           to="/tattoo-artist-uraba/unete"
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
-          style={{ backgroundColor: ACCENT }}
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity bg-gray-600"
         >
           Unirme como artista
         </Link>
@@ -506,7 +508,14 @@ export default function ArtistasUrabaPage() {
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
       <NavbarArtistas ciudadDetectada={ciudadDetectada} />
 
-      <section className="relative overflow-hidden pt-20 pb-8 md:pb-10 px-4 md:px-6">
+      {/* Hero fusionado con el navbar (2026-08-05, Jose: "funde el hero...
+          para que quede pegado con el navbar" — antes había un hueco
+          blanco entre el navbar oscuro y una card gris chica; ahora todo
+          el hero ES la card, a todo el ancho de pantalla, sin esquinas
+          redondeadas arriba, arrancando justo donde termina el navbar
+          (pt-16/pt-20 calza exacto con la altura h-16/h-20 del navbar, ya
+          blanco — ver NavbarArtistas.jsx). */}
+      <section className="relative overflow-hidden pt-16 md:pt-20 pb-8 md:pb-10 px-4 md:px-6 bg-gray-300 border-b border-gray-300">
         {/* pointer-events-none (2026-08-05): este fondo decorativo estaba
             tapando los clics del botón "Ver todo" de SeccionCercanos, que
             vive fuera del div `relative z-10` de más abajo — sin esto,
@@ -515,11 +524,7 @@ export default function ArtistasUrabaPage() {
             en el orden de pintado. */}
         <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={DOT_PATTERN} />
         <div className="relative z-10 max-w-3xl mx-auto text-center">
-          {/* Título + descripción dentro de una card, mismo lenguaje visual
-              que TarjetaReclutamiento (Jose, 2026-08-04). "tatuador" pasa
-              de texto rojo suelto a una card roja con texto blanco, y el
-              título ahora cabe en una sola línea (antes ocupaba dos). */}
-          <div className="rounded-xl border border-gray-300 p-5 md:p-7 mb-6 overflow-hidden bg-gray-300">
+          <div className="pt-5 md:pt-7">
             <h1 className="text-lg sm:text-4xl md:text-5xl font-black uppercase leading-tight whitespace-nowrap">
               Encuentra tu{' '}
               <span className="inline-block px-2 sm:px-3 py-0.5 rounded-lg text-white" style={{ backgroundColor: ACCENT }}>
@@ -527,7 +532,13 @@ export default function ArtistasUrabaPage() {
               </span>
             </h1>
             <p className="text-gray-700 text-sm md:text-lg leading-relaxed max-w-2xl mx-auto mt-1.5">
-              El buscador que conecta personas con tatuadores de toda Colombia. Busca por nombre, municipio o estilo — o deja que detectemos dónde estás.
+              {/* "INK" — apodo de INKognito para el buscador (Jose,
+                  2026-08-05): se agrega como un toque de marca dentro del
+                  copy, en la misma card roja que ya usa "tatuador" en el
+                  título, sin reemplazar "Tattoo Artist Colombia" en
+                  navbar/meta/footer — ese texto sigue haciendo el trabajo
+                  de explicarle a quien recién llega de qué se trata esto. */}
+              <span className="inline-block px-1.5 py-0.5 rounded-md text-white font-black" style={{ backgroundColor: ACCENT }}>INK</span>. El buscador que conecta personas con tatuadores de toda Colombia. Busca por nombre, municipio o estilo — o deja que detectemos dónde estás.
             </p>
 
             {/* Señales de confianza, mismo patrón que ya vimos en Tattoodo
@@ -550,7 +561,7 @@ export default function ArtistasUrabaPage() {
               todavía, mostrarlo como opción no sirve de nada (Jose,
               2026-08-03). El municipio/estilo solo aparece como RESULTADO
               de buscar, nunca como opción previa para elegir. */}
-          <div className="flex flex-col sm:flex-row gap-2 max-w-xl mx-auto">
+          <div className="flex flex-col sm:flex-row gap-2 max-w-xl mx-auto mt-6">
             <div className="relative flex-1">
               <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
@@ -573,8 +584,7 @@ export default function ArtistasUrabaPage() {
             <button
               onClick={usarMiUbicacion}
               disabled={ubicando}
-              className="flex items-center justify-center gap-2 px-5 py-3 rounded-full border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60"
-              style={{ borderColor: ACCENT, color: ACCENT }}
+              className="flex items-center justify-center gap-2 px-5 py-3 rounded-full border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60 border-gray-600 text-gray-600"
             >
               {ubicando ? <LoaderCircle size={15} className="animate-spin" /> : <Navigation size={15} />}
               {ubicando ? 'Ubicando...' : 'Cerca de ti'}

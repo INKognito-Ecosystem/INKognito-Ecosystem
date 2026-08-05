@@ -49,7 +49,10 @@ export default function LogoLupaIntro() {
     if (!primeraVezRef.current) return
 
     setMostrar(true)
-    const t = setTimeout(() => setMostrar(false), 1800)
+    // 1800ms → 3400ms (Jose, 2026-08-05: "el icono buscar que aparece...
+    // desaparece muy rapido"). Entrada+salida suman ~1s más, así que el
+    // total visible en pantalla ronda los 4s.
+    const t = setTimeout(() => setMostrar(false), 3400)
     return () => clearTimeout(t)
   }, [])
 
@@ -61,7 +64,7 @@ export default function LogoLupaIntro() {
           animate={{ opacity: 1, scale: 1, x: 0, y: 0, rotate: 0 }}
           exit={{ opacity: 0, scale: 0.6 }}
           transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
-          className="absolute -bottom-1 -right-1 z-10 w-6 h-6 rounded-full bg-white shadow-md flex items-center justify-center pointer-events-none"
+          className="absolute -bottom-1 -right-1 z-10 w-6 h-6 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center pointer-events-none"
         >
           <Search size={13} className="text-gray-700" strokeWidth={2.5} />
         </motion.div>

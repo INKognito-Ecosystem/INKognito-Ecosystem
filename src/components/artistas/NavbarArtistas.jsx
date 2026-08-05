@@ -26,12 +26,21 @@ import LogoLupaIntro from './LogoLupaIntro'
 // ya usa AnimatedWordmark.jsx para "INKOGNITO" → nombre del módulo, pero
 // en su propio componente (AnimatedCityWordmark) porque acá la palabra que
 // desaparece es dinámica según si hubo detección o no.
+//
+// Navbar oscuro → blanco → gris medio (2026-08-05, pedido de Jose): el
+// azul de la hamburguesa tricolor casi no se veía sobre el fondo gris muy
+// oscuro original (gray-800). Se probó blanco puro, pero Jose pidió un
+// punto intermedio: gris más oscuro que el hero (que a su vez se oscureció
+// un poco, ver ArtistasUrabaPage.jsx), para que el navbar mantenga algo de
+// peso visual sin volver a esconder el azul. Con el navbar de nuevo en un
+// tono medio/oscuro, logo/textos vuelven a la versión clara (como en el
+// diseño original), no la oscura que se usó durante la versión blanca.
 export default function NavbarArtistas({ ciudadDetectada = null }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const close = () => setMenuOpen(false)
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-gray-800 border-b border-gray-700">
+    <nav className="fixed top-0 left-0 w-full z-50 bg-gray-600 border-b border-gray-700">
       <div className="relative max-w-6xl mx-auto px-4 md:px-6">
         <div className="h-16 md:h-20 flex items-center justify-between">
 
@@ -47,7 +56,9 @@ export default function NavbarArtistas({ ciudadDetectada = null }) {
                 de fábrica) — acá el archivo ya viene recortado, así que el
                 <img> se achica al 57% dentro de la misma caja para igualar
                 el tamaño real en pantalla, no solo el de la caja
-                (2026-08-03). */}
+                (2026-08-03). Blanco de nuevo (2026-08-05) — vuelve el
+                navbar a un fondo medio/oscuro, así que el logo vuelve a
+                necesitar invert(1) para leerse claro sobre él. */}
             <div className="relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center flex-shrink-0">
               <img src={inkognitoLogo} alt="INKognito" className="w-7 h-7 md:w-8 md:h-8 object-contain" style={{ filter: 'brightness(0) invert(1)' }} />
               <LogoLupaIntro />
@@ -70,7 +81,9 @@ export default function NavbarArtistas({ ciudadDetectada = null }) {
               Colombia"). El ícono de lucide-react (Menu) es un solo trazo
               de un color — no se puede pintar cada línea por separado, así
               que se reemplaza por 3 barras propias solo en el estado
-              cerrado; la X de cerrar se queda como estaba. */}
+              cerrado; la X de cerrar vuelve a su hover claro original
+              (gray-400 → white), correcto de nuevo ahora que el navbar
+              volvió a un fondo oscuro. */}
           <button
             onClick={() => setMenuOpen(o => !o)}
             aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}

@@ -163,37 +163,43 @@ export default function ArtistaRegistroPage() {
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
       <NavbarArtistas ciudadDetectada={ciudadDetectada} />
 
-      <div className="flex-1 pt-20 md:pt-24 max-w-5xl mx-auto px-4 pb-16 w-full">
-
-        {enviado ? (
+      {enviado ? (
+        <div className="flex-1 pt-20 md:pt-24 max-w-5xl mx-auto px-4 pb-16 w-full">
           <div className="text-center py-16">
             <CheckCircle2 size={48} className="mx-auto mb-4" style={{ color: ACCENT }} />
             <h1 className="text-2xl font-black uppercase mb-3">¡Listo, recibimos tu registro!</h1>
             <p className="text-gray-500 text-sm leading-relaxed max-w-sm mx-auto">
               Vamos a revisar tu perfil y te escribimos por WhatsApp para confirmarte cuando quede activo en el buscador.
             </p>
-            <Link to="/tattoo-artist-uraba" className="inline-block mt-6 text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-opacity" style={{ color: ACCENT }}>
+            <Link to="/tattoo-artist-uraba" className="inline-block mt-6 text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-opacity text-gray-600">
               ← Volver al buscador
             </Link>
           </div>
-        ) : (
-          <>
-            {/* Mismo tratamiento visual que el hero del buscador (Jose,
-                2026-08-04): card gris sólida, palabra clave en su propia
-                card roja con texto blanco, espaciado compacto entre
-                título y descripción. */}
-            <div className="rounded-xl border border-gray-300 p-5 md:p-7 mb-8 overflow-hidden bg-gray-300 text-center">
-              <h1 className="text-xl sm:text-3xl md:text-4xl font-black uppercase leading-tight whitespace-nowrap">
-                Únete al{' '}
-                <span className="inline-block px-2 sm:px-3 py-0.5 rounded-lg text-white" style={{ backgroundColor: ACCENT }}>
-                  buscador
-                </span>
-              </h1>
-              <p className="text-gray-700 text-sm md:text-base leading-relaxed max-w-md mx-auto mt-1.5">
-                Tattoo Artist Colombia conecta clientes con tatuadores de todo el país. Llena tus datos y mira tu perfil tomar forma en tiempo real.
-              </p>
-            </div>
+        </div>
+      ) : (
+        <>
+          {/* Hero fusionado con el navbar (2026-08-05, mismo tratamiento
+              que ArtistasUrabaPage.jsx: "transforma tambien el hero de
+              unete al buscador" — antes esta card vivía adentro del
+              contenedor max-w-5xl con pt-20/24, dejando un hueco blanco
+              entre el navbar y una card chica flotante. Ahora es su
+              propia sección a todo el ancho, pegada al navbar, sin
+              esquinas redondeadas arriba. */}
+          <section className="relative overflow-hidden pt-16 md:pt-20 pb-6 md:pb-8 px-4 md:px-6 bg-gray-300 border-b border-gray-300 text-center">
+            <h1 className="text-xl sm:text-3xl md:text-4xl font-black uppercase leading-tight whitespace-nowrap pt-5 md:pt-7">
+              Únete al{' '}
+              <span className="inline-block px-2 sm:px-3 py-0.5 rounded-lg text-white bg-gray-600">
+                buscador
+              </span>
+            </h1>
+            <p className="text-gray-700 text-sm md:text-base leading-relaxed max-w-md mx-auto mt-1.5">
+              {/* "INK" en su propia card, igual que en el hero del buscador
+                  (Jose, 2026-08-05) — antes era texto plano acá. */}
+              <span className="inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">INK</span> conecta clientes con tatuadores de todo el país. Llena tus datos y mira tu perfil tomar forma en tiempo real.
+            </p>
+          </section>
 
+          <div className="flex-1 max-w-5xl mx-auto px-4 pt-8 pb-16 w-full">
             {/* inputs de archivo ocultos, uno por slot — se disparan desde
                 los botones de cámara dentro de la vista previa */}
             {SLOTS.map(({ key }) => (
@@ -242,8 +248,7 @@ export default function ArtistaRegistroPage() {
                         type="button"
                         onClick={() => elegirFoto('foto_url')}
                         aria-label="Subir foto de perfil"
-                        className="absolute -bottom-1 -right-1 flex items-center justify-center w-6 h-6 rounded-full text-white shadow-md"
-                        style={{ backgroundColor: ACCENT }}
+                        className="absolute -bottom-1 -right-1 flex items-center justify-center w-6 h-6 rounded-full text-white shadow-md bg-gray-600"
                       >
                         {subiendo === 'foto_url' ? <LoaderCircle size={11} className="animate-spin" /> : <Camera size={11} />}
                       </button>
@@ -361,7 +366,7 @@ export default function ArtistaRegistroPage() {
                     onClick={usarMiUbicacion}
                     disabled={ubicando}
                     className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60"
-                    style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: ACCENT, color: ACCENT }}
+                    style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: '#4B5563', color: '#4B5563' }}
                   >
                     {ubicando
                       ? <LoaderCircle size={14} className="animate-spin" />
@@ -409,16 +414,15 @@ export default function ArtistaRegistroPage() {
                 <button
                   type="submit"
                   disabled={enviando}
-                  className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
-                  style={{ backgroundColor: ACCENT }}
+                  className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm bg-gray-600"
                 >
                   {enviando ? 'Enviando...' : 'Enviar registro'}
                 </button>
               </form>
             </div>
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
 
       <footer className="border-t border-gray-200 py-6 px-4">
         <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-400 text-[12px] gap-3">
