@@ -538,7 +538,7 @@ export default function ArtistasUrabaPage() {
                   título, sin reemplazar "Tattoo Artist Colombia" en
                   navbar/meta/footer — ese texto sigue haciendo el trabajo
                   de explicarle a quien recién llega de qué se trata esto. */}
-              <span className="inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">INK</span> El buscador que conecta personas con tatuadores de toda Colombia. Busca por nombre, municipio, estilo — o déjanos recomendarte el artista más cercano.
+              <span className="inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">INK</span> El buscador que conecta personas con tatuadores de toda Colombia. Busca por nombre, municipio, estilo — y déjanos recomendarte el artista más cercano.
             </p>
 
             {/* Señales de confianza, mismo patrón que ya vimos en Tattoodo
