@@ -439,6 +439,14 @@ export default function ArtistaRegistroPage() {
       <footer className="border-t border-gray-200 py-6 px-4">
         <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-400 text-[12px] gap-3">
           <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Colombia — INKognito. Todos los derechos reservados.</p>
+          {/* Entrada para editar el perfil (2026-08-05) — Jose: vive mejor
+              acá (donde alguien está a punto de registrarse) que en el
+              footer del buscador, que ya tenía su propio "Desarrollado
+              por INKognito" y no debía perderlo. Sin login, el mecanismo
+              real vive en /mi-perfil (pide correo, manda link). */}
+          <Link to="/tattoo-artist-uraba/mi-perfil" className="text-gray-400 hover:text-gray-600 transition-colors">
+            ¿Ya tienes perfil? Edítalo
+          </Link>
           <span className="text-gray-300">Desarrollado por INKognito</span>
         </div>
       </footer>

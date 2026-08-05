@@ -4,6 +4,7 @@ import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { municipioDesdeNombreIP } from '../../data/colombiaGeo'
+import { idDesdeParam } from './artistaSlug'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const ACCENT = '#B3202F'
@@ -19,8 +20,13 @@ export async function loader({ params, request }) {
   } catch {
     ciudadDetectada = null
   }
+  // La URL ahora es "nombre-id" (ej. /artista/jhumaneztattoo-11, ver
+  // artistaSlug.js) — el nombre es cosmético, el id al final sigue siendo
+  // lo único que se usa para buscarlo. Un link viejo sin nombre
+  // ("/artista/11") sigue funcionando igual.
+  const id = idDesdeParam(params.id)
   try {
-    const res = await fetch(`${PANEL_URL}/api/artistas/${params.id}`)
+    const res = await fetch(`${PANEL_URL}/api/artistas/${id}`)
     if (!res.ok) return { artista: null, ciudadDetectada }
     return { artista: await res.json(), ciudadDetectada }
   } catch {

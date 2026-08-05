@@ -1,6 +1,7 @@
 import { Link, useLoaderData } from 'react-router-dom'
 import { CheckCircle2, XCircle } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
+import { artistaUrl } from './artistaSlug'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const ACCENT = '#B3202F'
@@ -43,7 +44,7 @@ export default function ArtistaVerificarPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-2 justify-center mt-6">
                 <Link
-                  to={`/artista/${id}`}
+                  to={artistaUrl({ id, nombre })}
                   className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-white text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
                   style={{ backgroundColor: ACCENT }}
                 >

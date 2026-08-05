@@ -3,6 +3,7 @@ import { Link, useLoaderData } from 'react-router-dom'
 import { Search, MapPin, Palette, BadgeCheck, ChevronRight, Navigation, LoaderCircle, Share2, Sparkles, Check } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { normalize, municipioMasCercanoNacional, municipioDesdeNombreIP, getCoordsMunicipio, distanciaKm } from '../../data/colombiaGeo'
+import { artistaUrl } from './artistaSlug'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 // Psicología del color (2026-08-05, decisión final tras probar "todo
@@ -124,7 +125,7 @@ function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo }) {
 
   return (
     <Link
-      to={`/artista/${a.id}`}
+      to={artistaUrl(a)}
       className="flex-shrink-0 w-56 snap-start rounded-xl border border-gray-200 hover:border-gray-300 bg-white overflow-hidden transition-colors"
     >
       <div className="relative h-28 bg-gray-100 flex gap-0.5">
@@ -537,7 +538,7 @@ export default function ArtistasUrabaPage() {
                   título, sin reemplazar "Tattoo Artist Colombia" en
                   navbar/meta/footer — ese texto sigue haciendo el trabajo
                   de explicarle a quien recién llega de qué se trata esto. */}
-              <span className="inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">INK</span>. El buscador que conecta personas con tatuadores de toda Colombia. Busca por nombre, municipio o estilo — o deja que detectemos dónde estás.
+              <span className="inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">INK</span> El buscador que conecta personas con tatuadores de toda Colombia. Busca por nombre, municipio, estilo — o deja que detectemos dónde estás.
             </p>
 
             {/* Señales de confianza, mismo patrón que ya vimos en Tattoodo
@@ -639,7 +640,7 @@ export default function ArtistasUrabaPage() {
           {filtrados.map(a => (
             <ListingRow
               key={a.id}
-              to={`/artista/${a.id}`}
+              to={artistaUrl(a)}
               nombre={a.nombre}
               municipio={a.municipio}
               estilo={a.estilo}
@@ -666,12 +667,7 @@ export default function ArtistasUrabaPage() {
       <footer className="border-t border-gray-200 py-6 px-4">
         <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-400 text-[12px] gap-3">
           <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Colombia — INKognito. Todos los derechos reservados.</p>
-          {/* Entrada discreta para editar el perfil (2026-08-05) — sin
-              login, el mecanismo real vive en /mi-perfil (pide correo,
-              manda link). */}
-          <Link to="/tattoo-artist-uraba/mi-perfil" className="text-gray-400 hover:text-gray-600 transition-colors">
-            ¿Ya tienes perfil? Edítalo
-          </Link>
+          <span className="text-gray-300">Desarrollado por INKognito</span>
         </div>
       </footer>
 
