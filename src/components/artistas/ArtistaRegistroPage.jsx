@@ -241,8 +241,13 @@ export default function ArtistaRegistroPage() {
 
               {/* VISTA PREVIA EN VIVO — mismo patrón visual de la landing
                   real (portada + avatar), se actualiza al instante con
-                  cada campo y cada foto que se sube. */}
-              <div className="order-2 md:order-1 md:sticky md:top-28">
+                  cada campo y cada foto que se sube. Va primero incluso en
+                  móvil (2026-08-05, Jose: el botón "Enviar registro" debe
+                  quedar de último — antes en móvil el formulario iba
+                  arriba y esta vista previa con los botones de subir foto
+                  quedaba después, así que el botón de enviar aparecía
+                  antes de poder subir las fotos). */}
+              <div className="order-1 md:sticky md:top-28">
                 <p className={labelClass}>Así se verá tu perfil</p>
                 <div className="rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
                   <div className="relative h-28 bg-gray-100">
@@ -349,7 +354,7 @@ export default function ArtistaRegistroPage() {
               </div>
 
               {/* FORMULARIO */}
-              <form onSubmit={enviar} className="order-1 md:order-2 space-y-4">
+              <form onSubmit={enviar} className="order-2 space-y-4">
                 <div>
                   <label className={labelClass}>Nombre *</label>
                   <input required className={inputClass} value={form.nombre} onChange={set('nombre')} placeholder="Tu nombre o el de tu estudio" />
