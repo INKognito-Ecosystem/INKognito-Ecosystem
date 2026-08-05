@@ -80,6 +80,7 @@ export default function ArtistaLandingPage() {
   const [lightbox, setLightbox] = useState(null)
   const touchStartX = useRef(null)
   const [disenoComprando, setDisenoComprando] = useState(null)
+  const [modalImgIdx, setModalImgIdx] = useState(0)
   const [compradorEmail, setCompradorEmail] = useState('')
   const [comprando, setComprando] = useState(false)
   const [errorCompra, setErrorCompra] = useState(null)
@@ -343,7 +344,11 @@ export default function ArtistaLandingPage() {
             visible arriba, esto es una opción adicional, no un reemplazo. */}
         {disenos.length > 0 && (
           <div className="mt-6 max-w-3xl mx-auto">
-            <p className="px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-2">Diseños disponibles</p>
+            {/* Título directo, no genérico (2026-08-05, Jose) — cubre los
+                dos casos reales: diseño de tatuaje (se lo tatúan) y
+                lámina/print (se la llevan) — este mismo bloque vende
+                ambos tipos, el copy no puede sonar exclusivo de uno. */}
+            <p className="px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-2">Tatúate uno de estos diseños o llévalo a casa</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-0.5 sm:gap-1 w-full">
               {disenos.map((d) => (
                 <div key={d.id} className="relative aspect-square bg-gray-50 overflow-hidden">
@@ -353,7 +358,7 @@ export default function ArtistaLandingPage() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => { setDisenoComprando(d); setErrorCompra(null) }}
+                    onClick={() => { setDisenoComprando(d); setErrorCompra(null); setModalImgIdx(0) }}
                     className="absolute bottom-1.5 inset-x-1.5 flex items-center justify-center gap-1.5 text-white text-[11px] font-black uppercase tracking-wide px-2 py-2 rounded-full hover:opacity-90 transition-opacity"
                     style={{ backgroundColor: MP_BLUE }}
                   >
@@ -461,55 +466,107 @@ export default function ArtistaLandingPage() {
         </div>
       )}
 
-      {/* MODAL DE COMPRA — pide el correo del comprador (ahí llega el
-          diseño limpio, sin marca de agua, tras confirmar el pago) y
-          redirige a Mercado Pago. */}
-      {disenoComprando && (
-        <div
-          className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center px-4"
-          onClick={() => !comprando && setDisenoComprando(null)}
-        >
-          <div className="bg-white rounded-2xl p-5 w-full max-w-xs" onClick={(e) => e.stopPropagation()}>
-            <img src={conMarcaDeAgua(disenoComprando.imagen_url)} alt="" className="w-full aspect-square object-cover rounded-lg mb-3" />
-            <p className="font-black uppercase text-sm mb-1">{disenoComprando.titulo || 'Diseño'}</p>
-            <p className="text-gray-500 text-xs mb-4">${Number(disenoComprando.precio).toLocaleString('es-CO')} COP — se reparte al instante entre {artista.nombre} e INKognito.</p>
-            <form onSubmit={comprarDiseno} className="space-y-2.5">
-              <input
-                required
-                type="email"
-                placeholder="Tu correo — ahí te llega el diseño"
-                value={compradorEmail}
-                onChange={(e) => setCompradorEmail(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:border-gray-500"
-              />
-              {errorCompra && <p className="text-xs" style={{ color: ACCENT }}>{errorCompra}</p>}
-              <button
-                type="submit"
-                disabled={comprando}
-                className="w-full py-3 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-xs flex items-center justify-center gap-2"
-                style={{ backgroundColor: MP_BLUE }}
-              >
-                {comprando ? (
-                  <LoaderCircle size={14} className="animate-spin" />
-                ) : (
+      {/* MODAL DE COMPRA — card informativa tipo landing de producto
+          (2026-08-05, Jose: "tipo hotmar, una card ultra informativa,
+          nombre valor, y descripcion" — este modal es la pieza clave de
+          conversión, no un simple resumen técnico del pago). Galería de
+          hasta 3 fotos + descripción de venta que escribió el artista;
+          pide el correo del comprador (ahí llega el diseño limpio, sin
+          marca de agua, tras confirmar el pago) y redirige a Mercado Pago. */}
+      {disenoComprando && (() => {
+        const imagenes = [disenoComprando.imagen_url, disenoComprando.imagen_url_2, disenoComprando.imagen_url_3].filter(Boolean)
+        return (
+          <div
+            className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center px-4 py-8"
+            onClick={() => !comprando && setDisenoComprando(null)}
+          >
+            <div className="bg-white rounded-2xl w-full max-w-sm max-h-full overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="relative">
+                <img src={conMarcaDeAgua(imagenes[modalImgIdx])} alt="" className="w-full aspect-square object-cover" />
+                <div className="absolute top-2.5 left-2.5 bg-black/60 text-white text-[9px] font-bold uppercase px-2 py-0.5 rounded-full">
+                  {disenoComprando.tipo === 'lamina' ? 'Lámina' : 'Tatuaje'}
+                </div>
+                {imagenes.length > 1 && (
                   <>
-                    Pagar con
-                    <img
-                      src={MP_LOGO_URL}
-                      alt="Mercado Pago"
-                      className="h-4"
-                      onError={(e) => { e.currentTarget.style.display = 'none' }}
-                    />
+                    <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex gap-1.5">
+                      {imagenes.map((_, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setModalImgIdx(i)}
+                          aria-label={`Foto ${i + 1}`}
+                          className={`w-1.5 h-1.5 rounded-full transition-colors ${i === modalImgIdx ? 'bg-white' : 'bg-white/50'}`}
+                        />
+                      ))}
+                    </div>
+                    <button type="button" onClick={() => setModalImgIdx((i) => (i - 1 + imagenes.length) % imagenes.length)} aria-label="Foto anterior" className="absolute left-1.5 top-1/2 -translate-y-1/2 text-white/80 hover:text-white p-1.5">
+                      <ChevronLeft size={20} />
+                    </button>
+                    <button type="button" onClick={() => setModalImgIdx((i) => (i + 1) % imagenes.length)} aria-label="Foto siguiente" className="absolute right-1.5 top-1/2 -translate-y-1/2 text-white/80 hover:text-white p-1.5">
+                      <ChevronRight size={20} />
+                    </button>
                   </>
                 )}
-              </button>
-              <button type="button" onClick={() => setDisenoComprando(null)} className="w-full text-center text-gray-400 text-[11px] uppercase tracking-widest py-1">
-                Cancelar
-              </button>
-            </form>
+              </div>
+
+              <div className="p-5">
+                <p className="font-black uppercase text-base leading-tight mb-1.5">{disenoComprando.titulo || 'Diseño'}</p>
+                {/* Frase orientativa (2026-08-05, Jose) — distinta según el
+                    tipo: para tatuaje se apoya en un hecho real (el diseño
+                    se reserva/desaparece al venderse, no es solo hype). */}
+                <p className="text-gray-500 text-xs italic mb-2">
+                  {disenoComprando.tipo === 'lamina'
+                    ? 'Llévate este diseño para enmarcar y hacerlo tuyo.'
+                    : 'Reserva este diseño y plásmalo en tu piel — es exclusivo, una vez vendido deja de estar disponible para los demás.'}
+                </p>
+                <p className="text-2xl font-black mb-3" style={{ color: MP_BLUE }}>
+                  ${Number(disenoComprando.precio).toLocaleString('es-CO')} <span className="text-xs font-bold text-gray-400">COP</span>
+                </p>
+
+                {disenoComprando.descripcion && (
+                  <p className="text-gray-600 text-sm leading-relaxed mb-4 whitespace-pre-line">{disenoComprando.descripcion}</p>
+                )}
+
+                <form onSubmit={comprarDiseno} className="space-y-2.5">
+                  <input
+                    required
+                    type="email"
+                    placeholder="Tu correo — ahí te llega el diseño"
+                    value={compradorEmail}
+                    onChange={(e) => setCompradorEmail(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:border-gray-500"
+                  />
+                  {errorCompra && <p className="text-xs" style={{ color: ACCENT }}>{errorCompra}</p>}
+                  <button
+                    type="submit"
+                    disabled={comprando}
+                    className="w-full py-3 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-xs flex items-center justify-center gap-2"
+                    style={{ backgroundColor: MP_BLUE }}
+                  >
+                    {comprando ? (
+                      <LoaderCircle size={14} className="animate-spin" />
+                    ) : (
+                      <>
+                        Pagar con
+                        <img
+                          src={MP_LOGO_URL}
+                          alt="Mercado Pago"
+                          className="h-4"
+                          onError={(e) => { e.currentTarget.style.display = 'none' }}
+                        />
+                      </>
+                    )}
+                  </button>
+                  <p className="text-gray-400 text-[10px] text-center">Pago 100% seguro, procesado por Mercado Pago.</p>
+                  <button type="button" onClick={() => setDisenoComprando(null)} className="w-full text-center text-gray-400 text-[11px] uppercase tracking-widest py-1">
+                    Cancelar
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
     </div>
   )
 }

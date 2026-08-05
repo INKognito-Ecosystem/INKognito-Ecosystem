@@ -121,13 +121,20 @@ const TIPOS_DISENO = [
 // ciclo de vida (subir/editar/borrar) que no encaja en el <form> plano de
 // "Guardar cambios" de arriba, así que vive FUERA de ese form con sus
 // propios endpoints.
+const NUEVO_VACIO = { tipo: 'tatuaje', titulo: '', descripcion: '', precio: '', imagen_url: '', imagen_url_2: '', imagen_url_3: '' }
+const SLOTS_DISENO = [
+  { key: 'imagen_url', label: 'Foto 1' },
+  { key: 'imagen_url_2', label: 'Foto 2' },
+  { key: 'imagen_url_3', label: 'Foto 3' },
+]
+
 function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
   const [disenos, setDisenos] = useState(null)
   const [cargando, setCargando] = useState(true)
-  const [subiendo, setSubiendo] = useState(false)
-  const [nuevo, setNuevo] = useState({ tipo: 'tatuaje', titulo: '', precio: '', imagen_url: '' })
+  const [subiendo, setSubiendo] = useState(null)
+  const [nuevo, setNuevo] = useState(NUEVO_VACIO)
   const [error, setError] = useState(null)
-  const fileInput = useRef(null)
+  const fileInputs = useRef({})
 
   useEffect(() => {
     fetch(`${PANEL_URL}/api/artistas-disenos-por-token?token=${encodeURIComponent(token)}`)
@@ -137,9 +144,11 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
       .finally(() => setCargando(false))
   }, [token])
 
-  const subirImagen = async (file) => {
+  const elegirFoto = (slot) => fileInputs.current[slot]?.click()
+
+  const subirImagen = async (slot, file) => {
     if (!file || !cloud_name || !upload_preset) return
-    setSubiendo(true)
+    setSubiendo(slot)
     setError(null)
     try {
       const fd = new FormData()
@@ -148,17 +157,17 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
       fd.append('folder', 'inkognito-disenos')
       const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, { method: 'POST', body: fd })
       const data = await res.json()
-      if (data.secure_url) setNuevo((n) => ({ ...n, imagen_url: data.secure_url }))
+      if (data.secure_url) setNuevo((n) => ({ ...n, [slot]: data.secure_url }))
     } catch {
       setError('No pudimos subir esa imagen — intenta de nuevo.')
     } finally {
-      setSubiendo(false)
+      setSubiendo(null)
     }
   }
 
   const agregarDiseno = async () => {
     if (!nuevo.imagen_url || !nuevo.precio) {
-      setError('Sube una imagen y ponle un precio antes de agregarlo.')
+      setError('Sube al menos la primera foto y ponle un precio antes de agregarlo.')
       return
     }
     setError(null)
@@ -171,7 +180,7 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
       if (!res.ok) throw new Error()
       const creado = await res.json()
       setDisenos((d) => [...(d || []), creado])
-      setNuevo({ tipo: 'tatuaje', titulo: '', precio: '', imagen_url: '' })
+      setNuevo(NUEVO_VACIO)
     } catch {
       setError('No pudimos agregar el diseño — intenta de nuevo.')
     }
@@ -251,20 +260,38 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
 
           {/* Formulario para agregar uno nuevo */}
           <div className="border border-dashed border-gray-300 rounded-lg p-3 space-y-2.5">
-            <input type="file" accept="image/*" ref={fileInput} style={{ display: 'none' }} onChange={(e) => subirImagen(e.target.files?.[0])} />
-            <button
-              type="button"
-              onClick={() => fileInput.current?.click()}
-              className="w-full flex items-center justify-center gap-2 py-8 rounded-lg bg-gray-50 border border-gray-200 text-gray-400 text-xs font-bold uppercase tracking-wide overflow-hidden relative"
-            >
-              {nuevo.imagen_url ? (
-                <img src={nuevo.imagen_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
-              ) : subiendo ? (
-                <LoaderCircle size={16} className="animate-spin" />
-              ) : (
-                <><Camera size={14} /> Subir imagen del diseño</>
-              )}
-            </button>
+            {SLOTS_DISENO.map(({ key }) => (
+              <input
+                key={key}
+                type="file"
+                accept="image/*"
+                ref={(el) => { fileInputs.current[key] = el }}
+                style={{ display: 'none' }}
+                onChange={(e) => subirImagen(key, e.target.files?.[0])}
+              />
+            ))}
+            <p className="text-gray-400 text-[10px]">Hasta 3 fotos — la primera es obligatoria (ej: el diseño solo), las otras 2 son opcionales (ej: sobre piel, otro ángulo).</p>
+            <div className="grid grid-cols-3 gap-2">
+              {SLOTS_DISENO.map(({ key, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => elegirFoto(key)}
+                  className="relative aspect-square rounded-lg bg-gray-50 border border-gray-200 text-gray-400 overflow-hidden"
+                >
+                  {nuevo[key] ? (
+                    <img src={nuevo[key]} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                  ) : subiendo === key ? (
+                    <div className="w-full h-full flex items-center justify-center"><LoaderCircle size={14} className="animate-spin" /></div>
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center gap-1">
+                      <Camera size={13} />
+                      <span className="text-[8px] font-bold uppercase">{label}</span>
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
 
             <div className="grid grid-cols-2 gap-2">
               {TIPOS_DISENO.map((t) => (
@@ -282,6 +309,16 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
             <p className="text-gray-400 text-[10px] -mt-1">{TIPOS_DISENO.find((t) => t.value === nuevo.tipo)?.hint}</p>
 
             <input className={inputClass} placeholder="Título (opcional)" value={nuevo.titulo} onChange={(e) => setNuevo((n) => ({ ...n, titulo: e.target.value }))} />
+            <div>
+              <textarea
+                rows={4}
+                className={inputClass}
+                placeholder="Cuéntale a quien lo vea por qué vale la pena — qué representa este diseño, qué se siente tatuárselo, para quién es. Esto es lo que van a leer antes de comprar."
+                value={nuevo.descripcion}
+                onChange={(e) => setNuevo((n) => ({ ...n, descripcion: e.target.value }))}
+              />
+              <p className="text-gray-400 text-[10px] mt-1">Esta descripción es lo más importante para que la persona decida comprar — sé específico, no genérico.</p>
+            </div>
             <input className={inputClass} type="number" min="1" placeholder="Precio en COP" value={nuevo.precio} onChange={(e) => setNuevo((n) => ({ ...n, precio: e.target.value }))} />
 
             <button
