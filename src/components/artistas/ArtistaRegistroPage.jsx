@@ -241,13 +241,8 @@ export default function ArtistaRegistroPage() {
 
               {/* VISTA PREVIA EN VIVO — mismo patrón visual de la landing
                   real (portada + avatar), se actualiza al instante con
-                  cada campo y cada foto que se sube. Va primero incluso en
-                  móvil (2026-08-05, Jose: el botón "Enviar registro" debe
-                  quedar de último — antes en móvil el formulario iba
-                  arriba y esta vista previa con los botones de subir foto
-                  quedaba después, así que el botón de enviar aparecía
-                  antes de poder subir las fotos). */}
-              <div className="order-1 md:sticky md:top-28">
+                  cada campo y cada foto que se sube. */}
+              <div className="order-2 md:order-1 md:sticky md:top-28">
                 <p className={labelClass}>Así se verá tu perfil</p>
                 <div className="rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
                   <div className="relative h-28 bg-gray-100">
@@ -354,7 +349,7 @@ export default function ArtistaRegistroPage() {
               </div>
 
               {/* FORMULARIO */}
-              <form onSubmit={enviar} className="order-2 space-y-4">
+              <form id="registro-form" onSubmit={enviar} className="order-1 md:order-2 space-y-4">
                 <div>
                   <label className={labelClass}>Nombre *</label>
                   <input required className={inputClass} value={form.nombre} onChange={set('nombre')} placeholder="Tu nombre o el de tu estudio" />
@@ -447,18 +442,25 @@ export default function ArtistaRegistroPage() {
                   <label className={labelClass}>No tatúas (opcional)</label>
                   <input className={inputClass} value={form.no_tatua} onChange={set('no_tatua')} placeholder="Ej: rostro, manos, zonas genitales" />
                 </div>
-
-                {error && <p className="text-sm" style={{ color: ACCENT }}>{error}</p>}
-
-                <button
-                  type="submit"
-                  disabled={enviando}
-                  className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
-                  style={{ backgroundColor: ACCENT }}
-                >
-                  {enviando ? 'Enviando...' : 'Enviar registro'}
-                </button>
               </form>
+            </div>
+
+            {/* Botón de enviar — de último en toda la página (2026-08-05,
+                Jose: debe quedar después de subir las fotos, no antes).
+                Vive fuera del <form> (que sigue arriba, en su columna) y
+                lo referencia por id para poder ubicarse como el último
+                elemento de la sección sin mover la vista previa/columnas. */}
+            <div className="mt-6 max-w-md mx-auto md:mx-0 md:ml-auto">
+              {error && <p className="text-sm mb-3 text-center md:text-right" style={{ color: ACCENT }}>{error}</p>}
+              <button
+                type="submit"
+                form="registro-form"
+                disabled={enviando}
+                className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
+                style={{ backgroundColor: ACCENT }}
+              >
+                {enviando ? 'Enviando...' : 'Enviar registro'}
+              </button>
             </div>
           </div>
         </>
