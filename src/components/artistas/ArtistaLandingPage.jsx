@@ -8,6 +8,15 @@ import { idDesdeParam } from './artistaSlug'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const ACCENT = '#B3202F'
+// Azul de marca de Mercado Pago (2026-08-05, Jose: "mercado pago es azul,
+// tanto ese como el botón pagar con mercado pago, deberían ser azules") —
+// solo para los 2 elementos ligados directo a Mercado Pago (precio/Comprar
+// de un diseño, y el botón de pago del modal); el resto del sitio sigue
+// con el rojo de INKognito. Logo real de Mercado Pago, hospedado en su
+// propio CDN (mlstatic.com) — si algún día cambian esa ruta y deja de
+// cargar, el onError la oculta sola, sin romper el botón.
+const MP_BLUE = '#3483FA'
+const MP_LOGO_URL = 'https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.21.0/mercadopago/logo__large@2x.png'
 
 // Marca de agua ligera en la vista previa pública (2026-08-05, Jose: debe
 // verse nítida, no una marca pesada que tape el detalle del trazo) — un
@@ -343,7 +352,7 @@ export default function ArtistaLandingPage() {
                     type="button"
                     onClick={() => { setDisenoComprando(d); setErrorCompra(null) }}
                     className="absolute bottom-1.5 inset-x-1.5 flex items-center justify-center gap-1.5 text-white text-[11px] font-black uppercase tracking-wide px-2 py-2 rounded-full hover:opacity-90 transition-opacity"
-                    style={{ backgroundColor: ACCENT }}
+                    style={{ backgroundColor: MP_BLUE }}
                   >
                     <ShoppingBag size={12} />
                     ${Number(d.precio).toLocaleString('es-CO')}
@@ -475,9 +484,21 @@ export default function ArtistaLandingPage() {
                 type="submit"
                 disabled={comprando}
                 className="w-full py-3 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-xs flex items-center justify-center gap-2"
-                style={{ backgroundColor: ACCENT }}
+                style={{ backgroundColor: MP_BLUE }}
               >
-                {comprando ? <LoaderCircle size={14} className="animate-spin" /> : 'Pagar con Mercado Pago'}
+                {comprando ? (
+                  <LoaderCircle size={14} className="animate-spin" />
+                ) : (
+                  <>
+                    Pagar con
+                    <img
+                      src={MP_LOGO_URL}
+                      alt="Mercado Pago"
+                      className="h-4"
+                      onError={(e) => { e.currentTarget.style.display = 'none' }}
+                    />
+                  </>
+                )}
               </button>
               <button type="button" onClick={() => setDisenoComprando(null)} className="w-full text-center text-gray-400 text-[11px] uppercase tracking-widest py-1">
                 Cancelar
