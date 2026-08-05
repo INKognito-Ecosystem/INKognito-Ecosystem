@@ -50,18 +50,19 @@ export function meta() {
 const inputClass = 'w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-500 transition-colors'
 const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb-1.5 block'
 
-// Autoregistro público (2026-08-04) — el artista carga sus propios datos
-// Y sus propias fotos, viendo su landing transformarse en vivo mientras
-// llena el formulario (pedido explícito de Jose: "que ellos esos datos
-// los llenen viendo como se ira transformando su landing, como en
-// facebook"). El perfil NACE OCULTO (activo=false, forzado en el
-// servidor) — Jose lo revisa en "Solicitudes pendientes" del panel y lo
-// aprueba con un clic. La curación sigue siendo esa aprobación manual,
-// no la subida de fotos en sí.
+// Autoregistro público — v2 (2026-08-05, decisión de Jose: registro
+// gratis y automático, sin revisión manual — el correo verificado es el
+// filtro anti-spam en vez de la aprobación de Jose). El artista carga sus
+// propios datos Y sus propias fotos, viendo su landing transformarse en
+// vivo mientras llena el formulario (pedido explícito de Jose: "que
+// ellos esos datos los llenen viendo como se ira transformando su
+// landing, como en facebook"). El perfil nace oculto SOLO hasta que
+// confirma el link que le llega al correo (ver ArtistaVerificarPage.jsx)
+// — ahí se activa solo, nadie del equipo tiene que revisarlo.
 export default function ArtistaRegistroPage() {
   const { cloud_name, upload_preset, ciudadDetectada } = useLoaderData()
   const [form, setForm] = useState({
-    nombre: '', departamento: '', municipio: '', lat: null, lng: null, estilo: '', bio: '', instagram: '', facebook: '', whatsapp: '', no_tatua: '',
+    nombre: '', departamento: '', municipio: '', lat: null, lng: null, estilo: '', bio: '', instagram: '', facebook: '', whatsapp: '', email: '', no_tatua: '',
     foto_url: '', foto_url_2: '', foto_trabajo_1: '', foto_trabajo_2: '', foto_trabajo_3: '',
   })
   const [subiendo, setSubiendo] = useState(null)
@@ -136,8 +137,8 @@ export default function ArtistaRegistroPage() {
 
   const enviar = async (e) => {
     e.preventDefault()
-    if (!form.nombre.trim() || !form.departamento || !form.municipio || !form.whatsapp.trim()) {
-      setError('Nombre, departamento, municipio y WhatsApp son obligatorios.')
+    if (!form.nombre.trim() || !form.departamento || !form.municipio || !form.whatsapp.trim() || !form.email.trim()) {
+      setError('Nombre, departamento, municipio, WhatsApp y correo son obligatorios.')
       return
     }
     setError(null)
@@ -167,9 +168,9 @@ export default function ArtistaRegistroPage() {
         <div className="flex-1 pt-20 md:pt-24 max-w-5xl mx-auto px-4 pb-16 w-full">
           <div className="text-center py-16">
             <CheckCircle2 size={48} className="mx-auto mb-4" style={{ color: ACCENT }} />
-            <h1 className="text-2xl font-black uppercase mb-3">¡Listo, recibimos tu registro!</h1>
+            <h1 className="text-2xl font-black uppercase mb-3">¡Ya casi!</h1>
             <p className="text-gray-500 text-sm leading-relaxed max-w-sm mx-auto">
-              Vamos a revisar tu perfil y te escribimos por WhatsApp para confirmarte cuando quede activo en el buscador.
+              Te mandamos un correo a <strong>{form.email}</strong> — ábrelo y confirma para que tu perfil quede activo en el buscador. Sin eso, no aparece.
             </p>
             <Link to="/tattoo-artist-uraba" className="inline-block mt-6 text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-opacity text-gray-600">
               ← Volver al buscador
@@ -392,6 +393,16 @@ export default function ArtistaRegistroPage() {
                 <div>
                   <label className={labelClass}>WhatsApp *</label>
                   <input required className={inputClass} value={form.whatsapp} onChange={set('whatsapp')} placeholder="57300..." />
+                </div>
+
+                <div>
+                  {/* Correo (2026-08-05) — es el filtro anti-spam ahora que
+                      el registro ya no pasa por revisión manual: el
+                      perfil nace oculto hasta que se confirma este
+                      correo, momento en el que se activa solo. */}
+                  <label className={labelClass}>Correo *</label>
+                  <input required type="email" className={inputClass} value={form.email} onChange={set('email')} placeholder="tucorreo@ejemplo.com" />
+                  <p className="text-gray-400 text-[10px] mt-1">Te mandamos un link para confirmar tu perfil — sin esto no queda activo.</p>
                 </div>
 
                 <div>

@@ -604,20 +604,25 @@ export default function ArtistasUrabaPage() {
             </button>
           )}
         </div>
-
-        {/* "Artistas más cercanos" — sugerencia proactiva, visible mientras
-            NO se está buscando activamente (Jose, 2026-08-05: "como
-            sugerencias parecido a cuando facebook las muestra", y luego:
-            "esa card de recomendacion, debera desaparecer cuando empiecen
-            a escribir en el buscador" — apenas hay texto, los resultados
-            reales de abajo ya cumplen ese rol, mantener la sugerencia
-            visible sería redundante). Gratis y ordenado por cercanía real
-            para TODOS los artistas — la prioridad paga es "aparecer
-            primero" dentro de esto, no el acceso a aparecer. */}
-        {!query && (
-          <SeccionCercanos artistas={artistas} misCoords={misCoords} onVerTodo={verTodo} onVerInfo={setModalArtista} />
-        )}
       </section>
+
+      {/* "Artistas más cercanos" — sección propia, FUERA del fondo gris del
+          hero (Jose, 2026-08-05: "el hero solo debera llegar hasta el
+          boton [Cerca de ti]... los artistas que aparecen cerca de ti se
+          suponen son otra seccion" — antes vivía dentro del mismo
+          <section> gris, así que el fondo gris se estiraba hasta abarcar
+          también el carrusel). Sugerencia proactiva, visible mientras NO
+          se está buscando activamente (Jose, 2026-08-04: "como sugerencias
+          parecido a cuando facebook las muestra"; luego: "esa card de
+          recomendacion, debera desaparecer cuando empiecen a escribir en
+          el buscador"). Gratis y ordenado por cercanía real para TODOS
+          los artistas — la prioridad paga es "aparecer primero" dentro de
+          esto, no el acceso a aparecer. */}
+      {!query && (
+        <section className="px-4 md:px-6">
+          <SeccionCercanos artistas={artistas} misCoords={misCoords} onVerTodo={verTodo} onVerInfo={setModalArtista} />
+        </section>
+      )}
 
       <section ref={listadoRef} className="flex-1 px-4 md:px-6 pb-16 max-w-3xl mx-auto scroll-mt-20 w-full">
 
@@ -661,7 +666,12 @@ export default function ArtistasUrabaPage() {
       <footer className="border-t border-gray-200 py-6 px-4">
         <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-400 text-[12px] gap-3">
           <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Colombia — INKognito. Todos los derechos reservados.</p>
-          <span className="text-gray-300">Desarrollado por INKognito</span>
+          {/* Entrada discreta para editar el perfil (2026-08-05) — sin
+              login, el mecanismo real vive en /mi-perfil (pide correo,
+              manda link). */}
+          <Link to="/tattoo-artist-uraba/mi-perfil" className="text-gray-400 hover:text-gray-600 transition-colors">
+            ¿Ya tienes perfil? Edítalo
+          </Link>
         </div>
       </footer>
 

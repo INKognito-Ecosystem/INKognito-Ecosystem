@@ -90,5 +90,9 @@ export default [
   // adrede — ver plan "Directorio de artistas de tatuaje en Urabá".
   route('tattoo-artist-uraba', 'components/artistas/ArtistasUrabaPage.jsx'),
   route('tattoo-artist-uraba/unete', 'components/artistas/ArtistaRegistroPage.jsx'),
+  // Verificación de correo + edición de perfil por token (2026-08-05) —
+  // ver server.js (panel) para el flujo completo.
+  route('tattoo-artist-uraba/mi-perfil', 'components/artistas/ArtistaEditarPerfilPage.jsx'),
+  route('artista/verificar', 'components/artistas/ArtistaVerificarPage.jsx'),
   route('artista/:id', 'components/artistas/ArtistaLandingPage.jsx'),
 ]
