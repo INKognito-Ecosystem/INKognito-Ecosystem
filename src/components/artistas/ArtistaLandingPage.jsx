@@ -1,13 +1,24 @@
 import { useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
-import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, LoaderCircle } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { municipioDesdeNombreIP } from '../../data/colombiaGeo'
 import { idDesdeParam } from './artistaSlug'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const ACCENT = '#B3202F'
+
+// Marca de agua ligera en la vista previa pública (2026-08-05, Jose: debe
+// verse nítida, no una marca pesada que tape el detalle del trazo) — un
+// solo texto centrado, semitransparente, insertado como transformación de
+// Cloudinary sobre la misma imagen (sin subir un segundo archivo). El
+// comprador recibe la imagen limpia por correo tras pagar.
+const conMarcaDeAgua = (url) => {
+  if (!url || !url.includes('/upload/')) return url
+  const marca = 'l_text:Arial_50_bold:INKognito,co_white,o_30,a_-30,g_center'
+  return url.replace('/upload/', `/upload/${marca}/`)
+}
 
 export async function loader({ params, request }) {
   // Mismo detector de ciudad por IP que usa la página madre — el navbar es
@@ -59,6 +70,10 @@ export default function ArtistaLandingPage() {
   const { artista, ciudadDetectada } = useLoaderData()
   const [lightbox, setLightbox] = useState(null)
   const touchStartX = useRef(null)
+  const [disenoComprando, setDisenoComprando] = useState(null)
+  const [compradorEmail, setCompradorEmail] = useState('')
+  const [comprando, setComprando] = useState(false)
+  const [errorCompra, setErrorCompra] = useState(null)
 
   if (!artista) return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -89,6 +104,27 @@ export default function ArtistaLandingPage() {
   }
 
   const trabajos = [artista.foto_trabajo_1, artista.foto_trabajo_2, artista.foto_trabajo_3].filter(Boolean)
+  const disenos = artista.disenos || []
+
+  const comprarDiseno = async (e) => {
+    e.preventDefault()
+    if (!disenoComprando) return
+    setComprando(true)
+    setErrorCompra(null)
+    try {
+      const res = await fetch(`${PANEL_URL}/api/disenos-comprar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ diseno_id: disenoComprando.id, comprador_email: compradorEmail }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.init_point) throw new Error(data.error || '')
+      window.location.href = data.init_point
+    } catch (err) {
+      setErrorCompra(err.message || 'No pudimos iniciar el pago — intenta de nuevo.')
+      setComprando(false)
+    }
+  }
 
   const irA = (delta) => setLightbox(i => (i + delta + trabajos.length) % trabajos.length)
   const onTouchStart = (e) => { touchStartX.current = e.touches[0].clientX }
@@ -265,6 +301,38 @@ export default function ArtistaLandingPage() {
           </div>
         )}
 
+        {/* DISEÑOS DISPONIBLES — venta directa (2026-08-05), primer paso de
+            monetización del directorio. Mismo patrón visual de grid que
+            "Trabajos" arriba, pero con precio + botón Comprar sobre una
+            versión con marca de agua (el archivo limpio llega por correo
+            tras pagar). El pago se reparte al instante entre el artista y
+            INKognito vía Mercado Pago — WhatsApp sigue siendo gratis y
+            visible arriba, esto es una opción adicional, no un reemplazo. */}
+        {disenos.length > 0 && (
+          <div className="mt-6 max-w-3xl mx-auto">
+            <p className="px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-2">Diseños disponibles</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-0.5 sm:gap-1 w-full">
+              {disenos.map((d) => (
+                <div key={d.id} className="relative aspect-square bg-gray-50 overflow-hidden">
+                  <img src={conMarcaDeAgua(d.imagen_url)} alt={d.titulo || 'Diseño'} className="w-full h-full object-cover" loading="lazy" />
+                  <div className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[9px] font-bold uppercase px-2 py-0.5 rounded-full">
+                    {d.tipo === 'lamina' ? 'Lámina' : 'Tatuaje'}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setDisenoComprando(d); setErrorCompra(null) }}
+                    className="absolute bottom-1.5 inset-x-1.5 flex items-center justify-center gap-1.5 text-white text-[11px] font-black uppercase tracking-wide px-2 py-2 rounded-full hover:opacity-90 transition-opacity"
+                    style={{ backgroundColor: ACCENT }}
+                  >
+                    <ShoppingBag size={12} />
+                    ${Number(d.precio).toLocaleString('es-CO')}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* INFO ADICIONAL — límites y preguntas frecuentes, autoreportadas
             por el artista (sin verificación, mismo criterio que las
             reseñas — ver debate 2026-08-04). Todo opcional, no cambia nada
@@ -357,6 +425,44 @@ export default function ArtistaLandingPage() {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* MODAL DE COMPRA — pide el correo del comprador (ahí llega el
+          diseño limpio, sin marca de agua, tras confirmar el pago) y
+          redirige a Mercado Pago. */}
+      {disenoComprando && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center px-4"
+          onClick={() => !comprando && setDisenoComprando(null)}
+        >
+          <div className="bg-white rounded-2xl p-5 w-full max-w-xs" onClick={(e) => e.stopPropagation()}>
+            <img src={conMarcaDeAgua(disenoComprando.imagen_url)} alt="" className="w-full aspect-square object-cover rounded-lg mb-3" />
+            <p className="font-black uppercase text-sm mb-1">{disenoComprando.titulo || 'Diseño'}</p>
+            <p className="text-gray-500 text-xs mb-4">${Number(disenoComprando.precio).toLocaleString('es-CO')} COP — se reparte al instante entre {artista.nombre} e INKognito.</p>
+            <form onSubmit={comprarDiseno} className="space-y-2.5">
+              <input
+                required
+                type="email"
+                placeholder="Tu correo — ahí te llega el diseño"
+                value={compradorEmail}
+                onChange={(e) => setCompradorEmail(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:border-gray-500"
+              />
+              {errorCompra && <p className="text-xs" style={{ color: ACCENT }}>{errorCompra}</p>}
+              <button
+                type="submit"
+                disabled={comprando}
+                className="w-full py-3 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-xs flex items-center justify-center gap-2"
+                style={{ backgroundColor: ACCENT }}
+              >
+                {comprando ? <LoaderCircle size={14} className="animate-spin" /> : 'Pagar con Mercado Pago'}
+              </button>
+              <button type="button" onClick={() => setDisenoComprando(null)} className="w-full text-center text-gray-400 text-[11px] uppercase tracking-widest py-1">
+                Cancelar
+              </button>
+            </form>
+          </div>
         </div>
       )}
     </div>

@@ -94,5 +94,8 @@ export default [
   // ver server.js (panel) para el flujo completo.
   route('tattoo-artist-uraba/mi-perfil', 'components/artistas/ArtistaEditarPerfilPage.jsx'),
   route('artista/verificar', 'components/artistas/ArtistaVerificarPage.jsx'),
+  // Venta de diseños (2026-08-05) — a donde vuelve el comprador tras pagar
+  // en Mercado Pago (back_urls de POST /api/disenos-comprar, panel).
+  route('artista/diseno/compra', 'components/artistas/DisenoCompraResultadoPage.jsx'),
   route('artista/:id', 'components/artistas/ArtistaLandingPage.jsx'),
 ]

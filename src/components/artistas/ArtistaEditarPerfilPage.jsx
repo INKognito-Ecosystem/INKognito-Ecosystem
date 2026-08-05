@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react'
-import { useLoaderData } from 'react-router-dom'
-import { Camera, LoaderCircle, Navigation, Check, Mail } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { useLoaderData, useSearchParams } from 'react-router-dom'
+import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
 import { DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO } from '../../data/colombiaGeo'
@@ -109,11 +109,206 @@ function PedirLinkForm() {
   )
 }
 
+const TIPOS_DISENO = [
+  { value: 'tatuaje', label: 'Diseño de tatuaje', hint: 'Se tatúa en una sola persona — desaparece de la venta al venderse' },
+  { value: 'lamina', label: 'Lámina / print', hint: 'Para enmarcar — se puede vender a varios clientes' },
+]
+
+// "Mis diseños en venta" (2026-08-05) — primer paso de monetización del
+// directorio: el artista sube diseños con precio, un comprador los paga
+// por Mercado Pago y el reparto (comisión INKognito + resto al artista)
+// es instantáneo. Autocontenido a propósito — cada diseño tiene su propio
+// ciclo de vida (subir/editar/borrar) que no encaja en el <form> plano de
+// "Guardar cambios" de arriba, así que vive FUERA de ese form con sus
+// propios endpoints.
+function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
+  const [disenos, setDisenos] = useState(null)
+  const [cargando, setCargando] = useState(true)
+  const [subiendo, setSubiendo] = useState(false)
+  const [nuevo, setNuevo] = useState({ tipo: 'tatuaje', titulo: '', precio: '', imagen_url: '' })
+  const [error, setError] = useState(null)
+  const fileInput = useRef(null)
+
+  useEffect(() => {
+    fetch(`${PANEL_URL}/api/artistas-disenos-por-token?token=${encodeURIComponent(token)}`)
+      .then((r) => r.ok ? r.json() : [])
+      .then(setDisenos)
+      .catch(() => setDisenos([]))
+      .finally(() => setCargando(false))
+  }, [token])
+
+  const subirImagen = async (file) => {
+    if (!file || !cloud_name || !upload_preset) return
+    setSubiendo(true)
+    setError(null)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('upload_preset', upload_preset)
+      fd.append('folder', 'inkognito-disenos')
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, { method: 'POST', body: fd })
+      const data = await res.json()
+      if (data.secure_url) setNuevo((n) => ({ ...n, imagen_url: data.secure_url }))
+    } catch {
+      setError('No pudimos subir esa imagen — intenta de nuevo.')
+    } finally {
+      setSubiendo(false)
+    }
+  }
+
+  const agregarDiseno = async () => {
+    if (!nuevo.imagen_url || !nuevo.precio) {
+      setError('Sube una imagen y ponle un precio antes de agregarlo.')
+      return
+    }
+    setError(null)
+    try {
+      const res = await fetch(`${PANEL_URL}/api/artistas-disenos-por-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, ...nuevo }),
+      })
+      if (!res.ok) throw new Error()
+      const creado = await res.json()
+      setDisenos((d) => [...(d || []), creado])
+      setNuevo({ tipo: 'tatuaje', titulo: '', precio: '', imagen_url: '' })
+    } catch {
+      setError('No pudimos agregar el diseño — intenta de nuevo.')
+    }
+  }
+
+  const toggleActivo = async (d) => {
+    const res = await fetch(`${PANEL_URL}/api/artistas-disenos-por-token/${d.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, activo: !d.activo }),
+    })
+    if (res.ok) setDisenos((ds) => ds.map((x) => x.id === d.id ? { ...x, activo: !x.activo } : x))
+  }
+
+  const borrarDiseno = async (d) => {
+    const res = await fetch(`${PANEL_URL}/api/artistas-disenos-por-token/${d.id}?token=${encodeURIComponent(token)}`, { method: 'DELETE' })
+    if (res.ok) {
+      setDisenos((ds) => ds.filter((x) => x.id !== d.id))
+    } else if (res.status === 409) {
+      setError('Este diseño ya tiene ventas — desactívalo con el switch en vez de borrarlo.')
+    }
+  }
+
+  return (
+    <div className="mb-6 border border-gray-200 rounded-2xl p-4">
+      <p className={labelClass}>Mis diseños en venta</p>
+
+      {/* Estado de Mercado Pago — sin esto conectado no se puede cobrar */}
+      <div className="flex items-center justify-between gap-3 mb-4 px-3 py-2.5 rounded-lg bg-gray-50 border border-gray-200">
+        <div className="flex items-center gap-2">
+          <Wallet size={16} className={mpConectado ? 'text-green-600' : 'text-gray-400'} />
+          <span className="text-xs font-bold">
+            {mpConectado ? 'Mercado Pago conectado' : 'Sin Mercado Pago conectado'}
+          </span>
+        </div>
+        {!mpConectado && (
+          <a
+            href={`${PANEL_URL}/api/artistas-mp-conectar?token=${encodeURIComponent(token)}`}
+            className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-white hover:opacity-90 transition-opacity"
+            style={{ backgroundColor: ACCENT }}
+          >
+            Conectar <ExternalLink size={11} />
+          </a>
+        )}
+      </div>
+      {!mpConectado && (
+        <p className="text-gray-400 text-[10px] mb-4 -mt-2">Necesitas conectar tu cuenta de Mercado Pago para poder vender diseños — el pago te llega directo a ti.</p>
+      )}
+
+      {cargando ? (
+        <p className="text-gray-400 text-xs text-center py-4">Cargando...</p>
+      ) : (
+        <>
+          {disenos && disenos.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+              {disenos.map((d) => (
+                <div key={d.id} className={`relative aspect-square rounded-lg overflow-hidden border ${d.activo ? 'border-gray-200' : 'border-gray-200 opacity-50'}`}>
+                  <img src={d.imagen_url} alt={d.titulo || 'Diseño'} className="w-full h-full object-cover" />
+                  <div className="absolute top-1 left-1 bg-black/60 text-white text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full">
+                    {d.tipo === 'lamina' ? 'Lámina' : 'Tatuaje'}
+                  </div>
+                  <div className="absolute bottom-0 inset-x-0 bg-black/70 text-white text-[10px] px-1.5 py-1 flex items-center justify-between">
+                    <span className="font-bold">${Number(d.precio).toLocaleString('es-CO')}</span>
+                    <div className="flex items-center gap-1.5">
+                      <button type="button" onClick={() => toggleActivo(d)} className="underline">
+                        {d.activo ? 'Ocultar' : 'Mostrar'}
+                      </button>
+                      <button type="button" onClick={() => borrarDiseno(d)} aria-label="Borrar diseño">
+                        <Trash2 size={11} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Formulario para agregar uno nuevo */}
+          <div className="border border-dashed border-gray-300 rounded-lg p-3 space-y-2.5">
+            <input type="file" accept="image/*" ref={fileInput} style={{ display: 'none' }} onChange={(e) => subirImagen(e.target.files?.[0])} />
+            <button
+              type="button"
+              onClick={() => fileInput.current?.click()}
+              className="w-full flex items-center justify-center gap-2 py-8 rounded-lg bg-gray-50 border border-gray-200 text-gray-400 text-xs font-bold uppercase tracking-wide overflow-hidden relative"
+            >
+              {nuevo.imagen_url ? (
+                <img src={nuevo.imagen_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
+              ) : subiendo ? (
+                <LoaderCircle size={16} className="animate-spin" />
+              ) : (
+                <><Camera size={14} /> Subir imagen del diseño</>
+              )}
+            </button>
+
+            <div className="grid grid-cols-2 gap-2">
+              {TIPOS_DISENO.map((t) => (
+                <button
+                  key={t.value}
+                  type="button"
+                  onClick={() => setNuevo((n) => ({ ...n, tipo: t.value }))}
+                  className={`px-2 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wide transition-colors ${nuevo.tipo === t.value ? 'text-white' : 'text-gray-500 border-gray-300'}`}
+                  style={nuevo.tipo === t.value ? { backgroundColor: ACCENT, borderColor: ACCENT } : {}}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-gray-400 text-[10px] -mt-1">{TIPOS_DISENO.find((t) => t.value === nuevo.tipo)?.hint}</p>
+
+            <input className={inputClass} placeholder="Título (opcional)" value={nuevo.titulo} onChange={(e) => setNuevo((n) => ({ ...n, titulo: e.target.value }))} />
+            <input className={inputClass} type="number" min="1" placeholder="Precio en COP" value={nuevo.precio} onChange={(e) => setNuevo((n) => ({ ...n, precio: e.target.value }))} />
+
+            <button
+              type="button"
+              onClick={agregarDiseno}
+              disabled={subiendo}
+              className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-lg border-2 text-xs font-black uppercase tracking-widest disabled:opacity-60"
+              style={{ borderColor: ACCENT, color: ACCENT }}
+            >
+              <Plus size={14} /> Agregar diseño
+            </button>
+          </div>
+        </>
+      )}
+
+      {error && <p className="text-sm mt-3" style={{ color: ACCENT }}>{error}</p>}
+    </div>
+  )
+}
+
 // Pantalla 2 — con token válido: formulario precargado. Deliberadamente
 // más simple que el de registro (ArtistaRegistroPage.jsx) — sin el panel
 // de vista previa en vivo, para no duplicar toda esa complejidad en una
 // pantalla de edición puntual.
 function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
+  const [searchParams] = useSearchParams()
+  const mp = searchParams.get('mp')
   const [form, setForm] = useState({
     nombre: artista.nombre || '', departamento: artista.departamento || '', municipio: artista.municipio || '',
     lat: artista.lat ?? null, lng: artista.lng ?? null, estilo: artista.estilo || '', bio: artista.bio || '',
@@ -190,6 +385,12 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
       {guardado && (
         <p className="text-sm text-center mb-4 py-2 rounded-lg bg-green-50 text-green-700 font-bold">✓ Cambios guardados</p>
       )}
+      {mp === 'ok' && (
+        <p className="text-sm text-center mb-4 py-2 rounded-lg bg-green-50 text-green-700 font-bold">✓ Mercado Pago conectado</p>
+      )}
+      {mp === 'error' && (
+        <p className="text-sm text-center mb-4 py-2 rounded-lg bg-gray-50 text-gray-600 font-bold">No pudimos conectar Mercado Pago — intenta de nuevo.</p>
+      )}
 
       {SLOTS.map(({ key }) => (
         <input
@@ -221,6 +422,8 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
           </button>
         ))}
       </div>
+
+      <MisDisenosSection token={token} cloud_name={cloud_name} upload_preset={upload_preset} mpConectado={artista.mp_conectado} />
 
       <form onSubmit={guardar} className="space-y-4">
         <div>
