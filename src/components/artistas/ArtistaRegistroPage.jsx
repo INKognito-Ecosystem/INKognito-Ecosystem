@@ -414,7 +414,8 @@ export default function ArtistaRegistroPage() {
                 <button
                   type="submit"
                   disabled={enviando}
-                  className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm bg-gray-600"
+                  className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
+                  style={{ backgroundColor: ACCENT }}
                 >
                   {enviando ? 'Enviando...' : 'Enviar registro'}
                 </button>

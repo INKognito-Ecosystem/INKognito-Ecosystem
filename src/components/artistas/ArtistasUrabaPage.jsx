@@ -5,12 +5,14 @@ import NavbarArtistas from './NavbarArtistas'
 import { normalize, municipioMasCercanoNacional, municipioDesdeNombreIP, getCoordsMunicipio, distanciaKm } from '../../data/colombiaGeo'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
-// Rojo → gris (2026-08-05, prueba visual pedida por Jose: "pasalos todos a
-// gris para ver que tal" — pills de INK/tatuador, ícono de la card de
-// reclutamiento, checkmarks, insignias, puntos de confianza). Queda todo
-// controlado por este único valor — volver a '#B3202F' revierte todo el
-// acento rojo de una vez si no convence.
-const ACCENT = '#4B5563'
+// Psicología del color (2026-08-05, decisión final tras probar "todo
+// rojo" y "todo gris"): ninguno de los dos extremos — rojo repetido en
+// insignias/checkmarks/puntos compite consigo mismo y se lee como alerta,
+// no invitación; gris total no le dice al ojo qué es lo importante. ACCENT
+// vuelve a ser rojo, pero reservado para UNA sola acción principal por
+// pantalla (acá: "Unirme como artista") — el resto de elementos usa clases
+// gray-* de Tailwind directamente, ya no depende de esta constante.
+const ACCENT = '#B3202F'
 
 // Puntitos oscuros y muy sutiles sobre fondo blanco (antes eran claros
 // sobre negro) — mismo recurso visual, paleta invertida.
@@ -134,10 +136,7 @@ function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo }) {
           </div>
         )}
         {nuevo && (
-          <span
-            className="absolute top-2 left-2 flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full text-white"
-            style={{ backgroundColor: ACCENT }}
-          >
+          <span className="absolute top-2 left-2 flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full text-white bg-gray-600">
             Nuevo artista
           </span>
         )}
@@ -150,7 +149,7 @@ function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo }) {
               : <span className="text-gray-300 text-[10px] font-black">{a.nombre?.[0]?.toUpperCase() || '?'}</span>}
           </div>
           <p className="font-black uppercase text-xs leading-tight truncate text-gray-900 min-w-0 flex-1">{a.nombre}</p>
-          <BadgeCheck size={13} style={{ color: ACCENT }} className="flex-shrink-0" />
+          <BadgeCheck size={13} className="flex-shrink-0 text-gray-600" />
         </div>
         <p className="text-gray-500 text-[10px] uppercase tracking-wide mt-1.5 truncate">
           {a.municipio}{a.departamento ? `, ${a.departamento}` : ''}
@@ -221,8 +220,7 @@ function SeccionCercanos({ artistas, misCoords, onVerTodo, onVerInfo }) {
 function VerifiedBadge() {
   return (
     <span
-      className="absolute top-2 right-2 flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0"
-      style={{ backgroundColor: ACCENT }}
+      className="absolute top-2 right-2 flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0 bg-gray-600"
       title="Verificado"
     >
       <BadgeCheck size={11} className="text-white" />
@@ -312,13 +310,13 @@ function TarjetaReclutamiento({ query, total, compartir }) {
       : 'Súmate y aparece junto a ellos.'
 
   return (
-    <div className="mt-6 rounded-xl border-2 p-5 md:p-6" style={{ borderColor: `${ACCENT}30`, backgroundColor: `${ACCENT}06` }}>
+    <div className="mt-6 rounded-xl border-2 border-gray-200 bg-gray-50 p-5 md:p-6">
       {/* El ícono solo ocupa la fila del encabezado — antes envolvía
           también el checklist y los botones, dejando un espacio vacío a
           la izquierda en cada línea de esos bloques (Jose, 2026-08-04).
           Checklist y botones ahora van a todo el ancho de la card. */}
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: ACCENT }}>
+        <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-600">
           <Sparkles size={18} className="text-white" />
         </div>
         <div className="flex-1 min-w-0">
@@ -329,15 +327,15 @@ function TarjetaReclutamiento({ query, total, compartir }) {
 
       <ul className="mt-3 space-y-1.5">
         <li className="flex items-center gap-2 text-xs text-gray-600">
-          <Check size={13} style={{ color: ACCENT }} className="flex-shrink-0" />
+          <Check size={13} className="flex-shrink-0 text-gray-500" />
           Apareces en las búsquedas de tu municipio
         </li>
         <li className="flex items-center gap-2 text-xs text-gray-600">
-          <Check size={13} style={{ color: ACCENT }} className="flex-shrink-0" />
+          <Check size={13} className="flex-shrink-0 text-gray-500" />
           Contacto directo por WhatsApp, sin intermediarios
         </li>
         <li className="flex items-center gap-2 text-xs text-gray-600">
-          <Check size={13} style={{ color: ACCENT }} className="flex-shrink-0" />
+          <Check size={13} className="flex-shrink-0 text-gray-500" />
           Sin costo por ahora — sin tarjeta, sin compromiso
         </li>
       </ul>
@@ -345,7 +343,8 @@ function TarjetaReclutamiento({ query, total, compartir }) {
       <div className="mt-4 flex flex-col sm:flex-row gap-2">
         <Link
           to="/tattoo-artist-uraba/unete"
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity bg-gray-600"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
+          style={{ backgroundColor: ACCENT }}
         >
           Unirme como artista
         </Link>
@@ -527,18 +526,18 @@ export default function ArtistasUrabaPage() {
           <div className="pt-5 md:pt-7">
             <h1 className="text-lg sm:text-4xl md:text-5xl font-black uppercase leading-tight whitespace-nowrap">
               Encuentra tu{' '}
-              <span className="inline-block px-2 sm:px-3 py-0.5 rounded-lg text-white" style={{ backgroundColor: ACCENT }}>
+              <span className="inline-block px-2 sm:px-3 py-0.5 rounded-lg text-white bg-gray-600">
                 tatuador
               </span>
             </h1>
             <p className="text-gray-700 text-sm md:text-lg leading-relaxed max-w-2xl mx-auto mt-1.5">
               {/* "INK" — apodo de INKognito para el buscador (Jose,
                   2026-08-05): se agrega como un toque de marca dentro del
-                  copy, en la misma card roja que ya usa "tatuador" en el
+                  copy, en la misma card que ya usa "tatuador" en el
                   título, sin reemplazar "Tattoo Artist Colombia" en
                   navbar/meta/footer — ese texto sigue haciendo el trabajo
                   de explicarle a quien recién llega de qué se trata esto. */}
-              <span className="inline-block px-1.5 py-0.5 rounded-md text-white font-black" style={{ backgroundColor: ACCENT }}>INK</span>. El buscador que conecta personas con tatuadores de toda Colombia. Busca por nombre, municipio o estilo — o deja que detectemos dónde estás.
+              <span className="inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">INK</span>. El buscador que conecta personas con tatuadores de toda Colombia. Busca por nombre, municipio o estilo — o deja que detectemos dónde estás.
             </p>
 
             {/* Señales de confianza, mismo patrón que ya vimos en Tattoodo
@@ -546,11 +545,11 @@ export default function ArtistasUrabaPage() {
                 al pie de la card (2026-08-04). */}
             <div className="flex items-center justify-center gap-4 mt-4 text-gray-600 text-xs md:text-sm font-bold uppercase tracking-wide">
               <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: ACCENT }} />
+                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-gray-500" />
                 Artistas verificados
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: ACCENT }} />
+                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-gray-500" />
                 Reserva fácil
               </span>
             </div>
