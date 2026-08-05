@@ -103,11 +103,21 @@ export default function ArtistaLandingPage() {
 
       <div className="flex-1 pt-16 md:pt-20">
 
-        {/* PORTADA */}
-        <div className="w-full h-40 sm:h-56 md:h-72 bg-gray-100 overflow-hidden">
-          {artista.foto_url_2 && (
-            <img src={artista.foto_url_2} alt="" className="w-full h-full object-cover" loading="eager" />
-          )}
+        {/* PORTADA — antes iba a todo el ancho de la pantalla; en monitores
+            anchos la portada (y más abajo redes sociales/trabajos) crecían
+            sin límite mientras el nombre/bio se quedaban en una columna
+            angosta al centro, generando un desbalance — "en pc el diseño
+            esta exagerado... deberia verse como facebook tambien en pc"
+            (Jose, 2026-08-05). Facebook limita TODO el contenido del
+            perfil a una columna, no solo el texto — acá se hace lo mismo
+            con max-w-3xl en portada/redes/trabajos, igual que ya tenía el
+            bloque de nombre/bio. */}
+        <div className="max-w-3xl mx-auto">
+          <div className="w-full h-40 sm:h-56 md:h-72 bg-gray-100 overflow-hidden">
+            {artista.foto_url_2 && (
+              <img src={artista.foto_url_2} alt="" className="w-full h-full object-cover" loading="eager" />
+            )}
+          </div>
         </div>
 
         <div className="max-w-3xl mx-auto px-4">
@@ -161,13 +171,15 @@ export default function ArtistaLandingPage() {
           </div>
         </div>
 
-        {/* REDES SOCIALES — Facebook e Instagram, siempre visibles a todo el
-            ancho de pantalla en 2 bloques (pedido de Jose, 2026-08-03). Si
-            el artista todavía no tiene el link cargado, el bloque se queda
-            visible pero deshabilitado con un aviso, nunca se oculta.
-            Delgadas, mismo alto que el botón de contacto de abajo. */}
-        <div className="mt-5">
-          <p className="max-w-3xl mx-auto px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-2">Redes sociales</p>
+        {/* REDES SOCIALES — Facebook e Instagram, en 2 bloques a todo el
+            ancho de la COLUMNA del perfil (antes iba a todo el ancho de la
+            pantalla — ver nota de la portada arriba sobre por qué se acotó
+            a max-w-3xl). Si el artista todavía no tiene el link cargado,
+            el bloque se queda visible pero deshabilitado con un aviso,
+            nunca se oculta. Delgadas, mismo alto que el botón de contacto
+            de abajo. */}
+        <div className="mt-5 max-w-3xl mx-auto">
+          <p className="px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-2">Redes sociales</p>
           <div className={`grid grid-cols-2 w-full border-t border-gray-200 ${waLink ? '' : 'border-b'}`}>
             <a
               href={artista.facebook || undefined}
@@ -220,12 +232,14 @@ export default function ArtistaLandingPage() {
           )}
         </div>
 
-        {/* TRABAJOS — fila horizontal a todo el ancho de la pantalla (pedido
-            explícito de Jose, 2026-08-03), rompe el max-w-3xl a propósito.
-            Cada foto abre el lightbox navegable con botón "Ver". */}
+        {/* TRABAJOS — antes iba a todo el ancho de la pantalla; en
+            monitores anchos cada foto crecía sin límite (más de 600px por
+            foto en 1920px) — acotado a max-w-3xl igual que el resto del
+            perfil, ver nota de la portada arriba. Cada foto abre el
+            lightbox navegable con botón "Ver". */}
         {trabajos.length > 0 && (
-          <div className="mt-6">
-            <p className="max-w-3xl mx-auto px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-2">Trabajos</p>
+          <div className="mt-6 max-w-3xl mx-auto">
+            <p className="px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-2">Trabajos</p>
             <div className="grid grid-cols-3 gap-0.5 sm:gap-1 w-full">
               {trabajos.map((src, i) => (
                 <button
