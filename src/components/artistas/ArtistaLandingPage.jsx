@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
-import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, LoaderCircle } from 'lucide-react'
+import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, LoaderCircle, Wallet } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { municipioDesdeNombreIP } from '../../data/colombiaGeo'
 import { idDesdeParam } from './artistaSlug'
@@ -198,6 +198,15 @@ export default function ArtistaLandingPage() {
                 {artista.disponibilidad && (
                   <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ backgroundColor: `${ACCENT}12`, color: ACCENT }}>
                     {artista.disponibilidad}
+                  </span>
+                )}
+                {/* Insignia de confianza (2026-08-05, Jose): que el visitante
+                    sepa, antes de llegar a los diseños, que este artista
+                    acepta pago directo y seguro por la plataforma. */}
+                {artista.mp_conectado && (
+                  <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-green-50 text-green-700">
+                    <Wallet size={11} />
+                    Acepta pagos con Mercado Pago
                   </span>
                 )}
               </div>
