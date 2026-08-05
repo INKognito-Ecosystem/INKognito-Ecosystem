@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLoaderData, useSearchParams } from 'react-router-dom'
-import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink } from 'lucide-react'
+import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
 import { DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO } from '../../data/colombiaGeo'
@@ -132,8 +132,16 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
   const [disenos, setDisenos] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [subiendo, setSubiendo] = useState(null)
+  const [guardando, setGuardando] = useState(false)
   const [nuevo, setNuevo] = useState(NUEVO_VACIO)
+  // null = formulario de "agregar nuevo"; con id = editando ese diseño ya
+  // existente (2026-08-05, bug real reportado por Jose: antes solo se
+  // podía subir uno nuevo, no había forma de editar ni de quitar una
+  // foto puntual de un diseño ya creado — "tengo una de un buho que no
+  // he podido borrar, solo se oculta").
+  const [editando, setEditando] = useState(null)
   const [error, setError] = useState(null)
+  const [guardadoOk, setGuardadoOk] = useState(false)
   const fileInputs = useRef({})
 
   useEffect(() => {
@@ -165,12 +173,30 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
     }
   }
 
+  const quitarFoto = (slot) => setNuevo((n) => ({ ...n, [slot]: '' }))
+
+  const iniciarEdicion = (d) => {
+    setError(null)
+    setEditando(d.id)
+    setNuevo({
+      tipo: d.tipo, titulo: d.titulo || '', descripcion: d.descripcion || '', precio: d.precio,
+      imagen_url: d.imagen_url || '', imagen_url_2: d.imagen_url_2 || '', imagen_url_3: d.imagen_url_3 || '',
+    })
+  }
+
+  const cancelarEdicion = () => {
+    setEditando(null)
+    setNuevo(NUEVO_VACIO)
+    setError(null)
+  }
+
   const agregarDiseno = async () => {
     if (!nuevo.imagen_url || !nuevo.precio) {
       setError('Sube al menos la primera foto y ponle un precio antes de agregarlo.')
       return
     }
     setError(null)
+    setGuardando(true)
     try {
       const res = await fetch(`${PANEL_URL}/api/artistas-disenos-por-token`, {
         method: 'POST',
@@ -181,8 +207,36 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
       const creado = await res.json()
       setDisenos((d) => [...(d || []), creado])
       setNuevo(NUEVO_VACIO)
+      setGuardadoOk(true)
     } catch {
       setError('No pudimos agregar el diseño — intenta de nuevo.')
+    } finally {
+      setGuardando(false)
+    }
+  }
+
+  const guardarEdicion = async () => {
+    if (!nuevo.imagen_url || !nuevo.precio) {
+      setError('El diseño necesita al menos la primera foto y un precio.')
+      return
+    }
+    setError(null)
+    setGuardando(true)
+    try {
+      const res = await fetch(`${PANEL_URL}/api/artistas-disenos-por-token/${editando}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, ...nuevo }),
+      })
+      if (!res.ok) throw new Error()
+      const actualizado = await res.json()
+      setDisenos((ds) => ds.map((x) => x.id === editando ? actualizado : x))
+      cancelarEdicion()
+      setGuardadoOk(true)
+    } catch {
+      setError('No pudimos guardar los cambios — intenta de nuevo.')
+    } finally {
+      setGuardando(false)
     }
   }
 
@@ -199,6 +253,7 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
     const res = await fetch(`${PANEL_URL}/api/artistas-disenos-por-token/${d.id}?token=${encodeURIComponent(token)}`, { method: 'DELETE' })
     if (res.ok) {
       setDisenos((ds) => ds.filter((x) => x.id !== d.id))
+      if (editando === d.id) cancelarEdicion()
     } else if (res.status === 409) {
       setError('Este diseño ya tiene ventas — desactívalo con el switch en vez de borrarlo.')
     }
@@ -232,16 +287,38 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
 
       {cargando ? (
         <p className="text-gray-400 text-xs text-center py-4">Cargando...</p>
+      ) : guardadoOk ? (
+        <div className="text-center py-10">
+          <CheckCircle2 size={40} className="mx-auto mb-3 text-green-600" />
+          <p className="font-black uppercase text-sm mb-1">¡Diseño guardado!</p>
+          <p className="text-gray-500 text-xs mb-5">Ya quedó visible en tu perfil público.</p>
+          <button
+            type="button"
+            onClick={() => setGuardadoOk(false)}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-white font-black uppercase tracking-widest text-[11px] hover:opacity-90 transition-opacity"
+            style={{ backgroundColor: ACCENT }}
+          >
+            ← Volver a mis diseños
+          </button>
+        </div>
       ) : (
         <>
           {disenos && disenos.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
               {disenos.map((d) => (
-                <div key={d.id} className={`relative aspect-square rounded-lg overflow-hidden border ${d.activo ? 'border-gray-200' : 'border-gray-200 opacity-50'}`}>
+                <div key={d.id} className={`relative aspect-square rounded-lg overflow-hidden border-2 ${editando === d.id ? '' : d.activo ? 'border-gray-200' : 'border-gray-200 opacity-50'}`} style={editando === d.id ? { borderColor: ACCENT } : {}}>
                   <img src={d.imagen_url} alt={d.titulo || 'Diseño'} className="w-full h-full object-cover" />
                   <div className="absolute top-1 left-1 bg-black/60 text-white text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full">
                     {d.tipo === 'lamina' ? 'Lámina' : 'Tatuaje'}
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => iniciarEdicion(d)}
+                    aria-label="Editar diseño"
+                    className="absolute top-1 right-1 flex items-center justify-center w-6 h-6 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors"
+                  >
+                    <Pencil size={11} />
+                  </button>
                   <div className="absolute bottom-0 inset-x-0 bg-black/70 text-white text-[10px] px-1.5 py-1 flex items-center justify-between">
                     <span className="font-bold">${Number(d.precio).toLocaleString('es-CO')}</span>
                     <div className="flex items-center gap-1.5">
@@ -258,8 +335,15 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
             </div>
           )}
 
-          {/* Formulario para agregar uno nuevo */}
+          {/* Formulario — agrega uno nuevo, o edita el que se seleccionó
+              con el lápiz de arriba (mismo formulario, distinto modo). */}
           <div className="border border-dashed border-gray-300 rounded-lg p-3 space-y-2.5">
+            {editando && (
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-black uppercase" style={{ color: ACCENT }}>Editando diseño</p>
+                <button type="button" onClick={cancelarEdicion} className="text-gray-400 text-[10px] font-bold uppercase underline">Cancelar</button>
+              </div>
+            )}
             {SLOTS_DISENO.map(({ key }) => (
               <input
                 key={key}
@@ -270,26 +354,40 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
                 onChange={(e) => subirImagen(key, e.target.files?.[0])}
               />
             ))}
-            <p className="text-gray-400 text-[10px]">Hasta 3 fotos — la primera es obligatoria (ej: el diseño solo), las otras 2 son opcionales (ej: sobre piel, otro ángulo).</p>
+            <p className="text-gray-400 text-[10px]">Hasta 3 fotos — la primera es obligatoria (ej: el diseño solo), las otras 2 son opcionales (ej: sobre piel, otro ángulo). Toca una foto para reemplazarla, o la ✕ para quitarla.</p>
             <div className="grid grid-cols-3 gap-2">
-              {SLOTS_DISENO.map(({ key, label }) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => elegirFoto(key)}
-                  className="relative aspect-square rounded-lg bg-gray-50 border border-gray-200 text-gray-400 overflow-hidden"
-                >
-                  {nuevo[key] ? (
-                    <img src={nuevo[key]} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                  ) : subiendo === key ? (
-                    <div className="w-full h-full flex items-center justify-center"><LoaderCircle size={14} className="animate-spin" /></div>
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center gap-1">
-                      <Camera size={13} />
-                      <span className="text-[8px] font-bold uppercase">{label}</span>
-                    </div>
+              {SLOTS_DISENO.map(({ key, label }, i) => (
+                <div key={key} className="relative aspect-square">
+                  <button
+                    type="button"
+                    onClick={() => elegirFoto(key)}
+                    className="w-full h-full rounded-lg bg-gray-50 border border-gray-200 text-gray-400 overflow-hidden"
+                  >
+                    {nuevo[key] ? (
+                      <img src={nuevo[key]} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                    ) : subiendo === key ? (
+                      <div className="w-full h-full flex items-center justify-center"><LoaderCircle size={14} className="animate-spin" /></div>
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center gap-1">
+                        <Camera size={13} />
+                        <span className="text-[8px] font-bold uppercase">{label}</span>
+                      </div>
+                    )}
+                  </button>
+                  {/* Solo las fotos 2 y 3 se pueden quitar del todo — la
+                      primera es obligatoria, siempre tiene que quedar al
+                      menos una. */}
+                  {nuevo[key] && i > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => quitarFoto(key)}
+                      aria-label={`Quitar ${label}`}
+                      className="absolute -top-1.5 -right-1.5 flex items-center justify-center w-5 h-5 rounded-full bg-gray-700 text-white hover:bg-gray-900 transition-colors"
+                    >
+                      <X size={11} />
+                    </button>
                   )}
-                </button>
+                </div>
               ))}
             </div>
 
@@ -323,12 +421,13 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
 
             <button
               type="button"
-              onClick={agregarDiseno}
-              disabled={subiendo}
+              onClick={editando ? guardarEdicion : agregarDiseno}
+              disabled={subiendo || guardando}
               className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-lg border-2 text-xs font-black uppercase tracking-widest disabled:opacity-60"
               style={{ borderColor: ACCENT, color: ACCENT }}
             >
-              <Plus size={14} /> Agregar diseño
+              {guardando ? <LoaderCircle size={14} className="animate-spin" /> : editando ? <Check size={14} /> : <Plus size={14} />}
+              {editando ? 'Guardar cambios' : 'Agregar diseño'}
             </button>
           </div>
         </>
@@ -419,9 +518,6 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
       <h1 className="text-xl font-black uppercase mb-1 text-center">Editar mi perfil</h1>
       <p className="text-gray-500 text-sm text-center mb-6">Hola {artista.nombre} — actualiza lo que necesites.</p>
 
-      {guardado && (
-        <p className="text-sm text-center mb-4 py-2 rounded-lg bg-green-50 text-green-700 font-bold">✓ Cambios guardados</p>
-      )}
       {mp === 'ok' && (
         <p className="text-sm text-center mb-4 py-2 rounded-lg bg-green-50 text-green-700 font-bold">✓ Mercado Pago conectado</p>
       )}
@@ -429,6 +525,27 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
         <p className="text-sm text-center mb-4 py-2 rounded-lg bg-gray-50 text-gray-600 font-bold">No pudimos conectar Mercado Pago — intenta de nuevo.</p>
       )}
 
+      {/* Confirmación a pantalla completa tras guardar (2026-08-05, Jose:
+          "solo espabila y arriba dice cambio exitoso... quiero que dé la
+          sensación de que sí ocurrió algo") — antes era un texto chico
+          que aparecía arriba sin mover nada más, fácil de no notar. Ahora
+          reemplaza todo el contenido hasta que el artista decide volver. */}
+      {guardado ? (
+        <div className="text-center py-14">
+          <CheckCircle2 size={48} className="mx-auto mb-4 text-green-600" />
+          <h2 className="text-lg font-black uppercase mb-2">¡Listo!</h2>
+          <p className="text-gray-500 text-sm mb-6">Guardamos tus cambios correctamente.</p>
+          <button
+            type="button"
+            onClick={() => setGuardado(false)}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white font-black uppercase tracking-widest text-xs hover:opacity-90 transition-opacity"
+            style={{ backgroundColor: ACCENT }}
+          >
+            ← Volver a editar
+          </button>
+        </div>
+      ) : (
+      <>
       {SLOTS.map(({ key }) => (
         <input
           key={key}
@@ -533,6 +650,8 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
           {guardando ? 'Guardando...' : 'Guardar cambios'}
         </button>
       </form>
+      </>
+      )}
     </div>
   )
 }
