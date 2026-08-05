@@ -225,7 +225,10 @@ export default function ArtistaLandingPage() {
                     sepa, antes de llegar a los diseños, que este artista
                     acepta pago directo y seguro por la plataforma. */}
                 {artista.mp_conectado && (
-                  <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-green-50 text-green-700">
+                  <span
+                    className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
+                    style={{ backgroundColor: `${MP_BLUE}14`, color: MP_BLUE }}
+                  >
                     <Wallet size={11} />
                     Acepta pagos con Mercado Pago
                   </span>
