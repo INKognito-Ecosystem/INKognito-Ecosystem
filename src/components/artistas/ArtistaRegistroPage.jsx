@@ -166,12 +166,21 @@ export default function ArtistaRegistroPage() {
 
       {enviado ? (
         <div className="flex-1 pt-20 md:pt-24 max-w-5xl mx-auto px-4 pb-16 w-full">
-          <div className="text-center py-16">
+          <div className="text-center py-16 max-w-sm mx-auto">
             <CheckCircle2 size={48} className="mx-auto mb-4" style={{ color: ACCENT }} />
             <h1 className="text-2xl font-black uppercase mb-3">¡Ya casi!</h1>
-            <p className="text-gray-500 text-sm leading-relaxed max-w-sm mx-auto">
-              Te mandamos un correo a <strong>{form.email}</strong> — ábrelo y confirma para que tu perfil quede activo en el buscador. Sin eso, no aparece.
+            <p className="text-gray-500 text-sm leading-relaxed">
+              Falta un paso para que tu perfil quede activo en el buscador.
             </p>
+            {/* Pasos explícitos (2026-08-05, Jose: "deberia orientar los
+                siguientes pasos para completar la inscripcion de forma
+                correcta" — antes era un solo párrafo, menos claro sobre
+                qué hacer si el correo no llega rápido). */}
+            <ol className="text-left text-gray-600 text-sm leading-relaxed mt-5 space-y-2.5 list-decimal list-inside">
+              <li>Revisa la bandeja de <strong>{form.email}</strong> (y la de spam/promociones, por si acaso).</li>
+              <li>Abre el correo de "Tattoo Artist Colombia" y haz clic en el link de confirmación.</li>
+              <li>Listo — tu perfil se activa al instante, sin que nadie más lo revise.</li>
+            </ol>
             <Link to="/tattoo-artist-uraba" className="inline-block mt-6 text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-opacity text-gray-600">
               ← Volver al buscador
             </Link>
@@ -186,7 +195,7 @@ export default function ArtistaRegistroPage() {
               entre el navbar y una card chica flotante. Ahora es su
               propia sección a todo el ancho, pegada al navbar, sin
               esquinas redondeadas arriba. */}
-          <section className="relative overflow-hidden pt-16 md:pt-20 pb-6 md:pb-8 px-4 md:px-6 bg-gray-300 border-b border-gray-300 text-center">
+          <section className="relative pt-16 md:pt-20 pb-6 md:pb-8 px-4 md:px-6 bg-gray-300 border-b border-gray-300 text-center">
             <h1 className="text-xl sm:text-3xl md:text-4xl font-black uppercase leading-tight whitespace-nowrap pt-5 md:pt-7">
               Únete al{' '}
               <span className="inline-block px-2 sm:px-3 py-0.5 rounded-lg text-white bg-gray-600">
@@ -198,6 +207,20 @@ export default function ArtistaRegistroPage() {
                   (Jose, 2026-08-05) — antes era texto plano acá. */}
               <span className="inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">INK</span> conecta clientes con tatuadores de todo el país. Llena tus datos y mira tu perfil tomar forma en tiempo real.
             </p>
+
+            {/* "¿Ya tienes perfil?" — Jose (2026-08-05): "no lo dejes por
+                haya abajo [footer]... esquina inferior derecha del hero...
+                pero por fuera... como un boton, no solo texto cliqueable".
+                Se ancla a la esquina del <section> (que ya es `relative`,
+                sin overflow-hidden para que SÍ pueda asomarse fuera de la
+                card gris) con -bottom para que quede a caballo entre el
+                hero y el contenido de abajo, en vez de vivir adentro. */}
+            <Link
+              to="/tattoo-artist-uraba/mi-perfil"
+              className="absolute -bottom-4 right-4 md:right-6 inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white border border-gray-300 shadow-md text-gray-700 text-[11px] font-bold uppercase tracking-wide hover:border-gray-500 transition-colors"
+            >
+              ¿Ya tienes perfil? Edítalo
+            </Link>
           </section>
 
           <div className="flex-1 max-w-5xl mx-auto px-4 pt-8 pb-16 w-full">
@@ -439,14 +462,6 @@ export default function ArtistaRegistroPage() {
       <footer className="border-t border-gray-200 py-6 px-4">
         <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-400 text-[12px] gap-3">
           <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Colombia — INKognito. Todos los derechos reservados.</p>
-          {/* Entrada para editar el perfil (2026-08-05) — Jose: vive mejor
-              acá (donde alguien está a punto de registrarse) que en el
-              footer del buscador, que ya tenía su propio "Desarrollado
-              por INKognito" y no debía perderlo. Sin login, el mecanismo
-              real vive en /mi-perfil (pide correo, manda link). */}
-          <Link to="/tattoo-artist-uraba/mi-perfil" className="text-gray-400 hover:text-gray-600 transition-colors">
-            ¿Ya tienes perfil? Edítalo
-          </Link>
           <span className="text-gray-300">Desarrollado por INKognito</span>
         </div>
       </footer>
