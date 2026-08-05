@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, LoaderCircle, Wallet } from 'lucide-react'
@@ -74,6 +74,18 @@ export default function ArtistaLandingPage() {
   const [compradorEmail, setCompradorEmail] = useState('')
   const [comprando, setComprando] = useState(false)
   const [errorCompra, setErrorCompra] = useState(null)
+
+  // Bug real reportado por Jose (2026-08-05): tras redirigir a Mercado
+  // Pago con window.location.href, si el usuario le da "Atrás" del
+  // navegador sin completar el pago, a veces el navegador restaura la
+  // página desde su caché (bfcache) exactamente como quedó al salir — con
+  // el botón congelado en "cargando", porque ese código nunca volvió a
+  // correr. `pageshow` con `event.persisted` detecta justo ese caso.
+  useEffect(() => {
+    const alRestaurar = (e) => { if (e.persisted) setComprando(false) }
+    window.addEventListener('pageshow', alRestaurar)
+    return () => window.removeEventListener('pageshow', alRestaurar)
+  }, [])
 
   if (!artista) return (
     <div className="min-h-screen bg-white flex flex-col">
