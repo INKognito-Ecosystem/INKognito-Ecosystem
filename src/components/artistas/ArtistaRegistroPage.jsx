@@ -43,7 +43,7 @@ export function meta() {
   return [
     { title },
     { name: 'description', content: description },
-    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/tattoo-artist-uraba/unete` },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/tattoo-artist-colombia/unete` },
   ]
 }
 
@@ -181,7 +181,7 @@ export default function ArtistaRegistroPage() {
               <li>Abre el correo de "Tattoo Artist Colombia" y haz clic en el link de confirmación.</li>
               <li>Listo — tu perfil se activa al instante, sin que nadie más lo revise.</li>
             </ol>
-            <Link to="/tattoo-artist-uraba" className="inline-block mt-6 text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-opacity text-gray-600">
+            <Link to="/tattoo-artist-colombia" className="inline-block mt-6 text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-opacity text-gray-600">
               ← Volver al buscador
             </Link>
           </div>
@@ -189,7 +189,7 @@ export default function ArtistaRegistroPage() {
       ) : (
         <>
           {/* Hero fusionado con el navbar (2026-08-05, mismo tratamiento
-              que ArtistasUrabaPage.jsx: "transforma tambien el hero de
+              que ArtistasColombiaPage.jsx: "transforma tambien el hero de
               unete al buscador" — antes esta card vivía adentro del
               contenedor max-w-5xl con pt-20/24, dejando un hueco blanco
               entre el navbar y una card chica flotante. Ahora es su
@@ -216,7 +216,7 @@ export default function ArtistaRegistroPage() {
                 card gris) con -bottom para que quede a caballo entre el
                 hero y el contenido de abajo, en vez de vivir adentro. */}
             <Link
-              to="/tattoo-artist-uraba/mi-perfil"
+              to="/tattoo-artist-colombia/mi-perfil"
               className="absolute -bottom-4 right-4 md:right-6 inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white border border-gray-300 shadow-md text-gray-700 text-[11px] font-bold uppercase tracking-wide hover:border-gray-500 transition-colors"
             >
               ¿Ya tienes perfil? Edítalo

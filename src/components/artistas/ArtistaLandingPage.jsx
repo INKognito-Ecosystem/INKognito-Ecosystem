@@ -396,7 +396,7 @@ export default function ArtistaLandingPage() {
 
         <div className="max-w-3xl mx-auto px-4">
           <div className="border-t border-gray-200 pt-5 mt-6 pb-10">
-            <Link to="/tattoo-artist-uraba" className="text-gray-400 hover:text-gray-900 text-xs uppercase tracking-widest transition-colors">
+            <Link to="/tattoo-artist-colombia" className="text-gray-400 hover:text-gray-900 text-xs uppercase tracking-widest transition-colors">
               ← Ver más artistas
             </Link>
           </div>

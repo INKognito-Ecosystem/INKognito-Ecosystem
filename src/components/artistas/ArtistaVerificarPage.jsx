@@ -51,7 +51,7 @@ export default function ArtistaVerificarPage() {
                   Ver mi perfil
                 </Link>
                 <Link
-                  to="/tattoo-artist-uraba"
+                  to="/tattoo-artist-colombia"
                   className="inline-flex items-center justify-center px-5 py-2.5 rounded-full border border-gray-300 text-gray-600 text-xs font-bold uppercase tracking-widest hover:border-gray-500 transition-colors"
                 >
                   Ir al buscador
@@ -66,7 +66,7 @@ export default function ArtistaVerificarPage() {
               <p className="text-gray-400 text-xs mt-4">
                 Si el link venció, regístrate de nuevo o escríbenos.
               </p>
-              <Link to="/tattoo-artist-uraba/unete" className="inline-block mt-6 text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-opacity text-gray-600">
+              <Link to="/tattoo-artist-colombia/unete" className="inline-block mt-6 text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-opacity text-gray-600">
                 ← Volver a intentar
               </Link>
             </>

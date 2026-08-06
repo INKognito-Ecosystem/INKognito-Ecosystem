@@ -31,7 +31,7 @@ import LogoLupaIntro from './LogoLupaIntro'
 // azul de la hamburguesa tricolor casi no se veía sobre el fondo gris muy
 // oscuro original (gray-800). Se probó blanco puro, pero Jose pidió un
 // punto intermedio: gris más oscuro que el hero (que a su vez se oscureció
-// un poco, ver ArtistasUrabaPage.jsx), para que el navbar mantenga algo de
+// un poco, ver ArtistasColombiaPage.jsx), para que el navbar mantenga algo de
 // peso visual sin volver a esconder el azul. Con el navbar de nuevo en un
 // tono medio/oscuro, logo/textos vuelven a la versión clara (como en el
 // diseño original), no la oscura que se usó durante la versión blanca.
@@ -50,7 +50,7 @@ export default function NavbarArtistas({ ciudadDetectada = null }) {
               navbar (absolute + left-1/2), no en el espacio libre entre
               logo y hamburguesa, para que quede alineado con el centro
               real de la barra sin importar el ancho de cada lado. */}
-          <Link to="/tattoo-artist-uraba" className="flex items-center flex-shrink-0">
+          <Link to="/tattoo-artist-colombia" className="flex items-center flex-shrink-0">
             {/* Medido contra el navbar de Supply con Playwright+sharp: su
                 logo ocupa ~57% de su caja de w-12/w-14 (el archivo trae aire
                 de fábrica) — acá el archivo ya viene recortado, así que el
@@ -66,7 +66,7 @@ export default function NavbarArtistas({ ciudadDetectada = null }) {
           </Link>
 
           <Link
-            to="/tattoo-artist-uraba"
+            to="/tattoo-artist-colombia"
             className="absolute left-1/2 -translate-x-1/2 text-base md:text-xl font-black uppercase tracking-wide leading-tight whitespace-nowrap"
           >
             <span className="text-gray-100">Tattoo Artist</span>{' '}
@@ -104,7 +104,7 @@ export default function NavbarArtistas({ ciudadDetectada = null }) {
 
       {menuOpen && (
         <div className="absolute right-4 top-16 md:top-20 bg-white border border-gray-200 w-56 z-50 shadow-lg">
-          <Link to="/tattoo-artist-uraba" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">
+          <Link to="/tattoo-artist-colombia" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">
             Inicio
           </Link>
           <InkognitoModuleMenu

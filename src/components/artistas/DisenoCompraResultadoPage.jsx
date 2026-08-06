@@ -46,7 +46,7 @@ export default function DisenoCompraResultadoPage() {
               </p>
             </>
           )}
-          <Link to="/tattoo-artist-uraba" className="inline-block mt-6 text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-opacity text-gray-600">
+          <Link to="/tattoo-artist-colombia" className="inline-block mt-6 text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-opacity text-gray-600">
             ← Volver al buscador
           </Link>
         </div>

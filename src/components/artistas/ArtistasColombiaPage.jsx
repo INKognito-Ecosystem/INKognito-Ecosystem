@@ -55,7 +55,7 @@ export function meta() {
     { name: 'description', content: description },
     { property: 'og:title', content: title },
     { property: 'og:description', content: description },
-    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/tattoo-artist-uraba` },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/tattoo-artist-colombia` },
   ]
 }
 
@@ -343,7 +343,7 @@ function TarjetaReclutamiento({ query, total, compartir }) {
 
       <div className="mt-4 flex flex-col sm:flex-row gap-2">
         <Link
-          to="/tattoo-artist-uraba/unete"
+          to="/tattoo-artist-colombia/unete"
           className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
           style={{ backgroundColor: ACCENT }}
         >
@@ -397,14 +397,15 @@ function ModalInfoArtista({ artista, onClose }) {
 }
 
 // Módulo nuevo (2026-08-03), desplegado sin exponer aún — ver plan de
-// "Directorio de artistas de tatuaje en Urabá". Tercera vuelta de diseño
-// el mismo día: v1 (grid de fotos negro) genérica; v2 (pills municipio +
-// pills estilo sobre negro) se sentía a pestañas; ahora Jose pidió pasar
-// a paleta blanco/rojo/gris (en vez del negro original) y mover el
-// nombre del módulo al navbar propio (NavbarArtistas.jsx) — el eyebrow
-// "Tattoo Artist Urabá" que vivía arriba del H1 alejaba demasiado el
-// título del navbar.
-export default function ArtistasUrabaPage() {
+// "Directorio de artistas de tatuaje en Urabá" (nombre original del plan;
+// el módulo pasó a llamarse "Tattoo Artist Colombia" el 2026-08-04 con la
+// expansión nacional del registro — ver NavbarArtistas.jsx). Tercera vuelta
+// de diseño el mismo día: v1 (grid de fotos negro) genérica; v2 (pills
+// municipio + pills estilo sobre negro) se sentía a pestañas; ahora Jose
+// pidió pasar a paleta blanco/rojo/gris (en vez del negro original) y mover
+// el nombre del módulo al navbar propio (NavbarArtistas.jsx) — el eyebrow
+// que vivía arriba del H1 alejaba demasiado el título del navbar.
+export default function ArtistasColombiaPage() {
   const { artistas, ciudadDetectada } = useLoaderData()
   const [query, setQuery] = useState('')
   const [ubicando, setUbicando] = useState(false)
@@ -492,7 +493,7 @@ export default function ArtistasUrabaPage() {
   // de dejarlo sin ninguna acción posible.
   const compartir = () => {
     const texto = 'Encuentra tatuadores en toda Colombia — el buscador que conecta clientes con artistas de tatuaje.'
-    const url = 'https://inkognito-ecosystem.com/tattoo-artist-uraba'
+    const url = 'https://inkognito-ecosystem.com/tattoo-artist-colombia'
     if (navigator.share) {
       navigator.share({ title: 'Tattoo Artist Colombia', text: texto, url }).catch(() => {})
     } else {

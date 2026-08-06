@@ -23,6 +23,7 @@ export default [
   route('cuidados', 'components/tattoo/CuidadosPage.jsx'),
   route('p/:id', 'components/landing/ProductLandingPage.jsx'),
   route('pedido/:module', 'components/pedido/PedidoOnlinePage.jsx'),
+  route('anllyfit', 'routes/AnllyFitPage.jsx'),
 
   // Legal
   route('privacidad', 'components/legal/PrivacidadPage.jsx'),
@@ -85,14 +86,16 @@ export default [
   route('suplementos/vitaminas', 'components/suplementos/categories/VitaminasPage.jsx'),
   route('suplementos/accesorios', 'components/suplementos/categories/AccesoriosPage.jsx'),
 
-  // Tattoo Artist Urabá — directorio de artistas (2026-08-03). Desplegado
-  // sin exponer aún: sin link desde InkognitoHome.jsx ni ningún navbar,
-  // adrede — ver plan "Directorio de artistas de tatuaje en Urabá".
-  route('tattoo-artist-uraba', 'components/artistas/ArtistasUrabaPage.jsx'),
-  route('tattoo-artist-uraba/unete', 'components/artistas/ArtistaRegistroPage.jsx'),
+  // Tattoo Artist Colombia — directorio de artistas (2026-08-03, renombrado
+  // de "Urabá" a "Colombia" el 2026-08-06 tras la expansión nacional del
+  // registro). Desplegado sin exponer aún: sin link desde InkognitoHome.jsx
+  // ni ningún navbar, adrede — ver plan "Directorio de artistas de tatuaje
+  // en Urabá" (nombre original del plan).
+  route('tattoo-artist-colombia', 'components/artistas/ArtistasColombiaPage.jsx'),
+  route('tattoo-artist-colombia/unete', 'components/artistas/ArtistaRegistroPage.jsx'),
   // Verificación de correo + edición de perfil por token (2026-08-05) —
   // ver server.js (panel) para el flujo completo.
-  route('tattoo-artist-uraba/mi-perfil', 'components/artistas/ArtistaEditarPerfilPage.jsx'),
+  route('tattoo-artist-colombia/mi-perfil', 'components/artistas/ArtistaEditarPerfilPage.jsx'),
   route('artista/verificar', 'components/artistas/ArtistaVerificarPage.jsx'),
   // Venta de diseños (2026-08-05) — a donde vuelve el comprador tras pagar
   // en Mercado Pago (back_urls de POST /api/disenos-comprar, panel).
