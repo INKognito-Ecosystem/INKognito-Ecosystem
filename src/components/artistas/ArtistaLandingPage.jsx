@@ -103,6 +103,9 @@ export default function ArtistaLandingPage() {
   // ambas secciones (tatuar/digital), ya que los ids de disenos son
   // únicos entre las dos.
   const [disenosExpandidos, setDisenosExpandidos] = useState({})
+  // "Ver más" de la bio (2026-08-06) — mismo patrón, un solo bloque de
+  // bio por perfil así que alcanza con un booleano simple.
+  const [bioExpandida, setBioExpandida] = useState(false)
   // Aviso al hacer clic en una red social que el artista no puso
   // (2026-08-06, Jose: "debería salirle un mensaje que diga que el
   // artista no la puso, pero algo bien profesional") — antes el clic no
@@ -480,7 +483,24 @@ export default function ArtistaLandingPage() {
             {artista.bio && (
               <div className="relative max-w-xl">
                 <div className="bg-gray-100 border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3.5">
-                  <p className="text-gray-700 text-sm leading-relaxed">{artista.bio}</p>
+                  {/* "Ver más" (2026-08-06, Jose: "si la info de sobre mí
+                      sobrepasa las 3 líneas, deberá aparecer el botón ver
+                      más como el que implementamos en la card de los
+                      diseños") — mismo patrón: recorte por defecto, scroll
+                      interno con max-h al expandir en vez de dejar que la
+                      burbuja crezca sin límite. */}
+                  <p className={`text-gray-700 text-sm leading-relaxed ${bioExpandida ? 'max-h-32 overflow-y-auto pr-1' : 'line-clamp-3'}`}>
+                    {artista.bio}
+                  </p>
+                  {artista.bio.length > 100 && (
+                    <button
+                      type="button"
+                      onClick={() => setBioExpandida((v) => !v)}
+                      className="text-[10px] font-black uppercase tracking-wide mt-1.5 text-gray-700 hover:opacity-70 transition-opacity"
+                    >
+                      {bioExpandida ? 'Ver menos' : 'Ver más'}
+                    </button>
+                  )}
                 </div>
                 <span className="absolute -top-3 left-4 px-2.5 py-1 rounded-full bg-white border border-gray-300 shadow-sm text-[10px] font-black uppercase tracking-widest text-gray-500">
                   Sobre mí
@@ -508,48 +528,43 @@ export default function ArtistaLandingPage() {
               </div>
             )}
 
+            {/* PORTAFOLIO — v2 (2026-08-06, Jose: "encierra portafolio en
+                una card gris... ponlo a la izquierda, para que el título
+                y descripción sean una sola línea... para que no quede
+                lejos de la card de sobre mí") — pasa de sección suelta a
+                todo el ancho, a una card compacta del mismo ancho que la
+                burbuja de bio (max-w-xl) y dentro del mismo space-y-2,
+                así el espaciado entre ambas es automático y mínimo.
+                Título+descripción combinados en un solo `<p>` con
+                truncate — nunca se parte en dos líneas sin importar el
+                largo del nombre/municipio. */}
+            {trabajos.length > 0 && (
+              <div className="max-w-xl">
+                <div className="bg-gray-100 border border-gray-200 rounded-2xl overflow-hidden">
+                  <p className="px-4 pt-3.5 pb-2 text-gray-400 text-[11px] text-left truncate">
+                    <span className="uppercase tracking-widest font-bold text-gray-500">Portafolio</span> — Tatuajes hechos por {artista.nombre} en {artista.municipio}
+                  </p>
+                  <div className="grid grid-cols-3 gap-0.5 sm:gap-1 w-full">
+                    {trabajos.map((src, i) => (
+                      <button
+                        key={src}
+                        type="button"
+                        onClick={() => setLightbox(i)}
+                        className="relative aspect-square bg-gray-50 overflow-hidden group"
+                      >
+                        <img src={src} alt={`Trabajo ${i + 1} de ${artista.nombre}`} className="w-full h-full object-cover" loading="lazy" />
+                        <span className="absolute bottom-1.5 right-1.5 flex items-center justify-center w-6 h-6 bg-black/60 text-white rounded-full backdrop-blur-sm group-hover:bg-black/80 transition-colors">
+                          <Search size={12} />
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
-
-        {/* TRABAJOS — subido acá arriba, justo después de la bio y antes
-            de Agenda en línea (2026-08-06, Jose: "las personas que entran
-            no ven de una vez el portafolio" — antes vivía debajo de
-            Agenda en línea Y de Diseños a la venta, dos bloques de venta
-            antes de que se viera un solo tatuaje real. Quien visita
-            decide primero por el trabajo, no por el precio). Antes iba a
-            todo el ancho de la pantalla; en monitores anchos cada foto
-            crecía sin límite (más de 600px por foto en 1920px) — acotado
-            a max-w-3xl igual que el resto del perfil. Cada foto abre el
-            lightbox navegable con botón "Ver". Frase corta bajo el
-            título con fin de SEO, no informativa para el visitante (las
-            fotos ya se explican solas). */}
-        {/* mt-3 en vez de mt-6 (2026-08-06, Jose: "el título Portafolio
-            quedó muy lejos de la card de Sobre mí") — antes esta sección
-            vivía después de Agenda en línea/Diseños, con más elementos de
-            por medio; al subirla justo debajo de la bio, el mismo
-            margen que se usaba entre secciones más grandes se sentía
-            como un salto de más. */}
-        {trabajos.length > 0 && (
-          <div className="mt-3 max-w-3xl mx-auto">
-            <p className="px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-1 text-center">Portafolio</p>
-            <p className="px-4 text-gray-400 text-[11px] mb-2 text-center">Tatuajes hechos por {artista.nombre} en {artista.municipio}</p>
-            <div className="grid grid-cols-3 gap-0.5 sm:gap-1 w-full">
-              {trabajos.map((src, i) => (
-                <button
-                  key={src}
-                  type="button"
-                  onClick={() => setLightbox(i)}
-                  className="relative aspect-square bg-gray-50 overflow-hidden group"
-                >
-                  <img src={src} alt={`Trabajo ${i + 1} de ${artista.nombre}`} className="w-full h-full object-cover" loading="lazy" />
-                  <span className="absolute bottom-1.5 right-1.5 flex items-center justify-center w-6 h-6 bg-black/60 text-white rounded-full backdrop-blur-sm group-hover:bg-black/80 transition-colors">
-                    <Search size={12} />
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
         <div className="max-w-3xl mx-auto px-4">
           <div className="mt-6 space-y-2">
