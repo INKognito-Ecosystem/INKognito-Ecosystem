@@ -35,7 +35,11 @@ import LogoLupaIntro from './LogoLupaIntro'
 // peso visual sin volver a esconder el azul. Con el navbar de nuevo en un
 // tono medio/oscuro, logo/textos vuelven a la versión clara (como en el
 // diseño original), no la oscura que se usó durante la versión blanca.
-export default function NavbarArtistas({ ciudadDetectada = null }) {
+// titulo (2026-08-06) — override opcional del wordmark central, solo para
+// pantallas de tarea puntual (ej. "Editar mi perfil") donde repetir el
+// nombre de marca no orienta tanto como decir en qué pantalla está el
+// artista. Sigue enlazando a /tattoo-artist-colombia igual que siempre.
+export default function NavbarArtistas({ ciudadDetectada = null, titulo = null }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const close = () => setMenuOpen(false)
 
@@ -69,10 +73,16 @@ export default function NavbarArtistas({ ciudadDetectada = null }) {
             to="/tattoo-artist-colombia"
             className="absolute left-1/2 -translate-x-1/2 text-base md:text-xl font-black uppercase tracking-wide leading-tight whitespace-nowrap"
           >
-            <span className="text-gray-100">Tattoo Artist</span>{' '}
-            {ciudadDetectada
-              ? <AnimatedCityWordmark ciudad={ciudadDetectada.municipio} />
-              : <span className="text-gray-300">Colombia</span>}
+            {titulo ? (
+              <span className="text-gray-100">{titulo}</span>
+            ) : (
+              <>
+                <span className="text-gray-100">Tattoo Artist</span>{' '}
+                {ciudadDetectada
+                  ? <AnimatedCityWordmark ciudad={ciudadDetectada.municipio} />
+                  : <span className="text-gray-300">Colombia</span>}
+              </>
+            )}
           </Link>
 
           {/* Hamburguesa tricolor — pedido de Jose (2026-08-05), colores de

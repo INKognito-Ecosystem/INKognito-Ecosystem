@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
-import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, LoaderCircle, Wallet } from 'lucide-react'
+import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { municipioDesdeNombreIP } from '../../data/colombiaGeo'
 import { idDesdeParam } from './artistaSlug'
+import { DISPONIBILIDAD_COLOR, DISPONIBILIDAD_TEXTO } from './disponibilidad'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const ACCENT = '#B3202F'
@@ -27,6 +28,19 @@ const conMarcaDeAgua = (url) => {
   if (!url || !url.includes('/upload/')) return url
   const marca = 'l_text:Arial_50_bold:INKognito,co_white,o_30,a_-30,g_center'
   return url.replace('/upload/', `/upload/${marca}/`)
+}
+
+// precio_sesion_texto es texto libre (no un número) a propósito — muchos
+// artistas prefieren escribir "depende del tamaño" en vez de un precio
+// exacto. Pero si SÍ escribieron solo dígitos (2026-08-06, Jose: "el
+// número se muestra sin comas"), se le da formato de miles como a
+// cualquier otro precio del sitio — sin tocar el texto si no es un
+// número puro.
+const formatearValorSesion = (texto) => {
+  if (!texto) return texto
+  const limpio = texto.trim()
+  if (!/^\d+$/.test(limpio)) return texto
+  return `$${Number(limpio).toLocaleString('es-CO')}`
 }
 
 export async function loader({ params, request }) {
@@ -80,6 +94,10 @@ export default function ArtistaLandingPage() {
   const [lightbox, setLightbox] = useState(null)
   const touchStartX = useRef(null)
   const [disenoComprando, setDisenoComprando] = useState(null)
+  // "Ver más" por diseño (2026-08-06) — objeto {id: bool} compartido entre
+  // ambas secciones (tatuar/digital), ya que los ids de disenos son
+  // únicos entre las dos.
+  const [disenosExpandidos, setDisenosExpandidos] = useState({})
   const [modalImgIdx, setModalImgIdx] = useState(0)
   const [compradorEmail, setCompradorEmail] = useState('')
   const [comprando, setComprando] = useState(false)
@@ -95,6 +113,24 @@ export default function ArtistaLandingPage() {
   const [resMensaje, setResMensaje] = useState('')
   const [enviandoReserva, setEnviandoReserva] = useState(false)
   const [errorReserva, setErrorReserva] = useState(null)
+  const [mostrarTerminos, setMostrarTerminos] = useState(false)
+
+  // Diseños agrupados por tipo, cada uno detrás de su propio botón
+  // desplegable. v3 (2026-08-06, Jose: primero pidió que ambas categorías
+  // arrancaran visibles si tenían productos, pero corrigió — "no se
+  // puede, una card ya ocupa el ancho de la pantalla; si tiene diseño en
+  // ambos lugares, debe mostrar primero el diseño antes que la lámina...
+  // la otra aparecerá si yo le doy al botón") — vuelve a ser mutuamente
+  // excluyente (una sola sección abierta a la vez), pero con un valor
+  // inicial inteligente en vez de arrancar cerrado: "tatuar" tiene
+  // prioridad si el artista tiene de los dos tipos, "digital" solo si es
+  // lo único que tiene.
+  const [seccionDisenos, setSeccionDisenos] = useState(() => {
+    const d = artista?.disenos || []
+    if (d.some((x) => x.tipo !== 'lamina')) return 'tatuar'
+    if (d.some((x) => x.tipo === 'lamina')) return 'digital'
+    return null
+  })
 
   // Bug real reportado por Jose (2026-08-05): tras redirigir a Mercado
   // Pago con window.location.href, si el usuario le da "Atrás" del
@@ -138,6 +174,86 @@ export default function ArtistaLandingPage() {
 
   const trabajos = [artista.foto_trabajo_1, artista.foto_trabajo_2, artista.foto_trabajo_3].filter(Boolean)
   const disenos = artista.disenos || []
+  const disenosTatuar = disenos.filter((d) => d.tipo !== 'lamina')
+  const disenosDigital = disenos.filter((d) => d.tipo === 'lamina')
+
+  // v2 (2026-08-06, Jose: "la descripción... por lo que veo no aparece
+  // en ningún lado" — antes vivía solo dentro del modal de compra, nunca
+  // ayudaba a decidir ANTES del clic en "Comprar"). Card horizontal:
+  // imagen a la izquierda (limpia, sin precio encima — se movió abajo
+  // para no tapar el detalle del trazo), título+descripción+precio a la
+  // derecha. Varios diseños hacen scroll lateral, mismo patrón ya
+  // probado en "Artistas más cercanos" (ArtistasColombiaPage.jsx).
+  // v3 (2026-08-06, Jose: "ojo que redujiste el tamaño de la card, la
+  // idea es que estos dos bloques... ocupen todo el ancho de la
+  // pantalla") — cada card pasa a ser un slide de ancho completo (una
+  // por pantalla, no varias chiquitas visibles a la vez); con varios
+  // diseños se hace scroll lateral para pasar al siguiente. Imagen y
+  // panel de texto se reparten ese ancho completo entre los dos.
+  const renderGridDisenos = (items) => (
+    <div className="flex overflow-x-auto px-4 snap-x snap-mandatory scrollbar-hide">
+      {items.map((d) => (
+        <div key={d.id} className="w-full flex-shrink-0 snap-center">
+          {/* v4 (2026-08-06, Jose: "la card quedó muy larga... debería
+              adaptarse al tamaño de fotos que suban") — al revés de la
+              v3: ahí el texto (variable, según lo que escriba cada
+              artista) mandaba el alto y la imagen se estiraba para
+              alcanzarlo, tamaño impredecible. Ahora la imagen tiene su
+              propia proporción fija (retrato, aspect-[4/5] — le sienta
+              mejor a fotos de tatuaje que un cuadrado) y el texto se
+              recorta más corto (line-clamp-3) para no desbordarse mucho
+              más allá de esa altura. Card consistente sin importar cuán
+              largo escriba el artista. */}
+          <div className="flex items-stretch bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
+            {/* self-start (2026-08-06) — sin esto, "items-stretch" del
+                padre estira la imagen para igualar el alto del texto
+                expandido, exactamente el problema que se acaba de
+                corregir. Con self-start, la imagen se queda en su propia
+                altura (aspect-[4/5]) sin importar cuánto crezca el texto
+                al lado. */}
+            <div className="w-2/5 sm:w-1/3 flex-shrink-0 self-start aspect-[4/5] bg-gray-100 overflow-hidden">
+              <img src={conMarcaDeAgua(d.imagen_url)} alt={d.titulo || 'Diseño'} className="w-full h-full object-cover" loading="lazy" />
+            </div>
+            <div className="flex-1 min-w-0 pt-3 pb-4 px-4 flex flex-col justify-start">
+              <p className="font-black text-sm uppercase leading-tight">{d.titulo || 'Diseño'}</p>
+              {d.descripcion && (
+                <>
+                  {/* "Ver más" (2026-08-06, Jose) — por defecto recortado a
+                      3 líneas; al expandir, scroll interno con max-h en
+                      vez de dejar que la card crezca sin límite. El
+                      umbral de 100 caracteres es un estimado de cuándo un
+                      texto ya no cabe en 3 líneas a este ancho/tamaño —
+                      no hay forma barata de medirlo exacto en CSS puro. */}
+                  <p className={`text-gray-500 text-xs leading-relaxed mt-1.5 ${disenosExpandidos[d.id] ? 'max-h-24 overflow-y-auto pr-1' : 'line-clamp-3'}`}>
+                    {d.descripcion}
+                  </p>
+                  {d.descripcion.length > 100 && (
+                    <button
+                      type="button"
+                      onClick={() => setDisenosExpandidos((s) => ({ ...s, [d.id]: !s[d.id] }))}
+                      className="text-[10px] font-black uppercase tracking-wide mt-1 self-start hover:opacity-70 transition-opacity"
+                      style={{ color: MP_BLUE }}
+                    >
+                      {disenosExpandidos[d.id] ? 'Ver menos' : 'Ver más'}
+                    </button>
+                  )}
+                </>
+              )}
+              <button
+                type="button"
+                onClick={() => { setDisenoComprando(d); setErrorCompra(null); setModalImgIdx(0) }}
+                className="mt-auto self-end flex items-center gap-1.5 text-white text-xs font-black uppercase tracking-wide px-3.5 py-2.5 rounded-full hover:opacity-90 transition-opacity"
+                style={{ backgroundColor: MP_BLUE }}
+              >
+                <ShoppingBag size={13} />
+                ${Number(d.precio).toLocaleString('es-CO')}
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
 
   const comprarDiseno = async (e) => {
     e.preventDefault()
@@ -219,9 +335,23 @@ export default function ArtistaLandingPage() {
 
         <div className="max-w-3xl mx-auto px-4">
 
-          {/* AVATAR — se monta sobre la portada, mismo patrón de perfil */}
-          <div className="relative -mt-12 sm:-mt-16 md:-mt-20">
-            <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full border-4 border-white bg-gray-100 shadow-md overflow-hidden">
+          {/* AVATAR + NOMBRE/UBICACIÓN/ESPECIALIDAD lado a lado (2026-08-06).
+              v3, Jose: "más grande el círculo... ya no dividido a la mitad,
+              un poquito más abajo como lo está Facebook" — sigue siendo
+              posicionamiento absoluto (garantiza el offset exacto que se
+              pida, sin depender de cómo flex mide cajas con margen
+              negativo), solo que ahora sube 1/3 de la altura del avatar en
+              vez de la mitad, dejando 2/3 del círculo por debajo de la
+              portada — mismo mecanismo, proporción distinta.
+              min-h-* en el contenedor (2026-08-06, Jose: "el texto quedó
+              muy pegado... se mete debajo de él") — el avatar es absolute,
+              así que NO le suma altura a este contenedor; sin el min-h, lo
+              que viene después (los badges) arrancaba apenas termina el
+              bloque de texto (más bajo que el avatar) y el avatar de abajo
+              se lo tapaba. El min-h es la porción del avatar que cuelga
+              por debajo del punto de anclaje (2/3 de su alto). */}
+          <div className="relative min-h-16 sm:min-h-[85px] md:min-h-[107px]">
+            <div className="absolute left-0 top-0 -translate-y-1/3 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full border-4 border-white bg-gray-100 shadow-md overflow-hidden">
               {artista.foto_url ? (
                 <img src={artista.foto_url} alt={artista.nombre} className="w-full h-full object-cover" loading="eager" />
               ) : (
@@ -230,50 +360,81 @@ export default function ArtistaLandingPage() {
                 </div>
               )}
             </div>
+
+            <div className="min-w-0 pt-2 pl-[108px] sm:pl-[144px] md:pl-[176px] flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <h1 className="text-base sm:text-xl md:text-2xl font-black uppercase leading-tight truncate">{artista.nombre}</h1>
+                {/* Ciudad y especialidad apiladas, cada una en su propia
+                    línea (2026-08-06, Jose) — antes iban lado a lado en una
+                    sola fila. */}
+                <div className="mt-1 space-y-0.5">
+                  <span className="flex items-center gap-1 text-[9px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 truncate">
+                    <MapPin size={10} className="flex-shrink-0" />
+                    <span className="truncate">{artista.municipio}{artista.departamento ? `, ${artista.departamento}` : ''}</span>
+                  </span>
+                  {artista.estilo && (
+                    <span className="flex items-center gap-1 text-[9px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 truncate">
+                      <Palette size={10} className="flex-shrink-0" />
+                      <span className="truncate">{artista.estilo}</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Precio (2026-08-06, Jose: "esa información va a
+                  aparecer... por el lado derecho de la pantalla" — antes
+                  vivía en su propia fila debajo de todo el encabezado,
+                  empujando la bio hacia abajo; ahora comparte la misma
+                  fila que nombre/ubicación, alineado a la derecha).
+                  Disponibilidad ya no va acá — se movió arriba de la
+                  card "Sobre mí" (ver más abajo). */}
+              {artista.precio_nivel && (
+                <span className="flex-shrink-0 text-xs font-bold tracking-widest text-gray-500 pt-0.5">{'$'.repeat(artista.precio_nivel)}</span>
+              )}
+            </div>
           </div>
 
-          <div className="mt-4 space-y-2">
+          {/* mt-6 (2026-08-06, Jose: "pegaste mucho 'sobre mí' a la foto
+              de perfil") — precio/disponibilidad ya no viven acá para dar
+              ese respiro, hay que ponerlo explícito en el margen. */}
+          <div className="mt-6 space-y-2">
 
-            <div>
-              <h1 className="text-2xl md:text-4xl font-black uppercase leading-tight">{artista.nombre}</h1>
-              <div className="flex items-center gap-3 mt-1 flex-wrap">
-                <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-gray-500">
-                  <MapPin size={13} />
-                  {artista.municipio}{artista.departamento ? `, ${artista.departamento}` : ''}
-                </span>
-                {artista.estilo && (
-                  <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-gray-500">
-                    <Palette size={13} />
-                    {artista.estilo}
-                  </span>
-                )}
-                {artista.precio_nivel && (
-                  <span className="text-xs font-bold tracking-widest text-gray-500">{'$'.repeat(artista.precio_nivel)}</span>
-                )}
-                {artista.disponibilidad && (
-                  <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ backgroundColor: `${ACCENT}12`, color: ACCENT }}>
-                    {artista.disponibilidad}
-                  </span>
-                )}
-                {/* Insignia de confianza (2026-08-05, Jose): que el visitante
-                    sepa, antes de llegar a los diseños, que este artista
-                    acepta pago directo y seguro por la plataforma. */}
-                {artista.mp_conectado && (
-                  <span
-                    className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
-                    style={{ backgroundColor: `${MP_BLUE}14`, color: MP_BLUE }}
-                  >
-                    <Wallet size={11} />
-                    Acepta pagos con Mercado Pago
-                  </span>
-                )}
-              </div>
-            </div>
-
+            {/* "Sobre mí" (2026-08-06, Jose: "el mismo sistema... como
+                está Mercado Pago en la card de agenda en línea, y que la
+                descripción parezca que está contenida en un chat") —
+                mismo truco de insignia mitad afuera/mitad adentro que ya
+                usa el badge de MP, acá arriba en vez de abajo. La esquina
+                superior izquierda de la burbuja se deja cuadrada
+                (rounded-tl-sm) para que se lea como una burbuja de chat,
+                justo donde "clipa" la insignia. */}
             {artista.bio && (
-              <div>
-                <p className="text-gray-400 text-[11px] uppercase tracking-widest mb-1">Sobre mí</p>
-                <p className="text-gray-600 text-sm leading-relaxed max-w-xl">{artista.bio}</p>
+              <div className="relative max-w-xl">
+                <div className="bg-gray-100 border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3.5">
+                  <p className="text-gray-700 text-sm leading-relaxed">{artista.bio}</p>
+                </div>
+                <span className="absolute -top-3 left-4 px-2.5 py-1 rounded-full bg-white border border-gray-300 shadow-sm text-[10px] font-black uppercase tracking-widest text-gray-500">
+                  Sobre mí
+                </span>
+                {/* Disponibilidad (2026-08-06, Jose: "ponlo justo encima
+                    de la card 'sobre mí', pero por su lado derecho" — y
+                    "quedó como si fuera una burbuja que hace parte de la
+                    bio, debe quedar encimita") — v2: antes usaba un
+                    fondo del acento casi transparente (7% opacidad), que
+                    se perdía contra el gris de la burbuja y parecía texto
+                    suelto adentro. Ahora fondo sólido + sombra (mismo
+                    "pop" que ya usa la insignia de MP) y -top-4 en vez de
+                    -top-3, para que quede claramente montada encima, no
+                    incrustada. Color sólido por estado, no el rojo de
+                    marca — "Disponible ahora" debe leerse como algo
+                    bueno a simple vista. */}
+                {artista.disponibilidad && (
+                  <span
+                    className="absolute -top-4 right-4 px-2 py-1 rounded-full whitespace-nowrap text-[8.5px] font-bold uppercase tracking-wide text-white shadow-md"
+                    style={{ backgroundColor: DISPONIBILIDAD_COLOR[artista.disponibilidad] || ACCENT }}
+                  >
+                    {DISPONIBILIDAD_TEXTO[artista.disponibilidad] || artista.disponibilidad}
+                  </span>
+                )}
               </div>
             )}
 
@@ -283,20 +444,124 @@ export default function ArtistaLandingPage() {
                 texto informativo y el botón se lean como una sola unidad.
                 precio_sesion_texto es puramente informativo (muchos
                 artistas no quieren publicar el precio real del tatuaje),
-                nunca es lo que se cobra. */}
+                nunca es lo que se cobra.
+                v2 (2026-08-06, Jose: "no dice la información suficiente...
+                que significa ese número") — se agrega UNA frase que
+                explica la mecánica (mismo texto que ya vivía escondido
+                dentro del modal, ahora visible antes de decidir). El botón
+                ya no repite el precio (ya queda claro en la grilla de
+                abajo) — sin escribir un párrafo largo.
+                v3 (2026-08-06, Jose: "una card dividida en 4... la primera
+                dirá el valor de mi sesión y abajo el precio, la otra dirá
+                para agendar y su precio abajo") — grilla 2x2: etiquetas
+                arriba, valores abajo. Si el artista no llenó
+                precio_sesion_texto (es opcional, muchos no quieren publicar
+                precio de tatuaje), se muestra solo el bloque de "Para
+                agendar" solo, sin la grilla vacía a su lado.
+                v4 (2026-08-06, Jose: "quitemos los rojos... card gris medio
+                con estilo premium", y "que se vean similares" los dos
+                precios). v5 (Jose: "no se ve premium" — flat solid gray
+                no alcanza) — degradado sutil (efecto metal cepillado, no
+                un solo gris plano), línea de acento clara arriba (mismo
+                recurso visual que tarjetas VIP/metálicas reales), borde
+                fino para definir el canto, sombra más profunda para que
+                la card "flote". precio_sesion_texto pasó a número real
+                (ver ArtistaEditarPerfilPage.jsx) — formatearValorSesion
+                sigue de respaldo por si queda algún texto viejo guardado. */}
             {artista.precio_agendar && (
-              <div className="mt-2 p-4 rounded-xl border max-w-xl" style={{ borderColor: `${ACCENT}30`, backgroundColor: `${ACCENT}08` }}>
-                <p className="text-[11px] font-black uppercase tracking-widest mb-1" style={{ color: ACCENT }}>Reserva tu cita</p>
-                {artista.precio_sesion_texto && (
-                  <p className="text-gray-600 text-xs leading-relaxed mb-3">{artista.precio_sesion_texto}</p>
+              // Dos capas (2026-08-06, Jose: la insignia de MP debe quedar
+              // mitad afuera/mitad adentro de la esquina, mismo truco que
+              // el avatar montado sobre la portada) — la card visual de
+              // adentro sigue con overflow-hidden (esquinas y degradado
+              // limpios), la insignia vive afuera de esa capa, como
+              // hermana, posicionada respecto a ESTE wrapper exterior — así
+              // puede sobresalir sin que se le corte nada.
+              <div className="relative mt-2 max-w-xl">
+                <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border border-gray-500/30 shadow-2xl shadow-gray-900/40">
+                  <div className="h-px bg-gradient-to-r from-transparent via-gray-300/50 to-transparent" />
+                  <div className="pt-2.5 px-4 pb-7">
+                    {/* v6 (2026-08-06, Jose: quitar "Reserva tu cita" + su
+                        frase, título nuevo "Agenda en línea" — card más
+                        angosta verticalmente; números más chicos; botón AL
+                        FRENTE de los precios, no debajo).
+                        v7 (Jose: "deja mucho espacio" — menos padding). */}
+                    <p className="text-[11px] font-black uppercase tracking-widest mb-2 text-gray-300">Agenda en línea</p>
+
+                    {/* v13 (2026-08-06, Jose): probamos pegar "Agendar" a
+                        "Para agendar" (v12) pero el hueco vacío solo se
+                        movió al lado derecho de la card en vez del medio —
+                        de vuelta a v9: botón fijo contra el borde derecho
+                        vía justify-between. */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-6">
+                        {artista.precio_sesion_texto && (
+                          <div className="min-w-0">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-0.5 whitespace-nowrap text-center">Valor de mi sesión</p>
+                            <p className="text-base font-black text-white leading-snug truncate text-center">{formatearValorSesion(artista.precio_sesion_texto)}</p>
+                          </div>
+                        )}
+
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-0.5 whitespace-nowrap text-center">Para agendar</p>
+                          <p className="text-base font-black text-white whitespace-nowrap text-center">
+                            ${Number(artista.precio_agendar).toLocaleString('es-CO')}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setReservando(true)}
+                        className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white text-gray-900 font-black uppercase tracking-widest text-[11px] hover:opacity-90 transition-opacity"
+                      >
+                        Agendar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Insignia de confianza de Mercado Pago (2026-08-06) — se
+                    movió acá desde el encabezado del perfil (Jose: ahí
+                    competía con precio/disponibilidad, que son datos del
+                    artista, no de la transacción). No se duplica también
+                    junto a "Comprar" de cada diseño ni dentro de los
+                    modales de pago — esos ya tienen su propia línea "Pago
+                    100% seguro, procesado por Mercado Pago", sería
+                    redundante repetirlo ahí.
+                    v8 (Jose): esquina inferior derecha, mitad afuera/mitad
+                    adentro — mismo mecanismo que el avatar sobre la
+                    portada (posición absoluta + mitad de su propio alto
+                    hacia afuera del borde). */}
+                {/* v10 (2026-08-06, Jose: "quita el texto pago seguro, y
+                    solo deja el logo") — sin texto ni ícono de tarjeta, el
+                    badge se queda en una sola línea siempre (ya no hay nada
+                    que pueda forzarlo a partirse en dos). */}
+                {artista.mp_conectado && (
+                  <span
+                    className="absolute -bottom-3 right-4 flex items-center px-2.5 py-1 rounded-full bg-white border shadow-md"
+                    style={{ borderColor: MP_BLUE }}
+                  >
+                    <img
+                      src={MP_LOGO_URL}
+                      alt="Mercado Pago"
+                      className="h-4"
+                      onError={(e) => { e.currentTarget.style.display = 'none' }}
+                    />
+                  </span>
                 )}
+
+                {/* Términos y condiciones (2026-08-06, Jose) — explica por
+                    qué conviene agendar en línea en vez de solo WhatsApp,
+                    sin ser un candado (WhatsApp sigue gratis). v11 (Jose:
+                    "estiró la card, no la estires, solo ubícalo abajo a la
+                    izquierda") — posición absoluta como la insignia de MP,
+                    ya no ocupa su propio renglón en el flujo normal. */}
                 <button
                   type="button"
-                  onClick={() => setReservando(true)}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-white font-black uppercase tracking-widest text-xs hover:opacity-90 transition-opacity"
-                  style={{ backgroundColor: ACCENT }}
+                  onClick={() => setMostrarTerminos(true)}
+                  className="absolute bottom-2 left-4 text-[10px] text-gray-400 underline decoration-gray-500 hover:text-gray-200 transition-colors"
                 >
-                  Reservar — ${Number(artista.precio_agendar).toLocaleString('es-CO')}
+                  Términos y condiciones
                 </button>
               </div>
             )}
@@ -304,15 +569,154 @@ export default function ArtistaLandingPage() {
           </div>
         </div>
 
+        {/* DISEÑOS A LA VENTA — venta directa (2026-08-05), primer paso de
+            monetización del directorio. v2 (2026-08-06, Jose: "debajo de
+            la card de agenda en línea vamos a poner dos botones... uno
+            será de diseños para tatuar, y el otro diseños digitales a la
+            venta... cada botón desplegará su contenido, así no cargamos
+            todo de una vez") — separados por tipo detrás de un botón
+            desplegable cada uno, mismo patrón de fila a 2 columnas que
+            usa Redes sociales más abajo. El grid con marca de agua de
+            cada tipo solo se monta cuando esa sección está abierta, así
+            el navegador no pide esas fotos hasta que el visitante decide
+            explorar esa categoría — y la descripción bajo cada botón es
+            la que le permite decidir sin tener que abrirlo primero. */}
+        {(disenosTatuar.length > 0 || disenosDigital.length > 0) && (
+          <div className="mt-2 max-w-3xl mx-auto">
+            <div className="grid grid-cols-2 w-full border-t border-b border-gray-200">
+              <button
+                type="button"
+                onClick={() => setSeccionDisenos((s) => (s === 'tatuar' ? null : 'tatuar'))}
+                disabled={disenosTatuar.length === 0}
+                aria-expanded={seccionDisenos === 'tatuar'}
+                className={`relative flex flex-col items-center justify-center gap-1 text-center py-3.5 px-2 pl-7 border-r border-gray-200 transition-colors ${
+                  disenosTatuar.length > 0 ? (seccionDisenos === 'tatuar' ? 'bg-gray-50' : 'hover:bg-gray-50 cursor-pointer') : 'cursor-default'
+                }`}
+              >
+                {/* Ícono a la esquina inferior izquierda (2026-08-06,
+                    Jose), fuera del título — pl-7 en el botón le hace
+                    espacio para que no se solape con el texto centrado. */}
+                <Palette size={14} className={`absolute bottom-2 left-2 ${disenosTatuar.length > 0 ? 'text-gray-400' : 'text-gray-300'}`} />
+                <span className={`text-xs sm:text-sm font-black uppercase tracking-widest ${disenosTatuar.length > 0 ? 'text-gray-700' : 'text-gray-300'}`}>
+                  Ideas únicas, listas para tu piel
+                </span>
+                {/* Sin la frase extra (2026-08-06, Jose: "es redundante
+                    con la descripción que aparece al abrir cada card")
+                    — solo el contador. */}
+                <span className={`text-[9.5px] font-medium leading-snug ${disenosTatuar.length > 0 ? 'text-gray-400' : 'text-gray-300'}`}>
+                  {disenosTatuar.length > 0
+                    ? `${disenosTatuar.length} diseño${disenosTatuar.length > 1 ? 's' : ''}`
+                    : 'Aún no hay disponibles'}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSeccionDisenos((s) => (s === 'digital' ? null : 'digital'))}
+                disabled={disenosDigital.length === 0}
+                aria-expanded={seccionDisenos === 'digital'}
+                className={`relative flex flex-col items-center justify-center gap-1 text-center py-3.5 px-2 pl-7 transition-colors ${
+                  disenosDigital.length > 0 ? (seccionDisenos === 'digital' ? 'bg-gray-50' : 'hover:bg-gray-50 cursor-pointer') : 'cursor-default'
+                }`}
+              >
+                <ImageIcon size={14} className={`absolute bottom-2 left-2 ${disenosDigital.length > 0 ? 'text-gray-400' : 'text-gray-300'}`} />
+                <span className={`text-xs sm:text-sm font-black uppercase tracking-widest ${disenosDigital.length > 0 ? 'text-gray-700' : 'text-gray-300'}`}>
+                  Arte para llevar a casa
+                </span>
+                <span className={`text-[9.5px] font-medium leading-snug ${disenosDigital.length > 0 ? 'text-gray-400' : 'text-gray-300'}`}>
+                  {disenosDigital.length > 0
+                    ? `${disenosDigital.length} lámina${disenosDigital.length > 1 ? 's' : ''}`
+                    : 'Aún no hay disponibles'}
+                </span>
+              </button>
+            </div>
+
+            {seccionDisenos === 'tatuar' && disenosTatuar.length > 0 && (
+              <div className="pt-2">
+                <p className="px-4 text-gray-500 text-[11px] leading-relaxed mb-1.5">Diseños elaborados por {artista.nombre}, listos para tatuar. Cada uno es único — al venderse, deja de estar disponible para los demás.</p>
+                {renderGridDisenos(disenosTatuar)}
+              </div>
+            )}
+            {seccionDisenos === 'digital' && disenosDigital.length > 0 && (
+              <div className="pt-2">
+                <p className="px-4 text-gray-500 text-[11px] leading-relaxed mb-1.5">Láminas digitales para imprimir y enmarcar — diseños exclusivos del artista.</p>
+                {renderGridDisenos(disenosDigital)}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TRABAJOS — antes iba a todo el ancho de la pantalla; en
+            monitores anchos cada foto crecía sin límite (más de 600px por
+            foto en 1920px) — acotado a max-w-3xl igual que el resto del
+            perfil, ver nota de la portada arriba. Cada foto abre el
+            lightbox navegable con botón "Ver". Frase corta bajo el título
+            (2026-08-06, Jose) — con fin de SEO, no informativo para el
+            visitante (las fotos ya se explican solas). */}
+        {trabajos.length > 0 && (
+          <div className="mt-6 max-w-3xl mx-auto">
+            <p className="px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-1 text-center">Portafolio</p>
+            <p className="px-4 text-gray-400 text-[11px] mb-2 text-center">Tatuajes hechos por {artista.nombre} en {artista.municipio}</p>
+            <div className="grid grid-cols-3 gap-0.5 sm:gap-1 w-full">
+              {trabajos.map((src, i) => (
+                <button
+                  key={src}
+                  type="button"
+                  onClick={() => setLightbox(i)}
+                  className="relative aspect-square bg-gray-50 overflow-hidden group"
+                >
+                  <img src={src} alt={`Trabajo ${i + 1} de ${artista.nombre}`} className="w-full h-full object-cover" loading="lazy" />
+                  <span className="absolute bottom-1.5 right-1.5 flex items-center gap-1 bg-black/60 text-white text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full backdrop-blur-sm group-hover:bg-black/80 transition-colors">
+                    <Search size={10} />
+                    Ver
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* INFO ADICIONAL — límites y preguntas frecuentes, autoreportadas
+            por el artista (sin verificación, mismo criterio que las
+            reseñas — ver debate 2026-08-04). Todo opcional, no cambia nada
+            de lo que ya existía arriba. (Se descartó "Especialidades"
+            aparte de "Estilo" — Jose notó que se repetiría el mismo
+            contenido, ej. "Realismo, línea fina" ya vive en Estilo.) */}
+        {(artista.no_tatua || artista.faq) && (
+          <div className="max-w-3xl mx-auto px-4 mt-6 space-y-4">
+            {artista.no_tatua && (
+              <div>
+                <p className="text-gray-400 text-[11px] uppercase tracking-widest mb-1">No tatúa</p>
+                <p className="text-gray-700 text-sm leading-relaxed">{artista.no_tatua}</p>
+              </div>
+            )}
+            {artista.faq && (
+              <div>
+                <p className="text-gray-400 text-[11px] uppercase tracking-widest mb-1">Preguntas frecuentes</p>
+                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">{artista.faq}</p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* REDES SOCIALES — Facebook e Instagram, en 2 bloques a todo el
-            ancho de la COLUMNA del perfil (antes iba a todo el ancho de la
-            pantalla — ver nota de la portada arriba sobre por qué se acotó
-            a max-w-3xl). Si el artista todavía no tiene el link cargado,
-            el bloque se queda visible pero deshabilitado con un aviso,
-            nunca se oculta. Delgadas, mismo alto que el botón de contacto
-            de abajo. */}
-        <div className="mt-5 max-w-3xl mx-auto">
-          <p className="px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-2">Redes sociales</p>
+            ancho de la COLUMNA del perfil. v2 (2026-08-06, Jose: "ubicar
+            la sesión redes sociales en la parte de abajo, antes del
+            footer") — se movió desde justo debajo del encabezado hasta
+            acá, ya que la prioridad de la página ahora es la agenda en
+            línea y los diseños en venta primero. Si el artista todavía no
+            tiene el link cargado, el bloque se queda visible pero
+            deshabilitado con un aviso, nunca se oculta. */}
+        <div className="mt-6 max-w-3xl mx-auto">
+          {/* Empujón sutil hacia Agenda en línea (2026-08-06, Jose) — tono
+              de invitación, no de advertencia: WhatsApp se queda gratis y
+              abierto como siempre, esto solo recuerda que la opción de
+              pago existe más arriba. Solo aparece si el artista activó
+              "para agendar". Centrado (Jose) — ya no hay una etiqueta
+              "Redes sociales" a su izquierda con la que alinearse; los
+              íconos de Facebook/Instagram de abajo ya se explican solos. */}
+          {artista.precio_agendar && (
+            <p className="px-4 text-gray-500 text-[11px] mb-3 text-center">¿Prefieres asegurar tu cupo? Agenda en línea más arriba ↑</p>
+          )}
           <div className={`grid grid-cols-2 w-full border-t border-gray-200 ${waLink ? '' : 'border-b'}`}>
             <a
               href={artista.facebook || undefined}
@@ -348,9 +752,9 @@ export default function ArtistaLandingPage() {
             </a>
           </div>
 
-          {/* CONTACTAR AL ARTISTA — antes vivía fijo en la parte inferior de
-              la pantalla; Jose pidió que ya no quede fijo y que se ubique
-              justo debajo de redes sociales (2026-08-04). */}
+          {/* CONTACTAR AL ARTISTA — se queda justo debajo de redes
+              sociales, viajan juntos como un solo bloque (2026-08-04 /
+              2026-08-06). */}
           {waLink && (
             <a
               href={waLink}
@@ -364,92 +768,6 @@ export default function ArtistaLandingPage() {
             </a>
           )}
         </div>
-
-        {/* TRABAJOS — antes iba a todo el ancho de la pantalla; en
-            monitores anchos cada foto crecía sin límite (más de 600px por
-            foto en 1920px) — acotado a max-w-3xl igual que el resto del
-            perfil, ver nota de la portada arriba. Cada foto abre el
-            lightbox navegable con botón "Ver". */}
-        {trabajos.length > 0 && (
-          <div className="mt-6 max-w-3xl mx-auto">
-            <p className="px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-2">Trabajos</p>
-            <div className="grid grid-cols-3 gap-0.5 sm:gap-1 w-full">
-              {trabajos.map((src, i) => (
-                <button
-                  key={src}
-                  type="button"
-                  onClick={() => setLightbox(i)}
-                  className="relative aspect-square bg-gray-50 overflow-hidden group"
-                >
-                  <img src={src} alt={`Trabajo ${i + 1} de ${artista.nombre}`} className="w-full h-full object-cover" loading="lazy" />
-                  <span className="absolute bottom-1.5 right-1.5 flex items-center gap-1 bg-black/60 text-white text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full backdrop-blur-sm group-hover:bg-black/80 transition-colors">
-                    <Search size={10} />
-                    Ver
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* DISEÑOS DISPONIBLES — venta directa (2026-08-05), primer paso de
-            monetización del directorio. Mismo patrón visual de grid que
-            "Trabajos" arriba, pero con precio + botón Comprar sobre una
-            versión con marca de agua (el archivo limpio llega por correo
-            tras pagar). El pago se reparte al instante entre el artista y
-            INKognito vía Mercado Pago — WhatsApp sigue siendo gratis y
-            visible arriba, esto es una opción adicional, no un reemplazo. */}
-        {disenos.length > 0 && (
-          <div className="mt-6 max-w-3xl mx-auto">
-            {/* Título directo, no genérico (2026-08-05, Jose) — cubre los
-                dos casos reales: diseño de tatuaje (se lo tatúan) y
-                lámina/print (se la llevan) — este mismo bloque vende
-                ambos tipos, el copy no puede sonar exclusivo de uno. */}
-            <p className="px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-2">Tatúate uno de estos diseños o llévalo a casa</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-0.5 sm:gap-1 w-full">
-              {disenos.map((d) => (
-                <div key={d.id} className="relative aspect-square bg-gray-50 overflow-hidden">
-                  <img src={conMarcaDeAgua(d.imagen_url)} alt={d.titulo || 'Diseño'} className="w-full h-full object-cover" loading="lazy" />
-                  <div className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[9px] font-bold uppercase px-2 py-0.5 rounded-full">
-                    {d.tipo === 'lamina' ? 'Lámina' : 'Tatuaje'}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => { setDisenoComprando(d); setErrorCompra(null); setModalImgIdx(0) }}
-                    className="absolute bottom-1.5 inset-x-1.5 flex items-center justify-center gap-1.5 text-white text-[11px] font-black uppercase tracking-wide px-2 py-2 rounded-full hover:opacity-90 transition-opacity"
-                    style={{ backgroundColor: MP_BLUE }}
-                  >
-                    <ShoppingBag size={12} />
-                    ${Number(d.precio).toLocaleString('es-CO')}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* INFO ADICIONAL — límites y preguntas frecuentes, autoreportadas
-            por el artista (sin verificación, mismo criterio que las
-            reseñas — ver debate 2026-08-04). Todo opcional, no cambia nada
-            de lo que ya existía arriba. (Se descartó "Especialidades"
-            aparte de "Estilo" — Jose notó que se repetiría el mismo
-            contenido, ej. "Realismo, línea fina" ya vive en Estilo.) */}
-        {(artista.no_tatua || artista.faq) && (
-          <div className="max-w-3xl mx-auto px-4 mt-6 space-y-4">
-            {artista.no_tatua && (
-              <div>
-                <p className="text-gray-400 text-[11px] uppercase tracking-widest mb-1">No tatúa</p>
-                <p className="text-gray-700 text-sm leading-relaxed">{artista.no_tatua}</p>
-              </div>
-            )}
-            {artista.faq && (
-              <div>
-                <p className="text-gray-400 text-[11px] uppercase tracking-widest mb-1">Preguntas frecuentes</p>
-                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">{artista.faq}</p>
-              </div>
-            )}
-          </div>
-        )}
 
         <div className="max-w-3xl mx-auto px-4">
           <div className="border-t border-gray-200 pt-5 mt-6 pb-10">
@@ -702,6 +1020,32 @@ export default function ArtistaLandingPage() {
                 Cancelar
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Términos y condiciones de "Agenda en línea" (2026-08-06) — texto
+          persuasivo, no un candado: WhatsApp/redes se quedan gratis y
+          abiertos, esto es una vía adicional. El punto de venta real es
+          que el artista recibe de inmediato los datos de contacto + la
+          idea del tatuaje por correo, en vez de depender de encontrar el
+          mensaje entre WhatsApp. */}
+      {mostrarTerminos && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center px-4 py-8"
+          onClick={() => setMostrarTerminos(false)}
+        >
+          <div className="bg-white rounded-2xl w-full max-w-sm max-h-full overflow-y-auto p-5" onClick={(e) => e.stopPropagation()}>
+            <p className="font-black uppercase text-base leading-tight mb-3">Cómo funciona agendar en línea</p>
+            <div className="space-y-3 text-gray-600 text-sm leading-relaxed">
+              <p>El WhatsApp y las redes de {artista.nombre} siguen siendo gratis para ti — puedes escribirle directo, cuando quieras.</p>
+              <p>Agendar y abonar en línea es una vía adicional, pensada para avanzar más rápido: al confirmarse el pago, {artista.nombre} recibe de inmediato un correo con tus datos de contacto y la idea de tu tatuaje.</p>
+              <p>Con esa información completa, {artista.nombre} se pone en contacto contigo para coordinar la valoración, el diseño y, después, la fecha de tu cita — sin que tu solicitud se pierda entre otros mensajes.</p>
+              <p className="font-bold text-gray-800">Es la forma más directa de convertir tu idea en una cita real.</p>
+            </div>
+            <button type="button" onClick={() => setMostrarTerminos(false)} className="w-full mt-5 py-3 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity text-xs" style={{ backgroundColor: ACCENT }}>
+              Entendido
+            </button>
           </div>
         </div>
       )}
