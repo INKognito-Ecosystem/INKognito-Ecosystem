@@ -23,7 +23,11 @@ const MODULES = [
 // sino que se llame 'Para artistas'" — mismo nombre que usa Tattoodo para
 // esta misma categoría) — override opcional, default "INKognito" para no
 // tocar los demás navbars.
-export default function InkognitoModuleMenu({ current, textClassName, onNavigate, only, label = 'INKognito' }) {
+// extraLinks (2026-08-06, Jose: "editar mi perfil no debería estar dentro
+// de 'para artistas'? que quede arriba de supply") — items opcionales que
+// se renderizan antes de los módulos, dentro del mismo desplegable. Vacío
+// por default para no afectar los navbars que no lo pasan.
+export default function InkognitoModuleMenu({ current, textClassName, onNavigate, only, label = 'INKognito', extraLinks = [] }) {
   const [open, setOpen] = useState(false)
   const others = only ? MODULES.filter(m => only.includes(m.key)) : MODULES.filter(m => m.key !== current)
 
@@ -37,6 +41,16 @@ export default function InkognitoModuleMenu({ current, textClassName, onNavigate
         <span>{label}</span>
         <ChevronDown size={14} className={`transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
       </button>
+      {open && extraLinks.map(item => (
+        <Link
+          key={item.to}
+          to={item.to}
+          onClick={onNavigate}
+          className={`block pl-10 pr-6 py-3 uppercase text-[11px] tracking-[0.2em] transition-all duration-300 ${textClassName}`}
+        >
+          {item.label}
+        </Link>
+      ))}
       {open && others.map(m => (
         <Link
           key={m.key}

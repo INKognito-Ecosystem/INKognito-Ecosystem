@@ -132,14 +132,12 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null }
           <Link to="/tattoo-artist-colombia/unete" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">
             Únete como artista
           </Link>
-          <Link to="/tattoo-artist-colombia/mi-perfil" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">
-            Editar mi perfil
-          </Link>
           <div className="border-t border-gray-100" />
           <InkognitoModuleMenu
             current="artistas"
             only={['supply']}
             label="Para artistas"
+            extraLinks={[{ label: 'Editar mi perfil', to: '/tattoo-artist-colombia/mi-perfil' }]}
             textClassName="text-gray-600 hover:text-gray-900 hover:bg-gray-50"
             onNavigate={close}
           />
