@@ -98,6 +98,17 @@ export default function ArtistaLandingPage() {
   // ambas secciones (tatuar/digital), ya que los ids de disenos son
   // únicos entre las dos.
   const [disenosExpandidos, setDisenosExpandidos] = useState({})
+  // Foto activa por diseño en la card de navegación (2026-08-06, Jose:
+  // "no veo la opción para ver o pasar las fotos" — hasta 3 fotos por
+  // diseño ya existían en la base y ya se navegaban dentro del modal
+  // "Comprar", pero la card de navegación solo mostraba la primera).
+  const [disenosImgIdx, setDisenosImgIdx] = useState({})
+  // Ver en grande (2026-08-06, Jose: "poner la opción ver para que la
+  // imagen se vea en tamaño completo tal como pasa con portafolio") —
+  // mismo lightbox que ya usan los trabajos, pero para diseños, con
+  // marca de agua (siguen sin comprarse) y comparte disenosImgIdx con la
+  // card para que abrir/cerrar no pierda la foto en la que ibas.
+  const [disenoLightboxId, setDisenoLightboxId] = useState(null)
   const [modalImgIdx, setModalImgIdx] = useState(0)
   const [compradorEmail, setCompradorEmail] = useState('')
   const [comprando, setComprando] = useState(false)
@@ -192,7 +203,10 @@ export default function ArtistaLandingPage() {
   // panel de texto se reparten ese ancho completo entre los dos.
   const renderGridDisenos = (items) => (
     <div className="flex overflow-x-auto px-4 snap-x snap-mandatory scrollbar-hide">
-      {items.map((d) => (
+      {items.map((d) => {
+        const imagenes = [d.imagen_url, d.imagen_url_2, d.imagen_url_3].filter(Boolean)
+        const idx = disenosImgIdx[d.id] || 0
+        return (
         <div key={d.id} className="w-full flex-shrink-0 snap-center">
           {/* v4 (2026-08-06, Jose: "la card quedó muy larga... debería
               adaptarse al tamaño de fotos que suban") — al revés de la
@@ -211,8 +225,49 @@ export default function ArtistaLandingPage() {
                 corregir. Con self-start, la imagen se queda en su propia
                 altura (aspect-[4/5]) sin importar cuánto crezca el texto
                 al lado. */}
-            <div className="w-2/5 sm:w-1/3 flex-shrink-0 self-start aspect-[4/5] bg-gray-100 overflow-hidden">
-              <img src={conMarcaDeAgua(d.imagen_url)} alt={d.titulo || 'Diseño'} className="w-full h-full object-cover" loading="lazy" />
+            <div className="relative w-2/5 sm:w-1/3 flex-shrink-0 self-start aspect-[4/5] bg-gray-100 overflow-hidden">
+              <img
+                src={conMarcaDeAgua(imagenes[idx])} alt={d.titulo || 'Diseño'} className="w-full h-full object-cover" loading="lazy"
+                draggable={false} onContextMenu={(e) => e.preventDefault()}
+              />
+              {/* Navegar entre fotos (2026-08-06, Jose: "no veo la opción
+                  para ver o pasar las fotos" — hasta 3 fotos por diseño
+                  ya existían en la base, pero acá solo se mostraba la
+                  primera). Mismo patrón de puntos+flechas que ya usa el
+                  modal "Comprar" para esto mismo. */}
+              {imagenes.length > 1 && (
+                <>
+                  <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-1">
+                    {imagenes.map((_, i) => (
+                      <span key={i} className={`w-1.5 h-1.5 rounded-full ${i === idx ? 'bg-white' : 'bg-white/50'}`} />
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setDisenosImgIdx((s) => ({ ...s, [d.id]: (idx - 1 + imagenes.length) % imagenes.length })) }}
+                    aria-label="Foto anterior"
+                    className="absolute left-0.5 top-1/2 -translate-y-1/2 text-white/80 hover:text-white p-1"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setDisenosImgIdx((s) => ({ ...s, [d.id]: (idx + 1) % imagenes.length })) }}
+                    aria-label="Foto siguiente"
+                    className="absolute right-0.5 top-1/2 -translate-y-1/2 text-white/80 hover:text-white p-1"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </>
+              )}
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setDisenoLightboxId(d.id) }}
+                aria-label="Ver en grande"
+                className="absolute top-1.5 right-1.5 flex items-center justify-center w-6 h-6 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors"
+              >
+                <Search size={12} />
+              </button>
             </div>
             <div className="flex-1 min-w-0 pt-3 pb-4 px-4 flex flex-col justify-start">
               <p className="font-black text-sm uppercase leading-tight">{d.titulo || 'Diseño'}</p>
@@ -231,8 +286,7 @@ export default function ArtistaLandingPage() {
                     <button
                       type="button"
                       onClick={() => setDisenosExpandidos((s) => ({ ...s, [d.id]: !s[d.id] }))}
-                      className="text-[10px] font-black uppercase tracking-wide mt-1 self-start hover:opacity-70 transition-opacity"
-                      style={{ color: MP_BLUE }}
+                      className="text-[10px] font-black uppercase tracking-wide mt-1 self-start text-gray-700 hover:opacity-70 transition-opacity"
                     >
                       {disenosExpandidos[d.id] ? 'Ver menos' : 'Ver más'}
                     </button>
@@ -251,7 +305,8 @@ export default function ArtistaLandingPage() {
             </div>
           </div>
         </div>
-      ))}
+        )
+      })}
     </div>
   )
 
@@ -536,9 +591,16 @@ export default function ArtistaLandingPage() {
                     solo deja el logo") — sin texto ni ícono de tarjeta, el
                     badge se queda en una sola línea siempre (ya no hay nada
                     que pueda forzarlo a partirse en dos). */}
+                {/* z-10 (2026-08-06, Jose: "cuando me paro en la card de
+                    diseños de láminas, este se superpone y tapa el
+                    botoncito de mercado pago... siempre se mantenga por
+                    debajo") — sin z-index, la sección de Diseños (que
+                    viene después en el DOM) puede pintarse encima de esta
+                    insignia cuando se abre/expande y su contenido se
+                    acerca al borde inferior de la card de Agenda. */}
                 {artista.mp_conectado && (
                   <span
-                    className="absolute -bottom-3 right-4 flex items-center px-2.5 py-1 rounded-full bg-white border shadow-md"
+                    className="absolute -bottom-3 right-4 z-10 flex items-center px-2.5 py-1 rounded-full bg-white border shadow-md"
                     style={{ borderColor: MP_BLUE }}
                   >
                     <img
@@ -559,7 +621,7 @@ export default function ArtistaLandingPage() {
                 <button
                   type="button"
                   onClick={() => setMostrarTerminos(true)}
-                  className="absolute bottom-2 left-4 text-[10px] text-gray-400 underline decoration-gray-500 hover:text-gray-200 transition-colors"
+                  className="absolute bottom-2 left-4 z-10 text-[10px] text-gray-400 underline decoration-gray-500 hover:text-gray-200 transition-colors"
                 >
                   Términos y condiciones
                 </button>
@@ -665,9 +727,8 @@ export default function ArtistaLandingPage() {
                   className="relative aspect-square bg-gray-50 overflow-hidden group"
                 >
                   <img src={src} alt={`Trabajo ${i + 1} de ${artista.nombre}`} className="w-full h-full object-cover" loading="lazy" />
-                  <span className="absolute bottom-1.5 right-1.5 flex items-center gap-1 bg-black/60 text-white text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full backdrop-blur-sm group-hover:bg-black/80 transition-colors">
-                    <Search size={10} />
-                    Ver
+                  <span className="absolute bottom-1.5 right-1.5 flex items-center justify-center w-6 h-6 bg-black/60 text-white rounded-full backdrop-blur-sm group-hover:bg-black/80 transition-colors">
+                    <Search size={12} />
                   </span>
                 </button>
               ))}
@@ -778,10 +839,17 @@ export default function ArtistaLandingPage() {
         </div>
       </div>
 
+      {/* Enlaces legales (2026-08-06, Jose) — el módulo de artistas era el
+          único sin enlace a /terminos ni /privacidad, aunque esas páginas
+          ya existen y ahora /terminos cubre el directorio (sección 6). */}
       <footer className="border-t border-gray-200 py-6 px-4 mt-8">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-400 text-[12px] gap-3">
           <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Colombia — INKognito. Todos los derechos reservados.</p>
-          <span className="text-gray-300">Desarrollado por INKognito</span>
+          <div className="flex items-center gap-4">
+            <Link to="/tattoo-artist-colombia/terminos" className="text-gray-400 hover:text-gray-700 transition-colors">Términos</Link>
+            <Link to="/tattoo-artist-colombia/privacidad" className="text-gray-400 hover:text-gray-700 transition-colors">Privacidad</Link>
+            <span className="text-gray-300">Desarrollado por INKognito</span>
+          </div>
         </div>
       </footer>
 
@@ -841,6 +909,82 @@ export default function ArtistaLandingPage() {
         </div>
       )}
 
+      {/* LIGHTBOX de diseños (2026-08-06, Jose: "poner la opción ver para
+          que la imagen se vea en tamaño completo tal como pasa con
+          portafolio") — mismo patrón que el de Trabajos arriba, con dos
+          diferencias: sigue con marca de agua (no se compró todavía) y
+          comparte disenosImgIdx con la card de navegación, así la foto en
+          la que ibas no se pierde al cerrar. */}
+      {disenoLightboxId !== null && (() => {
+        const d = disenos.find((x) => x.id === disenoLightboxId)
+        if (!d) return null
+        const imgs = [d.imagen_url, d.imagen_url_2, d.imagen_url_3].filter(Boolean)
+        const idx = disenosImgIdx[d.id] || 0
+        const ir = (delta) => setDisenosImgIdx((s) => ({ ...s, [d.id]: (idx + delta + imgs.length) % imgs.length }))
+        const onTouchEndLB = (e) => {
+          if (touchStartX.current == null) return
+          const delta = e.changedTouches[0].clientX - touchStartX.current
+          touchStartX.current = null
+          if (Math.abs(delta) < 40) return
+          ir(delta < 0 ? 1 : -1)
+        }
+        return (
+          <div
+            className="fixed inset-0 z-[60] bg-black/95 flex items-center justify-center"
+            onClick={() => setDisenoLightboxId(null)}
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEndLB}
+          >
+            <button
+              type="button"
+              onClick={() => setDisenoLightboxId(null)}
+              aria-label="Cerrar"
+              className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors p-2"
+            >
+              <X size={26} />
+            </button>
+
+            {imgs.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); ir(-1) }}
+                  aria-label="Anterior"
+                  className="absolute left-1 sm:left-4 text-white/60 hover:text-white transition-colors p-3"
+                >
+                  <ChevronLeft size={30} />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); ir(1) }}
+                  aria-label="Siguiente"
+                  className="absolute right-1 sm:right-4 text-white/60 hover:text-white transition-colors p-3"
+                >
+                  <ChevronRight size={30} />
+                </button>
+              </>
+            )}
+
+            <img
+              src={conMarcaDeAgua(imgs[idx])}
+              alt={d.titulo || 'Diseño'}
+              className="max-w-[90vw] max-h-[82vh] object-contain select-none"
+              onClick={(e) => e.stopPropagation()}
+              draggable={false}
+              onContextMenu={(e) => e.preventDefault()}
+            />
+
+            {imgs.length > 1 && (
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5">
+                {imgs.map((_, i) => (
+                  <span key={i} className={`w-1.5 h-1.5 rounded-full transition-colors ${i === idx ? 'bg-white' : 'bg-white/40'}`} />
+                ))}
+              </div>
+            )}
+          </div>
+        )
+      })()}
+
       {/* MODAL DE COMPRA — card informativa tipo landing de producto
           (2026-08-05, Jose: "tipo hotmar, una card ultra informativa,
           nombre valor, y descripcion" — este modal es la pieza clave de
@@ -857,7 +1001,10 @@ export default function ArtistaLandingPage() {
           >
             <div className="bg-white rounded-2xl w-full max-w-sm max-h-full overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               <div className="relative">
-                <img src={conMarcaDeAgua(imagenes[modalImgIdx])} alt="" className="w-full aspect-square object-cover" />
+                <img
+                  src={conMarcaDeAgua(imagenes[modalImgIdx])} alt="" className="w-full aspect-square object-cover"
+                  draggable={false} onContextMenu={(e) => e.preventDefault()}
+                />
                 <div className="absolute top-2.5 left-2.5 bg-black/60 text-white text-[9px] font-bold uppercase px-2 py-0.5 rounded-full">
                   {disenoComprando.tipo === 'lamina' ? 'Lámina' : 'Tatuaje'}
                 </div>
@@ -1041,6 +1188,7 @@ export default function ArtistaLandingPage() {
               <p>El WhatsApp y las redes de {artista.nombre} siguen siendo gratis para ti — puedes escribirle directo, cuando quieras.</p>
               <p>Agendar y abonar en línea es una vía adicional, pensada para avanzar más rápido: al confirmarse el pago, {artista.nombre} recibe de inmediato un correo con tus datos de contacto y la idea de tu tatuaje.</p>
               <p>Con esa información completa, {artista.nombre} se pone en contacto contigo para coordinar la valoración, el diseño y, después, la fecha de tu cita — sin que tu solicitud se pierda entre otros mensajes.</p>
+              <p>El pago se procesa de forma segura por Mercado Pago — nunca compartes tus datos de tarjeta con el artista ni con INKognito.</p>
               <p className="font-bold text-gray-800">Es la forma más directa de convertir tu idea en una cita real.</p>
             </div>
             <button type="button" onClick={() => setMostrarTerminos(false)} className="w-full mt-5 py-3 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity text-xs" style={{ backgroundColor: ACCENT }}>

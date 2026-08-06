@@ -14,9 +14,18 @@ const MODULES = [
 // tantas veces (2026-08-03, pedido de Jose). Gym queda fuera a propósito
 // (solo supply/store/suple) — sigue accesible vía "Ecosistema", que cada
 // navbar mantiene como link aparte.
-export default function InkognitoModuleMenu({ current, textClassName, onNavigate }) {
+// only (2026-08-06, Jose: "el INKognito que despliega los módulos, solo
+// deja Supply, quita los demás" — pedido específico del navbar de
+// artistas) — lista opcional de keys a mostrar; si no se pasa, se
+// mantiene el comportamiento de siempre (todos menos el módulo actual),
+// para no afectar los demás navbars que ya usan este componente.
+// label (2026-08-06, Jose: "que su botón inicial no se llame INKognito
+// sino que se llame 'Para artistas'" — mismo nombre que usa Tattoodo para
+// esta misma categoría) — override opcional, default "INKognito" para no
+// tocar los demás navbars.
+export default function InkognitoModuleMenu({ current, textClassName, onNavigate, only, label = 'INKognito' }) {
   const [open, setOpen] = useState(false)
-  const others = MODULES.filter(m => m.key !== current)
+  const others = only ? MODULES.filter(m => only.includes(m.key)) : MODULES.filter(m => m.key !== current)
 
   return (
     <div>
@@ -25,7 +34,7 @@ export default function InkognitoModuleMenu({ current, textClassName, onNavigate
         onClick={() => setOpen(o => !o)}
         className={`flex items-center justify-between w-full px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${textClassName}`}
       >
-        <span>INKognito</span>
+        <span>{label}</span>
         <ChevronDown size={14} className={`transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && others.map(m => (

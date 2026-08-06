@@ -95,6 +95,11 @@ export default [
   // Verificación de correo + edición de perfil por token (2026-08-05) —
   // ver server.js (panel) para el flujo completo.
   route('tattoo-artist-colombia/mi-perfil', 'components/artistas/ArtistaEditarPerfilPage.jsx'),
+  // Legal propio del módulo (2026-08-06, Jose: "este ser un módulo
+  // especial así que deberá aparecer solo su información") — separado
+  // de /terminos y /privacidad, que son del resto del ecosistema.
+  route('tattoo-artist-colombia/terminos', 'components/artistas/TerminosArtistasPage.jsx'),
+  route('tattoo-artist-colombia/privacidad', 'components/artistas/PrivacidadArtistasPage.jsx'),
   route('artista/verificar', 'components/artistas/ArtistaVerificarPage.jsx'),
   // Venta de diseños (2026-08-05) — a donde vuelve el comprador tras pagar
   // en Mercado Pago (back_urls de POST /api/disenos-comprar, panel).

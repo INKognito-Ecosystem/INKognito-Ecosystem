@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useLoaderData, useSearchParams } from 'react-router-dom'
+import { Link, useLoaderData, useSearchParams } from 'react-router-dom'
 import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
@@ -1076,7 +1076,11 @@ export default function ArtistaEditarPerfilPage() {
       <footer className="border-t border-gray-200 py-6 px-4">
         <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-400 text-[12px] gap-3">
           <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Colombia — INKognito. Todos los derechos reservados.</p>
-          <span className="text-gray-300">Desarrollado por INKognito</span>
+          <div className="flex items-center gap-4">
+            <Link to="/tattoo-artist-colombia/terminos" className="text-gray-400 hover:text-gray-700 transition-colors">Términos</Link>
+            <Link to="/tattoo-artist-colombia/privacidad" className="text-gray-400 hover:text-gray-700 transition-colors">Privacidad</Link>
+            <span className="text-gray-300">Desarrollado por INKognito</span>
+          </div>
         </div>
       </footer>
     </div>

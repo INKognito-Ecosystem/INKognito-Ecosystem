@@ -112,18 +112,47 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null }
         </div>
       </div>
 
+      {/* Estructura del menú (2026-08-06, Jose: "analiza su botón
+          hamburguesa... quiero que sea así mismo pero con nuestra
+          información") — Tattoodo separa su menú en "buscar/explorar" vs.
+          "para artistas" (gestión de cuenta), y cierra con legal. Antes
+          acá solo había "Inicio" + otros módulos + "Ecosistema", sin
+          ningún link para que un artista se registre o edite su perfil
+          desde el menú — había que conocer la URL de memoria.
+          v2 (Jose: "que al dar clic ocupe toda la pantalla, no un
+          pedacito") — pasa de un dropdown chico en la esquina a un
+          overlay a pantalla completa (fixed inset-0, debajo del navbar),
+          mismo patrón de menú full-screen que usa Tattoodo en móvil. */}
       {menuOpen && (
-        <div className="absolute right-4 top-16 md:top-20 bg-white border border-gray-200 w-56 z-50 shadow-lg">
+        <div className="fixed inset-0 top-16 md:top-20 bg-white z-50 overflow-y-auto">
           <Link to="/tattoo-artist-colombia" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">
-            Inicio
+            Buscar artistas
           </Link>
+          <div className="border-t border-gray-100" />
+          <Link to="/tattoo-artist-colombia/unete" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">
+            Únete como artista
+          </Link>
+          <Link to="/tattoo-artist-colombia/mi-perfil" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">
+            Editar mi perfil
+          </Link>
+          <div className="border-t border-gray-100" />
           <InkognitoModuleMenu
             current="artistas"
+            only={['supply']}
+            label="Para artistas"
             textClassName="text-gray-600 hover:text-gray-900 hover:bg-gray-50"
             onNavigate={close}
           />
-          <Link to="/" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">
-            Ecosistema
+          {/* "Ecosistema" quitado (2026-08-06, Jose) — ni un cliente
+              buscando tatuador ni un artista editando su perfil necesitan
+              un atajo a Store/Gym; el módulo se mantiene enfocado solo en
+              lo relevante para su propia audiencia. */}
+          <div className="border-t border-gray-100" />
+          <Link to="/tattoo-artist-colombia/terminos" onClick={close} className="block px-6 py-3 uppercase text-[10px] tracking-[0.2em] text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-all duration-300">
+            Términos
+          </Link>
+          <Link to="/tattoo-artist-colombia/privacidad" onClick={close} className="block px-6 py-3 uppercase text-[10px] tracking-[0.2em] text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-all duration-300">
+            Privacidad
           </Link>
         </div>
       )}
