@@ -106,6 +106,20 @@ export default function ArtistaLandingPage() {
   // "Ver más" de la bio (2026-08-06) — mismo patrón, un solo bloque de
   // bio por perfil así que alcanza con un booleano simple.
   const [bioExpandida, setBioExpandida] = useState(false)
+  // v2 (2026-08-06, Jose: "a mi texto de sobre mí no debería aparecerle
+  // el ver más, pues tiene tres líneas de texto" — un umbral de
+  // caracteres es solo una aproximación de "3 líneas", y para su bio
+  // específica daba falso positivo). Se mide de verdad: si el texto
+  // recortado (line-clamp-3) tiene más alto de contenido del que se
+  // alcanza a mostrar (scrollHeight > clientHeight), ahí sí se recortó
+  // algo de verdad y el botón tiene sentido.
+  const bioRef = useRef(null)
+  const [bioDesborda, setBioDesborda] = useState(false)
+  useEffect(() => {
+    if (bioRef.current) {
+      setBioDesborda(bioRef.current.scrollHeight > bioRef.current.clientHeight + 1)
+    }
+  }, [artista.bio])
   // Aviso al hacer clic en una red social que el artista no puso
   // (2026-08-06, Jose: "debería salirle un mensaje que diga que el
   // artista no la puso, pero algo bien profesional") — antes el clic no
@@ -489,10 +503,10 @@ export default function ArtistaLandingPage() {
                       diseños") — mismo patrón: recorte por defecto, scroll
                       interno con max-h al expandir en vez de dejar que la
                       burbuja crezca sin límite. */}
-                  <p className={`text-gray-700 text-sm leading-relaxed ${bioExpandida ? 'max-h-32 overflow-y-auto pr-1' : 'line-clamp-3'}`}>
+                  <p ref={bioRef} className={`text-gray-700 text-sm leading-relaxed ${bioExpandida ? 'max-h-32 overflow-y-auto pr-1' : 'line-clamp-3'}`}>
                     {artista.bio}
                   </p>
-                  {artista.bio.length > 100 && (
+                  {bioDesborda && (
                     <button
                       type="button"
                       onClick={() => setBioExpandida((v) => !v)}
