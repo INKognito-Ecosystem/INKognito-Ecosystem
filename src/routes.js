@@ -23,7 +23,6 @@ export default [
   route('cuidados', 'components/tattoo/CuidadosPage.jsx'),
   route('p/:id', 'components/landing/ProductLandingPage.jsx'),
   route('pedido/:module', 'components/pedido/PedidoOnlinePage.jsx'),
-  route('anllyfit', 'routes/AnllyFitPage.jsx'),
 
   // Legal
   route('privacidad', 'components/legal/PrivacidadPage.jsx'),
