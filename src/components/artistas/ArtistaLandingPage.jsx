@@ -9,6 +9,11 @@ import { DISPONIBILIDAD_COLOR, DISPONIBILIDAD_TEXTO } from './disponibilidad'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const ACCENT = '#B3202F'
+// BTN (2026-08-06, Jose: "todo botón que esté en rojo cámbialo a gris")
+// — ACCENT se queda como está (sigue usándose para texto de error y el
+// fallback de disponibilidad, que no son botones), pero los botones
+// reales pasan a este gris oscuro.
+const BTN = '#374151'
 // Azul de marca de Mercado Pago (2026-08-05, Jose: "mercado pago es azul,
 // tanto ese como el botón pagar con mercado pago, deberían ser azules") —
 // solo para los 2 elementos ligados directo a Mercado Pago (precio/Comprar
@@ -98,6 +103,16 @@ export default function ArtistaLandingPage() {
   // ambas secciones (tatuar/digital), ya que los ids de disenos son
   // únicos entre las dos.
   const [disenosExpandidos, setDisenosExpandidos] = useState({})
+  // Aviso al hacer clic en una red social que el artista no puso
+  // (2026-08-06, Jose: "debería salirle un mensaje que diga que el
+  // artista no la puso, pero algo bien profesional") — antes el clic no
+  // hacía nada (preventDefault silencioso). Toast simple, se autooculta.
+  const [avisoRed, setAvisoRed] = useState(null)
+  const mostrarAvisoRed = (red) => {
+    setAvisoRed(red)
+    setTimeout(() => setAvisoRed(null), 3500)
+  }
+
   // Foto activa por diseño en la card de navegación (2026-08-06, Jose:
   // "no veo la opción para ver o pasar las fotos" — hasta 3 fotos por
   // diseño ya existían en la base y ya se navegaban dentro del modal
@@ -493,6 +508,46 @@ export default function ArtistaLandingPage() {
               </div>
             )}
 
+          </div>
+        </div>
+
+        {/* TRABAJOS — subido acá arriba, justo después de la bio y antes
+            de Agenda en línea (2026-08-06, Jose: "las personas que entran
+            no ven de una vez el portafolio" — antes vivía debajo de
+            Agenda en línea Y de Diseños a la venta, dos bloques de venta
+            antes de que se viera un solo tatuaje real. Quien visita
+            decide primero por el trabajo, no por el precio). Antes iba a
+            todo el ancho de la pantalla; en monitores anchos cada foto
+            crecía sin límite (más de 600px por foto en 1920px) — acotado
+            a max-w-3xl igual que el resto del perfil. Cada foto abre el
+            lightbox navegable con botón "Ver". Frase corta bajo el
+            título con fin de SEO, no informativa para el visitante (las
+            fotos ya se explican solas). */}
+        {trabajos.length > 0 && (
+          <div className="mt-6 max-w-3xl mx-auto">
+            <p className="px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-1 text-center">Portafolio</p>
+            <p className="px-4 text-gray-400 text-[11px] mb-2 text-center">Tatuajes hechos por {artista.nombre} en {artista.municipio}</p>
+            <div className="grid grid-cols-3 gap-0.5 sm:gap-1 w-full">
+              {trabajos.map((src, i) => (
+                <button
+                  key={src}
+                  type="button"
+                  onClick={() => setLightbox(i)}
+                  className="relative aspect-square bg-gray-50 overflow-hidden group"
+                >
+                  <img src={src} alt={`Trabajo ${i + 1} de ${artista.nombre}`} className="w-full h-full object-cover" loading="lazy" />
+                  <span className="absolute bottom-1.5 right-1.5 flex items-center justify-center w-6 h-6 bg-black/60 text-white rounded-full backdrop-blur-sm group-hover:bg-black/80 transition-colors">
+                    <Search size={12} />
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="max-w-3xl mx-auto px-4">
+          <div className="mt-6 space-y-2">
+
             {/* Reservar (fase 2, 2026-08-06) — aparece solo si el artista
                 activó su precio para agendar. Card propia (no texto suelto
                 + botón sin relación visual, Jose 2026-08-06) para que el
@@ -707,35 +762,6 @@ export default function ArtistaLandingPage() {
           </div>
         )}
 
-        {/* TRABAJOS — antes iba a todo el ancho de la pantalla; en
-            monitores anchos cada foto crecía sin límite (más de 600px por
-            foto en 1920px) — acotado a max-w-3xl igual que el resto del
-            perfil, ver nota de la portada arriba. Cada foto abre el
-            lightbox navegable con botón "Ver". Frase corta bajo el título
-            (2026-08-06, Jose) — con fin de SEO, no informativo para el
-            visitante (las fotos ya se explican solas). */}
-        {trabajos.length > 0 && (
-          <div className="mt-6 max-w-3xl mx-auto">
-            <p className="px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-1 text-center">Portafolio</p>
-            <p className="px-4 text-gray-400 text-[11px] mb-2 text-center">Tatuajes hechos por {artista.nombre} en {artista.municipio}</p>
-            <div className="grid grid-cols-3 gap-0.5 sm:gap-1 w-full">
-              {trabajos.map((src, i) => (
-                <button
-                  key={src}
-                  type="button"
-                  onClick={() => setLightbox(i)}
-                  className="relative aspect-square bg-gray-50 overflow-hidden group"
-                >
-                  <img src={src} alt={`Trabajo ${i + 1} de ${artista.nombre}`} className="w-full h-full object-cover" loading="lazy" />
-                  <span className="absolute bottom-1.5 right-1.5 flex items-center justify-center w-6 h-6 bg-black/60 text-white rounded-full backdrop-blur-sm group-hover:bg-black/80 transition-colors">
-                    <Search size={12} />
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* INFO ADICIONAL — límites y preguntas frecuentes, autoreportadas
             por el artista (sin verificación, mismo criterio que las
             reseñas — ver debate 2026-08-04). Todo opcional, no cambia nada
@@ -783,10 +809,10 @@ export default function ArtistaLandingPage() {
               href={artista.facebook || undefined}
               target={artista.facebook ? '_blank' : undefined}
               rel={artista.facebook ? 'noopener noreferrer' : undefined}
-              onClick={artista.facebook ? undefined : (e) => e.preventDefault()}
+              onClick={artista.facebook ? undefined : (e) => { e.preventDefault(); mostrarAvisoRed('Facebook') }}
               aria-disabled={!artista.facebook}
               className={`flex items-center justify-center gap-2.5 py-3.5 border-r border-gray-200 transition-colors ${
-                artista.facebook ? 'text-gray-700 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-default'
+                artista.facebook ? 'text-gray-700 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-pointer'
               }`}
             >
               <FaFacebook size={18} />
@@ -799,10 +825,10 @@ export default function ArtistaLandingPage() {
               href={artista.instagram || undefined}
               target={artista.instagram ? '_blank' : undefined}
               rel={artista.instagram ? 'noopener noreferrer' : undefined}
-              onClick={artista.instagram ? undefined : (e) => e.preventDefault()}
+              onClick={artista.instagram ? undefined : (e) => { e.preventDefault(); mostrarAvisoRed('Instagram') }}
               aria-disabled={!artista.instagram}
               className={`flex items-center justify-center gap-2.5 py-3.5 transition-colors ${
-                artista.instagram ? 'text-gray-700 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-default'
+                artista.instagram ? 'text-gray-700 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-pointer'
               }`}
             >
               <FaInstagram size={18} />
@@ -1191,10 +1217,18 @@ export default function ArtistaLandingPage() {
               <p>El pago se procesa de forma segura por Mercado Pago — nunca compartes tus datos de tarjeta con el artista ni con INKognito.</p>
               <p className="font-bold text-gray-800">Es la forma más directa de convertir tu idea en una cita real.</p>
             </div>
-            <button type="button" onClick={() => setMostrarTerminos(false)} className="w-full mt-5 py-3 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity text-xs" style={{ backgroundColor: ACCENT }}>
+            <button type="button" onClick={() => setMostrarTerminos(false)} className="w-full mt-5 py-3 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity text-xs" style={{ backgroundColor: BTN }}>
               Entendido
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Aviso de red social no agregada (2026-08-06, Jose: "algo bien
+          profesional") — toast simple abajo, se cierra solo. */}
+      {avisoRed && (
+        <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-[70] bg-gray-900 text-white text-xs font-medium px-4 py-3 rounded-lg shadow-lg max-w-[90vw] text-center">
+          {artista.nombre} todavía no agregó su {avisoRed} — puedes escribirle por WhatsApp mientras tanto.
         </div>
       )}
     </div>

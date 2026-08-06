@@ -9,6 +9,10 @@ import { OPCIONES_DISPONIBILIDAD, DISPONIBILIDAD_COLOR, DISPONIBILIDAD_TEXTO } f
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const ACCENT = '#B3202F'
+// BTN (2026-08-06, Jose: "todo botón que esté en rojo cámbialo a gris")
+// — ACCENT se queda para texto de error/estado, y para el borde de la
+// miniatura del diseño que se está editando (no son botones).
+const BTN = '#374151'
 const MP_BLUE = '#3483FA'
 const MP_LOGO_URL = 'https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.21.0/mercadopago/logo__large@2x.png'
 
@@ -104,7 +108,7 @@ function PedirLinkForm() {
           type="submit"
           disabled={enviando}
           className="w-full py-3 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
-          style={{ backgroundColor: ACCENT }}
+          style={{ backgroundColor: BTN }}
         >
           {enviando ? 'Enviando...' : 'Mandarme el link'}
         </button>
@@ -322,17 +326,22 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
             type="button"
             onClick={() => setGuardadoOk(false)}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-white font-black uppercase tracking-widest text-[11px] hover:opacity-90 transition-opacity"
-            style={{ backgroundColor: ACCENT }}
+            style={{ backgroundColor: BTN }}
           >
             ← Volver a mis diseños
           </button>
         </div>
       ) : (
         <>
+          {/* Scroll lateral (2026-08-06, Jose: "cuando son más de dos, se
+              apilan todos en filas de a dos... la idea es que hagan
+              scroll lateral, para que no se alargue la card") — antes
+              era un grid que envolvía a nuevas filas con cada diseño
+              agregado, alargando la sección sin límite. */}
           {disenos && disenos.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+            <div className="flex gap-2 overflow-x-auto pb-2 mb-4 snap-x snap-mandatory scrollbar-hide">
               {disenos.map((d) => (
-                <div key={d.id} className={`relative aspect-square rounded-lg overflow-hidden border-2 ${editando === d.id ? '' : d.activo ? 'border-gray-200' : 'border-gray-200 opacity-50'}`} style={editando === d.id ? { borderColor: ACCENT } : {}}>
+                <div key={d.id} className={`relative w-[42%] sm:w-40 md:w-44 flex-shrink-0 snap-start aspect-square rounded-lg overflow-hidden border-2 ${editando === d.id ? '' : d.activo ? 'border-gray-200' : 'border-gray-200 opacity-50'}`} style={editando === d.id ? { borderColor: ACCENT } : {}}>
                   <img src={d.imagen_url} alt={d.titulo || 'Diseño'} className="w-full h-full object-cover" />
                   <div className="absolute top-1 left-1 bg-black/60 text-white text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full">
                     {d.tipo === 'lamina' ? 'Lámina' : 'Tatuaje'}
@@ -426,7 +435,7 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
                     type="button"
                     onClick={() => setNuevo((n) => ({ ...n, tipo: t.value }))}
                     className={`px-2 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wide transition-colors ${nuevo.tipo === t.value ? 'text-white' : 'text-gray-500 border-gray-300'}`}
-                    style={nuevo.tipo === t.value ? { backgroundColor: ACCENT, borderColor: ACCENT } : {}}
+                    style={nuevo.tipo === t.value ? { backgroundColor: BTN, borderColor: BTN } : {}}
                   >
                     {t.label} ({conteo}/5)
                   </button>
@@ -461,7 +470,7 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
               onClick={editando ? guardarEdicion : agregarDiseno}
               disabled={subiendo || guardando || (!editando && (disenos || []).filter((d) => d.tipo === nuevo.tipo).length >= 5)}
               className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-lg border-2 text-xs font-black uppercase tracking-widest disabled:opacity-60"
-              style={{ borderColor: ACCENT, color: ACCENT }}
+              style={{ borderColor: BTN, color: BTN }}
             >
               {guardando ? <LoaderCircle size={14} className="animate-spin" /> : editando ? <Check size={14} /> : <Plus size={14} />}
               {editando ? 'Guardar cambios' : 'Agregar diseño'}
@@ -598,7 +607,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
             type="button"
             onClick={() => setGuardado(false)}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white font-black uppercase tracking-widest text-xs hover:opacity-90 transition-opacity"
-            style={{ backgroundColor: ACCENT }}
+            style={{ backgroundColor: BTN }}
           >
             ← Volver a editar
           </button>
@@ -1036,7 +1045,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
           type="submit"
           disabled={guardando}
           className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
-          style={{ backgroundColor: ACCENT }}
+          style={{ backgroundColor: BTN }}
         >
           {guardando ? 'Guardando...' : 'Guardar cambios'}
         </button>

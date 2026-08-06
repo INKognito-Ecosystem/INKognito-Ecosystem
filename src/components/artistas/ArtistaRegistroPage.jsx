@@ -20,6 +20,13 @@ const SLOTS = [
   { key: 'foto_trabajo_3', label: 'Trabajo 3' },
 ]
 
+// captchaA/captchaB (2026-08-06) — generados acá en el loader (server-side,
+// una sola vez por request) en vez de con useState(() => Math.random())
+// dentro del componente. Generarlos en el cliente causaba un mismatch de
+// hidratación real: el HTML que manda el servidor trae un par de números,
+// pero al hidratar en el navegador se calculaba OTRO par distinto — React
+// detecta que no coinciden con lo ya renderizado. Con el loader, el mismo
+// valor viaja embebido en el HTML y se reusa tal cual al hidratar.
 export async function loader({ request }) {
   let ciudadDetectada = null
   try {
@@ -28,13 +35,15 @@ export async function loader({ request }) {
   } catch {
     ciudadDetectada = null
   }
+  const captchaA = Math.floor(Math.random() * 8) + 1
+  const captchaB = Math.floor(Math.random() * 8) + 1
   try {
     const res = await fetch(`${PANEL_URL}/api/upload-config`)
-    if (res.ok) return { ...(await res.json()), ciudadDetectada }
+    if (res.ok) return { ...(await res.json()), ciudadDetectada, captchaA, captchaB }
   } catch {
     // sigue abajo con el fallback
   }
-  return { cloud_name: null, upload_preset: null, ciudadDetectada }
+  return { cloud_name: null, upload_preset: null, ciudadDetectada, captchaA, captchaB }
 }
 
 export function meta() {
@@ -60,10 +69,14 @@ const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb
 // confirma el link que le llega al correo (ver ArtistaVerificarPage.jsx)
 // — ahí se activa solo, nadie del equipo tiene que revisarlo.
 export default function ArtistaRegistroPage() {
-  const { cloud_name, upload_preset, ciudadDetectada } = useLoaderData()
+  const { cloud_name, upload_preset, ciudadDetectada, captchaA, captchaB } = useLoaderData()
   const [form, setForm] = useState({
     nombre: '', departamento: '', municipio: '', lat: null, lng: null, estilo: '', bio: '', instagram: '', facebook: '', whatsapp: '', email: '', no_tatua: '',
     foto_url: '', foto_url_2: '', foto_trabajo_1: '', foto_trabajo_2: '', foto_trabajo_3: '',
+    // Honeypot (2026-08-06) — campo invisible para humanos; los bots que
+    // llenan formularios a ciegas suelen completar cualquier input que
+    // encuentren. Si viene con contenido, el backend rechaza en silencio.
+    sitio_web: '',
   })
   const [subiendo, setSubiendo] = useState(null)
   const [enviando, setEnviando] = useState(false)
@@ -72,6 +85,14 @@ export default function ArtistaRegistroPage() {
   const [ubicando, setUbicando] = useState(false)
   const [ubicacionError, setUbicacionError] = useState(null)
   const fileInputs = useRef({})
+
+  // Verificación anti-bot casera (2026-08-06, Jose: "constrúyelo para ver
+  // cómo se ve" — sin depender de una cuenta de reCAPTCHA/hCaptcha que
+  // Jose todavía no tiene creada). captchaA/captchaB vienen del loader
+  // (ver arriba, por qué no se generan acá con useState). El backend
+  // vuelve a sumar para verificar — no es a prueba de un bot hecho
+  // específicamente para este formulario, pero sí frena el spam genérico.
+  const [captchaRespuesta, setCaptchaRespuesta] = useState('')
 
   const set = (campo) => (e) => setForm((f) => ({ ...f, [campo]: e.target.value }))
 
@@ -141,18 +162,31 @@ export default function ArtistaRegistroPage() {
       setError('Nombre, departamento, municipio, WhatsApp y correo son obligatorios.')
       return
     }
+    // Al menos una red social (2026-08-06, Jose: "así estará obligado a
+    // compartir un perfil donde la gente vea quién es y dónde tiene
+    // trabajo real de él") — filtro adicional al correo verificado, sin
+    // exigir las dos.
+    if (!form.facebook.trim() && !form.instagram.trim()) {
+      setError('Agrega al menos una red social — Instagram o Facebook.')
+      return
+    }
+    if (Number(captchaRespuesta) !== captchaA + captchaB) {
+      setError('La respuesta de la verificación no es correcta.')
+      return
+    }
     setError(null)
     setEnviando(true)
     try {
       const res = await fetch(`${PANEL_URL}/api/artistas-solicitud`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, captcha_a: captchaA, captcha_b: captchaB, captcha_respuesta: captchaRespuesta }),
       })
-      if (!res.ok) throw new Error()
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || '')
       setEnviado(true)
-    } catch {
-      setError('No pudimos enviar tu registro — intenta de nuevo en un momento.')
+    } catch (err) {
+      setError(err.message || 'No pudimos enviar tu registro — intenta de nuevo en un momento.')
     } finally {
       setEnviando(false)
     }
@@ -410,7 +444,7 @@ export default function ArtistaRegistroPage() {
 
                 <div>
                   <label className={labelClass}>Bio</label>
-                  <textarea rows={3} className={inputClass} value={form.bio} onChange={set('bio')} placeholder="Cuenta tus técnicas, estilos y materiales — esto ayuda a que te encuentren en la búsqueda" />
+                  <textarea rows={3} className={inputClass} value={form.bio} onChange={set('bio')} placeholder="Cuenta tus técnicas, estilos y materiales — esto es lo primero que leen quienes ya te están considerando" />
                 </div>
 
                 <div>
@@ -429,19 +463,33 @@ export default function ArtistaRegistroPage() {
                 </div>
 
                 <div>
-                  <label className={labelClass}>Instagram</label>
+                  <label className={labelClass}>Instagram {!form.facebook.trim() && '*'}</label>
                   <input className={inputClass} value={form.instagram} onChange={set('instagram')} placeholder="https://instagram.com/..." />
                 </div>
 
                 <div>
-                  <label className={labelClass}>Facebook</label>
+                  <label className={labelClass}>Facebook {!form.instagram.trim() && '*'}</label>
                   <input className={inputClass} value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." />
+                  <p className="text-gray-400 text-[10px] mt-1">Necesitamos al menos una de las dos — es donde la gente ve que de verdad tatúas.</p>
                 </div>
 
                 <div>
                   <label className={labelClass}>No tatúas (opcional)</label>
                   <input className={inputClass} value={form.no_tatua} onChange={set('no_tatua')} placeholder="Ej: rostro, manos, zonas genitales" />
                 </div>
+
+                {/* Honeypot — invisible para una persona real, sin tabIndex
+                    ni autocompletar, así que no interfiere con el llenado
+                    normal del formulario. */}
+                <input
+                  type="text"
+                  value={form.sitio_web}
+                  onChange={set('sitio_web')}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }}
+                />
               </form>
             </div>
 
@@ -451,6 +499,21 @@ export default function ArtistaRegistroPage() {
                 lo referencia por id para poder ubicarse como el último
                 elemento de la sección sin mover la vista previa/columnas. */}
             <div className="mt-6 max-w-md mx-auto md:mx-0 md:ml-auto">
+              {/* Verificación anti-bot (2026-08-06) — un solo campo, sin
+                  cuentas de terceros. Los números se ven grandes/simples
+                  a propósito, no es una prueba difícil, solo un filtro
+                  contra scripts genéricos. */}
+              <div className="mb-4">
+                <label className={labelClass}>Verificación — ¿cuánto es {captchaA} + {captchaB}?</label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  className={inputClass}
+                  value={captchaRespuesta}
+                  onChange={(e) => setCaptchaRespuesta(e.target.value)}
+                  placeholder="Escribe el resultado"
+                />
+              </div>
               {error && <p className="text-sm mb-3 text-center md:text-right" style={{ color: ACCENT }}>{error}</p>}
               <button
                 type="submit"
