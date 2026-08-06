@@ -278,13 +278,17 @@ export default function ArtistaLandingPage() {
             )}
 
             {/* Reservar (fase 2, 2026-08-06) — aparece solo si el artista
-                activó su precio para agendar. precio_sesion_texto es
-                puramente informativo (muchos artistas no quieren publicar
-                el precio real del tatuaje), nunca es lo que se cobra. */}
+                activó su precio para agendar. Card propia (no texto suelto
+                + botón sin relación visual, Jose 2026-08-06) para que el
+                texto informativo y el botón se lean como una sola unidad.
+                precio_sesion_texto es puramente informativo (muchos
+                artistas no quieren publicar el precio real del tatuaje),
+                nunca es lo que se cobra. */}
             {artista.precio_agendar && (
-              <div className="pt-1">
+              <div className="mt-2 p-4 rounded-xl border max-w-xl" style={{ borderColor: `${ACCENT}30`, backgroundColor: `${ACCENT}08` }}>
+                <p className="text-[11px] font-black uppercase tracking-widest mb-1" style={{ color: ACCENT }}>Reserva tu cita</p>
                 {artista.precio_sesion_texto && (
-                  <p className="text-gray-500 text-xs italic mb-2 max-w-xl">{artista.precio_sesion_texto}</p>
+                  <p className="text-gray-600 text-xs leading-relaxed mb-3">{artista.precio_sesion_texto}</p>
                 )}
                 <button
                   type="button"
