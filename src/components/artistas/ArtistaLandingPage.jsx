@@ -523,8 +523,14 @@ export default function ArtistaLandingPage() {
             lightbox navegable con botón "Ver". Frase corta bajo el
             título con fin de SEO, no informativa para el visitante (las
             fotos ya se explican solas). */}
+        {/* mt-3 en vez de mt-6 (2026-08-06, Jose: "el título Portafolio
+            quedó muy lejos de la card de Sobre mí") — antes esta sección
+            vivía después de Agenda en línea/Diseños, con más elementos de
+            por medio; al subirla justo debajo de la bio, el mismo
+            margen que se usaba entre secciones más grandes se sentía
+            como un salto de más. */}
         {trabajos.length > 0 && (
-          <div className="mt-6 max-w-3xl mx-auto">
+          <div className="mt-3 max-w-3xl mx-auto">
             <p className="px-4 text-gray-400 text-[11px] uppercase tracking-widest mb-1 text-center">Portafolio</p>
             <p className="px-4 text-gray-400 text-[11px] mb-2 text-center">Tatuajes hechos por {artista.nombre} en {artista.municipio}</p>
             <div className="grid grid-cols-3 gap-0.5 sm:gap-1 w-full">
