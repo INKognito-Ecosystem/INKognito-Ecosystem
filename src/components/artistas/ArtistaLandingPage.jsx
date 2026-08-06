@@ -555,7 +555,7 @@ export default function ArtistaLandingPage() {
             {trabajos.length > 0 && (
               <div className="max-w-xl">
                 <div className="bg-gray-100 border border-gray-200 rounded-2xl overflow-hidden">
-                  <p className="px-4 pt-3.5 pb-2 text-gray-400 text-[11px] text-left truncate">
+                  <p className="px-4 pt-3.5 pb-2 text-gray-400 text-[11px] text-left overflow-x-auto whitespace-nowrap scrollbar-hide">
                     <span className="uppercase tracking-widest font-bold text-gray-500">Portafolio</span> — Tatuajes hechos por {artista.nombre} en {artista.municipio}
                   </p>
                   <div className="grid grid-cols-3 gap-0.5 sm:gap-1 w-full">
