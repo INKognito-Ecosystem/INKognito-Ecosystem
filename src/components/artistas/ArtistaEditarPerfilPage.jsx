@@ -299,15 +299,20 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
             {mpConectado ? 'Mercado Pago conectado' : 'Sin Mercado Pago conectado'}
           </span>
         </div>
-        {!mpConectado && (
-          <a
-            href={`${PANEL_URL}/api/artistas-mp-conectar?token=${encodeURIComponent(token)}`}
-            className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-white hover:opacity-90 transition-opacity"
-            style={{ backgroundColor: MP_BLUE }}
-          >
-            Conectar <ExternalLink size={11} />
-          </a>
-        )}
+        {/* Reconectar sigue visible aun ya conectado (2026-08-06, Jose:
+            "¿cómo hago para conectar con mi cuenta real si ya me muestra
+            que estoy conectado?") — antes el link desaparecía del todo al
+            conectar, sin forma de cambiar de cuenta. Autorizar de nuevo
+            sobrescribe el token guardado, no hace falta desconectar antes. */}
+        <a
+          href={`${PANEL_URL}/api/artistas-mp-conectar?token=${encodeURIComponent(token)}`}
+          className={mpConectado
+            ? 'text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors'
+            : 'inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-white hover:opacity-90 transition-opacity'}
+          style={mpConectado ? undefined : { backgroundColor: MP_BLUE }}
+        >
+          {mpConectado ? 'Reconectar' : (<>Conectar <ExternalLink size={11} /></>)}
+        </a>
       </div>
       {!mpConectado && (
         <p className="text-gray-400 text-[10px] mb-4">Conecta tu cuenta de Mercado Pago para empezar a vender tus diseños y recibir pagos de Agenda en línea — el dinero llega directo a ti.</p>
