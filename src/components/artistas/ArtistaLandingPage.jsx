@@ -85,6 +85,17 @@ export default function ArtistaLandingPage() {
   const [comprando, setComprando] = useState(false)
   const [errorCompra, setErrorCompra] = useState(null)
 
+  // Reservas con anticipo (fase 2, 2026-08-06) — mismo patrón que la compra
+  // de un diseño, formulario propio (nombre/WhatsApp/correo/mensaje) porque
+  // acá el artista necesita poder contactar al cliente para coordinar fecha.
+  const [reservando, setReservando] = useState(false)
+  const [resNombre, setResNombre] = useState('')
+  const [resTelefono, setResTelefono] = useState('')
+  const [resEmail, setResEmail] = useState('')
+  const [resMensaje, setResMensaje] = useState('')
+  const [enviandoReserva, setEnviandoReserva] = useState(false)
+  const [errorReserva, setErrorReserva] = useState(null)
+
   // Bug real reportado por Jose (2026-08-05): tras redirigir a Mercado
   // Pago con window.location.href, si el usuario le da "Atrás" del
   // navegador sin completar el pago, a veces el navegador restaura la
@@ -92,7 +103,7 @@ export default function ArtistaLandingPage() {
   // el botón congelado en "cargando", porque ese código nunca volvió a
   // correr. `pageshow` con `event.persisted` detecta justo ese caso.
   useEffect(() => {
-    const alRestaurar = (e) => { if (e.persisted) setComprando(false) }
+    const alRestaurar = (e) => { if (e.persisted) { setComprando(false); setEnviandoReserva(false) } }
     window.addEventListener('pageshow', alRestaurar)
     return () => window.removeEventListener('pageshow', alRestaurar)
   }, [])
@@ -145,6 +156,28 @@ export default function ArtistaLandingPage() {
     } catch (err) {
       setErrorCompra(err.message || 'No pudimos iniciar el pago — intenta de nuevo.')
       setComprando(false)
+    }
+  }
+
+  const hacerReserva = async (e) => {
+    e.preventDefault()
+    setEnviandoReserva(true)
+    setErrorReserva(null)
+    try {
+      const res = await fetch(`${PANEL_URL}/api/artistas-reservar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          artista_id: artista.id, cliente_nombre: resNombre, cliente_telefono: resTelefono,
+          cliente_email: resEmail, mensaje: resMensaje,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.init_point) throw new Error(data.error || '')
+      window.location.href = data.init_point
+    } catch (err) {
+      setErrorReserva(err.message || 'No pudimos iniciar el pago — intenta de nuevo.')
+      setEnviandoReserva(false)
     }
   }
 
@@ -241,6 +274,26 @@ export default function ArtistaLandingPage() {
               <div>
                 <p className="text-gray-400 text-[11px] uppercase tracking-widest mb-1">Sobre mí</p>
                 <p className="text-gray-600 text-sm leading-relaxed max-w-xl">{artista.bio}</p>
+              </div>
+            )}
+
+            {/* Reservar (fase 2, 2026-08-06) — aparece solo si el artista
+                activó su precio para agendar. precio_sesion_texto es
+                puramente informativo (muchos artistas no quieren publicar
+                el precio real del tatuaje), nunca es lo que se cobra. */}
+            {artista.precio_agendar && (
+              <div className="pt-1">
+                {artista.precio_sesion_texto && (
+                  <p className="text-gray-500 text-xs italic mb-2 max-w-xl">{artista.precio_sesion_texto}</p>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setReservando(true)}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-white font-black uppercase tracking-widest text-xs hover:opacity-90 transition-opacity"
+                  style={{ backgroundColor: ACCENT }}
+                >
+                  Reservar — ${Number(artista.precio_agendar).toLocaleString('es-CO')}
+                </button>
               </div>
             )}
 
@@ -567,6 +620,87 @@ export default function ArtistaLandingPage() {
           </div>
         )
       })()}
+
+      {/* MODAL DE RESERVA (fase 2, 2026-08-06) — mismo patrón que el de
+          compra de diseño, más simple (sin galería/marca de agua). Pide
+          nombre + WhatsApp + correo porque el artista necesita poder
+          contactar al cliente para coordinar la fecha, no solo mandarle un
+          archivo. */}
+      {reservando && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center px-4 py-8"
+          onClick={() => !enviandoReserva && setReservando(false)}
+        >
+          <div className="bg-white rounded-2xl w-full max-w-sm max-h-full overflow-y-auto p-5" onClick={(e) => e.stopPropagation()}>
+            <p className="font-black uppercase text-base leading-tight mb-1.5">Reservar con {artista.nombre}</p>
+            <p className="text-gray-500 text-xs italic mb-3">
+              {artista.nombre} se pondrá en contacto contigo para coordinar la fecha después de tu pago.
+            </p>
+            <p className="text-2xl font-black mb-3" style={{ color: MP_BLUE }}>
+              ${Number(artista.precio_agendar).toLocaleString('es-CO')} <span className="text-xs font-bold text-gray-400">COP</span>
+            </p>
+
+            <form onSubmit={hacerReserva} className="space-y-2.5">
+              <input
+                required
+                type="text"
+                placeholder="Tu nombre"
+                value={resNombre}
+                onChange={(e) => setResNombre(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:border-gray-500"
+              />
+              <input
+                required
+                type="text"
+                placeholder="Tu WhatsApp (573XXXXXXXXX)"
+                value={resTelefono}
+                onChange={(e) => setResTelefono(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:border-gray-500"
+              />
+              <input
+                required
+                type="email"
+                placeholder="Tu correo (ahí recibirás la confirmación)"
+                value={resEmail}
+                onChange={(e) => setResEmail(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:border-gray-500"
+              />
+              <textarea
+                rows={2}
+                placeholder="¿Qué tatuaje tienes en mente? (opcional)"
+                value={resMensaje}
+                onChange={(e) => setResMensaje(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:border-gray-500 resize-none"
+              />
+              {errorReserva && <p className="text-xs" style={{ color: ACCENT }}>{errorReserva}</p>}
+              <button
+                type="submit"
+                disabled={enviandoReserva}
+                className="w-full py-3 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-xs flex items-center justify-center gap-2"
+                style={{ backgroundColor: MP_BLUE }}
+              >
+                {enviandoReserva ? (
+                  <LoaderCircle size={14} className="animate-spin" />
+                ) : (
+                  <>
+                    Pagar con
+                    <img
+                      src={MP_LOGO_URL}
+                      alt="Mercado Pago"
+                      className="h-4"
+                      onError={(e) => { e.currentTarget.style.display = 'none' }}
+                    />
+                  </>
+                )}
+              </button>
+              <p className="text-gray-400 text-[10px] text-center">Pago 100% seguro, procesado por Mercado Pago.</p>
+              <button type="button" onClick={() => setReservando(false)} className="w-full text-center text-gray-400 text-[11px] uppercase tracking-widest py-1">
+                Cancelar
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

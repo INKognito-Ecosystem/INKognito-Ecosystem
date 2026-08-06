@@ -99,5 +99,8 @@ export default [
   // Venta de diseños (2026-08-05) — a donde vuelve el comprador tras pagar
   // en Mercado Pago (back_urls de POST /api/disenos-comprar, panel).
   route('artista/diseno/compra', 'components/artistas/DisenoCompraResultadoPage.jsx'),
+  // Reservas con anticipo (fase 2, 2026-08-06) — a donde vuelve el cliente
+  // tras pagar en Mercado Pago (back_urls de POST /api/artistas-reservar).
+  route('artista/reserva/resultado', 'components/artistas/ReservaResultadoPage.jsx'),
   route('artista/:id', 'components/artistas/ArtistaLandingPage.jsx'),
 ]

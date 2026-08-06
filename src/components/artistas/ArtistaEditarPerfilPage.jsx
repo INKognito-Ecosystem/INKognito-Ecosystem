@@ -450,6 +450,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
     lat: artista.lat ?? null, lng: artista.lng ?? null, estilo: artista.estilo || '', bio: artista.bio || '',
     instagram: artista.instagram || '', facebook: artista.facebook || '', whatsapp: artista.whatsapp || '',
     no_tatua: artista.no_tatua || '',
+    precio_agendar: artista.precio_agendar ?? '', precio_sesion_texto: artista.precio_sesion_texto || '',
     foto_url: artista.foto_url || '', foto_url_2: artista.foto_url_2 || '',
     foto_trabajo_1: artista.foto_trabajo_1 || '', foto_trabajo_2: artista.foto_trabajo_2 || '', foto_trabajo_3: artista.foto_trabajo_3 || '',
   })
@@ -637,6 +638,30 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
         <div>
           <label className={labelClass}>No tatúas (opcional)</label>
           <input className={inputClass} value={form.no_tatua} onChange={set('no_tatua')} placeholder="Ej: rostro, manos, zonas genitales" />
+        </div>
+
+        {/* Reservas con anticipo (fase 2, 2026-08-06) — un solo campo
+            obligatorio para activar el botón "Reservar" en el perfil: el
+            monto real que se cobra por Mercado Pago. No es un anticipo
+            parcial de un total mayor, es el monto completo de la reserva.
+            El texto de abajo es puramente informativo, nunca se cobra —
+            muchos artistas no quieren publicar el precio real del tatuaje,
+            pero sí dar contexto antes de que alguien pague. */}
+        <div className="pt-2 border-t border-gray-100">
+          <p className="text-gray-400 text-[11px] uppercase tracking-widest mb-3 pt-3">Reservas con anticipo</p>
+          <div>
+            <label className={labelClass}>Para agendar (COP)</label>
+            <input
+              type="number" min="0" className={inputClass} value={form.precio_agendar}
+              onChange={(e) => setForm((f) => ({ ...f, precio_agendar: e.target.value }))}
+              placeholder="Ej: 50000"
+            />
+            <p className="text-gray-400 text-[11px] mt-1">Si lo llenas, aparece un botón "Reservar" en tu perfil — esto es lo que se cobra, no un anticipo parcial.</p>
+          </div>
+          <div className="mt-3">
+            <label className={labelClass}>Sobre el valor de tu sesión (opcional)</label>
+            <textarea rows={2} className={inputClass} value={form.precio_sesion_texto} onChange={set('precio_sesion_texto')} placeholder="Ej: mi sesión vale desde $150.000" />
+          </div>
         </div>
 
         {error && <p className="text-sm" style={{ color: ACCENT }}>{error}</p>}
