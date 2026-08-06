@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLoaderData, useSearchParams } from 'react-router-dom'
+import { Link, useLoaderData, useSearchParams, useNavigate } from 'react-router-dom'
 import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
@@ -8,6 +8,13 @@ import { DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO } from '../../data/colombiaG
 import { OPCIONES_DISPONIBILIDAD, DISPONIBILIDAD_COLOR, DISPONIBILIDAD_TEXTO } from './disponibilidad'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+// Sesión persistida (2026-08-06, Jose: "no tener que estar generando link")
+// — el token en sí ya dura mucho más (ver TOKEN_VIGENCIA_HORAS en el panel),
+// esto es el complemento: una vez que el artista entra con un link válido,
+// el token queda guardado en este navegador, así que volver a /mi-perfil
+// sin el ?token en la URL (bookmark, o el link de "Editar mi perfil" del
+// navbar) lo reconecta solo, sin pedirle el correo de nuevo.
+const EDIT_TOKEN_KEY = 'artista_edit_token'
 const ACCENT = '#B3202F'
 // BTN (2026-08-06, Jose: "todo botón que esté en rojo cámbialo a gris")
 // — ACCENT se queda para texto de error/estado, y para el borde de la
@@ -1064,6 +1071,23 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
 
 export default function ArtistaEditarPerfilPage() {
   const { token, artista, error, cloud_name, upload_preset } = useLoaderData()
+  const navigate = useNavigate()
+
+  // Guardar el token válido para la próxima visita, y limpiar uno guardado
+  // que ya no sirve (evita reintentar en bucle un token vencido guardado
+  // de una sesión vieja).
+  useEffect(() => {
+    if (token && artista) localStorage.setItem(EDIT_TOKEN_KEY, token)
+    else if (token && error) localStorage.removeItem(EDIT_TOKEN_KEY)
+  }, [token, artista, error])
+
+  // Sin token en la URL — antes de mostrar "pide tu correo", intenta con
+  // el que quedó guardado de una visita anterior.
+  useEffect(() => {
+    if (token) return
+    const guardado = localStorage.getItem(EDIT_TOKEN_KEY)
+    if (guardado) navigate(`?token=${encodeURIComponent(guardado)}`, { replace: true })
+  }, [token, navigate])
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
