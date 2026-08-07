@@ -79,14 +79,6 @@ export default function EstudioLandingPage() {
               </div>
             </div>
             <div className="pt-3 pl-[108px] sm:pl-[144px] min-w-0">
-              {/* Insignia "Estudio de tatuajes" (2026-08-07, Jose) —
-                  identifica el tipo de perfil sin depender del nombre;
-                  un estudio puede llamarse corto (ej. "INKognito") y
-                  esta insignia sigue dejando claro qué es. */}
-              <span className="inline-flex items-center gap-1 text-[8px] sm:text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full text-white bg-gray-600 mb-1">
-                <Building2 size={9} />
-                Estudio de tatuajes
-              </span>
               {/* text-base en vez de text-lg/2xl + truncate (2026-08-07,
                   Jose: "el nombre del estudio como es largo genera dos
                   líneas de texto... para que no le pase a ningún otro
@@ -94,6 +86,17 @@ export default function EstudioLandingPage() {
                   artista a propósito, y con truncate para que SIEMPRE
                   quede en una sola línea sin importar el largo. */}
               <h1 className="text-base sm:text-xl font-black uppercase leading-tight truncate">{estudio.nombre}</h1>
+              {/* Insignia "Tattoo Studio" (2026-08-07, Jose: "que sea
+                  abajo [del nombre], pero en inglés, así podré quitar el
+                  'tattoo studio' del nombre de mi estudio, pq la insignia
+                  ya lo dirá") — identifica el tipo de perfil sin
+                  depender del nombre; un estudio puede llamarse corto
+                  (ej. "INKognito") y esta insignia sigue dejando claro
+                  qué es, sin repetirlo en el nombre. */}
+              <span className="inline-flex items-center gap-1 text-[8px] sm:text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full text-white bg-gray-600 mt-1">
+                <Building2 size={9} />
+                Tattoo Studio
+              </span>
               <span className="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 mt-1">
                 <MapPin size={11} className="flex-shrink-0" />
                 {estudio.municipio}{estudio.departamento ? `, ${estudio.departamento}` : ''}
