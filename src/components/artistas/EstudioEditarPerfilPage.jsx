@@ -440,6 +440,11 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
               {ubicando ? <LoaderCircle size={14} className="animate-spin" /> : form.lat ? <Check size={14} /> : <Navigation size={14} />}
               {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación exacta agregada' : 'Agregar ubicación exacta (ayuda a aparecer "cerca de ti")'}
             </button>
+            {/* Aclaración (2026-08-07, Jose confundió esto con el link de
+                Google Maps, pensando que uno reemplaza al otro) — son
+                independientes: esto alimenta el orden por cercanía del
+                buscador, el link de Google Maps de abajo NO. */}
+            <p className="text-gray-400 text-[10px] mt-1.5 text-center">Actívalo siempre — es lo único que ordena tu perfil por cercanía real en el buscador, tengas o no link de Google Maps.</p>
           </div>
           <div>
             <label className={labelClass}><FaInstagram className="inline -mt-0.5 mr-1" />Instagram</label>
@@ -458,10 +463,14 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
                 de ubicación con el mapa real de ese negocio") — opcional;
                 sin esto, el chip de ubicación del perfil público igual
                 funciona (cae a la ubicación exacta capturada o a una
-                búsqueda por nombre+municipio). */}
+                búsqueda por nombre+municipio). Texto de ayuda explícito
+                (2026-08-07, Jose confundió esto con la ubicación exacta,
+                pensando que había que elegir una de las dos) — deja claro
+                que esto es ADEMÁS de la ubicación exacta, no en su lugar,
+                y que no afecta el orden del buscador. */}
             <label className={labelClass}><MapPin size={12} className="inline -mt-0.5 mr-1" />Link de Google Maps (opcional)</label>
             <input value={form.google_maps_url} onChange={set('google_maps_url')} placeholder="https://maps.app.goo.gl/..." className={inputClass} />
-            <p className="text-gray-400 text-[10px] mt-1">Si ya tienes ficha de tu negocio en Google Maps, pega el link acá.</p>
+            <p className="text-gray-400 text-[10px] mt-1">Si ya tienes ficha de tu negocio en Google Maps, pégala acá — el botón de ubicación de tu perfil abrirá esa ficha real en vez de un pin genérico. No reemplaza la ubicación exacta de arriba, es un extra: no afecta el orden del buscador.</p>
           </div>
         </div>
       )}

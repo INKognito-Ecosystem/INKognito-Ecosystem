@@ -978,6 +978,11 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
             {ubicando ? <LoaderCircle size={14} className="animate-spin" /> : form.lat ? <Check size={14} /> : <Navigation size={14} />}
             {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación exacta guardada' : 'Actualizar mi ubicación exacta'}
           </button>
+          {/* Aclaración (2026-08-07, Jose confundió esto con el link de
+              Google Maps, pensando que uno reemplaza al otro) — son
+              independientes: esto alimenta el orden por cercanía del
+              buscador, el link de Google Maps de abajo NO. */}
+          <p className="text-gray-400 text-[10px] mt-1.5 text-center">Actívalo siempre — es lo único que ordena tu perfil por cercanía real en el buscador, tengas o no link de Google Maps.</p>
         </div>
 
         <div>
@@ -985,10 +990,13 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
               ubicación con el mapa real de ese negocio") — opcional; sin
               esto, el chip de ubicación del perfil público igual funciona
               (cae a la ubicación exacta de arriba o a una búsqueda por
-              nombre+municipio). */}
+              nombre+municipio). Texto de ayuda explícito (Jose confundió
+              esto con la ubicación exacta, pensando que había que elegir
+              una de las dos) — deja claro que esto es ADEMÁS, no en su
+              lugar, y que no afecta el orden del buscador. */}
           <label className={labelClass}>Link de Google Maps (opcional)</label>
           <input className={inputClass} value={form.google_maps_url} onChange={set('google_maps_url')} placeholder="https://maps.app.goo.gl/..." />
-          <p className="text-gray-400 text-[10px] mt-1">Si ya tienes ficha de tu estudio/local en Google Maps, pega el link acá.</p>
+          <p className="text-gray-400 text-[10px] mt-1">Si ya tienes ficha de tu estudio/local en Google Maps, pégala acá — el botón de ubicación de tu perfil abrirá esa ficha real en vez de un pin genérico. No reemplaza la ubicación exacta de arriba, es un extra: no afecta el orden del buscador.</p>
         </div>
 
         <div>
