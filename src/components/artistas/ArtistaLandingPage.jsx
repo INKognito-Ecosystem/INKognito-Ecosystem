@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
-import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle } from 'lucide-react'
+import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle, Building2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { municipioDesdeNombreIP } from '../../data/colombiaGeo'
 import { idDesdeParam } from './artistaSlug'
@@ -465,15 +465,18 @@ export default function ArtistaLandingPage() {
                       <span className="truncate">{artista.estilo}</span>
                     </span>
                   )}
-                  {/* Cruce con el estudio (fase 3, 2026-08-06) — chip
-                      chico que enlaza a la página del estudio, aditivo
-                      sobre un header ya construido. */}
+                  {/* Cruce con el estudio (fase 3, 2026-08-06) — v2 (Jose:
+                      "el artista no le pertenece al estudio" — se quita el
+                      verbo de posesión y se trata como un dato más, mismo
+                      estilo que municipio/estilo arriba (ícono + texto, sin
+                      frase), no como una relación de pertenencia. */}
                   {artista.estudio && (
                     <Link
                       to={`/tattoo-artist-colombia/estudio/${artista.estudio.id}`}
-                      className="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-bold text-gray-400 hover:text-gray-700 transition-colors truncate"
+                      className="flex items-center gap-1 text-[9px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 hover:text-gray-700 transition-colors truncate"
                     >
-                      Pertenece a {artista.estudio.nombre} →
+                      <Building2 size={10} className="flex-shrink-0" />
+                      <span className="truncate">{artista.estudio.nombre}</span>
                     </Link>
                   )}
                 </div>
