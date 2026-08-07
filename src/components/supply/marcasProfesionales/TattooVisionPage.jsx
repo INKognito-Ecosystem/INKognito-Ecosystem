@@ -1,5 +1,5 @@
 import { Link, useLoaderData } from 'react-router-dom'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Award } from 'lucide-react'
 import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
 import BrandCatalogSection from '../BrandCatalogSection'
@@ -9,8 +9,19 @@ import { useSupplyVisual } from '../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../hooks/useScrolled'
 import { fetchCatalogMarca } from '../../../hooks/useCatalog'
 
+const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+// fase 6.1 (2026-08-07) — id real en `estudios` vinculado a esta marca,
+// solo para leer distribuidor_oficial (la insignia paga). Si el fetch
+// falla, simplemente no se muestra insignia — no rompe la página.
+const ESTUDIO_ID = 4
+
 export async function loader() {
-  return fetchCatalogMarca('supply', 'tattoo-vision')
+  const [catalogo, estudioRes] = await Promise.all([
+    fetchCatalogMarca('supply', 'tattoo-vision'),
+    fetch(`${PANEL_URL}/api/estudios/${ESTUDIO_ID}`).catch(() => null),
+  ])
+  const estudio = estudioRes && estudioRes.ok ? await estudioRes.json() : null
+  return { ...catalogo, distribuidorOficial: estudio?.distribuidor_oficial || false }
 }
 
 export function meta() {
@@ -45,8 +56,16 @@ const faq = [
   },
 ]
 
+function InsigniaDistribuidorOficial() {
+  return (
+    <span className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-black text-[9px] font-black uppercase tracking-widest bg-amber-400">
+      <Award size={10} /> Distribuidor Oficial
+    </span>
+  )
+}
+
 export default function TattooVisionPage() {
-  const { products } = useLoaderData()
+  const { products, distribuidorOficial } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_tattoo_vision')
   const { prev, next } = getAdjacentBrands(0)
   const scrolled = useScrolled()
@@ -96,12 +115,13 @@ export default function TattooVisionPage() {
             <div className="h-20 md:h-32" />
           ) : logoUrl ? (
             <div>
-              <div className="float-left w-[180px] mr-6 md:mr-8 mb-2">
+              <div className="float-left w-[180px] mr-6 md:mr-8 mb-2 flex flex-col items-start">
                 <img
                   src={logoUrl}
                   alt="Tattoo Vision"
                   className="h-20 md:h-32 w-auto max-w-full object-contain"
                 />
+                {distribuidorOficial && <InsigniaDistribuidorOficial />}
               </div>
               <p className="text-zinc-400 text-sm md:text-base leading-relaxed text-justify [hyphens:auto]">
                 Sistemas visuales diseñados para tatuadores profesionales.
@@ -113,9 +133,12 @@ export default function TattooVisionPage() {
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8">
-              <h1 className="text-4xl md:text-7xl font-black uppercase leading-none flex-shrink-0">
-                Tattoo Vision
-              </h1>
+              <div className="flex-shrink-0">
+                <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
+                  Tattoo Vision
+                </h1>
+                {distribuidorOficial && <InsigniaDistribuidorOficial />}
+              </div>
               <p className="max-w-xl text-zinc-400 text-sm md:text-base leading-relaxed text-justify [hyphens:auto] sm:border-l sm:border-zinc-800 sm:pl-8">
                 Sistemas visuales diseñados para tatuadores profesionales.
                 Gafas especializadas, iluminación avanzada y accesorios

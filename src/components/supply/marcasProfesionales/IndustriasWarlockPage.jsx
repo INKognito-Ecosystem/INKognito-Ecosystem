@@ -1,5 +1,5 @@
 import { Link, useLoaderData } from 'react-router-dom'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Award } from 'lucide-react'
 import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
 import BrandCatalogSection from '../BrandCatalogSection'
@@ -9,6 +9,12 @@ import { useSupplyVisual } from '../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../hooks/useScrolled'
 import { fetchCatalogMarca } from '../../../hooks/useCatalog'
 
+const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+// fase 6.1 (2026-08-07) — id real en `estudios` vinculado a esta marca,
+// solo para leer distribuidor_oficial (la insignia paga). Si el fetch
+// falla, simplemente no se muestra insignia — no rompe la página.
+const ESTUDIO_ID = 5
+
 // Antes esta página era de Kwadron (cartuchos, /supply/cartridges/kwadron,
 // components/supply/categories/Cartridges/KwadronCartridgesPage.jsx).
 // Reemplazada por Industrias Warlock (mobiliario) y movida acá — decisión
@@ -16,7 +22,12 @@ import { fetchCatalogMarca } from '../../../hooks/useCatalog'
 // propósito: el logo ya se subió en el panel bajo esa misma clave
 // (supply_brand_kwadron) y cambiarla rompería esa imagen.
 export async function loader() {
-  return fetchCatalogMarca('supply', 'kwadron')
+  const [catalogo, estudioRes] = await Promise.all([
+    fetchCatalogMarca('supply', 'kwadron'),
+    fetch(`${PANEL_URL}/api/estudios/${ESTUDIO_ID}`).catch(() => null),
+  ])
+  const estudio = estudioRes && estudioRes.ok ? await estudioRes.json() : null
+  return { ...catalogo, distribuidorOficial: estudio?.distribuidor_oficial || false }
 }
 
 export function meta() {
@@ -54,8 +65,16 @@ const faq = [
   },
 ]
 
+function InsigniaDistribuidorOficial() {
+  return (
+    <span className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-black text-[9px] font-black uppercase tracking-widest bg-amber-400">
+      <Award size={10} /> Distribuidor Oficial
+    </span>
+  )
+}
+
 export default function IndustriasWarlockPage() {
-  const { products } = useLoaderData()
+  const { products, distribuidorOficial } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_kwadron')
   const { prev, next } = getAdjacentBrands(1)
   const scrolled = useScrolled()
@@ -111,12 +130,15 @@ export default function IndustriasWarlockPage() {
                   poco el piñón del diseño pero llena el espacio parejo con
                   las demás marcas — decisión de Jose, prefiere esto a que
                   se vea chico con object-contain. */}
-              <div className="float-left w-[180px] h-20 md:h-32 mr-6 md:mr-8 mb-2 overflow-hidden">
-                <img
-                  src={logoUrl}
-                  alt="Industrias Warlock"
-                  className="w-full h-full object-cover"
-                />
+              <div className="float-left w-[180px] mr-6 md:mr-8 mb-2 flex flex-col items-start">
+                <div className="w-full h-20 md:h-32 overflow-hidden">
+                  <img
+                    src={logoUrl}
+                    alt="Industrias Warlock"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                {distribuidorOficial && <InsigniaDistribuidorOficial />}
               </div>
 
               <p>
@@ -140,9 +162,12 @@ export default function IndustriasWarlockPage() {
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8">
-              <h1 className="text-4xl md:text-7xl font-black uppercase leading-none flex-shrink-0">
-                Industrias Warlock
-              </h1>
+              <div className="flex-shrink-0">
+                <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
+                  Industrias Warlock
+                </h1>
+                {distribuidorOficial && <InsigniaDistribuidorOficial />}
+              </div>
 
               <div className="max-w-xl text-zinc-400 leading-relaxed text-justify [hyphens:auto] space-y-2 sm:border-l sm:border-zinc-800 sm:pl-8">
 

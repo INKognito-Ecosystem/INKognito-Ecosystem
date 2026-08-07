@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
-import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle, Building2 } from 'lucide-react'
+import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle, Building2, Award } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { municipioDesdeNombreIP } from '../../data/colombiaGeo'
 import { idDesdeParam } from './artistaSlug'
@@ -487,13 +487,20 @@ export default function ArtistaLandingPage() {
                       tenía ninguna señal de que se puede tocar): subrayado
                       en el texto, mismo recurso que ya usa esta página para
                       "Especialidades" y el "ver más" de la bio. */}
+                  {/* v4 (fase 6.1, 2026-08-07, Jose) — si el vínculo es
+                      con una empresa (marca proveedora), no con un
+                      estudio de tatuaje real, se reencuadra como
+                      patrocinio: mismo dato (`artista.estudio_id`), sin
+                      inventar una relación nueva. */}
                   {artista.estudio && (
                     <Link
                       to={`/tattoo-artist-colombia/estudio/${artista.estudio.id}`}
                       className="flex items-center gap-1 text-[9px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 hover:text-gray-700 transition-colors truncate"
                     >
-                      <Building2 size={10} className="flex-shrink-0" />
-                      <span className="truncate underline underline-offset-2 decoration-gray-300">{artista.estudio.nombre}</span>
+                      {artista.estudio.tipo === 'empresa' ? <Award size={10} className="flex-shrink-0" /> : <Building2 size={10} className="flex-shrink-0" />}
+                      <span className="truncate underline underline-offset-2 decoration-gray-300">
+                        {artista.estudio.tipo === 'empresa' ? `Patrocinado por ${artista.estudio.nombre}` : artista.estudio.nombre}
+                      </span>
                     </Link>
                   )}
                 </div>

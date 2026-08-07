@@ -1,4 +1,4 @@
-import { useLoaderData } from 'react-router-dom'
+import { useLoaderData, redirect } from 'react-router-dom'
 import { Award } from 'lucide-react'
 import FooterSupply from './FooterSupply'
 import NavbarCategory from './NavbarCategory'
@@ -14,16 +14,24 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-pro
 // por marca, copy escrito a mano), esta es dinámica: cualquier estudio
 // con vende_supply activo tiene esta misma página, sin tocar código.
 export async function loader({ params }) {
+  let estudio = null, products = []
   try {
     const [estudioRes, catalogo] = await Promise.all([
       fetch(`${PANEL_URL}/api/estudios/${params.id}`),
       fetchCatalogEstudio('supply', params.id),
     ])
-    const estudio = estudioRes.ok ? await estudioRes.json() : null
-    return { estudio, products: catalogo.products }
+    estudio = estudioRes.ok ? await estudioRes.json() : null
+    products = catalogo.products
   } catch {
-    return { estudio: null, products: [] }
+    estudio = null
   }
+  // fase 6.1 (2026-08-07, Jose) — una marca con landing propia ya hecha a
+  // mano (marcasProfesionales/*.jsx) o su propio sitio externo no debe
+  // quedarse con esta página genérica vacía como duplicado; el redirect
+  // va FUERA del try/catch de arriba a propósito — throw redirect() es un
+  // Response, no un error, y un catch genérico lo tragaría silenciosamente.
+  if (estudio?.catalogo_url) throw redirect(estudio.catalogo_url)
+  return { estudio, products }
 }
 
 export function meta({ data }) {

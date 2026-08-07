@@ -1,6 +1,6 @@
 import { Link, useLoaderData } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
-import { MapPin, Users, Building2, ShoppingBag } from 'lucide-react'
+import { MapPin, Users, Building2, ShoppingBag, Award } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { idDesdeParam } from './artistaSlug'
 import { urlGoogleMaps } from './mapaUrl'
@@ -89,9 +89,13 @@ export default function EstudioLandingPage() {
                   como es largo genera dos líneas de texto") — más chico
                   que el de artista a propósito, para que SIEMPRE quede en
                   una sola línea sin importar el largo. */}
+              {/* fase 6.1 (2026-08-07, Jose) — una empresa proveedora
+                  pura no es un estudio de tatuaje, la insignia/tooltip
+                  cambia para reflejar eso ("Marca Profesional" en vez de
+                  "Tattoo Studio"), mismo ícono-antes-del-nombre. */}
               <div className="flex items-center gap-1.5 min-w-0">
-                <span title="Tattoo Studio" className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-gray-600">
-                  <Building2 size={11} className="text-white" />
+                <span title={estudio.tipo === 'empresa' ? 'Marca Profesional' : 'Tattoo Studio'} className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-gray-600">
+                  {estudio.tipo === 'empresa' ? <Award size={11} className="text-white" /> : <Building2 size={11} className="text-white" />}
                 </span>
                 <h1 className="text-base sm:text-xl font-black uppercase leading-tight truncate min-w-0">{estudio.nombre}</h1>
               </div>
@@ -113,32 +117,43 @@ export default function EstudioLandingPage() {
                 {estudio.municipio}{estudio.departamento ? `, ${estudio.departamento}` : ''}
               </a>
 
-              {/* Supply multitenant (fase 4/5, 2026-08-07) — v3 (Jose:
+              {/* Supply multitenant (fase 4/5/6.1, 2026-08-07) — v3 (Jose:
                   "alineado con el nombre y la ubicación, no debajo del
                   perfil") — DENTRO de la columna con pl-[108px]/[144px],
                   no como hermano del wrapper `relative` de arriba; así
                   hereda el mismo indent que nombre/ubicación en vez de
                   arrancar desde el borde izquierdo (debajo de la foto).
-                  Parpadeo 3 veces al entrar (CSS puro sobre un solo
+                  v4 (fase 6.1): ya no depende solo de vende_supply — una
+                  marca con landing propia (catalogo_url, ver fase 6.1)
+                  también debe mostrar el link aunque no suba inventario
+                  acá. Parpadeo 3 veces al entrar (CSS puro sobre un solo
                   elemento, sin costo relacionado al tamaño del catálogo) —
                   respeta prefers-reduced-motion. */}
-              {estudio.vende_supply && estudio.n_productos_supply > 0 && (
-                <>
-                  <style>{`
-                    @media (prefers-reduced-motion: no-preference) {
-                      @keyframes catalogoCtaBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-                      .catalogo-cta-blink { animation: catalogoCtaBlink 0.45s ease-in-out 3; }
-                    }
-                  `}</style>
-                  <Link
-                    to={`/supply/estudio/${estudio.id}`}
-                    className="catalogo-cta-blink flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white hover:opacity-90 active:scale-95 transition-all rounded-full px-2.5 py-1 mt-1.5 w-fit"
-                    style={{ backgroundColor: BTN }}
-                  >
-                    <ShoppingBag size={11} className="flex-shrink-0" /> Mi Supply en línea
-                  </Link>
-                </>
-              )}
+              {(estudio.catalogo_url || (estudio.vende_supply && estudio.n_productos_supply > 0)) && (() => {
+                const destino = estudio.catalogo_url || `/supply/estudio/${estudio.id}`
+                const externo = /^https?:\/\//.test(destino)
+                const texto = estudio.tipo === 'empresa' ? 'Ver su catálogo' : 'Mi Supply en línea'
+                const claseComun = "catalogo-cta-blink flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white hover:opacity-90 active:scale-95 transition-all rounded-full px-2.5 py-1 mt-1.5 w-fit"
+                return (
+                  <>
+                    <style>{`
+                      @media (prefers-reduced-motion: no-preference) {
+                        @keyframes catalogoCtaBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+                        .catalogo-cta-blink { animation: catalogoCtaBlink 0.45s ease-in-out 3; }
+                      }
+                    `}</style>
+                    {externo ? (
+                      <a href={destino} target="_blank" rel="noreferrer" className={claseComun} style={{ backgroundColor: BTN }}>
+                        <ShoppingBag size={11} className="flex-shrink-0" /> {texto}
+                      </a>
+                    ) : (
+                      <Link to={destino} className={claseComun} style={{ backgroundColor: BTN }}>
+                        <ShoppingBag size={11} className="flex-shrink-0" /> {texto}
+                      </Link>
+                    )}
+                  </>
+                )
+              })()}
             </div>
           </div>
 
@@ -171,11 +186,20 @@ export default function EstudioLandingPage() {
           )}
 
           <div className="mt-8">
+            {/* fase 6.1 (2026-08-07, Jose) — para una empresa (no un
+                estudio real), este mismo vínculo/grid se reencuadra como
+                patrocinio: una marca puede patrocinar a un tatuador real
+                para que la promocione, reusando `artista.estudio_id` sin
+                ningún cambio de datos, solo de copy. */}
             <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-1.5">
-              <Users size={13} /> {estudio.artistas?.length || 0} artista{estudio.artistas?.length === 1 ? '' : 's'} en este estudio
+              <Users size={13} /> {estudio.tipo === 'empresa'
+                ? `${estudio.artistas?.length || 0} artista${estudio.artistas?.length === 1 ? '' : 's'} patrocinado${estudio.artistas?.length === 1 ? '' : 's'}`
+                : `${estudio.artistas?.length || 0} artista${estudio.artistas?.length === 1 ? '' : 's'} en este estudio`}
             </p>
             {!estudio.artistas || estudio.artistas.length === 0 ? (
-              <p className="text-gray-400 text-sm">Este estudio todavía no tiene artistas activos.</p>
+              <p className="text-gray-400 text-sm">
+                {estudio.tipo === 'empresa' ? 'Esta marca todavía no patrocina a ningún artista.' : 'Este estudio todavía no tiene artistas activos.'}
+              </p>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-5">
                 {/* v3 (2026-08-07, Jose: revierte el tratamiento tipo

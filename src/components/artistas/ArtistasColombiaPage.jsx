@@ -778,7 +778,7 @@ export default function ArtistasColombiaPage() {
               {proveedoresFiltrados.map(e => (
                 <ListingRow
                   key={`proveedor-${e.id}`}
-                  to={`/supply/estudio/${e.id}`}
+                  to={e.catalogo_url || `/supply/estudio/${e.id}`}
                   nombre={e.nombre}
                   municipio={e.municipio}
                   estilo={null}
