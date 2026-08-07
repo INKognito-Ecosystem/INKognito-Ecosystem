@@ -456,18 +456,22 @@ export default function ArtistaLandingPage() {
                     línea (2026-08-06, Jose) — antes iban lado a lado en una
                     sola fila. */}
                 <div className="mt-1 space-y-0.5">
-                  {/* Enlace real a Google Maps (2026-08-07, Jose) — usa el
-                      link propio si lo pegó, si no el punto exacto que
-                      capturó al registrarse, si no una búsqueda por
+                  {/* Enlace real a Google Maps (2026-08-07, Jose) — v2:
+                      "como botón no es claro... debería ser sensible" — el
+                      texto subrayado no se leía como botón real y el área
+                      de toque era muy chica en celular. Ahora es un botón
+                      con fondo/borde visibles y feedback al tocar
+                      (active:). Link propio si lo pegó, si no el punto
+                      exacto capturado, si no búsqueda por
                       nombre+municipio. Nunca queda sin link. */}
                   <a
                     href={urlGoogleMaps(artista)}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-1 text-[9px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 hover:text-gray-700 transition-colors truncate"
+                    className="inline-flex items-center gap-1 text-[9px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-600 hover:text-gray-900 hover:bg-gray-50 active:scale-95 transition-all border border-gray-300 rounded-full px-2 py-0.5 max-w-full truncate"
                   >
                     <MapPin size={10} className="flex-shrink-0" />
-                    <span className="truncate underline underline-offset-2 decoration-gray-300">{artista.municipio}{artista.departamento ? `, ${artista.departamento}` : ''}</span>
+                    <span className="truncate">{artista.municipio}{artista.departamento ? `, ${artista.departamento}` : ''}</span>
                   </a>
                   {artista.estilo && (
                     <span className="flex items-center gap-1 text-[9px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 truncate">

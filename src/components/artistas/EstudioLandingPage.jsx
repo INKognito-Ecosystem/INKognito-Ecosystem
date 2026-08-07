@@ -95,18 +95,22 @@ export default function EstudioLandingPage() {
                 </span>
                 <h1 className="text-base sm:text-xl font-black uppercase leading-tight truncate min-w-0">{estudio.nombre}</h1>
               </div>
-              {/* Enlace real a Google Maps (2026-08-07, Jose) — mismo
-                  criterio que ArtistaLandingPage.jsx: link propio si lo
-                  pegaron, si no el punto exacto capturado, si no una
-                  búsqueda por nombre+municipio. */}
+              {/* Enlace real a Google Maps (2026-08-07, Jose) — v2:
+                  "como botón no es claro... debería ser sensible" — el
+                  texto subrayado no se leía como botón real y el área de
+                  toque era muy chica en celular. Ahora es un botón con
+                  fondo/borde visibles y feedback al tocar (active:), área
+                  de toque más grande. Link propio si lo pegaron, si no el
+                  punto exacto capturado, si no búsqueda por
+                  nombre+municipio. */}
               <a
                 href={urlGoogleMaps(estudio)}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 hover:text-gray-700 transition-colors mt-1"
+                className="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-600 hover:text-gray-900 hover:bg-gray-50 active:scale-95 transition-all border border-gray-300 rounded-full px-2.5 py-1 mt-1.5"
               >
                 <MapPin size={11} className="flex-shrink-0" />
-                <span className="underline underline-offset-2 decoration-gray-300">{estudio.municipio}{estudio.departamento ? `, ${estudio.departamento}` : ''}</span>
+                {estudio.municipio}{estudio.departamento ? `, ${estudio.departamento}` : ''}
               </a>
             </div>
           </div>
