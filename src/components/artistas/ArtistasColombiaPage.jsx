@@ -710,7 +710,12 @@ export default function ArtistasColombiaPage() {
                   título, sin reemplazar "Tattoo Artist Colombia" en
                   navbar/meta/footer — ese texto sigue haciendo el trabajo
                   de explicarle a quien recién llega de qué se trata esto. */}
-              <span className="inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">INK</span> El buscador que conecta personas con tatuadores de toda Colombia. Busca por nombre, municipio, estilo — y déjanos recomendarte el artista más cercano.
+              {/* v2 (fase 6.5, 2026-08-07, Jose: "conecta personas con
+                  estudios de tu ciudad, o de Colombia") — ahora que el
+                  menú separa "Buscar artistas"/"Buscar estudios", el copy
+                  del hero menciona ambos y las dos escalas (ciudad y
+                  nacional), en vez de hablar solo de tatuadores. */}
+              <span className="inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">INK</span> El buscador que conecta personas con tatuadores y estudios de tu ciudad, o de toda Colombia. Busca por nombre, municipio, estilo — y déjanos recomendarte el más cercano.
             </p>
 
             {/* Señales de confianza, mismo patrón que ya vimos en Tattoodo
