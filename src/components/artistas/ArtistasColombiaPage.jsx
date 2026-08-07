@@ -690,6 +690,7 @@ export default function ArtistasColombiaPage() {
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder="Nombre, municipio o estilo..."
+                autoComplete="off"
                 className="w-full bg-gray-50 border border-gray-300 rounded-full pl-11 pr-9 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-500 transition-colors"
               />
               {query && (
@@ -767,35 +768,29 @@ export default function ArtistasColombiaPage() {
 
         {/* PROVEEDORES OFICIALES (fase 6, 2026-08-07) — el producto real
             de "Distribuidor Oficial": aparecer frente a esta misma
-            audiencia. Enlaza a su catálogo de Supply (/supply/estudio/:id),
-            no al perfil de tatuaje — es una marca proveedora, no un
-            estudio. Bloque separado de "Estudios" para no confundir un
-            proveedor de insumos con un lugar donde tatuarse. */}
+            audiencia. v2 (2026-08-07, Jose: "suponía que me abriría el
+            perfil de esa marca, y allí ver información útil... pero en
+            cambio me manda a la landing premium de una vez") — enlaza a
+            SU PROPIO PERFIL (mismo destino que "Estudios" abajo), no
+            directo al catálogo. El perfil (EstudioLandingPage.jsx) es
+            donde vive el botón "Ver su catálogo" hacia catalogo_url —
+            clic en el resultado de búsqueda ya no salta ese paso. */}
         {proveedoresFiltrados.length > 0 && (
           <div className="mb-5">
             <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 px-1">Proveedores Oficiales</p>
             <div className="flex flex-col gap-3">
-              {proveedoresFiltrados.map(e => {
-                // ?flechas=0 (fase 6.1, 2026-08-07, bug real: las flechas
-                // prev/next de marcasProfesionales/*.jsx dejaban saltar a
-                // otra marca sin relación desde acá) — solo aplica a rutas
-                // internas, una URL externa no tiene ese problema.
-                const base = e.catalogo_url || `/supply/estudio/${e.id}`
-                const externo = /^https?:\/\//.test(base)
-                const destino = externo ? base : `${base}${base.includes('?') ? '&' : '?'}flechas=0`
-                return (
-                  <ListingRow
-                    key={`proveedor-${e.id}`}
-                    to={destino}
-                    nombre={e.nombre}
-                    municipio={e.municipio}
-                    estilo={null}
-                    bio={e.bio}
-                    foto={e.logo_url}
-                    onVerInfo={() => setModalArtista(e)}
-                  />
-                )
-              })}
+              {proveedoresFiltrados.map(e => (
+                <ListingRow
+                  key={`proveedor-${e.id}`}
+                  to={`/tattoo-artist-colombia/estudio/${e.id}`}
+                  nombre={e.nombre}
+                  municipio={e.municipio}
+                  estilo={null}
+                  bio={e.bio}
+                  foto={e.logo_url}
+                  onVerInfo={() => setModalArtista(e)}
+                />
+              ))}
             </div>
           </div>
         )}
