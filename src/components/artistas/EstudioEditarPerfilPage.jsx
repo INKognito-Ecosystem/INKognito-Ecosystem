@@ -233,6 +233,7 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
     lat: estudio.lat ?? null, lng: estudio.lng ?? null,
     bio: estudio.bio || '', instagram: estudio.instagram || '', facebook: estudio.facebook || '', whatsapp: estudio.whatsapp || '',
     logo_url: estudio.logo_url || '', foto_portada: estudio.foto_portada || '',
+    google_maps_url: estudio.google_maps_url || '',
   })
   const [subiendo, setSubiendo] = useState(null)
   const [guardando, setGuardando] = useState(false)
@@ -451,6 +452,16 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
           <div>
             <label className={labelClass}><FaWhatsapp className="inline -mt-0.5 mr-1" />WhatsApp</label>
             <input value={form.whatsapp} onChange={set('whatsapp')} placeholder="57300..." className={inputClass} />
+          </div>
+          <div>
+            {/* Link de Google Maps (2026-08-07, Jose: "conectar el botón
+                de ubicación con el mapa real de ese negocio") — opcional;
+                sin esto, el chip de ubicación del perfil público igual
+                funciona (cae a la ubicación exacta capturada o a una
+                búsqueda por nombre+municipio). */}
+            <label className={labelClass}><MapPin size={12} className="inline -mt-0.5 mr-1" />Link de Google Maps (opcional)</label>
+            <input value={form.google_maps_url} onChange={set('google_maps_url')} placeholder="https://maps.app.goo.gl/..." className={inputClass} />
+            <p className="text-gray-400 text-[10px] mt-1">Si ya tienes ficha de tu negocio en Google Maps, pega el link acá.</p>
           </div>
         </div>
       )}

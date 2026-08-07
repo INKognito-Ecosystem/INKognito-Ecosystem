@@ -3,6 +3,7 @@ import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import { MapPin, Users, Building2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { idDesdeParam } from './artistaSlug'
+import { urlGoogleMaps } from './mapaUrl'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const BTN = '#374151'
@@ -79,28 +80,35 @@ export default function EstudioLandingPage() {
               </div>
             </div>
             <div className="pt-3 pl-[108px] sm:pl-[144px] min-w-0">
-              {/* text-base en vez de text-lg/2xl + truncate (2026-08-07,
-                  Jose: "el nombre del estudio como es largo genera dos
-                  líneas de texto... para que no le pase a ningún otro
-                  estudio con nombre largo") — más chico que el de
-                  artista a propósito, y con truncate para que SIEMPRE
-                  quede en una sola línea sin importar el largo. */}
-              <h1 className="text-base sm:text-xl font-black uppercase leading-tight truncate">{estudio.nombre}</h1>
-              {/* Insignia "Tattoo Studio" (2026-08-07, Jose: "que sea
-                  abajo [del nombre], pero en inglés, así podré quitar el
-                  'tattoo studio' del nombre de mi estudio, pq la insignia
-                  ya lo dirá") — identifica el tipo de perfil sin
-                  depender del nombre; un estudio puede llamarse corto
-                  (ej. "INKognito") y esta insignia sigue dejando claro
-                  qué es, sin repetirlo en el nombre. */}
-              <span className="inline-flex items-center gap-1 text-[8px] sm:text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full text-white bg-gray-600 mt-1">
-                <Building2 size={9} />
-                Tattoo Studio
-              </span>
-              <span className="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 mt-1">
+              {/* v3 (2026-08-07, Jose: "lo que aparecerá enfrente será el
+                  nombre del estudio... el ícono iría detrás del nombre") —
+                  el nombre va primero y el ícono queda pegado a él en la
+                  misma línea (mismo patrón que VerifiedBadge en
+                  ArtistasColombiaPage.jsx: solo ícono, sin texto), en vez
+                  de una insignia de texto aparte debajo. text-base en vez
+                  de text-lg/2xl + truncate (Jose: "el nombre del estudio
+                  como es largo genera dos líneas de texto") — más chico
+                  que el de artista a propósito, para que SIEMPRE quede en
+                  una sola línea sin importar el largo. */}
+              <div className="flex items-center gap-1.5 min-w-0">
+                <h1 className="text-base sm:text-xl font-black uppercase leading-tight truncate min-w-0">{estudio.nombre}</h1>
+                <span title="Tattoo Studio" className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-gray-600">
+                  <Building2 size={11} className="text-white" />
+                </span>
+              </div>
+              {/* Enlace real a Google Maps (2026-08-07, Jose) — mismo
+                  criterio que ArtistaLandingPage.jsx: link propio si lo
+                  pegaron, si no el punto exacto capturado, si no una
+                  búsqueda por nombre+municipio. */}
+              <a
+                href={urlGoogleMaps(estudio)}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 hover:text-gray-700 transition-colors mt-1"
+              >
                 <MapPin size={11} className="flex-shrink-0" />
-                {estudio.municipio}{estudio.departamento ? `, ${estudio.departamento}` : ''}
-              </span>
+                <span className="underline underline-offset-2 decoration-gray-300">{estudio.municipio}{estudio.departamento ? `, ${estudio.departamento}` : ''}</span>
+              </a>
             </div>
           </div>
 

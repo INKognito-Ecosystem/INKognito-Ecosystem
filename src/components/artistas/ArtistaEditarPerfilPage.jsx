@@ -512,6 +512,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
     precio_agendar: artista.precio_agendar ?? '', precio_sesion_texto: artista.precio_sesion_texto || '',
     foto_url: artista.foto_url || '', foto_url_2: artista.foto_url_2 || '',
     foto_trabajo_1: artista.foto_trabajo_1 || '', foto_trabajo_2: artista.foto_trabajo_2 || '', foto_trabajo_3: artista.foto_trabajo_3 || '',
+    google_maps_url: artista.google_maps_url || '',
   })
   const [subiendo, setSubiendo] = useState(null)
   const [ubicando, setUbicando] = useState(false)
@@ -977,6 +978,17 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
             {ubicando ? <LoaderCircle size={14} className="animate-spin" /> : form.lat ? <Check size={14} /> : <Navigation size={14} />}
             {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación exacta guardada' : 'Actualizar mi ubicación exacta'}
           </button>
+        </div>
+
+        <div>
+          {/* Link de Google Maps (2026-08-07, Jose: "conectar el botón de
+              ubicación con el mapa real de ese negocio") — opcional; sin
+              esto, el chip de ubicación del perfil público igual funciona
+              (cae a la ubicación exacta de arriba o a una búsqueda por
+              nombre+municipio). */}
+          <label className={labelClass}>Link de Google Maps (opcional)</label>
+          <input className={inputClass} value={form.google_maps_url} onChange={set('google_maps_url')} placeholder="https://maps.app.goo.gl/..." />
+          <p className="text-gray-400 text-[10px] mt-1">Si ya tienes ficha de tu estudio/local en Google Maps, pega el link acá.</p>
         </div>
 
         <div>

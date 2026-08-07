@@ -6,6 +6,7 @@ import NavbarArtistas from './NavbarArtistas'
 import { municipioDesdeNombreIP } from '../../data/colombiaGeo'
 import { idDesdeParam } from './artistaSlug'
 import { DISPONIBILIDAD_COLOR, DISPONIBILIDAD_TEXTO } from './disponibilidad'
+import { urlGoogleMaps } from './mapaUrl'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const ACCENT = '#B3202F'
@@ -455,10 +456,19 @@ export default function ArtistaLandingPage() {
                     línea (2026-08-06, Jose) — antes iban lado a lado en una
                     sola fila. */}
                 <div className="mt-1 space-y-0.5">
-                  <span className="flex items-center gap-1 text-[9px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 truncate">
+                  {/* Enlace real a Google Maps (2026-08-07, Jose) — usa el
+                      link propio si lo pegó, si no el punto exacto que
+                      capturó al registrarse, si no una búsqueda por
+                      nombre+municipio. Nunca queda sin link. */}
+                  <a
+                    href={urlGoogleMaps(artista)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-1 text-[9px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 hover:text-gray-700 transition-colors truncate"
+                  >
                     <MapPin size={10} className="flex-shrink-0" />
-                    <span className="truncate">{artista.municipio}{artista.departamento ? `, ${artista.departamento}` : ''}</span>
-                  </span>
+                    <span className="truncate underline underline-offset-2 decoration-gray-300">{artista.municipio}{artista.departamento ? `, ${artista.departamento}` : ''}</span>
+                  </a>
                   {artista.estilo && (
                     <span className="flex items-center gap-1 text-[9px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 truncate">
                       <Palette size={10} className="flex-shrink-0" />
