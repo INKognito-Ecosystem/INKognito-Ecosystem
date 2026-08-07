@@ -112,35 +112,35 @@ export default function EstudioLandingPage() {
                 <MapPin size={11} className="flex-shrink-0" />
                 {estudio.municipio}{estudio.departamento ? `, ${estudio.departamento}` : ''}
               </a>
+
+              {/* Supply multitenant (fase 4/5, 2026-08-07) — v3 (Jose:
+                  "alineado con el nombre y la ubicación, no debajo del
+                  perfil") — DENTRO de la columna con pl-[108px]/[144px],
+                  no como hermano del wrapper `relative` de arriba; así
+                  hereda el mismo indent que nombre/ubicación en vez de
+                  arrancar desde el borde izquierdo (debajo de la foto).
+                  Parpadeo 3 veces al entrar (CSS puro sobre un solo
+                  elemento, sin costo relacionado al tamaño del catálogo) —
+                  respeta prefers-reduced-motion. */}
+              {estudio.vende_supply && estudio.n_productos_supply > 0 && (
+                <>
+                  <style>{`
+                    @media (prefers-reduced-motion: no-preference) {
+                      @keyframes catalogoCtaBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+                      .catalogo-cta-blink { animation: catalogoCtaBlink 0.45s ease-in-out 3; }
+                    }
+                  `}</style>
+                  <Link
+                    to={`/supply/estudio/${estudio.id}`}
+                    className="catalogo-cta-blink flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white hover:opacity-90 active:scale-95 transition-all rounded-full px-2.5 py-1 mt-1.5 w-fit"
+                    style={{ backgroundColor: BTN }}
+                  >
+                    <ShoppingBag size={11} className="flex-shrink-0" /> Mi catálogo en línea
+                  </Link>
+                </>
+              )}
             </div>
           </div>
-
-          {/* Supply multitenant (fase 4/5, 2026-08-07) — movido arriba,
-              justo debajo del nombre/ubicación (Jose: "debería estar
-              arriba"). v2 (Jose: "quedó muy grande, ponlo al mismo nivel
-              de la ubicación") — mismo tamaño/padding/tracking que el chip
-              de ubicación de arriba, en vez del botón grande original.
-              Parpadeo 3 veces al entrar (Jose preguntó si esto sería
-              pesado con cientos de productos/artistas — no, es CSS puro
-              sobre un solo elemento, sin relación con el tamaño del
-              catálogo ni de la búsqueda) — respeta prefers-reduced-motion. */}
-          {estudio.vende_supply && estudio.n_productos_supply > 0 && (
-            <>
-              <style>{`
-                @media (prefers-reduced-motion: no-preference) {
-                  @keyframes catalogoCtaBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-                  .catalogo-cta-blink { animation: catalogoCtaBlink 0.45s ease-in-out 3; }
-                }
-              `}</style>
-              <Link
-                to={`/supply/estudio/${estudio.id}`}
-                className="catalogo-cta-blink inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white hover:opacity-90 active:scale-95 transition-all rounded-full px-2.5 py-1 mt-1.5"
-                style={{ backgroundColor: BTN }}
-              >
-                <ShoppingBag size={11} className="flex-shrink-0" /> Mi catálogo en línea
-              </Link>
-            </>
-          )}
 
           {estudio.bio && (
             <div className="mt-6 max-w-xl">
