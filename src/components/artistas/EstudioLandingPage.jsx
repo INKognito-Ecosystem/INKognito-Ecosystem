@@ -80,21 +80,20 @@ export default function EstudioLandingPage() {
               </div>
             </div>
             <div className="pt-3 pl-[108px] sm:pl-[144px] min-w-0">
-              {/* v3 (2026-08-07, Jose: "lo que aparecerá enfrente será el
-                  nombre del estudio... el ícono iría detrás del nombre") —
-                  el nombre va primero y el ícono queda pegado a él en la
-                  misma línea (mismo patrón que VerifiedBadge en
-                  ArtistasColombiaPage.jsx: solo ícono, sin texto), en vez
-                  de una insignia de texto aparte debajo. text-base en vez
-                  de text-lg/2xl + truncate (Jose: "el nombre del estudio
+              {/* v4 (2026-08-07, Jose: "el ícono iba antes del nombre, no
+                  al frente" — corrige v3, que lo puso después) — ícono
+                  primero, nombre después, mismo patrón inline (solo
+                  ícono, sin texto, como VerifiedBadge en
+                  ArtistasColombiaPage.jsx). text-base en vez de
+                  text-lg/2xl + truncate (Jose: "el nombre del estudio
                   como es largo genera dos líneas de texto") — más chico
                   que el de artista a propósito, para que SIEMPRE quede en
                   una sola línea sin importar el largo. */}
               <div className="flex items-center gap-1.5 min-w-0">
-                <h1 className="text-base sm:text-xl font-black uppercase leading-tight truncate min-w-0">{estudio.nombre}</h1>
                 <span title="Tattoo Studio" className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-gray-600">
                   <Building2 size={11} className="text-white" />
                 </span>
+                <h1 className="text-base sm:text-xl font-black uppercase leading-tight truncate min-w-0">{estudio.nombre}</h1>
               </div>
               {/* Enlace real a Google Maps (2026-08-07, Jose) — mismo
                   criterio que ArtistaLandingPage.jsx: link propio si lo
