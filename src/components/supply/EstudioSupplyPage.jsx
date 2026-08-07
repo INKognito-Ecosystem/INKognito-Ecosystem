@@ -1,4 +1,5 @@
 import { useLoaderData } from 'react-router-dom'
+import { Award } from 'lucide-react'
 import FooterSupply from './FooterSupply'
 import NavbarCategory from './NavbarCategory'
 import BrandCatalogSection from './BrandCatalogSection'
@@ -63,6 +64,19 @@ export default function EstudioSupplyPage() {
             <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm mb-1">Catálogo de</p>
             <h1 className="text-2xl md:text-4xl font-black uppercase leading-tight">{estudio.nombre}</h1>
             {estudio.municipio && <p className="text-zinc-500 text-sm mt-1">{estudio.municipio}{estudio.departamento ? `, ${estudio.departamento}` : ''}</p>}
+            {/* Insignia "Distribuidor Oficial" (fase 6, 2026-08-07) —
+                tarifa fija de patrocinio, no comisión (la venta acá no
+                necesariamente pasa por el carrito). Color ámbar a
+                propósito, distinto del azul de toda la identidad de
+                Supply, para que se lea como un sello aparte. Sin flechas
+                prev/next (Jose: a esta página se llega desde el perfil
+                del estudio en el buscador, no desde el menú de marcas —
+                saltar a otra marca sin relación no tiene sentido acá). */}
+            {estudio.distribuidor_oficial && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-black text-[10px] font-black uppercase tracking-widest bg-amber-400 mt-2">
+                <Award size={12} /> Distribuidor Oficial
+              </span>
+            )}
           </div>
         </div>
 
