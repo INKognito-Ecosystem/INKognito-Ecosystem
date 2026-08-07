@@ -467,16 +467,19 @@ export default function ArtistaLandingPage() {
                   )}
                   {/* Cruce con el estudio (fase 3, 2026-08-06) — v2 (Jose:
                       "el artista no le pertenece al estudio" — se quita el
-                      verbo de posesión y se trata como un dato más, mismo
-                      estilo que municipio/estilo arriba (ícono + texto, sin
-                      frase), no como una relación de pertenencia. */}
+                      verbo de posesión, mismo estilo que municipio/estilo
+                      arriba). v3 (Jose: "cómo hace la gente para saber que
+                      es cliqueable" — sin la flecha ni el verbo, ya no
+                      tenía ninguna señal de que se puede tocar): subrayado
+                      en el texto, mismo recurso que ya usa esta página para
+                      "Especialidades" y el "ver más" de la bio. */}
                   {artista.estudio && (
                     <Link
                       to={`/tattoo-artist-colombia/estudio/${artista.estudio.id}`}
                       className="flex items-center gap-1 text-[9px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 hover:text-gray-700 transition-colors truncate"
                     >
                       <Building2 size={10} className="flex-shrink-0" />
-                      <span className="truncate">{artista.estudio.nombre}</span>
+                      <span className="truncate underline underline-offset-2 decoration-gray-300">{artista.estudio.nombre}</span>
                     </Link>
                   )}
                 </div>
