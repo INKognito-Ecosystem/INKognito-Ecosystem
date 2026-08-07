@@ -116,18 +116,30 @@ export default function EstudioLandingPage() {
           </div>
 
           {/* Supply multitenant (fase 4/5, 2026-08-07) — movido arriba,
-              justo debajo del nombre/ubicación (Jose, 2026-08-07: "debería
-              estar arriba" — antes vivía después de bio/redes, muy lejos
-              del encabezado). Solo visible si Jose activó vende_supply
-              para este estudio Y ya tiene al menos un producto activo. */}
+              justo debajo del nombre/ubicación (Jose: "debería estar
+              arriba"). v2 (Jose: "quedó muy grande, ponlo al mismo nivel
+              de la ubicación") — mismo tamaño/padding/tracking que el chip
+              de ubicación de arriba, en vez del botón grande original.
+              Parpadeo 3 veces al entrar (Jose preguntó si esto sería
+              pesado con cientos de productos/artistas — no, es CSS puro
+              sobre un solo elemento, sin relación con el tamaño del
+              catálogo ni de la búsqueda) — respeta prefers-reduced-motion. */}
           {estudio.vende_supply && estudio.n_productos_supply > 0 && (
-            <Link
-              to={`/supply/estudio/${estudio.id}`}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-white text-xs font-bold uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all mt-4"
-              style={{ backgroundColor: BTN }}
-            >
-              <ShoppingBag size={13} /> Mi catálogo en línea
-            </Link>
+            <>
+              <style>{`
+                @media (prefers-reduced-motion: no-preference) {
+                  @keyframes catalogoCtaBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+                  .catalogo-cta-blink { animation: catalogoCtaBlink 0.45s ease-in-out 3; }
+                }
+              `}</style>
+              <Link
+                to={`/supply/estudio/${estudio.id}`}
+                className="catalogo-cta-blink inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white hover:opacity-90 active:scale-95 transition-all rounded-full px-2.5 py-1 mt-1.5"
+                style={{ backgroundColor: BTN }}
+              >
+                <ShoppingBag size={11} className="flex-shrink-0" /> Mi catálogo en línea
+              </Link>
+            </>
           )}
 
           {estudio.bio && (
