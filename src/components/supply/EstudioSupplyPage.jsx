@@ -84,6 +84,7 @@ export default function EstudioSupplyPage() {
           brandName={estudio.nombre}
           products={products}
           supplierBadge={`Suministrado por ${estudio.nombre}`}
+          whatsapp={estudio.whatsapp || undefined}
         />
       </div>
 

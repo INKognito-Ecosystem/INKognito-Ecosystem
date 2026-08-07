@@ -17,7 +17,14 @@ const WA = '573207911013'
 // ink/cartuchos vienen de ahí; pasar null para no mostrar ninguna insignia.
 const TOMMY_BADGE = 'Suministrado por Tommy Tattoo Supply — marca reconocida en Urabá'
 
-export default function BrandCatalogSection({ brandName, products = [], supplierBadge = TOMMY_BADGE }) {
+// whatsapp (2026-08-07, bug real reportado por Jose): antes SIEMPRE usaba
+// el WhatsApp de INKognito acá, aunque la página fuera de un proveedor con
+// su propio número real (estudio.whatsapp) — alguien preguntando por un
+// producto sin stock de un "Distribuidor Oficial" terminaba escribiéndole
+// a INKognito en vez de al proveedor. Opcional, cae al número de INKognito
+// si no se pasa (las 4 páginas de marcasProfesionales/ no tienen un
+// WhatsApp propio registrado, siguen igual que siempre).
+export default function BrandCatalogSection({ brandName, products = [], supplierBadge = TOMMY_BADGE, whatsapp = WA }) {
   if (products.length === 0) {
     return (
       <div className="border border-zinc-800 bg-zinc-950 rounded-2xl p-10 md:p-16 text-center">
@@ -29,7 +36,7 @@ export default function BrandCatalogSection({ brandName, products = [], supplier
           de esta marca, escríbenos y te orientamos.
         </p>
         <a
-          href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero orientación sobre productos ${brandName}.`)}`}
+          href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(`Hola, quiero orientación sobre productos ${brandName}.`)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white font-bold uppercase tracking-[0.15em] text-xs rounded hover:opacity-90 transition"
