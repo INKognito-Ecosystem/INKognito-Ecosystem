@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { CheckCircle2, ImagePlus, X, ShoppingBag, Landmark } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
+import PedidoSupplyVendorCheckout from './PedidoSupplyVendorCheckout'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import { useGymCart } from '../../contexts/GymCartContext'
 import { useSupleCart } from '../../contexts/SupleCartContext'
@@ -270,6 +271,18 @@ export default function PedidoOnlinePage() {
             </Link>
           </div>
         </section>
+        <MiniFooter moduleLabel={MODULE_LABELS[module]} />
+      </>
+    )
+  }
+
+  // Carrito bloqueado a un proveedor con Mercado Pago propio (fase 5,
+  // 2026-08-07) — checkout completamente distinto (sin nequi/contraentrega/
+  // Eljach, paga directo por Split), ver PedidoSupplyVendorCheckout.jsx.
+  if (module === 'supply' && cart.vendorLock) {
+    return (
+      <>
+        <PedidoSupplyVendorCheckout cart={cart} />
         <MiniFooter moduleLabel={MODULE_LABELS[module]} />
       </>
     )

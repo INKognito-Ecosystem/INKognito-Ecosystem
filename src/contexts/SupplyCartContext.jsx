@@ -25,16 +25,31 @@ export function SupplyCartProvider({ children }) {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)) } catch {}
   }, [items, hydrated])
 
-  const addItem = useCallback((product, category) => {
+  // Un proveedor con Mercado Pago propio a la vez (fase 5, 2026-08-07) —
+  // el Split de Mercado Pago reparte un pago hacia UNA sola cuenta
+  // conectada por preferencia, así que mezclar dos proveedores conectados
+  // (o un proveedor conectado con productos directos de INKognito) no se
+  // puede cobrar en un solo checkout. La mayoría del tráfico real entra ya
+  // filtrado por proveedor (desde su perfil en el buscador), así que esto
+  // casi nunca se siente como una restricción real.
+  const addItem = useCallback((product, category, opts = {}) => {
+    const { estudioId = null, estudioNombre = null, mpConectado = false } = opts
+    const bloqueadoPor = items.find(i => i.mpConectado)
+    if (bloqueadoPor && (!mpConectado || estudioId !== bloqueadoPor.estudioId)) {
+      return { ok: false, motivo: 'otro_proveedor', nombreActual: bloqueadoPor.estudioNombre }
+    }
     const key = `${category}-${product.id}`
     setItems(prev => {
       const existing = prev.find(i => i.key === key)
       if (existing) {
         return prev.map(i => i.key === key ? { ...i, qty: i.qty + 1 } : i)
       }
-      return [...prev, { key, ...product, category, qty: 1 }]
+      return [...prev, { key, ...product, category, qty: 1, estudioId, estudioNombre, mpConectado }]
     })
-  }, [])
+    return { ok: true }
+  }, [items])
+
+  const vendorLock = items.find(i => i.mpConectado) || null
 
   const removeItem = useCallback((key) => {
     setItems(prev => prev.filter(i => i.key !== key))
@@ -58,7 +73,7 @@ export function SupplyCartProvider({ children }) {
   }, 0)
 
   return (
-    <SupplyCartContext.Provider value={{ items, addItem, removeItem, changeQty, clearCart, count, total }}>
+    <SupplyCartContext.Provider value={{ items, addItem, removeItem, changeQty, clearCart, count, total, vendorLock }}>
       {children}
     </SupplyCartContext.Provider>
   )

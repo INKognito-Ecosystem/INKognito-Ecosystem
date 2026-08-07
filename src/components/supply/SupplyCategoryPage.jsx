@@ -76,13 +76,17 @@ const AFILIADO_COPY = {
 
 const WA = '573207911013'
 
-// Insignia de proveedor por categoría — por defecto Tommy Tattoo Supply
-// (todas las categorías de ink/cartuchos/agujas/etc. vienen de ahí).
-// Combos mezcla productos de varias categorías/proveedores, no es
-// atribuible a uno solo (null = no mostrar insignia). Mobiliario es
-// Industrias Warlock, no Tommy — mismo criterio que supplierBadge en
+// Insignia de proveedor por categoría — antes tenía un texto fijo de
+// Tommy Tattoo Supply asumiendo que TODO lo de ink/cartuchos/agujas/etc.
+// venía de ahí, pero con proveedores propios (fase 5, 2026-08-07) eso ya
+// no es cierto: un producto de la misma categoría puede venir de otro
+// estudio/empresa. La atribución real ahora es por producto (ver
+// SupplyProductCard.jsx, item.estudio_nombre_supply) — Tommy no muestra
+// nada hasta que se registre como empresa proveedora. Mobiliario sigue
+// siendo 100% Industrias Warlock (sin excepciones todavía), por eso
+// conserva su insignia fija — mismo criterio que supplierBadge en
 // BrandCatalogSection.jsx.
-const DEFAULT_BADGE = 'Suministrado por Tommy Tattoo Supply — marca reconocida en Urabá'
+const DEFAULT_BADGE = null
 const CATEGORY_BADGE = {
   Mobiliario: 'Producto de Industrias Warlock — mobiliario fabricado en Bogotá, envío a toda Colombia',
   Combos: null,

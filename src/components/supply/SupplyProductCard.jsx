@@ -68,6 +68,7 @@ export default function SupplyProductCard({ item, categoria }) {
   const { items: cartItems, addItem } = useSupplyCart()
   const [selIdx, setSelIdx] = useState(0)
   const [showDesc, setShowDesc] = useState(false)
+  const [bloqueoMsg, setBloqueoMsg] = useState(null)
 
   // variantObjs (con nombre) es solo para el selector — si el producto tiene
   // una única variante SIN nombre (ej. mobiliario, no todo necesita un
@@ -108,14 +109,22 @@ export default function SupplyProductCard({ item, categoria }) {
   const enCarrito = cartItems.some(i => i.key === cartKey)
 
   const handleAdd = () => {
-    addItem({
+    const resultado = addItem({
       id:          productId,
       inventoryId: sel.id ?? null,
       name:        item.name + (sel.variant ? ` (${sel.variant})` : ''),
       price:       resolvedPrice || '—',
       brand:       item.categoria || '',
       image:       activeImage || '',
-    }, categoria)
+    }, categoria, {
+      estudioId:      item.estudio_id || null,
+      estudioNombre:  item.estudio_nombre_supply || item.estudio_nombre || null,
+      mpConectado:    !!item.estudio_mp_conectado,
+    })
+    if (!resultado.ok) {
+      setBloqueoMsg(`Ya tienes productos de ${resultado.nombreActual} en tu carrito — termina esa compra antes de agregar de otro proveedor.`)
+      setTimeout(() => setBloqueoMsg(null), 5000)
+    }
   }
 
   return (
@@ -176,6 +185,9 @@ export default function SupplyProductCard({ item, categoria }) {
         </div>
       </div>
 
+      {bloqueoMsg && (
+        <p className="px-3 pb-2 text-[9px] leading-snug text-amber-400 bg-amber-950/40">{bloqueoMsg}</p>
+      )}
       <button
         onClick={handleAdd}
         className={`w-full py-2.5 font-bold uppercase tracking-[0.1em] text-[10px] flex-shrink-0 transition-all duration-300 ${

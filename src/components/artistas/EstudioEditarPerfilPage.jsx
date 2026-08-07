@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLoaderData, useNavigate } from 'react-router-dom'
-import { Camera, LoaderCircle, Mail, Pencil, MapPin, CheckCircle2, Users, UserPlus, X, Navigation, Check, Trash2, ShoppingBag } from 'lucide-react'
+import { Link, useLoaderData, useNavigate, useSearchParams } from 'react-router-dom'
+import { Camera, LoaderCircle, Mail, Pencil, MapPin, CheckCircle2, Users, UserPlus, X, Navigation, Check, Trash2, ShoppingBag, ExternalLink, Wallet } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
@@ -11,6 +11,8 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-pro
 // (2026-08-06) — key propia para no chocar con el token del artista.
 const EDIT_TOKEN_KEY = 'estudio_edit_token'
 const BTN = '#374151'
+const MP_BLUE = '#3483FA'
+const MP_LOGO_URL = 'https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.21.0/mercadopago/logo__large@2x.png'
 
 // Dashboard de estudio (fase 3 del directorio, 2026-08-06) — mellizo
 // simplificado de ArtistaEditarPerfilPage.jsx: mismo mecanismo de sesión
@@ -417,13 +419,56 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
   )
 }
 
+// "Mis ventas" (fase 5, 2026-08-07) — solo lectura, lo que ya pagaron los
+// clientes vía Mercado Pago Split directo a la cuenta del estudio/empresa.
+// La fuente de verdad real es el webhook del panel; acá solo se muestra
+// lo que ya quedó confirmado como aprobado o quedó pendiente/rechazado.
+function MisVentasSupplySection({ token }) {
+  const [ventas, setVentas] = useState(null)
+
+  useEffect(() => {
+    fetch(`${PANEL_URL}/api/estudios-ventas-supply-por-token?token=${encodeURIComponent(token)}`)
+      .then((r) => r.ok ? r.json() : [])
+      .then(setVentas)
+      .catch(() => setVentas([]))
+  }, [token])
+
+  if (!ventas || ventas.length === 0) return null
+
+  return (
+    <div className="mb-8 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5">
+      <p className={labelClass}><Wallet size={12} className="inline -mt-0.5 mr-1" />Mis ventas</p>
+      <div className="space-y-2">
+        {ventas.map((v) => (
+          <div key={v.id} className="flex items-center justify-between gap-3 bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-xs">
+            <div className="min-w-0">
+              <p className="font-bold truncate">{v.items.map((i) => `${i.cantidad}x ${i.product_nombre}`).join(', ')}</p>
+              <p className="text-gray-400">{v.cliente_nombre || v.cliente_telefono} · {new Date(v.created_at).toLocaleDateString('es-CO')}</p>
+            </div>
+            <div className="flex-shrink-0 text-right">
+              <p className="font-black">${Number(v.monto_estudio).toLocaleString('es-CO')}</p>
+              <p className={
+                v.estado === 'aprobado' ? 'text-green-600 font-bold' : v.estado === 'rechazado' ? 'text-gray-400' : 'text-amber-600 font-bold'
+              }>
+                {v.estado === 'aprobado' ? 'Pagado' : v.estado === 'rechazado' ? 'Rechazado' : 'Pendiente'}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, invitaciones }) {
+  const [searchParams] = useSearchParams()
+  const mp = searchParams.get('mp')
   const [form, setForm] = useState({
     nombre: estudio.nombre || '', departamento: estudio.departamento || '', municipio: estudio.municipio || '',
     lat: estudio.lat ?? null, lng: estudio.lng ?? null,
     bio: estudio.bio || '', instagram: estudio.instagram || '', facebook: estudio.facebook || '', whatsapp: estudio.whatsapp || '',
     logo_url: estudio.logo_url || '', foto_portada: estudio.foto_portada || '',
-    google_maps_url: estudio.google_maps_url || '',
+    google_maps_url: estudio.google_maps_url || '', nombre_supply: estudio.nombre_supply || '',
   })
   const [subiendo, setSubiendo] = useState(null)
   const [guardando, setGuardando] = useState(false)
@@ -669,16 +714,54 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
         <p className="text-gray-400 text-[10px] mt-2 flex items-center gap-1"><MapPin size={10} />{form.municipio ? `${form.municipio}${form.departamento ? ', ' + form.departamento : ''}` : 'Sin ubicación'}</p>
       )}
 
-      <div className="mt-8">
-        <MiEquipoSection token={token} artistas={estudio.artistas} invitacionesIniciales={invitaciones} />
-      </div>
+      {/* Una empresa proveedora pura (Tommy/Warlock/Nutri House, tipo=
+          'empresa') no tiene roster de artistas — esta sección solo aplica
+          a un estudio de tatuaje real (fase 5, 2026-08-07). */}
+      {estudio.tipo !== 'empresa' && (
+        <div className="mt-8">
+          <MiEquipoSection token={token} artistas={estudio.artistas} invitacionesIniciales={invitaciones} />
+        </div>
+      )}
 
       {/* Supply multitenant (fase 4, 2026-08-07) — solo aparece si Jose
           activó vende_supply para este estudio desde el panel; sin eso,
           ni siquiera se nota que la función existe. */}
       {estudio.vende_supply && (
-        <div className="mt-8">
+        <div className="mt-8 space-y-4">
+          <div>
+            <label className={labelClass}>Nombre para mostrar en Supply (opcional)</label>
+            <input value={form.nombre_supply} onChange={set('nombre_supply')} placeholder={form.nombre || 'Nombre del estudio'} className={inputClass} />
+            <p className="text-gray-400 text-[10px] mt-1">Si vendes insumos además de tatuar, puedes usar un nombre distinto acá (ej. "INKognito Supply") — si lo dejas vacío, se muestra el mismo nombre de tu perfil.</p>
+          </div>
+
+          {/* Mercado Pago Split (fase 5, 2026-08-07) — mismo patrón que
+              ArtistaEditarPerfilPage.jsx: sin esto conectado, un comprador
+              no puede pagarte directo por tus productos de Supply. */}
+          <div>
+            <label className={labelClass}>Mercado Pago</label>
+            {estudio.mp_conectado ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border" style={{ borderColor: MP_BLUE }}>
+                <img src={MP_LOGO_URL} alt="Mercado Pago" className="h-4" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: MP_BLUE }}>Conectado</span>
+              </span>
+            ) : (
+              <a
+                href={`${PANEL_URL}/api/estudios-mp-conectar?token=${encodeURIComponent(token)}`}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-white text-[11px] font-black uppercase tracking-widest shadow-md hover:opacity-90 transition-opacity"
+                style={{ backgroundColor: MP_BLUE }}
+              >
+                Conecta Mercado Pago <ExternalLink size={12} />
+              </a>
+            )}
+            {!estudio.mp_conectado && (
+              <p className="text-gray-400 text-[10px] mt-1.5">Sin esto conectado, nadie puede pagarte por tus productos de Supply — la plata te llega directo a tu cuenta, sin pasar por INKognito.</p>
+            )}
+            {mp === 'ok' && <p className="text-green-600 text-[11px] font-bold mt-1.5">¡Mercado Pago conectado!</p>}
+            {mp === 'error' && <p className="text-red-600 text-[11px] font-bold mt-1.5">No pudimos conectar tu cuenta — intenta de nuevo.</p>}
+          </div>
+
           <MisProductosSupplySection token={token} cloud_name={cloud_name} upload_preset={upload_preset} />
+          <MisVentasSupplySection token={token} />
         </div>
       )}
 

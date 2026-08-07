@@ -10,14 +10,6 @@ import { useGymCart } from '../../contexts/GymCartContext'
 import { useSupleCart } from '../../contexts/SupleCartContext'
 import logoNutriHouse from '../../assets/milogo/nutrihouse.webp'
 
-// Marcas que NO vienen de Tommy Tattoo Supply — confirmado por Jose
-// (2026-08-01). Mismo criterio que supplierBadge={null} en
-// TattooVisionPage.jsx/HeavenProPage.jsx y SIN_INSIGNIA_TOMMY en
-// SupplyCategoryPage.jsx (ese excluye por categoría — Mobiliario/Combos — este
-// por marca, porque Tattoo Vision y Heaven Pro comparten categoría con
-// productos que sí son de Tommy).
-const MARCAS_SIN_TOMMY = new Set(['tattoo-vision', 'heaven-pro', 'kwadron'])
-
 const PANEL_URL  = import.meta.env.VITE_PANEL_URL
 const WA_NUMBER  = import.meta.env.VITE_WHATSAPP_NUMBER || '573207911013'
 
@@ -212,35 +204,47 @@ export default function ProductLandingPage() {
   // salir a otra app (2026-07-30).
   const cartModule = CART_MODULE[product.module]
   const cart = { supply: supplyCart, store: storeCart, gym: gymCart, suplementos: supleCart }[cartModule]
+  const [bloqueoMsg, setBloqueoMsg] = useState(null)
   const handlePedidoOnline = () => {
     if (sinStock || !cart) return
     const productId = product.name + (variant?.variant ? '-' + variant.variant : '')
-    cart.addItem({
+    const resultado = cart.addItem({
       id:          productId,
       inventoryId: variant?.id ?? null,
       name:        product.name + (variant?.variant ? ` (${variant.variant})` : ''),
       price:       variant?.price ? '$' + Math.round(variant.price).toLocaleString('es-CO') : '—',
       brand:       product.categoria || '',
       image:       imageUrl || '',
-    }, product.categoria)
+    }, product.categoria, isSupply ? {
+      estudioId:     product.estudio_id || null,
+      estudioNombre: product.estudio_nombre_supply || product.estudio_nombre || null,
+      mpConectado:   !!product.estudio_mp_conectado,
+    } : undefined)
+    if (resultado && resultado.ok === false) {
+      setBloqueoMsg(`Ya tienes productos de ${resultado.nombreActual} en tu carrito — termina esa compra antes de agregar de otro proveedor.`)
+      return
+    }
     navigate(`/pedido/${cartModule}`)
   }
 
   const PedidoOnlineButton = ({ className = '' }) => (
-    <button
-      type="button"
-      onClick={handlePedidoOnline}
-      disabled={sinStock}
-      className={`flex items-center justify-center gap-3 py-4 font-black uppercase tracking-widest rounded transition-all text-sm ${
-        sinStock
-          ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
-          : 'border-2 text-white hover:bg-white/5'
-      } ${className}`}
-      style={sinStock ? {} : { borderColor: accent }}
-    >
-      <CalendarCheck size={18} />
-      Agendar Pedido en Línea
-    </button>
+    <div className={className}>
+      <button
+        type="button"
+        onClick={handlePedidoOnline}
+        disabled={sinStock}
+        className={`w-full flex items-center justify-center gap-3 py-4 font-black uppercase tracking-widest rounded transition-all text-sm ${
+          sinStock
+            ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+            : 'border-2 text-white hover:bg-white/5'
+        }`}
+        style={sinStock ? {} : { borderColor: accent }}
+      >
+        <CalendarCheck size={18} />
+        Agendar Pedido en Línea
+      </button>
+      {bloqueoMsg && <p className="mt-2 text-[11px] leading-snug text-amber-400">{bloqueoMsg}</p>}
+    </div>
   )
 
   const CTAButton = ({ className = '' }) => isAfiliado ? (
@@ -516,10 +520,15 @@ export default function ProductLandingPage() {
                   </>
                 ) : (
                   <>
-                    {isSupply && !MARCAS_SIN_TOMMY.has(product.marca) && (
+                    {/* Insignia dinámica por producto (fase 5, 2026-08-07)
+                        — reemplaza el texto fijo de Tommy, que asumía que
+                        todo lo de Supply venía de ahí. Ya no muestra nada
+                        hasta que Tommy se registre como empresa proveedora
+                        y sus productos queden asociados a su perfil. */}
+                    {isSupply && product.estudio_nombre_supply && (
                       <div className="flex items-center gap-3 text-zinc-400 text-xs">
                         <ShieldCheck size={13} className="shrink-0" style={{ color: accent }} />
-                        <span>Suministrado por Tommy Tattoo Supply — marca reconocida en Urabá</span>
+                        <span>Suministrado por {product.estudio_nombre_supply}</span>
                       </div>
                     )}
                     {esNutriHouse && (
