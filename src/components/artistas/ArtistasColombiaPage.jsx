@@ -548,10 +548,26 @@ export default function ArtistasColombiaPage() {
 
   // Estudios (fase 3, 2026-08-06) — mismo criterio de query que los
   // artistas, resultado aparte (no interleaved en la misma lista, para no
-  // confundir un perfil individual con uno de equipo).
-  let estudiosFiltrados = q === '' ? (mostrarTodos ? estudios : []) : estudios.filter(e => matches(e.nombre, e.municipio, e.bio))
+  // confundir un perfil individual con uno de equipo). `estudios` (del
+  // loader) ahora también puede traer empresas proveedoras con
+  // distribuidor_oficial=true (fase 6, 2026-08-07 — GET /api/estudios ya
+  // las incluye) — se separan acá porque enlazan a un destino distinto
+  // (su catálogo de Supply, no un perfil de tatuaje) y no deben mezclarse
+  // visualmente con estudios de tatuaje reales.
+  const estudiosReales = estudios.filter(e => e.tipo !== 'empresa')
+  const proveedoresOficiales = estudios.filter(e => e.tipo === 'empresa')
+
+  let estudiosFiltrados = q === '' ? (mostrarTodos ? estudiosReales : []) : estudiosReales.filter(e => matches(e.nombre, e.municipio, e.bio))
   estudiosFiltrados = ordenarPorCercania(estudiosFiltrados, misCoords, coordsDeEstudio)
   const totalEstudios = estudiosFiltrados.length
+
+  // Proveedores oficiales (fase 6, 2026-08-07) — el producto real que se
+  // le vende a una marca por "Distribuidor Oficial": aparecer frente a
+  // esta misma audiencia de tatuadores buscando. Mismo patrón de query
+  // que estudios, sin ordenar por cercanía (son marcas nacionales, no
+  // tiene sentido "el más cercano").
+  const proveedoresFiltrados = q === '' ? (mostrarTodos ? proveedoresOficiales : []) : proveedoresOficiales.filter(e => matches(e.nombre, e.municipio, e.bio))
+  const totalProveedores = proveedoresFiltrados.length
 
   // Al iniciar la búsqueda (primera letra escrita) el teclado del celular
   // tapa las cards que aparecen debajo — scroll automático hacia el
@@ -727,7 +743,13 @@ export default function ArtistasColombiaPage() {
       {!query && (
         <section className="px-4 md:px-6">
           <SeccionCercanos artistas={artistas} misCoords={misCoords} onVerTodo={verTodo} onVerInfo={setModalArtista} />
-          <SeccionEstudiosCercanos estudios={estudios} misCoords={misCoords} onVerInfo={setModalArtista} />
+          {/* estudiosReales, no estudios crudo (fase 6, 2026-08-07) — el
+              loader ahora también puede traer empresas proveedoras con
+              distribuidor_oficial=true, que no tienen sentido acá (esta
+              card enlaza al perfil de tatuaje y ordena por cercanía real,
+              ninguna de las dos aplica a una marca nacional). Esas se
+              muestran aparte, solo en resultados de búsqueda activa. */}
+          <SeccionEstudiosCercanos estudios={estudiosReales} misCoords={misCoords} onVerInfo={setModalArtista} />
         </section>
       )}
 
@@ -735,11 +757,38 @@ export default function ArtistasColombiaPage() {
 
         {/* CONTADOR — solo tiene sentido con búsqueda activa, ningún
             artista (fundador incluido) se lista por defecto. Cuenta
-            artistas + estudios juntos (2026-08-06). */}
+            artistas + estudios + proveedores oficiales juntos (fase 6,
+            2026-08-07). */}
         {query && (
           <p className="text-gray-400 text-xs uppercase tracking-widest mb-4">
-            {total + totalEstudios} resultado{(total + totalEstudios) !== 1 ? 's' : ''} para <span className="text-gray-600">"{query}"</span>
+            {total + totalEstudios + totalProveedores} resultado{(total + totalEstudios + totalProveedores) !== 1 ? 's' : ''} para <span className="text-gray-600">"{query}"</span>
           </p>
+        )}
+
+        {/* PROVEEDORES OFICIALES (fase 6, 2026-08-07) — el producto real
+            de "Distribuidor Oficial": aparecer frente a esta misma
+            audiencia. Enlaza a su catálogo de Supply (/supply/estudio/:id),
+            no al perfil de tatuaje — es una marca proveedora, no un
+            estudio. Bloque separado de "Estudios" para no confundir un
+            proveedor de insumos con un lugar donde tatuarse. */}
+        {proveedoresFiltrados.length > 0 && (
+          <div className="mb-5">
+            <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 px-1">Proveedores Oficiales</p>
+            <div className="flex flex-col gap-3">
+              {proveedoresFiltrados.map(e => (
+                <ListingRow
+                  key={`proveedor-${e.id}`}
+                  to={`/supply/estudio/${e.id}`}
+                  nombre={e.nombre}
+                  municipio={e.municipio}
+                  estilo={null}
+                  bio={e.bio}
+                  foto={e.logo_url}
+                  onVerInfo={() => setModalArtista(e)}
+                />
+              ))}
+            </div>
+          </div>
         )}
 
         {/* ESTUDIOS — bloque propio arriba de los artistas (2026-08-06,
@@ -781,7 +830,7 @@ export default function ArtistasColombiaPage() {
             />
           ))}
 
-          {query && total === 0 && totalEstudios === 0 && (
+          {query && total === 0 && totalEstudios === 0 && totalProveedores === 0 && (
             <div className="text-center py-6 text-gray-400 text-sm">
               No hay artistas con esa búsqueda por ahora.
             </div>
