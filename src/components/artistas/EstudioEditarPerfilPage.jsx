@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData, useNavigate } from 'react-router-dom'
-import { Camera, LoaderCircle, Mail, Pencil, MapPin, CheckCircle2, Users, UserPlus, X } from 'lucide-react'
+import { Camera, LoaderCircle, Mail, Pencil, MapPin, CheckCircle2, Users, UserPlus, X, Navigation, Check } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
@@ -229,6 +229,7 @@ function MiEquipoSection({ token, artistas, invitacionesIniciales }) {
 function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, invitaciones }) {
   const [form, setForm] = useState({
     nombre: estudio.nombre || '', departamento: estudio.departamento || '', municipio: estudio.municipio || '',
+    lat: estudio.lat ?? null, lng: estudio.lng ?? null,
     bio: estudio.bio || '', instagram: estudio.instagram || '', facebook: estudio.facebook || '', whatsapp: estudio.whatsapp || '',
     logo_url: estudio.logo_url || '', foto_portada: estudio.foto_portada || '',
   })
@@ -237,12 +238,27 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
   const [guardado, setGuardado] = useState(false)
   const [error, setError] = useState(null)
   const [editandoHero, setEditandoHero] = useState(false)
+  const [ubicando, setUbicando] = useState(false)
   const fileInputs = useRef({})
 
   const set = (campo) => (e) => setForm((f) => ({ ...f, [campo]: e.target.value }))
   const setDepartamento = (nuevo) => setForm((f) => ({ ...f, departamento: nuevo, municipio: '' }))
   const setMunicipio = (nuevo) => setForm((f) => ({ ...f, municipio: nuevo }))
   const municipiosDisponibles = MUNICIPIOS_POR_DEPARTAMENTO[form.departamento] || []
+
+  // Ubicación exacta (2026-08-06, Jose: "por que el buscador no me lo
+  // muestra como cercano") — el estudio creado a mano desde el panel
+  // nace sin lat/lng (ese formulario no la pide); acá es donde se
+  // completa, mismo patrón que ya usa el artista.
+  const usarMiUbicacion = () => {
+    if (!navigator.geolocation) return
+    setUbicando(true)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => { setForm((f) => ({ ...f, lat: pos.coords.latitude, lng: pos.coords.longitude })); setUbicando(false) },
+      () => setUbicando(false),
+      { timeout: 8000 }
+    )
+  }
 
   const elegirFoto = (slot) => fileInputs.current[slot]?.click()
   const subirFoto = async (slot, file) => {
@@ -398,6 +414,18 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
               <label className={labelClass}>Municipio *</label>
               <ComboboxBuscable value={form.municipio} onChange={setMunicipio} options={municipiosDisponibles} disabled={!form.departamento} placeholder="Escribe para buscar..." inputClassName={inputClass} />
             </div>
+          </div>
+          <div>
+            <button
+              type="button"
+              onClick={usarMiUbicacion}
+              disabled={ubicando}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60"
+              style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: '#4B5563', color: '#4B5563' }}
+            >
+              {ubicando ? <LoaderCircle size={14} className="animate-spin" /> : form.lat ? <Check size={14} /> : <Navigation size={14} />}
+              {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación exacta agregada' : 'Agregar ubicación exacta (ayuda a aparecer "cerca de ti")'}
+            </button>
           </div>
           <div>
             <label className={labelClass}><FaInstagram className="inline -mt-0.5 mr-1" />Instagram</label>

@@ -38,13 +38,15 @@ export async function loader({ request }) {
     ciudadDetectada = null
   }
 
-  try {
-    const res = await fetch(`${PANEL_URL}/api/artistas`)
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    return { artistas: await res.json(), ciudadDetectada }
-  } catch {
-    return { artistas: [], ciudadDetectada }
-  }
+  // Estudios (fase 3, 2026-08-06) — se piden en paralelo, mismo criterio
+  // que el resto del sitio; un fallo en uno no debe tumbar al otro.
+  const [artistasRes, estudiosRes] = await Promise.allSettled([
+    fetch(`${PANEL_URL}/api/artistas`),
+    fetch(`${PANEL_URL}/api/estudios`),
+  ])
+  const artistas = artistasRes.status === 'fulfilled' && artistasRes.value.ok ? await artistasRes.value.json() : []
+  const estudios = estudiosRes.status === 'fulfilled' && estudiosRes.value.ok ? await estudiosRes.value.json() : []
+  return { artistas, estudios, ciudadDetectada }
 }
 
 export function meta() {
@@ -68,15 +70,25 @@ function coordsDeArtista(a) {
   return (a.lat != null && a.lng != null) ? { lat: a.lat, lng: a.lng } : getCoordsMunicipio(a.departamento, a.municipio)
 }
 
-// Ordena una lista de artistas por cercanía real a un punto — devuelve una
-// copia nueva, estable (sin coords conocidas quedan al final, sin alterar
-// su orden relativo). Si no hay `desde` (ubicación del visitante
-// desconocida), devuelve la lista tal cual llegó.
-function ordenarPorCercania(lista, desde) {
+// Mismo criterio para estudios (fase 3, 2026-08-06) — punto exacto si lo
+// capturó (ver "Agregar ubicación exacta" en su dashboard), si no, el
+// centroide de su municipio.
+function coordsDeEstudio(e) {
+  return (e.lat != null && e.lng != null) ? { lat: e.lat, lng: e.lng } : getCoordsMunicipio(e.departamento, e.municipio)
+}
+
+// Ordena una lista por cercanía real a un punto — devuelve una copia
+// nueva, estable (sin coords conocidas quedan al final, sin alterar su
+// orden relativo). Si no hay `desde` (ubicación del visitante
+// desconocida), devuelve la lista tal cual llegó. `coordsFn` generalizado
+// (2026-08-06) para reusar esto mismo con estudios, sin duplicar la
+// lógica de ordenamiento — default artistas para no tocar los usos ya
+// existentes.
+function ordenarPorCercania(lista, desde, coordsFn = coordsDeArtista) {
   if (!desde) return lista
   return [...lista].sort((a, b) => {
-    const ca = coordsDeArtista(a)
-    const cb = coordsDeArtista(b)
+    const ca = coordsFn(a)
+    const cb = coordsFn(b)
     if (!ca && !cb) return 0
     if (!ca) return 1
     if (!cb) return -1
@@ -178,6 +190,69 @@ function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo }) {
         )}
       </div>
     </Link>
+  )
+}
+
+// Mellizo de ArtistaCercanoCard para estudios (fase 3, 2026-08-06) — sin
+// "especialidades" (los estudios no tienen estilo propio, cada artista
+// adentro tiene el suyo) y con foto_portada/logo_url en vez de
+// foto_trabajo_1/2 + foto_url.
+function EstudioCercanoCard({ e, distanciaTexto }) {
+  return (
+    <Link
+      to={`/tattoo-artist-colombia/estudio/${e.id}`}
+      className="flex-shrink-0 w-56 snap-start rounded-xl border border-gray-200 hover:border-gray-300 bg-white overflow-hidden transition-colors"
+    >
+      <div className="relative h-28 bg-gray-100">
+        {e.foto_portada ? (
+          <img src={e.foto_portada} alt="" className="w-full h-full object-cover" loading="lazy" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-300 text-3xl font-black">{e.nombre?.[0]?.toUpperCase() || '?'}</div>
+        )}
+        <span className="absolute top-2 left-2 flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full text-white bg-gray-600">
+          Estudio
+        </span>
+      </div>
+      <div className="p-3">
+        <div className="flex items-center gap-2 flex-nowrap">
+          <div className="w-7 h-7 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
+            {e.logo_url
+              ? <img src={e.logo_url} alt={e.nombre} className="w-full h-full object-cover" loading="lazy" />
+              : <span className="text-gray-300 text-[10px] font-black">{e.nombre?.[0]?.toUpperCase() || '?'}</span>}
+          </div>
+          <p className="font-black uppercase text-xs leading-tight truncate text-gray-900 min-w-0 flex-1">{e.nombre}</p>
+        </div>
+        <p className="text-gray-500 text-[10px] uppercase tracking-wide mt-1.5 truncate">
+          {e.municipio}{e.departamento ? `, ${e.departamento}` : ''}
+        </p>
+        {distanciaTexto && (
+          <p className="text-gray-400 text-[10px] mt-1">A {distanciaTexto} km de distancia</p>
+        )}
+      </div>
+    </Link>
+  )
+}
+
+// Sección "Estudios cercanos" — mismo patrón que SeccionCercanos, propia
+// y más chica (sin "ver todo": los estudios no tienen su propio listado
+// completo aparte, viven dentro de la misma búsqueda). No se muestra si
+// no hay ningún estudio activo todavía.
+function SeccionEstudiosCercanos({ estudios, misCoords }) {
+  if (estudios.length === 0) return null
+  const ordenados = ordenarPorCercania(estudios, misCoords, coordsDeEstudio).slice(0, 10)
+  return (
+    <div className="mt-6 max-w-3xl mx-auto text-left">
+      <h2 className="font-black uppercase text-sm text-gray-900 mb-3 px-1">
+        {misCoords ? 'Estudios más cercanos' : 'Estudios en el directorio'}
+      </h2>
+      <div className="flex gap-3 overflow-x-auto pb-2 px-1 snap-x snap-mandatory scrollbar-hide">
+        {ordenados.map((e) => {
+          const c = coordsDeEstudio(e)
+          const distanciaTexto = misCoords && c ? distanciaKm(misCoords.lat, misCoords.lng, c.lat, c.lng).toFixed(1) : null
+          return <EstudioCercanoCard key={e.id} e={e} distanciaTexto={distanciaTexto} />
+        })}
+      </div>
+    </div>
   )
 }
 
@@ -406,7 +481,7 @@ function ModalInfoArtista({ artista, onClose }) {
 // el nombre del módulo al navbar propio (NavbarArtistas.jsx) — el eyebrow
 // que vivía arriba del H1 alejaba demasiado el título del navbar.
 export default function ArtistasColombiaPage() {
-  const { artistas, ciudadDetectada } = useLoaderData()
+  const { artistas, estudios, ciudadDetectada } = useLoaderData()
   const [query, setQuery] = useState('')
   const [ubicando, setUbicando] = useState(false)
   const [ubicacionError, setUbicacionError] = useState(null)
@@ -448,6 +523,13 @@ export default function ArtistasColombiaPage() {
   let filtrados = q === '' ? (mostrarTodos ? artistas : []) : artistas.filter(a => matches(a.nombre, a.municipio, a.estilo, a.bio))
   filtrados = ordenarPorCercania(filtrados, misCoords)
   const total = filtrados.length
+
+  // Estudios (fase 3, 2026-08-06) — mismo criterio de query que los
+  // artistas, resultado aparte (no interleaved en la misma lista, para no
+  // confundir un perfil individual con uno de equipo).
+  let estudiosFiltrados = q === '' ? (mostrarTodos ? estudios : []) : estudios.filter(e => matches(e.nombre, e.municipio, e.bio))
+  estudiosFiltrados = ordenarPorCercania(estudiosFiltrados, misCoords, coordsDeEstudio)
+  const totalEstudios = estudiosFiltrados.length
 
   // Al iniciar la búsqueda (primera letra escrita) el teclado del celular
   // tapa las cards que aparecen debajo — scroll automático hacia el
@@ -623,17 +705,43 @@ export default function ArtistasColombiaPage() {
       {!query && (
         <section className="px-4 md:px-6">
           <SeccionCercanos artistas={artistas} misCoords={misCoords} onVerTodo={verTodo} onVerInfo={setModalArtista} />
+          <SeccionEstudiosCercanos estudios={estudios} misCoords={misCoords} />
         </section>
       )}
 
       <section ref={listadoRef} className="flex-1 px-4 md:px-6 pb-16 max-w-3xl mx-auto scroll-mt-20 w-full">
 
         {/* CONTADOR — solo tiene sentido con búsqueda activa, ningún
-            artista (fundador incluido) se lista por defecto. */}
+            artista (fundador incluido) se lista por defecto. Cuenta
+            artistas + estudios juntos (2026-08-06). */}
         {query && (
           <p className="text-gray-400 text-xs uppercase tracking-widest mb-4">
-            {total} resultado{total !== 1 ? 's' : ''} para <span className="text-gray-600">"{query}"</span>
+            {total + totalEstudios} resultado{(total + totalEstudios) !== 1 ? 's' : ''} para <span className="text-gray-600">"{query}"</span>
           </p>
+        )}
+
+        {/* ESTUDIOS — bloque propio arriba de los artistas (2026-08-06,
+            resultado de que el estudio recién creado no aparecía en
+            ninguna búsqueda). Reusa ListingRow, sin "especialidades" (los
+            estudios no tienen estilo propio). */}
+        {estudiosFiltrados.length > 0 && (
+          <div className="mb-5">
+            <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 px-1">Estudios</p>
+            <div className="flex flex-col gap-3">
+              {estudiosFiltrados.map(e => (
+                <ListingRow
+                  key={`estudio-${e.id}`}
+                  to={`/tattoo-artist-colombia/estudio/${e.id}`}
+                  nombre={e.nombre}
+                  municipio={e.municipio}
+                  estilo={null}
+                  bio={e.bio}
+                  foto={e.logo_url}
+                  onVerInfo={() => {}}
+                />
+              ))}
+            </div>
+          </div>
         )}
 
         {/* LISTADO */}
@@ -651,7 +759,7 @@ export default function ArtistasColombiaPage() {
             />
           ))}
 
-          {query && total === 0 && (
+          {query && total === 0 && totalEstudios === 0 && (
             <div className="text-center py-6 text-gray-400 text-sm">
               No hay artistas con esa búsqueda por ahora.
             </div>

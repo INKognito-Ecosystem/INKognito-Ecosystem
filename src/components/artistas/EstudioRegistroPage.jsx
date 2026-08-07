@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
-import { CheckCircle2, Camera, LoaderCircle } from 'lucide-react'
+import { CheckCircle2, Camera, LoaderCircle, Navigation, Check } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
 import { DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO, municipioDesdeNombreIP } from '../../data/colombiaGeo'
@@ -51,7 +51,7 @@ const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb
 export default function EstudioRegistroPage() {
   const { cloud_name, upload_preset, captchaA, captchaB } = useLoaderData()
   const [form, setForm] = useState({
-    nombre: '', departamento: '', municipio: '', bio: '', instagram: '', facebook: '', whatsapp: '', email: '',
+    nombre: '', departamento: '', municipio: '', lat: null, lng: null, bio: '', instagram: '', facebook: '', whatsapp: '', email: '',
     logo_url: '', foto_portada: '',
     sitio_web: '', // honeypot
   })
@@ -60,12 +60,37 @@ export default function EstudioRegistroPage() {
   const [enviado, setEnviado] = useState(false)
   const [error, setError] = useState(null)
   const [captchaRespuesta, setCaptchaRespuesta] = useState('')
+  const [ubicando, setUbicando] = useState(false)
+  const [ubicacionError, setUbicacionError] = useState(null)
   const fileInputs = useRef({})
 
   const set = (campo) => (e) => setForm((f) => ({ ...f, [campo]: e.target.value }))
   const setDepartamento = (nuevo) => setForm((f) => ({ ...f, departamento: nuevo, municipio: '' }))
   const setMunicipio = (nuevo) => setForm((f) => ({ ...f, municipio: nuevo }))
   const municipiosDisponibles = MUNICIPIOS_POR_DEPARTAMENTO[form.departamento] || []
+
+  // Ubicación exacta opcional (2026-08-06) — mismo criterio que
+  // ArtistaRegistroPage.jsx: sin esto, el estudio solo aparece "cerca de
+  // ti" por el centroide de su municipio, no por su punto real.
+  const usarMiUbicacion = () => {
+    setUbicacionError(null)
+    if (!navigator.geolocation) {
+      setUbicacionError('Tu navegador no soporta geolocalización — no pasa nada, el perfil funciona igual.')
+      return
+    }
+    setUbicando(true)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setForm((f) => ({ ...f, lat: pos.coords.latitude, lng: pos.coords.longitude }))
+        setUbicando(false)
+      },
+      () => {
+        setUbicacionError('No pudimos acceder a tu ubicación — actívala en el navegador, o simplemente sigue sin ella.')
+        setUbicando(false)
+      },
+      { timeout: 8000 }
+    )
+  }
 
   const elegirFoto = (slot) => fileInputs.current[slot]?.click()
   const subirFoto = async (slot, file) => {
@@ -180,6 +205,23 @@ export default function EstudioRegistroPage() {
                 <label className={labelClass}>Municipio *</label>
                 <ComboboxBuscable value={form.municipio} onChange={setMunicipio} options={municipiosDisponibles} disabled={!form.departamento} placeholder={form.departamento ? 'Escribe para buscar...' : 'Elige antes el departamento'} inputClassName={inputClass} />
               </div>
+            </div>
+
+            <div>
+              <button
+                type="button"
+                onClick={usarMiUbicacion}
+                disabled={ubicando}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60"
+                style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: '#4B5563', color: '#4B5563' }}
+              >
+                {ubicando ? <LoaderCircle size={14} className="animate-spin" /> : form.lat ? <Check size={14} /> : <Navigation size={14} />}
+                {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación exacta agregada' : 'Agregar ubicación exacta (opcional)'}
+              </button>
+              <p className="text-gray-400 text-[10px] mt-1.5 text-center leading-relaxed">
+                Ayuda a que clientes cerca del estudio lo encuentren primero. Es opcional — sin esto, igual aparece en su municipio.
+              </p>
+              {ubicacionError && <p className="text-gray-400 text-[10px] mt-1 text-center">{ubicacionError}</p>}
             </div>
 
             <div>
