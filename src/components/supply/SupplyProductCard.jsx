@@ -137,6 +137,14 @@ export default function SupplyProductCard({ item, categoria }) {
       </div>
 
       <div className="p-3 flex flex-col flex-1 gap-1.5 min-h-0">
+        {/* Supply multitenant (fase 4, 2026-08-07) — insignia por card
+            solo para productos de un estudio-vendedor. La insignia fija
+            de categoría (Tommy/Warlock) sigue viviendo en
+            SupplyCategoryPage.jsx a nivel de página, sin tocar — esta es
+            la excepción puntual cuando el producto viene de otra parte. */}
+        {item.estudio_nombre && (
+          <p className="text-[8px] font-bold uppercase tracking-wide text-blue-400">Suministrado por {item.estudio_nombre}</p>
+        )}
         <h3 className="text-xs font-black uppercase leading-tight text-white">{item.name}</h3>
         {resolvedPrice && <p className="text-white font-bold text-sm">{resolvedPrice}</p>}
         {totalStock <= 3 && totalStock > 0 && (

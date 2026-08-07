@@ -56,6 +56,10 @@ export default [
   route('supply/brands/royal-three', 'components/supply/marcasProfesionales/RoyalThreePage.jsx'),
   route('supply/mobiliario/warlock', 'components/supply/marcasProfesionales/IndustriasWarlockPage.jsx'),
   route('supply/aprende', 'components/supply/AprendePage.jsx'),
+  // Supply multitenant (fase 4, 2026-08-07) — catálogo dinámico de un
+  // estudio-vendedor (vende_supply activo), a diferencia de las marcas de
+  // arriba (archivo fijo por marca) esta ruta sirve a cualquier estudio.
+  route('supply/estudio/:id', 'components/supply/EstudioSupplyPage.jsx'),
 
   // Store
   route('store', 'components/store/StorePage.jsx'),

@@ -1,6 +1,6 @@
 import { Link, useLoaderData } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
-import { MapPin, Users, Building2 } from 'lucide-react'
+import { MapPin, Users, Building2, ShoppingBag } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { idDesdeParam } from './artistaSlug'
 import { urlGoogleMaps } from './mapaUrl'
@@ -141,6 +141,20 @@ export default function EstudioLandingPage() {
                 </a>
               )}
             </div>
+          )}
+
+          {/* Supply multitenant (fase 4, 2026-08-07) — solo visible si
+              Jose activó vende_supply para este estudio Y ya tiene al
+              menos un producto activo (n_productos_supply, calculado en
+              el backend). */}
+          {estudio.vende_supply && estudio.n_productos_supply > 0 && (
+            <Link
+              to={`/supply/estudio/${estudio.id}`}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-white text-xs font-bold uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all mt-4"
+              style={{ backgroundColor: BTN }}
+            >
+              <ShoppingBag size={13} /> Ver su catálogo en Supply
+            </Link>
           )}
 
           <div className="mt-8">

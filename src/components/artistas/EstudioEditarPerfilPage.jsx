@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData, useNavigate } from 'react-router-dom'
-import { Camera, LoaderCircle, Mail, Pencil, MapPin, CheckCircle2, Users, UserPlus, X, Navigation, Check } from 'lucide-react'
+import { Camera, LoaderCircle, Mail, Pencil, MapPin, CheckCircle2, Users, UserPlus, X, Navigation, Check, Trash2, ShoppingBag } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
@@ -222,6 +222,196 @@ function MiEquipoSection({ token, artistas, invitacionesIniciales }) {
             </div>
           ))}
         </div>
+      )}
+    </div>
+  )
+}
+
+// Mismo set fijo que ya usa el panel (INV_CATEGORIAS.supply) — las
+// páginas de categoría de Supply son rutas fijas por texto exacto, un
+// valor libre dejaría el producto sin ninguna página real donde aparecer.
+const SUPPLY_CATEGORIAS = ['Tintas', 'Cartuchos', 'Agujas', 'Máquinas', 'Guantes', 'Cuidados', 'Fuentes', 'Accesorios', 'Mobiliario', 'Combos', 'Cursos', 'Kit Externo', 'Recursos']
+const PRODUCTO_VACIO = { product: '', variant: '', price: '', stock: '', categoria: SUPPLY_CATEGORIAS[0], image_url: '', descripcion: '' }
+
+// "Mis productos en Supply" (fase 4, 2026-08-07, Supply multitenant) —
+// solo se renderiza si el estudio tiene vende_supply activo (Jose lo
+// activa uno por uno desde el panel, mismo criterio de curaduría que ya
+// usa con Tommy/Warlock). Mismo patrón de CRUD autocontenido que
+// MisDisenosSection en ArtistaEditarPerfilPage.jsx, adaptado a los
+// campos de un producto (una sola foto, categoría fija, variante y
+// stock) en vez de un diseño.
+function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
+  const [productos, setProductos] = useState(null)
+  const [cargando, setCargando] = useState(true)
+  const [subiendo, setSubiendo] = useState(false)
+  const [guardando, setGuardando] = useState(false)
+  const [nuevo, setNuevo] = useState(PRODUCTO_VACIO)
+  const [editando, setEditando] = useState(null)
+  const [error, setError] = useState(null)
+  const fileInput = useRef(null)
+
+  useEffect(() => {
+    fetch(`${PANEL_URL}/api/estudios-inventario-por-token?token=${encodeURIComponent(token)}`)
+      .then((r) => r.ok ? r.json() : [])
+      .then(setProductos)
+      .catch(() => setProductos([]))
+      .finally(() => setCargando(false))
+  }, [token])
+
+  const subirFoto = async (file) => {
+    if (!file || !cloud_name || !upload_preset) return
+    setSubiendo(true)
+    setError(null)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('upload_preset', upload_preset)
+      fd.append('folder', 'inkognito-supply-estudios')
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, { method: 'POST', body: fd })
+      const data = await res.json()
+      if (data.secure_url) setNuevo((n) => ({ ...n, image_url: data.secure_url }))
+    } catch {
+      setError('No pudimos subir la foto — intenta de nuevo.')
+    } finally {
+      setSubiendo(false)
+    }
+  }
+
+  const iniciarEdicion = (p) => {
+    setError(null)
+    setEditando(p.id)
+    setNuevo({ product: p.product, variant: p.variant || '', price: p.price, stock: p.stock, categoria: p.categoria, image_url: p.image_url || '', descripcion: p.descripcion || '' })
+  }
+  const cancelarEdicion = () => { setEditando(null); setNuevo(PRODUCTO_VACIO); setError(null) }
+
+  const guardar = async () => {
+    if (!nuevo.product.trim() || !nuevo.price) {
+      setError('El nombre y el precio son obligatorios.')
+      return
+    }
+    setError(null)
+    setGuardando(true)
+    try {
+      const url = editando ? `${PANEL_URL}/api/estudios-inventario-por-token/${editando}` : `${PANEL_URL}/api/estudios-inventario-por-token`
+      const res = await fetch(url, {
+        method: editando ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, ...nuevo }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || '')
+      if (editando) {
+        setProductos((ps) => ps.map((x) => x.id === editando ? data : x))
+      } else {
+        setProductos((ps) => [data, ...(ps || [])])
+      }
+      cancelarEdicion()
+    } catch (err) {
+      setError(err.message || 'No pudimos guardar — intenta de nuevo.')
+    } finally {
+      setGuardando(false)
+    }
+  }
+
+  const toggleActivo = async (p) => {
+    const res = await fetch(`${PANEL_URL}/api/estudios-inventario-por-token/${p.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, is_active: !p.is_active }),
+    })
+    if (res.ok) setProductos((ps) => ps.map((x) => x.id === p.id ? { ...x, is_active: !x.is_active } : x))
+  }
+
+  const borrar = async (p) => {
+    const res = await fetch(`${PANEL_URL}/api/estudios-inventario-por-token/${p.id}?token=${encodeURIComponent(token)}`, { method: 'DELETE' })
+    if (res.ok) {
+      setProductos((ps) => ps.filter((x) => x.id !== p.id))
+      if (editando === p.id) cancelarEdicion()
+    }
+  }
+
+  return (
+    <div className="mb-8 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5">
+      <p className={labelClass}><ShoppingBag size={12} className="inline -mt-0.5 mr-1" />Mis productos en Supply</p>
+      <p className="text-gray-400 text-[10px] mb-4">Aparecen en tu propio catálogo (enlazado desde tu perfil) y también mezclados en la tienda general de Supply, en su categoría correspondiente.</p>
+
+      {cargando ? (
+        <p className="text-gray-400 text-xs text-center py-4">Cargando...</p>
+      ) : (
+        <>
+          {productos && productos.length > 0 && (
+            <div className="flex gap-2 overflow-x-auto pb-2 mb-4 snap-x snap-mandatory scrollbar-hide">
+              {productos.map((p) => (
+                <div key={p.id} className={`relative w-[42%] sm:w-40 md:w-44 flex-shrink-0 snap-start aspect-square rounded-lg overflow-hidden border-2 ${p.is_active ? 'border-gray-200' : 'border-gray-200 opacity-50'}`}>
+                  {p.image_url ? (
+                    <img src={p.image_url} alt={p.product} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300 text-xs">Sin foto</div>
+                  )}
+                  <div className="absolute top-1 left-1 bg-black/60 text-white text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full truncate max-w-[80%]">{p.categoria}</div>
+                  <button type="button" onClick={() => iniciarEdicion(p)} aria-label="Editar producto" className="absolute top-1 right-1 flex items-center justify-center w-6 h-6 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors">
+                    <Pencil size={11} />
+                  </button>
+                  <div className="absolute bottom-0 inset-x-0 bg-black/70 text-white text-[10px] px-1.5 py-1">
+                    <p className="font-bold truncate">{p.product}</p>
+                    <div className="flex items-center justify-between">
+                      <span>${Number(p.price).toLocaleString('es-CO')}</span>
+                      <div className="flex items-center gap-1.5">
+                        <button type="button" onClick={() => toggleActivo(p)} className="underline">{p.is_active ? 'Ocultar' : 'Mostrar'}</button>
+                        <button type="button" onClick={() => borrar(p)} aria-label="Borrar producto"><Trash2 size={11} /></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="border border-dashed border-gray-300 rounded-lg p-3 space-y-2.5">
+            {editando && (
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-black uppercase text-gray-700">Editando producto</p>
+                <button type="button" onClick={cancelarEdicion} className="text-gray-400 text-[10px] font-bold uppercase underline">Cancelar</button>
+              </div>
+            )}
+            <input type="file" accept="image/*" ref={fileInput} style={{ display: 'none' }} onChange={(e) => subirFoto(e.target.files?.[0])} />
+            <button type="button" onClick={() => fileInput.current?.click()} className="w-full aspect-video rounded-lg bg-white border border-gray-200 text-gray-400 overflow-hidden relative">
+              {nuevo.image_url ? (
+                <img src={nuevo.image_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
+              ) : subiendo ? (
+                <div className="w-full h-full flex items-center justify-center"><LoaderCircle size={16} className="animate-spin" /></div>
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center gap-1">
+                  <Camera size={16} />
+                  <span className="text-[10px] font-bold uppercase">Foto del producto</span>
+                </div>
+              )}
+            </button>
+
+            <input className={inputClass} placeholder="Nombre del producto" value={nuevo.product} onChange={(e) => setNuevo((n) => ({ ...n, product: e.target.value }))} />
+            <input className={inputClass} placeholder="Variante (opcional, ej: color, tamaño)" value={nuevo.variant} onChange={(e) => setNuevo((n) => ({ ...n, variant: e.target.value }))} />
+            <div className="grid grid-cols-2 gap-2">
+              <input className={inputClass} type="number" min="1" placeholder="Precio en COP" value={nuevo.price} onChange={(e) => setNuevo((n) => ({ ...n, price: e.target.value }))} />
+              <input className={inputClass} type="number" min="0" placeholder="Stock" value={nuevo.stock} onChange={(e) => setNuevo((n) => ({ ...n, stock: e.target.value }))} />
+            </div>
+            <select className={inputClass} value={nuevo.categoria} onChange={(e) => setNuevo((n) => ({ ...n, categoria: e.target.value }))}>
+              {SUPPLY_CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <textarea rows={2} className={inputClass} placeholder="Descripción (opcional)" value={nuevo.descripcion} onChange={(e) => setNuevo((n) => ({ ...n, descripcion: e.target.value }))} />
+
+            {error && <p className="text-red-600 text-xs">{error}</p>}
+
+            <button
+              type="button"
+              onClick={guardar}
+              disabled={guardando}
+              className="w-full py-2.5 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60"
+              style={{ backgroundColor: BTN }}
+            >
+              {guardando ? 'Guardando...' : editando ? 'Guardar cambios' : '+ Agregar producto'}
+            </button>
+          </div>
+        </>
       )}
     </div>
   )
@@ -482,6 +672,15 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
       <div className="mt-8">
         <MiEquipoSection token={token} artistas={estudio.artistas} invitacionesIniciales={invitaciones} />
       </div>
+
+      {/* Supply multitenant (fase 4, 2026-08-07) — solo aparece si Jose
+          activó vende_supply para este estudio desde el panel; sin eso,
+          ni siquiera se nota que la función existe. */}
+      {estudio.vende_supply && (
+        <div className="mt-8">
+          <MisProductosSupplySection token={token} cloud_name={cloud_name} upload_preset={upload_preset} />
+        </div>
+      )}
 
       {error && <p className="text-red-600 text-sm text-center mb-4">{error}</p>}
 

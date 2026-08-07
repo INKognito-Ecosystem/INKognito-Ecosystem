@@ -120,6 +120,18 @@ export async function fetchCatalogMarca(module, marca) {
   return { products: allProducts.filter(p => p.marca === marca) }
 }
 
+/**
+ * Supply multitenant (fase 4, 2026-08-07) — productos de un módulo
+ * cargados por un estudio-vendedor específico (`inventory.estudio_id`),
+ * para la vista filtrada que se abre desde el perfil de ese estudio en
+ * Tattoo Artist Colombia. Mismo criterio que fetchCatalogMarca: filtro
+ * sobre el catálogo ya cacheado, sin pegarle a un endpoint aparte.
+ */
+export async function fetchCatalogEstudio(module, estudioId) {
+  const { allProducts } = await fetchCatalogFull(module)
+  return { products: allProducts.filter(p => p.estudio_id === Number(estudioId)) }
+}
+
 /** Converts a catalog item to the format StoreProductCard expects */
 export function toProdCard(item) {
   const firstPrice = item.variantes?.[0]?.price
