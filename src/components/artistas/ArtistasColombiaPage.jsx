@@ -512,6 +512,12 @@ export default function ArtistasColombiaPage() {
   // el listado completo (ordenado por cercanía) sin necesidad de escribir
   // nada en el buscador (2026-08-05).
   const [mostrarTodos, setMostrarTodos] = useState(false)
+  // Filtro de categoría (fase 6.3, 2026-08-07, Jose: "podríamos poner un
+  // filtro al lado del botón de búsqueda... y allí solo mostrar los
+  // artistas o los estudios cerca de mí") — reusa mostrarTodos (antes
+  // solo lo activaba "Ver todo"): elegir una categoría equivale a un
+  // "Ver todo" ya filtrado por tipo, con o sin texto en el buscador.
+  const [categoria, setCategoria] = useState('todos') // 'todos' | 'artistas' | 'estudios'
   // Coordenadas reales del visitante — de la geolocalización precisa del
   // navegador si tocó "Cerca de ti", o si no, del centroide de la ciudad
   // detectada por IP (menos preciso, pero mejor que nada). Con esto se
@@ -565,9 +571,22 @@ export default function ArtistasColombiaPage() {
   // le vende a una marca por "Distribuidor Oficial": aparecer frente a
   // esta misma audiencia de tatuadores buscando. Mismo patrón de query
   // que estudios, sin ordenar por cercanía (son marcas nacionales, no
-  // tiene sentido "el más cercano").
-  const proveedoresFiltrados = q === '' ? (mostrarTodos ? proveedoresOficiales : []) : proveedoresOficiales.filter(e => matches(e.nombre, e.municipio, e.bio))
+  // tiene sentido "el más cercano"). NUNCA pasivas (fase 6.3, 2026-08-07)
+  // — a diferencia de artistas/estudios, ni "Ver todo" ni el filtro de
+  // categoría las muestran sin texto: solo aparecen si el visitante
+  // escribió algo que de verdad coincide con una. Formaliza en código lo
+  // que Jose ya había aprobado antes ("las marcas no aparecen como
+  // sugerencias, a diferencia de artistas y estudios") — hasta ahora era
+  // un accidente de la fórmula (sí aparecían con "Ver todo").
+  const proveedoresFiltrados = q === '' ? [] : proveedoresOficiales.filter(e => matches(e.nombre, e.municipio, e.bio))
   const totalProveedores = proveedoresFiltrados.length
+
+  // Totales acotados a lo que la categoría activa realmente muestra
+  // (fase 6.3) — sin esto, el contador y el estado vacío contarían
+  // resultados de una categoría oculta por el filtro.
+  const totalArtistasVisible = categoria !== 'estudios' ? total : 0
+  const totalOrgVisible = categoria !== 'artistas' ? totalEstudios + totalProveedores : 0
+  const totalGeneral = totalArtistasVisible + totalOrgVisible
 
   // Al iniciar la búsqueda (primera letra escrita) el teclado del celular
   // tapa las cards que aparecen debajo — scroll automático hacia el
@@ -606,6 +625,21 @@ export default function ArtistasColombiaPage() {
     setMostrarTodos(true)
     setQuery('')
     listadoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  // Filtro de categoría (fase 6.3) — elegir "Artistas"/"Estudios" activa
+  // el mismo mostrarTodos que ya usa "Ver todo", así el listado completo
+  // (ordenado por cercanía) aparece de inmediato, con o sin texto
+  // escrito. Volver a "Todos" sin texto restaura los carruseles de
+  // sugerencia de siempre.
+  const cambiarCategoria = (nueva) => {
+    setCategoria(nueva)
+    if (nueva === 'todos') {
+      setMostrarTodos(false)
+    } else {
+      setMostrarTodos(true)
+      listadoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
   }
 
   // Web Share API con fallback a WhatsApp — pedido de Jose (2026-08-04):
@@ -712,6 +746,32 @@ export default function ArtistasColombiaPage() {
               {ubicando ? 'Ubicando...' : 'Cerca de ti'}
             </button>
           </div>
+
+          {/* Filtro de categoría (fase 6.3, 2026-08-07, Jose: "un filtro al
+              lado del botón de búsqueda, que filtre automático, bien sea
+              por artistas, o por estudios") — 3 pills, misma paleta
+              activo/inactivo que ya usa el selector de tipo en
+              EstudioRegistroPage.jsx. No incluye "Marcas" a propósito —
+              las marcas no se navegan como categoría, solo aparecen si el
+              texto escrito coincide con una. */}
+          <div className="flex items-center justify-center gap-2 max-w-xl mx-auto mt-3">
+            {[
+              { key: 'todos', label: 'Todos' },
+              { key: 'artistas', label: 'Artistas' },
+              { key: 'estudios', label: 'Estudios' },
+            ].map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => cambiarCategoria(key)}
+                className={`px-4 py-1.5 rounded-full border text-[11px] font-bold uppercase tracking-wide transition-colors ${
+                  categoria === key ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-400 text-gray-600 hover:border-gray-600'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
           {ubicacionError && (
             <p className="text-gray-400 text-xs mt-3 max-w-md mx-auto">{ubicacionError}</p>
           )}
@@ -740,8 +800,11 @@ export default function ArtistasColombiaPage() {
           recomendacion, debera desaparecer cuando empiecen a escribir en
           el buscador"). Gratis y ordenado por cercanía real para TODOS
           los artistas — la prioridad paga es "aparecer primero" dentro de
-          esto, no el acceso a aparecer. */}
-      {!query && (
+          esto, no el acceso a aparecer. Solo con categoría "todos" (fase
+          6.3) — con una categoría activa, mostrarTodos ya fuerza el
+          listado completo de abajo; mostrar ambas cosas a la vez sería
+          redundante. */}
+      {!query && categoria === 'todos' && (
         <section className="px-4 md:px-6">
           <SeccionCercanos artistas={artistas} misCoords={misCoords} onVerTodo={verTodo} onVerInfo={setModalArtista} />
           {/* estudiosReales, no estudios crudo (fase 6, 2026-08-07) — el
@@ -756,13 +819,12 @@ export default function ArtistasColombiaPage() {
 
       <section ref={listadoRef} className="flex-1 px-4 md:px-6 pb-16 max-w-3xl mx-auto scroll-mt-20 w-full">
 
-        {/* CONTADOR — solo tiene sentido con búsqueda activa, ningún
-            artista (fundador incluido) se lista por defecto. Cuenta
-            artistas + estudios + proveedores oficiales juntos (fase 6,
-            2026-08-07). */}
-        {query && (
+        {/* CONTADOR — con búsqueda activa O con una categoría eligiendo
+            "ver todo" (fase 6.3, antes solo `query`). Totales acotados a
+            lo que la categoría activa realmente muestra. */}
+        {(query || mostrarTodos) && (
           <p className="text-gray-400 text-xs uppercase tracking-widest mb-4">
-            {total + totalEstudios + totalProveedores} resultado{(total + totalEstudios + totalProveedores) !== 1 ? 's' : ''} para <span className="text-gray-600">"{query}"</span>
+            {totalGeneral} resultado{totalGeneral !== 1 ? 's' : ''}{query ? <> para <span className="text-gray-600">"{query}"</span></> : ' cerca de ti'}
           </p>
         )}
 
@@ -774,8 +836,9 @@ export default function ArtistasColombiaPage() {
             SU PROPIO PERFIL (mismo destino que "Estudios" abajo), no
             directo al catálogo. El perfil (EstudioLandingPage.jsx) es
             donde vive el botón "Ver su catálogo" hacia catalogo_url —
-            clic en el resultado de búsqueda ya no salta ese paso. */}
-        {proveedoresFiltrados.length > 0 && (
+            clic en el resultado de búsqueda ya no salta ese paso. Oculto
+            bajo el filtro "Artistas" (fase 6.3). */}
+        {categoria !== 'artistas' && proveedoresFiltrados.length > 0 && (
           <div className="mb-5">
             <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 px-1">Proveedores Oficiales</p>
             <div className="flex flex-col gap-3">
@@ -798,8 +861,9 @@ export default function ArtistasColombiaPage() {
         {/* ESTUDIOS — bloque propio arriba de los artistas (2026-08-06,
             resultado de que el estudio recién creado no aparecía en
             ninguna búsqueda). Reusa ListingRow, sin "especialidades" (los
-            estudios no tienen estilo propio). */}
-        {estudiosFiltrados.length > 0 && (
+            estudios no tienen estilo propio). Oculto bajo el filtro
+            "Artistas" (fase 6.3). */}
+        {categoria !== 'artistas' && estudiosFiltrados.length > 0 && (
           <div className="mb-5">
             <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 px-1">Estudios</p>
             <div className="flex flex-col gap-3">
@@ -819,33 +883,40 @@ export default function ArtistasColombiaPage() {
           </div>
         )}
 
-        {/* LISTADO */}
-        <div className={`flex flex-col gap-3 ${query ? '' : 'mt-1'}`}>
-          {filtrados.map(a => (
-            <ListingRow
-              key={a.id}
-              to={artistaUrl(a)}
-              nombre={a.nombre}
-              municipio={a.municipio}
-              estilo={a.estilo}
-              bio={a.bio}
-              foto={a.foto_url}
-              onVerInfo={() => setModalArtista(a)}
-            />
-          ))}
+        {/* LISTADO — oculto bajo el filtro "Estudios" (fase 6.3). */}
+        {categoria !== 'estudios' && (
+          <div className={`flex flex-col gap-3 ${query ? '' : 'mt-1'}`}>
+            {filtrados.map(a => (
+              <ListingRow
+                key={a.id}
+                to={artistaUrl(a)}
+                nombre={a.nombre}
+                municipio={a.municipio}
+                estilo={a.estilo}
+                bio={a.bio}
+                foto={a.foto_url}
+                onVerInfo={() => setModalArtista(a)}
+              />
+            ))}
+          </div>
+        )}
 
-          {query && total === 0 && totalEstudios === 0 && totalProveedores === 0 && (
-            <div className="text-center py-6 text-gray-400 text-sm">
-              No hay artistas con esa búsqueda por ahora.
-            </div>
-          )}
-        </div>
+        {(query || mostrarTodos) && totalGeneral === 0 && (
+          <div className="text-center py-6 text-gray-400 text-sm">
+            No hay resultados por ahora.
+          </div>
+        )}
 
         {/* RECLUTAMIENTO — siempre visible debajo de la búsqueda, sea cual
             sea el estado (Jose, 2026-08-04: "deberán aparecer siempre
             debajo en la búsqueda, pero en una card... con informaciones
-            persuasivas"). Antes solo aparecía con búsqueda activa. */}
-        <TarjetaReclutamiento query={query} total={total} compartir={compartir} />
+            persuasivas"). Antes solo aparecía con búsqueda activa. Oculto
+            bajo el filtro "Estudios" (fase 6.3) — es una card de
+            reclutamiento de ARTISTAS, no aplica mientras se navega solo
+            estudios. */}
+        {categoria !== 'estudios' && (
+          <TarjetaReclutamiento query={query} total={total} compartir={compartir} />
+        )}
       </section>
 
       <footer className="border-t border-gray-200 py-6 px-4">

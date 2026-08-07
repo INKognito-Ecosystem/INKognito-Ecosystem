@@ -133,6 +133,14 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null }
             Únete como artista
           </Link>
           <div className="border-t border-gray-100" />
+          {/* fase 6.3 (2026-08-07, Jose) — el registro de estudio existía
+              pero sin ningún link público hacia él, solo por URL directa.
+              Las marcas (tipo='empresa') a propósito NO tienen link acá —
+              Jose las sigue creando él directamente desde el panel. */}
+          <Link to="/tattoo-artist-colombia/estudio/unete" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">
+            Registra tu estudio
+          </Link>
+          <div className="border-t border-gray-100" />
           <InkognitoModuleMenu
             current="artistas"
             only={['supply']}
