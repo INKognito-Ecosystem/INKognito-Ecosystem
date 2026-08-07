@@ -1,6 +1,6 @@
 import { Link, useLoaderData } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
-import { MapPin, Users } from 'lucide-react'
+import { MapPin, Users, Building2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { idDesdeParam } from './artistaSlug'
 
@@ -51,9 +51,18 @@ export default function EstudioLandingPage() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
-      <NavbarArtistas />
+      {/* "Tattoo Studios Colombia" en vez del wordmark de artista
+          individual (2026-08-07, Jose) — la insignia de abajo ya deja
+          claro que es un estudio, así que el nombre del estudio en sí
+          puede ser corto (ej. "INKognito") sin perder contexto. */}
+      <NavbarArtistas titulo="Tattoo Studios Colombia" />
 
       <div className="flex-1 pt-16 md:pt-20">
+        {/* h-40/56/64 con ancho completo — una foto que no sea
+            panorámica (ej. una foto de celular en vertical u horizontal
+            normal) se ve exageradamente recortada con object-cover acá.
+            El aviso de formato ideal vive en el dashboard del estudio
+            (donde se sube la foto), no en esta página pública. */}
         <div className="w-full h-40 sm:h-56 md:h-64 bg-gray-100 overflow-hidden">
           {estudio.foto_portada && <img src={estudio.foto_portada} alt="" className="w-full h-full object-cover" />}
         </div>
@@ -69,8 +78,22 @@ export default function EstudioLandingPage() {
                 )}
               </div>
             </div>
-            <div className="pt-3 pl-[108px] sm:pl-[144px]">
-              <h1 className="text-lg sm:text-2xl font-black uppercase leading-tight">{estudio.nombre}</h1>
+            <div className="pt-3 pl-[108px] sm:pl-[144px] min-w-0">
+              {/* Insignia "Estudio de tatuajes" (2026-08-07, Jose) —
+                  identifica el tipo de perfil sin depender del nombre;
+                  un estudio puede llamarse corto (ej. "INKognito") y
+                  esta insignia sigue dejando claro qué es. */}
+              <span className="inline-flex items-center gap-1 text-[8px] sm:text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full text-white bg-gray-600 mb-1">
+                <Building2 size={9} />
+                Estudio de tatuajes
+              </span>
+              {/* text-base en vez de text-lg/2xl + truncate (2026-08-07,
+                  Jose: "el nombre del estudio como es largo genera dos
+                  líneas de texto... para que no le pase a ningún otro
+                  estudio con nombre largo") — más chico que el de
+                  artista a propósito, y con truncate para que SIEMPRE
+                  quede en una sola línea sin importar el largo. */}
+              <h1 className="text-base sm:text-xl font-black uppercase leading-tight truncate">{estudio.nombre}</h1>
               <span className="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 mt-1">
                 <MapPin size={11} className="flex-shrink-0" />
                 {estudio.municipio}{estudio.departamento ? `, ${estudio.departamento}` : ''}
@@ -126,6 +149,10 @@ export default function EstudioLandingPage() {
                     <div className="px-2.5 py-2">
                       <p className="text-sm font-bold truncate">{a.nombre}</p>
                       {a.estilo && <p className="text-[11px] text-gray-500 truncate">{a.estilo}</p>}
+                      {/* Fragmento de bio (2026-08-07, Jose: "tal como ya
+                          aparece en la búsqueda del buscador") — mismo
+                          tratamiento que ListingRow en ArtistasColombiaPage.jsx. */}
+                      {a.bio && <p className="text-gray-400 text-[10px] mt-0.5 leading-snug truncate">{a.bio}</p>}
                     </div>
                   </Link>
                 ))}

@@ -189,6 +189,9 @@ export default function EstudioRegistroPage() {
               {subiendo === 'foto_portada' && <LoaderCircle size={16} className="animate-spin absolute inset-0 m-auto text-gray-600" />}
             </button>
           </div>
+          <p className="text-gray-400 text-[10px] text-center -mt-3 mb-5">
+            Logo: cuadrado, mínimo 400×400px · Portada: horizontal, ideal 1200×400px
+          </p>
 
           <form onSubmit={enviar} className="space-y-4">
             <div>

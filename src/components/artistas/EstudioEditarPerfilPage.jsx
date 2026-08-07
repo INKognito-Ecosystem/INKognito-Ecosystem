@@ -386,6 +386,18 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
         </div>
       </div>
 
+      {/* Guía de formato ideal (2026-08-07, Jose: "las fotos tienen mucho
+          zoom... esto debería mostrar el formato ideal en el que el
+          artista debe cargar la foto") — object-cover recorta agresivo
+          cuando la proporción de la foto subida no coincide con la del
+          contenedor (portada muy ancha y baja, logo cuadrado). Solo
+          visible mientras se edita, para no ensuciar la vista normal. */}
+      {editandoHero && (
+        <p className="text-gray-400 text-[10px] text-center mt-2 mb-1">
+          Portada: horizontal, ideal 1200×400px · Logo: cuadrado, mínimo 400×400px
+        </p>
+      )}
+
       <div className="mt-6 space-y-2">
         <div className="max-w-xl">
           <div className="bg-gray-100 border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3.5">
