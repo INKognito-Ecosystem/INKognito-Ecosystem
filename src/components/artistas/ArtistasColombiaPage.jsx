@@ -317,7 +317,7 @@ function VerifiedBadge() {
   )
 }
 
-function ListingRow({ to, nombre, municipio, estilo, bio, foto, onVerInfo }) {
+function ListingRow({ to, nombre, municipio, estilo, bio, foto, onVerInfo, kicker }) {
   // Los botones de "ver más" viven DENTRO de un <Link> que navega al
   // perfil completo — sin esto, tocarlos también dispara la navegación.
   const abrirInfo = (e) => { e.preventDefault(); e.stopPropagation(); onVerInfo() }
@@ -340,6 +340,12 @@ function ListingRow({ to, nombre, municipio, estilo, bio, foto, onVerInfo }) {
       <div className="flex-1 min-w-0 pr-5">
         {/* pr-5 en el contenedor de texto le deja espacio a la insignia de
             la esquina — sin esto el nombre largo quedaba debajo del ícono. */}
+        {/* kicker (fase 6.4, 2026-08-07, Jose: "marca profesional debería
+            estar debajo o encima del nombre, tal como se muestra cuando
+            entro a una marca") — mismo texto que ya vive en la página de
+            la marca, ahora también visible acá en el resultado de
+            búsqueda, no solo al entrar. */}
+        {kicker && <p className="text-gray-400 text-[9px] font-black uppercase tracking-widest leading-tight">{kicker}</p>}
         <p className="font-black uppercase text-sm leading-tight truncate text-gray-900">{nombre}</p>
         <div className="flex items-center gap-3 mt-0.5 flex-nowrap min-w-0">
           <span className="flex items-center gap-1 text-gray-500 text-[11px] uppercase tracking-wide leading-snug flex-shrink-0">
@@ -852,6 +858,7 @@ export default function ArtistasColombiaPage() {
                   bio={e.bio}
                   foto={e.logo_url}
                   onVerInfo={() => setModalArtista(e)}
+                  kicker="Marca Profesional"
                 />
               ))}
             </div>

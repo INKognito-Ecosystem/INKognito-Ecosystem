@@ -93,6 +93,15 @@ export default function EstudioLandingPage() {
                   pura no es un estudio de tatuaje, la insignia/tooltip
                   cambia para reflejar eso ("Marca Profesional" en vez de
                   "Tattoo Studio"), mismo ícono-antes-del-nombre. */}
+              {/* v2 (fase 6.4, 2026-08-07, Jose) — el texto vivía SOLO en
+                  el tooltip del ícono (invisible sin hover, inútil en
+                  celular). Ahora es texto real arriba del nombre, mismo
+                  kicker que ya se agregó al resultado de búsqueda en
+                  ArtistasColombiaPage.jsx — se lee igual en los dos
+                  lugares. */}
+              {estudio.tipo === 'empresa' && (
+                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest leading-tight">Marca Profesional</p>
+              )}
               <div className="flex items-center gap-1.5 min-w-0">
                 <span title={estudio.tipo === 'empresa' ? 'Marca Profesional' : 'Tattoo Studio'} className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-gray-600">
                   {estudio.tipo === 'empresa' ? <Award size={11} className="text-white" /> : <Building2 size={11} className="text-white" />}
