@@ -65,7 +65,7 @@ export default function PedidoSupplyVendorCheckout({ cart }) {
           Confirma tu <span className="text-zinc-600">Compra</span>
         </h2>
         <p className="text-gray-500 text-sm text-center max-w-md mx-auto mb-8">
-          Pagas directo a {vendorLock.estudioNombre} por Mercado Pago — coordina la entrega con ellos por WhatsApp después de pagar.
+          Pagas directo a {vendorLock.estudioNombre} por Mercado Pago. En cuanto se apruebe el pago, le llega tu pedido por correo para que lo despache y te escribe por WhatsApp para coordinar la entrega.
         </p>
 
         <form onSubmit={enviar} className="bg-zinc-950 border border-gray-800 rounded-xl p-6 md:p-10 space-y-6">
@@ -101,7 +101,7 @@ export default function PedidoSupplyVendorCheckout({ cart }) {
           <div className="flex items-start gap-3 bg-zinc-900 border border-amber-500/30 rounded-lg p-4">
             <Landmark size={18} className="text-amber-500 flex-shrink-0 mt-0.5" />
             <p className="text-gray-400 text-[13px] leading-relaxed">
-              Al confirmar, Mercado Pago te va a pedir el pago completo (${total.toLocaleString('es-CO')}). {vendorLock.estudioNombre} coordina la entrega directo contigo después de pagar.
+              Al confirmar, Mercado Pago te pedirá el pago completo (${total.toLocaleString('es-CO')}) — le llega directo a la cuenta de {vendorLock.estudioNombre}, sin pasar por INKognito. Con el pago aprobado, {vendorLock.estudioNombre} recibe tu pedido y tus datos por correo para despacharlo, y te escribe por WhatsApp para coordinar la entrega.
             </p>
           </div>
 
