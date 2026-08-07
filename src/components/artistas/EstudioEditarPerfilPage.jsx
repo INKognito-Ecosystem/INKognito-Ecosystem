@@ -131,11 +131,12 @@ function MiEquipoSection({ token, artistas, invitacionesIniciales }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, email }),
       })
-      if (!res.ok) throw new Error()
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || '')
       setInvitaciones((prev) => [{ id: Date.now(), email, estado: 'pendiente', created_at: new Date().toISOString() }, ...prev])
       setEmail('')
-    } catch {
-      setError('No pudimos enviar la invitación — intenta de nuevo.')
+    } catch (err) {
+      setError(err.message || 'No pudimos enviar la invitación — intenta de nuevo.')
     } finally {
       setInvitando(false)
     }
