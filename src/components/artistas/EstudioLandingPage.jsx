@@ -153,7 +153,7 @@ export default function EstudioLandingPage() {
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-white text-xs font-bold uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all mt-4"
               style={{ backgroundColor: BTN }}
             >
-              <ShoppingBag size={13} /> Ver su catálogo en Supply
+              <ShoppingBag size={13} /> Mi catálogo en línea
             </Link>
           )}
 
