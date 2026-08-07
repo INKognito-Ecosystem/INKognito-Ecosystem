@@ -197,7 +197,11 @@ function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo }) {
 // "especialidades" (los estudios no tienen estilo propio, cada artista
 // adentro tiene el suyo) y con foto_portada/logo_url en vez de
 // foto_trabajo_1/2 + foto_url.
-function EstudioCercanoCard({ e, distanciaTexto }) {
+function EstudioCercanoCard({ e, distanciaTexto, onVerInfo }) {
+  // Descripción con el mismo umbral "ver más" que ya usa ArtistaCercanoCard
+  // (2026-08-07, bug real: esta card nunca mostró bio, ni truncada ni
+  // completa — Jose lo notó comparando contra la de artistas).
+  const abrirInfo = (e_) => { e_.preventDefault(); e_.stopPropagation(); onVerInfo() }
   return (
     <Link
       to={`/tattoo-artist-colombia/estudio/${e.id}`}
@@ -225,6 +229,15 @@ function EstudioCercanoCard({ e, distanciaTexto }) {
         <p className="text-gray-500 text-[10px] uppercase tracking-wide mt-1.5 truncate">
           {e.municipio}{e.departamento ? `, ${e.departamento}` : ''}
         </p>
+        {e.bio && (
+          e.bio.length > BIO_BOTON_MIN ? (
+            <button type="button" onClick={abrirInfo} className="block w-full text-left text-gray-400 text-[10px] mt-1 truncate underline underline-offset-2 decoration-gray-300">
+              {e.bio}
+            </button>
+          ) : (
+            <p className="text-gray-400 text-[10px] mt-1 truncate">{e.bio}</p>
+          )
+        )}
         {distanciaTexto && (
           <p className="text-gray-400 text-[10px] mt-1">A {distanciaTexto} km de distancia</p>
         )}
@@ -237,7 +250,7 @@ function EstudioCercanoCard({ e, distanciaTexto }) {
 // y más chica (sin "ver todo": los estudios no tienen su propio listado
 // completo aparte, viven dentro de la misma búsqueda). No se muestra si
 // no hay ningún estudio activo todavía.
-function SeccionEstudiosCercanos({ estudios, misCoords }) {
+function SeccionEstudiosCercanos({ estudios, misCoords, onVerInfo }) {
   if (estudios.length === 0) return null
   const ordenados = ordenarPorCercania(estudios, misCoords, coordsDeEstudio).slice(0, 10)
   return (
@@ -249,7 +262,7 @@ function SeccionEstudiosCercanos({ estudios, misCoords }) {
         {ordenados.map((e) => {
           const c = coordsDeEstudio(e)
           const distanciaTexto = misCoords && c ? distanciaKm(misCoords.lat, misCoords.lng, c.lat, c.lng).toFixed(1) : null
-          return <EstudioCercanoCard key={e.id} e={e} distanciaTexto={distanciaTexto} />
+          return <EstudioCercanoCard key={e.id} e={e} distanciaTexto={distanciaTexto} onVerInfo={() => onVerInfo(e)} />
         })}
       </div>
     </div>
@@ -714,7 +727,7 @@ export default function ArtistasColombiaPage() {
       {!query && (
         <section className="px-4 md:px-6">
           <SeccionCercanos artistas={artistas} misCoords={misCoords} onVerTodo={verTodo} onVerInfo={setModalArtista} />
-          <SeccionEstudiosCercanos estudios={estudios} misCoords={misCoords} />
+          <SeccionEstudiosCercanos estudios={estudios} misCoords={misCoords} onVerInfo={setModalArtista} />
         </section>
       )}
 

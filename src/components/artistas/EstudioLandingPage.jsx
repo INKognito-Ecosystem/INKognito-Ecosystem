@@ -115,6 +115,21 @@ export default function EstudioLandingPage() {
             </div>
           </div>
 
+          {/* Supply multitenant (fase 4/5, 2026-08-07) — movido arriba,
+              justo debajo del nombre/ubicación (Jose, 2026-08-07: "debería
+              estar arriba" — antes vivía después de bio/redes, muy lejos
+              del encabezado). Solo visible si Jose activó vende_supply
+              para este estudio Y ya tiene al menos un producto activo. */}
+          {estudio.vende_supply && estudio.n_productos_supply > 0 && (
+            <Link
+              to={`/supply/estudio/${estudio.id}`}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-white text-xs font-bold uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all mt-4"
+              style={{ backgroundColor: BTN }}
+            >
+              <ShoppingBag size={13} /> Mi catálogo en línea
+            </Link>
+          )}
+
           {estudio.bio && (
             <div className="mt-6 max-w-xl">
               <div className="bg-gray-100 border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3.5">
@@ -143,20 +158,6 @@ export default function EstudioLandingPage() {
             </div>
           )}
 
-          {/* Supply multitenant (fase 4, 2026-08-07) — solo visible si
-              Jose activó vende_supply para este estudio Y ya tiene al
-              menos un producto activo (n_productos_supply, calculado en
-              el backend). */}
-          {estudio.vende_supply && estudio.n_productos_supply > 0 && (
-            <Link
-              to={`/supply/estudio/${estudio.id}`}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-white text-xs font-bold uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all mt-4"
-              style={{ backgroundColor: BTN }}
-            >
-              <ShoppingBag size={13} /> Mi catálogo en línea
-            </Link>
-          )}
-
           <div className="mt-8">
             <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-1.5">
               <Users size={13} /> {estudio.artistas?.length || 0} artista{estudio.artistas?.length === 1 ? '' : 's'} en este estudio
@@ -165,32 +166,24 @@ export default function EstudioLandingPage() {
               <p className="text-gray-400 text-sm">Este estudio todavía no tiene artistas activos.</p>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-5">
-                {/* v2 (2026-08-07, Jose: "tipo Facebook... mostrará el
-                    logo y su portada más la información") — mini hero
-                    igual que el perfil completo (portada + avatar
-                    superpuesto), no un solo cuadro. Wrapper `relative`
-                    SIN overflow-hidden (para que el avatar sí pueda
-                    asomarse fuera de la card clipeada), mismo truco de
-                    "mitad adentro/mitad afuera" que ya usa el hero
-                    principal de esta página. */}
+                {/* v3 (2026-08-07, Jose: revierte el tratamiento tipo
+                    Facebook v2 — "donde se veía su foto de perfil
+                    completa") — vuelve a la foto de perfil completa
+                    (foto_url) a todo el ancho de la card, sin recorte
+                    parcial ni avatar superpuesto. */}
                 {estudio.artistas.map((a) => (
-                  <Link key={a.id} to={`/artista/${a.id}`} className="relative block group">
-                    <div className="rounded-xl border border-gray-200 group-hover:border-gray-400 overflow-hidden transition-colors bg-white">
-                      <div className="w-full h-14 sm:h-16 bg-gray-100">
-                        {a.foto_url_2 && <img src={a.foto_url_2} alt="" className="w-full h-full object-cover" />}
-                      </div>
-                      <div className="px-2.5 pt-6 pb-2.5">
-                        <p className="text-sm font-bold truncate">{a.nombre}</p>
-                        {a.estilo && <p className="text-[11px] text-gray-500 truncate">{a.estilo}</p>}
-                        {a.bio && <p className="text-gray-400 text-[10px] mt-0.5 leading-snug truncate">{a.bio}</p>}
-                      </div>
-                    </div>
-                    <div className="absolute left-2 top-14 sm:top-16 -translate-y-1/2 w-10 h-10 rounded-full border-2 border-white bg-gray-100 overflow-hidden shadow-sm">
+                  <Link key={a.id} to={`/artista/${a.id}`} className="block group rounded-xl border border-gray-200 group-hover:border-gray-400 overflow-hidden transition-colors bg-white">
+                    <div className="w-full aspect-square bg-gray-100">
                       {a.foto_url ? (
                         <img src={a.foto_url} alt={a.nombre} className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-300 text-sm font-black">{a.nombre?.[0]?.toUpperCase() || '?'}</div>
+                        <div className="w-full h-full flex items-center justify-center text-gray-300 text-2xl font-black">{a.nombre?.[0]?.toUpperCase() || '?'}</div>
                       )}
+                    </div>
+                    <div className="px-2.5 py-2.5">
+                      <p className="text-sm font-bold truncate">{a.nombre}</p>
+                      {a.estilo && <p className="text-[11px] text-gray-500 truncate">{a.estilo}</p>}
+                      {a.bio && <p className="text-gray-400 text-[10px] mt-0.5 leading-snug truncate">{a.bio}</p>}
                     </div>
                   </Link>
                 ))}
