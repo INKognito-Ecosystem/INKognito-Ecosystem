@@ -109,6 +109,32 @@ export default function PedidoOnlinePage() {
   const [pagarProductoAhora, setPagarProductoAhora] = useState(false)
   const submitted = useRef(false)
 
+  // Verificación EN VIVO del proveedor conectado (fase 5, 2026-08-07) —
+  // bug real: SupplyCartContext guarda si el proveedor tenía Mercado Pago
+  // conectado en el momento exacto de agregar el producto al carrito. Si
+  // el comprador lo agregó ANTES de que el proveedor conectara su cuenta
+  // (o con el catálogo cacheado del lado del cliente, ver useCatalog.js),
+  // ese dato queda "congelado" en falso y el botón de pago nunca aparece,
+  // aunque el proveedor ya esté conectado. Se revalida acá, justo antes
+  // del checkout, contra /api/estudios/:id (siempre fresco, sin caché) en
+  // vez de confiar en el valor guardado por ítem.
+  const [vendorLive, setVendorLive] = useState(null)
+  const [vendorChecking, setVendorChecking] = useState(false)
+  const estudioIdsEnCarrito = module === 'supply'
+    ? [...new Set(supplyCart.items.map(i => i.estudioId).filter(Boolean))]
+    : []
+  useEffect(() => {
+    if (estudioIdsEnCarrito.length !== 1) { setVendorLive(null); return }
+    let active = true
+    setVendorChecking(true)
+    fetch(`${PANEL_URL}/api/estudios/${estudioIdsEnCarrito[0]}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (active) setVendorLive(d && d.mp_conectado ? { estudioId: d.id, estudioNombre: d.nombre_supply || d.nombre } : null) })
+      .catch(() => { if (active) setVendorLive(null) })
+      .finally(() => { if (active) setVendorChecking(false) })
+    return () => { active = false }
+  }, [estudioIdsEnCarrito.join(',')])
+
   useEffect(() => {
     fetch(`${PANEL_URL}/api/visual/flete`)
       .then(r => r.json())
@@ -279,10 +305,23 @@ export default function PedidoOnlinePage() {
   // Carrito bloqueado a un proveedor con Mercado Pago propio (fase 5,
   // 2026-08-07) — checkout completamente distinto (sin nequi/contraentrega/
   // Eljach, paga directo por Split), ver PedidoSupplyVendorCheckout.jsx.
-  if (module === 'supply' && cart.vendorLock) {
+  // vendorLive (no cart.vendorLock) es la fuente de verdad — ver el efecto
+  // de arriba, evita el bug de "conectado pero el botón no aparece".
+  if (module === 'supply' && estudioIdsEnCarrito.length === 1 && vendorChecking && !vendorLive) {
     return (
       <>
-        <PedidoSupplyVendorCheckout cart={cart} />
+        <section className="min-h-[60vh] flex items-center justify-center py-16 px-4 bg-black">
+          <p className="text-gray-500 text-sm">Cargando...</p>
+        </section>
+        <MiniFooter moduleLabel={MODULE_LABELS[module]} />
+      </>
+    )
+  }
+
+  if (module === 'supply' && vendorLive) {
+    return (
+      <>
+        <PedidoSupplyVendorCheckout cart={{ ...cart, vendorLock: vendorLive }} />
         <MiniFooter moduleLabel={MODULE_LABELS[module]} />
       </>
     )
