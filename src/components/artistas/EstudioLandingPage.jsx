@@ -150,23 +150,33 @@ export default function EstudioLandingPage() {
             {!estudio.artistas || estudio.artistas.length === 0 ? (
               <p className="text-gray-400 text-sm">Este estudio todavía no tiene artistas activos.</p>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-5">
+                {/* v2 (2026-08-07, Jose: "tipo Facebook... mostrará el
+                    logo y su portada más la información") — mini hero
+                    igual que el perfil completo (portada + avatar
+                    superpuesto), no un solo cuadro. Wrapper `relative`
+                    SIN overflow-hidden (para que el avatar sí pueda
+                    asomarse fuera de la card clipeada), mismo truco de
+                    "mitad adentro/mitad afuera" que ya usa el hero
+                    principal de esta página. */}
                 {estudio.artistas.map((a) => (
-                  <Link key={a.id} to={`/artista/${a.id}`} className="block border border-gray-200 rounded-xl overflow-hidden hover:border-gray-400 transition-colors">
-                    <div className="w-full aspect-square bg-gray-100">
+                  <Link key={a.id} to={`/artista/${a.id}`} className="relative block group">
+                    <div className="rounded-xl border border-gray-200 group-hover:border-gray-400 overflow-hidden transition-colors bg-white">
+                      <div className="w-full h-14 sm:h-16 bg-gray-100">
+                        {a.foto_url_2 && <img src={a.foto_url_2} alt="" className="w-full h-full object-cover" />}
+                      </div>
+                      <div className="px-2.5 pt-6 pb-2.5">
+                        <p className="text-sm font-bold truncate">{a.nombre}</p>
+                        {a.estilo && <p className="text-[11px] text-gray-500 truncate">{a.estilo}</p>}
+                        {a.bio && <p className="text-gray-400 text-[10px] mt-0.5 leading-snug truncate">{a.bio}</p>}
+                      </div>
+                    </div>
+                    <div className="absolute left-2 top-14 sm:top-16 -translate-y-1/2 w-10 h-10 rounded-full border-2 border-white bg-gray-100 overflow-hidden shadow-sm">
                       {a.foto_url ? (
                         <img src={a.foto_url} alt={a.nombre} className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-300 text-3xl font-black">{a.nombre?.[0]?.toUpperCase() || '?'}</div>
+                        <div className="w-full h-full flex items-center justify-center text-gray-300 text-sm font-black">{a.nombre?.[0]?.toUpperCase() || '?'}</div>
                       )}
-                    </div>
-                    <div className="px-2.5 py-2">
-                      <p className="text-sm font-bold truncate">{a.nombre}</p>
-                      {a.estilo && <p className="text-[11px] text-gray-500 truncate">{a.estilo}</p>}
-                      {/* Fragmento de bio (2026-08-07, Jose: "tal como ya
-                          aparece en la búsqueda del buscador") — mismo
-                          tratamiento que ListingRow en ArtistasColombiaPage.jsx. */}
-                      {a.bio && <p className="text-gray-400 text-[10px] mt-0.5 leading-snug truncate">{a.bio}</p>}
                     </div>
                   </Link>
                 ))}
