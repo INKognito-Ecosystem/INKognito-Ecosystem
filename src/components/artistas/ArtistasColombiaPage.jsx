@@ -23,6 +23,14 @@ const DOT_PATTERN = {
 }
 
 export async function loader({ request }) {
+  // Categoría inicial desde el link del menú (fase 6.5, 2026-08-07, Jose:
+  // "búsqueda sectorizada... buscar estudios cerca") — mismo patrón que
+  // ?flechas=0 en las páginas de marca: un query param que otro punto del
+  // sitio (acá, NavbarArtistas.jsx) usa para aterrizar directo en un
+  // estado específico, sin tocar nada del resto de la página.
+  const categoriaParam = new URL(request.url).searchParams.get('categoria')
+  const categoriaInicial = ['artistas', 'estudios'].includes(categoriaParam) ? categoriaParam : 'todos'
+
   // Geolocalización por IP vía el header x-vercel-ip-city que Vercel
   // inyecta en producción. Diagnosticado 2026-08-04: para pueblos chicos
   // (ej. Chigorodó) el proveedor de geolocalización de Vercel/MaxMind no
@@ -46,7 +54,7 @@ export async function loader({ request }) {
   ])
   const artistas = artistasRes.status === 'fulfilled' && artistasRes.value.ok ? await artistasRes.value.json() : []
   const estudios = estudiosRes.status === 'fulfilled' && estudiosRes.value.ok ? await estudiosRes.value.json() : []
-  return { artistas, estudios, ciudadDetectada }
+  return { artistas, estudios, ciudadDetectada, categoriaInicial }
 }
 
 export function meta() {
@@ -504,7 +512,7 @@ function ModalInfoArtista({ artista, onClose }) {
 // el nombre del módulo al navbar propio (NavbarArtistas.jsx) — el eyebrow
 // que vivía arriba del H1 alejaba demasiado el título del navbar.
 export default function ArtistasColombiaPage() {
-  const { artistas, estudios, ciudadDetectada } = useLoaderData()
+  const { artistas, estudios, ciudadDetectada, categoriaInicial } = useLoaderData()
   const [query, setQuery] = useState('')
   const [ubicando, setUbicando] = useState(false)
   const [ubicacionError, setUbicacionError] = useState(null)
@@ -517,13 +525,16 @@ export default function ArtistasColombiaPage() {
   // "Ver todo" del carrusel "Artistas más cercanos" activa esto — muestra
   // el listado completo (ordenado por cercanía) sin necesidad de escribir
   // nada en el buscador (2026-08-05).
-  const [mostrarTodos, setMostrarTodos] = useState(false)
+  // categoriaInicial (fase 6.5) — si se llegó vía "Buscar estudios"/
+  // "Buscar artistas" del menú, mostrarTodos nace activo, igual que si
+  // se hubiera tocado el pill manualmente.
+  const [mostrarTodos, setMostrarTodos] = useState(categoriaInicial !== 'todos')
   // Filtro de categoría (fase 6.3, 2026-08-07, Jose: "podríamos poner un
   // filtro al lado del botón de búsqueda... y allí solo mostrar los
   // artistas o los estudios cerca de mí") — reusa mostrarTodos (antes
   // solo lo activaba "Ver todo"): elegir una categoría equivale a un
   // "Ver todo" ya filtrado por tipo, con o sin texto en el buscador.
-  const [categoria, setCategoria] = useState('todos') // 'todos' | 'artistas' | 'estudios'
+  const [categoria, setCategoria] = useState(categoriaInicial) // 'todos' | 'artistas' | 'estudios'
   // Coordenadas reales del visitante — de la geolocalización precisa del
   // navegador si tocó "Cerca de ti", o si no, del centroide de la ciudad
   // detectada por IP (menos preciso, pero mejor que nada). Con esto se

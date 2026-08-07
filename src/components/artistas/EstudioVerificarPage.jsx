@@ -15,7 +15,7 @@ export async function loader({ request }) {
     const res = await fetch(`${PANEL_URL}/api/estudios-verificar?token=${encodeURIComponent(token)}`)
     const data = await res.json()
     if (!res.ok) return { ok: false, error: data.error || 'No pudimos confirmar el correo.' }
-    return { ok: true, id: data.id, nombre: data.nombre }
+    return { ok: true, id: data.id, nombre: data.nombre, tipo: data.tipo }
   } catch {
     return { ok: false, error: 'No pudimos confirmar el correo — intenta de nuevo en un momento.' }
   }
@@ -26,7 +26,7 @@ export function meta() {
 }
 
 export default function EstudioVerificarPage() {
-  const { ok, error, id, nombre } = useLoaderData()
+  const { ok, error, id, nombre, tipo } = useLoaderData()
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
@@ -37,8 +37,14 @@ export default function EstudioVerificarPage() {
             <>
               <CheckCircle2 size={48} className="mx-auto mb-4" style={{ color: ACCENT }} />
               <h1 className="text-2xl font-black uppercase mb-3">¡Listo, {nombre}!</h1>
+              {/* fase 6.5 (2026-08-07) — pantalla compartida entre estudio
+                  y marca (ambos llegan acá al confirmar correo); el copy
+                  se reencuadra igual que ya hacen InvitacionEstudioPage.jsx
+                  y EstudioEditarPerfilPage.jsx. */}
               <p className="text-gray-500 text-sm leading-relaxed">
-                El correo quedó confirmado y el perfil de tu estudio ya está activo — ahora puedes invitar a los artistas de tu equipo.
+                {tipo === 'empresa'
+                  ? 'El correo quedó confirmado y el perfil de tu marca ya está activo — ahora puedes patrocinar artistas del directorio.'
+                  : 'El correo quedó confirmado y el perfil de tu estudio ya está activo — ahora puedes invitar a los artistas de tu equipo.'}
               </p>
               <div className="flex flex-col sm:flex-row gap-2 justify-center mt-6">
                 <Link

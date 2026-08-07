@@ -125,8 +125,17 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null }
           mismo patrón de menú full-screen que usa Tattoodo en móvil. */}
       {menuOpen && (
         <div className="fixed inset-0 top-16 md:top-20 bg-white z-50 overflow-y-auto">
-          <Link to="/tattoo-artist-colombia" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">
+          {/* Búsqueda sectorizada (fase 6.5, 2026-08-07, Jose: "por si solo
+              quiero búsquedas de estudios, o tatuadores") — ambos links
+              aterrizan directo en modo "cerca de mí" para su categoría
+              (mismo filtro de ArtistasColombiaPage.jsx, fase 6.3), sin
+              tener que tocar el pill después de cargar. */}
+          <Link to="/tattoo-artist-colombia?categoria=artistas" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">
             Buscar artistas
+          </Link>
+          <div className="border-t border-gray-100" />
+          <Link to="/tattoo-artist-colombia?categoria=estudios" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">
+            Buscar estudios
           </Link>
           <div className="border-t border-gray-100" />
           <Link to="/tattoo-artist-colombia/unete" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">

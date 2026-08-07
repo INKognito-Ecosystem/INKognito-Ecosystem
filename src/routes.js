@@ -123,5 +123,9 @@ export default [
   route('tattoo-artist-colombia/estudio/mi-perfil', 'components/artistas/EstudioEditarPerfilPage.jsx'),
   route('tattoo-artist-colombia/invitacion', 'components/artistas/InvitacionEstudioPage.jsx'),
   route('tattoo-artist-colombia/estudio/:id', 'components/artistas/EstudioLandingPage.jsx'),
+  // Registro de marca (fase 6.5, 2026-08-07) — a propósito SIN ningún
+  // link público hacia ella (Jose: "las marcas las sigo creando yo...
+  // este no debe ser público"); se comparte la URL a mano.
+  route('tattoo-artist-colombia/marca/unete', 'components/artistas/EstudioMarcaRegistroPage.jsx'),
   route('artista/:id', 'components/artistas/ArtistaLandingPage.jsx'),
 ]
