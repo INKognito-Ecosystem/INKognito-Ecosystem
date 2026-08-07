@@ -135,7 +135,7 @@ export default function EstudioLandingPage() {
                     className="catalogo-cta-blink flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white hover:opacity-90 active:scale-95 transition-all rounded-full px-2.5 py-1 mt-1.5 w-fit"
                     style={{ backgroundColor: BTN }}
                   >
-                    <ShoppingBag size={11} className="flex-shrink-0" /> Mi catálogo en línea
+                    <ShoppingBag size={11} className="flex-shrink-0" /> Mi Supply en línea
                   </Link>
                 </>
               )}
