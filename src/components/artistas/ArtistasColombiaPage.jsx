@@ -315,10 +315,14 @@ function ListingRow({ to, nombre, municipio, estilo, bio, foto, onVerInfo }) {
       className="group relative flex items-center gap-4 p-3 md:p-4 rounded-lg border border-gray-200 hover:border-gray-300 bg-gray-50/60 hover:bg-gray-50 transition-all duration-200"
     >
       <VerifiedBadge />
-      <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
+      {/* Foto/logo más grande (2026-08-07, Jose: "que ocupe espacio... más
+          grande, mejor visibilidad, parecido a el perfil") — antes 64-80px
+          se veía chico comparado con el avatar real del perfil (~96-128px);
+          ahora se acerca a esa escala. */}
+      <div className="w-24 h-24 md:w-28 md:h-28 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
         {foto
           ? <img src={foto} alt={nombre} className="w-full h-full object-cover" loading="lazy" />
-          : <span className="text-gray-300 text-2xl font-black">{nombre?.[0]?.toUpperCase() || '?'}</span>}
+          : <span className="text-gray-300 text-3xl font-black">{nombre?.[0]?.toUpperCase() || '?'}</span>}
       </div>
       <div className="flex-1 min-w-0 pr-5">
         {/* pr-5 en el contenedor de texto le deja espacio a la insignia de
@@ -485,6 +489,11 @@ export default function ArtistasColombiaPage() {
   const [query, setQuery] = useState('')
   const [ubicando, setUbicando] = useState(false)
   const [ubicacionError, setUbicacionError] = useState(null)
+  // Guarda un artista O un estudio (2026-08-07: la fila de estudios
+  // reusaba ListingRow y su botón "ver más", pero onVerInfo era un no-op —
+  // el botón no hacía nada, aunque se veía igual de clicable que el de un
+  // artista). ModalInfoArtista solo lee nombre/bio/estilo, así que un
+  // estudio (sin estilo) encaja sin cambios en el modal.
   const [modalArtista, setModalArtista] = useState(null)
   // "Ver todo" del carrusel "Artistas más cercanos" activa esto — muestra
   // el listado completo (ordenado por cercanía) sin necesidad de escribir
@@ -737,7 +746,7 @@ export default function ArtistasColombiaPage() {
                   estilo={null}
                   bio={e.bio}
                   foto={e.logo_url}
-                  onVerInfo={() => {}}
+                  onVerInfo={() => setModalArtista(e)}
                 />
               ))}
             </div>

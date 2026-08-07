@@ -137,7 +137,10 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null }
             current="artistas"
             only={['supply']}
             label="Para artistas"
-            extraLinks={[{ label: 'Editar mi perfil', to: '/tattoo-artist-colombia/mi-perfil' }]}
+            extraLinks={[
+              { label: 'Editar mi perfil', to: '/tattoo-artist-colombia/mi-perfil' },
+              { label: 'Cursos de Supply', to: '/supply/aprende' },
+            ]}
             textClassName="text-gray-600 hover:text-gray-900 hover:bg-gray-50"
             onNavigate={close}
           />
