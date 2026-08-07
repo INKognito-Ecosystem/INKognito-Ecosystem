@@ -116,7 +116,13 @@ function PedirLinkForm() {
 // como artista y queda vinculada de una. Autocontenido, fuera del <form>
 // principal — mismo criterio que "Mis diseños en venta" en el perfil de
 // artista (su propio ciclo de vida, sus propios endpoints).
-function MiEquipoSection({ token, artistas, invitacionesIniciales }) {
+// esEmpresa (fase 6.2, 2026-08-07, Jose: "desde editar mi marca, mandar
+// el correo de patrocinio a algún artista") — mismos datos/endpoints
+// (estudio.artistas, /api/estudios-invitar, /api/estudios-quitar-artista),
+// solo cambia el copy: para una empresa esto es patrocinio, no "mi
+// equipo". Antes esta sección se ocultaba por completo para tipo=empresa
+// — ya no tiene sentido con la idea de patrocinio.
+function MiEquipoSection({ token, artistas, invitacionesIniciales, esEmpresa }) {
   const [invitaciones, setInvitaciones] = useState(invitacionesIniciales || [])
   const [email, setEmail] = useState('')
   const [invitando, setInvitando] = useState(false)
@@ -160,9 +166,9 @@ function MiEquipoSection({ token, artistas, invitacionesIniciales }) {
 
   return (
     <div className="mb-8 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5">
-      <p className={labelClass}><Users size={12} className="inline -mt-0.5 mr-1" />Mi equipo</p>
+      <p className={labelClass}><Users size={12} className="inline -mt-0.5 mr-1" />{esEmpresa ? 'Artistas patrocinados' : 'Mi equipo'}</p>
       {equipo.length === 0 ? (
-        <p className="text-gray-400 text-xs mb-4">Todavía no tienes artistas en tu equipo — invita al primero abajo.</p>
+        <p className="text-gray-400 text-xs mb-4">{esEmpresa ? 'Todavía no patrocinas a ningún artista — patrocina al primero abajo.' : 'Todavía no tienes artistas en tu equipo — invita al primero abajo.'}</p>
       ) : (
         <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory scrollbar-hide mb-4 pb-1">
           {equipo.map((a) => (
@@ -180,7 +186,7 @@ function MiEquipoSection({ token, artistas, invitacionesIniciales }) {
               <button
                 type="button"
                 onClick={() => quitar(a.id)}
-                aria-label={`Quitar a ${a.nombre} del estudio`}
+                aria-label={esEmpresa ? `Quitar patrocinio a ${a.nombre}` : `Quitar a ${a.nombre} del estudio`}
                 className="absolute top-1 right-1 flex items-center justify-center w-5 h-5 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors"
               >
                 <X size={11} />
@@ -190,7 +196,7 @@ function MiEquipoSection({ token, artistas, invitacionesIniciales }) {
         </div>
       )}
 
-      <p className={labelClass}><UserPlus size={12} className="inline -mt-0.5 mr-1" />Invitar artista</p>
+      <p className={labelClass}><UserPlus size={12} className="inline -mt-0.5 mr-1" />{esEmpresa ? 'Patrocinar artista' : 'Invitar artista'}</p>
       <form onSubmit={invitar} className="flex gap-2 mb-3">
         <input
           required
@@ -206,7 +212,7 @@ function MiEquipoSection({ token, artistas, invitacionesIniciales }) {
           className="flex-shrink-0 px-4 py-2.5 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60"
           style={{ backgroundColor: BTN }}
         >
-          {invitando ? '...' : 'Invitar'}
+          {invitando ? '...' : esEmpresa ? 'Patrocinar' : 'Invitar'}
         </button>
       </form>
       {error && <p className="text-red-600 text-xs mb-2">{error}</p>}
@@ -491,6 +497,7 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
     bio: estudio.bio || '', instagram: estudio.instagram || '', facebook: estudio.facebook || '', whatsapp: estudio.whatsapp || '',
     logo_url: estudio.logo_url || '', foto_portada: estudio.foto_portada || '',
     google_maps_url: estudio.google_maps_url || '', nombre_supply: estudio.nombre_supply || '',
+    catalogo_url: estudio.catalogo_url || '',
   })
   const [subiendo, setSubiendo] = useState(null)
   const [guardando, setGuardando] = useState(false)
@@ -736,12 +743,23 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
         <p className="text-gray-400 text-[10px] mt-2 flex items-center gap-1"><MapPin size={10} />{form.municipio ? `${form.municipio}${form.departamento ? ', ' + form.departamento : ''}` : 'Sin ubicación'}</p>
       )}
 
-      {/* Una empresa proveedora pura (Tommy/Warlock/Nutri House, tipo=
-          'empresa') no tiene roster de artistas — esta sección solo aplica
-          a un estudio de tatuaje real (fase 5, 2026-08-07). */}
-      {estudio.tipo !== 'empresa' && (
+      {/* v2 (fase 6.2, 2026-08-07, Jose: "de ahí mandar el correo de
+          patrocinio a algún artista") — ya NO se oculta para tipo=
+          'empresa'; una empresa proveedora sí puede patrocinar artistas,
+          mismos datos/endpoints, MiEquipoSection reencuadra el copy sola. */}
+      <div className="mt-8">
+        <MiEquipoSection token={token} artistas={estudio.artistas} invitacionesIniciales={invitaciones} esEmpresa={estudio.tipo === 'empresa'} />
+      </div>
+
+      {/* fase 6.2 (2026-08-07) — link a su propio catálogo (interno o
+          externo), solo para marcas/empresas. Reusa el mismo mecanismo
+          que ya redirige /supply/estudio/:id cuando este campo está
+          seteado (fase 6.1). */}
+      {estudio.tipo === 'empresa' && (
         <div className="mt-8">
-          <MiEquipoSection token={token} artistas={estudio.artistas} invitacionesIniciales={invitaciones} />
+          <label className={labelClass}>Link de tu catálogo (opcional)</label>
+          <input value={form.catalogo_url} onChange={set('catalogo_url')} placeholder="https://tu-sitio.com o /supply/brands/tu-marca" className={inputClass} />
+          <p className="text-gray-400 text-[10px] mt-1">Puede ser tu propia web, o si ya tienes una página armada con nosotros, pégala acá. Quien vea tu perfil en el buscador va a llegar directo ahí en vez de a una página genérica.</p>
         </div>
       )}
 

@@ -74,7 +74,9 @@ export default function InvitacionEstudioPage() {
             <>
               <CheckCircle2 size={48} className="mx-auto mb-4" style={{ color: ACCENT }} />
               <h1 className="text-2xl font-black uppercase mb-3">¡Listo!</h1>
-              <p className="text-gray-500 text-sm leading-relaxed">Ya quedaste vinculado a {data.estudio_nombre}.</p>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                {data.estudio_tipo === 'empresa' ? `${data.estudio_nombre} ya te patrocina.` : `Ya quedaste vinculado a ${data.estudio_nombre}.`}
+              </p>
               <Link
                 to={artistaUrl(data.artista)}
                 className="inline-flex items-center justify-center px-5 py-2.5 mt-6 rounded-full text-white text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
@@ -87,16 +89,22 @@ export default function InvitacionEstudioPage() {
             <>
               <XCircle size={48} className="mx-auto mb-4 text-gray-400" />
               <h1 className="text-2xl font-black uppercase mb-3">Invitación rechazada</h1>
-              <p className="text-gray-500 text-sm leading-relaxed">No quedaste vinculado a {data.estudio_nombre}.</p>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                {data.estudio_tipo === 'empresa' ? `No aceptaste el patrocinio de ${data.estudio_nombre}.` : `No quedaste vinculado a ${data.estudio_nombre}.`}
+              </p>
             </>
           ) : (
             <>
               {data.estudio_logo && <img src={data.estudio_logo} alt="" className="w-16 h-16 rounded-full object-cover mx-auto mb-4" />}
-              <h1 className="text-xl font-black uppercase mb-3">{data.estudio_nombre} te invitó</h1>
+              <h1 className="text-xl font-black uppercase mb-3">
+                {data.estudio_tipo === 'empresa' ? `${data.estudio_nombre} quiere patrocinarte` : `${data.estudio_nombre} te invitó`}
+              </h1>
 
               {data.ya_tiene_perfil ? (
                 <>
-                  <p className="text-gray-500 text-sm leading-relaxed mb-6">¿Quieres unirte a este estudio con tu perfil de artista ya registrado?</p>
+                  <p className="text-gray-500 text-sm leading-relaxed mb-6">
+                    {data.estudio_tipo === 'empresa' ? '¿Aceptas que esta marca te patrocine con tu perfil de artista ya registrado?' : '¿Quieres unirte a este estudio con tu perfil de artista ya registrado?'}
+                  </p>
                   {error && <p className="text-sm mb-3" style={{ color: ACCENT }}>{error}</p>}
                   <div className="flex flex-col sm:flex-row gap-2 justify-center">
                     <button

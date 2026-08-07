@@ -50,11 +50,20 @@ const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb
 
 export default function EstudioRegistroPage() {
   const { cloud_name, upload_preset, captchaA, captchaB } = useLoaderData()
+  // tipo (fase 6.2, 2026-08-07, Jose: "esa marca ya podrá hacer también
+  // su propio registro") — default 'estudio' preserva el comportamiento
+  // de siempre para quien no toca el selector. Elegir 'empresa' no le da
+  // visibilidad a nadie por sí solo (sigue sin aparecer en el buscador
+  // ni tener insignia hasta que Jose active distribuidor_oficial a
+  // mano) — el mismo honeypot+captcha+correo de siempre sigue siendo el
+  // único filtro anti-abuso, igual que para un estudio.
   const [form, setForm] = useState({
+    tipo: 'estudio',
     nombre: '', departamento: '', municipio: '', lat: null, lng: null, bio: '', instagram: '', facebook: '', whatsapp: '', email: '',
     logo_url: '', foto_portada: '',
     sitio_web: '', // honeypot
   })
+  const esEmpresa = form.tipo === 'empresa'
   const [subiendo, setSubiendo] = useState(null)
   const [enviando, setEnviando] = useState(false)
   const [enviado, setEnviado] = useState(false)
@@ -152,11 +161,11 @@ export default function EstudioRegistroPage() {
           <div className="text-center py-16">
             <CheckCircle2 size={48} className="mx-auto mb-4" style={{ color: ACCENT }} />
             <h1 className="text-2xl font-black uppercase mb-3">¡Ya casi!</h1>
-            <p className="text-gray-500 text-sm leading-relaxed">Falta un paso para que el perfil de tu estudio quede activo.</p>
+            <p className="text-gray-500 text-sm leading-relaxed">Falta un paso para que el perfil de {esEmpresa ? 'tu marca' : 'tu estudio'} quede activo.</p>
             <ol className="text-left text-gray-600 text-sm leading-relaxed mt-5 space-y-2.5 list-decimal list-inside">
               <li>Revisa la bandeja de <strong>{form.email}</strong> (y la de spam/promociones, por si acaso).</li>
               <li>Abre el correo de "Tattoo Artist Colombia" y haz clic en el link de confirmación.</li>
-              <li>Listo — desde ahí mismo puedes invitar a los artistas de tu equipo.</li>
+              <li>Listo — desde ahí mismo puedes {esEmpresa ? 'patrocinar artistas del directorio' : 'invitar a los artistas de tu equipo'}.</li>
             </ol>
             <Link to="/tattoo-artist-colombia" className="inline-block mt-6 text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-opacity text-gray-600">
               ← Volver al buscador
@@ -165,8 +174,37 @@ export default function EstudioRegistroPage() {
         </div>
       ) : (
         <div className="flex-1 pt-20 md:pt-24 max-w-md mx-auto px-4 pb-16 w-full">
-          <h1 className="text-xl font-black uppercase mb-2 text-center">Registra tu estudio</h1>
-          <p className="text-gray-500 text-sm text-center mb-6">Agrupa a los artistas de tu equipo bajo un mismo perfil, y ayúdalos a que se sumen al buscador.</p>
+          <h1 className="text-xl font-black uppercase mb-2 text-center">{esEmpresa ? 'Registra tu marca' : 'Registra tu estudio'}</h1>
+          <p className="text-gray-500 text-sm text-center mb-5">
+            {esEmpresa
+              ? 'Aparece frente a los tatuadores del directorio y patrocina a los artistas que quieras promocionar.'
+              : 'Agrupa a los artistas de tu equipo bajo un mismo perfil, y ayúdalos a que se sumen al buscador.'}
+          </p>
+
+          {/* Selector de tipo (fase 6.2, 2026-08-07) — 2 opciones simples,
+              default "estudio". Cambia el copy del resto del formulario
+              pero ningún campo es exclusivo de un tipo — mismos datos
+              para ambos. */}
+          <div className="flex gap-2 mb-6">
+            <button
+              type="button"
+              onClick={() => setForm((f) => ({ ...f, tipo: 'estudio' }))}
+              className={`flex-1 py-2.5 rounded-lg border text-[11px] font-bold uppercase tracking-wide transition-colors ${
+                !esEmpresa ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-300 text-gray-500'
+              }`}
+            >
+              Soy un estudio
+            </button>
+            <button
+              type="button"
+              onClick={() => setForm((f) => ({ ...f, tipo: 'empresa' }))}
+              className={`flex-1 py-2.5 rounded-lg border text-[11px] font-bold uppercase tracking-wide transition-colors ${
+                esEmpresa ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-300 text-gray-500'
+              }`}
+            >
+              Soy una empresa
+            </button>
+          </div>
 
           {SLOTS_ESTUDIO_REG.map(({ key }) => (
             <input
@@ -195,8 +233,8 @@ export default function EstudioRegistroPage() {
 
           <form onSubmit={enviar} className="space-y-4">
             <div>
-              <label className={labelClass}>Nombre del estudio *</label>
-              <input required className={inputClass} value={form.nombre} onChange={set('nombre')} placeholder="Ej: Estudio de tatuajes X" />
+              <label className={labelClass}>{esEmpresa ? 'Nombre de la empresa *' : 'Nombre del estudio *'}</label>
+              <input required className={inputClass} value={form.nombre} onChange={set('nombre')} placeholder={esEmpresa ? 'Ej: Mi Marca de Insumos' : 'Ej: Estudio de tatuajes X'} />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
