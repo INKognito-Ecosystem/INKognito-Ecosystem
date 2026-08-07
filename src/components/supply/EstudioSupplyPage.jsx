@@ -30,7 +30,17 @@ export async function loader({ params }) {
   // quedarse con esta página genérica vacía como duplicado; el redirect
   // va FUERA del try/catch de arriba a propósito — throw redirect() es un
   // Response, no un error, y un catch genérico lo tragaría silenciosamente.
-  if (estudio?.catalogo_url) throw redirect(estudio.catalogo_url)
+  // ?flechas=0 (bug real, 2026-08-07, Jose: "el botón de las flechas para
+  // navegar entre marcas sigue apareciendo") — quien llega acá viene del
+  // perfil del estudio en el buscador, no del menú de marcas; las 4
+  // páginas de marcasProfesionales/ leen este parámetro para ocultar sus
+  // flechas prev/next solo en ese caso, sin tocar su comportamiento
+  // normal cuando se navega entre ellas desde el menú de Supply.
+  if (estudio?.catalogo_url) {
+    const externo = /^https?:\/\//.test(estudio.catalogo_url)
+    const destino = externo ? estudio.catalogo_url : `${estudio.catalogo_url}${estudio.catalogo_url.includes('?') ? '&' : '?'}flechas=0`
+    throw redirect(destino)
+  }
   return { estudio, products }
 }
 

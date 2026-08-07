@@ -130,8 +130,12 @@ export default function EstudioLandingPage() {
                   elemento, sin costo relacionado al tamaño del catálogo) —
                   respeta prefers-reduced-motion. */}
               {(estudio.catalogo_url || (estudio.vende_supply && estudio.n_productos_supply > 0)) && (() => {
-                const destino = estudio.catalogo_url || `/supply/estudio/${estudio.id}`
-                const externo = /^https?:\/\//.test(destino)
+                const base = estudio.catalogo_url || `/supply/estudio/${estudio.id}`
+                const externo = /^https?:\/\//.test(base)
+                // ?flechas=0 (fase 6.1) — quien entra desde este perfil no
+                // debe poder saltar a otra marca sin relación vía las
+                // flechas prev/next de marcasProfesionales/*.jsx.
+                const destino = externo ? base : `${base}${base.includes('?') ? '&' : '?'}flechas=0`
                 const texto = estudio.tipo === 'empresa' ? 'Ver su catálogo' : 'Mi Supply en línea'
                 const claseComun = "catalogo-cta-blink flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white hover:opacity-90 active:scale-95 transition-all rounded-full px-2.5 py-1 mt-1.5 w-fit"
                 return (

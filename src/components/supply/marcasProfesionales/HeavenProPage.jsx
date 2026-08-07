@@ -15,13 +15,18 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-pro
 // falla, simplemente no se muestra insignia — no rompe la página.
 const ESTUDIO_ID = 6
 
-export async function loader() {
+export async function loader({ request }) {
   const [catalogo, estudioRes] = await Promise.all([
     fetchCatalogMarca('supply', 'heaven-pro'),
     fetch(`${PANEL_URL}/api/estudios/${ESTUDIO_ID}`).catch(() => null),
   ])
   const estudio = estudioRes && estudioRes.ok ? await estudioRes.json() : null
-  return { ...catalogo, distribuidorOficial: estudio?.distribuidor_oficial || false }
+  // ?flechas=0 (fase 6.1, bug real de Jose) — quien llega acá desde el
+  // perfil de un estudio en el buscador no debe poder saltar a otra
+  // marca sin relación; navegando normal desde el menú de Supply, el
+  // parámetro no viene y las flechas se ven como siempre.
+  const mostrarFlechas = new URL(request.url).searchParams.get('flechas') !== '0'
+  return { ...catalogo, distribuidorOficial: estudio?.distribuidor_oficial || false, mostrarFlechas }
 }
 
 export function meta() {
@@ -65,7 +70,7 @@ function InsigniaDistribuidorOficial() {
 }
 
 export default function HeavenProPage() {
-  const { products, distribuidorOficial } = useLoaderData()
+  const { products, distribuidorOficial, mostrarFlechas } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_heaven_pro')
   const { prev, next } = getAdjacentBrands(5)
   const scrolled = useScrolled()
@@ -74,7 +79,7 @@ export default function HeavenProPage() {
     <div className="min-h-screen bg-black text-white">
       <NavbarCategory pageName="Heaven Pro" />
 
-      {scrolled && (
+      {mostrarFlechas && scrolled && (
         <>
           <Link
             to={prev.path} replace
@@ -100,15 +105,19 @@ export default function HeavenProPage() {
           <div className="relative z-10">
 
           <div className="flex items-center justify-between gap-3 mb-3">
-            <Link to={prev.path} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors">
-              <ArrowLeft size={18} />
-            </Link>
+            {mostrarFlechas ? (
+              <Link to={prev.path} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors">
+                <ArrowLeft size={18} />
+              </Link>
+            ) : <span />}
             <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm text-center flex-1">
               Marca Profesional
             </p>
-            <Link to={next.path} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors">
-              <ArrowRight size={18} />
-            </Link>
+            {mostrarFlechas ? (
+              <Link to={next.path} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors">
+                <ArrowRight size={18} />
+              </Link>
+            ) : <span />}
           </div>
 
           {logoUrl === undefined ? (
