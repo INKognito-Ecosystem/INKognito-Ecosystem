@@ -35,15 +35,20 @@ export async function loader({ request }) {
   } catch {
     ciudadDetectada = null
   }
+  // Invitación de estudio (2026-08-06) — cuando se llega acá desde
+  // InvitacionEstudioPage.jsx ("todavía no tienes perfil"), este token
+  // viaja en el POST final para que el vínculo con el estudio se
+  // complete en el mismo registro (ver POST /api/artistas-solicitud).
+  const invitacion = new URL(request.url).searchParams.get('invitacion')
   const captchaA = Math.floor(Math.random() * 8) + 1
   const captchaB = Math.floor(Math.random() * 8) + 1
   try {
     const res = await fetch(`${PANEL_URL}/api/upload-config`)
-    if (res.ok) return { ...(await res.json()), ciudadDetectada, captchaA, captchaB }
+    if (res.ok) return { ...(await res.json()), ciudadDetectada, captchaA, captchaB, invitacion }
   } catch {
     // sigue abajo con el fallback
   }
-  return { cloud_name: null, upload_preset: null, ciudadDetectada, captchaA, captchaB }
+  return { cloud_name: null, upload_preset: null, ciudadDetectada, captchaA, captchaB, invitacion }
 }
 
 export function meta() {
@@ -69,7 +74,7 @@ const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb
 // confirma el link que le llega al correo (ver ArtistaVerificarPage.jsx)
 // — ahí se activa solo, nadie del equipo tiene que revisarlo.
 export default function ArtistaRegistroPage() {
-  const { cloud_name, upload_preset, ciudadDetectada, captchaA, captchaB } = useLoaderData()
+  const { cloud_name, upload_preset, ciudadDetectada, captchaA, captchaB, invitacion } = useLoaderData()
   const [form, setForm] = useState({
     nombre: '', departamento: '', municipio: '', lat: null, lng: null, estilo: '', bio: '', instagram: '', facebook: '', whatsapp: '', email: '', no_tatua: '',
     foto_url: '', foto_url_2: '', foto_trabajo_1: '', foto_trabajo_2: '', foto_trabajo_3: '',
@@ -180,7 +185,7 @@ export default function ArtistaRegistroPage() {
       const res = await fetch(`${PANEL_URL}/api/artistas-solicitud`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, captcha_a: captchaA, captcha_b: captchaB, captcha_respuesta: captchaRespuesta }),
+        body: JSON.stringify({ ...form, captcha_a: captchaA, captcha_b: captchaB, captcha_respuesta: captchaRespuesta, invitacion_token: invitacion || undefined }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || '')

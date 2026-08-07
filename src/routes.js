@@ -23,6 +23,7 @@ export default [
   route('cuidados', 'components/tattoo/CuidadosPage.jsx'),
   route('p/:id', 'components/landing/ProductLandingPage.jsx'),
   route('pedido/:module', 'components/pedido/PedidoOnlinePage.jsx'),
+  route('anllyfit', 'routes/AnllyFitPage.jsx'),
 
   // Legal
   route('privacidad', 'components/legal/PrivacidadPage.jsx'),
@@ -107,5 +108,13 @@ export default [
   // Reservas con anticipo (fase 2, 2026-08-06) — a donde vuelve el cliente
   // tras pagar en Mercado Pago (back_urls de POST /api/artistas-reservar).
   route('artista/reserva/resultado', 'components/artistas/ReservaResultadoPage.jsx'),
+  // Estudios de tatuaje (fase 3, 2026-08-06) — un estudio agrupa varios
+  // artistas ya existentes; mismo criterio de no-exposición que el resto
+  // del módulo (sin link en ningún navbar/home todavía).
+  route('tattoo-artist-colombia/estudio/unete', 'components/artistas/EstudioRegistroPage.jsx'),
+  route('tattoo-artist-colombia/estudio/verificar', 'components/artistas/EstudioVerificarPage.jsx'),
+  route('tattoo-artist-colombia/estudio/mi-perfil', 'components/artistas/EstudioEditarPerfilPage.jsx'),
+  route('tattoo-artist-colombia/invitacion', 'components/artistas/InvitacionEstudioPage.jsx'),
+  route('tattoo-artist-colombia/estudio/:id', 'components/artistas/EstudioLandingPage.jsx'),
   route('artista/:id', 'components/artistas/ArtistaLandingPage.jsx'),
 ]

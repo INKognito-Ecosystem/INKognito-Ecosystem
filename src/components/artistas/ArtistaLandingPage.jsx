@@ -465,6 +465,17 @@ export default function ArtistaLandingPage() {
                       <span className="truncate">{artista.estilo}</span>
                     </span>
                   )}
+                  {/* Cruce con el estudio (fase 3, 2026-08-06) — chip
+                      chico que enlaza a la página del estudio, aditivo
+                      sobre un header ya construido. */}
+                  {artista.estudio && (
+                    <Link
+                      to={`/tattoo-artist-colombia/estudio/${artista.estudio.id}`}
+                      className="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-bold text-gray-400 hover:text-gray-700 transition-colors truncate"
+                    >
+                      Pertenece a {artista.estudio.nombre} →
+                    </Link>
+                  )}
                 </div>
               </div>
 
