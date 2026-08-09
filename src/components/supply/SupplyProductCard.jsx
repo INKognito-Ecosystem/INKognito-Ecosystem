@@ -27,7 +27,7 @@ export function VariantSelectorSupply({ variantObjs, selIdx, onChange }) {
                 : 'border-zinc-700 text-zinc-500 hover:border-blue-400 hover:text-white'
             }`}
           >
-            {v.variant || 'Única'}
+            {v.variant}
           </button>
         ))}
       </div>

@@ -386,6 +386,15 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
       setError('El nombre y el precio son obligatorios.')
       return
     }
+    // Obligatoria (Jose, 2026-08-09): una fila sin variante quedaba
+    // invisible/inseleccionable en la card de Supply cuando comparte
+    // producto con otra fila que sí la tiene. Si el producto de verdad
+    // no tiene variantes, escribe "Único" o algo simple — decisión tuya,
+    // no un texto que el sistema inventa en silencio.
+    if (!nuevo.variant.trim()) {
+      setError('Escribe una variante (talla, sabor, color...) — o "Único" si el producto no tiene variantes.')
+      return
+    }
     setError(null)
 
     // Si no se está editando/vinculando uno ya existente, avisar (sin
@@ -554,7 +563,7 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
               )}
             </div>
             <p className="text-gray-400 text-[10px] -mt-1.5">Si ya alguien cargó este producto antes, elígelo de la lista para no repetir categoría/marca/descripción.</p>
-            <input className={inputClass} placeholder="Variante (opcional, ej: color, tamaño)" value={nuevo.variant} onChange={(e) => setNuevo((n) => ({ ...n, variant: e.target.value }))} />
+            <input className={inputClass} placeholder='Variante — talla, sabor, color... o "Único" si no aplica' value={nuevo.variant} onChange={(e) => setNuevo((n) => ({ ...n, variant: e.target.value }))} />
             <div className="grid grid-cols-2 gap-2">
               <input className={inputClass} type="number" min="1" placeholder="Precio en COP" value={nuevo.price} onChange={(e) => setNuevo((n) => ({ ...n, price: e.target.value }))} />
               <input className={inputClass} type="number" min="0" placeholder="Stock" value={nuevo.stock} onChange={(e) => setNuevo((n) => ({ ...n, stock: e.target.value }))} />
