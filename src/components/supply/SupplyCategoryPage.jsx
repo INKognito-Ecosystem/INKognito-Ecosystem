@@ -228,7 +228,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
           ) : (
             <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-0 px-6 md:px-6 pb-3 md:pb-0 scrollbar-hide">
               {products.map(item => (
-                <div key={item.name} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">
+                <div key={`${item.name}-${item.estudio_id ?? 'x'}`} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">
                   <SupplyProductCard item={item} categoria={categoria} />
                 </div>
               ))}

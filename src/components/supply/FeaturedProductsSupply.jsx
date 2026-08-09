@@ -121,7 +121,7 @@ export default function FeaturedProductsSupply({ categorias = {}, allProducts = 
                   <div className="flex-1 h-px bg-zinc-800" />
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                  {items.map(item => <ProductCard key={item.name} item={item} />)}
+                  {items.map(item => <ProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} />)}
                 </div>
               </div>
             ))}

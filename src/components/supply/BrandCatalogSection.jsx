@@ -58,7 +58,7 @@ export default function BrandCatalogSection({ brandName, products = [], supplier
       )}
       <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide">
         {products.map(item => (
-          <div key={item.name} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">
+          <div key={`${item.name}-${item.estudio_id ?? 'x'}`} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">
             <SupplyProductCard item={item} categoria={item.categoria} showEstudioBadge={showEstudioBadge} />
           </div>
         ))}
