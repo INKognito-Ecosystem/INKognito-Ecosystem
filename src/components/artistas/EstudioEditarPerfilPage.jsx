@@ -261,16 +261,28 @@ const SUPPLY_MARCA_LABEL = (v) => SUPPLY_MARCAS.find((m) => m.value === v)?.labe
 
 // Qué marcas tiene sentido ofrecer según la categoría elegida (Jose,
 // 2026-08-09: "si agrego tintas, en marcas debería aparecerme solo
-// tintas"). Tattoo Vision y Royal Three son distribuidoras generales
-// (venden de varias líneas, no una sola), por eso aparecen en todas —
-// el resto son marcas de un solo tipo de producto. Si algo queda mal
-// clasificado, es fácil de ajustar acá.
+// tintas"). Investigado marca por marca (2026-08-09) — nada de "general,
+// aparece en todas" sin verificar primero:
+// - Tattoo Vision: NO es distribuidora general — es una marca colombiana
+//   de tecnología de visualización (luz polarizada para ver la
+//   saturación mientras se tatúa), un producto de equipo/accesorio, no
+//   tinta ni cuidado ni cartucho.
+// - Royal Three: tampoco es general — es específicamente una marca de
+//   cuidado/proceso (mixers diluyentes, cremas, jabón, limpiador
+//   anestésico pre-tatuaje) — encaja en Cuidados, no en tintas/cartuchos.
+// - Eternal/Intenze/Fusion/World Famous/Solid Ink: tintas puras,
+//   confirmado.
+// - EZ Tattoo: cartuchos/agujas puro, confirmado.
+// - Kwadron: sí es de verdad multi-línea — agujas/cartuchos Y mobiliario
+//   (banquetas, estaciones de trabajo), confirmado con fuentes reales.
 const MARCAS_POR_CATEGORIA = {
-  'Tintas':      ['vice-colors', 'dynamic', 'eternal', 'intenze', 'fusion', 'world-famous', 'solid-ink', 'tattoo-vision', 'royal-three'],
-  'Cartuchos':   ['wjx', 'kwadron', 'ez-tattoo', 'tattoo-vision', 'royal-three'],
-  'Agujas':      ['wjx', 'kwadron', 'ez-tattoo', 'tattoo-vision', 'royal-three'],
-  'Cuidados':    ['heaven-pro', 'tattoo-vision', 'royal-three'],
-  'Mobiliario':  ['kwadron', 'tattoo-vision', 'royal-three'],
+  'Tintas':      ['vice-colors', 'dynamic', 'eternal', 'intenze', 'fusion', 'world-famous', 'solid-ink'],
+  'Cartuchos':   ['wjx', 'kwadron', 'ez-tattoo'],
+  'Agujas':      ['wjx', 'kwadron', 'ez-tattoo'],
+  'Cuidados':    ['heaven-pro', 'royal-three'],
+  'Mobiliario':  ['kwadron'],
+  'Máquinas':    ['tattoo-vision'],
+  'Accesorios':  ['tattoo-vision'],
 }
 const marcasParaCategoria = (categoria) => {
   const permitidas = MARCAS_POR_CATEGORIA[categoria]
