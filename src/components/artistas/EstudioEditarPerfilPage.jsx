@@ -356,6 +356,18 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
     }, 300)
   }
 
+  // Autocompletar la descripción EN VIVO al elegir categoría/marca (no solo
+  // al guardar, que confundía — Jose, 2026-08-09: "mientras subía producto
+  // tampoco se autocompletó de manera automática"). Nunca pisa algo que el
+  // proveedor ya haya escrito — mismo criterio que la cascada del servidor.
+  const prefillDescripcion = async (categoria, marca) => {
+    try {
+      const res = await fetch(`${PANEL_URL}/api/catalogo-defaults-lookup?module=supply&categoria=${encodeURIComponent(categoria || '')}&marca=${encodeURIComponent(marca || '')}`)
+      const data = await res.json()
+      if (data.descripcion) setNuevo((n) => (n.descripcion ? n : { ...n, descripcion: data.descripcion }))
+    } catch { /* silencioso — el proveedor siempre puede escribirla a mano */ }
+  }
+
   const seleccionarMaster = (item) => {
     setNuevo((n) => ({
       ...n,
@@ -547,10 +559,10 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
               <input className={inputClass} type="number" min="1" placeholder="Precio en COP" value={nuevo.price} onChange={(e) => setNuevo((n) => ({ ...n, price: e.target.value }))} />
               <input className={inputClass} type="number" min="0" placeholder="Stock" value={nuevo.stock} onChange={(e) => setNuevo((n) => ({ ...n, stock: e.target.value }))} />
             </div>
-            <select className={inputClass} value={nuevo.categoria} onChange={(e) => setNuevo((n) => ({ ...n, categoria: e.target.value }))}>
+            <select className={inputClass} value={nuevo.categoria} onChange={(e) => { setNuevo((n) => ({ ...n, categoria: e.target.value })); prefillDescripcion(e.target.value, nuevo.marca) }}>
               {SUPPLY_CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
-            <select className={inputClass} value={nuevo.marca} onChange={(e) => setNuevo((n) => ({ ...n, marca: e.target.value }))}>
+            <select className={inputClass} value={nuevo.marca} onChange={(e) => { setNuevo((n) => ({ ...n, marca: e.target.value })); prefillDescripcion(nuevo.categoria, e.target.value) }}>
               {SUPPLY_MARCAS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
             </select>
             <textarea rows={2} className={inputClass} placeholder="Descripción (opcional)" value={nuevo.descripcion} onChange={(e) => setNuevo((n) => ({ ...n, descripcion: e.target.value }))} />
