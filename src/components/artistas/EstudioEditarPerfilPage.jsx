@@ -336,6 +336,7 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
       categoria: item.categoria || n.categoria,
       marca: item.marca || n.marca,
       descripcion: item.descripcion || n.descripcion,
+      image_url: n.image_url || item.image_url || '',
       master_product_id: item.id,
     }))
     setMasterResults([])
