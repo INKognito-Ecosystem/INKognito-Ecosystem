@@ -1,10 +1,12 @@
 import { useLoaderData, redirect } from 'react-router-dom'
+import { useMemo, useState } from 'react'
 import { Award } from 'lucide-react'
 import FooterSupply from './FooterSupply'
 import NavbarCategory from './NavbarCategory'
 import BrandCatalogSection from './BrandCatalogSection'
 import CajaSurtidaWidget from './CajaSurtidaWidget'
 import { fetchCatalogEstudio } from '../../hooks/useCatalog'
+import { SUPPLY_CATEGORIES_ORDER } from '../../data/supplyCategoriesOrder'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
@@ -76,12 +78,30 @@ export default function EstudioSupplyPage() {
 
   const nombreSupply = estudio.nombre_supply || estudio.nombre
 
+  // Sub-pestañas por categoría (2026-08-09, Jose: "subpestañas que filtren
+  // los productos dentro de su web... como hicimos en el hero del buscador,
+  // que filtra estudios, artistas, todos") — mismo patrón de pills de
+  // ArtistasColombiaPage.jsx, acá filtrando el catálogo de ESTE proveedor
+  // en vez de estudios/artistas. Solo se listan las categorías que este
+  // proveedor de verdad tiene cargadas (no las 13 fijas de Supply) —
+  // ordenadas según SUPPLY_CATEGORIES_ORDER para que el orden sea el mismo
+  // que ya usa el resto de la web, con cualquier categoría fuera de esa
+  // lista (Cursos, Kit Externo, Recursos...) al final.
+  const categoriasEnCatalogo = useMemo(() => {
+    const presentes = new Set(products.map((p) => p.categoria).filter(Boolean))
+    const ordenadas = SUPPLY_CATEGORIES_ORDER.map((c) => c.name).filter((c) => presentes.has(c))
+    const resto = [...presentes].filter((c) => !ordenadas.includes(c))
+    return [...ordenadas, ...resto]
+  }, [products])
+  const [categoriaActiva, setCategoriaActiva] = useState('todos')
+  const productosFiltrados = categoriaActiva === 'todos' ? products : products.filter((p) => p.categoria === categoriaActiva)
+
   return (
     <div className="min-h-screen bg-black text-white">
       <NavbarCategory pageName={nombreSupply} />
 
       <div className="pt-20 md:pt-24 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-6">
           {estudio.logo_url && (
             <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-zinc-800 flex-shrink-0">
               <img src={estudio.logo_url} alt={nombreSupply} className="w-full h-full object-cover" />
@@ -107,6 +127,23 @@ export default function EstudioSupplyPage() {
           </div>
         </div>
 
+        {categoriasEnCatalogo.length > 1 && (
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 mb-6 scrollbar-hide">
+            {['todos', ...categoriasEnCatalogo].map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setCategoriaActiva(c)}
+                className={`flex-shrink-0 px-4 py-1.5 rounded-full border text-[11px] font-bold uppercase tracking-wide transition-colors ${
+                  categoriaActiva === c ? 'border-blue-500 bg-blue-500 text-white' : 'border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-zinc-200'
+                }`}
+              >
+                {c === 'todos' ? 'Todos' : c}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Sin insignia de proveedor por card ni banner "Suministrado
             por..." acá — sería redundante, el título de esta misma
             página ya deja claro de quién es el catálogo (Jose,
@@ -114,7 +151,7 @@ export default function EstudioSupplyPage() {
             de Supply, donde los productos vienen mezclados. */}
         <BrandCatalogSection
           brandName={nombreSupply}
-          products={products}
+          products={productosFiltrados}
           supplierBadge={null}
           showEstudioBadge={false}
           whatsapp={estudio.whatsapp || undefined}
