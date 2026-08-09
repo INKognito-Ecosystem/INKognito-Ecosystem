@@ -267,8 +267,13 @@ const PRODUCTO_VACIO = { product: '', variant: '', price: '', stock: '', categor
 // campos de un producto (una sola foto, categoría fija, variante y
 // stock) en vez de un diseño.
 function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
+  // Desplegable como Mis Ventas — a diferencia de esa sección, acá ni
+  // siquiera se pide la lista al servidor hasta que se abre por primera
+  // vez (puede traer fotos de muchos productos, no vale la pena cargarlo
+  // de entrada si el proveedor no lo va a abrir).
+  const [open, setOpen] = useState(false)
   const [productos, setProductos] = useState(null)
-  const [cargando, setCargando] = useState(true)
+  const [cargando, setCargando] = useState(false)
   const [subiendo, setSubiendo] = useState(false)
   const [guardando, setGuardando] = useState(false)
   const [nuevo, setNuevo] = useState(PRODUCTO_VACIO)
@@ -279,14 +284,18 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
   const fileInput = useRef(null)
   const masterSearchTimer = useRef(null)
   const formRef = useRef(null)
+  const cargadoRef = useRef(false)
 
   useEffect(() => {
+    if (!open || cargadoRef.current) return
+    cargadoRef.current = true
+    setCargando(true)
     fetch(`${PANEL_URL}/api/estudios-inventario-por-token?token=${encodeURIComponent(token)}`)
       .then((r) => r.ok ? r.json() : [])
       .then(setProductos)
       .catch(() => setProductos([]))
       .finally(() => setCargando(false))
-  }, [token])
+  }, [open, token])
 
   const subirFoto = async (file) => {
     if (!file || !cloud_name || !upload_preset) return
@@ -436,15 +445,27 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
   }, [productos])
 
   return (
-    <div className="mb-8 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5">
-      <p className={labelClass}><ShoppingBag size={12} className="inline -mt-0.5 mr-1" />Mis productos en Supply</p>
-      <p className="text-gray-400 text-[10px] mb-4">Aparecen en tu propio catálogo (enlazado desde tu perfil) y también mezclados en la tienda general de Supply, en su categoría correspondiente.</p>
+    <div className="mb-8 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="w-full px-4 py-4 flex items-center justify-between gap-2 text-left hover:bg-gray-100 transition-colors"
+      >
+        <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-500">
+          <ShoppingBag size={12} />
+          Mis productos en Supply
+        </span>
+        <ChevronDown size={16} className={`text-gray-400 flex-shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="px-4 pb-5">
+          <p className="text-gray-400 text-[10px] mb-4">Aparecen en tu propio catálogo (enlazado desde tu perfil) y también mezclados en la tienda general de Supply, en su categoría correspondiente.</p>
 
-      {cargando ? (
-        <p className="text-gray-400 text-xs text-center py-4">Cargando...</p>
-      ) : (
-        <>
-          {grupos.length > 0 && (
+          {cargando ? (
+            <p className="text-gray-400 text-xs text-center py-4">Cargando...</p>
+          ) : (
+            <>
+              {grupos.length > 0 && (
             <div className="flex gap-2.5 overflow-x-auto pb-2 mb-4 snap-x snap-mandatory scrollbar-hide">
               {grupos.map((g) => {
                 const portada = g.variantes.find((v) => v.image_url)?.image_url
@@ -546,7 +567,9 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
               {guardando ? 'Guardando...' : editando ? 'Guardar cambios' : '+ Agregar producto'}
             </button>
           </div>
-        </>
+            </>
+          )}
+        </div>
       )}
     </div>
   )
