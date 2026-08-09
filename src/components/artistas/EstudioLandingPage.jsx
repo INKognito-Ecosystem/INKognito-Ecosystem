@@ -36,6 +36,43 @@ export function meta({ data }) {
   ]
 }
 
+// CTA "Ver su catálogo" (empresa) / "Mi Supply en línea" (estudio real) —
+// factorizado (2026-08-09) para no duplicarlo entre los dos heros de abajo.
+// v4 (fase 6.1): ya no depende solo de vende_supply — una marca con landing
+// propia (catalogo_url) también debe mostrar el link aunque no suba
+// inventario acá. Parpadeo 3 veces al entrar (CSS puro sobre un solo
+// elemento, sin costo relacionado al tamaño del catálogo) — respeta
+// prefers-reduced-motion. ?flechas=0: quien entra desde este perfil no debe
+// poder saltar a otra marca sin relación vía las flechas prev/next de
+// marcasProfesionales/*.jsx.
+function CatalogoCTA({ estudio }) {
+  if (!(estudio.catalogo_url || (estudio.vende_supply && estudio.n_productos_supply > 0))) return null
+  const base = estudio.catalogo_url || `/supply/estudio/${estudio.id}`
+  const externo = /^https?:\/\//.test(base)
+  const destino = externo ? base : `${base}${base.includes('?') ? '&' : '?'}flechas=0`
+  const texto = estudio.tipo === 'empresa' ? 'Ver su catálogo' : 'Mi Supply en línea'
+  const claseComun = "catalogo-cta-blink flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white hover:opacity-90 active:scale-95 transition-all rounded-full px-2.5 py-1 mt-1.5 w-fit"
+  return (
+    <>
+      <style>{`
+        @media (prefers-reduced-motion: no-preference) {
+          @keyframes catalogoCtaBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+          .catalogo-cta-blink { animation: catalogoCtaBlink 0.45s ease-in-out 3; }
+        }
+      `}</style>
+      {externo ? (
+        <a href={destino} target="_blank" rel="noreferrer" className={claseComun} style={{ backgroundColor: BTN }}>
+          <ShoppingBag size={11} className="flex-shrink-0" /> {texto}
+        </a>
+      ) : (
+        <Link to={destino} className={claseComun} style={{ backgroundColor: BTN }}>
+          <ShoppingBag size={11} className="flex-shrink-0" /> {texto}
+        </Link>
+      )}
+    </>
+  )
+}
+
 export default function EstudioLandingPage() {
   const { estudio } = useLoaderData()
 
@@ -59,117 +96,117 @@ export default function EstudioLandingPage() {
       <NavbarArtistas titulo="Tattoo Studios Colombia" />
 
       <div className="flex-1 pt-16 md:pt-20">
-        {/* h-40/56/64 con ancho completo — una foto que no sea
-            panorámica (ej. una foto de celular en vertical u horizontal
-            normal) se ve exageradamente recortada con object-cover acá.
-            El aviso de formato ideal vive en el dashboard del estudio
-            (donde se sube la foto), no en esta página pública. */}
-        <div className="w-full h-40 sm:h-56 md:h-64 bg-gray-100 overflow-hidden">
-          {estudio.foto_portada && <img src={estudio.foto_portada} alt="" className="w-full h-full object-cover" />}
-        </div>
-
-        <div className="max-w-3xl mx-auto px-4">
-          <div className="relative min-h-16 sm:min-h-[85px]">
-            <div className="absolute left-0 top-0 -translate-y-1/3">
-              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white bg-gray-100 shadow-md overflow-hidden">
+        {estudio.tipo === 'empresa' ? (
+          // Hero de EMPRESA (marca proveedora, no estudio de tatuaje) —
+          // v2 (2026-08-09, Jose: "este formato... para las de empresa" —
+          // reusa el hero que se construyó primero para la tienda de
+          // Supply de cada proveedor, EstudioSupplyPage.jsx). Sin foto de
+          // portada (una empresa proveedora no tiene "local" que mostrar
+          // como las fotos de estudio real) — logo y burbuja de texto en
+          // una sola fila siempre, nombre/insignia dentro de la burbuja,
+          // ubicación montada mitad adentro/mitad afuera de su borde
+          // inferior, mismo mecanismo que la insignia de Mercado Pago en
+          // ArtistaLandingPage.jsx.
+          <div className="max-w-3xl mx-auto px-4 pt-6 md:pt-8">
+            <div className="flex items-start gap-3 sm:gap-6">
+              <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full border-4 border-gray-100 bg-gray-100 shadow-md overflow-hidden flex-shrink-0">
                 {estudio.logo_url ? (
                   <img src={estudio.logo_url} alt={estudio.nombre} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-300 text-4xl font-black">{estudio.nombre?.[0]?.toUpperCase() || '?'}</div>
+                  <div className="w-full h-full flex items-center justify-center text-gray-300 text-2xl sm:text-4xl font-black">{estudio.nombre?.[0]?.toUpperCase() || '?'}</div>
+                )}
+              </div>
+              <div className="relative max-w-md pb-4 min-w-0">
+                <div className="bg-gray-100 border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3.5">
+                  <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest leading-tight mb-1">Marca Profesional</p>
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span title="Marca Profesional" className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-gray-600">
+                      <Award size={11} className="text-white" />
+                    </span>
+                    <h1 className="text-base sm:text-xl font-black uppercase leading-tight truncate min-w-0">{estudio.nombre}</h1>
+                  </div>
+                  <CatalogoCTA estudio={estudio} />
+                </div>
+                {estudio.municipio && (
+                  <a
+                    href={urlGoogleMaps(estudio)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="absolute -bottom-1 left-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-gray-300 shadow-md text-[10px] font-bold uppercase tracking-widest text-gray-600 hover:text-gray-900 active:scale-95 transition-all whitespace-nowrap"
+                  >
+                    <MapPin size={11} className="flex-shrink-0" />
+                    {estudio.municipio}{estudio.departamento ? `, ${estudio.departamento}` : ''}
+                  </a>
                 )}
               </div>
             </div>
-            <div className="pt-3 pl-[108px] sm:pl-[144px] min-w-0">
-              {/* v4 (2026-08-07, Jose: "el ícono iba antes del nombre, no
-                  al frente" — corrige v3, que lo puso después) — ícono
-                  primero, nombre después, mismo patrón inline (solo
-                  ícono, sin texto, como VerifiedBadge en
-                  ArtistasColombiaPage.jsx). text-base en vez de
-                  text-lg/2xl + truncate (Jose: "el nombre del estudio
-                  como es largo genera dos líneas de texto") — más chico
-                  que el de artista a propósito, para que SIEMPRE quede en
-                  una sola línea sin importar el largo. */}
-              {/* fase 6.1 (2026-08-07, Jose) — una empresa proveedora
-                  pura no es un estudio de tatuaje, la insignia/tooltip
-                  cambia para reflejar eso ("Marca Profesional" en vez de
-                  "Tattoo Studio"), mismo ícono-antes-del-nombre. */}
-              {/* v2 (fase 6.4, 2026-08-07, Jose) — el texto vivía SOLO en
-                  el tooltip del ícono (invisible sin hover, inútil en
-                  celular). Ahora es texto real arriba del nombre, mismo
-                  kicker que ya se agregó al resultado de búsqueda en
-                  ArtistasColombiaPage.jsx — se lee igual en los dos
-                  lugares. */}
-              {estudio.tipo === 'empresa' && (
-                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest leading-tight">Marca Profesional</p>
-              )}
-              <div className="flex items-center gap-1.5 min-w-0">
-                <span title={estudio.tipo === 'empresa' ? 'Marca Profesional' : 'Tattoo Studio'} className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-gray-600">
-                  {estudio.tipo === 'empresa' ? <Award size={11} className="text-white" /> : <Building2 size={11} className="text-white" />}
-                </span>
-                <h1 className="text-base sm:text-xl font-black uppercase leading-tight truncate min-w-0">{estudio.nombre}</h1>
-              </div>
-              {/* Enlace real a Google Maps (2026-08-07, Jose) — v2:
-                  "como botón no es claro... debería ser sensible" — el
-                  texto subrayado no se leía como botón real y el área de
-                  toque era muy chica en celular. Ahora es un botón con
-                  fondo/borde visibles y feedback al tocar (active:), área
-                  de toque más grande. Link propio si lo pegaron, si no el
-                  punto exacto capturado, si no búsqueda por
-                  nombre+municipio. */}
-              <a
-                href={urlGoogleMaps(estudio)}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-600 hover:text-gray-900 hover:bg-gray-50 active:scale-95 transition-all border border-gray-300 rounded-full px-2.5 py-1 mt-1.5"
-              >
-                <MapPin size={11} className="flex-shrink-0" />
-                {estudio.municipio}{estudio.departamento ? `, ${estudio.departamento}` : ''}
-              </a>
-
-              {/* Supply multitenant (fase 4/5/6.1, 2026-08-07) — v3 (Jose:
-                  "alineado con el nombre y la ubicación, no debajo del
-                  perfil") — DENTRO de la columna con pl-[108px]/[144px],
-                  no como hermano del wrapper `relative` de arriba; así
-                  hereda el mismo indent que nombre/ubicación en vez de
-                  arrancar desde el borde izquierdo (debajo de la foto).
-                  v4 (fase 6.1): ya no depende solo de vende_supply — una
-                  marca con landing propia (catalogo_url, ver fase 6.1)
-                  también debe mostrar el link aunque no suba inventario
-                  acá. Parpadeo 3 veces al entrar (CSS puro sobre un solo
-                  elemento, sin costo relacionado al tamaño del catálogo) —
-                  respeta prefers-reduced-motion. */}
-              {(estudio.catalogo_url || (estudio.vende_supply && estudio.n_productos_supply > 0)) && (() => {
-                const base = estudio.catalogo_url || `/supply/estudio/${estudio.id}`
-                const externo = /^https?:\/\//.test(base)
-                // ?flechas=0 (fase 6.1) — quien entra desde este perfil no
-                // debe poder saltar a otra marca sin relación vía las
-                // flechas prev/next de marcasProfesionales/*.jsx.
-                const destino = externo ? base : `${base}${base.includes('?') ? '&' : '?'}flechas=0`
-                const texto = estudio.tipo === 'empresa' ? 'Ver su catálogo' : 'Mi Supply en línea'
-                const claseComun = "catalogo-cta-blink flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white hover:opacity-90 active:scale-95 transition-all rounded-full px-2.5 py-1 mt-1.5 w-fit"
-                return (
-                  <>
-                    <style>{`
-                      @media (prefers-reduced-motion: no-preference) {
-                        @keyframes catalogoCtaBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-                        .catalogo-cta-blink { animation: catalogoCtaBlink 0.45s ease-in-out 3; }
-                      }
-                    `}</style>
-                    {externo ? (
-                      <a href={destino} target="_blank" rel="noreferrer" className={claseComun} style={{ backgroundColor: BTN }}>
-                        <ShoppingBag size={11} className="flex-shrink-0" /> {texto}
-                      </a>
-                    ) : (
-                      <Link to={destino} className={claseComun} style={{ backgroundColor: BTN }}>
-                        <ShoppingBag size={11} className="flex-shrink-0" /> {texto}
-                      </Link>
-                    )}
-                  </>
-                )
-              })()}
-            </div>
           </div>
+        ) : (
+          <>
+            {/* h-40/56/64 con ancho completo — una foto que no sea
+                panorámica (ej. una foto de celular en vertical u
+                horizontal normal) se ve exageradamente recortada con
+                object-cover acá. El aviso de formato ideal vive en el
+                dashboard del estudio (donde se sube la foto), no en esta
+                página pública. */}
+            <div className="w-full h-40 sm:h-56 md:h-64 bg-gray-100 overflow-hidden">
+              {estudio.foto_portada && <img src={estudio.foto_portada} alt="" className="w-full h-full object-cover" />}
+            </div>
 
+            <div className="max-w-3xl mx-auto px-4">
+              <div className="relative min-h-16 sm:min-h-[85px]">
+                <div className="absolute left-0 top-0 -translate-y-1/3">
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white bg-gray-100 shadow-md overflow-hidden">
+                    {estudio.logo_url ? (
+                      <img src={estudio.logo_url} alt={estudio.nombre} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-300 text-4xl font-black">{estudio.nombre?.[0]?.toUpperCase() || '?'}</div>
+                    )}
+                  </div>
+                </div>
+                <div className="pt-3 pl-[108px] sm:pl-[144px] min-w-0">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span title="Tattoo Studio" className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-gray-600">
+                      <Building2 size={11} className="text-white" />
+                    </span>
+                    <h1 className="text-base sm:text-xl font-black uppercase leading-tight truncate min-w-0">{estudio.nombre}</h1>
+                  </div>
+                  {/* Enlace real a Google Maps (2026-08-07, Jose) — v2:
+                      "como botón no es claro... debería ser sensible" — el
+                      texto subrayado no se leía como botón real y el área
+                      de toque era muy chica en celular. Ahora es un botón
+                      con fondo/borde visibles y feedback al tocar
+                      (active:), área de toque más grande. Link propio si
+                      lo pegaron, si no el punto exacto capturado, si no
+                      búsqueda por nombre+municipio. */}
+                  <a
+                    href={urlGoogleMaps(estudio)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-600 hover:text-gray-900 hover:bg-gray-50 active:scale-95 transition-all border border-gray-300 rounded-full px-2.5 py-1 mt-1.5"
+                  >
+                    <MapPin size={11} className="flex-shrink-0" />
+                    {estudio.municipio}{estudio.departamento ? `, ${estudio.departamento}` : ''}
+                  </a>
+
+                  {/* Supply multitenant (fase 4/5/6.1, 2026-08-07) — v3
+                      (Jose: "alineado con el nombre y la ubicación, no
+                      debajo del perfil") — DENTRO de la columna con
+                      pl-[108px]/[144px], no como hermano del wrapper
+                      `relative` de arriba; así hereda el mismo indent que
+                      nombre/ubicación en vez de arrancar desde el borde
+                      izquierdo (debajo de la foto). */}
+                  <CatalogoCTA estudio={estudio} />
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Bio, redes y roster de artistas — compartido por los dos heros
+            de arriba (empresa y estudio real), independiente de cuál se
+            haya renderizado. */}
+        <div className="max-w-3xl mx-auto px-4">
           {estudio.bio && (
             <div className="mt-6 max-w-xl">
               <div className="bg-gray-100 border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3.5">

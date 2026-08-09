@@ -113,19 +113,22 @@ export default function EstudioSupplyPage() {
           — mismo mecanismo que la insignia de Mercado Pago en la card de
           agenda (absolute, mitad de su propio alto hacia afuera). */}
       <div className="bg-white text-gray-900 pt-20 md:pt-24 pb-9 px-4 md:px-6">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
-          <div className="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-gray-100 bg-gray-100 shadow-md overflow-hidden flex-shrink-0 mx-auto sm:mx-0">
+        {/* Logo y burbuja SIEMPRE en una sola fila, incluso en celular
+            (2026-08-09, Jose: "que logo y texto ocupen una línea, y no
+            texto debajo del logo" — v1 apilaba en mobile con flex-col). */}
+        <div className="max-w-7xl mx-auto flex items-start gap-3 sm:gap-6">
+          <div className="w-16 h-16 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full border-4 border-gray-100 bg-gray-100 shadow-md overflow-hidden flex-shrink-0">
             {estudio.logo_url ? (
               <img src={estudio.logo_url} alt={nombreSupply} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-300 text-4xl font-black">{nombreSupply?.[0]?.toUpperCase() || '?'}</div>
+              <div className="w-full h-full flex items-center justify-center text-gray-300 text-2xl sm:text-4xl font-black">{nombreSupply?.[0]?.toUpperCase() || '?'}</div>
             )}
           </div>
 
-          <div className="relative max-w-md w-full sm:w-auto mx-auto sm:mx-0 pb-4">
-            <div className="bg-gray-100 border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3.5 text-center sm:text-left">
+          <div className="relative max-w-md pb-4 min-w-0">
+            <div className="bg-gray-100 border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3.5">
               <p className="uppercase tracking-[0.25em] text-gray-400 text-[10px] font-black mb-1">Catálogo de</p>
-              <h1 className="text-xl md:text-2xl font-black uppercase leading-tight">{nombreSupply}</h1>
+              <h1 className="text-lg sm:text-2xl font-black uppercase leading-tight">{nombreSupply}</h1>
               {/* Insignia "Distribuidor Oficial" (fase 6, 2026-08-07) —
                   tarifa fija de patrocinio, no comisión (la venta acá no
                   necesariamente pasa por el carrito). Color ámbar a
@@ -142,7 +145,7 @@ export default function EstudioSupplyPage() {
                 href={urlGoogleMaps(estudio)}
                 target="_blank"
                 rel="noreferrer"
-                className="absolute -bottom-1 left-1/2 -translate-x-1/2 sm:left-4 sm:translate-x-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-gray-300 shadow-md text-[10px] font-bold uppercase tracking-widest text-gray-600 hover:text-gray-900 active:scale-95 transition-all whitespace-nowrap"
+                className="absolute -bottom-1 left-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-gray-300 shadow-md text-[10px] font-bold uppercase tracking-widest text-gray-600 hover:text-gray-900 active:scale-95 transition-all whitespace-nowrap"
               >
                 <MapPin size={11} className="flex-shrink-0" />
                 {estudio.municipio}{estudio.departamento ? `, ${estudio.departamento}` : ''}
