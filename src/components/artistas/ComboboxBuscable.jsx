@@ -15,12 +15,18 @@ import { normalize } from '../../data/colombiaGeo'
 // importar tildes/mayúsculas) — si no matchea nada, revierte al último
 // valor válido. Esto evita que quede guardado un municipio mal escrito
 // que después no encuentre coordenadas ni aparezca bien en el buscador.
-export default function ComboboxBuscable({ value, onChange, options, placeholder, disabled, inputClassName }) {
-  const [texto, setTexto] = useState(value || '')
+// labelFor (opcional): cuando la opción guardada no es el texto que se
+// debe mostrar (ej. marca: se guarda el slug "vice-colors" pero se
+// muestra "Vice Colors") — por defecto identidad, no cambia nada para
+// los usos existentes (departamento/municipio, donde valor y texto son
+// lo mismo).
+export default function ComboboxBuscable({ value, onChange, options, placeholder, disabled, inputClassName, labelFor }) {
+  const getLabel = labelFor || ((v) => v)
+  const [texto, setTexto] = useState(getLabel(value) || '')
   const [abierto, setAbierto] = useState(false)
   const wrapRef = useRef(null)
 
-  useEffect(() => { setTexto(value || '') }, [value])
+  useEffect(() => { setTexto(getLabel(value) || '') }, [value])
 
   useEffect(() => {
     const onClickFuera = (e) => {
@@ -31,10 +37,10 @@ export default function ComboboxBuscable({ value, onChange, options, placeholder
   }, [])
 
   const q = normalize(texto.trim())
-  const filtradas = q === '' ? options : options.filter((o) => normalize(o).includes(q))
+  const filtradas = q === '' ? options : options.filter((o) => normalize(getLabel(o)).includes(q))
 
   const elegir = (opcion) => {
-    setTexto(opcion)
+    setTexto(getLabel(opcion))
     onChange(opcion)
     setAbierto(false)
   }
@@ -54,9 +60,9 @@ export default function ComboboxBuscable({ value, onChange, options, placeholder
           onFocus={() => setAbierto(true)}
           onBlur={() => {
             setAbierto(false)
-            const match = options.find((o) => normalize(o) === normalize(texto))
-            if (match) { setTexto(match); if (match !== value) onChange(match) }
-            else setTexto(value || '')
+            const match = options.find((o) => normalize(getLabel(o)) === normalize(texto))
+            if (match) { setTexto(getLabel(match)); if (match !== value) onChange(match) }
+            else setTexto(getLabel(value) || '')
           }}
           placeholder={placeholder}
           className={inputClassName}
@@ -78,7 +84,7 @@ export default function ComboboxBuscable({ value, onChange, options, placeholder
               className={`block w-full text-left px-4 py-2 text-sm transition-colors hover:bg-gray-50 ${o === value ? 'font-bold' : 'text-gray-700'}`}
               style={o === value ? { color: '#B3202F' } : undefined}
             >
-              {o}
+              {getLabel(o)}
             </button>
           )) : (
             <p className="px-4 py-2 text-sm text-gray-400">Sin resultados</p>

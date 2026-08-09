@@ -257,6 +257,28 @@ const SUPPLY_MARCAS = [
   { value: 'heaven-pro', label: 'Heaven Pro' },
   { value: 'royal-three', label: 'Royal Three' },
 ]
+const SUPPLY_MARCA_LABEL = (v) => SUPPLY_MARCAS.find((m) => m.value === v)?.label || v
+
+// Qué marcas tiene sentido ofrecer según la categoría elegida (Jose,
+// 2026-08-09: "si agrego tintas, en marcas debería aparecerme solo
+// tintas"). Tattoo Vision y Royal Three son distribuidoras generales
+// (venden de varias líneas, no una sola), por eso aparecen en todas —
+// el resto son marcas de un solo tipo de producto. Si algo queda mal
+// clasificado, es fácil de ajustar acá.
+const MARCAS_POR_CATEGORIA = {
+  'Tintas':      ['vice-colors', 'dynamic', 'eternal', 'intenze', 'fusion', 'world-famous', 'solid-ink', 'tattoo-vision', 'royal-three'],
+  'Cartuchos':   ['wjx', 'kwadron', 'ez-tattoo', 'tattoo-vision', 'royal-three'],
+  'Agujas':      ['wjx', 'kwadron', 'ez-tattoo', 'tattoo-vision', 'royal-three'],
+  'Cuidados':    ['heaven-pro', 'tattoo-vision', 'royal-three'],
+  'Mobiliario':  ['kwadron', 'tattoo-vision', 'royal-three'],
+}
+const marcasParaCategoria = (categoria) => {
+  const permitidas = MARCAS_POR_CATEGORIA[categoria]
+  return permitidas
+    ? SUPPLY_MARCAS.filter((m) => m.value === '' || permitidas.includes(m.value)).map((m) => m.value)
+    : SUPPLY_MARCAS.map((m) => m.value)
+}
+
 const PRODUCTO_VACIO = { product: '', variant: '', price: '', stock: '', categoria: SUPPLY_CATEGORIAS[0], marca: '', image_url: '', descripcion: '', master_product_id: null }
 
 // "Mis productos en Supply" (fase 4, 2026-08-07, Supply multitenant) —
@@ -568,12 +590,29 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
               <input className={inputClass} type="number" min="1" placeholder="Precio en COP" value={nuevo.price} onChange={(e) => setNuevo((n) => ({ ...n, price: e.target.value }))} />
               <input className={inputClass} type="number" min="0" placeholder="Stock" value={nuevo.stock} onChange={(e) => setNuevo((n) => ({ ...n, stock: e.target.value }))} />
             </div>
-            <select className={inputClass} value={nuevo.categoria} onChange={(e) => { setNuevo((n) => ({ ...n, categoria: e.target.value })); prefillDescripcion(e.target.value, nuevo.marca) }}>
-              {SUPPLY_CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <select className={inputClass} value={nuevo.marca} onChange={(e) => { setNuevo((n) => ({ ...n, marca: e.target.value })); prefillDescripcion(nuevo.categoria, e.target.value) }}>
-              {SUPPLY_MARCAS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
-            </select>
+            <ComboboxBuscable
+              value={nuevo.categoria}
+              options={SUPPLY_CATEGORIAS}
+              placeholder="Categoría"
+              inputClassName={inputClass}
+              onChange={(categoria) => {
+                // Al cambiar de categoría, si la marca elegida ya no
+                // aplica ahí (ej. venía de Tintas y ahora es Cartuchos),
+                // se limpia — evita dejar una marca incoherente guardada.
+                const marcasValidas = marcasParaCategoria(categoria)
+                const marcaSigueValida = marcasValidas.includes(nuevo.marca)
+                setNuevo((n) => ({ ...n, categoria, marca: marcaSigueValida ? n.marca : '' }))
+                prefillDescripcion(categoria, marcaSigueValida ? nuevo.marca : '')
+              }}
+            />
+            <ComboboxBuscable
+              value={nuevo.marca}
+              options={marcasParaCategoria(nuevo.categoria)}
+              labelFor={SUPPLY_MARCA_LABEL}
+              placeholder="Marca (opcional)"
+              inputClassName={inputClass}
+              onChange={(marca) => { setNuevo((n) => ({ ...n, marca })); prefillDescripcion(nuevo.categoria, marca) }}
+            />
             <textarea rows={2} className={inputClass} placeholder="Descripción (opcional)" value={nuevo.descripcion} onChange={(e) => setNuevo((n) => ({ ...n, descripcion: e.target.value }))} />
 
             {error && <p className="text-red-600 text-xs">{error}</p>}
