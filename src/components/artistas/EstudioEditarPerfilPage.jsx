@@ -291,7 +291,14 @@ const marcasParaCategoria = (categoria) => {
     : SUPPLY_MARCAS.map((m) => m.value)
 }
 
-const PRODUCTO_VACIO = { product: '', variant: '', price: '', stock: '', categoria: SUPPLY_CATEGORIAS[0], marca: '', image_url: '', descripcion: '', master_product_id: null }
+// descripcionAuto: si la descripción actual vino sola (cascada
+// categoría/marca), sigue siendo "refrescable" al cambiar de categoría/
+// marca después. En cuanto el proveedor la toca a mano, o viene de un
+// producto real (editar, vincular del buscador), deja de tocarse sola
+// (reportado 2026-08-09: una camilla se quedó con la descripción de
+// cartuchos porque había quedado autocompletada de una categoría
+// elegida antes, y cambiar de categoría/marca después no la refrescaba).
+const PRODUCTO_VACIO = { product: '', variant: '', price: '', stock: '', categoria: SUPPLY_CATEGORIAS[0], marca: '', image_url: '', descripcion: '', descripcionAuto: false, master_product_id: null }
 
 // "Mis productos en Supply" (fase 4, 2026-08-07, Supply multitenant) —
 // solo se renderiza si el estudio tiene vende_supply activo (Jose lo
@@ -355,7 +362,7 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
     setEditando(p.id)
     setVarianteDe(null)
     setMasterResults([])
-    setNuevo({ product: p.product, variant: p.variant || '', price: p.price, stock: p.stock, categoria: p.categoria, marca: p.marca || '', image_url: p.image_url || '', descripcion: p.descripcion || '', master_product_id: null })
+    setNuevo({ product: p.product, variant: p.variant || '', price: p.price, stock: p.stock, categoria: p.categoria, marca: p.marca || '', image_url: p.image_url || '', descripcion: p.descripcion || '', descripcionAuto: false, master_product_id: null })
   }
   const cancelarEdicion = () => { setEditando(null); setVarianteDe(null); setNuevo(PRODUCTO_VACIO); setMasterResults([]); setError(null) }
 
@@ -370,7 +377,7 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
     setEditando(null)
     setVarianteDe(p.product)
     setMasterResults([])
-    setNuevo({ product: p.product, variant: '', price: p.price || '', stock: '', categoria: p.categoria, marca: p.marca || '', image_url: '', descripcion: p.descripcion || '', master_product_id: p.master_product_id || null })
+    setNuevo({ product: p.product, variant: '', price: p.price || '', stock: '', categoria: p.categoria, marca: p.marca || '', image_url: '', descripcion: p.descripcion || '', descripcionAuto: false, master_product_id: p.master_product_id || null })
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -398,7 +405,13 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
     try {
       const res = await fetch(`${PANEL_URL}/api/catalogo-defaults-lookup?module=supply&categoria=${encodeURIComponent(categoria || '')}&marca=${encodeURIComponent(marca || '')}`)
       const data = await res.json()
-      if (data.descripcion) setNuevo((n) => (n.descripcion ? n : { ...n, descripcion: data.descripcion }))
+      // Se refresca si el campo está vacío O si lo que hay ahí sigue
+      // siendo una sugerencia automática de una elección anterior — pero
+      // nunca si el proveedor ya la escribió a mano o vino de un
+      // producto real (editar, vincular del buscador).
+      if (data.descripcion) {
+        setNuevo((n) => (n.descripcion && !n.descripcionAuto ? n : { ...n, descripcion: data.descripcion, descripcionAuto: true }))
+      }
     } catch { /* silencioso — el proveedor siempre puede escribirla a mano */ }
   }
 
@@ -409,6 +422,7 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
       categoria: item.categoria || n.categoria,
       marca: item.marca || n.marca,
       descripcion: item.descripcion || n.descripcion,
+      descripcionAuto: false,
       image_url: n.image_url || item.image_url || '',
       master_product_id: item.id,
     }))
@@ -625,7 +639,7 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
               inputClassName={inputClass}
               onChange={(marca) => { setNuevo((n) => ({ ...n, marca })); prefillDescripcion(nuevo.categoria, marca) }}
             />
-            <textarea rows={2} className={inputClass} placeholder="Descripción (opcional)" value={nuevo.descripcion} onChange={(e) => setNuevo((n) => ({ ...n, descripcion: e.target.value }))} />
+            <textarea rows={2} className={inputClass} placeholder="Descripción (opcional)" value={nuevo.descripcion} onChange={(e) => setNuevo((n) => ({ ...n, descripcion: e.target.value, descripcionAuto: false }))} />
 
             {error && <p className="text-red-600 text-xs">{error}</p>}
 
