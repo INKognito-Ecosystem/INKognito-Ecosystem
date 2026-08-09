@@ -366,6 +366,21 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
       return
     }
     setError(null)
+
+    // Si no se está editando/vinculando uno ya existente, avisar (sin
+    // bloquear) si hay algo muy parecido en el catálogo maestro.
+    if (!editando && !nuevo.master_product_id) {
+      try {
+        const simRes = await fetch(`${PANEL_URL}/api/master-catalog/similar?module=supply&product=${encodeURIComponent(nuevo.product.trim())}`)
+        const simData = await simRes.json()
+        if (simData.results?.length) {
+          const nombres = simData.results.map((r) => `• ${r.product}${r.marca ? ' — ' + r.marca : ''}`).join('\n')
+          const seguir = window.confirm(`Ya existe algo parecido en el catálogo maestro:\n\n${nombres}\n\n¿Seguro que es un producto distinto?\n\nAceptar = crear de todos modos.\nCancelar = revisar el nombre.`)
+          if (!seguir) return
+        }
+      } catch { /* si falla la verificación, no bloquear el guardado */ }
+    }
+
     setGuardando(true)
     try {
       const url = editando ? `${PANEL_URL}/api/estudios-inventario-por-token/${editando}` : `${PANEL_URL}/api/estudios-inventario-por-token`
