@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLoaderData, useNavigate, useSearchParams } from 'react-router-dom'
 import { Camera, LoaderCircle, Mail, Pencil, MapPin, CheckCircle2, Users, UserPlus, X, Navigation, Check, Trash2, ShoppingBag, ExternalLink, Wallet, ChevronDown, Copy } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
@@ -421,6 +421,20 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
     }
   }
 
+  // Agrupar por nombre exacto de producto — mismo criterio que usa la
+  // tienda pública de Supply para armar una sola card con variantes
+  // (GROUP BY product), para que el dashboard se vea igual de agrupado
+  // que la web en vez de una card por fila/variante.
+  const grupos = useMemo(() => {
+    if (!productos) return []
+    const mapa = new Map()
+    for (const p of productos) {
+      if (!mapa.has(p.product)) mapa.set(p.product, { product: p.product, categoria: p.categoria, variantes: [] })
+      mapa.get(p.product).variantes.push(p)
+    }
+    return [...mapa.values()]
+  }, [productos])
+
   return (
     <div className="mb-8 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5">
       <p className={labelClass}><ShoppingBag size={12} className="inline -mt-0.5 mr-1" />Mis productos en Supply</p>
@@ -430,36 +444,39 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
         <p className="text-gray-400 text-xs text-center py-4">Cargando...</p>
       ) : (
         <>
-          {productos && productos.length > 0 && (
-            <div className="flex gap-2 overflow-x-auto pb-2 mb-4 snap-x snap-mandatory scrollbar-hide">
-              {productos.map((p) => (
-                <div key={p.id} className={`relative w-[42%] sm:w-40 md:w-44 flex-shrink-0 snap-start aspect-square rounded-lg overflow-hidden border-2 ${p.is_active ? 'border-gray-200' : 'border-gray-200 opacity-50'}`}>
-                  {p.image_url ? (
-                    <img src={p.image_url} alt={p.product} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300 text-xs">Sin foto</div>
-                  )}
-                  <div className="absolute top-1 left-1 bg-black/60 text-white text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full truncate max-w-[80%]">{p.categoria}</div>
-                  <div className="absolute top-1 right-1 flex items-center gap-1">
-                    <button type="button" onClick={() => agregarVariante(p)} aria-label="Agregar variante de este producto" title="Agregar variante (talla, sabor, color...)" className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors">
-                      <Copy size={11} />
-                    </button>
-                    <button type="button" onClick={() => iniciarEdicion(p)} aria-label="Editar producto" className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors">
-                      <Pencil size={11} />
-                    </button>
-                  </div>
-                  <div className="absolute bottom-0 inset-x-0 bg-black/70 text-white text-[10px] px-1.5 py-1">
-                    <p className="font-bold truncate">{p.product}</p>
-                    <div className="flex items-center justify-between">
-                      <span>${Number(p.price).toLocaleString('es-CO')}</span>
-                      <div className="flex items-center gap-1.5">
-                        <button type="button" onClick={() => toggleActivo(p)} className="underline">{p.is_active ? 'Ocultar' : 'Mostrar'}</button>
-                        <button type="button" onClick={() => borrar(p)} aria-label="Borrar producto"><Trash2 size={11} /></button>
-                      </div>
+          {grupos.length > 0 && (
+            <div className="flex gap-2.5 overflow-x-auto pb-2 mb-4 snap-x snap-mandatory scrollbar-hide">
+              {grupos.map((g) => {
+                const portada = g.variantes.find((v) => v.image_url)?.image_url
+                return (
+                  <div key={g.product} className="w-[85%] sm:w-64 flex-shrink-0 snap-start rounded-lg overflow-hidden border-2 border-gray-200 bg-white">
+                    <div className="relative h-28">
+                      {portada ? (
+                        <img src={portada} alt={g.product} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300 text-xs">Sin foto</div>
+                      )}
+                      <div className="absolute top-1 left-1 bg-black/60 text-white text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full truncate max-w-[70%]">{g.categoria}</div>
+                      <button type="button" onClick={() => agregarVariante(g.variantes[0])} aria-label="Agregar variante de este producto" title="Agregar variante (talla, sabor, color...)" className="absolute top-1 right-1 flex items-center justify-center w-6 h-6 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors">
+                        <Copy size={11} />
+                      </button>
+                    </div>
+                    <p className="font-black text-xs px-2.5 pt-2 truncate">{g.product}</p>
+                    <div className="px-2.5 pb-2.5 pt-1 space-y-1">
+                      {g.variantes.map((v) => (
+                        <div key={v.id} className={`flex items-center justify-between text-[10px] rounded-md px-1.5 py-1 ${v.is_active ? 'bg-gray-50' : 'bg-gray-50 opacity-50'}`}>
+                          <span className="truncate flex-1">{v.variant || 'Única'} — ${Number(v.price).toLocaleString('es-CO')}</span>
+                          <div className="flex items-center gap-1.5 text-gray-500 flex-shrink-0 ml-1.5">
+                            <button type="button" onClick={() => iniciarEdicion(v)} aria-label="Editar variante"><Pencil size={10} /></button>
+                            <button type="button" onClick={() => toggleActivo(v)} className="underline">{v.is_active ? 'Ocultar' : 'Mostrar'}</button>
+                            <button type="button" onClick={() => borrar(v)} aria-label="Borrar variante"><Trash2 size={10} /></button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
 
