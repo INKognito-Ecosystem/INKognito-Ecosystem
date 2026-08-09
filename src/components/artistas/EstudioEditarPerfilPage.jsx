@@ -390,7 +390,7 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
     if (value.trim().length < 2) { setMasterResults([]); return }
     masterSearchTimer.current = setTimeout(async () => {
       try {
-        const res = await fetch(`${PANEL_URL}/api/master-catalog/search?module=supply&q=${encodeURIComponent(value.trim())}`)
+        const res = await fetch(`${PANEL_URL}/api/master-catalog/search?module=supply&categoria=${encodeURIComponent(nuevo.categoria || '')}&q=${encodeURIComponent(value.trim())}`)
         const data = await res.json()
         setMasterResults(data.results || [])
       } catch { setMasterResults([]) }
@@ -449,7 +449,7 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
     // bloquear) si hay algo muy parecido en el catálogo maestro.
     if (!editando && !nuevo.master_product_id) {
       try {
-        const simRes = await fetch(`${PANEL_URL}/api/master-catalog/similar?module=supply&product=${encodeURIComponent(nuevo.product.trim())}`)
+        const simRes = await fetch(`${PANEL_URL}/api/master-catalog/similar?module=supply&categoria=${encodeURIComponent(nuevo.categoria || '')}&product=${encodeURIComponent(nuevo.product.trim())}`)
         const simData = await simRes.json()
         if (simData.results?.length) {
           const nombres = simData.results.map((r) => `• ${r.product}${r.marca ? ' — ' + r.marca : ''}`).join('\n')

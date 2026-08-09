@@ -30,6 +30,15 @@ export default function ComboboxBuscable({ value, onChange, options, placeholder
   // mano (reportado 2026-08-09: "el filtro no se está efectuando").
   const textoInicial = (v) => (v ? getLabel(v) : '')
   const [texto, setTexto] = useState(textoInicial(value))
+  // filtro: lo que se usa para BUSCAR, separado de lo que se MUESTRA.
+  // Antes se filtraba directo sobre `texto` — si el campo ya tenía algo
+  // elegido (ej. categoría arranca en "Tintas" por defecto) y el
+  // proveedor le daba clic, el filtro arrancaba buscando "tintas" y solo
+  // mostraba esa una opción, pareciendo que no pasaba nada al hacer clic
+  // (Jose, 2026-08-09: "me toca eliminar y empezar a escribir algo para
+  // que se despliegue"). Ahora abrir SIEMPRE muestra la lista completa;
+  // el filtro solo se activa cuando el usuario de verdad escribe algo.
+  const [filtro, setFiltro] = useState('')
   const [abierto, setAbierto] = useState(false)
   const wrapRef = useRef(null)
 
@@ -43,11 +52,14 @@ export default function ComboboxBuscable({ value, onChange, options, placeholder
     return () => document.removeEventListener('mousedown', onClickFuera)
   }, [])
 
-  const q = normalize(texto.trim())
+  const q = normalize(filtro.trim())
   const filtradas = q === '' ? options : options.filter((o) => normalize(getLabel(o)).includes(q))
+
+  const abrir = () => { setFiltro(''); setAbierto(true) }
 
   const elegir = (opcion) => {
     setTexto(textoInicial(opcion))
+    setFiltro('')
     onChange(opcion)
     setAbierto(false)
   }
@@ -61,10 +73,11 @@ export default function ComboboxBuscable({ value, onChange, options, placeholder
           value={texto}
           onChange={(e) => {
             setTexto(e.target.value)
+            setFiltro(e.target.value)
             setAbierto(true)
             if (e.target.value === '') onChange('')
           }}
-          onFocus={() => setAbierto(true)}
+          onFocus={(e) => { abrir(); e.target.select() }}
           onBlur={() => {
             setAbierto(false)
             if (texto.trim() === '') { setTexto(''); if (value !== '') onChange(''); return }
@@ -94,7 +107,16 @@ export default function ComboboxBuscable({ value, onChange, options, placeholder
             <X size={14} />
           </button>
         )}
-        <ChevronDown size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+        {!disabled && (
+          <button
+            type="button"
+            aria-label="Desplegar opciones"
+            onMouseDown={(e) => { e.preventDefault(); abrir() }}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+          >
+            <ChevronDown size={15} />
+          </button>
+        )}
       </div>
 
       {abierto && !disabled && (
