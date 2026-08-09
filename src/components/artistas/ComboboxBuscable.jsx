@@ -22,11 +22,18 @@ import { normalize } from '../../data/colombiaGeo'
 // lo mismo).
 export default function ComboboxBuscable({ value, onChange, options, placeholder, disabled, inputClassName, labelFor }) {
   const getLabel = labelFor || ((v) => v)
-  const [texto, setTexto] = useState(getLabel(value) || '')
+  // Sin valor elegido, el campo debe verse VACÍO — no basta con
+  // "getLabel(value) || ''", porque una opción como marca='' ("— Sin
+  // marca / genérica —") tiene una etiqueta NO vacía. Si esa etiqueta
+  // quedaba precargada en el input, la búsqueda arrancaba filtrando
+  // sobre ese texto y escondía el resto de opciones hasta borrarlo a
+  // mano (reportado 2026-08-09: "el filtro no se está efectuando").
+  const textoInicial = (v) => (v ? getLabel(v) : '')
+  const [texto, setTexto] = useState(textoInicial(value))
   const [abierto, setAbierto] = useState(false)
   const wrapRef = useRef(null)
 
-  useEffect(() => { setTexto(getLabel(value) || '') }, [value])
+  useEffect(() => { setTexto(textoInicial(value)) }, [value])
 
   useEffect(() => {
     const onClickFuera = (e) => {
@@ -40,7 +47,7 @@ export default function ComboboxBuscable({ value, onChange, options, placeholder
   const filtradas = q === '' ? options : options.filter((o) => normalize(getLabel(o)).includes(q))
 
   const elegir = (opcion) => {
-    setTexto(getLabel(opcion))
+    setTexto(textoInicial(opcion))
     onChange(opcion)
     setAbierto(false)
   }
@@ -60,9 +67,10 @@ export default function ComboboxBuscable({ value, onChange, options, placeholder
           onFocus={() => setAbierto(true)}
           onBlur={() => {
             setAbierto(false)
+            if (texto.trim() === '') { setTexto(''); if (value !== '') onChange(''); return }
             const match = options.find((o) => normalize(getLabel(o)) === normalize(texto))
-            if (match) { setTexto(getLabel(match)); if (match !== value) onChange(match) }
-            else setTexto(getLabel(value) || '')
+            if (match) { setTexto(textoInicial(match)); if (match !== value) onChange(match) }
+            else setTexto(textoInicial(value))
           }}
           placeholder={placeholder}
           className={inputClassName}
