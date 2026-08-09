@@ -27,7 +27,7 @@ export function VariantSelectorSupply({ variantObjs, selIdx, onChange }) {
                 : 'border-zinc-700 text-zinc-500 hover:border-blue-400 hover:text-white'
             }`}
           >
-            {v.variant}
+            {v.variant || 'Única'}
           </button>
         ))}
       </div>
@@ -70,16 +70,19 @@ export default function SupplyProductCard({ item, categoria, showEstudioBadge = 
   const [showDesc, setShowDesc] = useState(false)
   const [bloqueoMsg, setBloqueoMsg] = useState(null)
 
-  // variantObjs (con nombre) es solo para el selector — si el producto tiene
-  // una única variante SIN nombre (ej. mobiliario, no todo necesita un
-  // "sabor"/talla), antes quedaba filtrada por completo y sel caía en {},
-  // perdiendo precio/stock/imagen aunque el producto sí los tuviera (la
-  // landing individual de producto sí los mostraba, porque no filtra por
-  // nombre — de ahí la inconsistencia reportada 2026-08-01).
+  // Antes se filtraba a solo las variantes CON nombre — pensado para el
+  // caso de una única variante sin nombre (mobiliario, no todo necesita
+  // "sabor"/talla). Pero con varios proveedores compartiendo el mismo
+  // producto (catálogo maestro), es común que una fila tenga nombre de
+  // variante y otra no — filtrar dejaba esas filas sin nombre totalmente
+  // invisibles/imposibles de seleccionar, aunque tuvieran stock real
+  // (reportado 2026-08-09: un producto de un proveedor no aparecía). Se
+  // usan todas las variantes tal cual; ProductLandingPage.jsx ya hace lo
+  // mismo (`v.variant || 'Único'`) sin filtrar.
   const allVariants = item.variantes ?? []
-  const variantObjs = allVariants.filter(v => v.variant)
+  const variantObjs = allVariants
   const totalStock  = allVariants.reduce((s, v) => s + (v.stock || 0), 0)
-  const sel         = variantObjs[selIdx] || variantObjs[0] || allVariants[0] || {}
+  const sel         = variantObjs[selIdx] || variantObjs[0] || {}
 
   const resolvedPrice = sel.price
     ? '$' + Math.round(sel.price).toLocaleString('es-CO')
