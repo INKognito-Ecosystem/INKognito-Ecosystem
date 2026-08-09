@@ -256,6 +256,17 @@ const SUPPLY_MARCAS = [
   { value: 'tattoo-vision', label: 'Tattoo Vision' },
   { value: 'heaven-pro', label: 'Heaven Pro' },
   { value: 'royal-three', label: 'Royal Three' },
+  // Fuentes de poder — marcas profesionales reconocidas internacionalmente
+  // (investigado 2026-08-09, sin inventario real todavía en esta categoría).
+  { value: 'cheyenne', label: 'Cheyenne' },
+  { value: 'critical', label: 'Critical' },
+  { value: 'tatsoul', label: 'TATSoul' },
+  { value: 'bishop', label: 'Bishop' },
+  // Guantes — a diferencia de tintas/agujas, la mayoría de estudios compra
+  // guantes genéricos de distribuidor médico sin lealtad de marca; estas
+  // dos sí aparecen específicamente ligadas al gremio de tatuaje.
+  { value: 'gorilla', label: 'Gorilla' },
+  { value: 'naturflex', label: 'Naturflex' },
 ]
 const SUPPLY_MARCA_LABEL = (v) => SUPPLY_MARCAS.find((m) => m.value === v)?.label || v
 
@@ -283,12 +294,19 @@ const MARCAS_POR_CATEGORIA = {
   'Mobiliario':  ['kwadron'],
   'Máquinas':    ['tattoo-vision'],
   'Accesorios':  ['tattoo-vision'],
+  'Fuentes':     ['cheyenne', 'critical', 'tatsoul', 'bishop'],
+  'Guantes':     ['gorilla', 'naturflex'],
 }
+// Categoría sin entrada acá (Combos, Cursos, Kit Externo, Recursos, o
+// cualquiera nueva que se agregue después) → solo "Sin marca / genérica",
+// NUNCA la lista completa. Antes faltaban 6 de las 13 categorías reales de
+// Supply en este mapa y todas caían al fallback "mostrar todo", por eso
+// Fuentes mostraba marcas de tintas y agujas (Jose, 2026-08-09). Estas 4
+// categorías tampoco son realmente "de marca" — un combo mezcla productos
+// de varias marcas, un curso/recurso digital no tiene fabricante.
 const marcasParaCategoria = (categoria) => {
-  const permitidas = MARCAS_POR_CATEGORIA[categoria]
-  return permitidas
-    ? SUPPLY_MARCAS.filter((m) => m.value === '' || permitidas.includes(m.value)).map((m) => m.value)
-    : SUPPLY_MARCAS.map((m) => m.value)
+  const permitidas = MARCAS_POR_CATEGORIA[categoria] || []
+  return SUPPLY_MARCAS.filter((m) => m.value === '' || permitidas.includes(m.value)).map((m) => m.value)
 }
 
 // descripcionAuto: si la descripción actual vino sola (cascada
@@ -513,6 +531,17 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
     return [...mapa.values()]
   }, [productos])
 
+  // Categoría/marca "reales" (2026-08-09, Jose: "que aparezcan las
+  // categorías y marcas reales detrás de cada producto"). No hay forma de
+  // adivinar la marca real de un nombre que nunca se ha subido — pero para
+  // un producto que SÍ ya existe (vinculado del buscador de catálogo
+  // maestro, o una variante nueva de algo propio ya cargado), la
+  // categoría/marca reales ya se conocen y no deberían poder desviarse por
+  // error. Mismo principio que departamento→municipio: una vez el valor
+  // está confirmado contra un dato real, el campo deja de ser editable a
+  // mano.
+  const categoriaMarcaBloqueada = !!varianteDe || !!nuevo.master_product_id
+
   return (
     <div className="mb-8 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl overflow-hidden">
       <button
@@ -621,6 +650,7 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
               options={SUPPLY_CATEGORIAS}
               placeholder="Categoría"
               inputClassName={inputClass}
+              disabled={categoriaMarcaBloqueada}
               onChange={(categoria) => {
                 // Al cambiar de categoría, si la marca elegida ya no
                 // aplica ahí (ej. venía de Tintas y ahora es Cartuchos),
@@ -637,8 +667,15 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
               labelFor={SUPPLY_MARCA_LABEL}
               placeholder="Marca (opcional)"
               inputClassName={inputClass}
+              disabled={categoriaMarcaBloqueada}
               onChange={(marca) => { setNuevo((n) => ({ ...n, marca })); prefillDescripcion(nuevo.categoria, marca) }}
             />
+            {nuevo.master_product_id && !varianteDe && (
+              <div className="flex items-center justify-between bg-green-50 rounded-md px-2.5 py-1.5 -mt-1">
+                <p className="text-[10px] text-green-700">✓ Categoría y marca reales — vinculadas al catálogo maestro.</p>
+                <button type="button" onClick={() => setNuevo((n) => ({ ...n, master_product_id: null }))} className="text-gray-400 text-[10px] font-bold uppercase underline flex-shrink-0 ml-2">No es este</button>
+              </div>
+            )}
             <textarea rows={2} className={inputClass} placeholder="Descripción (opcional)" value={nuevo.descripcion} onChange={(e) => setNuevo((n) => ({ ...n, descripcion: e.target.value, descripcionAuto: false }))} />
 
             {error && <p className="text-red-600 text-xs">{error}</p>}
