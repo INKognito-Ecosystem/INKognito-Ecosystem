@@ -64,7 +64,7 @@ export function VariantSelectorSupply({ variantObjs, selIdx, onChange }) {
   )
 }
 
-export default function SupplyProductCard({ item, categoria }) {
+export default function SupplyProductCard({ item, categoria, showEstudioBadge = true }) {
   const { items: cartItems, addItem } = useSupplyCart()
   const [selIdx, setSelIdx] = useState(0)
   const [showDesc, setShowDesc] = useState(false)
@@ -104,6 +104,15 @@ export default function SupplyProductCard({ item, categoria }) {
   // nunca cambiaba al cambiar de variante (reportado 2026-08-02).
   const description = sel.descripcion || item.descripcion
 
+  // Dueño real de la variante seleccionada — no del producto agrupado
+  // (que puede mezclar variantes de más de un estudio desde que el
+  // catálogo maestro permite compartir el mismo nombre de producto).
+  // Con fallback al nivel de producto por compatibilidad con datos
+  // viejos, pero la variante siempre gana si trae su propio dato.
+  const proveedorId      = sel.estudio_id ?? item.estudio_id ?? null
+  const proveedorNombre  = sel.estudio_nombre_supply || sel.estudio_nombre || item.estudio_nombre_supply || item.estudio_nombre || null
+  const proveedorMp      = sel.estudio_mp_conectado ?? item.estudio_mp_conectado ?? false
+
   const productId = item.name + (sel.variant ? '-' + sel.variant : '')
   const cartKey = `${categoria}-${productId}`
   const enCarrito = cartItems.some(i => i.key === cartKey)
@@ -117,9 +126,9 @@ export default function SupplyProductCard({ item, categoria }) {
       brand:       item.categoria || '',
       image:       activeImage || '',
     }, categoria, {
-      estudioId:      item.estudio_id || null,
-      estudioNombre:  item.estudio_nombre_supply || item.estudio_nombre || null,
-      mpConectado:    !!item.estudio_mp_conectado,
+      estudioId:      proveedorId,
+      estudioNombre:  proveedorNombre,
+      mpConectado:    !!proveedorMp,
     })
     if (!resultado.ok) {
       setBloqueoMsg(`Ya tienes productos de ${resultado.nombreActual} en tu carrito — termina esa compra antes de agregar de otro proveedor.`)
@@ -151,8 +160,8 @@ export default function SupplyProductCard({ item, categoria }) {
             de categoría (Tommy/Warlock) sigue viviendo en
             SupplyCategoryPage.jsx a nivel de página, sin tocar — esta es
             la excepción puntual cuando el producto viene de otra parte. */}
-        {item.estudio_nombre && (
-          <p className="text-[8px] font-bold uppercase tracking-wide text-blue-400">Suministrado por {item.estudio_nombre}</p>
+        {showEstudioBadge && proveedorNombre && (
+          <p className="text-[8px] font-bold uppercase tracking-wide text-blue-400">Suministrado por {proveedorNombre}</p>
         )}
         <h3 className="text-xs font-black uppercase leading-tight text-white">{item.name}</h3>
         {resolvedPrice && <p className="text-white font-bold text-sm">{resolvedPrice}</p>}

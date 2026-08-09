@@ -216,9 +216,13 @@ export default function ProductLandingPage() {
       brand:       product.categoria || '',
       image:       imageUrl || '',
     }, product.categoria, isSupply ? {
-      estudioId:     product.estudio_id || null,
-      estudioNombre: product.estudio_nombre_supply || product.estudio_nombre || null,
-      mpConectado:   !!product.estudio_mp_conectado,
+      // Dueño de la VARIANTE activa, no de la fila con la que se aterrizó
+      // en esta página — el catálogo maestro permite que variantes del
+      // mismo producto pertenezcan a proveedores distintos (reportado
+      // 2026-08-09). Fallback a nivel de producto por compatibilidad.
+      estudioId:     variant?.estudio_id ?? product.estudio_id ?? null,
+      estudioNombre: variant?.estudio_nombre_supply || variant?.estudio_nombre || product.estudio_nombre_supply || product.estudio_nombre || null,
+      mpConectado:   !!(variant?.estudio_mp_conectado ?? product.estudio_mp_conectado),
     } : undefined)
     if (resultado && resultado.ok === false) {
       setBloqueoMsg(`Ya tienes productos de ${resultado.nombreActual} en tu carrito — termina esa compra antes de agregar de otro proveedor.`)
@@ -525,10 +529,10 @@ export default function ProductLandingPage() {
                         todo lo de Supply venía de ahí. Ya no muestra nada
                         hasta que Tommy se registre como empresa proveedora
                         y sus productos queden asociados a su perfil. */}
-                    {isSupply && product.estudio_nombre_supply && (
+                    {isSupply && (variant?.estudio_nombre_supply || product.estudio_nombre_supply) && (
                       <div className="flex items-center gap-3 text-zinc-400 text-xs">
                         <ShieldCheck size={13} className="shrink-0" style={{ color: accent }} />
-                        <span>Suministrado por {product.estudio_nombre_supply}</span>
+                        <span>Suministrado por {variant?.estudio_nombre_supply || product.estudio_nombre_supply}</span>
                       </div>
                     )}
                     {esNutriHouse && (

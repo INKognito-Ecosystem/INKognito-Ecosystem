@@ -24,7 +24,7 @@ const TOMMY_BADGE = 'Suministrado por Tommy Tattoo Supply — marca reconocida e
 // a INKognito en vez de al proveedor. Opcional, cae al número de INKognito
 // si no se pasa (las 4 páginas de marcasProfesionales/ no tienen un
 // WhatsApp propio registrado, siguen igual que siempre).
-export default function BrandCatalogSection({ brandName, products = [], supplierBadge = TOMMY_BADGE, whatsapp = WA }) {
+export default function BrandCatalogSection({ brandName, products = [], supplierBadge = TOMMY_BADGE, whatsapp = WA, showEstudioBadge = true }) {
   if (products.length === 0) {
     return (
       <div className="border border-zinc-800 bg-zinc-950 rounded-2xl p-10 md:p-16 text-center">
@@ -59,7 +59,7 @@ export default function BrandCatalogSection({ brandName, products = [], supplier
       <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide">
         {products.map(item => (
           <div key={item.name} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">
-            <SupplyProductCard item={item} categoria={item.categoria} />
+            <SupplyProductCard item={item} categoria={item.categoria} showEstudioBadge={showEstudioBadge} />
           </div>
         ))}
       </div>

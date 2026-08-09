@@ -47,8 +47,14 @@ export async function loader({ params }) {
 export function meta({ data }) {
   const estudio = data?.estudio
   if (!estudio) return [{ title: 'Estudio no encontrado | INKognito Supply' }]
-  const title = `${estudio.nombre} — Catálogo | INKognito Supply`
-  const description = `Productos de ${estudio.nombre} disponibles en INKognito Supply.`
+  // nombre_supply (2026-08-07): identidad propia para vender en Supply,
+  // distinta del nombre de tatuajes (ej. "INKognito Supply" vs "INKognito
+  // Tattoo Studio") — esta página nunca lo leía, siempre mostraba el
+  // nombre de tatuajes sin importar lo que el proveedor configurara
+  // (reportado 2026-08-09).
+  const nombreSupply = estudio.nombre_supply || estudio.nombre
+  const title = `${nombreSupply} — Catálogo | INKognito Supply`
+  const description = `Productos de ${nombreSupply} disponibles en INKognito Supply.`
   return [
     { title },
     { name: 'description', content: description },
@@ -67,20 +73,22 @@ export default function EstudioSupplyPage() {
     )
   }
 
+  const nombreSupply = estudio.nombre_supply || estudio.nombre
+
   return (
     <div className="min-h-screen bg-black text-white">
-      <NavbarCategory pageName={estudio.nombre} />
+      <NavbarCategory pageName={nombreSupply} />
 
       <div className="pt-20 md:pt-24 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-8">
           {estudio.logo_url && (
             <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-zinc-800 flex-shrink-0">
-              <img src={estudio.logo_url} alt={estudio.nombre} className="w-full h-full object-cover" />
+              <img src={estudio.logo_url} alt={nombreSupply} className="w-full h-full object-cover" />
             </div>
           )}
           <div>
             <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm mb-1">Catálogo de</p>
-            <h1 className="text-2xl md:text-4xl font-black uppercase leading-tight">{estudio.nombre}</h1>
+            <h1 className="text-2xl md:text-4xl font-black uppercase leading-tight">{nombreSupply}</h1>
             {estudio.municipio && <p className="text-zinc-500 text-sm mt-1">{estudio.municipio}{estudio.departamento ? `, ${estudio.departamento}` : ''}</p>}
             {/* Insignia "Distribuidor Oficial" (fase 6, 2026-08-07) —
                 tarifa fija de patrocinio, no comisión (la venta acá no
@@ -98,10 +106,16 @@ export default function EstudioSupplyPage() {
           </div>
         </div>
 
+        {/* Sin insignia de proveedor por card ni banner "Suministrado
+            por..." acá — sería redundante, el título de esta misma
+            página ya deja claro de quién es el catálogo (Jose,
+            2026-08-09). Esa insignia sí importa en el catálogo general
+            de Supply, donde los productos vienen mezclados. */}
         <BrandCatalogSection
-          brandName={estudio.nombre}
+          brandName={nombreSupply}
           products={products}
-          supplierBadge={`Suministrado por ${estudio.nombre}`}
+          supplierBadge={null}
+          showEstudioBadge={false}
           whatsapp={estudio.whatsapp || undefined}
         />
       </div>
