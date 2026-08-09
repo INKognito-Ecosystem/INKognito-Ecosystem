@@ -244,7 +244,16 @@ const SUPPLY_CATEGORIAS = ['Tintas', 'Cartuchos', 'Agujas', 'Máquinas', 'Guante
 const SUPPLY_MARCAS = [
   { value: '', label: '— Sin marca / genérica —' },
   { value: 'wjx', label: 'WJX' },
-  { value: 'kwadron', label: 'Industrias Warlock (mobiliario)' },
+  // 'kwadron' es la marca global de agujas/cartuchos (y también mobiliario,
+  // ver nota en MARCAS_POR_CATEGORIA) — 'industrias-warlock' es un
+  // proveedor LOCAL de mobiliario aparte, sin relación con la marca
+  // Kwadron (ver project_proveedor_warlock_mobiliario en memoria). Antes
+  // este mismo valor 'kwadron' traía la etiqueta "Industrias Warlock
+  // (mobiliario)" — así aparecía mal en Cartuchos/Agujas (Jose,
+  // 2026-08-09: "warlock no debería aparecer allí, solo marcas de
+  // agujas"). Separados en dos opciones reales.
+  { value: 'kwadron', label: 'Kwadron' },
+  { value: 'industrias-warlock', label: 'Industrias Warlock (mobiliario)' },
   { value: 'ez-tattoo', label: 'EZ Tattoo' },
   { value: 'vice-colors', label: 'Vice Colors' },
   { value: 'dynamic', label: 'Dynamic' },
@@ -291,7 +300,7 @@ const MARCAS_POR_CATEGORIA = {
   'Cartuchos':   ['wjx', 'kwadron', 'ez-tattoo'],
   'Agujas':      ['wjx', 'kwadron', 'ez-tattoo'],
   'Cuidados':    ['heaven-pro', 'royal-three'],
-  'Mobiliario':  ['kwadron'],
+  'Mobiliario':  ['kwadron', 'industrias-warlock'],
   'Máquinas':    ['tattoo-vision'],
   'Accesorios':  ['tattoo-vision'],
   'Fuentes':     ['cheyenne', 'critical', 'tatsoul', 'bishop'],
