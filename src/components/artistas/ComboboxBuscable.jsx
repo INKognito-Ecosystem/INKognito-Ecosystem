@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, X } from 'lucide-react'
 import { normalize } from '../../data/colombiaGeo'
 
 // Reemplaza el <select> nativo para listas largas (departamentos,
@@ -74,8 +74,26 @@ export default function ComboboxBuscable({ value, onChange, options, placeholder
           }}
           placeholder={placeholder}
           className={inputClassName}
+          style={texto ? { paddingRight: '2.75rem' } : undefined}
           autoComplete="off"
         />
+        {/* Borrar de un clic — antes había que borrar letra por letra
+            (Jose, 2026-08-09). onMouseDown (no onClick) + preventDefault,
+            mismo motivo que elegir(): dispara antes del blur del input. */}
+        {texto && !disabled && (
+          <button
+            type="button"
+            aria-label="Limpiar"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              setTexto('')
+              if (value !== '') onChange('')
+            }}
+            className="absolute right-8 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X size={14} />
+          </button>
+        )}
         <ChevronDown size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
       </div>
 

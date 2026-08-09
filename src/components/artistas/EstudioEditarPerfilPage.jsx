@@ -685,7 +685,9 @@ function MisVentasSupplySection({ token }) {
   if (!ventas || ventas.length === 0) return null
 
   return (
-    <div className="mb-8 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl overflow-hidden">
+    // mb-2 (no mb-8) — Jose, 2026-08-09: quedaba mucho espacio muerto
+    // entre este botón y "Mis productos en Supply", justo debajo.
+    <div className="mb-2 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
