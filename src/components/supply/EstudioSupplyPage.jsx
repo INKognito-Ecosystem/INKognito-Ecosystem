@@ -129,7 +129,7 @@ export default function EstudioSupplyPage() {
         {estudio.vende_cajas_surtidas && (() => {
           const cartuchos = products.filter((p) => p.categoria === 'Cartuchos')
           return cartuchos.length > 0 ? (
-            <CajaSurtidaWidget products={cartuchos} estudioId={estudio.id} estudioNombre={nombreSupply} mpConectado={estudio.mp_conectado} />
+            <CajaSurtidaWidget products={cartuchos} estudioId={estudio.id} estudioNombre={nombreSupply} mpConectado={estudio.mp_conectado} recargoPct={estudio.recargo_caja_surtida_pct || 0} />
           ) : null
         })()}
       </div>

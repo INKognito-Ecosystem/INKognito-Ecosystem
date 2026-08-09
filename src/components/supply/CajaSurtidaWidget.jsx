@@ -27,7 +27,7 @@ const fmtPrecio = (p) => p != null ? `$${Number(p).toLocaleString('es-CO')} COP`
 // Acá `products` YA viene filtrado a la categoría Cartuchos de un solo
 // proveedor (ver EstudioSupplyPage.jsx) — el precio de referencia sigue
 // siendo un producto real, pero siempre de ESE proveedor.
-export default function CajaSurtidaWidget({ products, estudioId, estudioNombre, mpConectado }) {
+export default function CajaSurtidaWidget({ products, estudioId, estudioNombre, mpConectado, recargoPct = 0 }) {
   const { addItem } = useSupplyCart()
 
   // Hooks siempre primero, sin returns condicionales antes — el posible
@@ -53,7 +53,12 @@ export default function CajaSurtidaWidget({ products, estudioId, estudioNombre, 
   const restantes = BOX_SIZE - total
   const completa = total === BOX_SIZE
   const fuentePrecio = (marcaSel ? preciosPorMarca[marcaSel] : null) || referenciaGeneral
-  const precioMostrado = fmtPrecio(fuentePrecio?.price)
+  // El recargo (2026-08-09, si el proveedor lo configuró en "editar mi
+  // estudio") se aplica sobre el precio de referencia para la vista
+  // previa — el monto real siempre se recalcula server-side al crear el
+  // pago (POST /api/estudios-supply-comprar), esto es solo estimado.
+  const precioConRecargo = fuentePrecio ? Math.round(fuentePrecio.price * (1 + recargoPct / 100)) : null
+  const precioMostrado = fmtPrecio(precioConRecargo)
 
   const setNumero = (key, numero) => { setAdded(false); setFilas(f => ({ ...f, [key]: { ...f[key], numero } })) }
   const inc = (key) => { if (total >= BOX_SIZE) return; setAdded(false); setFilas(f => ({ ...f, [key]: { ...f[key], qty: f[key].qty + 1 } })) }
@@ -102,13 +107,20 @@ export default function CajaSurtidaWidget({ products, estudioId, estudioNombre, 
         </div>
       </div>
 
-      {marcas.length > 1 && (
+      {/* Antes solo se mostraba con 2+ marcas cargadas — con una sola
+          (ej. un proveedor que recién empieza) quedaba oculto del todo,
+          sin forma de ver/elegir de qué marca es la caja (Jose,
+          2026-08-09). Con una sola marca no tiene sentido el botón
+          "Cualquier marca" (sería idéntico a elegir la única que hay). */}
+      {marcas.length > 0 && (
         <div className="mb-6">
-          <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] mb-2">Marca (opcional)</p>
+          <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] mb-2">Marca{marcas.length > 1 ? ' (opcional)' : ''}</p>
           <div className="flex gap-1.5 flex-wrap">
-            <button type="button" onClick={() => setMarcaSel(null)} className={`px-3.5 py-2 rounded-lg text-xs font-black uppercase tracking-wide transition-all duration-200 ${marcaSel === null ? 'bg-blue-500 text-black' : 'bg-zinc-900 text-zinc-400 border border-zinc-700 hover:border-zinc-500'}`}>
-              Cualquier marca
-            </button>
+            {marcas.length > 1 && (
+              <button type="button" onClick={() => setMarcaSel(null)} className={`px-3.5 py-2 rounded-lg text-xs font-black uppercase tracking-wide transition-all duration-200 ${marcaSel === null ? 'bg-blue-500 text-black' : 'bg-zinc-900 text-zinc-400 border border-zinc-700 hover:border-zinc-500'}`}>
+                Cualquier marca
+              </button>
+            )}
             {marcas.map(m => (
               <button key={m} type="button" onClick={() => setMarcaSel(m)} className={`px-3.5 py-2 rounded-lg text-xs font-black uppercase tracking-wide transition-all duration-200 ${marcaSel === m ? 'bg-blue-500 text-black' : 'bg-zinc-900 text-zinc-400 border border-zinc-700 hover:border-zinc-500'}`}>
                 {m}

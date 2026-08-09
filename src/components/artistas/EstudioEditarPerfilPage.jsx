@@ -669,6 +669,8 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
     logo_url: estudio.logo_url || '', foto_portada: estudio.foto_portada || '',
     google_maps_url: estudio.google_maps_url || '', nombre_supply: estudio.nombre_supply || '',
     catalogo_url: estudio.catalogo_url || '',
+    vende_cajas_surtidas: estudio.vende_cajas_surtidas || false,
+    recargo_caja_surtida_pct: estudio.recargo_caja_surtida_pct ?? 0,
   })
   const [subiendo, setSubiendo] = useState(null)
   const [guardando, setGuardando] = useState(false)
@@ -969,6 +971,28 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
             )}
             {mp === 'ok' && <p className="text-green-600 text-[11px] font-bold mt-1.5">¡Mercado Pago conectado!</p>}
             {mp === 'error' && <p className="text-red-600 text-[11px] font-bold mt-1.5">No pudimos conectar tu cuenta — intenta de nuevo.</p>}
+          </div>
+
+          {/* Cajas surtidas de cartuchos (2026-08-09) — reencuadrado el
+              mismo día: en vez de que solo Jose active esto por
+              proveedor, cada proveedor lo prende/apaga él mismo acá,
+              igual que ya autogestiona su inventario. Solo tiene efecto
+              si además hay productos reales en categoría Cartuchos (ver
+              EstudioSupplyPage.jsx) — sin eso, no hay de qué armar la
+              caja aunque el interruptor esté prendido. */}
+          <div className="border-t border-gray-200 pt-4">
+            <label className="flex items-center gap-2.5 cursor-pointer">
+              <input type="checkbox" checked={form.vende_cajas_surtidas} onChange={(e) => setForm((f) => ({ ...f, vende_cajas_surtidas: e.target.checked }))} className="w-4 h-4" />
+              <span className={labelClass}>Ofrecer cajas surtidas de cartuchos</span>
+            </label>
+            <p className="text-gray-400 text-[10px] mt-1 mb-3">Le muestra a tus clientes un armador de cajas de 20 cartuchos (calibre y referencia a su gusto) en tu propia tienda de Supply — usa tus productos de Cartuchos ya cargados como referencia de precio, no necesitas subir nada aparte.</p>
+            {form.vende_cajas_surtidas && (
+              <div>
+                <label className={labelClass}>Recargo por armar la caja (%)</label>
+                <input type="number" min="0" step="1" value={form.recargo_caja_surtida_pct} onChange={(e) => setForm((f) => ({ ...f, recargo_caja_surtida_pct: Number(e.target.value) || 0 }))} className={inputClass} style={{ maxWidth: '140px' }} />
+                <p className="text-gray-400 text-[10px] mt-1">0% = la caja surtida cuesta lo mismo que una caja completa de esa referencia. Súbelo si quieres cobrar de más por armarla a la medida.</p>
+              </div>
+            )}
           </div>
 
           <MisVentasSupplySection token={token} />
