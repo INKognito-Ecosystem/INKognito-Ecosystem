@@ -41,7 +41,15 @@ export default function PedidoSupplyVendorCheckout({ cart }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           estudio_id: vendorLock.estudioId,
-          items: items.filter(i => i.inventoryId != null).map(i => ({ inventory_id: i.inventoryId, cantidad: i.qty })),
+          items: items.filter(i => i.inventoryId != null).map(i => ({
+            inventory_id: i.inventoryId,
+            cantidad: i.qty,
+            // Cajas surtidas (2026-08-09): el inventory_id de arriba es
+            // solo referencia de precio real del proveedor — esto le dice
+            // al backend que no es literalmente lo comprado, para que no
+            // le descuente stock a un producto ajeno a la mezcla.
+            ...(i.nombrePersonalizado ? { nombre_personalizado: i.nombrePersonalizado } : {}),
+          })),
           cliente_nombre: form.nombre || null,
           cliente_telefono: form.telefono,
           cliente_email: form.email,

@@ -188,13 +188,15 @@ export default function SupplyProductCard({ item, categoria, showEstudioBadge = 
             </button>
           </>
         )}
-        <div className="mt-auto pt-1">
-          {variantObjs.length === 1 ? (
-            <p className="text-[9px] font-bold text-zinc-400 uppercase truncate">{variantObjs[0].variant}</p>
-          ) : (
+        {/* Con una sola variante no hay nada que elegir — mostrar su
+            nombre ("Único", una talla suelta, lo que sea que haya
+            escrito el proveedor) no aporta nada, solo ruido visual
+            (Jose, 2026-08-09). El selector solo aparece con 2+. */}
+        {variantObjs.length > 1 && (
+          <div className="mt-auto pt-1">
             <VariantSelectorSupply variantObjs={variantObjs} selIdx={selIdx} onChange={setSelIdx} />
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {bloqueoMsg && (

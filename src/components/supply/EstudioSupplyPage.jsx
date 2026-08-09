@@ -3,6 +3,7 @@ import { Award } from 'lucide-react'
 import FooterSupply from './FooterSupply'
 import NavbarCategory from './NavbarCategory'
 import BrandCatalogSection from './BrandCatalogSection'
+import CajaSurtidaWidget from './CajaSurtidaWidget'
 import { fetchCatalogEstudio } from '../../hooks/useCatalog'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
@@ -118,6 +119,19 @@ export default function EstudioSupplyPage() {
           showEstudioBadge={false}
           whatsapp={estudio.whatsapp || undefined}
         />
+
+        {/* Cajas surtidas de cartuchos (2026-08-09) — solo si Jose activó
+            el toggle para este proveedor Y ya tiene productos reales en
+            Cartuchos (de ahí salen las marcas/precio de referencia, sin
+            que el proveedor tenga que cargar nada aparte). Vive en la
+            tienda de CADA proveedor, no en una página central, para que
+            nunca haya ambigüedad de a quién se le compra. */}
+        {estudio.vende_cajas_surtidas && (() => {
+          const cartuchos = products.filter((p) => p.categoria === 'Cartuchos')
+          return cartuchos.length > 0 ? (
+            <CajaSurtidaWidget products={cartuchos} estudioId={estudio.id} estudioNombre={nombreSupply} mpConectado={estudio.mp_conectado} />
+          ) : null
+        })()}
       </div>
 
       <FooterSupply />
