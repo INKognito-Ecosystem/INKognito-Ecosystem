@@ -239,7 +239,25 @@ function MiEquipoSection({ token, artistas, invitacionesIniciales, esEmpresa }) 
 // páginas de categoría de Supply son rutas fijas por texto exacto, un
 // valor libre dejaría el producto sin ninguna página real donde aparecer.
 const SUPPLY_CATEGORIAS = ['Tintas', 'Cartuchos', 'Agujas', 'Máquinas', 'Guantes', 'Cuidados', 'Fuentes', 'Accesorios', 'Mobiliario', 'Combos', 'Cursos', 'Kit Externo', 'Recursos']
-const PRODUCTO_VACIO = { product: '', variant: '', price: '', stock: '', categoria: SUPPLY_CATEGORIAS[0], image_url: '', descripcion: '' }
+// Mismo set fijo que INV_MARCAS.supply en el panel (public/index.html) —
+// copia local, mismo criterio que SUPPLY_CATEGORIAS de arriba.
+const SUPPLY_MARCAS = [
+  { value: '', label: '— Sin marca / genérica —' },
+  { value: 'wjx', label: 'WJX' },
+  { value: 'kwadron', label: 'Industrias Warlock (mobiliario)' },
+  { value: 'ez-tattoo', label: 'EZ Tattoo' },
+  { value: 'vice-colors', label: 'Vice Colors' },
+  { value: 'dynamic', label: 'Dynamic' },
+  { value: 'eternal', label: 'Eternal' },
+  { value: 'intenze', label: 'Intenze' },
+  { value: 'fusion', label: 'Fusion' },
+  { value: 'world-famous', label: 'World Famous' },
+  { value: 'solid-ink', label: 'Solid Ink' },
+  { value: 'tattoo-vision', label: 'Tattoo Vision' },
+  { value: 'heaven-pro', label: 'Heaven Pro' },
+  { value: 'royal-three', label: 'Royal Three' },
+]
+const PRODUCTO_VACIO = { product: '', variant: '', price: '', stock: '', categoria: SUPPLY_CATEGORIAS[0], marca: '', image_url: '', descripcion: '', master_product_id: null }
 
 // "Mis productos en Supply" (fase 4, 2026-08-07, Supply multitenant) —
 // solo se renderiza si el estudio tiene vende_supply activo (Jose lo
@@ -256,7 +274,9 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
   const [nuevo, setNuevo] = useState(PRODUCTO_VACIO)
   const [editando, setEditando] = useState(null)
   const [error, setError] = useState(null)
+  const [masterResults, setMasterResults] = useState([])
   const fileInput = useRef(null)
+  const masterSearchTimer = useRef(null)
 
   useEffect(() => {
     fetch(`${PANEL_URL}/api/estudios-inventario-por-token?token=${encodeURIComponent(token)}`)
@@ -288,9 +308,38 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
   const iniciarEdicion = (p) => {
     setError(null)
     setEditando(p.id)
-    setNuevo({ product: p.product, variant: p.variant || '', price: p.price, stock: p.stock, categoria: p.categoria, image_url: p.image_url || '', descripcion: p.descripcion || '' })
+    setMasterResults([])
+    setNuevo({ product: p.product, variant: p.variant || '', price: p.price, stock: p.stock, categoria: p.categoria, marca: p.marca || '', image_url: p.image_url || '', descripcion: p.descripcion || '', master_product_id: null })
   }
-  const cancelarEdicion = () => { setEditando(null); setNuevo(PRODUCTO_VACIO); setError(null) }
+  const cancelarEdicion = () => { setEditando(null); setNuevo(PRODUCTO_VACIO); setMasterResults([]); setError(null) }
+
+  // Catálogo maestro — buscar un producto ya cargado por otro proveedor
+  // (o por Jose desde el panel admin) para no retipear nombre/categoría/
+  // marca/descripción desde cero.
+  const onProductInput = (value) => {
+    setNuevo((n) => ({ ...n, product: value, master_product_id: null }))
+    clearTimeout(masterSearchTimer.current)
+    if (value.trim().length < 2) { setMasterResults([]); return }
+    masterSearchTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`${PANEL_URL}/api/master-catalog/search?module=supply&q=${encodeURIComponent(value.trim())}`)
+        const data = await res.json()
+        setMasterResults(data.results || [])
+      } catch { setMasterResults([]) }
+    }, 300)
+  }
+
+  const seleccionarMaster = (item) => {
+    setNuevo((n) => ({
+      ...n,
+      product: item.product,
+      categoria: item.categoria || n.categoria,
+      marca: item.marca || n.marca,
+      descripcion: item.descripcion || n.descripcion,
+      master_product_id: item.id,
+    }))
+    setMasterResults([])
+  }
 
   const guardar = async () => {
     if (!nuevo.product.trim() || !nuevo.price) {
@@ -396,7 +445,20 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
               )}
             </button>
 
-            <input className={inputClass} placeholder="Nombre del producto" value={nuevo.product} onChange={(e) => setNuevo((n) => ({ ...n, product: e.target.value }))} />
+            <div className="relative">
+              <input className={inputClass} placeholder="Nombre del producto" autoComplete="off" value={nuevo.product} onChange={(e) => onProductInput(e.target.value)} />
+              {masterResults.length > 0 && (
+                <div className="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                  {masterResults.map((r) => (
+                    <button type="button" key={r.id} onClick={() => seleccionarMaster(r)} className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 border-b border-gray-100 last:border-0 flex items-center justify-between gap-2">
+                      <span className="truncate">{r.product}{r.marca && <span className="text-gray-400"> — {r.marca}</span>}</span>
+                      <span className="text-gray-400 text-[10px] flex-shrink-0">{r.categoria}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <p className="text-gray-400 text-[10px] -mt-1.5">Si ya alguien cargó este producto antes, elígelo de la lista para no repetir categoría/marca/descripción.</p>
             <input className={inputClass} placeholder="Variante (opcional, ej: color, tamaño)" value={nuevo.variant} onChange={(e) => setNuevo((n) => ({ ...n, variant: e.target.value }))} />
             <div className="grid grid-cols-2 gap-2">
               <input className={inputClass} type="number" min="1" placeholder="Precio en COP" value={nuevo.price} onChange={(e) => setNuevo((n) => ({ ...n, price: e.target.value }))} />
@@ -404,6 +466,9 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
             </div>
             <select className={inputClass} value={nuevo.categoria} onChange={(e) => setNuevo((n) => ({ ...n, categoria: e.target.value }))}>
               {SUPPLY_CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <select className={inputClass} value={nuevo.marca} onChange={(e) => setNuevo((n) => ({ ...n, marca: e.target.value }))}>
+              {SUPPLY_MARCAS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
             </select>
             <textarea rows={2} className={inputClass} placeholder="Descripción (opcional)" value={nuevo.descripcion} onChange={(e) => setNuevo((n) => ({ ...n, descripcion: e.target.value }))} />
 
