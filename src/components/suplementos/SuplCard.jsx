@@ -84,7 +84,7 @@ export function SuplCard({ p, onAddToCart, enCarrito }) {
     <div className="snap-start flex-shrink-0 w-[40vw] md:w-auto border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300">
       <div className="relative w-full aspect-square bg-gray-800 flex items-center justify-center flex-shrink-0">
         {galleryImages.length > 0
-          ? <ProductImageGallery images={galleryImages} alt={p.nombre} containerClassName="w-full h-full" imgClassName="w-full h-full object-cover" onImgError={e => { e.target.style.display = 'none' }} />
+          ? <ProductImageGallery images={galleryImages} alt={p.nombre} containerClassName="w-full h-full" imgClassName="w-full h-full object-cover" onImgError={e => { e.target.style.display = 'none' }} square />
           : <span className="text-gray-700 text-[10px] uppercase tracking-widest text-center px-2">Imagen próx.</span>
         }
       </div>

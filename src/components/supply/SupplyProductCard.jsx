@@ -149,6 +149,7 @@ export default function SupplyProductCard({ item, categoria, showEstudioBadge = 
             alt={`${item.name}${sel.variant ? ' ' + sel.variant : ''}`}
             containerClassName="w-full h-full"
             imgClassName="w-full h-full object-cover"
+            square
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

@@ -120,6 +120,7 @@ export default function StoreProductCard({ product, category, sizes }) {
             containerClassName="w-full h-full"
             imgClassName="w-full h-full object-cover"
             onImgError={(e) => { e.currentTarget.style.display = 'none' }}
+            square
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100">

@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { cloudinarySquare } from '../lib/cloudinary'
 
 // Galería de hasta 3 fotos por producto/variante (2026-08-01). Nunca monta
 // más de un <img> a la vez — el src cambia según el índice activo (mismo
@@ -22,6 +23,12 @@ export default function ProductImageGallery({
   onIndexChange,
   eager = false,
   onImgError,
+  // square (2026-08-09, Pilar 2 Cloudinary): opt-in — tarjetas de catálogo
+  // (Supply/Store/Suplementos) lo activan para pasar de recorte
+  // (object-cover) a relleno con fondo blanco. Por defecto false: la foto
+  // grande de ProductLandingPage sigue mostrando la imagen completa tal
+  // cual, sin forzar cuadrado.
+  square = false,
 }) {
   const [internalIdx, setInternalIdx] = useState(0)
   const controlled = activeIndex != null
@@ -29,6 +36,7 @@ export default function ProductImageGallery({
   const setIdx = controlled ? onIndexChange : setInternalIdx
   const touchStartX = useRef(null)
   const multi = images.length > 1
+  const src = square ? cloudinarySquare(images[idx]) : images[idx]
 
   const handleMouseMove = (e) => {
     if (!multi) return
@@ -66,8 +74,8 @@ export default function ProductImageGallery({
       onTouchEnd={handleTouchEnd}
     >
       <img
-        key={images[idx]}
-        src={images[idx]}
+        key={src}
+        src={src}
         alt={alt}
         className={`transition-opacity duration-200 ${imgClassName}`}
         loading={eager ? undefined : 'lazy'}
