@@ -126,10 +126,24 @@ export async function fetchCatalogMarca(module, marca) {
  * para la vista filtrada que se abre desde el perfil de ese estudio en
  * Tattoo Artist Colombia. Mismo criterio que fetchCatalogMarca: filtro
  * sobre el catálogo ya cacheado, sin pegarle a un endpoint aparte.
+ *
+ * Filtra por VARIANTE, no por el `estudio_id` del producto agrupado —
+ * desde que el catálogo maestro permite que distintos estudios compartan
+ * el mismo nombre de producto (vinculándose al mismo master_product_id),
+ * un solo grupo puede mezclar variantes de más de un dueño. El
+ * `estudio_id` a nivel de producto solo refleja la PRIMERA fila del
+ * grupo — filtrar por ahí dejaba fuera productos reales del estudio si
+ * ese grupo también tenía una variante de otro proveedor (reportado
+ * 2026-08-09: un producto no aparecía en la tienda propia del proveedor).
  */
 export async function fetchCatalogEstudio(module, estudioId) {
   const { allProducts } = await fetchCatalogFull(module)
-  return { products: allProducts.filter(p => p.estudio_id === Number(estudioId)) }
+  const id = Number(estudioId)
+  return {
+    products: allProducts
+      .map((p) => ({ ...p, variantes: (p.variantes || []).filter((v) => v.estudio_id === id) }))
+      .filter((p) => p.variantes.length > 0),
+  }
 }
 
 /** Converts a catalog item to the format StoreProductCard expects */
