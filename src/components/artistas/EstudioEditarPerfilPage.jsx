@@ -235,10 +235,18 @@ function MiEquipoSection({ token, artistas, invitacionesIniciales, esEmpresa }) 
   )
 }
 
-// Mismo set fijo que ya usa el panel (INV_CATEGORIAS.supply) — las
-// páginas de categoría de Supply son rutas fijas por texto exacto, un
-// valor libre dejaría el producto sin ninguna página real donde aparecer.
-const SUPPLY_CATEGORIAS = ['Tintas', 'Cartuchos', 'Agujas', 'Máquinas', 'Guantes', 'Cuidados', 'Fuentes', 'Accesorios', 'Mobiliario', 'Combos', 'Cursos', 'Kit Externo', 'Recursos']
+// Mismo set fijo que ya usa el panel (INV_CATEGORIAS.supply), MENOS
+// 'Cursos' y 'Kit Externo' (Jose, 2026-08-09: "no podrá subir kit
+// externo, ni cursos... eso lo manejo solo yo de momento") — esas dos
+// categorías son contenido curado a mano por Jose (afiliados/cursos
+// digitales), no algo que un proveedor externo deba poder autopublicar.
+// Server-side también las excluye de SUPPLY_CATEGORIAS_ESTUDIO en
+// server.js — este archivo es SOLO el dashboard de autoservicio del
+// proveedor, el panel admin (public/index.html) sigue con el set
+// completo sin tocar. Las páginas de categoría de Supply son rutas fijas
+// por texto exacto, un valor libre dejaría el producto sin ninguna
+// página real donde aparecer.
+const SUPPLY_CATEGORIAS = ['Tintas', 'Cartuchos', 'Agujas', 'Máquinas', 'Guantes', 'Cuidados', 'Fuentes', 'Accesorios', 'Mobiliario', 'Combos', 'Recursos']
 // Mismo set fijo que INV_MARCAS.supply en el panel (public/index.html) —
 // copia local, mismo criterio que SUPPLY_CATEGORIAS de arriba.
 const SUPPLY_MARCAS = [
