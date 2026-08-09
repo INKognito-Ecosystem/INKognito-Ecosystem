@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData, useNavigate, useSearchParams } from 'react-router-dom'
-import { Camera, LoaderCircle, Mail, Pencil, MapPin, CheckCircle2, Users, UserPlus, X, Navigation, Check, Trash2, ShoppingBag, ExternalLink, Wallet, ChevronDown } from 'lucide-react'
+import { Camera, LoaderCircle, Mail, Pencil, MapPin, CheckCircle2, Users, UserPlus, X, Navigation, Check, Trash2, ShoppingBag, ExternalLink, Wallet, ChevronDown, Copy } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
@@ -275,8 +275,10 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
   const [editando, setEditando] = useState(null)
   const [error, setError] = useState(null)
   const [masterResults, setMasterResults] = useState([])
+  const [varianteDe, setVarianteDe] = useState(null)
   const fileInput = useRef(null)
   const masterSearchTimer = useRef(null)
+  const formRef = useRef(null)
 
   useEffect(() => {
     fetch(`${PANEL_URL}/api/estudios-inventario-por-token?token=${encodeURIComponent(token)}`)
@@ -308,10 +310,26 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
   const iniciarEdicion = (p) => {
     setError(null)
     setEditando(p.id)
+    setVarianteDe(null)
     setMasterResults([])
     setNuevo({ product: p.product, variant: p.variant || '', price: p.price, stock: p.stock, categoria: p.categoria, marca: p.marca || '', image_url: p.image_url || '', descripcion: p.descripcion || '', master_product_id: null })
   }
-  const cancelarEdicion = () => { setEditando(null); setNuevo(PRODUCTO_VACIO); setMasterResults([]); setError(null) }
+  const cancelarEdicion = () => { setEditando(null); setVarianteDe(null); setNuevo(PRODUCTO_VACIO); setMasterResults([]); setError(null) }
+
+  // Agregar una variante (talla, sabor, color...) de un producto propio ya
+  // cargado — a diferencia de "editar", esto SIEMPRE crea una fila nueva
+  // (POST, no PUT), pero copia el nombre/categoría/marca EXACTOS del
+  // producto original para que quede agrupado en la misma card en la web
+  // de Supply en vez de crear un producto aparte por una diferencia de
+  // texto (mayúsculas, espacios) al retipear el nombre a mano.
+  const agregarVariante = (p) => {
+    setError(null)
+    setEditando(null)
+    setVarianteDe(p.product)
+    setMasterResults([])
+    setNuevo({ product: p.product, variant: '', price: p.price || '', stock: '', categoria: p.categoria, marca: p.marca || '', image_url: '', descripcion: p.descripcion || '', master_product_id: p.master_product_id || null })
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   // Catálogo maestro — buscar un producto ya cargado por otro proveedor
   // (o por Jose desde el panel admin) para no retipear nombre/categoría/
@@ -407,9 +425,14 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
                     <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300 text-xs">Sin foto</div>
                   )}
                   <div className="absolute top-1 left-1 bg-black/60 text-white text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full truncate max-w-[80%]">{p.categoria}</div>
-                  <button type="button" onClick={() => iniciarEdicion(p)} aria-label="Editar producto" className="absolute top-1 right-1 flex items-center justify-center w-6 h-6 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors">
-                    <Pencil size={11} />
-                  </button>
+                  <div className="absolute top-1 right-1 flex items-center gap-1">
+                    <button type="button" onClick={() => agregarVariante(p)} aria-label="Agregar variante de este producto" title="Agregar variante (talla, sabor, color...)" className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors">
+                      <Copy size={11} />
+                    </button>
+                    <button type="button" onClick={() => iniciarEdicion(p)} aria-label="Editar producto" className="flex items-center justify-center w-6 h-6 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors">
+                      <Pencil size={11} />
+                    </button>
+                  </div>
                   <div className="absolute bottom-0 inset-x-0 bg-black/70 text-white text-[10px] px-1.5 py-1">
                     <p className="font-bold truncate">{p.product}</p>
                     <div className="flex items-center justify-between">
@@ -425,11 +448,17 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
             </div>
           )}
 
-          <div className="border border-dashed border-gray-300 rounded-lg p-3 space-y-2.5">
+          <div ref={formRef} className="border border-dashed border-gray-300 rounded-lg p-3 space-y-2.5">
             {editando && (
               <div className="flex items-center justify-between">
                 <p className="text-xs font-black uppercase text-gray-700">Editando producto</p>
                 <button type="button" onClick={cancelarEdicion} className="text-gray-400 text-[10px] font-bold uppercase underline">Cancelar</button>
+              </div>
+            )}
+            {varianteDe && (
+              <div className="flex items-center justify-between bg-gray-100 rounded-md px-2.5 py-1.5">
+                <p className="text-[10px] text-gray-600">Nueva variante de <span className="font-black">{varianteDe}</span> — quedará en la misma card en Supply.</p>
+                <button type="button" onClick={cancelarEdicion} className="text-gray-400 text-[10px] font-bold uppercase underline flex-shrink-0 ml-2">Cancelar</button>
               </div>
             )}
             <input type="file" accept="image/*" ref={fileInput} style={{ display: 'none' }} onChange={(e) => subirFoto(e.target.files?.[0])} />
@@ -447,7 +476,7 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
             </button>
 
             <div className="relative">
-              <input className={inputClass} placeholder="Nombre del producto" autoComplete="off" value={nuevo.product} onChange={(e) => onProductInput(e.target.value)} />
+              <input className={`${inputClass} ${varianteDe ? 'bg-gray-100 text-gray-500' : ''}`} placeholder="Nombre del producto" autoComplete="off" readOnly={!!varianteDe} value={nuevo.product} onChange={(e) => onProductInput(e.target.value)} />
               {masterResults.length > 0 && (
                 <div className="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
                   {masterResults.map((r) => (
