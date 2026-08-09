@@ -1,12 +1,13 @@
 import { useLoaderData, redirect } from 'react-router-dom'
 import { useMemo, useState } from 'react'
-import { Award } from 'lucide-react'
+import { Award, MapPin } from 'lucide-react'
 import FooterSupply from './FooterSupply'
 import NavbarCategory from './NavbarCategory'
 import BrandCatalogSection from './BrandCatalogSection'
 import CajaSurtidaWidget from './CajaSurtidaWidget'
 import { fetchCatalogEstudio } from '../../hooks/useCatalog'
 import { SUPPLY_CATEGORIES_ORDER } from '../../data/supplyCategoriesOrder'
+import { urlGoogleMaps } from '../artistas/mapaUrl'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
@@ -100,33 +101,58 @@ export default function EstudioSupplyPage() {
     <div className="min-h-screen bg-black text-white">
       <NavbarCategory pageName={nombreSupply} />
 
-      <div className="pt-20 md:pt-24 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-6">
-          {estudio.logo_url && (
-            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-zinc-800 flex-shrink-0">
+      {/* HERO blanco (2026-08-09, Jose: "el fondo del hero debera ser
+          blanco") — mismo look que el perfil del estudio/artista en el
+          buscador (EstudioLandingPage.jsx/ArtistaLandingPage.jsx), en vez
+          del negro que usa el resto de esta página de catálogo. Todo el
+          texto (antes plano, debajo/al lado del logo) ahora vive DENTRO de
+          una burbuja de chat — mismo recurso que la burbuja "Sobre mí" de
+          ArtistaLandingPage.jsx (rounded-2xl rounded-tl-sm, esquina
+          superior izquierda cuadrada). La ubicación queda AFUERA de la
+          burbuja, montada mitad adentro/mitad afuera de su borde inferior
+          — mismo mecanismo que la insignia de Mercado Pago en la card de
+          agenda (absolute, mitad de su propio alto hacia afuera). */}
+      <div className="bg-white text-gray-900 pt-20 md:pt-24 pb-9 px-4 md:px-6">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
+          <div className="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-gray-100 bg-gray-100 shadow-md overflow-hidden flex-shrink-0 mx-auto sm:mx-0">
+            {estudio.logo_url ? (
               <img src={estudio.logo_url} alt={nombreSupply} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-300 text-4xl font-black">{nombreSupply?.[0]?.toUpperCase() || '?'}</div>
+            )}
+          </div>
+
+          <div className="relative max-w-md w-full sm:w-auto mx-auto sm:mx-0 pb-4">
+            <div className="bg-gray-100 border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3.5 text-center sm:text-left">
+              <p className="uppercase tracking-[0.25em] text-gray-400 text-[10px] font-black mb-1">Catálogo de</p>
+              <h1 className="text-xl md:text-2xl font-black uppercase leading-tight">{nombreSupply}</h1>
+              {/* Insignia "Distribuidor Oficial" (fase 6, 2026-08-07) —
+                  tarifa fija de patrocinio, no comisión (la venta acá no
+                  necesariamente pasa por el carrito). Color ámbar a
+                  propósito, distinto del azul de toda la identidad de
+                  Supply, para que se lea como un sello aparte. */}
+              {estudio.distribuidor_oficial && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-black text-[10px] font-black uppercase tracking-widest bg-amber-400 mt-2">
+                  <Award size={12} /> Distribuidor Oficial
+                </span>
+              )}
             </div>
-          )}
-          <div>
-            <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm mb-1">Catálogo de</p>
-            <h1 className="text-2xl md:text-4xl font-black uppercase leading-tight">{nombreSupply}</h1>
-            {estudio.municipio && <p className="text-zinc-500 text-sm mt-1">{estudio.municipio}{estudio.departamento ? `, ${estudio.departamento}` : ''}</p>}
-            {/* Insignia "Distribuidor Oficial" (fase 6, 2026-08-07) —
-                tarifa fija de patrocinio, no comisión (la venta acá no
-                necesariamente pasa por el carrito). Color ámbar a
-                propósito, distinto del azul de toda la identidad de
-                Supply, para que se lea como un sello aparte. Sin flechas
-                prev/next (Jose: a esta página se llega desde el perfil
-                del estudio en el buscador, no desde el menú de marcas —
-                saltar a otra marca sin relación no tiene sentido acá). */}
-            {estudio.distribuidor_oficial && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-black text-[10px] font-black uppercase tracking-widest bg-amber-400 mt-2">
-                <Award size={12} /> Distribuidor Oficial
-              </span>
+            {estudio.municipio && (
+              <a
+                href={urlGoogleMaps(estudio)}
+                target="_blank"
+                rel="noreferrer"
+                className="absolute -bottom-1 left-1/2 -translate-x-1/2 sm:left-4 sm:translate-x-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-gray-300 shadow-md text-[10px] font-bold uppercase tracking-widest text-gray-600 hover:text-gray-900 active:scale-95 transition-all whitespace-nowrap"
+              >
+                <MapPin size={11} className="flex-shrink-0" />
+                {estudio.municipio}{estudio.departamento ? `, ${estudio.departamento}` : ''}
+              </a>
             )}
           </div>
         </div>
+      </div>
 
+      <div className="pt-8 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
         {categoriasEnCatalogo.length > 1 && (
           <div className="flex items-center gap-2 overflow-x-auto pb-1 mb-6 scrollbar-hide">
             {['todos', ...categoriasEnCatalogo].map((c) => (
