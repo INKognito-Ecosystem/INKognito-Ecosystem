@@ -3,11 +3,11 @@ import { ArrowLeft, ArrowRight, Award } from 'lucide-react'
 import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
 import BrandCatalogSection from '../BrandCatalogSection'
-import AccordionCard from '../AccordionCard'
+import SupplyFAQ from '../SupplyFAQ'
 import { getAdjacentBrands } from '../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../hooks/useScrolled'
-import { fetchCatalogMarca } from '../../../hooks/useCatalog'
+import { fetchCatalogEstudio, fetchSupplyFaq } from '../../../hooks/useCatalog'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 // fase 6.1 (2026-08-07) — id real en `estudios` vinculado a esta marca,
@@ -16,9 +16,19 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-pro
 const ESTUDIO_ID = 6
 
 export async function loader({ request }) {
-  const [catalogo, estudioRes] = await Promise.all([
-    fetchCatalogMarca('supply', 'heaven-pro'),
+  const [catalogo, estudioRes, faqItems] = await Promise.all([
+    // Filtrado por estudio_id (el dueño real de Heaven Pro), no por marca
+    // (2026-08-09, Jose: "entré a ver su catálogo, la landing premium...
+    // aparece un producto subido por INKognito Supply, ahí no debería
+    // cargarse este producto" — antes fetchCatalogMarca traía CUALQUIER
+    // producto de cualquier proveedor que tuviera marca='heaven-pro'
+    // (ej. Jose subió su propio "tactus" con esa marca), aunque esta
+    // landing es la tienda dedicada de Heaven Pro específicamente. La
+    // mezcla multi-proveedor por marca sí es correcta en el catálogo
+    // general de Supply ("en la web"), no acá.
+    fetchCatalogEstudio('supply', ESTUDIO_ID),
     fetch(`${PANEL_URL}/api/estudios/${ESTUDIO_ID}`).catch(() => null),
+    fetchSupplyFaq({ marca: 'heaven-pro' }),
   ])
   const estudio = estudioRes && estudioRes.ok ? await estudioRes.json() : null
   // ?flechas=0 (fase 6.1, bug real de Jose) — quien llega acá desde el
@@ -26,7 +36,7 @@ export async function loader({ request }) {
   // marca sin relación; navegando normal desde el menú de Supply, el
   // parámetro no viene y las flechas se ven como siempre.
   const mostrarFlechas = new URL(request.url).searchParams.get('flechas') !== '0'
-  return { ...catalogo, distribuidorOficial: estudio?.distribuidor_oficial || false, mostrarFlechas }
+  return { ...catalogo, distribuidorOficial: estudio?.distribuidor_oficial || false, mostrarFlechas, faqItems }
 }
 
 export function meta() {
@@ -46,21 +56,6 @@ const DOT_PATTERN = {
   backgroundSize: '18px 18px',
 }
 
-const faq = [
-  {
-    question: '¿Qué productos incluye la línea Heaven Pro?',
-    answer: 'Crema y toallitas de limpieza para usar durante la sesión, y crema de cicatrización para después — cubre las dos etapas del tatuaje.'
-  },
-  {
-    question: '¿Cuáles debo tener siempre en el estudio?',
-    answer: 'La crema para tatuar y las toallitas de limpieza las usas en cada sesión mientras tatúas. La crema de cicatrización la recomiendas o vendes a tu cliente para después.'
-  },
-  {
-    question: '¿Puedo revender la crema de cicatrización a mis clientes?',
-    answer: 'Sí. Muchos tatuadores la incluyen como parte del kit de cuidado que entregan al cliente al terminar la sesión.'
-  },
-]
-
 function InsigniaDistribuidorOficial() {
   return (
     <span className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-black text-[9px] font-black uppercase tracking-widest bg-amber-400">
@@ -70,7 +65,7 @@ function InsigniaDistribuidorOficial() {
 }
 
 export default function HeavenProPage() {
-  const { products, distribuidorOficial, mostrarFlechas } = useLoaderData()
+  const { products, distribuidorOficial, mostrarFlechas, faqItems } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_heaven_pro')
   const { prev, next } = getAdjacentBrands(5)
   const scrolled = useScrolled()
@@ -165,22 +160,7 @@ export default function HeavenProPage() {
             Vision e Industrias Warlock). */}
         <BrandCatalogSection brandName="Heaven Pro" products={products} supplierBadge={null} />
 
-        <section className="mt-10 md:mt-14">
-          <AccordionCard
-            icon="❓"
-            title="Preguntas frecuentes"
-            subtitle="Todo lo que necesitas saber sobre Heaven Pro antes de tu pedido. Toca para ver las respuestas."
-          >
-            <div className="flex flex-col gap-5">
-              {faq.map((item, i) => (
-                <div key={i} className={i < faq.length - 1 ? 'pb-5 border-b border-zinc-800' : ''}>
-                  <p className="font-bold text-white text-sm mb-2">{item.question}</p>
-                  <p className="text-zinc-500 text-sm leading-relaxed">{item.answer}</p>
-                </div>
-              ))}
-            </div>
-          </AccordionCard>
-        </section>
+        <SupplyFAQ items={faqItems} nombre="Heaven Pro" />
 
       </div>
 

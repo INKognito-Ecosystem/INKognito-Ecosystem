@@ -1,6 +1,6 @@
 import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../SupplyCategoryPage'
-import { fetchCatalogCategoria } from '../../../hooks/useCatalog'
+import { fetchCatalogCategoria, fetchSupplyFaq } from '../../../hooks/useCatalog'
 
 const TITLE = 'Fuentes de poder'
 const CATEGORIA = 'Fuentes'
@@ -16,15 +16,12 @@ const guide = [
   { icon: '🔇', title: 'Inalambricas', text: 'Libertad de movimiento. Autonomia entre 3 y 5 horas. Ten segunda bateria cargada.' },
 ]
 
-const faqs = [
-  { q: 'Que fuente para rotativas?', a: 'Control digital, minimo 2A y display visible. Escribenos con tu maquina.' },
-  { q: 'Las inalambricas duran toda la sesion?', a: 'Entre 3 y 5 horas segun uso. Ten segunda bateria cargada.' },
-  { q: 'Incluyen cable y adaptadores?', a: 'Consultamos el kit incluido antes de confirmar.' },
-  { q: 'Envios?', a: 'Si, por transportadora desde Chigorodo.' },
-]
-
 export async function loader() {
-  return fetchCatalogCategoria('supply', CATEGORIA)
+  const [catalogo, faqs] = await Promise.all([
+    fetchCatalogCategoria('supply', CATEGORIA),
+    fetchSupplyFaq({ categoria: CATEGORIA }),
+  ])
+  return { ...catalogo, faqs }
 }
 
 export function meta() {
@@ -39,7 +36,7 @@ export function meta() {
 }
 
 export default function PowerSuppliesPage() {
-  const { products, afiliados } = useLoaderData()
+  const { products, afiliados, faqs } = useLoaderData()
   return (
     <SupplyCategoryPage
       title={TITLE}

@@ -1,6 +1,6 @@
 import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../SupplyCategoryPage'
-import { fetchCatalogCategoria } from '../../../hooks/useCatalog'
+import { fetchCatalogCategoria, fetchSupplyFaq } from '../../../hooks/useCatalog'
 
 const TITLE = 'Maquinas'
 const CATEGORIA = 'Maquinas'
@@ -16,15 +16,12 @@ const guide = [
   { icon: '⚖️', title: 'Peso y ergonomia', text: 'Para detalle elige algo ligero. Para linea con fuerza, mas peso da estabilidad.' },
 ]
 
-const faqs = [
-  { q: 'Que maquina para empezar?', a: 'Rotativa de lapiz con cartuchos. La mas versatil.' },
-  { q: 'Incluyen garantia?', a: 'Depende del fabricante. Consultamos condiciones antes de confirmar.' },
-  { q: 'Compatibles con todas las fuentes?', a: 'Si, que la fuente entregue 5V-12V.' },
-  { q: 'Envios a Colombia?', a: 'Si, por transportadora desde Chigorodo.' },
-]
-
 export async function loader() {
-  return fetchCatalogCategoria('supply', CATEGORIA)
+  const [catalogo, faqs] = await Promise.all([
+    fetchCatalogCategoria('supply', CATEGORIA),
+    fetchSupplyFaq({ categoria: CATEGORIA }),
+  ])
+  return { ...catalogo, faqs }
 }
 
 export function meta() {
@@ -39,7 +36,7 @@ export function meta() {
 }
 
 export default function MachinesPage() {
-  const { products, afiliados } = useLoaderData()
+  const { products, afiliados, faqs } = useLoaderData()
   return (
     <SupplyCategoryPage
       title={TITLE}

@@ -1,6 +1,6 @@
 import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../SupplyCategoryPage'
-import { fetchCatalogCategoria } from '../../../hooks/useCatalog'
+import { fetchCatalogCategoria, fetchSupplyFaq } from '../../../hooks/useCatalog'
 
 const TITLE = 'Agujas'
 const CATEGORIA = 'Agujas'
@@ -16,15 +16,12 @@ const guide = [
   { icon: '🔬', title: 'Bugpin', text: 'Calibre ultra fino para detalle extremo. Requiere maquina calibrada.' },
 ]
 
-const faqs = [
-  { q: 'Las agujas vienen esterilizadas?', a: 'Si, selladas por EO. Uso unico, nunca reutilices.' },
-  { q: 'Que aguja para letras?', a: 'RL3 o RL5 para letras finas. RS7 o M1 para relleno.' },
-  { q: 'Venden por caja?', a: 'Si. Consultamos cantidades especificas.' },
-  { q: 'Hacen envios?', a: 'Si, a toda la region de Uraba y Colombia.' },
-]
-
 export async function loader() {
-  return fetchCatalogCategoria('supply', CATEGORIA)
+  const [catalogo, faqs] = await Promise.all([
+    fetchCatalogCategoria('supply', CATEGORIA),
+    fetchSupplyFaq({ categoria: CATEGORIA }),
+  ])
+  return { ...catalogo, faqs }
 }
 
 export function meta() {
@@ -39,7 +36,7 @@ export function meta() {
 }
 
 export default function NeedlesPage() {
-  const { products, afiliados } = useLoaderData()
+  const { products, afiliados, faqs } = useLoaderData()
   return (
     <SupplyCategoryPage
       title={TITLE}

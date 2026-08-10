@@ -1,6 +1,6 @@
 import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../../SupplyCategoryPage'
-import { fetchCatalogCategoria } from '../../../../hooks/useCatalog'
+import { fetchCatalogCategoria, fetchSupplyFaq } from '../../../../hooks/useCatalog'
 
 const TITLE = 'Tintas'
 const CATEGORIA = 'Tintas'
@@ -17,16 +17,12 @@ const guide = [
   { icon: '🔬', title: 'Veganas y aptas piel', text: 'Todas las tintas en nuestro catálogo son libres de crueldad animal y formuladas para uso dérmico profesional, cumpliendo estándares de seguridad para tatuaje.' },
 ]
 
-const faqs = [
-  { q: '¿Las tintas son originales de las marcas que ofrecen?', a: 'Sí. Trabajamos con distribución directa de las marcas que tenemos disponibles. Cada tinta viene con sello de fábrica y fecha de vencimiento visible.' },
-  { q: '¿Hacen envíos a ciudades fuera de Chigorodó?', a: 'Sí. Despachamos a Apartadó, Turbo, Carepa, Mutatá, Arboletes y otras ciudades de Urabá. Confirmamos tiempos y costos de envío por WhatsApp.' },
-  { q: '¿Qué tinta me recomiendan para comenzar en el realismo?', a: 'Para realismo negro y gris te recomendamos una tinta negra de alta densidad más sets de grises ya preparados. Escríbenos y te orientamos según tu estilo y máquina.' },
-  { q: '¿Tienen disponibilidad inmediata o es por pedido?', a: 'Depende del producto. Lo que ves en la tienda está en stock actual. Si necesitas algo específico que no aparece, escríbenos — podemos conseguirlo con tiempo.' },
-  { q: '¿Puedo comprar tintas individuales o solo cajas?', a: 'Vendemos por unidad y en cantidades mayores. El precio varía según volumen. Para compras de 6 unidades o más consultamos descuento especial.' },
-]
-
 export async function loader() {
-  return fetchCatalogCategoria('supply', CATEGORIA)
+  const [catalogo, faqs] = await Promise.all([
+    fetchCatalogCategoria('supply', CATEGORIA),
+    fetchSupplyFaq({ categoria: CATEGORIA }),
+  ])
+  return { ...catalogo, faqs }
 }
 
 export function meta() {
@@ -41,7 +37,7 @@ export function meta() {
 }
 
 export default function InkPage() {
-  const { products, afiliados } = useLoaderData()
+  const { products, afiliados, faqs } = useLoaderData()
   return (
     <SupplyCategoryPage
       title={TITLE}

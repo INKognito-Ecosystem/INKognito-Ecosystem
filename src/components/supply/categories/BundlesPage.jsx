@@ -1,6 +1,6 @@
 import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../SupplyCategoryPage'
-import { fetchCatalogCategoria } from '../../../hooks/useCatalog'
+import { fetchCatalogCategoria, fetchSupplyFaq } from '../../../hooks/useCatalog'
 
 const TITLE = 'Combos'
 const CATEGORIA = 'Combos'
@@ -15,15 +15,12 @@ const guide = [
   { icon: '💡', title: 'Por que un combo?', text: 'Menos tiempo buscando, mejor precio por volumen, todo coordinado.' },
 ]
 
-const faqs = [
-  { q: 'Puedo personalizar un combo?', a: 'Si. Escribenos lo que usas y armamos un paquete a tu medida.' },
-  { q: 'Los combos tienen descuento?', a: 'Si, siempre hay beneficio en precio al comprar en conjunto.' },
-  { q: 'Con que frecuencia actualizan los combos?', a: 'Dependen del stock actual. Escribenos para disponibilidad.' },
-  { q: 'Envios?', a: 'Si, por transportadora desde Chigorodo, Uraba.' },
-]
-
 export async function loader() {
-  return fetchCatalogCategoria('supply', CATEGORIA)
+  const [catalogo, faqs] = await Promise.all([
+    fetchCatalogCategoria('supply', CATEGORIA),
+    fetchSupplyFaq({ categoria: CATEGORIA }),
+  ])
+  return { ...catalogo, faqs }
 }
 
 export function meta() {
@@ -38,7 +35,7 @@ export function meta() {
 }
 
 export default function BundlesPage() {
-  const { products, afiliados } = useLoaderData()
+  const { products, afiliados, faqs } = useLoaderData()
   return (
     <SupplyCategoryPage
       title={TITLE}

@@ -2,10 +2,15 @@ import { useLoaderData } from 'react-router-dom'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
-import { fetchCatalogMarca } from '../../../../hooks/useCatalog'
+import SupplyFAQ from '../../SupplyFAQ'
+import { fetchCatalogMarca, fetchSupplyFaq } from '../../../../hooks/useCatalog'
 
 export async function loader() {
-  return fetchCatalogMarca('supply', 'fusion')
+  const [catalogo, faqItems] = await Promise.all([
+    fetchCatalogMarca('supply', 'fusion'),
+    fetchSupplyFaq({ marca: 'fusion' }),
+  ])
+  return { ...catalogo, faqItems }
 }
 
 export function meta() {
@@ -24,7 +29,7 @@ export function meta() {
 // inventados ("$XX.XXX") con un botón que sí agregaba al carrito real. Ahora
 // usa BrandCatalogSection con productos reales filtrados por `marca='fusion'`.
 export default function FusionColorsPage() {
-  const { products } = useLoaderData()
+  const { products, faqItems } = useLoaderData()
   return (
     <div className="min-h-screen bg-black text-white">
       <NavbarCategory pageName="Fusion Ink" />
@@ -55,58 +60,7 @@ export default function FusionColorsPage() {
 
         <BrandCatalogSection brandName="Fusion Ink" products={products} />
 
-        <section className="mt-24 md:mt-32">
-          <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">
-            Preguntas frecuentes
-          </h2>
-
-          <div className="space-y-6">
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Quién fabrica la tinta Fusion Ink?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Fusion Ink es el resultado de una colaboración directa entre el experto de la industria Adam Everett y Next Generation Tattoo Machines, garantizando un estándar técnico superior.
-              </p>
-            </div>
-
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Qué hace que Fusion Ink sea tan brillante?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Su secreto reside en un altísimo porcentaje de pigmento orgánico de dispersión fina y la total ausencia de aditivos o rellenos químicos innecesarios.
-              </p>
-            </div>
-
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Las tintas Fusion Ink son veganas?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Sí, Fusion Ink es un producto 100% vegano, libre de subproductos animales y no testado en animales.
-              </p>
-            </div>
-
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Cómo es la consistencia de Fusion Ink?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Tiene una textura ligeramente más densa que otras marcas tradicionales pero sumamente sedosa, lo que evita salpicaduras y facilita una inyección impecable.
-              </p>
-            </div>
-
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Las tintas Fusion se secan rápido en el tintero?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Debido a su alta concentración mineral, pueden tender a espesarse durante sesiones muy largas. Se puede añadir una gota de solución mezcladora o agua destilada si es necesario.
-              </p>
-            </div>
-          </div>
-        </section>
+        <SupplyFAQ items={faqItems} nombre="Fusion Ink" />
 
       </div>
 

@@ -2,10 +2,15 @@ import { useLoaderData } from 'react-router-dom'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
-import { fetchCatalogMarca } from '../../../../hooks/useCatalog'
+import SupplyFAQ from '../../SupplyFAQ'
+import { fetchCatalogMarca, fetchSupplyFaq } from '../../../../hooks/useCatalog'
 
 export async function loader() {
-  return fetchCatalogMarca('supply', 'solid-ink')
+  const [catalogo, faqItems] = await Promise.all([
+    fetchCatalogMarca('supply', 'solid-ink'),
+    fetchSupplyFaq({ marca: 'solid-ink' }),
+  ])
+  return { ...catalogo, faqItems }
 }
 
 export function meta() {
@@ -24,7 +29,7 @@ export function meta() {
 // inventados ("$XX.XXX") con un botón que sí agregaba al carrito real. Ahora
 // usa BrandCatalogSection con productos reales filtrados por `marca='solid-ink'`.
 export default function SolidColorsPage() {
-  const { products } = useLoaderData()
+  const { products, faqItems } = useLoaderData()
   return (
     <div className="min-h-screen bg-black text-white">
       <NavbarCategory pageName="Solid Ink" />
@@ -55,58 +60,7 @@ export default function SolidColorsPage() {
 
         <BrandCatalogSection brandName="Solid Ink" products={products} />
 
-        <section className="mt-24 md:mt-32">
-          <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">
-            Preguntas frecuentes
-          </h2>
-
-          <div className="space-y-6">
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Quién creó Solid Ink?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Solid Ink fue desarrollada por el tatuador Federico Ferroni, quien diseñó una fórmula sumamente concentrada y natural para satisfacer sus propias exigencias artísticas y las de la industria profesional.
-              </p>
-            </div>
-
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Qué ingredientes se utilizan en la tinta Solid Ink?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Está elaborada con pigmentos orgánicos puros de excelente grado, mezclados con agua destilada estéril, glicerina vegetal y un toque de extracto de hamamelis orgánico.
-              </p>
-            </div>
-
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Las tintas de Solid Ink son veganas?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Sí, toda la línea de Solid Ink es 100% vegana, libre de gluten, crueldad animal y conservantes químicos agresivos.
-              </p>
-            </div>
-
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Cómo cura la tinta Solid Ink?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Su curación destaca por dejar un acabado mate satinado de extrema solidez, donde los colores se mantienen sumamente fieles al tono original inyectado.
-              </p>
-            </div>
-
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Solid Ink contiene alérgenos o gluten?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                No, la marca se enorgullece de fabricar un producto totalmente hipoalergénico, libre de gluten y metales pesados nocivos para el organismo.
-              </p>
-            </div>
-          </div>
-        </section>
+        <SupplyFAQ items={faqItems} nombre="Solid Ink" />
 
       </div>
 

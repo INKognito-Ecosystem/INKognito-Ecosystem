@@ -1,6 +1,6 @@
 import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../SupplyCategoryPage'
-import { fetchCatalogCategoria } from '../../../hooks/useCatalog'
+import { fetchCatalogCategoria, fetchSupplyFaq } from '../../../hooks/useCatalog'
 
 const TITLE = 'Accesorios'
 const CATEGORIA = 'Accesorios'
@@ -16,15 +16,12 @@ const guide = [
   { icon: '🗑️', title: 'Contenedores de residuos', text: 'Los residuos biologicos en contenedores especiales. Parte de tu profesionalismo.' },
 ]
 
-const faqs = [
-  { q: 'Transfer paper compatible con impresoras?', a: 'Hay tipos para impresora y para copiado manual. Verifica antes de comprar.' },
-  { q: 'Que gel recomiendan?', a: 'Depende de la piel. Escribenos con tu caso.' },
-  { q: 'Venden por unidad o pack?', a: 'Varia segun producto. Consultamos por WhatsApp.' },
-  { q: 'Envios?', a: 'Si, a toda la region de Uraba y Colombia.' },
-]
-
 export async function loader() {
-  return fetchCatalogCategoria('supply', CATEGORIA)
+  const [catalogo, faqs] = await Promise.all([
+    fetchCatalogCategoria('supply', CATEGORIA),
+    fetchSupplyFaq({ categoria: CATEGORIA }),
+  ])
+  return { ...catalogo, faqs }
 }
 
 export function meta() {
@@ -39,7 +36,7 @@ export function meta() {
 }
 
 export default function AccessoriesPage() {
-  const { products, afiliados } = useLoaderData()
+  const { products, afiliados, faqs } = useLoaderData()
   return (
     <SupplyCategoryPage
       title={TITLE}

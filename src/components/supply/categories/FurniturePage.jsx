@@ -1,6 +1,6 @@
 import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../SupplyCategoryPage'
-import { fetchCatalogCategoria } from '../../../hooks/useCatalog'
+import { fetchCatalogCategoria, fetchSupplyFaq } from '../../../hooks/useCatalog'
 
 // Mobiliario es Industrias Warlock — fabrican en Bogotá y envían a todo el
 // país, no es un proveedor local de Urabá como el resto de Supply. Por eso
@@ -21,15 +21,12 @@ const guide = [
   { icon: '📐', title: 'Distribucion del espacio', text: 'Organiza muebles para minimizar movimiento durante la sesion.' },
 ]
 
-const faqs = [
-  { q: 'Las camillas resisten cualquier peso?', a: 'Entre 150 y 200kg segun modelo. Confirmamos capacidad antes de vender.' },
-  { q: 'Que tapizado es mas facil de limpiar?', a: 'Polipiel (cuero sintetico). Evita telas o materiales porosos.' },
-  { q: '¿Desde dónde envían y cómo pago?', a: 'Industrias Warlock fabrica en Bogotá y envía a toda Colombia. El pago es por Nequi antes del despacho — por ahora no manejamos pago contraentrega para mobiliario.' },
-  { q: 'Opciones para espacios pequenos?', a: 'Si. Escribenos con las medidas de tu espacio.' },
-]
-
 export async function loader() {
-  return fetchCatalogCategoria('supply', CATEGORIA)
+  const [catalogo, faqs] = await Promise.all([
+    fetchCatalogCategoria('supply', CATEGORIA),
+    fetchSupplyFaq({ categoria: CATEGORIA }),
+  ])
+  return { ...catalogo, faqs }
 }
 
 export function meta() {
@@ -44,7 +41,7 @@ export function meta() {
 }
 
 export default function FurniturePage() {
-  const { products, afiliados } = useLoaderData()
+  const { products, afiliados, faqs } = useLoaderData()
   return (
     <SupplyCategoryPage
       title={TITLE}

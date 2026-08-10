@@ -1,6 +1,6 @@
 import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../SupplyCategoryPage'
-import { fetchCatalogCategoria } from '../../../hooks/useCatalog'
+import { fetchCatalogCategoria, fetchSupplyFaq } from '../../../hooks/useCatalog'
 
 const TITLE = 'Cuidados'
 const CATEGORIA = 'Cuidados'
@@ -16,15 +16,12 @@ const guide = [
   { icon: '📋', title: 'Instrucciones al cliente', text: 'Instrucciones claras reducen consultas post-sesion y protegen tu reputacion.' },
 ]
 
-const faqs = [
-  { q: 'Que productos para aftercare?', a: 'Crema sin fragancia ni alcohol. La vaselina funciona bien los primeros dias.' },
-  { q: 'El film reemplaza el vendaje?', a: 'Si. Mas comodo y protege mejor. Se puede dejar 24-48 horas.' },
-  { q: 'Venden kits de aftercare?', a: 'Consultamos disponibilidad por WhatsApp.' },
-  { q: 'Envios?', a: 'Si, coordinamos por WhatsApp.' },
-]
-
 export async function loader() {
-  return fetchCatalogCategoria('supply', CATEGORIA)
+  const [catalogo, faqs] = await Promise.all([
+    fetchCatalogCategoria('supply', CATEGORIA),
+    fetchSupplyFaq({ categoria: CATEGORIA }),
+  ])
+  return { ...catalogo, faqs }
 }
 
 export function meta() {
@@ -39,7 +36,7 @@ export function meta() {
 }
 
 export default function AftercarePage() {
-  const { products, afiliados } = useLoaderData()
+  const { products, afiliados, faqs } = useLoaderData()
   return (
     <SupplyCategoryPage
       title={TITLE}

@@ -139,6 +139,27 @@ export async function fetchCatalogEstudio(module, estudioId) {
   return { products: allProducts.filter((p) => p.estudio_id === Number(estudioId)) }
 }
 
+/**
+ * Preguntas frecuentes de Supply (2026-08-09) — antes vivían hardcodeadas
+ * en cada página .jsx de categoría/marca; ahora en `supply_faq` (panel),
+ * editables desde Configuración sin tocar código. El servidor ya devuelve
+ * general + el nivel pedido combinado — acá no hay que sumar nada, solo
+ * pasar el parámetro correcto. Server-side (llamado desde loader()), no
+ * client-side — el contenido de FAQ sí aporta SEO/AEO real y debe venir
+ * en el HTML ya renderizado, no aparecer recién después de hidratar.
+ */
+export async function fetchSupplyFaq({ categoria, marca } = {}) {
+  const qs = categoria ? `categoria=${encodeURIComponent(categoria)}` : `marca=${encodeURIComponent(marca)}`
+  try {
+    const res = await fetch(`${PANEL_URL}/api/supply-faq?${qs}`)
+    if (!res.ok) return []
+    const data = await res.json()
+    return data.items || []
+  } catch {
+    return []
+  }
+}
+
 /** Converts a catalog item to the format StoreProductCard expects */
 export function toProdCard(item) {
   const firstPrice = item.variantes?.[0]?.price

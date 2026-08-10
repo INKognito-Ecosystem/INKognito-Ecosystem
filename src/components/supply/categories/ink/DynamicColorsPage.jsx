@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
-import AccordionCard from '../../AccordionCard'
+import SupplyFAQ from '../../SupplyFAQ'
 export function meta() {
   const title = 'Tintas Dynamic | INKognito Supply — Colombia'
   const description = 'Dynamic Black, Triple Black y colores clásicos. Pigmentos densos y fluidos para black and grey y estilo tradicional. Disponibles en Urabá, despacho a Colombia.'
@@ -18,10 +18,14 @@ export function meta() {
 import { getAdjacentBrands } from '../../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../../hooks/useScrolled'
-import { fetchCatalogMarca } from '../../../../hooks/useCatalog'
+import { fetchCatalogMarca, fetchSupplyFaq } from '../../../../hooks/useCatalog'
 
 export async function loader() {
-  return fetchCatalogMarca('supply', 'dynamic')
+  const [catalogo, faqItems] = await Promise.all([
+    fetchCatalogMarca('supply', 'dynamic'),
+    fetchSupplyFaq({ marca: 'dynamic' }),
+  ])
+  return { ...catalogo, faqItems }
 }
 
 const DOT_PATTERN = {
@@ -29,23 +33,8 @@ const DOT_PATTERN = {
   backgroundSize: '18px 18px',
 }
 
-const faq = [
-  {
-    question: '¿Por qué la tinta negra Dynamic Black es tan popular?',
-    answer: 'Su popularidad se debe a su altísima concentración de pigmento, excelente fluidez y un tono negro profundo que no se desvanece fácilmente, facilitando un delineado limpio y sombreados consistentes.'
-  },
-  {
-    question: '¿Cuál es la diferencia entre Dynamic Black y Triple Black?',
-    answer: 'El Dynamic Black estándar es ideal para delinear y diluir en mezclas de sombras (greywash). Por otro lado, Triple Black contiene una carga de pigmento aún mayor, lo que lo hace perfecto exclusivamente para rellenos sólidos y tribales super oscuros.'
-  },
-  {
-    question: '¿Las tintas Dynamic son aptas para veganos?',
-    answer: 'Sí, todas las tintas Dynamic están formuladas con ingredientes de alta pureza de origen no animal y son 100% libres de crueldad animal.'
-  },
-]
-
 export default function DynamicColorsPage() {
-  const { products } = useLoaderData()
+  const { products, faqItems } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_dynamic')
   const { prev, next } = getAdjacentBrands(4)
   const scrolled = useScrolled()
@@ -136,22 +125,7 @@ export default function DynamicColorsPage() {
 
         <BrandCatalogSection brandName="Dynamic" products={products} />
 
-        <section className="mt-10 md:mt-14">
-          <AccordionCard
-            icon="❓"
-            title="Preguntas frecuentes"
-            subtitle="Todo lo que necesitas saber sobre Dynamic antes de tu pedido. Toca para ver las respuestas."
-          >
-            <div className="flex flex-col gap-5">
-              {faq.map((item, i) => (
-                <div key={i} className={i < faq.length - 1 ? 'pb-5 border-b border-zinc-800' : ''}>
-                  <p className="font-bold text-white text-sm mb-2">{item.question}</p>
-                  <p className="text-zinc-500 text-sm leading-relaxed">{item.answer}</p>
-                </div>
-              ))}
-            </div>
-          </AccordionCard>
-        </section>
+        <SupplyFAQ items={faqItems} nombre="Dynamic" />
 
       </div>
 

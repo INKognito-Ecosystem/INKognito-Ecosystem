@@ -2,10 +2,15 @@ import { useLoaderData } from 'react-router-dom'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
-import { fetchCatalogMarca } from '../../../../hooks/useCatalog'
+import SupplyFAQ from '../../SupplyFAQ'
+import { fetchCatalogMarca, fetchSupplyFaq } from '../../../../hooks/useCatalog'
 
 export async function loader() {
-  return fetchCatalogMarca('supply', 'eternal')
+  const [catalogo, faqItems] = await Promise.all([
+    fetchCatalogMarca('supply', 'eternal'),
+    fetchSupplyFaq({ marca: 'eternal' }),
+  ])
+  return { ...catalogo, faqItems }
 }
 
 export function meta() {
@@ -24,7 +29,7 @@ export function meta() {
 // inventados ("$XX.XXX") con un botón que sí agregaba al carrito real. Ahora
 // usa BrandCatalogSection con productos reales filtrados por `marca='eternal'`.
 export default function EternalColorsPage() {
-  const { products } = useLoaderData()
+  const { products, faqItems } = useLoaderData()
   return (
     <div className="min-h-screen bg-black text-white">
       <NavbarCategory pageName="Eternal Ink" />
@@ -55,58 +60,7 @@ export default function EternalColorsPage() {
 
         <BrandCatalogSection brandName="Eternal Ink" products={products} />
 
-        <section className="mt-24 md:mt-32">
-          <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">
-            Preguntas frecuentes
-          </h2>
-
-          <div className="space-y-6">
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Qué hace especial a la tinta Eternal Ink?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Su consistencia impecable, brillo y facilidad de inserción, perfeccionados durante más de dos décadas de innovación constante por reconocidos artistas.
-              </p>
-            </div>
-
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Las tintas Eternal Ink contienen acrílico?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                No, Eternal Ink es de base acuosa y orgánica, libre de plásticos y acrílicos nocivos, lo que previene reacciones alérgicas y asegura una curación limpia.
-              </p>
-            </div>
-
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Cuál es el negro más oscuro de Eternal Ink?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Tanto Maxx Black como Pitch Black ofrecen una altísima densidad de negro. Pitch Black destaca por su brillo y profundidad absoluta en rellenos sólidos.
-              </p>
-            </div>
-
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Las tintas de Eternal Ink son seguras para la piel?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Totalmente. Se elaboran bajo rigurosos protocolos médicos y de laboratorio en EE. UU., siendo testeadas periódicamente para garantizar total bioseguridad.
-              </p>
-            </div>
-
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Cómo debe almacenarse la tinta Eternal Ink?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Debe mantenerse a temperatura ambiente, protegida de la luz solar directa e hidratación excesiva, agitándola bien antes de cada aplicación.
-              </p>
-            </div>
-          </div>
-        </section>
+        <SupplyFAQ items={faqItems} nombre="Eternal Ink" />
 
       </div>
 

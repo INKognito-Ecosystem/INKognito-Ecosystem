@@ -3,14 +3,18 @@ import { ArrowLeft, ArrowRight } from 'lucide-react'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
-import AccordionCard from '../../AccordionCard'
+import SupplyFAQ from '../../SupplyFAQ'
 import { getAdjacentBrands } from '../../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../../hooks/useScrolled'
-import { fetchCatalogMarca } from '../../../../hooks/useCatalog'
+import { fetchCatalogMarca, fetchSupplyFaq } from '../../../../hooks/useCatalog'
 
 export async function loader() {
-  return fetchCatalogMarca('supply', 'vice-colors')
+  const [catalogo, faqItems] = await Promise.all([
+    fetchCatalogMarca('supply', 'vice-colors'),
+    fetchSupplyFaq({ marca: 'vice-colors' }),
+  ])
+  return { ...catalogo, faqItems }
 }
 
 export function meta() {
@@ -30,23 +34,8 @@ const DOT_PATTERN = {
   backgroundSize: '18px 18px',
 }
 
-const faq = [
-  {
-    question: '¿Qué caracteriza a las tintas Vice Colors?',
-    answer: 'Su excelente saturación y brillo post-cicatrización, acompañados de nombres super creativos inspirados en la cultura pop y del tatuaje, con una inyección sumamente fluida.'
-  },
-  {
-    question: '¿Cuál es el negro más recomendado de Vice Colors?',
-    answer: 'Black Sabbath y Vicious Black son los negros estrella. Black Sabbath destaca para líneas y sombras estables, mientras que Vicious Black ofrece una profundidad absoluta para rellenos sólidos.'
-  },
-  {
-    question: '¿Las tintas de Vice Colors son seguras para la piel?',
-    answer: 'Por supuesto. Se fabrican siguiendo normativas internacionales muy exigentes de bioseguridad, garantizando pigmentos puros, estériles y estables.'
-  },
-]
-
 export default function ViceColorsPage() {
-  const { products } = useLoaderData()
+  const { products, faqItems } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_vice_colors')
   const { prev, next } = getAdjacentBrands(3)
   const scrolled = useScrolled()
@@ -137,22 +126,7 @@ export default function ViceColorsPage() {
 
         <BrandCatalogSection brandName="Vice Colors" products={products} />
 
-        <section className="mt-10 md:mt-14">
-          <AccordionCard
-            icon="❓"
-            title="Preguntas frecuentes"
-            subtitle="Todo lo que necesitas saber sobre Vice Colors antes de tu pedido. Toca para ver las respuestas."
-          >
-            <div className="flex flex-col gap-5">
-              {faq.map((item, i) => (
-                <div key={i} className={i < faq.length - 1 ? 'pb-5 border-b border-zinc-800' : ''}>
-                  <p className="font-bold text-white text-sm mb-2">{item.question}</p>
-                  <p className="text-zinc-500 text-sm leading-relaxed">{item.answer}</p>
-                </div>
-              ))}
-            </div>
-          </AccordionCard>
-        </section>
+        <SupplyFAQ items={faqItems} nombre="Vice Colors" />
 
       </div>
 

@@ -1,7 +1,7 @@
 import { useLoaderData, Link } from 'react-router'
 import { Package } from 'lucide-react'
 import SupplyCategoryPage from '../../SupplyCategoryPage'
-import { fetchCatalogCategoria } from '../../../../hooks/useCatalog'
+import { fetchCatalogCategoria, fetchSupplyFaq } from '../../../../hooks/useCatalog'
 
 const TITLE = 'Cartuchos'
 const CATEGORIA = 'Cartuchos'
@@ -18,16 +18,12 @@ const guide = [
   { icon: '🔒', title: 'Membrana anti-retorno', text: 'Todos nuestros cartuchos tienen membrana de seguridad que impide retorno de tinta a la máquina. Esencial para higiene y protección del mecanismo.' },
 ]
 
-const faqs = [
-  { q: '¿Los cartuchos vienen esterilizados?', a: 'Sí. Todos vienen sellados y esterilizados por EO (óxido de etileno). Son de uso único — nunca reutilices un cartucho aunque lo laves.' },
-  { q: '¿Cuántos cartuchos necesito para una sesión de 6 horas?', a: 'Depende del trabajo. Para linework calculas 2-4 cartuchos. Para pieza con sombras y color puedes necesitar entre 4 y 8. Conviene tener extra.' },
-  { q: '¿Cómo sé qué número de cartucho necesito?', a: 'El número indica cuántas agujas tiene y cómo están agrupadas. Escríbenos describiendo tu estilo de trabajo (realismo, tradicional, letras) y te recomendamos.' },
-  { q: '¿Venden cartuchos por unidad o por caja?', a: 'Por caja de 10 o 20 unidades según la referencia. Escríbenos si necesitas cantidad específica para cotizar.' },
-  { q: '¿Hacen envíos fuera de Chigorodó?', a: 'Sí, a toda la región de Urabá: Apartadó, Turbo, Carepa, Mutatá, Arboletes. Coordinamos envío por WhatsApp.' },
-]
-
 export async function loader() {
-  return fetchCatalogCategoria('supply', CATEGORIA)
+  const [catalogo, faqs] = await Promise.all([
+    fetchCatalogCategoria('supply', CATEGORIA),
+    fetchSupplyFaq({ categoria: CATEGORIA }),
+  ])
+  return { ...catalogo, faqs }
 }
 
 export function meta() {
@@ -42,7 +38,7 @@ export function meta() {
 }
 
 export default function CartridgesPage() {
-  const { products, afiliados } = useLoaderData()
+  const { products, afiliados, faqs } = useLoaderData()
   return (
     <SupplyCategoryPage
       title={TITLE}

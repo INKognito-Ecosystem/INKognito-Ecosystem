@@ -3,14 +3,18 @@ import { ArrowLeft, ArrowRight } from 'lucide-react'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
-import AccordionCard from '../../AccordionCard'
+import SupplyFAQ from '../../SupplyFAQ'
 import { getAdjacentBrands } from '../../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../../hooks/useScrolled'
-import { fetchCatalogMarca } from '../../../../hooks/useCatalog'
+import { fetchCatalogMarca, fetchSupplyFaq } from '../../../../hooks/useCatalog'
 
 export async function loader() {
-  return fetchCatalogMarca('supply', 'wjx')
+  const [catalogo, faqItems] = await Promise.all([
+    fetchCatalogMarca('supply', 'wjx'),
+    fetchSupplyFaq({ marca: 'wjx' }),
+  ])
+  return { ...catalogo, faqItems }
 }
 
 export function meta() {
@@ -30,26 +34,8 @@ const DOT_PATTERN = {
   backgroundSize: '18px 18px',
 }
 
-const faq = [
-  {
-    question: '¿Los cartuchos WJX sirven para cualquier máquina?',
-    answer:
-      'Sí. Los cartuchos WJX utilizan el sistema universal de cartuchos compatible con la mayoría de máquinas rotativas modernas.'
-  },
-  {
-    question: '¿Qué diferencia hay entre WJX y EZ Tattoo?',
-    answer:
-      'WJX suele destacar por una membrana más firme y una sensación más consistente durante sesiones largas, mientras que EZ ofrece una excelente relación calidad-precio.'
-  },
-  {
-    question: '¿Qué configuración es mejor para realismo?',
-    answer:
-      'Para realismo suelen utilizarse Curved Magnum y Bugpin Magnum por su capacidad de crear degradados suaves.'
-  },
-]
-
 export default function WJXCartridgesPage() {
-  const { products } = useLoaderData()
+  const { products, faqItems } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_wjx')
   const { prev, next } = getAdjacentBrands(2)
   const scrolled = useScrolled()
@@ -160,22 +146,7 @@ export default function WJXCartridgesPage() {
 
         <BrandCatalogSection brandName="WJX Tattoo" products={products} />
 
-        <section className="mt-10 md:mt-14">
-          <AccordionCard
-            icon="❓"
-            title="Preguntas frecuentes"
-            subtitle="Todo lo que necesitas saber sobre WJX antes de tu pedido. Toca para ver las respuestas."
-          >
-            <div className="flex flex-col gap-5">
-              {faq.map((item, i) => (
-                <div key={i} className={i < faq.length - 1 ? 'pb-5 border-b border-zinc-800' : ''}>
-                  <p className="font-bold text-white text-sm mb-2">{item.question}</p>
-                  <p className="text-zinc-500 text-sm leading-relaxed">{item.answer}</p>
-                </div>
-              ))}
-            </div>
-          </AccordionCard>
-        </section>
+        <SupplyFAQ items={faqItems} nombre="WJX" />
 
       </div>
 

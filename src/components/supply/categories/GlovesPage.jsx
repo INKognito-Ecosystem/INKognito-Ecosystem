@@ -1,6 +1,6 @@
 import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../SupplyCategoryPage'
-import { fetchCatalogCategoria } from '../../../hooks/useCatalog'
+import { fetchCatalogCategoria, fetchSupplyFaq } from '../../../hooks/useCatalog'
 
 const TITLE = 'Guantes'
 const CATEGORIA = 'Guantes'
@@ -15,15 +15,12 @@ const guide = [
   { icon: '♻️', title: 'Uso unico', text: 'Nunca reutilices aunque parezca intacto. La barrera microscopica se compromete.' },
 ]
 
-const faqs = [
-  { q: 'Son libres de latex?', a: 'Si, todos de nitrilo. Aptos para personas con alergia.' },
-  { q: 'Venden por caja?', a: 'Por caja de 100 unidades.' },
-  { q: 'Cual talla es la mas pedida?', a: 'Talla M para la mayoria. Mide el ancho de tu palma.' },
-  { q: 'Envios?', a: 'Si, a toda la region de Uraba y Colombia.' },
-]
-
 export async function loader() {
-  return fetchCatalogCategoria('supply', CATEGORIA)
+  const [catalogo, faqs] = await Promise.all([
+    fetchCatalogCategoria('supply', CATEGORIA),
+    fetchSupplyFaq({ categoria: CATEGORIA }),
+  ])
+  return { ...catalogo, faqs }
 }
 
 export function meta() {
@@ -38,7 +35,7 @@ export function meta() {
 }
 
 export default function GlovesPage() {
-  const { products, afiliados } = useLoaderData()
+  const { products, afiliados, faqs } = useLoaderData()
   return (
     <SupplyCategoryPage
       title={TITLE}

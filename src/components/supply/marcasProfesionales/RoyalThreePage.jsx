@@ -3,11 +3,11 @@ import { ArrowLeft, ArrowRight, Award } from 'lucide-react'
 import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
 import BrandCatalogSection from '../BrandCatalogSection'
-import AccordionCard from '../AccordionCard'
+import SupplyFAQ from '../SupplyFAQ'
 import { getAdjacentBrands } from '../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../hooks/useScrolled'
-import { fetchCatalogMarca } from '../../../hooks/useCatalog'
+import { fetchCatalogMarca, fetchSupplyFaq } from '../../../hooks/useCatalog'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 // fase 6.1 (2026-08-07) — id real en `estudios` vinculado a esta marca,
@@ -16,9 +16,10 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-pro
 const ESTUDIO_ID = 7
 
 export async function loader({ request }) {
-  const [catalogo, estudioRes] = await Promise.all([
+  const [catalogo, estudioRes, faqItems] = await Promise.all([
     fetchCatalogMarca('supply', 'royal-three'),
     fetch(`${PANEL_URL}/api/estudios/${ESTUDIO_ID}`).catch(() => null),
+    fetchSupplyFaq({ marca: 'royal-three' }),
   ])
   const estudio = estudioRes && estudioRes.ok ? await estudioRes.json() : null
   // ?flechas=0 (fase 6.1, bug real de Jose) — quien llega acá desde el
@@ -26,7 +27,7 @@ export async function loader({ request }) {
   // marca sin relación; navegando normal desde el menú de Supply, el
   // parámetro no viene y las flechas se ven como siempre.
   const mostrarFlechas = new URL(request.url).searchParams.get('flechas') !== '0'
-  return { ...catalogo, distribuidorOficial: estudio?.distribuidor_oficial || false, mostrarFlechas }
+  return { ...catalogo, distribuidorOficial: estudio?.distribuidor_oficial || false, mostrarFlechas, faqItems }
 }
 
 export function meta() {
@@ -46,21 +47,6 @@ const DOT_PATTERN = {
   backgroundSize: '18px 18px',
 }
 
-const faq = [
-  {
-    question: '¿Qué hace diferentes a los productos Royal Three?',
-    answer: 'Combinan formulaciones de uso clínico con la practicidad que necesita un estudio de tatuaje en el día a día.'
-  },
-  {
-    question: '¿Son solo para estudios profesionales?',
-    answer: 'Están pensados principalmente para el uso diario en estudio, aunque algunos productos de cuidado también sirven para el cliente en casa.'
-  },
-  {
-    question: '¿Cumplen normas de bioseguridad?',
-    answer: 'Sí, las líneas de jabones y cremas están formuladas bajo estándares de bioseguridad pensados para el entorno de un estudio de tatuaje.'
-  },
-]
-
 function InsigniaDistribuidorOficial() {
   return (
     <span className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-black text-[9px] font-black uppercase tracking-widest bg-amber-400">
@@ -70,7 +56,7 @@ function InsigniaDistribuidorOficial() {
 }
 
 export default function RoyalThreePage() {
-  const { products, distribuidorOficial, mostrarFlechas } = useLoaderData()
+  const { products, distribuidorOficial, mostrarFlechas, faqItems } = useLoaderData()
   const logoUrl = useSupplyVisual('supply_brand_royal_three')
   const { prev, next } = getAdjacentBrands(6)
   const scrolled = useScrolled()
@@ -160,22 +146,7 @@ export default function RoyalThreePage() {
 
         <BrandCatalogSection brandName="Royal Three" products={products} />
 
-        <section className="mt-10 md:mt-14">
-          <AccordionCard
-            icon="❓"
-            title="Preguntas frecuentes"
-            subtitle="Todo lo que necesitas saber sobre Royal Three antes de tu pedido. Toca para ver las respuestas."
-          >
-            <div className="flex flex-col gap-5">
-              {faq.map((item, i) => (
-                <div key={i} className={i < faq.length - 1 ? 'pb-5 border-b border-zinc-800' : ''}>
-                  <p className="font-bold text-white text-sm mb-2">{item.question}</p>
-                  <p className="text-zinc-500 text-sm leading-relaxed">{item.answer}</p>
-                </div>
-              ))}
-            </div>
-          </AccordionCard>
-        </section>
+        <SupplyFAQ items={faqItems} nombre="Royal Three" />
 
       </div>
 

@@ -2,10 +2,15 @@ import { useLoaderData } from 'react-router-dom'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
-import { fetchCatalogMarca } from '../../../../hooks/useCatalog'
+import SupplyFAQ from '../../SupplyFAQ'
+import { fetchCatalogMarca, fetchSupplyFaq } from '../../../../hooks/useCatalog'
 
 export async function loader() {
-  return fetchCatalogMarca('supply', 'world-famous')
+  const [catalogo, faqItems] = await Promise.all([
+    fetchCatalogMarca('supply', 'world-famous'),
+    fetchSupplyFaq({ marca: 'world-famous' }),
+  ])
+  return { ...catalogo, faqItems }
 }
 
 export function meta() {
@@ -24,7 +29,7 @@ export function meta() {
 // inventados ("$XX.XXX") con un botón que sí agregaba al carrito real. Ahora
 // usa BrandCatalogSection con productos reales filtrados por `marca='world-famous'`.
 export default function WorldFamousColorsPage() {
-  const { products } = useLoaderData()
+  const { products, faqItems } = useLoaderData()
   return (
     <div className="min-h-screen bg-black text-white">
       <NavbarCategory pageName="World Famous" />
@@ -55,58 +60,7 @@ export default function WorldFamousColorsPage() {
 
         <BrandCatalogSection brandName="World Famous" products={products} />
 
-        <section className="mt-24 md:mt-32">
-          <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">
-            Preguntas frecuentes
-          </h2>
-
-          <div className="space-y-6">
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Por qué se consideran revolucionarias las tintas World Famous?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Su fama radica en una de las mayores densidades de pigmento del mercado y un flujo ultra rápido que reduce la resistencia al tatuar, logrando curados extremadamente duraderos y nítidos.
-              </p>
-            </div>
-
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Qué es la gama Limitless de World Famous?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Limitless es la línea premium rediseñada de World Famous para cumplir al 100% con los estrictos parámetros del reglamento europeo REACH sobre pigmentos seguros.
-              </p>
-            </div>
-
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Las tintas de World Famous son veganas?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Sí, todos sus productos son completamente libres de crueldad animal, no contienen derivados de origen animal y se clasifican como vegan-friendly.
-              </p>
-            </div>
-
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Dónde se fabrican las tintas World Famous?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Cada envase original se produce en instalaciones avanzadas ubicadas en los Estados Unidos, sujetas a estrictas pautas de grado médico.
-              </p>
-            </div>
-
-            <div className="border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-bold text-lg mb-3">
-                ¿Son seguras las tintas World Famous Ink?
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Absolutamente. Su esterilización mediante radiación gamma de alta penetración y su envasado hermético garantizan la máxima seguridad higiénica para el artista y el cliente.
-              </p>
-            </div>
-          </div>
-        </section>
+        <SupplyFAQ items={faqItems} nombre="World Famous" />
 
       </div>
 

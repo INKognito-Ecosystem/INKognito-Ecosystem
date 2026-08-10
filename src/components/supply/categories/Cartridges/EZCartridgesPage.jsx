@@ -2,10 +2,15 @@ import { useLoaderData } from 'react-router-dom'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
-import { fetchCatalogMarca } from '../../../../hooks/useCatalog'
+import SupplyFAQ from '../../SupplyFAQ'
+import { fetchCatalogMarca, fetchSupplyFaq } from '../../../../hooks/useCatalog'
 
 export async function loader() {
-  return fetchCatalogMarca('supply', 'ez-tattoo')
+  const [catalogo, faqItems] = await Promise.all([
+    fetchCatalogMarca('supply', 'ez-tattoo'),
+    fetchSupplyFaq({ marca: 'ez-tattoo' }),
+  ])
+  return { ...catalogo, faqItems }
 }
 
 export function meta() {
@@ -20,36 +25,13 @@ export function meta() {
   ]
 }
 
-const faqs = [
-  {
-    question: '¿Para qué sirven las agujas Round Liner?',
-    answer:
-      'Las Round Liner están diseñadas para líneas, lettering, detalles finos y contornos precisos.'
-  },
-  {
-    question: '¿Qué diferencia hay entre Magnum y Curved Magnum?',
-    answer:
-      'Las Curved Magnum tienen una configuración arqueada que distribuye mejor la presión y ayuda a realizar sombras más suaves.'
-  },
-  {
-    question: '¿Las agujas EZ sirven para realismo?',
-    answer:
-      'Sí. Son ampliamente utilizadas para black and grey, microrealismo y trabajos de detalle.'
-  },
-  {
-    question: '¿Qué configuración se recomienda para sombras?',
-    answer:
-      'Las Magnum y Curved Magnum suelen ser las más utilizadas para rellenos y sombreado.'
-  }
-]
-
 // Reescrito 2026-07-30 — antes mostraba una grilla de productos y precios
 // inventados ("$XX.XXX") con un botón que sí agregaba al carrito real, sin
 // stock ni precio de verdad detrás. Ahora usa el mismo BrandCatalogSection
 // que el resto de páginas de marca, con productos reales filtrados por
 // `marca='ez-tattoo'` desde el inventario del panel.
 export default function EZCartridgesPage() {
-  const { products } = useLoaderData()
+  const { products, faqItems } = useLoaderData()
   return (
     <div className="min-h-screen bg-black text-white">
       <NavbarCategory pageName="EZ Tattoo" />
@@ -79,36 +61,7 @@ export default function EZCartridgesPage() {
 
         <BrandCatalogSection brandName="EZ Tattoo" products={products} />
 
-        <section className="mt-20 border-t border-zinc-800 pt-12">
-
-          <h2 className="text-3xl md:text-5xl font-black uppercase mb-10">
-            Preguntas Frecuentes
-          </h2>
-
-          <div className="space-y-6">
-
-            {faqs.map((faq) => (
-
-              <div
-                key={faq.question}
-                className="border border-zinc-800 rounded-xl p-5 md:p-6"
-              >
-
-                <h3 className="font-bold text-lg mb-3">
-                  {faq.question}
-                </h3>
-
-                <p className="text-zinc-400 leading-relaxed">
-                  {faq.answer}
-                </p>
-
-              </div>
-
-            ))}
-
-          </div>
-
-        </section>
+        <SupplyFAQ items={faqItems} nombre="EZ Tattoo" />
 
       </div>
 
