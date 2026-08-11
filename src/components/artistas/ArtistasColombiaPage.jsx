@@ -765,6 +765,13 @@ export default function ArtistasColombiaPage() {
   // no solo una.
   const matches = (...campos) => {
     if (q === '') return true
+    // Con 1 sola letra, la coincidencia exacta por substring matchea casi
+    // cualquier cosa (2026-08-11, Jose: "cualquier letra... activa todas
+    // las marcas de prueba" — "Heaven Pro" contiene casi cualquier letra
+    // suelta). Se pide al menos 2 caracteres antes de intentar coincidir,
+    // igual que la mayoría de buscadores — mientras se escribe la primera
+    // letra simplemente no hay resultados todavía, no resultados falsos.
+    if (q.length < 2) return false
     if (campos.some(c => c && normalize(c).includes(q))) return true
     return campos.some(c => {
       if (!c) return false
@@ -870,7 +877,10 @@ export default function ArtistasColombiaPage() {
   // solo — sin esto, un tatuador de otra ciudad simplemente "no existiría"
   // para quien escribe su nombre.
   useEffect(() => {
-    if (q !== '' && alcance !== 'nacional' && !cargandoNacional && total === 0 && totalEstudios === 0) {
+    // q.length >= 2 (2026-08-11): con 1 sola letra `matches()` ya no
+    // devuelve nada (ver más abajo), así que sin esto cada primera tecla
+    // dispararía una carga nacional innecesaria.
+    if (q.length >= 2 && alcance !== 'nacional' && !cargandoNacional && total === 0 && totalEstudios === 0) {
       cargarNacional()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -888,13 +898,15 @@ export default function ArtistasColombiaPage() {
         setMisCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
         const cercano = municipioMasCercanoNacional(pos.coords.latitude, pos.coords.longitude)
         if (cercano) setQuery(cercano.municipio)
-        // "Cerca de ti" es la señal explícita que justifica traer el país
+        // "Cerca de ti" es la señal explícita que justifica TRAER el país
         // completo (Jose: "o uso cerca de ti, cuál es el beneficio allí")
         // — el GPS real puede caer en otro departamento al detectado por IP.
-        // verTodoActivo también en true acá (no solo en verTodo()) por si
-        // `cercano` no resuelve — mejor mostrar el país ordenado por
-        // distancia que quedarse pegado solo en la región de IP.
-        setVerTodoActivo(true)
+        // Pero NO activa verTodoActivo (2026-08-11, bug real: si después el
+        // buscador vuelve a quedar vacío — se borra el texto, etc. — sin
+        // esto se quedaba pegado mostrando el país completo en vez de
+        // volver a la región). "Cerca de ti" solo debe FILTRAR por el
+        // municipio resuelto (vía setQuery arriba); "mostrar todo el país
+        // sin filtro" es exclusivo del botón "Ver todo".
         cargarNacional()
         setUbicando(false)
       },
