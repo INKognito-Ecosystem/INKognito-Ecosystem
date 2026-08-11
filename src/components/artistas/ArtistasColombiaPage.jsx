@@ -142,6 +142,30 @@ function ordenarPorCercania(lista, desde, coordsFn = coordsDeArtista) {
   })
 }
 
+// "Cerca de ti" — radio real, no "todo el país ordenado" (2026-08-11,
+// Jose: "el botón cerca de mí debería tener un rango limitado" — con
+// razón: mostrar a alguien a 800km bajo un botón que dice "cerca de ti"
+// no tiene sentido). Filtra a los que están dentro de RADIO_CERCA_KM; si
+// NADIE cae dentro de ese radio, cae de respaldo a los 10 más cercanos
+// del país (para no dejar la pantalla vacía si sí existe alguien, aunque
+// esté lejos — Jose: "si hay un artista lo muestres" — pero acotado a 10,
+// no a todo lo que haya cargado).
+const RADIO_CERCA_KM = 50
+
+function filtrarCercaDeTi(lista, desde, coordsFn = coordsDeArtista) {
+  if (!desde) return ordenarPorCercania(lista, desde, coordsFn)
+  const conDistancia = lista
+    .map(item => {
+      const c = coordsFn(item)
+      return { item, km: c ? distanciaKm(desde.lat, desde.lng, c.lat, c.lng) : null }
+    })
+    .filter(x => x.km !== null)
+    .sort((a, b) => a.km - b.km)
+  const dentroDelRadio = conDistancia.filter(x => x.km <= RADIO_CERCA_KM)
+  const resultado = dentroDelRadio.length > 0 ? dentroDelRadio : conDistancia.slice(0, 10)
+  return resultado.map(x => x.item)
+}
+
 const DIAS_ARTISTA_NUEVO = 14
 
 function esArtistaNuevo(createdAt) {
@@ -743,15 +767,16 @@ export default function ArtistasColombiaPage() {
   // decir "bio corta, 1-2 líneas sobre ti" — ahora si un artista escribe
   // "puntillismo" o "acuarela" en su bio, alguien que busque esa palabra
   // sí lo va a encontrar, no solo por nombre/municipio/estilo.
-  // cercaDeTiActivo (2026-08-11) muestra TODO lo cargado sin filtrar por
-  // texto — es la única forma de garantizar que, si existe un artista
-  // real, aparezca por distancia real aunque su municipio no coincida
-  // textualmente con el tuyo.
+  // cercaDeTiActivo (2026-08-11, v2) — ya NO muestra todo lo cargado sin
+  // filtrar: usa `filtrarCercaDeTi` (radio real de RADIO_CERCA_KM, con
+  // respaldo a los 10 más cercanos si nadie cae dentro del radio) — ver
+  // su comentario más arriba en el archivo.
   // a.departamento entra a la búsqueda (2026-08-11, bug real: escribir
   // "Antioquia" no encontraba a un artista de Chigorodó — solo se
   // comparaba nombre/municipio/estilo/bio, nunca el departamento).
-  let filtrados = cercaDeTiActivo ? artistasData : (q.length >= 2 ? artistasData.filter(a => matches(a.nombre, a.municipio, a.departamento, a.estilo, a.bio)) : [])
-  filtrados = ordenarPorCercania(filtrados, misCoords)
+  let filtrados = cercaDeTiActivo
+    ? filtrarCercaDeTi(artistasData, misCoords, coordsDeArtista)
+    : (q.length >= 2 ? ordenarPorCercania(artistasData.filter(a => matches(a.nombre, a.municipio, a.departamento, a.estilo, a.bio)), misCoords) : [])
   const total = filtrados.length
 
   // Estudios (fase 3, 2026-08-06) — mismo criterio de query que los
@@ -765,8 +790,9 @@ export default function ArtistasColombiaPage() {
   const estudiosReales = estudiosData.filter(e => e.tipo !== 'empresa')
   const proveedoresOficiales = estudiosData.filter(e => e.tipo === 'empresa')
 
-  let estudiosFiltrados = cercaDeTiActivo ? estudiosReales : (q.length >= 2 ? estudiosReales.filter(e => matches(e.nombre, e.municipio, e.departamento, e.bio)) : [])
-  estudiosFiltrados = ordenarPorCercania(estudiosFiltrados, misCoords, coordsDeEstudio)
+  let estudiosFiltrados = cercaDeTiActivo
+    ? filtrarCercaDeTi(estudiosReales, misCoords, coordsDeEstudio)
+    : (q.length >= 2 ? ordenarPorCercania(estudiosReales.filter(e => matches(e.nombre, e.municipio, e.departamento, e.bio)), misCoords, coordsDeEstudio) : [])
   const totalEstudios = estudiosFiltrados.length
 
   // Proveedores oficiales (fase 6, 2026-08-07) — el producto real que se
