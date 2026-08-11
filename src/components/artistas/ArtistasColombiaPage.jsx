@@ -953,9 +953,8 @@ export default function ArtistasColombiaPage() {
                   {tooltipInkVisible && (
                     <div className="absolute z-30 top-full mt-3 left-0 w-72 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left normal-case font-normal">
                       <span className="absolute -top-1.5 left-4 w-3 h-3 bg-gray-900 rotate-45" />
-                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5">Acerca de INK</p>
                       <p className="text-xs leading-relaxed text-gray-200">
-                        INK es un buscador inteligente, pensado para resolver algo simple pero importante: encontrarte con el tatuador correcto. Te muestra el trabajo real de cada artista, qué tan cerca está de ti, y te conecta directo con él — sin vueltas.
+                        Es un buscador inteligente, pensado para resolver algo simple pero importante: encontrarte con el tatuador correcto. Te muestra el trabajo real de cada artista, qué tan cerca está de ti, y te conecta directo con él — sin vueltas.
                       </p>
                       <button
                         onClick={cerrarTooltipInk}
