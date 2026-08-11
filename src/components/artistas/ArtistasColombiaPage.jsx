@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
-import { Search, MapPin, Palette, BadgeCheck, ChevronRight, Navigation, LoaderCircle, Share2, Sparkles, Check } from 'lucide-react'
+import { Search, MapPin, Palette, BadgeCheck, ChevronRight, Navigation, LoaderCircle, Share2, Sparkles, Check, Building2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { normalize, municipioMasCercanoNacional, municipioDesdeNombreIP, getCoordsMunicipio, distanciaKm } from '../../data/colombiaGeo'
 import { artistaUrl } from './artistaSlug'
@@ -138,7 +138,13 @@ const BIO_BOTON_MIN = 45
 // imagen tape a otra. También se agregan estilo/bio (antes solo mostraba
 // municipio+departamento), reusando el mismo botón-que-abre-modal que ya
 // existe en ListingRow en vez de duplicar esa lógica.
-function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo }) {
+// full (2026-08-09, Jose: quiere que los resultados de la pestaña
+// Artistas se vean con portada como en Todos, no la fila compacta de
+// ListingRow — "más estilo redes sociales", scroll vertical, una card
+// completa debajo de otra) — mismo componente que ya usaba el carrusel
+// "Artistas más cercanos", solo cambia el contenedor: ancho fijo +
+// snap-scroll (carrusel horizontal) vs. ancho completo (feed vertical).
+function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo, full = false }) {
   const fotos = [a.foto_trabajo_1, a.foto_trabajo_2].filter(Boolean)
   const nuevo = esArtistaNuevo(a.created_at)
   const abrirInfo = (e) => { e.preventDefault(); e.stopPropagation(); onVerInfo() }
@@ -146,9 +152,9 @@ function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo }) {
   return (
     <Link
       to={artistaUrl(a)}
-      className="flex-shrink-0 w-56 snap-start rounded-xl border border-gray-200 hover:border-gray-300 bg-white overflow-hidden transition-colors"
+      className={`${full ? 'w-full' : 'flex-shrink-0 w-56 snap-start'} rounded-xl border border-gray-200 hover:border-gray-300 bg-white overflow-hidden transition-colors`}
     >
-      <div className="relative h-28 bg-gray-100 flex gap-0.5">
+      <div className={`relative bg-gray-100 flex gap-0.5 ${full ? 'h-48 sm:h-56' : 'h-28'}`}>
         {fotos.length > 0 ? fotos.map((f, i) => (
           <img key={i} src={f} alt="" className="flex-1 h-full object-cover" loading="lazy" />
         )) : (
@@ -205,7 +211,10 @@ function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo }) {
 // "especialidades" (los estudios no tienen estilo propio, cada artista
 // adentro tiene el suyo) y con foto_portada/logo_url en vez de
 // foto_trabajo_1/2 + foto_url.
-function EstudioCercanoCard({ e, distanciaTexto, onVerInfo }) {
+// full — mismo criterio que ArtistaCercanoCard (2026-08-09): resultados de
+// la pestaña Estudios con portada completa, feed vertical, en vez de la
+// fila compacta de ListingRow.
+function EstudioCercanoCard({ e, distanciaTexto, onVerInfo, full = false }) {
   // Descripción con el mismo umbral "ver más" que ya usa ArtistaCercanoCard
   // (2026-08-07, bug real: esta card nunca mostró bio, ni truncada ni
   // completa — Jose lo notó comparando contra la de artistas).
@@ -213,9 +222,9 @@ function EstudioCercanoCard({ e, distanciaTexto, onVerInfo }) {
   return (
     <Link
       to={`/tattoo-artist-colombia/estudio/${e.id}`}
-      className="flex-shrink-0 w-56 snap-start rounded-xl border border-gray-200 hover:border-gray-300 bg-white overflow-hidden transition-colors"
+      className={`${full ? 'w-full' : 'flex-shrink-0 w-56 snap-start'} rounded-xl border border-gray-200 hover:border-gray-300 bg-white overflow-hidden transition-colors`}
     >
-      <div className="relative h-28 bg-gray-100">
+      <div className={`relative bg-gray-100 ${full ? 'h-48 sm:h-56' : 'h-28'}`}>
         {e.foto_portada ? (
           <img src={e.foto_portada} alt="" className="w-full h-full object-cover" loading="lazy" />
         ) : (
@@ -258,6 +267,11 @@ function EstudioCercanoCard({ e, distanciaTexto, onVerInfo }) {
 // y más chica (sin "ver todo": los estudios no tienen su propio listado
 // completo aparte, viven dentro de la misma búsqueda). No se muestra si
 // no hay ningún estudio activo todavía.
+// v2 (2026-08-09, Jose: "las cards de Todos se quedan pequeñas aun en
+// pc... que hagan lo mismo que acabamos de organizar") — deja de ser un
+// carrusel horizontal de cards chicas (w-56) y pasa a la misma grilla de
+// cards con portada completa que ya usan las pestañas Artistas/Estudios:
+// 1 columna en celular, 2 en pantallas grandes.
 function SeccionEstudiosCercanos({ estudios, misCoords, onVerInfo }) {
   if (estudios.length === 0) return null
   const ordenados = ordenarPorCercania(estudios, misCoords, coordsDeEstudio).slice(0, 10)
@@ -266,11 +280,11 @@ function SeccionEstudiosCercanos({ estudios, misCoords, onVerInfo }) {
       <h2 className="font-black uppercase text-sm text-gray-900 mb-3 px-1">
         {misCoords ? 'Estudios más cercanos' : 'Estudios en el directorio'}
       </h2>
-      <div className="flex gap-3 overflow-x-auto pb-2 px-1 snap-x snap-mandatory scrollbar-hide">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {ordenados.map((e) => {
           const c = coordsDeEstudio(e)
           const distanciaTexto = misCoords && c ? distanciaKm(misCoords.lat, misCoords.lng, c.lat, c.lng).toFixed(1) : null
-          return <EstudioCercanoCard key={e.id} e={e} distanciaTexto={distanciaTexto} onVerInfo={() => onVerInfo(e)} />
+          return <EstudioCercanoCard key={e.id} e={e} distanciaTexto={distanciaTexto} onVerInfo={() => onVerInfo(e)} full />
         })}
       </div>
     </div>
@@ -299,11 +313,11 @@ function SeccionCercanos({ artistas, misCoords, onVerTodo, onVerInfo }) {
           Ver todo
         </button>
       </div>
-      <div className="flex gap-3 overflow-x-auto pb-2 px-1 snap-x snap-mandatory scrollbar-hide">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {ordenados.map((a) => {
           const c = coordsDeArtista(a)
           const distanciaTexto = misCoords && c ? distanciaKm(misCoords.lat, misCoords.lng, c.lat, c.lng).toFixed(1) : null
-          return <ArtistaCercanoCard key={a.id} a={a} distanciaTexto={distanciaTexto} onVerInfo={() => onVerInfo(a)} />
+          return <ArtistaCercanoCard key={a.id} a={a} distanciaTexto={distanciaTexto} onVerInfo={() => onVerInfo(a)} full />
         })}
       </div>
     </div>
@@ -443,7 +457,11 @@ function TarjetaReclutamiento({ query, total, compartir }) {
         </li>
         <li className="flex items-center gap-2 text-xs text-gray-600">
           <Check size={13} className="flex-shrink-0 text-gray-500" />
-          Sin costo por ahora — sin tarjeta, sin compromiso
+          Vende tus diseños y láminas directo desde tu perfil
+        </li>
+        <li className="flex items-center gap-2 text-xs text-gray-600">
+          <Check size={13} className="flex-shrink-0 text-gray-500" />
+          Agenda citas y cobra el abono en línea, sin negociar por WhatsApp
         </li>
       </ul>
 
@@ -454,6 +472,78 @@ function TarjetaReclutamiento({ query, total, compartir }) {
           style={{ backgroundColor: ACCENT }}
         >
           Unirme como artista
+        </Link>
+        <button
+          onClick={compartir}
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-gray-300 text-gray-600 text-xs font-bold uppercase tracking-widest hover:border-gray-500 transition-colors"
+        >
+          <Share2 size={13} />
+          Compartir
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// Tarjeta de reclutamiento para ESTUDIOS (2026-08-09, Jose: "cuando estoy
+// sobre la pestaña artistas, abajo me muestra una card que invita al
+// artista a unirse gratis, pero cuando me paro en estudios no hay una que
+// corresponda" — mismo patrón que TarjetaReclutamiento de arriba, pero con
+// los beneficios reales que le importan a un ESTUDIO, no a un artista
+// individual: roster de su equipo, tienda propia en Supply con Mercado
+// Pago (cobra directo, cero retención), autoservicio de catálogo. Pedido
+// explícito de Jose: "sumamente profesional... super informativa" — por
+// eso 5 puntos en vez de los 3 de la de artistas, no un calco reducido.
+function TarjetaReclutamientoEstudio({ query, total, compartir }) {
+  const encabezado = !query
+    ? '¿Tienes un estudio de tatuajes? Únete gratis'
+    : total === 0
+      ? `Todavía no hay estudios para "${query}"`
+      : `Ya hay ${total} estudio${total !== 1 ? 's' : ''} en "${query}"`
+  const subtitulo = !query
+    ? 'Crea el perfil de tu estudio, suma a tu equipo de artistas y abre tu propia tienda en INKognito Supply.'
+    : total === 0
+      ? 'Sé el primer estudio en aparecer aquí.'
+      : 'Súmate y aparece junto a ellos.'
+
+  return (
+    <div className="mt-6 rounded-xl border-2 border-gray-200 bg-gray-50 p-5 md:p-6">
+      <div className="flex items-center gap-4">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-600">
+          <Building2 size={18} className="text-white" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-black uppercase text-sm text-gray-900 leading-tight">{encabezado}</p>
+          <p className="text-gray-500 text-xs mt-0.5">{subtitulo}</p>
+        </div>
+      </div>
+
+      <ul className="mt-3 space-y-1.5">
+        <li className="flex items-center gap-2 text-xs text-gray-600">
+          <Check size={13} className="flex-shrink-0 text-gray-500" />
+          Perfil profesional del estudio, visible en las búsquedas de tu municipio
+        </li>
+        <li className="flex items-center gap-2 text-xs text-gray-600">
+          <Check size={13} className="flex-shrink-0 text-gray-500" />
+          Suma a los artistas de tu equipo bajo el mismo perfil
+        </li>
+        <li className="flex items-center gap-2 text-xs text-gray-600">
+          <Check size={13} className="flex-shrink-0 text-gray-500" />
+          Tienda propia en INKognito Supply — cobras directo por Mercado Pago, sin que te retengamos tu dinero
+        </li>
+        <li className="flex items-center gap-2 text-xs text-gray-600">
+          <Check size={13} className="flex-shrink-0 text-gray-500" />
+          Subes tu propio catálogo cuando quieras, sin depender de nadie más
+        </li>
+      </ul>
+
+      <div className="mt-4 flex flex-col sm:flex-row gap-2">
+        <Link
+          to="/tattoo-artist-colombia/estudio/unete"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-white text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
+          style={{ backgroundColor: ACCENT }}
+        >
+          Registrar mi estudio
         </Link>
         <button
           onClick={compartir}
@@ -715,7 +805,7 @@ export default function ArtistasColombiaPage() {
                   menú separa "Buscar artistas"/"Buscar estudios", el copy
                   del hero menciona ambos y las dos escalas (ciudad y
                   nacional), en vez de hablar solo de tatuadores. */}
-              <span className="inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">INK</span> El buscador que conecta personas con tatuadores y estudios de tu ciudad, o de toda Colombia. Busca por nombre, municipio, estilo — y déjanos recomendarte el más cercano.
+              <span className="inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">INK</span> El buscador que conecta personas con tatuadores y estudios de tu ciudad. Busca por nombre, municipio, estilo — y déjanos recomendarte el más cercano.
             </p>
 
             {/* Señales de confianza, mismo patrón que ya vimos en Tattoodo
@@ -883,43 +973,67 @@ export default function ArtistasColombiaPage() {
 
         {/* ESTUDIOS — bloque propio arriba de los artistas (2026-08-06,
             resultado de que el estudio recién creado no aparecía en
-            ninguna búsqueda). Reusa ListingRow, sin "especialidades" (los
-            estudios no tienen estilo propio). Oculto bajo el filtro
-            "Artistas" (fase 6.3). */}
+            ninguna búsqueda). Oculto bajo el filtro "Artistas" (fase 6.3).
+            v2 (2026-08-09, Jose: "quiero que se vean con portada, como en
+            Todos, estilo redes sociales") — con la pestaña "Estudios"
+            activa, cada resultado es una EstudioCercanoCard de ancho
+            completo (feed vertical) en vez de la fila compacta ListingRow;
+            en "Todos" (donde la portada ya la muestra el carrusel de
+            arriba) sigue igual que siempre. */}
         {categoria !== 'artistas' && estudiosFiltrados.length > 0 && (
           <div className="mb-5">
             <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 px-1">Estudios</p>
-            <div className="flex flex-col gap-3">
+            {/* grid de 2 columnas desde sm: (2026-08-09, Jose) — solo
+                cuando se pintan las cards con portada (full); en "Todos"
+                sigue siendo lista vertical de ListingRow como siempre. En
+                celular queda 1 sola columna a propósito, para que la foto
+                grande "estilo redes sociales" no se achique. */}
+            <div className={categoria === 'estudios' ? 'grid grid-cols-1 sm:grid-cols-2 gap-3' : 'flex flex-col gap-3'}>
               {estudiosFiltrados.map(e => (
-                <ListingRow
-                  key={`estudio-${e.id}`}
-                  to={`/tattoo-artist-colombia/estudio/${e.id}`}
-                  nombre={e.nombre}
-                  municipio={e.municipio}
-                  estilo={null}
-                  bio={e.bio}
-                  foto={e.logo_url}
-                  onVerInfo={() => setModalArtista(e)}
-                />
+                categoria === 'estudios' ? (
+                  <EstudioCercanoCard key={`estudio-${e.id}`} e={e} full onVerInfo={() => setModalArtista(e)} />
+                ) : (
+                  <ListingRow
+                    key={`estudio-${e.id}`}
+                    to={`/tattoo-artist-colombia/estudio/${e.id}`}
+                    nombre={e.nombre}
+                    municipio={e.municipio}
+                    estilo={null}
+                    bio={e.bio}
+                    foto={e.logo_url}
+                    onVerInfo={() => setModalArtista(e)}
+                  />
+                )
               ))}
             </div>
           </div>
         )}
 
-        {/* LISTADO — oculto bajo el filtro "Estudios" (fase 6.3). */}
+        {/* LISTADO — oculto bajo el filtro "Estudios" (fase 6.3). v2
+            (2026-08-09): mismo criterio que el bloque de Estudios de
+            arriba — con "Artistas" activa, ArtistaCercanoCard de ancho
+            completo; en "Todos", ListingRow como siempre. */}
         {categoria !== 'estudios' && (
-          <div className={`flex flex-col gap-3 ${query ? '' : 'mt-1'}`}>
+          <div className={
+            categoria === 'artistas'
+              ? `grid grid-cols-1 sm:grid-cols-2 gap-3 ${query ? '' : 'mt-1'}`
+              : `flex flex-col gap-3 ${query ? '' : 'mt-1'}`
+          }>
             {filtrados.map(a => (
-              <ListingRow
-                key={a.id}
-                to={artistaUrl(a)}
-                nombre={a.nombre}
-                municipio={a.municipio}
-                estilo={a.estilo}
-                bio={a.bio}
-                foto={a.foto_url}
-                onVerInfo={() => setModalArtista(a)}
-              />
+              categoria === 'artistas' ? (
+                <ArtistaCercanoCard key={a.id} a={a} full onVerInfo={() => setModalArtista(a)} />
+              ) : (
+                <ListingRow
+                  key={a.id}
+                  to={artistaUrl(a)}
+                  nombre={a.nombre}
+                  municipio={a.municipio}
+                  estilo={a.estilo}
+                  bio={a.bio}
+                  foto={a.foto_url}
+                  onVerInfo={() => setModalArtista(a)}
+                />
+              )
             ))}
           </div>
         )}
@@ -939,6 +1053,14 @@ export default function ArtistasColombiaPage() {
             estudios. */}
         {categoria !== 'estudios' && (
           <TarjetaReclutamiento query={query} total={total} compartir={compartir} />
+        )}
+
+        {/* RECLUTAMIENTO DE ESTUDIOS (2026-08-09) — solo en la pestaña
+            "Estudios", exclusiva con la de artistas de arriba (nunca se
+            muestran las dos a la vez, cada una tiene su propio botón
+            rojo — "una sola acción principal por pantalla"). */}
+        {categoria === 'estudios' && (
+          <TarjetaReclutamientoEstudio query={query} total={totalEstudios} compartir={compartir} />
         )}
       </section>
 
