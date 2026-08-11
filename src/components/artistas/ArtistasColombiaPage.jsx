@@ -881,7 +881,12 @@ export default function ArtistasColombiaPage() {
           redondeadas arriba, arrancando justo donde termina el navbar
           (pt-16/pt-20 calza exacto con la altura h-16/h-20 del navbar, ya
           blanco — ver NavbarArtistas.jsx). */}
-      <section className="relative overflow-hidden pt-16 md:pt-20 pb-8 md:pb-10 px-4 md:px-6 bg-gray-300 border-b border-gray-300">
+      {/* overflow-hidden quitado (2026-08-11) — recortaba el tooltip de
+          "Cerca de ti" (position: absolute, se extiende debajo del botón,
+          cerca del borde inferior de este hero) contra la card de abajo.
+          El fondo de puntos (DOT_PATTERN) ya calza exacto vía inset-0, no
+          dependía de este overflow para no desbordarse. */}
+      <section className="relative pt-16 md:pt-20 pb-8 md:pb-10 px-4 md:px-6 bg-gray-300 border-b border-gray-300">
         {/* pointer-events-none (2026-08-05): este fondo decorativo estaba
             tapando los clics del botón "Ver todo" de SeccionCercanos, que
             vive fuera del div `relative z-10` de más abajo — sin esto,
@@ -968,7 +973,7 @@ export default function ArtistasColombiaPage() {
                   truco que un cuadrado rotado 45° oculto detrás del
                   cuerpo del tooltip. */}
               {tooltipUbicacionVisible && (
-                <div className="absolute z-20 top-full mt-3 left-1/2 -translate-x-1/2 w-64 bg-gray-900 text-white rounded-xl p-4 shadow-xl text-left">
+                <div className="absolute z-30 top-full mt-3 left-1/2 -translate-x-1/2 w-64 bg-gray-900 text-white rounded-xl p-4 shadow-xl text-left">
                   <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-900 rotate-45" />
                   <p className="text-xs leading-relaxed text-gray-200">
                     Con tu permiso de ubicación te mostramos artistas y estudios reales cerca de ti, ordenados por distancia — no una lista genérica.
