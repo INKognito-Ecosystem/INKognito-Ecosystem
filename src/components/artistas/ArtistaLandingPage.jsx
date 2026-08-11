@@ -159,6 +159,24 @@ export default function ArtistaLandingPage() {
   const [enviandoReserva, setEnviandoReserva] = useState(false)
   const [errorReserva, setErrorReserva] = useState(null)
   const [mostrarTerminos, setMostrarTerminos] = useState(false)
+  // Tooltip de onboarding sobre "Para agendar" (2026-08-11, mismo patrón
+  // que los de INK/Cerca de ti en ArtistasColombiaPage.jsx) — aclara que
+  // ese número es un ABONO parcial, no el precio completo del tatuaje;
+  // malentendido real si alguien paga pensando que ya cubrió todo.
+  // Arranca en `false` a propósito — el servidor no tiene localStorage, así
+  // que debe coincidir con el HTML inicial (evita mismatch de hidratación).
+  const [tooltipAgendarVisible, setTooltipAgendarVisible] = useState(false)
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem('kg_tooltip_agendar_visto')) setTooltipAgendarVisible(true)
+    } catch {
+      // localStorage puede fallar en navegación privada — sin tooltip, no rompe nada
+    }
+  }, [])
+  const cerrarTooltipAgendar = () => {
+    try { localStorage.setItem('kg_tooltip_agendar_visto', '1') } catch {}
+    setTooltipAgendarVisible(false)
+  }
 
   // Diseños agrupados por tipo, cada uno detrás de su propio botón
   // desplegable. v3 (2026-08-06, Jose: primero pidió que ambas categorías
@@ -754,6 +772,30 @@ export default function ArtistaLandingPage() {
                 >
                   Términos y condiciones
                 </button>
+
+                {/* Tooltip de onboarding sobre "Para agendar" (2026-08-11)
+                    — aclara que ese número es un ABONO parcial, no el
+                    precio completo del tatuaje. Mismo patrón de las de
+                    ArtistasColombiaPage.jsx (una sola vez, localStorage).
+                    Vive como HERMANA de la card `overflow-hidden` (mismo
+                    truco que la insignia de MP y "Términos y condiciones"
+                    arriba) — anidarlo adentro lo recortaría contra el
+                    borde de la card, igual que le pasó al hero del
+                    buscador con su propio overflow-hidden. */}
+                {tooltipAgendarVisible && (
+                  <div className="absolute z-20 top-full mt-3 left-4 w-72 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left">
+                    <span className="absolute -top-1.5 left-6 w-3 h-3 bg-gray-900 rotate-45" />
+                    <p className="text-xs leading-relaxed text-gray-200">
+                      "Para agendar" es un abono para reservar tu cita — no el precio completo del tatuaje. El resto se paga directo con {artista.nombre}, el día de tu sesión.
+                    </p>
+                    <button
+                      onClick={cerrarTooltipAgendar}
+                      className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
+                    >
+                      Entendido
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
