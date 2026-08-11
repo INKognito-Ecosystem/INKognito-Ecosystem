@@ -640,6 +640,25 @@ export default function ArtistasColombiaPage() {
   const [query, setQuery] = useState('')
   const [ubicando, setUbicando] = useState(false)
   const [ubicacionError, setUbicacionError] = useState(null)
+  // Tooltip de onboarding sobre "Cerca de ti" (2026-08-11, Jose: "que
+  // aparezca como cuando uno entra a una aplicación nueva que indica el
+  // por qué de cada botón... solo la primera vez"). Arranca en `false` a
+  // propósito — el servidor no tiene localStorage, así que debe coincidir
+  // con lo que se renderiza en el HTML inicial (evita un mismatch de
+  // hidratación); recién en el useEffect de abajo, ya en el navegador, se
+  // decide si mostrarlo.
+  const [tooltipUbicacionVisible, setTooltipUbicacionVisible] = useState(false)
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem('kg_tooltip_cerca_de_ti_visto')) setTooltipUbicacionVisible(true)
+    } catch {
+      // localStorage puede fallar en navegación privada — sin tooltip, no rompe nada
+    }
+  }, [])
+  const cerrarTooltipUbicacion = () => {
+    try { localStorage.setItem('kg_tooltip_cerca_de_ti_visto', '1') } catch {}
+    setTooltipUbicacionVisible(false)
+  }
   // Guarda un artista O un estudio (2026-08-07: la fila de estudios
   // reusaba ListingRow y su botón "ver más", pero onVerInfo era un no-op —
   // el botón no hacía nada, aunque se veía igual de clicable que el de un
@@ -711,7 +730,10 @@ export default function ArtistasColombiaPage() {
   // texto — es la única forma de garantizar que, si existe un artista
   // real, aparezca por distancia real aunque su municipio no coincida
   // textualmente con el tuyo.
-  let filtrados = cercaDeTiActivo ? artistasData : (q.length >= 2 ? artistasData.filter(a => matches(a.nombre, a.municipio, a.estilo, a.bio)) : [])
+  // a.departamento entra a la búsqueda (2026-08-11, bug real: escribir
+  // "Antioquia" no encontraba a un artista de Chigorodó — solo se
+  // comparaba nombre/municipio/estilo/bio, nunca el departamento).
+  let filtrados = cercaDeTiActivo ? artistasData : (q.length >= 2 ? artistasData.filter(a => matches(a.nombre, a.municipio, a.departamento, a.estilo, a.bio)) : [])
   filtrados = ordenarPorCercania(filtrados, misCoords)
   const total = filtrados.length
 
@@ -726,7 +748,7 @@ export default function ArtistasColombiaPage() {
   const estudiosReales = estudiosData.filter(e => e.tipo !== 'empresa')
   const proveedoresOficiales = estudiosData.filter(e => e.tipo === 'empresa')
 
-  let estudiosFiltrados = cercaDeTiActivo ? estudiosReales : (q.length >= 2 ? estudiosReales.filter(e => matches(e.nombre, e.municipio, e.bio)) : [])
+  let estudiosFiltrados = cercaDeTiActivo ? estudiosReales : (q.length >= 2 ? estudiosReales.filter(e => matches(e.nombre, e.municipio, e.departamento, e.bio)) : [])
   estudiosFiltrados = ordenarPorCercania(estudiosFiltrados, misCoords, coordsDeEstudio)
   const totalEstudios = estudiosFiltrados.length
 
@@ -741,7 +763,7 @@ export default function ArtistasColombiaPage() {
   // que Jose ya había aprobado antes ("las marcas no aparecen como
   // sugerencias, a diferencia de artistas y estudios") — hasta ahora era
   // un accidente de la fórmula (sí aparecían con "Ver todo").
-  const proveedoresFiltrados = q === '' ? [] : proveedoresOficiales.filter(e => matches(e.nombre, e.municipio, e.bio))
+  const proveedoresFiltrados = q === '' ? [] : proveedoresOficiales.filter(e => matches(e.nombre, e.municipio, e.departamento, e.bio))
   const totalProveedores = proveedoresFiltrados.length
 
   // Totales acotados a lo que la categoría activa realmente muestra
@@ -801,6 +823,7 @@ export default function ArtistasColombiaPage() {
   // IP haya resuelto tu ciudad, así que esto funciona siempre que el
   // navegador dé permiso, sin importar el caso de Chigorodó de arriba.
   const usarMiUbicacion = () => {
+    cerrarTooltipUbicacion()
     setUbicacionError(null)
     if (!navigator.geolocation) {
       setUbicacionError('Tu navegador no soporta geolocalización.')
@@ -930,14 +953,35 @@ export default function ArtistasColombiaPage() {
                 </button>
               )}
             </div>
-            <button
-              onClick={usarMiUbicacion}
-              disabled={ubicando}
-              className="flex items-center justify-center gap-2 px-5 py-3 rounded-full border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60 border-gray-600 text-gray-600"
-            >
-              {ubicando ? <LoaderCircle size={15} className="animate-spin" /> : <Navigation size={15} />}
-              {ubicando ? 'Ubicando...' : 'Cerca de ti'}
-            </button>
+            <div className="relative">
+              <button
+                onClick={usarMiUbicacion}
+                disabled={ubicando}
+                className="flex items-center justify-center gap-2 px-5 py-3 rounded-full border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60 border-gray-600 text-gray-600 w-full"
+              >
+                {ubicando ? <LoaderCircle size={15} className="animate-spin" /> : <Navigation size={15} />}
+                {ubicando ? 'Ubicando...' : 'Cerca de ti'}
+              </button>
+              {/* Tooltip de onboarding — solo la primera vez (ver
+                  useEffect/localStorage de arriba). Centrado bajo el
+                  botón con una flechita apuntando hacia arriba, mismo
+                  truco que un cuadrado rotado 45° oculto detrás del
+                  cuerpo del tooltip. */}
+              {tooltipUbicacionVisible && (
+                <div className="absolute z-20 top-full mt-3 left-1/2 -translate-x-1/2 w-64 bg-gray-900 text-white rounded-xl p-4 shadow-xl text-left">
+                  <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-900 rotate-45" />
+                  <p className="text-xs leading-relaxed text-gray-200">
+                    Con tu permiso de ubicación te mostramos artistas y estudios reales cerca de ti, ordenados por distancia — no una lista genérica.
+                  </p>
+                  <button
+                    onClick={cerrarTooltipUbicacion}
+                    className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
+                  >
+                    Entendido
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Filtro de categoría (fase 6.3, 2026-08-07, Jose: "un filtro al
