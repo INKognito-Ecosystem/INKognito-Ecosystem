@@ -61,8 +61,10 @@ export async function loader({ request }) {
   // ?flechas=0 en las páginas de marca: un query param que otro punto del
   // sitio (acá, NavbarArtistas.jsx) usa para aterrizar directo en un
   // estado específico, sin tocar nada del resto de la página.
+  // Pestaña "Todos" eliminada (2026-08-11, Jose) — solo quedan Artistas y
+  // Estudios; sin parámetro explícito, se aterriza en Artistas por defecto.
   const categoriaParam = new URL(request.url).searchParams.get('categoria')
-  const categoriaInicial = ['artistas', 'estudios'].includes(categoriaParam) ? categoriaParam : 'todos'
+  const categoriaInicial = categoriaParam === 'estudios' ? 'estudios' : 'artistas'
 
   // Geolocalización por IP vía el header x-vercel-ip-city que Vercel
   // inyecta en producción. Diagnosticado 2026-08-04: para pueblos chicos
@@ -89,17 +91,25 @@ export async function loader({ request }) {
   // `cargarNacional` más abajo en el componente): al tocar "Ver todo",
   // "Cerca de ti", o si una búsqueda no encuentra nada en la región ya
   // cargada. Sin `ciudadDetectada` (IP no resolvió) no hay otra señal
-  // disponible en el servidor — se pide sin filtro, como antes.
-  const qsDepartamento = ciudadDetectada?.departamento
-    ? `?departamento=${encodeURIComponent(ciudadDetectada.departamento)}`
-    : ''
-  const alcanceInicial = ciudadDetectada?.departamento ? 'departamento' : 'nacional'
-  const [artistasRes, estudiosRes] = await Promise.allSettled([
-    fetch(`${PANEL_URL}/api/artistas${qsDepartamento}`),
-    fetch(`${PANEL_URL}/api/estudios${qsDepartamento}`),
-  ])
-  const artistas = artistasRes.status === 'fulfilled' && artistasRes.value.ok ? await artistasRes.value.json() : []
-  const estudios = estudiosRes.status === 'fulfilled' && estudiosRes.value.ok ? await estudiosRes.value.json() : []
+  // disponible en el servidor. v2 (2026-08-11, Jose probando desde
+  // Chigorodó — justo el pueblo del comentario de arriba, IP sin resolver):
+  // antes, sin señal, se pedía el país COMPLETO como respaldo — quedaba
+  // mostrando todo de una, exactamente lo que se quería evitar. Ahora sin
+  // señal simplemente no se trae nada por defecto: el visitante ve
+  // resultados al escribir o al tocar "Cerca de ti" (GPS real, no depende
+  // de esto), nunca el país entero sin haber pedido nada.
+  let artistas = []
+  let estudios = []
+  if (ciudadDetectada?.departamento) {
+    const qsDepartamento = `?departamento=${encodeURIComponent(ciudadDetectada.departamento)}`
+    const [artistasRes, estudiosRes] = await Promise.allSettled([
+      fetch(`${PANEL_URL}/api/artistas${qsDepartamento}`),
+      fetch(`${PANEL_URL}/api/estudios${qsDepartamento}`),
+    ])
+    artistas = artistasRes.status === 'fulfilled' && artistasRes.value.ok ? await artistasRes.value.json() : []
+    estudios = estudiosRes.status === 'fulfilled' && estudiosRes.value.ok ? await estudiosRes.value.json() : []
+  }
+  const alcanceInicial = 'departamento'
   return { artistas, estudios, ciudadDetectada, categoriaInicial, alcanceInicial }
 }
 
@@ -311,67 +321,6 @@ function EstudioCercanoCard({ e, distanciaTexto, onVerInfo, full = false }) {
         )}
       </div>
     </Link>
-  )
-}
-
-// Sección "Estudios cercanos" — mismo patrón que SeccionCercanos, propia
-// y más chica (sin "ver todo": los estudios no tienen su propio listado
-// completo aparte, viven dentro de la misma búsqueda). No se muestra si
-// no hay ningún estudio activo todavía.
-// v2 (2026-08-09, Jose: "las cards de Todos se quedan pequeñas aun en
-// pc... que hagan lo mismo que acabamos de organizar") — deja de ser un
-// carrusel horizontal de cards chicas (w-56) y pasa a la misma grilla de
-// cards con portada completa que ya usan las pestañas Artistas/Estudios:
-// 1 columna en celular, 2 en pantallas grandes.
-function SeccionEstudiosCercanos({ estudios, misCoords, onVerInfo }) {
-  if (estudios.length === 0) return null
-  const ordenados = ordenarPorCercania(estudios, misCoords, coordsDeEstudio).slice(0, 10)
-  return (
-    <div className="mt-6 max-w-3xl mx-auto text-left">
-      <h2 className="font-black uppercase text-sm text-gray-900 mb-3 px-1">
-        {misCoords ? 'Estudios más cercanos' : 'Estudios en el directorio'}
-      </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {ordenados.map((e) => {
-          const c = coordsDeEstudio(e)
-          const distanciaTexto = misCoords && c ? distanciaKm(misCoords.lat, misCoords.lng, c.lat, c.lng).toFixed(1) : null
-          return <EstudioCercanoCard key={e.id} e={e} distanciaTexto={distanciaTexto} onVerInfo={() => onVerInfo(e)} full />
-        })}
-      </div>
-    </div>
-  )
-}
-
-// Sección "Artistas más cercanos" — carrusel horizontal siempre visible
-// (no requiere buscar), reservado para cuando SÍ hay al menos un artista
-// activo — con 0 artistas en todo el país, la card de reclutamiento ya
-// cumple ese rol de "sé el primero" sin duplicar mensajes vacíos acá.
-// "Ver todo" activa `onVerTodo`, que muestra el listado completo abajo
-// sin necesidad de escribir nada en el buscador.
-function SeccionCercanos({ artistas, misCoords, onVerTodo, onVerInfo }) {
-  if (artistas.length === 0) return null
-  const ordenados = ordenarPorCercania(artistas, misCoords).slice(0, 10)
-  return (
-    <div className="mt-6 max-w-3xl mx-auto text-left">
-      <div className="flex items-center justify-between mb-3 px-1">
-        <h2 className="font-black uppercase text-sm text-gray-900">
-          {misCoords ? 'Artistas más cercanos' : 'Artistas en el directorio'}
-        </h2>
-        <button
-          onClick={onVerTodo}
-          className="text-xs font-bold uppercase tracking-wide hover:opacity-70 transition-opacity text-gray-600"
-        >
-          Ver todo
-        </button>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {ordenados.map((a) => {
-          const c = coordsDeArtista(a)
-          const distanciaTexto = misCoords && c ? distanciaKm(misCoords.lat, misCoords.lng, c.lat, c.lng).toFixed(1) : null
-          return <ArtistaCercanoCard key={a.id} a={a} distanciaTexto={distanciaTexto} onVerInfo={() => onVerInfo(a)} full />
-        })}
-      </div>
-    </div>
   )
 }
 
@@ -717,24 +666,11 @@ export default function ArtistasColombiaPage() {
   // artista). ModalInfoArtista solo lee nombre/bio/estilo, así que un
   // estudio (sin estilo) encaja sin cambios en el modal.
   const [modalArtista, setModalArtista] = useState(null)
-  // "Ver todo" del carrusel "Artistas más cercanos" activa esto — muestra
-  // el listado completo (ordenado por cercanía) sin necesidad de escribir
-  // nada en el buscador (2026-08-05).
-  // categoriaInicial (fase 6.5) — si se llegó vía "Buscar estudios"/
-  // "Buscar artistas" del menú, mostrarTodos nace activo, igual que si
-  // se hubiera tocado el pill manualmente.
-  const [mostrarTodos, setMostrarTodos] = useState(categoriaInicial !== 'todos')
-  // Distingue "aterricé en la pestaña Artistas/Estudios" (debe mostrar solo
-  // mi región, barato) de "toqué Ver todo" (sí quiero el país completo)
-  // (2026-08-11, bug real: una vez `cargarNacional()` se disparaba UNA vez
-  // por cualquier motivo — Ver todo, Cerca de ti, búsqueda sin resultados
-  // — esa base ampliada se quedaba pegada, y aterrizar de nuevo en una
-  // pestaña sin texto mostraba el país completo en vez de volver a mi
-  // región. `artistasData`/`estudiosData` sí pueden crecer a nacional;
-  // este flag decide si el "sin texto, mostrar todos" usa esa base
-  // ampliada o la región original (`artistas`/`estudios` del loader, que
-  // nunca se tocan).
-  const [verTodoActivo, setVerTodoActivo] = useState(false)
+  // Sin pestaña "Todos" (2026-08-11), siempre hay una categoría activa
+  // (Artistas o Estudios) desde que se carga la página, así que esto nace
+  // siempre activo — controla si se muestra el listado por defecto
+  // (región) o nada (sin ninguna categoría posible que lo desactive).
+  const [mostrarTodos, setMostrarTodos] = useState(true)
   // Filtro de categoría (fase 6.3, 2026-08-07, Jose: "podríamos poner un
   // filtro al lado del botón de búsqueda... y allí solo mostrar los
   // artistas o los estudios cerca de mí") — reusa mostrarTodos (antes
@@ -794,7 +730,7 @@ export default function ArtistasColombiaPage() {
   // decir "bio corta, 1-2 líneas sobre ti" — ahora si un artista escribe
   // "puntillismo" o "acuarela" en su bio, alguien que busque esa palabra
   // sí lo va a encontrar, no solo por nombre/municipio/estilo.
-  let filtrados = q === '' ? (mostrarTodos ? (verTodoActivo ? artistasData : artistas) : []) : artistasData.filter(a => matches(a.nombre, a.municipio, a.estilo, a.bio))
+  let filtrados = q === '' ? (mostrarTodos ? artistas : []) : artistasData.filter(a => matches(a.nombre, a.municipio, a.estilo, a.bio))
   filtrados = ordenarPorCercania(filtrados, misCoords)
   const total = filtrados.length
 
@@ -812,7 +748,7 @@ export default function ArtistasColombiaPage() {
   // "aterricé en la pestaña" sin arrastrar una base ya ampliada a nacional.
   const estudiosRealesRegional = estudios.filter(e => e.tipo !== 'empresa')
 
-  let estudiosFiltrados = q === '' ? (mostrarTodos ? (verTodoActivo ? estudiosReales : estudiosRealesRegional) : []) : estudiosReales.filter(e => matches(e.nombre, e.municipio, e.bio))
+  let estudiosFiltrados = q === '' ? (mostrarTodos ? estudiosRealesRegional : []) : estudiosReales.filter(e => matches(e.nombre, e.municipio, e.bio))
   estudiosFiltrados = ordenarPorCercania(estudiosFiltrados, misCoords, coordsDeEstudio)
   const totalEstudios = estudiosFiltrados.length
 
@@ -901,12 +837,9 @@ export default function ArtistasColombiaPage() {
         // "Cerca de ti" es la señal explícita que justifica TRAER el país
         // completo (Jose: "o uso cerca de ti, cuál es el beneficio allí")
         // — el GPS real puede caer en otro departamento al detectado por IP.
-        // Pero NO activa verTodoActivo (2026-08-11, bug real: si después el
-        // buscador vuelve a quedar vacío — se borra el texto, etc. — sin
-        // esto se quedaba pegado mostrando el país completo en vez de
-        // volver a la región). "Cerca de ti" solo debe FILTRAR por el
-        // municipio resuelto (vía setQuery arriba); "mostrar todo el país
-        // sin filtro" es exclusivo del botón "Ver todo".
+        // Solo FILTRA por el municipio resuelto (vía setQuery arriba); no
+        // hay forma de "mostrar todo el país sin filtro" — se eliminó junto
+        // con la pestaña "Todos" (2026-08-11).
         cargarNacional()
         setUbicando(false)
       },
@@ -918,31 +851,12 @@ export default function ArtistasColombiaPage() {
     )
   }
 
-  const verTodo = () => {
-    setMostrarTodos(true)
-    setVerTodoActivo(true)
-    setQuery('')
-    cargarNacional()
-    listadoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
-  // Filtro de categoría (fase 6.3) — elegir "Artistas"/"Estudios" activa
-  // el mismo mostrarTodos que ya usa "Ver todo", así el listado completo
-  // (ordenado por cercanía) aparece de inmediato, con o sin texto
-  // escrito. Volver a "Todos" sin texto restaura los carruseles de
-  // sugerencia de siempre.
+  // Filtro de categoría (fase 6.3) — elegir "Artistas"/"Estudios" muestra
+  // de inmediato el listado de la región, con o sin texto escrito.
   const cambiarCategoria = (nueva) => {
     setCategoria(nueva)
-    if (nueva === 'todos') {
-      setMostrarTodos(false)
-    } else {
-      setMostrarTodos(true)
-      // Solo cambiar de pestaña NO es "Ver todo" — sin esto, una vez
-      // `verTodoActivo` quedaba en true por cualquier motivo anterior, se
-      // quedaba pegado también acá (ver comentario en su declaración).
-      setVerTodoActivo(false)
-      listadoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
+    setMostrarTodos(true)
+    listadoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   // Web Share API con fallback a WhatsApp — pedido de Jose (2026-08-04):
@@ -1064,7 +978,6 @@ export default function ArtistasColombiaPage() {
               texto escrito coincide con una. */}
           <div className="flex items-center justify-center gap-2 max-w-xl mx-auto mt-3">
             {[
-              { key: 'todos', label: 'Todos' },
               { key: 'artistas', label: 'Artistas' },
               { key: 'estudios', label: 'Estudios' },
             ].map(({ key, label }) => (
@@ -1096,34 +1009,6 @@ export default function ArtistasColombiaPage() {
           )}
         </div>
       </section>
-
-      {/* "Artistas más cercanos" — sección propia, FUERA del fondo gris del
-          hero (Jose, 2026-08-05: "el hero solo debera llegar hasta el
-          boton [Cerca de ti]... los artistas que aparecen cerca de ti se
-          suponen son otra seccion" — antes vivía dentro del mismo
-          <section> gris, así que el fondo gris se estiraba hasta abarcar
-          también el carrusel). Sugerencia proactiva, visible mientras NO
-          se está buscando activamente (Jose, 2026-08-04: "como sugerencias
-          parecido a cuando facebook las muestra"; luego: "esa card de
-          recomendacion, debera desaparecer cuando empiecen a escribir en
-          el buscador"). Gratis y ordenado por cercanía real para TODOS
-          los artistas — la prioridad paga es "aparecer primero" dentro de
-          esto, no el acceso a aparecer. Solo con categoría "todos" (fase
-          6.3) — con una categoría activa, mostrarTodos ya fuerza el
-          listado completo de abajo; mostrar ambas cosas a la vez sería
-          redundante. */}
-      {!query && categoria === 'todos' && (
-        <section className="px-4 md:px-6">
-          <SeccionCercanos artistas={artistasData} misCoords={misCoords} onVerTodo={verTodo} onVerInfo={setModalArtista} />
-          {/* estudiosReales, no estudios crudo (fase 6, 2026-08-07) — el
-              loader ahora también puede traer empresas proveedoras con
-              distribuidor_oficial=true, que no tienen sentido acá (esta
-              card enlaza al perfil de tatuaje y ordena por cercanía real,
-              ninguna de las dos aplica a una marca nacional). Esas se
-              muestran aparte, solo en resultados de búsqueda activa. */}
-          <SeccionEstudiosCercanos estudios={estudiosReales} misCoords={misCoords} onVerInfo={setModalArtista} />
-        </section>
-      )}
 
       <section ref={listadoRef} className="flex-1 px-4 md:px-6 pb-16 max-w-3xl mx-auto scroll-mt-20 w-full">
 
