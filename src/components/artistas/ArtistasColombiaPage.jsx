@@ -4,6 +4,7 @@ import { Search, MapPin, Palette, BadgeCheck, ChevronRight, Navigation, LoaderCi
 import NavbarArtistas from './NavbarArtistas'
 import { normalize, municipioMasCercanoNacional, municipioDesdeNombreIP, getCoordsMunicipio, distanciaKm } from '../../data/colombiaGeo'
 import { artistaUrl } from './artistaSlug'
+import { cloudinaryFill } from '../../lib/cloudinary'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 // Psicología del color (2026-08-05, decisión final tras probar "todo
@@ -14,6 +15,38 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-pro
 // pantalla (acá: "Unirme como artista") — el resto de elementos usa clases
 // gray-* de Tailwind directamente, ya no depende de esta constante.
 const ACCENT = '#B3202F'
+
+// Tolerancia a errores de tipeo en la búsqueda (2026-08-09, Jose: "cuál
+// es el problema de arreglar eso desde ya" — antes un typo como
+// "Medallin" en vez de "Medellín" no encontraba nada, aunque hubiera
+// poquísimos artistas en la base; no es un problema de escala, es de
+// calidad de búsqueda hoy mismo). Mismo algoritmo (Levenshtein) que ya
+// usa el panel para detectar productos parecidos en el catálogo maestro
+// (server.js, `_levenshtein`/`_similitudTexto`) — acá en el navegador
+// porque esta búsqueda es 100% client-side sobre la lista ya cargada.
+function levenshtein(a, b) {
+  const m = a.length, n = b.length
+  if (!m) return n
+  if (!n) return m
+  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0))
+  for (let i = 0; i <= m; i++) dp[i][0] = i
+  for (let j = 0; j <= n; j++) dp[0][j] = j
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
+    }
+  }
+  return dp[m][n]
+}
+function similitud(a, b) {
+  const maxLen = Math.max(a.length, b.length) || 1
+  return 1 - levenshtein(a, b) / maxLen
+}
+// Umbral 0.75 — tolera 1-2 letras distintas en una palabra típica (ej.
+// "medallin" vs "medellin" ya da 0.875). Palabras de menos de 3 letras no
+// entran a esta comparación (demasiado cortas para que la similitud
+// signifique algo — "el"/"de" siempre estarían "cerca" de cualquier cosa).
+const UMBRAL_SIMILITUD = 0.75
 
 // Puntitos oscuros y muy sutiles sobre fondo blanco (antes eran claros
 // sobre negro) — mismo recurso visual, paleta invertida.
@@ -46,15 +79,28 @@ export async function loader({ request }) {
     ciudadDetectada = null
   }
 
-  // Estudios (fase 3, 2026-08-06) — se piden en paralelo, mismo criterio
-  // que el resto del sitio; un fallo en uno no debe tumbar al otro.
+  // Alcance regional por defecto (2026-08-11, Jose: "por qué cargarle a un
+  // usuario todos los artistas del país si no ha escrito nada") — antes
+  // esto pedía TODO el país en cada visita, sin importar si la persona
+  // solo iba a ver su propia región. Con `ciudadDetectada` ya resuelta acá
+  // arriba (IP), se pide solo ese departamento — mismo filtro que ya
+  // soportan ambos endpoints (`?departamento=`, ver server.js). El país
+  // completo solo se trae bajo demanda desde el navegador (ver
+  // `cargarNacional` más abajo en el componente): al tocar "Ver todo",
+  // "Cerca de ti", o si una búsqueda no encuentra nada en la región ya
+  // cargada. Sin `ciudadDetectada` (IP no resolvió) no hay otra señal
+  // disponible en el servidor — se pide sin filtro, como antes.
+  const qsDepartamento = ciudadDetectada?.departamento
+    ? `?departamento=${encodeURIComponent(ciudadDetectada.departamento)}`
+    : ''
+  const alcanceInicial = ciudadDetectada?.departamento ? 'departamento' : 'nacional'
   const [artistasRes, estudiosRes] = await Promise.allSettled([
-    fetch(`${PANEL_URL}/api/artistas`),
-    fetch(`${PANEL_URL}/api/estudios`),
+    fetch(`${PANEL_URL}/api/artistas${qsDepartamento}`),
+    fetch(`${PANEL_URL}/api/estudios${qsDepartamento}`),
   ])
   const artistas = artistasRes.status === 'fulfilled' && artistasRes.value.ok ? await artistasRes.value.json() : []
   const estudios = estudiosRes.status === 'fulfilled' && estudiosRes.value.ok ? await estudiosRes.value.json() : []
-  return { artistas, estudios, ciudadDetectada, categoriaInicial }
+  return { artistas, estudios, ciudadDetectada, categoriaInicial, alcanceInicial }
 }
 
 export function meta() {
@@ -156,7 +202,7 @@ function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo, full = false }) {
     >
       <div className={`relative bg-gray-100 flex gap-0.5 ${full ? 'h-48 sm:h-56' : 'h-28'}`}>
         {fotos.length > 0 ? fotos.map((f, i) => (
-          <img key={i} src={f} alt="" className="flex-1 h-full object-cover" loading="lazy" />
+          <img key={i} src={cloudinaryFill(f, full ? 500 : 250, full ? 320 : 150)} alt="" className="flex-1 h-full object-cover" loading="lazy" />
         )) : (
           <div className="flex-1 h-full flex items-center justify-center text-gray-300 text-3xl font-black">
             {a.nombre?.[0]?.toUpperCase() || '?'}
@@ -172,7 +218,7 @@ function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo, full = false }) {
         <div className="flex items-center gap-2 flex-nowrap">
           <div className="w-7 h-7 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
             {a.foto_url
-              ? <img src={a.foto_url} alt={a.nombre} className="w-full h-full object-cover" loading="lazy" />
+              ? <img src={cloudinaryFill(a.foto_url, 80, 80)} alt={a.nombre} className="w-full h-full object-cover" loading="lazy" />
               : <span className="text-gray-300 text-[10px] font-black">{a.nombre?.[0]?.toUpperCase() || '?'}</span>}
           </div>
           <p className="font-black uppercase text-xs leading-tight truncate text-gray-900 min-w-0 flex-1">{a.nombre}</p>
@@ -226,7 +272,7 @@ function EstudioCercanoCard({ e, distanciaTexto, onVerInfo, full = false }) {
     >
       <div className={`relative bg-gray-100 ${full ? 'h-48 sm:h-56' : 'h-28'}`}>
         {e.foto_portada ? (
-          <img src={e.foto_portada} alt="" className="w-full h-full object-cover" loading="lazy" />
+          <img src={cloudinaryFill(e.foto_portada, full ? 500 : 250, full ? 320 : 150)} alt="" className="w-full h-full object-cover" loading="lazy" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-300 text-3xl font-black">{e.nombre?.[0]?.toUpperCase() || '?'}</div>
         )}
@@ -238,7 +284,7 @@ function EstudioCercanoCard({ e, distanciaTexto, onVerInfo, full = false }) {
         <div className="flex items-center gap-2 flex-nowrap">
           <div className="w-7 h-7 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
             {e.logo_url
-              ? <img src={e.logo_url} alt={e.nombre} className="w-full h-full object-cover" loading="lazy" />
+              ? <img src={cloudinaryFill(e.logo_url, 80, 80)} alt={e.nombre} className="w-full h-full object-cover" loading="lazy" />
               : <span className="text-gray-300 text-[10px] font-black">{e.nombre?.[0]?.toUpperCase() || '?'}</span>}
           </div>
           <p className="font-black uppercase text-xs leading-tight truncate text-gray-900 min-w-0 flex-1">{e.nombre}</p>
@@ -356,7 +402,7 @@ function ListingRow({ to, nombre, municipio, estilo, bio, foto, onVerInfo, kicke
           ahora se acerca a esa escala. */}
       <div className="w-24 h-24 md:w-28 md:h-28 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
         {foto
-          ? <img src={foto} alt={nombre} className="w-full h-full object-cover" loading="lazy" />
+          ? <img src={cloudinaryFill(foto, 250, 250)} alt={nombre} className="w-full h-full object-cover" loading="lazy" />
           : <span className="text-gray-300 text-3xl font-black">{nombre?.[0]?.toUpperCase() || '?'}</span>}
       </div>
       <div className="flex-1 min-w-0 pr-5">
@@ -557,6 +603,51 @@ function TarjetaReclutamientoEstudio({ query, total, compartir }) {
   )
 }
 
+// Card informativa para quien BUSCA (no para quien se quiere registrar) —
+// 2026-08-11, Jose: "así como mostramos una card que invita a estudios y
+// artistas a unirse, creo que también debería haber unas que inviten a los
+// usuarios a usar este sitio... sumamente informativas y claras con lo que
+// encontrarán, según la pestaña en la que estén". Vive arriba de
+// TarjetaReclutamiento/TarjetaReclutamientoEstudio (pedido explícito de
+// posición), siempre visible como ellas — pero a propósito NO es un CTA:
+// fondo blanco, borde de 1px, ícono en círculo gris claro (no sólido) y sin
+// botones, para que se lea como información de confianza y no compita
+// visualmente con el único botón rojo de la pantalla (la de reclutamiento).
+function TarjetaInfoVisitante({ categoria }) {
+  const config = {
+    todos: {
+      icon: Search,
+      titulo: 'Qué vas a encontrar acá',
+      texto: 'Un directorio de tatuadores y estudios verificados en toda Colombia. Portafolio real, estilo, disponibilidad y qué tan cerca está cada uno de ti. Compra sus diseños y láminas o agenda tu cita en línea, sin escribir primero — y si prefieres, escríbele directo por WhatsApp.',
+    },
+    artistas: {
+      icon: Palette,
+      titulo: 'Qué vas a encontrar en cada perfil de artista',
+      texto: 'Portafolio de trabajos reales, estilo, disponibilidad y ubicación exacta — no aproximada. Compra sus diseños y láminas o agenda tu cita en línea directo desde su perfil, con contacto por WhatsApp si lo necesitas.',
+    },
+    estudios: {
+      icon: Building2,
+      titulo: 'Qué vas a encontrar en cada perfil de estudio',
+      texto: 'El equipo completo de artistas que trabaja ahí, su ubicación, y — si el estudio vende insumos — su propio catálogo de INKognito Supply. Entra al perfil de cada artista para ver sus diseños, láminas y agendar en línea.',
+    },
+  }
+  const { icon: Icon, titulo, texto } = config[categoria] || config.todos
+
+  return (
+    <div className="mt-6 rounded-xl border border-gray-200 bg-white p-5 md:p-6">
+      <div className="flex items-center gap-4">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-100">
+          <Icon size={18} className="text-gray-600" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-black uppercase text-sm text-gray-900 leading-tight">{titulo}</p>
+          <p className="text-gray-500 text-xs mt-1 leading-relaxed">{texto}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Modal inferior compartido — "Sobre mí" + "Especialidades" completos de
 // un artista (2026-08-05, pedido de Jose: cuando el estilo/bio no caben en
 // la card compacta de resultados, un botón abre esto en vez de estirar la
@@ -602,7 +693,16 @@ function ModalInfoArtista({ artista, onClose }) {
 // el nombre del módulo al navbar propio (NavbarArtistas.jsx) — el eyebrow
 // que vivía arriba del H1 alejaba demasiado el título del navbar.
 export default function ArtistasColombiaPage() {
-  const { artistas, estudios, ciudadDetectada, categoriaInicial } = useLoaderData()
+  const { artistas, estudios, ciudadDetectada, categoriaInicial, alcanceInicial } = useLoaderData()
+  // Lo que llegó del loader es solo el departamento detectado por IP (o el
+  // país completo si no hubo señal) — `artistasData`/`estudiosData` viven
+  // en estado porque `cargarNacional()` los reemplaza por el listado
+  // nacional completo cuando de verdad hace falta (ver más abajo), sin
+  // necesidad de otra vuelta al loader/SSR.
+  const [artistasData, setArtistasData] = useState(artistas)
+  const [estudiosData, setEstudiosData] = useState(estudios)
+  const [alcance, setAlcance] = useState(alcanceInicial) // 'departamento' | 'nacional'
+  const [cargandoNacional, setCargandoNacional] = useState(false)
   const [query, setQuery] = useState('')
   const [ubicando, setUbicando] = useState(false)
   const [ubicacionError, setUbicacionError] = useState(null)
@@ -641,7 +741,23 @@ export default function ArtistasColombiaPage() {
   const prevVacioRef = useRef(true)
 
   const q = normalize(query.trim())
-  const matches = (...campos) => q === '' || campos.some(c => c && normalize(c).includes(q))
+  const palabrasQuery = q.split(/\s+/).filter(Boolean)
+  // Primero coincidencia exacta (rápida, cubre el 99% de los casos) — si
+  // ningún campo la tiene, recién ahí se prueba tolerancia a tipeo:
+  // CADA palabra escrita debe tener alguna palabra parecida (o contenida)
+  // en el campo, para que "juan realismo" siga exigiendo las dos cosas,
+  // no solo una.
+  const matches = (...campos) => {
+    if (q === '') return true
+    if (campos.some(c => c && normalize(c).includes(q))) return true
+    return campos.some(c => {
+      if (!c) return false
+      const palabrasCampo = normalize(c).split(/\s+/).filter(Boolean)
+      return palabrasQuery.every(pq =>
+        pq.length < 3 || palabrasCampo.some(pc => pc.includes(pq) || similitud(pq, pc) >= UMBRAL_SIMILITUD)
+      )
+    })
+  }
 
   // Sin búsqueda activa no se lista ningún artista, A MENOS que "Ver
   // todo" del carrusel esté activo (2026-08-05) — el fundador (Jose
@@ -655,7 +771,7 @@ export default function ArtistasColombiaPage() {
   // decir "bio corta, 1-2 líneas sobre ti" — ahora si un artista escribe
   // "puntillismo" o "acuarela" en su bio, alguien que busque esa palabra
   // sí lo va a encontrar, no solo por nombre/municipio/estilo.
-  let filtrados = q === '' ? (mostrarTodos ? artistas : []) : artistas.filter(a => matches(a.nombre, a.municipio, a.estilo, a.bio))
+  let filtrados = q === '' ? (mostrarTodos ? artistasData : []) : artistasData.filter(a => matches(a.nombre, a.municipio, a.estilo, a.bio))
   filtrados = ordenarPorCercania(filtrados, misCoords)
   const total = filtrados.length
 
@@ -667,8 +783,8 @@ export default function ArtistasColombiaPage() {
   // las incluye) — se separan acá porque enlazan a un destino distinto
   // (su catálogo de Supply, no un perfil de tatuaje) y no deben mezclarse
   // visualmente con estudios de tatuaje reales.
-  const estudiosReales = estudios.filter(e => e.tipo !== 'empresa')
-  const proveedoresOficiales = estudios.filter(e => e.tipo === 'empresa')
+  const estudiosReales = estudiosData.filter(e => e.tipo !== 'empresa')
+  const proveedoresOficiales = estudiosData.filter(e => e.tipo === 'empresa')
 
   let estudiosFiltrados = q === '' ? (mostrarTodos ? estudiosReales : []) : estudiosReales.filter(e => matches(e.nombre, e.municipio, e.bio))
   estudiosFiltrados = ordenarPorCercania(estudiosFiltrados, misCoords, coordsDeEstudio)
@@ -706,6 +822,41 @@ export default function ArtistasColombiaPage() {
     prevVacioRef.current = vacio
   }, [q])
 
+  // Trae el directorio nacional completo bajo demanda (2026-08-11) — el
+  // loader solo pidió el departamento detectado por IP; esto se llama
+  // desde el navegador (ambos endpoints ya tienen CORS abierto) solo
+  // cuando de verdad hay una señal real de que hace falta: "Ver todo",
+  // "Cerca de ti", o una búsqueda que no encontró nada en la región ya
+  // cargada. No bloquea nada — si falla, la persona simplemente se queda
+  // con los resultados de su región.
+  const cargarNacional = async () => {
+    if (alcance === 'nacional' || cargandoNacional) return
+    setCargandoNacional(true)
+    try {
+      const [ar, er] = await Promise.all([
+        fetch(`${PANEL_URL}/api/artistas`),
+        fetch(`${PANEL_URL}/api/estudios`),
+      ])
+      setArtistasData(ar.ok ? await ar.json() : [])
+      setEstudiosData(er.ok ? await er.json() : [])
+      setAlcance('nacional')
+    } catch {
+      // silencioso — se queda con los datos regionales que ya tenía
+    } finally {
+      setCargandoNacional(false)
+    }
+  }
+
+  // Si alguien busca algo que no está en su región ya cargada, se amplía
+  // solo — sin esto, un tatuador de otra ciudad simplemente "no existiría"
+  // para quien escribe su nombre.
+  useEffect(() => {
+    if (q !== '' && alcance !== 'nacional' && !cargandoNacional && total === 0 && totalEstudios === 0) {
+      cargarNacional()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q, alcance, cargandoNacional, total, totalEstudios])
+
   const usarMiUbicacion = () => {
     setUbicacionError(null)
     if (!navigator.geolocation) {
@@ -718,6 +869,10 @@ export default function ArtistasColombiaPage() {
         setMisCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
         const cercano = municipioMasCercanoNacional(pos.coords.latitude, pos.coords.longitude)
         if (cercano) setQuery(cercano.municipio)
+        // "Cerca de ti" es la señal explícita que justifica traer el país
+        // completo (Jose: "o uso cerca de ti, cuál es el beneficio allí")
+        // — el GPS real puede caer en otro departamento al detectado por IP.
+        cargarNacional()
         setUbicando(false)
       },
       () => {
@@ -731,6 +886,7 @@ export default function ArtistasColombiaPage() {
   const verTodo = () => {
     setMostrarTodos(true)
     setQuery('')
+    cargarNacional()
     listadoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -918,7 +1074,7 @@ export default function ArtistasColombiaPage() {
           redundante. */}
       {!query && categoria === 'todos' && (
         <section className="px-4 md:px-6">
-          <SeccionCercanos artistas={artistas} misCoords={misCoords} onVerTodo={verTodo} onVerInfo={setModalArtista} />
+          <SeccionCercanos artistas={artistasData} misCoords={misCoords} onVerTodo={verTodo} onVerInfo={setModalArtista} />
           {/* estudiosReales, no estudios crudo (fase 6, 2026-08-07) — el
               loader ahora también puede traer empresas proveedoras con
               distribuidor_oficial=true, que no tienen sentido acá (esta
@@ -990,9 +1146,17 @@ export default function ArtistasColombiaPage() {
                 grande "estilo redes sociales" no se achique. */}
             <div className={categoria === 'estudios' ? 'grid grid-cols-1 sm:grid-cols-2 gap-3' : 'flex flex-col gap-3'}>
               {estudiosFiltrados.map(e => (
-                categoria === 'estudios' ? (
-                  <EstudioCercanoCard key={`estudio-${e.id}`} e={e} full onVerInfo={() => setModalArtista(e)} />
-                ) : (
+                categoria === 'estudios' ? (() => {
+                  // Distancia aproximada (2026-08-09, Jose preguntó
+                  // explícitamente si esto se mostraba) — se calcula igual
+                  // que en la sección "Estudios cercanos", pero acá faltaba
+                  // pasarla al convertir el resultado de búsqueda en card
+                  // completa; el orden ya era por cercanía, solo faltaba el
+                  // número.
+                  const c = coordsDeEstudio(e)
+                  const distanciaTexto = misCoords && c ? distanciaKm(misCoords.lat, misCoords.lng, c.lat, c.lng).toFixed(1) : null
+                  return <EstudioCercanoCard key={`estudio-${e.id}`} e={e} distanciaTexto={distanciaTexto} full onVerInfo={() => setModalArtista(e)} />
+                })() : (
                   <ListingRow
                     key={`estudio-${e.id}`}
                     to={`/tattoo-artist-colombia/estudio/${e.id}`}
@@ -1020,9 +1184,11 @@ export default function ArtistasColombiaPage() {
               : `flex flex-col gap-3 ${query ? '' : 'mt-1'}`
           }>
             {filtrados.map(a => (
-              categoria === 'artistas' ? (
-                <ArtistaCercanoCard key={a.id} a={a} full onVerInfo={() => setModalArtista(a)} />
-              ) : (
+              categoria === 'artistas' ? (() => {
+                const c = coordsDeArtista(a)
+                const distanciaTexto = misCoords && c ? distanciaKm(misCoords.lat, misCoords.lng, c.lat, c.lng).toFixed(1) : null
+                return <ArtistaCercanoCard key={a.id} a={a} distanciaTexto={distanciaTexto} full onVerInfo={() => setModalArtista(a)} />
+              })() : (
                 <ListingRow
                   key={a.id}
                   to={artistaUrl(a)}
@@ -1038,11 +1204,23 @@ export default function ArtistasColombiaPage() {
           </div>
         )}
 
-        {(query || mostrarTodos) && totalGeneral === 0 && (
+        {/* Se muestra solo mientras se amplía a nacional buscando algo que
+            no estaba en la región ya cargada (ver `cargarNacional`) —
+            evita que un "No hay resultados" parpadee antes de tiempo. */}
+        {cargandoNacional && (query || mostrarTodos) && totalGeneral === 0 && (
+          <div className="text-center py-6 text-gray-400 text-sm flex items-center justify-center gap-2">
+            <LoaderCircle size={14} className="animate-spin" />
+            Buscando en toda Colombia...
+          </div>
+        )}
+
+        {!cargandoNacional && (query || mostrarTodos) && totalGeneral === 0 && (
           <div className="text-center py-6 text-gray-400 text-sm">
             No hay resultados por ahora.
           </div>
         )}
+
+        <TarjetaInfoVisitante categoria={categoria} />
 
         {/* RECLUTAMIENTO — siempre visible debajo de la búsqueda, sea cual
             sea el estado (Jose, 2026-08-04: "deberán aparecer siempre

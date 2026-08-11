@@ -4,6 +4,7 @@ import { MapPin, Users, Building2, ShoppingBag, Award } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { idDesdeParam } from './artistaSlug'
 import { urlGoogleMaps } from './mapaUrl'
+import { cloudinaryFill } from '../../lib/cloudinary'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const BTN = '#374151'
@@ -111,7 +112,7 @@ export default function EstudioLandingPage() {
             <div className="flex items-start gap-3 sm:gap-6">
               <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full border-4 border-gray-100 bg-gray-100 shadow-md overflow-hidden flex-shrink-0">
                 {estudio.logo_url ? (
-                  <img src={estudio.logo_url} alt={estudio.nombre} className="w-full h-full object-cover" />
+                  <img src={cloudinaryFill(estudio.logo_url, 200, 200)} alt={estudio.nombre} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-300 text-2xl sm:text-4xl font-black">{estudio.nombre?.[0]?.toUpperCase() || '?'}</div>
                 )}
@@ -150,7 +151,7 @@ export default function EstudioLandingPage() {
                 dashboard del estudio (donde se sube la foto), no en esta
                 página pública. */}
             <div className="w-full h-40 sm:h-56 md:h-64 bg-gray-100 overflow-hidden">
-              {estudio.foto_portada && <img src={estudio.foto_portada} alt="" className="w-full h-full object-cover" />}
+              {estudio.foto_portada && <img src={cloudinaryFill(estudio.foto_portada, 700, 300)} alt="" className="w-full h-full object-cover" />}
             </div>
 
             <div className="max-w-3xl mx-auto px-4">
@@ -158,7 +159,7 @@ export default function EstudioLandingPage() {
                 <div className="absolute left-0 top-0 -translate-y-1/3">
                   <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white bg-gray-100 shadow-md overflow-hidden">
                     {estudio.logo_url ? (
-                      <img src={estudio.logo_url} alt={estudio.nombre} className="w-full h-full object-cover" />
+                      <img src={cloudinaryFill(estudio.logo_url, 260, 260)} alt={estudio.nombre} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-300 text-4xl font-black">{estudio.nombre?.[0]?.toUpperCase() || '?'}</div>
                     )}
@@ -261,7 +262,7 @@ export default function EstudioLandingPage() {
                   <Link key={a.id} to={`/artista/${a.id}`} className="block group rounded-xl border border-gray-200 group-hover:border-gray-400 overflow-hidden transition-colors bg-white">
                     <div className="w-full aspect-square bg-gray-100">
                       {a.foto_url ? (
-                        <img src={a.foto_url} alt={a.nombre} className="w-full h-full object-cover" />
+                        <img src={cloudinaryFill(a.foto_url, 350, 350)} alt={a.nombre} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-300 text-2xl font-black">{a.nombre?.[0]?.toUpperCase() || '?'}</div>
                       )}

@@ -7,6 +7,7 @@ import { municipioDesdeNombreIP } from '../../data/colombiaGeo'
 import { idDesdeParam } from './artistaSlug'
 import { DISPONIBILIDAD_COLOR, DISPONIBILIDAD_TEXTO } from './disponibilidad'
 import { urlGoogleMaps } from './mapaUrl'
+import { cloudinaryFill, cloudinaryLimit } from '../../lib/cloudinary'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const ACCENT = '#B3202F'
@@ -416,7 +417,7 @@ export default function ArtistaLandingPage() {
         <div className="max-w-3xl mx-auto">
           <div className="w-full h-40 sm:h-56 md:h-72 bg-gray-100 overflow-hidden">
             {artista.foto_url_2 && (
-              <img src={artista.foto_url_2} alt="" className="w-full h-full object-cover" loading="eager" />
+              <img src={cloudinaryFill(artista.foto_url_2, 700, 300)} alt="" className="w-full h-full object-cover" loading="eager" />
             )}
           </div>
         </div>
@@ -441,7 +442,7 @@ export default function ArtistaLandingPage() {
           <div className="relative min-h-16 sm:min-h-[85px] md:min-h-[107px]">
             <div className="absolute left-0 top-0 -translate-y-1/3 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full border-4 border-white bg-gray-100 shadow-md overflow-hidden">
               {artista.foto_url ? (
-                <img src={artista.foto_url} alt={artista.nombre} className="w-full h-full object-cover" loading="eager" />
+                <img src={cloudinaryFill(artista.foto_url, 320, 320)} alt={artista.nombre} className="w-full h-full object-cover" loading="eager" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-300 text-4xl font-black">
                   {artista.nombre?.[0]?.toUpperCase() || '?'}
@@ -604,7 +605,7 @@ export default function ArtistaLandingPage() {
                         onClick={() => setLightbox(i)}
                         className="relative aspect-square bg-gray-50 overflow-hidden group"
                       >
-                        <img src={src} alt={`Trabajo ${i + 1} de ${artista.nombre}`} className="w-full h-full object-cover" loading="lazy" />
+                        <img src={cloudinaryFill(src, 400, 400)} alt={`Trabajo ${i + 1} de ${artista.nombre}`} className="w-full h-full object-cover" loading="lazy" />
                         <span className="absolute bottom-1.5 right-1.5 flex items-center justify-center w-6 h-6 bg-black/60 text-white rounded-full backdrop-blur-sm group-hover:bg-black/80 transition-colors">
                           <Search size={12} />
                         </span>
@@ -992,7 +993,7 @@ export default function ArtistaLandingPage() {
           )}
 
           <img
-            src={trabajos[lightbox]}
+            src={cloudinaryLimit(trabajos[lightbox])}
             alt={`Trabajo ${lightbox + 1} de ${artista.nombre}`}
             className="max-w-[90vw] max-h-[82vh] object-contain select-none"
             onClick={(e) => e.stopPropagation()}
