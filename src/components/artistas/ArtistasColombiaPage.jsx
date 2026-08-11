@@ -640,21 +640,38 @@ export default function ArtistasColombiaPage() {
   const [query, setQuery] = useState('')
   const [ubicando, setUbicando] = useState(false)
   const [ubicacionError, setUbicacionError] = useState(null)
-  // Tooltip de onboarding sobre "Cerca de ti" (2026-08-11, Jose: "que
-  // aparezca como cuando uno entra a una aplicación nueva que indica el
-  // por qué de cada botón... solo la primera vez"). Arranca en `false` a
-  // propósito — el servidor no tiene localStorage, así que debe coincidir
-  // con lo que se renderiza en el HTML inicial (evita un mismatch de
-  // hidratación); recién en el useEffect de abajo, ya en el navegador, se
-  // decide si mostrarlo.
+  // Tooltips de onboarding, en secuencia (2026-08-11, Jose: "que aparezca
+  // como cuando uno entra a una aplicación nueva que indica el por qué de
+  // cada botón... solo la primera vez" — primero INK, y al dar "Entendido"
+  // ahí recién aparece la de Cerca de ti, nunca las dos a la vez). Ambas
+  // arrancan en `false` a propósito — el servidor no tiene localStorage,
+  // así que deben coincidir con lo que se renderiza en el HTML inicial
+  // (evita un mismatch de hidratación); recién en el useEffect de abajo,
+  // ya en el navegador, se decide cuál mostrar.
+  const [tooltipInkVisible, setTooltipInkVisible] = useState(false)
   const [tooltipUbicacionVisible, setTooltipUbicacionVisible] = useState(false)
   useEffect(() => {
     try {
-      if (!localStorage.getItem('kg_tooltip_cerca_de_ti_visto')) setTooltipUbicacionVisible(true)
+      if (!localStorage.getItem('kg_tooltip_ink_visto')) {
+        setTooltipInkVisible(true)
+      } else if (!localStorage.getItem('kg_tooltip_cerca_de_ti_visto')) {
+        setTooltipUbicacionVisible(true)
+      }
     } catch {
-      // localStorage puede fallar en navegación privada — sin tooltip, no rompe nada
+      // localStorage puede fallar en navegación privada — sin tooltips, no rompe nada
     }
   }, [])
+  const cerrarTooltipInk = () => {
+    try {
+      localStorage.setItem('kg_tooltip_ink_visto', '1')
+      setTooltipInkVisible(false)
+      // Encadena con la de Cerca de ti — Jose: "cuando yo le dé entendido,
+      // entonces aparecerá la de cerca de ti".
+      if (!localStorage.getItem('kg_tooltip_cerca_de_ti_visto')) setTooltipUbicacionVisible(true)
+    } catch {
+      setTooltipInkVisible(false)
+    }
+  }
   const cerrarTooltipUbicacion = () => {
     try { localStorage.setItem('kg_tooltip_cerca_de_ti_visto', '1') } catch {}
     setTooltipUbicacionVisible(false)
@@ -914,7 +931,26 @@ export default function ArtistasColombiaPage() {
                   menú separa "Buscar artistas"/"Buscar estudios", el copy
                   del hero menciona ambos y las dos escalas (ciudad y
                   nacional), en vez de hablar solo de tatuadores. */}
-              <span className="inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">INK</span> El buscador que conecta personas con tatuadores y estudios de tu ciudad. Busca por nombre, municipio, estilo — y déjanos recomendarte el más cercano.
+              <span className="relative inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">
+                INK
+                {/* Tooltip de onboarding sobre la marca INK (2026-08-11) —
+                    primero en la secuencia, antes que el de "Cerca de ti"
+                    (ver useEffect/cerrarTooltipInk arriba). */}
+                {tooltipInkVisible && (
+                  <div className="absolute z-30 top-full mt-3 left-1/2 -translate-x-1/2 w-64 bg-gray-900 rounded-xl p-4 shadow-xl text-left normal-case font-normal">
+                    <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-900 rotate-45" />
+                    <p className="text-xs leading-relaxed text-gray-200">
+                      <strong className="text-white font-black">INK</strong> es el buscador de INKognito: tatuadores y estudios reales, verificados, en toda Colombia — con portafolio, disponibilidad y contacto directo.
+                    </p>
+                    <button
+                      onClick={cerrarTooltipInk}
+                      className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
+                    >
+                      Entendido
+                    </button>
+                  </div>
+                )}
+              </span> El buscador que conecta personas con tatuadores y estudios de tu ciudad. Busca por nombre, municipio, estilo — y déjanos recomendarte el más cercano.
             </p>
 
             {/* Señales de confianza, mismo patrón que ya vimos en Tattoodo
