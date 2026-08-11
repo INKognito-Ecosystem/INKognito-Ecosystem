@@ -724,6 +724,17 @@ export default function ArtistasColombiaPage() {
   // "Buscar artistas" del menú, mostrarTodos nace activo, igual que si
   // se hubiera tocado el pill manualmente.
   const [mostrarTodos, setMostrarTodos] = useState(categoriaInicial !== 'todos')
+  // Distingue "aterricé en la pestaña Artistas/Estudios" (debe mostrar solo
+  // mi región, barato) de "toqué Ver todo" (sí quiero el país completo)
+  // (2026-08-11, bug real: una vez `cargarNacional()` se disparaba UNA vez
+  // por cualquier motivo — Ver todo, Cerca de ti, búsqueda sin resultados
+  // — esa base ampliada se quedaba pegada, y aterrizar de nuevo en una
+  // pestaña sin texto mostraba el país completo en vez de volver a mi
+  // región. `artistasData`/`estudiosData` sí pueden crecer a nacional;
+  // este flag decide si el "sin texto, mostrar todos" usa esa base
+  // ampliada o la región original (`artistas`/`estudios` del loader, que
+  // nunca se tocan).
+  const [verTodoActivo, setVerTodoActivo] = useState(false)
   // Filtro de categoría (fase 6.3, 2026-08-07, Jose: "podríamos poner un
   // filtro al lado del botón de búsqueda... y allí solo mostrar los
   // artistas o los estudios cerca de mí") — reusa mostrarTodos (antes
@@ -776,7 +787,7 @@ export default function ArtistasColombiaPage() {
   // decir "bio corta, 1-2 líneas sobre ti" — ahora si un artista escribe
   // "puntillismo" o "acuarela" en su bio, alguien que busque esa palabra
   // sí lo va a encontrar, no solo por nombre/municipio/estilo.
-  let filtrados = q === '' ? (mostrarTodos ? artistasData : []) : artistasData.filter(a => matches(a.nombre, a.municipio, a.estilo, a.bio))
+  let filtrados = q === '' ? (mostrarTodos ? (verTodoActivo ? artistasData : artistas) : []) : artistasData.filter(a => matches(a.nombre, a.municipio, a.estilo, a.bio))
   filtrados = ordenarPorCercania(filtrados, misCoords)
   const total = filtrados.length
 
@@ -790,8 +801,11 @@ export default function ArtistasColombiaPage() {
   // visualmente con estudios de tatuaje reales.
   const estudiosReales = estudiosData.filter(e => e.tipo !== 'empresa')
   const proveedoresOficiales = estudiosData.filter(e => e.tipo === 'empresa')
+  // Misma región congelada que `artistas` (loader), para el mismo fallback
+  // "aterricé en la pestaña" sin arrastrar una base ya ampliada a nacional.
+  const estudiosRealesRegional = estudios.filter(e => e.tipo !== 'empresa')
 
-  let estudiosFiltrados = q === '' ? (mostrarTodos ? estudiosReales : []) : estudiosReales.filter(e => matches(e.nombre, e.municipio, e.bio))
+  let estudiosFiltrados = q === '' ? (mostrarTodos ? (verTodoActivo ? estudiosReales : estudiosRealesRegional) : []) : estudiosReales.filter(e => matches(e.nombre, e.municipio, e.bio))
   estudiosFiltrados = ordenarPorCercania(estudiosFiltrados, misCoords, coordsDeEstudio)
   const totalEstudios = estudiosFiltrados.length
 
@@ -877,6 +891,10 @@ export default function ArtistasColombiaPage() {
         // "Cerca de ti" es la señal explícita que justifica traer el país
         // completo (Jose: "o uso cerca de ti, cuál es el beneficio allí")
         // — el GPS real puede caer en otro departamento al detectado por IP.
+        // verTodoActivo también en true acá (no solo en verTodo()) por si
+        // `cercano` no resuelve — mejor mostrar el país ordenado por
+        // distancia que quedarse pegado solo en la región de IP.
+        setVerTodoActivo(true)
         cargarNacional()
         setUbicando(false)
       },
@@ -890,6 +908,7 @@ export default function ArtistasColombiaPage() {
 
   const verTodo = () => {
     setMostrarTodos(true)
+    setVerTodoActivo(true)
     setQuery('')
     cargarNacional()
     listadoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -906,6 +925,10 @@ export default function ArtistasColombiaPage() {
       setMostrarTodos(false)
     } else {
       setMostrarTodos(true)
+      // Solo cambiar de pestaña NO es "Ver todo" — sin esto, una vez
+      // `verTodoActivo` quedaba en true por cualquier motivo anterior, se
+      // quedaba pegado también acá (ver comentario en su declaración).
+      setVerTodoActivo(false)
       listadoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }
