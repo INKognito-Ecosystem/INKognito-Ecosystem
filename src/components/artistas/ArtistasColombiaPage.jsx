@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { Search, MapPin, Palette, BadgeCheck, ChevronRight, Navigation, LoaderCircle, Share2, Sparkles, Check, Building2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
-import { normalize, municipioMasCercanoNacional, municipioDesdeNombreIP, getCoordsMunicipio, distanciaKm } from '../../data/colombiaGeo'
+import { normalize, municipioDesdeNombreIP, getCoordsMunicipio, distanciaKm } from '../../data/colombiaGeo'
 import { artistaUrl } from './artistaSlug'
 import { cloudinaryFill } from '../../lib/cloudinary'
 
@@ -81,36 +81,18 @@ export async function loader({ request }) {
     ciudadDetectada = null
   }
 
-  // Alcance regional por defecto (2026-08-11, Jose: "por qué cargarle a un
-  // usuario todos los artistas del país si no ha escrito nada") — antes
-  // esto pedía TODO el país en cada visita, sin importar si la persona
-  // solo iba a ver su propia región. Con `ciudadDetectada` ya resuelta acá
-  // arriba (IP), se pide solo ese departamento — mismo filtro que ya
-  // soportan ambos endpoints (`?departamento=`, ver server.js). El país
-  // completo solo se trae bajo demanda desde el navegador (ver
-  // `cargarNacional` más abajo en el componente): al tocar "Ver todo",
-  // "Cerca de ti", o si una búsqueda no encuentra nada en la región ya
-  // cargada. Sin `ciudadDetectada` (IP no resolvió) no hay otra señal
-  // disponible en el servidor. v2 (2026-08-11, Jose probando desde
-  // Chigorodó — justo el pueblo del comentario de arriba, IP sin resolver):
-  // antes, sin señal, se pedía el país COMPLETO como respaldo — quedaba
-  // mostrando todo de una, exactamente lo que se quería evitar. Ahora sin
-  // señal simplemente no se trae nada por defecto: el visitante ve
-  // resultados al escribir o al tocar "Cerca de ti" (GPS real, no depende
-  // de esto), nunca el país entero sin haber pedido nada.
-  let artistas = []
-  let estudios = []
-  if (ciudadDetectada?.departamento) {
-    const qsDepartamento = `?departamento=${encodeURIComponent(ciudadDetectada.departamento)}`
-    const [artistasRes, estudiosRes] = await Promise.allSettled([
-      fetch(`${PANEL_URL}/api/artistas${qsDepartamento}`),
-      fetch(`${PANEL_URL}/api/estudios${qsDepartamento}`),
-    ])
-    artistas = artistasRes.status === 'fulfilled' && artistasRes.value.ok ? await artistasRes.value.json() : []
-    estudios = estudiosRes.status === 'fulfilled' && estudiosRes.value.ok ? await estudiosRes.value.json() : []
-  }
-  const alcanceInicial = 'departamento'
-  return { artistas, estudios, ciudadDetectada, categoriaInicial, alcanceInicial }
+  // v3 (2026-08-11, Jose: "que tal si cuando recién alguien entra al
+  // buscador no ve ningún artista aún... solo si escribe algo o usa
+  // cerca de mí aparecen") — ya no se precarga NADA en el servidor, ni
+  // por región ni por país completo. La IP (ciudadDetectada) solo se usa
+  // para la sugerencia "¿Buscas tatuadores en X?" (ver más abajo en el
+  // render) — nunca para decidir qué traer. Esto también resuelve de raíz
+  // el caso sin señal (Chigorodó): ya no hay una rama especial que se
+  // comporte distinto, todos empiezan igual, vacío, sin importar si su IP
+  // resolvió o no. Los datos reales se piden bajo demanda desde el
+  // navegador (ver `cargarDatos` en el componente) recién cuando la
+  // persona escribe algo o toca "Cerca de ti".
+  return { ciudadDetectada, categoriaInicial }
 }
 
 export function meta() {
@@ -647,16 +629,14 @@ function ModalInfoArtista({ artista, onClose }) {
 // el nombre del módulo al navbar propio (NavbarArtistas.jsx) — el eyebrow
 // que vivía arriba del H1 alejaba demasiado el título del navbar.
 export default function ArtistasColombiaPage() {
-  const { artistas, estudios, ciudadDetectada, categoriaInicial, alcanceInicial } = useLoaderData()
-  // Lo que llegó del loader es solo el departamento detectado por IP (o el
-  // país completo si no hubo señal) — `artistasData`/`estudiosData` viven
-  // en estado porque `cargarNacional()` los reemplaza por el listado
-  // nacional completo cuando de verdad hace falta (ver más abajo), sin
-  // necesidad de otra vuelta al loader/SSR.
-  const [artistasData, setArtistasData] = useState(artistas)
-  const [estudiosData, setEstudiosData] = useState(estudios)
-  const [alcance, setAlcance] = useState(alcanceInicial) // 'departamento' | 'nacional'
-  const [cargandoNacional, setCargandoNacional] = useState(false)
+  const { ciudadDetectada, categoriaInicial } = useLoaderData()
+  // Nada se precarga desde el servidor (2026-08-11, ver comentario en el
+  // loader) — arrancan vacíos y `cargarDatos()` los llena bajo demanda, la
+  // primera vez que la persona escribe algo o toca "Cerca de ti".
+  const [artistasData, setArtistasData] = useState([])
+  const [estudiosData, setEstudiosData] = useState([])
+  const [datosCargados, setDatosCargados] = useState(false)
+  const [cargando, setCargando] = useState(false)
   const [query, setQuery] = useState('')
   const [ubicando, setUbicando] = useState(false)
   const [ubicacionError, setUbicacionError] = useState(null)
@@ -666,17 +646,14 @@ export default function ArtistasColombiaPage() {
   // artista). ModalInfoArtista solo lee nombre/bio/estilo, así que un
   // estudio (sin estilo) encaja sin cambios en el modal.
   const [modalArtista, setModalArtista] = useState(null)
-  // Sin pestaña "Todos" (2026-08-11), siempre hay una categoría activa
-  // (Artistas o Estudios) desde que se carga la página, así que esto nace
-  // siempre activo — controla si se muestra el listado por defecto
-  // (región) o nada (sin ninguna categoría posible que lo desactive).
-  const [mostrarTodos, setMostrarTodos] = useState(true)
-  // Filtro de categoría (fase 6.3, 2026-08-07, Jose: "podríamos poner un
-  // filtro al lado del botón de búsqueda... y allí solo mostrar los
-  // artistas o los estudios cerca de mí") — reusa mostrarTodos (antes
-  // solo lo activaba "Ver todo"): elegir una categoría equivale a un
-  // "Ver todo" ya filtrado por tipo, con o sin texto en el buscador.
-  const [categoria, setCategoria] = useState(categoriaInicial) // 'todos' | 'artistas' | 'estudios'
+  // "Cerca de ti" ya resuelto (2026-08-11) — a diferencia de escribir un
+  // texto, acá se muestra TODO lo cargado ordenado por distancia real, sin
+  // filtrar por coincidencia de nombre de municipio (antes un artista en un
+  // municipio vecino al tuyo, con nombre distinto, simplemente no aparecía
+  // aunque estuviera cerca). Se apaga apenas la persona vuelve a escribir —
+  // ver el onChange del buscador más abajo.
+  const [cercaDeTiActivo, setCercaDeTiActivo] = useState(false)
+  const [categoria, setCategoria] = useState(categoriaInicial) // 'artistas' | 'estudios'
   // Coordenadas reales del visitante — de la geolocalización precisa del
   // navegador si tocó "Cerca de ti", o si no, del centroide de la ciudad
   // detectada por IP (menos preciso, pero mejor que nada). Con esto se
@@ -718,9 +695,9 @@ export default function ArtistasColombiaPage() {
     })
   }
 
-  // Sin búsqueda activa no se lista ningún artista, A MENOS que "Ver
-  // todo" del carrusel esté activo (2026-08-05) — el fundador (Jose
-  // Humanez) ya NO tiene trato especial: se quitó el perfil fijo/
+  // Sin buscar nada todavía no se lista ningún artista (2026-08-11, Jose:
+  // "que solo si escribe algo o usa cerca de mí aparecen") — el fundador
+  // (Jose Humanez) tampoco tiene trato especial: se quitó el perfil fijo/
   // destacado — "vamos a usar la plataforma como cualquier tatuador más"
   // (Jose, 2026-08-04). Si quiere aparecer en el directorio, se registra
   // igual que cualquier artista.
@@ -730,25 +707,26 @@ export default function ArtistasColombiaPage() {
   // decir "bio corta, 1-2 líneas sobre ti" — ahora si un artista escribe
   // "puntillismo" o "acuarela" en su bio, alguien que busque esa palabra
   // sí lo va a encontrar, no solo por nombre/municipio/estilo.
-  let filtrados = q === '' ? (mostrarTodos ? artistas : []) : artistasData.filter(a => matches(a.nombre, a.municipio, a.estilo, a.bio))
+  // cercaDeTiActivo (2026-08-11) muestra TODO lo cargado sin filtrar por
+  // texto — es la única forma de garantizar que, si existe un artista
+  // real, aparezca por distancia real aunque su municipio no coincida
+  // textualmente con el tuyo.
+  let filtrados = cercaDeTiActivo ? artistasData : (q.length >= 2 ? artistasData.filter(a => matches(a.nombre, a.municipio, a.estilo, a.bio)) : [])
   filtrados = ordenarPorCercania(filtrados, misCoords)
   const total = filtrados.length
 
   // Estudios (fase 3, 2026-08-06) — mismo criterio de query que los
   // artistas, resultado aparte (no interleaved en la misma lista, para no
-  // confundir un perfil individual con uno de equipo). `estudios` (del
-  // loader) ahora también puede traer empresas proveedoras con
-  // distribuidor_oficial=true (fase 6, 2026-08-07 — GET /api/estudios ya
-  // las incluye) — se separan acá porque enlazan a un destino distinto
-  // (su catálogo de Supply, no un perfil de tatuaje) y no deben mezclarse
-  // visualmente con estudios de tatuaje reales.
+  // confundir un perfil individual con uno de equipo). `estudiosData`
+  // también puede traer empresas proveedoras con distribuidor_oficial=true
+  // (fase 6, 2026-08-07 — GET /api/estudios ya las incluye) — se separan
+  // acá porque enlazan a un destino distinto (su catálogo de Supply, no un
+  // perfil de tatuaje) y no deben mezclarse visualmente con estudios de
+  // tatuaje reales.
   const estudiosReales = estudiosData.filter(e => e.tipo !== 'empresa')
   const proveedoresOficiales = estudiosData.filter(e => e.tipo === 'empresa')
-  // Misma región congelada que `artistas` (loader), para el mismo fallback
-  // "aterricé en la pestaña" sin arrastrar una base ya ampliada a nacional.
-  const estudiosRealesRegional = estudios.filter(e => e.tipo !== 'empresa')
 
-  let estudiosFiltrados = q === '' ? (mostrarTodos ? estudiosRealesRegional : []) : estudiosReales.filter(e => matches(e.nombre, e.municipio, e.bio))
+  let estudiosFiltrados = cercaDeTiActivo ? estudiosReales : (q.length >= 2 ? estudiosReales.filter(e => matches(e.nombre, e.municipio, e.bio)) : [])
   estudiosFiltrados = ordenarPorCercania(estudiosFiltrados, misCoords, coordsDeEstudio)
   const totalEstudios = estudiosFiltrados.length
 
@@ -784,16 +762,15 @@ export default function ArtistasColombiaPage() {
     prevVacioRef.current = vacio
   }, [q])
 
-  // Trae el directorio nacional completo bajo demanda (2026-08-11) — el
-  // loader solo pidió el departamento detectado por IP; esto se llama
-  // desde el navegador (ambos endpoints ya tienen CORS abierto) solo
-  // cuando de verdad hay una señal real de que hace falta: "Ver todo",
-  // "Cerca de ti", o una búsqueda que no encontró nada en la región ya
-  // cargada. No bloquea nada — si falla, la persona simplemente se queda
-  // con los resultados de su región.
-  const cargarNacional = async () => {
-    if (alcance === 'nacional' || cargandoNacional) return
-    setCargandoNacional(true)
+  // Trae el directorio completo bajo demanda (2026-08-11) — nada se pidió
+  // en el loader; esto se llama desde el navegador (ambos endpoints ya
+  // tienen CORS abierto) la primera vez que hace falta de verdad: al
+  // escribir 2+ caracteres o al tocar "Cerca de ti". Una sola vez por
+  // visita — `datosCargados` evita pedirlo de nuevo. No bloquea nada — si
+  // falla, simplemente no hay resultados todavía.
+  const cargarDatos = async () => {
+    if (datosCargados || cargando) return
+    setCargando(true)
     try {
       const [ar, er] = await Promise.all([
         fetch(`${PANEL_URL}/api/artistas`),
@@ -801,27 +778,28 @@ export default function ArtistasColombiaPage() {
       ])
       setArtistasData(ar.ok ? await ar.json() : [])
       setEstudiosData(er.ok ? await er.json() : [])
-      setAlcance('nacional')
+      setDatosCargados(true)
     } catch {
-      // silencioso — se queda con los datos regionales que ya tenía
+      // silencioso
     } finally {
-      setCargandoNacional(false)
+      setCargando(false)
     }
   }
 
-  // Si alguien busca algo que no está en su región ya cargada, se amplía
-  // solo — sin esto, un tatuador de otra ciudad simplemente "no existiría"
-  // para quien escribe su nombre.
   useEffect(() => {
-    // q.length >= 2 (2026-08-11): con 1 sola letra `matches()` ya no
-    // devuelve nada (ver más abajo), así que sin esto cada primera tecla
-    // dispararía una carga nacional innecesaria.
-    if (q.length >= 2 && alcance !== 'nacional' && !cargandoNacional && total === 0 && totalEstudios === 0) {
-      cargarNacional()
+    if (q.length >= 2 && !datosCargados && !cargando) {
+      cargarDatos()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q, alcance, cargandoNacional, total, totalEstudios])
+  }, [q, datosCargados, cargando])
 
+  // v2 (2026-08-11, Jose: "la idea es que si hay un artista lo muestres")
+  // — ya no fija el buscador al nombre del municipio más cercano (un
+  // artista real en un municipio VECINO con nombre distinto simplemente no
+  // aparecía). Ahora "Cerca de ti" activa `cercaDeTiActivo`, que muestra
+  // TODO lo cargado ordenado por distancia real — GPS no depende de que la
+  // IP haya resuelto tu ciudad, así que esto funciona siempre que el
+  // navegador dé permiso, sin importar el caso de Chigorodó de arriba.
   const usarMiUbicacion = () => {
     setUbicacionError(null)
     if (!navigator.geolocation) {
@@ -832,15 +810,9 @@ export default function ArtistasColombiaPage() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setMisCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
-        const cercano = municipioMasCercanoNacional(pos.coords.latitude, pos.coords.longitude)
-        if (cercano) setQuery(cercano.municipio)
-        // "Cerca de ti" es la señal explícita que justifica TRAER el país
-        // completo (Jose: "o uso cerca de ti, cuál es el beneficio allí")
-        // — el GPS real puede caer en otro departamento al detectado por IP.
-        // Solo FILTRA por el municipio resuelto (vía setQuery arriba); no
-        // hay forma de "mostrar todo el país sin filtro" — se eliminó junto
-        // con la pestaña "Todos" (2026-08-11).
-        cargarNacional()
+        setQuery('')
+        setCercaDeTiActivo(true)
+        cargarDatos()
         setUbicando(false)
       },
       () => {
@@ -851,11 +823,10 @@ export default function ArtistasColombiaPage() {
     )
   }
 
-  // Filtro de categoría (fase 6.3) — elegir "Artistas"/"Estudios" muestra
-  // de inmediato el listado de la región, con o sin texto escrito.
+  // Filtro de categoría (fase 6.3) — elegir "Artistas"/"Estudios" solo
+  // cambia qué se muestra; ni trae datos ni cambia el estado de búsqueda.
   const cambiarCategoria = (nueva) => {
     setCategoria(nueva)
-    setMostrarTodos(true)
     listadoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -944,7 +915,7 @@ export default function ArtistasColombiaPage() {
               <input
                 type="text"
                 value={query}
-                onChange={e => setQuery(e.target.value)}
+                onChange={e => { setQuery(e.target.value); setCercaDeTiActivo(false) }}
                 placeholder="Nombre, municipio o estilo..."
                 autoComplete="off"
                 className="w-full bg-gray-50 border border-gray-300 rounded-full pl-11 pr-9 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-500 transition-colors"
@@ -1012,12 +983,13 @@ export default function ArtistasColombiaPage() {
 
       <section ref={listadoRef} className="flex-1 px-4 md:px-6 pb-16 max-w-3xl mx-auto scroll-mt-20 w-full">
 
-        {/* CONTADOR — con búsqueda activa O con una categoría eligiendo
-            "ver todo" (fase 6.3, antes solo `query`). Totales acotados a
-            lo que la categoría activa realmente muestra. */}
-        {(query || mostrarTodos) && (
+        {/* CONTADOR — con búsqueda de 2+ caracteres o "Cerca de ti" activo
+            (2026-08-11, antes también con `mostrarTodos`, eliminado junto
+            con la pestaña Todos). Totales acotados a lo que la categoría
+            activa realmente muestra. */}
+        {(q.length >= 2 || cercaDeTiActivo) && (
           <p className="text-gray-400 text-xs uppercase tracking-widest mb-4">
-            {totalGeneral} resultado{totalGeneral !== 1 ? 's' : ''}{query ? <> para <span className="text-gray-600">"{query}"</span></> : ' cerca de ti'}
+            {totalGeneral} resultado{totalGeneral !== 1 ? 's' : ''}{cercaDeTiActivo ? ' cerca de ti' : <> para <span className="text-gray-600">"{query}"</span></>}
           </p>
         )}
 
@@ -1129,17 +1101,17 @@ export default function ArtistasColombiaPage() {
           </div>
         )}
 
-        {/* Se muestra solo mientras se amplía a nacional buscando algo que
-            no estaba en la región ya cargada (ver `cargarNacional`) —
-            evita que un "No hay resultados" parpadee antes de tiempo. */}
-        {cargandoNacional && (query || mostrarTodos) && totalGeneral === 0 && (
+        {/* Se muestra mientras se trae el directorio la primera vez (ver
+            `cargarDatos`) — evita que un "No hay resultados" parpadee
+            antes de tiempo. */}
+        {cargando && (q.length >= 2 || cercaDeTiActivo) && totalGeneral === 0 && (
           <div className="text-center py-6 text-gray-400 text-sm flex items-center justify-center gap-2">
             <LoaderCircle size={14} className="animate-spin" />
-            Buscando en toda Colombia...
+            Buscando...
           </div>
         )}
 
-        {!cargandoNacional && (query || mostrarTodos) && totalGeneral === 0 && (
+        {!cargando && (q.length >= 2 || cercaDeTiActivo) && totalGeneral === 0 && (
           <div className="text-center py-6 text-gray-400 text-sm">
             No hay resultados por ahora.
           </div>
