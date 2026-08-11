@@ -201,8 +201,13 @@ function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo, full = false }) {
       className={`${full ? 'w-full' : 'flex-shrink-0 w-56 snap-start'} rounded-xl border border-gray-200 hover:border-gray-300 bg-white overflow-hidden transition-colors`}
     >
       <div className={`relative bg-gray-100 flex gap-0.5 ${full ? 'h-48 sm:h-56' : 'h-28'}`}>
+        {/* El ancho pedido a Cloudinary se reparte entre las fotos que de
+            verdad comparten la fila (2026-08-11, bug real: antes se pedía
+            el mismo recorte ancho sin importar si había 1 o 2 fotos —
+            con 2 lado a lado, cada una es casi cuadrada, no panorámica,
+            y el recorte inteligente (g_auto) elegía mal el encuadre). */}
         {fotos.length > 0 ? fotos.map((f, i) => (
-          <img key={i} src={cloudinaryFill(f, full ? 500 : 250, full ? 320 : 150)} alt="" className="flex-1 h-full object-cover" loading="lazy" />
+          <img key={i} src={cloudinaryFill(f, Math.round((full ? 500 : 250) / fotos.length), full ? 320 : 150)} alt="" className="flex-1 h-full object-cover" loading="lazy" />
         )) : (
           <div className="flex-1 h-full flex items-center justify-center text-gray-300 text-3xl font-black">
             {a.nombre?.[0]?.toUpperCase() || '?'}
