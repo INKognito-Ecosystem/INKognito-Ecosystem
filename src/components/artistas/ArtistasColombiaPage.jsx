@@ -933,25 +933,38 @@ export default function ArtistasColombiaPage() {
                   nacional), en vez de hablar solo de tatuadores. */}
               <span className="relative inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">
                 INK
-                {/* Tooltip de onboarding sobre la marca INK (2026-08-11) —
-                    primero en la secuencia, antes que el de "Cerca de ti"
-                    (ver useEffect/cerrarTooltipInk arriba). */}
-                {tooltipInkVisible && (
-                  <div className="absolute z-30 top-full mt-3 left-1/2 -translate-x-1/2 w-64 bg-gray-900 rounded-xl p-4 shadow-xl text-left normal-case font-normal">
-                    <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-900 rotate-45" />
-                    <p className="text-xs leading-relaxed text-gray-200">
-                      <strong className="text-white font-black">INK</strong> es el buscador de INKognito: tatuadores y estudios reales, verificados, en toda Colombia — con portafolio, disponibilidad y contacto directo.
-                    </p>
-                    <button
-                      onClick={cerrarTooltipInk}
-                      className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
-                    >
-                      Entendido
-                    </button>
-                  </div>
-                )}
               </span> El buscador que conecta personas con tatuadores y estudios de tu ciudad. Busca por nombre, municipio, estilo — y déjanos recomendarte el más cercano.
             </p>
+
+            {/* Tooltip de onboarding sobre la marca INK (2026-08-11) —
+                primero en la secuencia, antes que el de "Cerca de ti" (ver
+                useEffect/cerrarTooltipInk arriba). v2: antes vivía DENTRO
+                del <span> "INK" (inline, centrado sobre él con
+                left-1/2+translate) — Jose: "la card está quedando fuera de
+                la pantalla, pq ubicas su salida en el centro... cuando
+                tendría que ser desde el frente". Esa palabra puede caer
+                cerca del borde en pantallas angostas según cómo envuelva
+                el texto, así que centrarla ahí desbordaba. Ahora es
+                `fixed` centrada en el VIEWPORT (no en el span), con
+                márgenes laterales — nunca se sale sin importar dónde cae
+                la palabra INK en el renglón. Jose: "INK no es el buscador
+                de INKognito, INK ES un buscador inteligente, que brinda
+                soluciones" — corregido el texto, ya no lo describe como
+                una herramienta de INKognito sino como el producto mismo. */}
+            {tooltipInkVisible && (
+              <div className="fixed z-30 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-80 top-24 bg-gray-900 rounded-xl p-4 shadow-xl text-left normal-case font-normal">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5">Acerca de INK</p>
+                <p className="text-xs leading-relaxed text-gray-200">
+                  INK es un buscador inteligente, pensado para resolver algo simple pero importante: encontrarte con el tatuador correcto. Te muestra el trabajo real de cada artista, qué tan cerca está de ti, y te conecta directo con él — sin vueltas. Empezamos en Urabá y seguimos creciendo por toda Colombia.
+                </p>
+                <button
+                  onClick={cerrarTooltipInk}
+                  className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
+                >
+                  Entendido
+                </button>
+              </div>
+            )}
 
             {/* Señales de confianza, mismo patrón que ya vimos en Tattoodo
                 ("Verified artists · Easy booking") — Jose pidió agregarlas
