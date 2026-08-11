@@ -919,60 +919,54 @@ export default function ArtistasColombiaPage() {
                 tatuador
               </span>
             </h1>
-            {/* relative en el div envolvente, no en el <p> (2026-08-11) —
-                un <div> no puede vivir dentro de un <p> en HTML válido;
-                anidarlo ahí generaba un cierre implícito del <p> en el
-                navegador que no coincidía con lo que React renderizó en
-                el servidor (mismatch de hidratación). */}
-            <div className="relative max-w-2xl mx-auto">
-              <p className="text-gray-700 text-sm md:text-lg leading-relaxed mt-1.5">
+            {/* div envolvente (no <p>) porque el tooltip de abajo es un
+                <div> — no puede vivir dentro de un <p> en HTML válido; ver
+                comentario completo en el tooltip mismo. */}
+            <div className="max-w-2xl mx-auto">
+              <div className="text-gray-700 text-sm md:text-lg leading-relaxed mt-1.5">
                 {/* "INK" — apodo de INKognito para el buscador (Jose,
                     2026-08-05): se agrega como un toque de marca dentro del
                     copy, en la misma card que ya usa "tatuador" en el
                     título, sin reemplazar "Tattoo Artist Colombia" en
                     navbar/meta/footer — ese texto sigue haciendo el trabajo
-                    de explicarle a quien recién llega de qué se trata esto. */}
-                {/* v2 (fase 6.5, 2026-08-07, Jose: "conecta personas con
-                    estudios de tu ciudad, o de Colombia") — ahora que el
-                    menú separa "Buscar artistas"/"Buscar estudios", el copy
-                    del hero menciona ambos y las dos escalas (ciudad y
-                    nacional), en vez de hablar solo de tatuadores. */}
-                <span className="inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">
+                    de explicarle a quien recién llega de qué se trata esto.
+                    v3 (2026-08-11) — texto acortado: la explicación de qué
+                    es INK y a qué se dedica ahora vive en su tooltip de
+                    onboarding (ver abajo), así que acá solo queda la
+                    instrucción de uso, sin repetir lo mismo dos veces. */}
+                <span className="relative inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">
                   INK
-                </span> El buscador que conecta personas con tatuadores y estudios de tu ciudad. Busca por nombre, municipio, estilo — y déjanos recomendarte el más cercano.
-              </p>
-
-              {/* Tooltip de onboarding sobre la marca INK (2026-08-11) —
-                  primero en la secuencia, antes que el de "Cerca de ti"
-                  (ver useEffect/cerrarTooltipInk arriba). v3: ancla al
-                  bloque de texto completo (`relative` en el div de
-                  arriba), no a la palabra "INK" — Jose: "esa card no debe
-                  ser un modal sino que sale con su flechita como pasa con
-                  cerca de ti". v2 había probado `fixed` centrado en el
-                  viewport para no desbordarse, pero eso lo hacía ver
-                  flotando sin conexión, como un modal — sin la flecha se
-                  perdía la sensación de "esto sale de acá". Anclarlo al
-                  bloque (ya centrado y con margen seguro vía max-w-2xl
-                  mx-auto, a diferencia del span angosto de "INK") resuelve
-                  ambas cosas a la vez: mantiene la flecha apuntando hacia
-                  arriba y nunca se sale de pantalla.
-                  `max-w-[calc(100vw-2rem)]` como respaldo extra en
-                  pantallas muy angostas. */}
-              {tooltipInkVisible && (
-                <div className="absolute z-30 top-full mt-3 left-1/2 -translate-x-1/2 w-72 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left normal-case font-normal">
-                  <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-900 rotate-45" />
-                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5">Acerca de INK</p>
-                  <p className="text-xs leading-relaxed text-gray-200">
-                    INK es un buscador inteligente, pensado para resolver algo simple pero importante: encontrarte con el tatuador correcto. Te muestra el trabajo real de cada artista, qué tan cerca está de ti, y te conecta directo con él — sin vueltas. Empezamos en Urabá y seguimos creciendo por toda Colombia.
-                  </p>
-                  <button
-                    onClick={cerrarTooltipInk}
-                    className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
-                  >
-                    Entendido
-                  </button>
-                </div>
-              )}
+                  {/* Tooltip de onboarding sobre la marca INK (2026-08-11) —
+                      primero en la secuencia, antes que el de "Cerca de ti"
+                      (ver useEffect/cerrarTooltipInk arriba). v4: vuelve a
+                      anclarse a la palabra "INK" (no al bloque de texto
+                      completo de v3) — Jose: "la flecha... debería salir de
+                      la zona izquierda, y más arriba, apuntando justamente
+                      a la palabra ink". Ancla en `left-0` (no centrada) para
+                      que la card se despliegue hacia la derecha desde ahí
+                      en vez de partirse a ambos lados — con "INK" pegado a
+                      la izquierda del bloque de texto, centrarla la hacía
+                      desbordar. `max-w-[calc(100vw-2rem)]` sigue de
+                      respaldo en pantallas muy angostas; el <div> vive
+                      dentro de este <span> (inline-block, no <p>), por eso
+                      el <p> de afuera se cambió a un <div> envolvente. */}
+                  {tooltipInkVisible && (
+                    <div className="absolute z-30 top-full mt-3 left-0 w-72 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left normal-case font-normal">
+                      <span className="absolute -top-1.5 left-4 w-3 h-3 bg-gray-900 rotate-45" />
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1.5">Acerca de INK</p>
+                      <p className="text-xs leading-relaxed text-gray-200">
+                        INK es un buscador inteligente, pensado para resolver algo simple pero importante: encontrarte con el tatuador correcto. Te muestra el trabajo real de cada artista, qué tan cerca está de ti, y te conecta directo con él — sin vueltas. Empezamos en Urabá y seguimos creciendo por toda Colombia.
+                      </p>
+                      <button
+                        onClick={cerrarTooltipInk}
+                        className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
+                      >
+                        Entendido
+                      </button>
+                    </div>
+                  )}
+                </span> Busca por nombre, municipio o estilo, o usa tu ubicación — te mostramos lo más cercano.
+              </div>
             </div>
 
             {/* Señales de confianza, mismo patrón que ya vimos en Tattoodo
