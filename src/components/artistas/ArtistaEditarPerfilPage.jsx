@@ -4,6 +4,7 @@ import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, Ex
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
+import EditarPerfilTabs from './EditarPerfilTabs'
 import { DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO } from '../../data/colombiaGeo'
 import { OPCIONES_DISPONIBILIDAD, DISPONIBILIDAD_COLOR, DISPONIBILIDAD_TEXTO } from './disponibilidad'
 
@@ -22,6 +23,13 @@ const ACCENT = '#B3202F'
 const BTN = '#374151'
 const MP_BLUE = '#3483FA'
 const MP_LOGO_URL = 'https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.21.0/mercadopago/logo__large@2x.png'
+
+// Pestañas de "Editar mi perfil" (2026-08-19) — ver EditarPerfilTabs.jsx.
+const TABS_ARTISTA = [
+  { key: 'perfil', label: 'Mi perfil', icon: MapPin },
+  { key: 'disenos', label: 'Mis diseños', icon: Palette },
+  { key: 'agenda', label: 'Reservas y agenda', icon: CalendarCheck },
+]
 
 const SLOTS = [
   { key: 'foto_url', label: 'Perfil' },
@@ -760,8 +768,17 @@ function ProximasCitasSection({ reservasIniciales }) {
 }
 
 function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioInicial, bloqueosInicial, reservasInicial }) {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const mp = searchParams.get('mp')
+  // Pestaña activa en la URL (2026-08-19) — mismo patrón que ?mp=/
+  // ?bienvenida= que ya usa esta página, da un link directo a una
+  // pestaña específica sin inventar un mecanismo nuevo.
+  const activeTab = searchParams.get('tab') || 'perfil'
+  const cambiarTab = (key) => {
+    const next = new URLSearchParams(searchParams)
+    next.set('tab', key)
+    setSearchParams(next, { replace: true })
+  }
   const [form, setForm] = useState({
     nombre: artista.nombre || '', departamento: artista.departamento || '', municipio: artista.municipio || '',
     lat: artista.lat ?? null, lng: artista.lng ?? null, estilo: artista.estilo || '', bio: artista.bio || '',
@@ -835,6 +852,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
       })
       if (!res.ok) throw new Error()
       setGuardado(true)
+      setTimeout(() => setGuardado(false), 2500)
     } catch {
       setError('No pudimos guardar los cambios — intenta de nuevo en un momento.')
     } finally {
@@ -869,27 +887,12 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
         )}
       </div>
 
-      {/* Confirmación a pantalla completa tras guardar (2026-08-05, Jose:
-          "solo espabila y arriba dice cambio exitoso... quiero que dé la
-          sensación de que sí ocurrió algo") — antes era un texto chico
-          que aparecía arriba sin mover nada más, fácil de no notar. Ahora
-          reemplaza todo el contenido hasta que el artista decide volver. */}
-      {guardado ? (
-        <div className="text-center py-14 px-4 max-w-sm mx-auto">
-          <CheckCircle2 size={48} className="mx-auto mb-4 text-green-600" />
-          <h2 className="text-lg font-black uppercase mb-2">¡Listo!</h2>
-          <p className="text-gray-500 text-sm mb-6">Guardamos tus cambios correctamente.</p>
-          <button
-            type="button"
-            onClick={() => setGuardado(false)}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white font-black uppercase tracking-widest text-xs hover:opacity-90 transition-opacity"
-            style={{ backgroundColor: BTN }}
-          >
-            ← Volver a editar
-          </button>
-        </div>
-      ) : (
-      <>
+      {/* Confirmación en línea (2026-08-19) — antes "guardado" reemplazaba
+          TODA la página con una pantalla "¡Listo!"; con pestañas y dos
+          botones "Guardar cambios" independientes (Mi perfil / Reservas y
+          agenda) ya no tiene sentido tapar la navegación por guardar una
+          sola pestaña. Cada botón ahora pasa a "✓ Guardado" un par de
+          segundos (mismo criterio que HorarioSemanalSection). */}
       {SLOTS.map(({ key }) => (
         <input
           key={key}
@@ -900,6 +903,8 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           onChange={(e) => subirFoto(key, e.target.files?.[0])}
         />
       ))}
+
+      <EditarPerfilTabs tabs={TABS_ARTISTA} activeTab={activeTab} onChange={cambiarTab}>
 
       {/* EDICIÓN IN SITU (2026-08-06, Jose: "esta previsualización...
           debería aparecer de primero en el hero, y no debería estar
@@ -920,7 +925,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           ocuparán el lado derecho") — en móvil sigue apilado igual que
           antes (las clases lg: no hacen nada por debajo de ese
           breakpoint), en desktop se parte en dos bloques lado a lado. */}
-      <div className="lg:grid lg:grid-cols-2 lg:gap-0 lg:items-start lg:w-full">
+      <div className={activeTab === 'perfil' ? 'block' : 'hidden'}>
       <div>
       <div className="w-full h-40 sm:h-56 md:h-72 bg-gray-100 overflow-hidden relative">
         {form.foto_url_2 && <img src={form.foto_url_2} alt="" className="w-full h-full object-cover" />}
@@ -1199,25 +1204,13 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           <div className="border-t border-b border-gray-200" />
         )}
       </div>
-      </div>
 
-      {/* Columna derecha en PC: SOLO "Mis diseños en venta" — sin
-          max-w-lg, ocupa todo el ancho que le queda al lado del perfil
-          editable (2026-08-06, Jose: "que la sesión de agregar o editar
-          diseños ocupe todo el ancho de la pantalla que le queda"). */}
-      <div>
-      <div className="px-4 mt-8 lg:mt-0">
-
-      <MisDisenosSection token={token} cloud_name={cloud_name} upload_preset={upload_preset} mpConectado={artista.mp_conectado} />
-
-      </div>
-      </div>
-      </div>
-
-      {/* Resto del formulario — un solo bloque largo, a todo el ancho,
-          debajo de las dos columnas de arriba (2026-08-06, Jose: "así
-          formamos, dos bloques arriba, y uno largo debajo de ambos"). */}
-      <div className="px-4 mt-8">
+      {/* Resto de "Mi perfil" — ubicación/no tatúa/precio/disponibilidad,
+          antes vivía en un solo formulario largo compartido con "Reservas
+          con anticipo"; ahora cada pestaña guarda por su cuenta, mismo
+          estado `form` de siempre así que no se pierde nada al cambiar de
+          pestaña. */}
+      <div className="px-4 lg:px-0 mt-8">
       <form onSubmit={guardar} className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -1241,22 +1234,10 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
             {ubicando ? <LoaderCircle size={14} className="animate-spin" /> : form.lat ? <Check size={14} /> : <Navigation size={14} />}
             {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación exacta guardada' : 'Actualizar mi ubicación exacta'}
           </button>
-          {/* Aclaración (2026-08-07, Jose confundió esto con el link de
-              Google Maps, pensando que uno reemplaza al otro) — son
-              independientes: esto alimenta el orden por cercanía del
-              buscador, el link de Google Maps de abajo NO. */}
           <p className="text-gray-400 text-[10px] mt-1.5 text-center">Actívalo siempre — es lo único que ordena tu perfil por cercanía real en el buscador, tengas o no link de Google Maps.</p>
         </div>
 
         <div>
-          {/* Link de Google Maps (2026-08-07, Jose: "conectar el botón de
-              ubicación con el mapa real de ese negocio") — opcional; sin
-              esto, el chip de ubicación del perfil público igual funciona
-              (cae a la ubicación exacta de arriba o a una búsqueda por
-              nombre+municipio). Texto de ayuda explícito (Jose confundió
-              esto con la ubicación exacta, pensando que había que elegir
-              una de las dos) — deja claro que esto es ADEMÁS, no en su
-              lugar, y que no afecta el orden del buscador. */}
           <label className={labelClass}>Link de Google Maps (opcional)</label>
           <input className={inputClass} value={form.google_maps_url} onChange={set('google_maps_url')} placeholder="https://maps.app.goo.gl/..." />
           <p className="text-gray-400 text-[10px] mt-1">Si ya tienes ficha de tu estudio/local en Google Maps, pégala acá — el botón de ubicación de tu perfil abrirá esa ficha real en vez de un pin genérico. No reemplaza la ubicación exacta de arriba, es un extra: no afecta el orden del buscador.</p>
@@ -1267,12 +1248,6 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           <input className={inputClass} value={form.no_tatua} onChange={set('no_tatua')} placeholder="Ej: rostro, manos, zonas genitales" />
         </div>
 
-        {/* Precio/disponibilidad (2026-08-06, Jose: "la opción de editar
-            del artista no tiene para elegir estos dos datos" — antes solo
-            se podían cambiar desde el panel admin; se muestran en el
-            perfil público como badges, tiene sentido que el artista los
-            actualice él mismo, sobre todo disponibilidad, que cambia
-            seguido). */}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className={labelClass}>Precio</label>
@@ -1290,6 +1265,38 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           </div>
         </div>
 
+        {error && <p className="text-sm" style={{ color: ACCENT }}>{error}</p>}
+        <button
+          type="submit"
+          disabled={guardando}
+          className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
+          style={{ backgroundColor: BTN }}
+        >
+          {guardando ? 'Guardando...' : guardado ? '✓ Guardado' : 'Guardar cambios'}
+        </button>
+      </form>
+      </div>
+      </div>
+      </div>
+
+      {/* Pestaña "Mis diseños" (2026-08-19) — antes vivía al lado del
+          hero en una grilla de 2 columnas; ahora es su propia pestaña,
+          sin compartir ancho con nada. */}
+      <div className={activeTab === 'disenos' ? 'block' : 'hidden'}>
+      <div className="px-4 lg:px-0">
+
+      <MisDisenosSection token={token} cloud_name={cloud_name} upload_preset={upload_preset} mpConectado={artista.mp_conectado} />
+
+      </div>
+      </div>
+
+      {/* Pestaña "Reservas y agenda" (2026-08-19) — antes era "el resto
+          del formulario" a todo el ancho; ahora agrupa también el
+          horario semanal, bloqueos y próximas citas que estaban debajo,
+          todo en un solo lugar. */}
+      <div className={activeTab === 'agenda' ? 'block' : 'hidden'}>
+      <div className="px-4 lg:px-0">
+      <form onSubmit={guardar} className="space-y-4">
         {/* Reservas con anticipo (fase 2, 2026-08-06) — un solo campo
             obligatorio para activar el botón "Reservar" en el perfil: el
             monto real que se cobra por Mercado Pago. No es un anticipo
@@ -1367,7 +1374,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
           style={{ backgroundColor: BTN }}
         >
-          {guardando ? 'Guardando...' : 'Guardar cambios'}
+          {guardando ? 'Guardando...' : guardado ? '✓ Guardado' : 'Guardar cambios'}
         </button>
       </form>
       </div>
@@ -1376,7 +1383,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           dividamos el espacio como hicimos arriba") — mismo patrón que el
           split de perfil editable / diseños más arriba (lg:grid-cols-2).
           En móvil sigue apilado igual que antes. */}
-      <div className="px-4 mt-6 lg:grid lg:grid-cols-2 lg:gap-4 lg:items-start">
+      <div className="px-4 lg:px-0 mt-6 lg:grid lg:grid-cols-2 lg:gap-4 lg:items-start">
         <div>
           <HorarioSemanalSection token={token} horarioInicial={horarioInicial} />
         </div>
@@ -1385,8 +1392,9 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           <BloqueosSection token={token} bloqueosInicial={bloqueosInicial} />
         </div>
       </div>
-      </>
-      )}
+      </div>
+
+      </EditarPerfilTabs>
     </div>
   )
 }

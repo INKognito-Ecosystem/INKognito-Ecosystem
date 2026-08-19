@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLoaderData, useNavigate, useSearchParams } from 'react-router-dom'
-import { Camera, LoaderCircle, Mail, Pencil, MapPin, CheckCircle2, Users, UserPlus, X, Navigation, Check, Trash2, ShoppingBag, ExternalLink, Wallet, ChevronDown, Copy } from 'lucide-react'
+import { Camera, LoaderCircle, Mail, Pencil, MapPin, Users, UserPlus, X, Navigation, Check, Trash2, ShoppingBag, ExternalLink, Wallet, ChevronDown, Copy } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
+import EditarPerfilTabs from './EditarPerfilTabs'
 import { DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO } from '../../data/colombiaGeo'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
@@ -784,8 +785,25 @@ function MisVentasSupplySection({ token }) {
 }
 
 function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, invitaciones }) {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const mp = searchParams.get('mp')
+  // Pestañas (2026-08-19) — mismo patrón que ArtistaEditarPerfilPage.jsx:
+  // "Supply" solo aparece en el menú si el estudio tiene vende_supply
+  // activo. Si la URL trae un ?tab= que ya no aplica (ej. se desactivó
+  // Supply), cae de vuelta a "Mi perfil" en vez de mostrar una pestaña
+  // fantasma.
+  const tabsEstudio = [
+    { key: 'perfil', label: 'Mi perfil', icon: MapPin },
+    { key: 'equipo', label: estudio.tipo === 'empresa' ? 'Patrocinados' : 'Mi equipo', icon: Users },
+    ...(estudio.vende_supply ? [{ key: 'supply', label: 'Supply', icon: ShoppingBag }] : []),
+  ]
+  const tabPedido = searchParams.get('tab')
+  const activeTab = tabsEstudio.some((t) => t.key === tabPedido) ? tabPedido : 'perfil'
+  const cambiarTab = (key) => {
+    const next = new URLSearchParams(searchParams)
+    next.set('tab', key)
+    setSearchParams(next, { replace: true })
+  }
   const [form, setForm] = useState({
     nombre: estudio.nombre || '', departamento: estudio.departamento || '', municipio: estudio.municipio || '',
     lat: estudio.lat ?? null, lng: estudio.lng ?? null,
@@ -854,6 +872,7 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
       })
       if (!res.ok) throw new Error()
       setGuardado(true)
+      setTimeout(() => setGuardado(false), 2500)
     } catch {
       setError('No pudimos guardar los cambios — intenta de nuevo en un momento.')
     } finally {
@@ -861,31 +880,15 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
     }
   }
 
-  if (guardado) {
-    return (
-      <div className="text-center py-14 px-4 max-w-sm mx-auto">
-        <CheckCircle2 size={48} className="mx-auto mb-4 text-green-600" />
-        <h2 className="text-lg font-black uppercase mb-2">¡Listo!</h2>
-        <p className="text-gray-500 text-sm mb-6">Guardamos los cambios de tu estudio.</p>
-        <button
-          type="button"
-          onClick={() => setGuardado(false)}
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white font-black uppercase tracking-widest text-xs hover:opacity-90 transition-opacity"
-          style={{ backgroundColor: BTN }}
-        >
-          ← Volver a editar
-        </button>
-      </div>
-    )
-  }
-
   return (
-    <div className="max-w-3xl mx-auto px-4">
-      <p className="text-gray-500 text-sm text-center mb-6 pt-2">Hola {estudio.nombre} — toca "Editar" para cambiar los datos del estudio, o cualquier foto para reemplazarla.</p>
+    <div className="max-w-3xl lg:max-w-none mx-auto">
+      <div className="px-4 max-w-3xl mx-auto">
+        <p className="text-gray-500 text-sm text-center mb-6 pt-2">Hola {estudio.nombre} — toca "Editar" para cambiar los datos del estudio, o cualquier foto para reemplazarla.</p>
 
-      {searchParams.get('bienvenida') === '1' && (
-        <p className="text-sm text-center mb-4 py-2 rounded-lg bg-green-50 text-green-700 font-bold">✓ Tu correo quedó confirmado — ya puedes editar tu perfil</p>
-      )}
+        {searchParams.get('bienvenida') === '1' && (
+          <p className="text-sm text-center mb-4 py-2 rounded-lg bg-green-50 text-green-700 font-bold">✓ Tu correo quedó confirmado — ya puedes editar tu perfil</p>
+        )}
+      </div>
 
       {SLOTS_ESTUDIO.map(({ key }) => (
         <input
@@ -897,6 +900,11 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
           onChange={(e) => subirFoto(key, e.target.files?.[0])}
         />
       ))}
+
+      <EditarPerfilTabs tabs={tabsEstudio} activeTab={activeTab} onChange={cambiarTab}>
+
+      <div className={activeTab === 'perfil' ? 'block' : 'hidden'}>
+      <div className="px-4 max-w-3xl mx-auto lg:mx-0">
 
       <div className="w-full h-40 sm:h-56 bg-gray-100 overflow-hidden relative rounded-2xl">
         {form.foto_portada && <img src={form.foto_portada} alt="" className="w-full h-full object-cover" />}
@@ -1044,14 +1052,6 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
         <p className="text-gray-400 text-[10px] mt-2 flex items-center gap-1"><MapPin size={10} />{form.municipio ? `${form.municipio}${form.departamento ? ', ' + form.departamento : ''}` : 'Sin ubicación'}</p>
       )}
 
-      {/* v2 (fase 6.2, 2026-08-07, Jose: "de ahí mandar el correo de
-          patrocinio a algún artista") — ya NO se oculta para tipo=
-          'empresa'; una empresa proveedora sí puede patrocinar artistas,
-          mismos datos/endpoints, MiEquipoSection reencuadra el copy sola. */}
-      <div className="mt-8">
-        <MiEquipoSection token={token} artistas={estudio.artistas} invitacionesIniciales={invitaciones} esEmpresa={estudio.tipo === 'empresa'} />
-      </div>
-
       {/* fase 6.2 (2026-08-07) — link a su propio catálogo (interno o
           externo), solo para marcas/empresas. Reusa el mismo mecanismo
           que ya redirige /supply/estudio/:id cuando este campo está
@@ -1064,11 +1064,34 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
         </div>
       )}
 
-      {/* Supply multitenant (fase 4, 2026-08-07) — solo aparece si Jose
-          activó vende_supply para este estudio desde el panel; sin eso,
-          ni siquiera se nota que la función existe. */}
+      {error && <p className="text-red-600 text-sm text-center mt-8">{error}</p>}
+      <button
+        type="button"
+        onClick={guardar}
+        disabled={guardando}
+        className="w-full mt-4 py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
+        style={{ backgroundColor: BTN }}
+      >
+        {guardando ? 'Guardando...' : guardado ? '✓ Guardado' : 'Guardar cambios'}
+      </button>
+
+      </div>
+      </div>
+
+      {/* Pestaña "Mi equipo"/"Patrocinados" (2026-08-19) — antes vivía
+          pegada debajo del hero; ahora es su propia pestaña, self-
+          contained (guarda aparte, no necesita el botón de arriba). */}
+      <div className={activeTab === 'equipo' ? 'block' : 'hidden'}>
+      <div className="px-4 max-w-3xl mx-auto lg:mx-0">
+        <MiEquipoSection token={token} artistas={estudio.artistas} invitacionesIniciales={invitaciones} esEmpresa={estudio.tipo === 'empresa'} />
+      </div>
+      </div>
+
+      {/* Pestaña "Supply" (2026-08-19) — solo se monta si vende_supply,
+          mismo criterio que ya decide si aparece en tabsEstudio. */}
       {estudio.vende_supply && (
-        <div className="mt-8 space-y-4">
+      <div className={activeTab === 'supply' ? 'block' : 'hidden'}>
+      <div className="px-4 max-w-3xl mx-auto lg:mx-0 space-y-4">
           <div>
             <label className={labelClass}>Nombre para mostrar en Supply (opcional)</label>
             <input value={form.nombre_supply} onChange={set('nombre_supply')} placeholder={form.nombre || 'Nombre del estudio'} className={inputClass} />
@@ -1125,20 +1148,22 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
 
           <MisVentasSupplySection token={token} />
           <MisProductosSupplySection token={token} cloud_name={cloud_name} upload_preset={upload_preset} />
-        </div>
+
+          {error && <p className="text-red-600 text-sm text-center mt-4">{error}</p>}
+          <button
+            type="button"
+            onClick={guardar}
+            disabled={guardando}
+            className="w-full mt-4 py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
+            style={{ backgroundColor: BTN }}
+          >
+            {guardando ? 'Guardando...' : guardado ? '✓ Guardado' : 'Guardar cambios'}
+          </button>
+      </div>
+      </div>
       )}
 
-      {error && <p className="text-red-600 text-sm text-center mb-4">{error}</p>}
-
-      <button
-        type="button"
-        onClick={guardar}
-        disabled={guardando}
-        className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
-        style={{ backgroundColor: BTN }}
-      >
-        {guardando ? 'Guardando...' : 'Guardar cambios'}
-      </button>
+      </EditarPerfilTabs>
     </div>
   )
 }
