@@ -444,7 +444,7 @@ export default function ArtistaLandingPage() {
     setReservaMesVisible({ year: hoy.getFullYear(), month: hoy.getMonth() })
     setFechaElegida(null)
     setHoraElegida(null)
-    setSlotsDia([])
+    setVentanaDia(null)
     setReservaPaso(artista.tiene_horario ? 1 : 3)
     setReservando(true)
   }
