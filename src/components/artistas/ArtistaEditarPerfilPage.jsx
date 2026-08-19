@@ -1372,10 +1372,18 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
       </form>
       </div>
 
-      <div className="px-4 mt-6">
-        <ProximasCitasSection reservasIniciales={reservasInicial} />
-        <HorarioSemanalSection token={token} horarioInicial={horarioInicial} />
-        <BloqueosSection token={token} bloqueosInicial={bloqueosInicial} />
+      {/* Dos columnas en PC (2026-08-19, Jose: "ocupan mucho a lo largo,
+          dividamos el espacio como hicimos arriba") — mismo patrón que el
+          split de perfil editable / diseños más arriba (lg:grid-cols-2).
+          En móvil sigue apilado igual que antes. */}
+      <div className="px-4 mt-6 lg:grid lg:grid-cols-2 lg:gap-4 lg:items-start">
+        <div>
+          <HorarioSemanalSection token={token} horarioInicial={horarioInicial} />
+        </div>
+        <div>
+          <ProximasCitasSection reservasIniciales={reservasInicial} />
+          <BloqueosSection token={token} bloqueosInicial={bloqueosInicial} />
+        </div>
       </div>
       </>
       )}
