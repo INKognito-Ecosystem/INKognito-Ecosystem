@@ -1518,7 +1518,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
                 placeholder="Ej: 50000"
               />
             </div>
-            <p className="text-gray-400 text-[11px] mt-1">Esto es lo que el cliente paga para agendar contigo — no un anticipo parcial, es el monto completo de la reserva. Con solo este campo ya puedes empezar a recibir reservas pagas.</p>
+            <p className="text-gray-400 text-[11px] mt-1">Es el monto completo que el cliente paga para reservar contigo — no un anticipo parcial de un total mayor.</p>
           </div>
           <div className="mt-3">
             <label className={labelClass}>El valor de mi sesión (COP, opcional)</label>
@@ -1530,7 +1530,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
                 placeholder="Ej: 150000"
               />
             </div>
-            <p className="text-gray-400 text-[11px] mt-1">Opcional — no te compromete a cobrar exactamente eso, pero da contexto para que quien te escribe ya venga con una expectativa clara. Muchos artistas prefieren dejarlo vacío y solo publicar "Para agendar", sin exponer sus tarifas — también funciona bien así.</p>
+            <p className="text-gray-400 text-[11px] mt-1">Opcional — publícalo solo si es un valor real que respaldas, el mismo que le dirías a un cliente que pregunta directamente. Si tu tarifa varía mucho según el diseño, mejor déjalo vacío y publica solo "Para agendar" — es preferible no mostrar un número a mostrar uno que no vas a cumplir.</p>
           </div>
           {/* Anticipación mínima (2026-08-19, Jose: "cada artista debería
               poder elegir su propio mínimo... unos manejan diseños
