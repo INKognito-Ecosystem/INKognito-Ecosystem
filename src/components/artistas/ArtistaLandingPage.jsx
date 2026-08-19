@@ -183,7 +183,11 @@ export default function ArtistaLandingPage() {
   const [dispoMes, setDispoMes] = useState({})
   const [cargandoMes, setCargandoMes] = useState(false)
   const [fechaElegida, setFechaElegida] = useState(null)
-  const [slotsDia, setSlotsDia] = useState([])
+  // ventanaDia (2026-08-19, Jose: "debería dejarme elegir cualquier
+  // hora... teniendo en cuenta el horario que maneje el artista") —
+  // reemplaza la lista de franjas fijas: { disponible, hora_inicio,
+  // hora_fin, bloqueosParciales }.
+  const [ventanaDia, setVentanaDia] = useState(null)
   const [cargandoDia, setCargandoDia] = useState(false)
   const [horaElegida, setHoraElegida] = useState(null)
   // Tooltip de onboarding sobre "Para agendar" (2026-08-11, mismo patrón
@@ -469,18 +473,26 @@ export default function ArtistaLandingPage() {
     if (dispoMes[iso] !== 'disponible') return
     setFechaElegida(iso)
     setHoraElegida(null)
-    setSlotsDia([])
+    setVentanaDia(null)
     setCargandoDia(true)
     setReservaPaso(2)
     fetch(`${PANEL_URL}/api/artistas-disponibilidad-dia?artista_id=${artista.id}&fecha=${iso}`)
-      .then(r => r.ok ? r.json() : { slots: [] })
-      .then(data => setSlotsDia(data.slots || []))
-      .catch(() => setSlotsDia([]))
+      .then(r => r.ok ? r.json() : { disponible: false })
+      .then(data => {
+        setVentanaDia(data)
+        if (data.disponible) setHoraElegida(data.hora_inicio)
+      })
+      .catch(() => setVentanaDia({ disponible: false }))
       .finally(() => setCargandoDia(false))
   }
 
-  const elegirHora = (hhmm) => {
-    setHoraElegida(hhmm)
+  // Hora libre (2026-08-19) — dentro del rango del artista ese día, sin
+  // caer en un bloqueo puntual (ej. el almuerzo).
+  const horaEnBloqueoParcial = !!ventanaDia?.bloqueosParciales?.some(
+    (b) => horaElegida >= b.hora_inicio && horaElegida < b.hora_fin
+  )
+  const confirmarHora = () => {
+    if (!horaElegida || horaEnBloqueoParcial) return
     setReservaPaso(3)
   }
 
@@ -1370,7 +1382,10 @@ export default function ArtistaLandingPage() {
               </>
             )}
 
-            {/* Paso 2 — franjas del día elegido. */}
+            {/* Paso 2 — hora libre dentro del horario del artista ese día
+                (2026-08-19, Jose: "debería dejarme elegir cualquier hora,
+                obviamente teniendo en cuenta el horario que maneje el
+                artista"). */}
             {artista.tiene_horario && reservaPaso === 2 && (
               <>
                 <button type="button" onClick={() => setReservaPaso(1)} className="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-2">
@@ -1378,25 +1393,33 @@ export default function ArtistaLandingPage() {
                 </button>
                 <p className="text-gray-500 text-xs italic mb-3">{fechaElegida} — elige una hora.</p>
                 {cargandoDia ? (
-                  <p className="text-center text-gray-400 text-xs py-8">Cargando horarios...</p>
-                ) : slotsDia.length === 0 ? (
-                  <p className="text-center text-gray-400 text-xs py-8">Ese día no tiene franjas configuradas.</p>
+                  <p className="text-center text-gray-400 text-xs py-8">Cargando horario...</p>
+                ) : !ventanaDia?.disponible ? (
+                  <p className="text-center text-gray-400 text-xs py-8">Ese día ya no está disponible — vuelve a elegir otro.</p>
                 ) : (
-                  <div className="grid grid-cols-3 gap-2">
-                    {slotsDia.map((s) => (
-                      <button
-                        key={s.hora_inicio}
-                        type="button"
-                        disabled={!s.libre}
-                        onClick={() => elegirHora(s.hora_inicio)}
-                        className={`py-2 rounded-lg text-[11px] font-bold border transition-colors ${
-                          s.libre ? 'border-gray-300 text-gray-700 hover:border-gray-500' : 'border-gray-100 text-gray-300 line-through'
-                        }`}
-                      >
-                        {formatearHora12(s.hora_inicio)}
-                      </button>
-                    ))}
-                  </div>
+                  <>
+                    <input
+                      type="time"
+                      value={horaElegida || ''}
+                      min={ventanaDia.hora_inicio}
+                      max={ventanaDia.hora_fin}
+                      onChange={(e) => setHoraElegida(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-gray-500"
+                    />
+                    <p className="text-gray-400 text-[10px] mt-1.5">Disponible entre {formatearHora12(ventanaDia.hora_inicio)} y {formatearHora12(ventanaDia.hora_fin)}.</p>
+                    {horaEnBloqueoParcial && (
+                      <p className="text-xs mt-1.5" style={{ color: ACCENT }}>Esa hora tiene un bloqueo (ej. almuerzo) — elige otra.</p>
+                    )}
+                    <button
+                      type="button"
+                      onClick={confirmarHora}
+                      disabled={!horaElegida || horaEnBloqueoParcial}
+                      className="w-full mt-3 py-3 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40 text-xs"
+                      style={{ backgroundColor: BTN }}
+                    >
+                      Continuar
+                    </button>
+                  </>
                 )}
               </>
             )}

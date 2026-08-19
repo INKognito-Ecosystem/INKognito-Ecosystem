@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData, useSearchParams, useNavigate } from 'react-router-dom'
-import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarX, CalendarCheck, ChevronLeft, ChevronRight, Lock } from 'lucide-react'
+import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarX, CalendarCheck, ChevronLeft, ChevronRight } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
@@ -649,6 +649,12 @@ function CalendarioBloqueosSection({ token }) {
   const [dias, setDias] = useState({})
   const [cargando, setCargando] = useState(false)
   const [error, setError] = useState(null)
+  // Modal de detalle (2026-08-19, Jose: "me gustaría ver los datos y la
+  // idea de diseño de esa persona") — click en un día "reservado".
+  const [detalle, setDetalle] = useState(null) // { iso, cargando, datos, error }
+  // Modal de entrada manual (2026-08-19, Jose: "que abra un modal donde
+  // escribe de manera manual qué ocurrirá ese día") — click en "disponible".
+  const [manual, setManual] = useState(null) // { iso } cuando está abierto
 
   useEffect(() => {
     const { year, month } = mesVisible
@@ -670,46 +676,47 @@ function CalendarioBloqueosSection({ token }) {
     })
   }
 
-  const clickDia = async (iso) => {
-    const info = dias[iso]
-    if (!info || info.estado === 'reservado' || info.estado === 'cerrado') return
-    setError(null)
-    if (info.estado === 'disponible') {
-      setDias((prev) => ({ ...prev, [iso]: { estado: 'bloqueado' } }))
-      try {
-        const res = await fetch(`${PANEL_URL}/api/artistas-bloqueos-por-token`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token, fecha: iso, hora_inicio: null, hora_fin: null, motivo: null }),
-        })
-        const data = await res.json().catch(() => ({}))
-        if (!res.ok) throw new Error()
-        setDias((prev) => ({ ...prev, [iso]: { estado: 'bloqueado', bloqueo_id: data.id } }))
-      } catch {
-        setDias((prev) => ({ ...prev, [iso]: { estado: 'disponible' } }))
-        setError('No pudimos bloquear ese día — intenta de nuevo.')
-      }
-    } else if (info.estado === 'bloqueado') {
-      setDias((prev) => ({ ...prev, [iso]: { estado: 'disponible' } }))
-      try {
-        const res = await fetch(`${PANEL_URL}/api/artistas-bloqueos-eliminar-por-token`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token, id: info.bloqueo_id }),
-        })
-        if (!res.ok) throw new Error()
-      } catch {
-        setDias((prev) => ({ ...prev, [iso]: info }))
-        setError('No pudimos desbloquear ese día — intenta de nuevo.')
-      }
+  const verDetalle = async (iso) => {
+    setDetalle({ iso, cargando: true, datos: null, error: null })
+    try {
+      const res = await fetch(`${PANEL_URL}/api/artistas-reserva-dia-por-token?token=${encodeURIComponent(token)}&fecha=${iso}`)
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || '')
+      setDetalle({ iso, cargando: false, datos: data, error: null })
+    } catch (err) {
+      setDetalle({ iso, cargando: false, datos: null, error: err.message || 'No pudimos cargar los datos de esa cita.' })
     }
+  }
+
+  const desbloquear = async (iso, info) => {
+    setDias((prev) => ({ ...prev, [iso]: { estado: 'disponible' } }))
+    try {
+      const res = await fetch(`${PANEL_URL}/api/artistas-bloqueos-eliminar-por-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, id: info.bloqueo_id }),
+      })
+      if (!res.ok) throw new Error()
+    } catch {
+      setDias((prev) => ({ ...prev, [iso]: info }))
+      setError('No pudimos desbloquear ese día — intenta de nuevo.')
+    }
+  }
+
+  const clickDia = (iso) => {
+    const info = dias[iso]
+    if (!info || info.estado === 'cerrado') return
+    setError(null)
+    if (info.estado === 'reservado') verDetalle(iso)
+    else if (info.estado === 'disponible') setManual({ iso })
+    else if (info.estado === 'bloqueado') desbloquear(iso, info)
   }
 
   return (
     <div className="mb-6 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5">
       <p className={labelClass}><CalendarX size={12} className="inline -mt-0.5 mr-1" />Días bloqueados</p>
       <p className="text-gray-500 text-[11px] leading-relaxed mb-4">
-        Toca un día para bloquearlo (vacaciones, día libre) o desbloquearlo — un día con ✕ verde ya tiene una cita real pagada, ese no se puede tocar desde acá.
+        Toca un día disponible para anotar qué va a pasar (o bloquearlo sin más), toca uno bloqueado para liberarlo, o toca uno con ✓ verde para ver los datos de esa cita.
       </p>
 
       <div className="flex items-center justify-between mb-2">
@@ -729,7 +736,7 @@ function CalendarioBloqueosSection({ token }) {
           if (!c) return <span key={i} />
           const info = dias[c.iso]
           const estado = info?.estado
-          const clickeable = estado === 'disponible' || estado === 'bloqueado'
+          const clickeable = estado === 'disponible' || estado === 'bloqueado' || estado === 'reservado'
           const estilos = {
             disponible: 'bg-white border border-gray-300 text-gray-700 hover:border-gray-500',
             bloqueado: 'bg-red-50 border border-red-200 text-red-600',
@@ -746,13 +753,136 @@ function CalendarioBloqueosSection({ token }) {
             >
               {c.dia}
               {estado === 'bloqueado' && <X size={9} />}
-              {estado === 'reservado' && <Lock size={9} />}
+              {estado === 'reservado' && <Check size={9} />}
             </button>
           )
         })}
       </div>
       {cargando && <p className="text-center text-gray-400 text-[11px] mt-3">Cargando...</p>}
       {error && <p className="text-red-600 text-xs mt-3">{error}</p>}
+
+      {detalle && (
+        <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center px-4 py-8" onClick={() => setDetalle(null)}>
+          <div className="bg-white rounded-2xl w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
+            <p className="font-black uppercase text-sm mb-3">{detalle.iso}</p>
+            {detalle.cargando ? (
+              <p className="text-gray-400 text-xs">Cargando...</p>
+            ) : detalle.error ? (
+              <p className="text-red-600 text-xs">{detalle.error}</p>
+            ) : (
+              <div className="space-y-2 text-sm">
+                <p><span className="text-gray-400 text-[11px] uppercase tracking-widest block">Cliente</span>{detalle.datos.cliente_nombre || '—'}</p>
+                {detalle.datos.hora_inicio_slot && <p><span className="text-gray-400 text-[11px] uppercase tracking-widest block">Hora</span>{detalle.datos.hora_inicio_slot.slice(0, 5)}</p>}
+                {detalle.datos.cliente_email && <p><span className="text-gray-400 text-[11px] uppercase tracking-widest block">Correo</span>{detalle.datos.cliente_email}</p>}
+                {detalle.datos.cliente_telefono && (
+                  <p>
+                    <span className="text-gray-400 text-[11px] uppercase tracking-widest block">WhatsApp</span>
+                    <a href={`https://wa.me/${detalle.datos.cliente_telefono}`} target="_blank" rel="noreferrer" className="text-green-700 font-bold">{detalle.datos.cliente_telefono}</a>
+                  </p>
+                )}
+                {detalle.datos.mensaje && <p><span className="text-gray-400 text-[11px] uppercase tracking-widest block">Idea de diseño</span>{detalle.datos.mensaje}</p>}
+                {detalle.datos.origen === 'online' && <p><span className="text-gray-400 text-[11px] uppercase tracking-widest block">Pagó</span>${Number(detalle.datos.monto_pagado).toLocaleString('es-CO')}</p>}
+                {detalle.datos.origen === 'manual' && <p className="text-gray-400 text-[11px] italic">Anotada a mano, sin pago en línea.</p>}
+              </div>
+            )}
+            <button type="button" onClick={() => setDetalle(null)} className="w-full mt-4 text-center text-gray-400 text-[11px] uppercase tracking-widest py-1">Cerrar</button>
+          </div>
+        </div>
+      )}
+
+      {manual && (
+        <ModalDiaManual
+          token={token}
+          iso={manual.iso}
+          onClose={() => setManual(null)}
+          onGuardado={(iso, resultado) => {
+            setDias((prev) => ({
+              ...prev,
+              [iso]: resultado.tipo === 'reserva' ? { estado: 'reservado' } : { estado: 'bloqueado', bloqueo_id: resultado.id },
+            }))
+            setManual(null)
+          }}
+        />
+      )}
+    </div>
+  )
+}
+
+// Modal de entrada manual (2026-08-19) — motivo obligatorio, datos de
+// cliente opcionales. Con datos de cliente se vuelve una cita real
+// (aparece "reservado" y entra al recordatorio por correo); sin ellos,
+// un bloqueo simple.
+function ModalDiaManual({ token, iso, onClose, onGuardado }) {
+  const [motivo, setMotivo] = useState('')
+  const [conCliente, setConCliente] = useState(false)
+  const [clienteNombre, setClienteNombre] = useState('')
+  const [clienteEmail, setClienteEmail] = useState('')
+  const [clienteTelefono, setClienteTelefono] = useState('')
+  const [guardando, setGuardando] = useState(false)
+  const [error, setError] = useState(null)
+
+  const guardar = async (e) => {
+    e.preventDefault()
+    setError(null)
+    setGuardando(true)
+    try {
+      const res = await fetch(`${PANEL_URL}/api/artistas-dia-manual-por-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token, fecha: iso, motivo,
+          cliente_nombre: conCliente ? clienteNombre : null,
+          cliente_email: conCliente ? clienteEmail : null,
+          cliente_telefono: conCliente ? clienteTelefono : null,
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || '')
+      onGuardado(iso, data)
+    } catch (err) {
+      setError(err.message || 'No pudimos guardar — intenta de nuevo.')
+    } finally {
+      setGuardando(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center px-4 py-8" onClick={() => !guardando && onClose()}>
+      <div className="bg-white rounded-2xl w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
+        <p className="font-black uppercase text-sm mb-1">{iso}</p>
+        <p className="text-gray-500 text-xs mb-3">¿Qué va a pasar este día? Lo más probable es que sea un tatuaje que ya coordinaste por fuera de la plataforma.</p>
+        <form onSubmit={guardar} className="space-y-2.5">
+          <textarea
+            required
+            rows={2}
+            placeholder="Ej: Diseño de manga para Juan Pérez"
+            value={motivo}
+            onChange={(e) => setMotivo(e.target.value)}
+            className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none"
+          />
+          <label className="flex items-center gap-2 text-xs text-gray-600">
+            <input type="checkbox" checked={conCliente} onChange={(e) => setConCliente(e.target.checked)} />
+            Tengo los datos del cliente (para poder avisarle un día antes)
+          </label>
+          {conCliente && (
+            <div className="space-y-2 pl-1 border-l-2 border-gray-200 pl-3">
+              <input type="text" placeholder="Nombre del cliente" value={clienteNombre} onChange={(e) => setClienteNombre(e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-xs" />
+              <input type="email" placeholder="Correo (para el recordatorio)" value={clienteEmail} onChange={(e) => setClienteEmail(e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-xs" />
+              <input type="text" placeholder="WhatsApp (573XXXXXXXXX)" value={clienteTelefono} onChange={(e) => setClienteTelefono(e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-xs" />
+            </div>
+          )}
+          {error && <p className="text-red-600 text-xs">{error}</p>}
+          <button
+            type="submit"
+            disabled={guardando}
+            className="w-full py-2.5 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60"
+            style={{ backgroundColor: BTN }}
+          >
+            {guardando ? 'Guardando...' : 'Guardar'}
+          </button>
+          <button type="button" onClick={onClose} className="w-full text-center text-gray-400 text-[11px] uppercase tracking-widest py-1">Cancelar</button>
+        </form>
+      </div>
     </div>
   )
 }
@@ -772,7 +902,7 @@ function ProximasCitasSection({ reservasIniciales }) {
           <div key={r.id} className="bg-white border border-gray-200 rounded-lg px-3 py-2.5">
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-black text-gray-900">
-                {r.fecha_slot ? `${r.fecha_slot.slice(0, 10)} · ${r.hora_inicio_slot?.slice(0, 5)}–${r.hora_fin_slot?.slice(0, 5)}` : 'Sin fecha agendada aún'}
+                {r.fecha_slot ? `${r.fecha_slot.slice(0, 10)}${r.hora_inicio_slot ? ' · ' + r.hora_inicio_slot.slice(0, 5) : ''}` : 'Sin fecha agendada aún'}
               </span>
               <span className="text-[11px] font-bold text-green-600">${Number(r.monto_pagado).toLocaleString('es-CO')}</span>
             </div>
@@ -808,7 +938,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
     no_tatua: artista.no_tatua || '',
     precio_nivel: artista.precio_nivel ?? '', disponibilidad: artista.disponibilidad || '',
     precio_agendar: artista.precio_agendar ?? '', precio_sesion_texto: artista.precio_sesion_texto || '',
-    duracion_franja_min: artista.duracion_franja_min || 60,
+    anticipacion_min_dias: artista.anticipacion_min_dias ?? 1,
     foto_url: artista.foto_url || '', foto_url_2: artista.foto_url_2 || '',
     foto_trabajo_1: artista.foto_trabajo_1 || '', foto_trabajo_2: artista.foto_trabajo_2 || '', foto_trabajo_3: artista.foto_trabajo_3 || '',
     google_maps_url: artista.google_maps_url || '',
@@ -1403,24 +1533,28 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
             </div>
             <p className="text-gray-400 text-[11px] mt-1">Opcional — no te compromete a cobrar exactamente eso, pero da contexto para que quien te escribe ya venga con una expectativa clara. Muchos artistas prefieren dejarlo vacío y solo publicar "Para agendar", sin exponer sus tarifas — también funciona bien así.</p>
           </div>
-          {/* Calendario real (fase 1 de agenda, 2026-08-19) — duración de
-              franja es un escalar simple de artistas, vive en el mismo
-              formulario que los precios. El horario semanal y los bloqueos
-              (uno-a-muchos) viven aparte, en HorarioSemanalSection/
-              BloqueosSection debajo de este formulario. */}
+          {/* Anticipación mínima (2026-08-19, Jose: "cada artista debería
+              poder elegir su propio mínimo... unos manejan diseños
+              complejos, otros atienden turistas que no esperan mucho") —
+              reemplaza a "Duración de cada cita", que perdió su función
+              real ahora que las horas son libres (ver paso 2 del modal de
+              reserva del cliente). */}
           <div className="mt-3">
-            <label className={labelClass}>Duración de cada cita</label>
+            <label className={labelClass}>Anticipación mínima para reservar</label>
             <select
               className={inputClass}
-              value={form.duracion_franja_min}
-              onChange={(e) => setForm((f) => ({ ...f, duracion_franja_min: e.target.value }))}
+              value={form.anticipacion_min_dias}
+              onChange={(e) => setForm((f) => ({ ...f, anticipacion_min_dias: e.target.value }))}
             >
-              <option value={30}>30 minutos</option>
-              <option value={60}>1 hora</option>
-              <option value={90}>1 hora y media</option>
-              <option value={120}>2 horas</option>
+              <option value={0}>Mismo día</option>
+              <option value={1}>1 día</option>
+              <option value={2}>2 días</option>
+              <option value={3}>3 días</option>
+              <option value={5}>5 días</option>
+              <option value={8}>8 días</option>
+              <option value={15}>15 días</option>
             </select>
-            <p className="text-gray-400 text-[11px] mt-1">Así calculamos las franjas de tu calendario — configúralo abajo en "Mi horario".</p>
+            <p className="text-gray-400 text-[11px] mt-1">Cuánto tiempo mínimo de anticipación pides antes de una cita — bajo si atiendes turistas de paso, alto si tus diseños necesitan más planeación.</p>
           </div>
         </div>
 
