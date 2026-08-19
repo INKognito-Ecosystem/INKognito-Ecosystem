@@ -50,6 +50,29 @@ const formatearValorSesion = (texto) => {
   return `$${Number(limpio).toLocaleString('es-CO')}`
 }
 
+// Calendario real (fase 1 de agenda, 2026-08-19) — utilidades de fecha
+// hechas a mano, sin librería (el mes tiene aritmética simple, no amerita
+// una dependencia nueva en el frontend).
+const MESES_CALENDARIO = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+const _pad2 = (n) => String(n).padStart(2, '0')
+const fechaISO = (d) => `${d.getFullYear()}-${_pad2(d.getMonth() + 1)}-${_pad2(d.getDate())}`
+// Grid de 7 columnas empezando en lunes — devuelve null en las celdas
+// vacías antes del día 1 / después del último día del mes.
+const celdasDelMes = (year, month) => {
+  const primerDia = new Date(year, month, 1)
+  const totalDias = new Date(year, month + 1, 0).getDate()
+  const offset = (primerDia.getDay() + 6) % 7 // Date.getDay(): 0=domingo → offset para que lunes quede primero
+  const celdas = Array(offset).fill(null)
+  for (let dia = 1; dia <= totalDias; dia++) celdas.push({ dia, iso: fechaISO(new Date(year, month, dia)) })
+  return celdas
+}
+const formatearHora12 = (hhmm) => {
+  const [h, m] = hhmm.split(':').map(Number)
+  const ampm = h < 12 ? 'AM' : 'PM'
+  const h12 = h % 12 === 0 ? 12 : h % 12
+  return `${h12}:${_pad2(m)} ${ampm}`
+}
+
 export async function loader({ params, request }) {
   // Mismo detector de ciudad por IP que usa la página madre — el navbar es
   // compartido, así que también acá hay que resolver ciudadDetectada
@@ -159,6 +182,20 @@ export default function ArtistaLandingPage() {
   const [enviandoReserva, setEnviandoReserva] = useState(false)
   const [errorReserva, setErrorReserva] = useState(null)
   const [mostrarTerminos, setMostrarTerminos] = useState(false)
+
+  // Calendario real (fase 1 de agenda, 2026-08-19) — reservaPaso solo
+  // importa si artista.tiene_horario; artistas sin horario configurado
+  // siguen exactamente en el paso 3 (el formulario de siempre), sin
+  // ningún cambio de comportamiento para ellos.
+  const [reservaPaso, setReservaPaso] = useState(3)
+  const hoyBase = new Date()
+  const [reservaMesVisible, setReservaMesVisible] = useState({ year: hoyBase.getFullYear(), month: hoyBase.getMonth() })
+  const [dispoMes, setDispoMes] = useState({})
+  const [cargandoMes, setCargandoMes] = useState(false)
+  const [fechaElegida, setFechaElegida] = useState(null)
+  const [slotsDia, setSlotsDia] = useState([])
+  const [cargandoDia, setCargandoDia] = useState(false)
+  const [horaElegida, setHoraElegida] = useState(null)
   // Tooltip de onboarding sobre "Para agendar" (2026-08-11, mismo patrón
   // que los de INK/Cerca de ti en ArtistasColombiaPage.jsx) — aclara que
   // ese número es un ABONO parcial, no el precio completo del tatuaje;
@@ -393,6 +430,7 @@ export default function ArtistaLandingPage() {
         body: JSON.stringify({
           artista_id: artista.id, cliente_nombre: resNombre, cliente_telefono: resTelefono,
           cliente_email: resEmail, mensaje: resMensaje,
+          ...(artista.tiene_horario ? { fecha_slot: fechaElegida, hora_inicio_slot: horaElegida } : {}),
         }),
       })
       const data = await res.json()
@@ -402,6 +440,58 @@ export default function ArtistaLandingPage() {
       setErrorReserva(err.message || 'No pudimos iniciar el pago — intenta de nuevo.')
       setEnviandoReserva(false)
     }
+  }
+
+  // Calendario real (fase 1 de agenda, 2026-08-19) — abre el modal en el
+  // paso 1 (calendario) si el artista configuró horario; si no, salta
+  // directo al formulario de siempre, cero cambio para esos artistas.
+  const abrirReserva = () => {
+    const hoy = new Date()
+    setReservaMesVisible({ year: hoy.getFullYear(), month: hoy.getMonth() })
+    setFechaElegida(null)
+    setHoraElegida(null)
+    setSlotsDia([])
+    setReservaPaso(artista.tiene_horario ? 1 : 3)
+    setReservando(true)
+  }
+
+  useEffect(() => {
+    if (!reservando || !artista.tiene_horario || reservaPaso !== 1) return
+    const { year, month } = reservaMesVisible
+    const desde = fechaISO(new Date(year, month, 1))
+    const hasta = fechaISO(new Date(year, month + 1, 0))
+    setCargandoMes(true)
+    fetch(`${PANEL_URL}/api/artistas-disponibilidad-mes?artista_id=${artista.id}&desde=${desde}&hasta=${hasta}`)
+      .then(r => r.ok ? r.json() : {})
+      .then(setDispoMes)
+      .catch(() => setDispoMes({}))
+      .finally(() => setCargandoMes(false))
+  }, [reservando, reservaPaso, reservaMesVisible, artista.id, artista.tiene_horario])
+
+  const cambiarMes = (delta) => {
+    setReservaMesVisible(({ year, month }) => {
+      const d = new Date(year, month + delta, 1)
+      return { year: d.getFullYear(), month: d.getMonth() }
+    })
+  }
+
+  const elegirDia = (iso) => {
+    if (dispoMes[iso] !== 'disponible') return
+    setFechaElegida(iso)
+    setHoraElegida(null)
+    setSlotsDia([])
+    setCargandoDia(true)
+    setReservaPaso(2)
+    fetch(`${PANEL_URL}/api/artistas-disponibilidad-dia?artista_id=${artista.id}&fecha=${iso}`)
+      .then(r => r.ok ? r.json() : { slots: [] })
+      .then(data => setSlotsDia(data.slots || []))
+      .catch(() => setSlotsDia([]))
+      .finally(() => setCargandoDia(false))
+  }
+
+  const elegirHora = (hhmm) => {
+    setHoraElegida(hhmm)
+    setReservaPaso(3)
   }
 
   const irA = (delta) => setLightbox(i => (i + delta + trabajos.length) % trabajos.length)
@@ -713,7 +803,7 @@ export default function ArtistaLandingPage() {
 
                       <button
                         type="button"
-                        onClick={() => setReservando(true)}
+                        onClick={abrirReserva}
                         className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white text-gray-900 font-black uppercase tracking-widest text-[11px] hover:opacity-90 transition-opacity"
                       >
                         Agendar
@@ -1244,71 +1334,165 @@ export default function ArtistaLandingPage() {
         >
           <div className="bg-white rounded-2xl w-full max-w-sm max-h-full overflow-y-auto p-5" onClick={(e) => e.stopPropagation()}>
             <p className="font-black uppercase text-base leading-tight mb-1.5">Reservar con {artista.nombre}</p>
-            <p className="text-gray-500 text-xs italic mb-3">
-              {artista.nombre} se pondrá en contacto contigo para coordinar la fecha después de tu pago.
-            </p>
-            <p className="text-2xl font-black mb-3" style={{ color: MP_BLUE }}>
-              ${Number(artista.precio_agendar).toLocaleString('es-CO')} <span className="text-xs font-bold text-gray-400">COP</span>
-            </p>
 
-            <form onSubmit={hacerReserva} className="space-y-2.5">
-              <input
-                required
-                type="text"
-                placeholder="Tu nombre"
-                value={resNombre}
-                onChange={(e) => setResNombre(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:border-gray-500"
-              />
-              <input
-                required
-                type="text"
-                placeholder="Tu WhatsApp (573XXXXXXXXX)"
-                value={resTelefono}
-                onChange={(e) => setResTelefono(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:border-gray-500"
-              />
-              <input
-                required
-                type="email"
-                placeholder="Tu correo (ahí recibirás la confirmación)"
-                value={resEmail}
-                onChange={(e) => setResEmail(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:border-gray-500"
-              />
-              <textarea
-                rows={2}
-                placeholder="¿Qué tatuaje tienes en mente? (opcional)"
-                value={resMensaje}
-                onChange={(e) => setResMensaje(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:border-gray-500 resize-none"
-              />
-              {errorReserva && <p className="text-xs" style={{ color: ACCENT }}>{errorReserva}</p>}
-              <button
-                type="submit"
-                disabled={enviandoReserva}
-                className="w-full py-3 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-xs flex items-center justify-center gap-2"
-                style={{ backgroundColor: MP_BLUE }}
-              >
-                {enviandoReserva ? (
-                  <LoaderCircle size={14} className="animate-spin" />
+            {/* Paso 1 — calendario de mes (fase 1 de agenda, 2026-08-19).
+                Solo existe si el artista configuró horario; si no, el
+                modal salta directo al paso 3 y esto nunca se renderiza. */}
+            {artista.tiene_horario && reservaPaso === 1 && (
+              <>
+                <p className="text-gray-500 text-xs italic mb-3">Elige un día disponible.</p>
+                <div className="flex items-center justify-between mb-2">
+                  <button type="button" onClick={() => cambiarMes(-1)} className="p-1 text-gray-400 hover:text-gray-700">
+                    <ChevronLeft size={16} />
+                  </button>
+                  <span className="text-xs font-black uppercase">{MESES_CALENDARIO[reservaMesVisible.month]} {reservaMesVisible.year}</span>
+                  <button type="button" onClick={() => cambiarMes(1)} className="p-1 text-gray-400 hover:text-gray-700">
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+                <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-gray-400 mb-1">
+                  {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map((d, i) => <span key={i}>{d}</span>)}
+                </div>
+                <div className="grid grid-cols-7 gap-1">
+                  {celdasDelMes(reservaMesVisible.year, reservaMesVisible.month).map((c, i) => {
+                    if (!c) return <span key={i} />
+                    const estado = dispoMes[c.iso]
+                    const disponible = estado === 'disponible'
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        disabled={!disponible}
+                        onClick={() => elegirDia(c.iso)}
+                        className={`aspect-square rounded-lg text-[11px] font-bold flex items-center justify-center transition-colors ${
+                          disponible ? 'bg-green-50 text-green-700 hover:bg-green-100' : 'text-gray-300'
+                        }`}
+                      >
+                        {c.dia}
+                      </button>
+                    )
+                  })}
+                </div>
+                {cargandoMes && <p className="text-center text-gray-400 text-[11px] mt-3">Cargando disponibilidad...</p>}
+                <button type="button" onClick={() => setReservando(false)} className="w-full text-center text-gray-400 text-[11px] uppercase tracking-widest py-1 mt-3">
+                  Cancelar
+                </button>
+              </>
+            )}
+
+            {/* Paso 2 — franjas del día elegido. */}
+            {artista.tiene_horario && reservaPaso === 2 && (
+              <>
+                <button type="button" onClick={() => setReservaPaso(1)} className="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-2">
+                  ‹ Cambiar día
+                </button>
+                <p className="text-gray-500 text-xs italic mb-3">{fechaElegida} — elige una hora.</p>
+                {cargandoDia ? (
+                  <p className="text-center text-gray-400 text-xs py-8">Cargando horarios...</p>
+                ) : slotsDia.length === 0 ? (
+                  <p className="text-center text-gray-400 text-xs py-8">Ese día no tiene franjas configuradas.</p>
                 ) : (
-                  <>
-                    Pagar con
-                    <img
-                      src={MP_LOGO_URL}
-                      alt="Mercado Pago"
-                      className="h-4"
-                      onError={(e) => { e.currentTarget.style.display = 'none' }}
-                    />
-                  </>
+                  <div className="grid grid-cols-3 gap-2">
+                    {slotsDia.map((s) => (
+                      <button
+                        key={s.hora_inicio}
+                        type="button"
+                        disabled={!s.libre}
+                        onClick={() => elegirHora(s.hora_inicio)}
+                        className={`py-2 rounded-lg text-[11px] font-bold border transition-colors ${
+                          s.libre ? 'border-gray-300 text-gray-700 hover:border-gray-500' : 'border-gray-100 text-gray-300 line-through'
+                        }`}
+                      >
+                        {formatearHora12(s.hora_inicio)}
+                      </button>
+                    ))}
+                  </div>
                 )}
-              </button>
-              <p className="text-gray-400 text-[10px] text-center">Pago 100% seguro, procesado por Mercado Pago.</p>
-              <button type="button" onClick={() => setReservando(false)} className="w-full text-center text-gray-400 text-[11px] uppercase tracking-widest py-1">
-                Cancelar
-              </button>
-            </form>
+              </>
+            )}
+
+            {/* Paso 3 — formulario de contacto (el único paso que existe
+                para un artista sin horario configurado). */}
+            {(!artista.tiene_horario || reservaPaso === 3) && (
+              <>
+                {artista.tiene_horario && fechaElegida && horaElegida && (
+                  <button
+                    type="button"
+                    onClick={() => setReservaPaso(1)}
+                    className="w-full text-left bg-gray-50 rounded-lg px-3 py-2 mb-3 text-[11px] font-bold text-gray-600"
+                  >
+                    📅 {fechaElegida} · {formatearHora12(horaElegida)} — <span className="underline">Cambiar</span>
+                  </button>
+                )}
+                <p className="text-gray-500 text-xs italic mb-3">
+                  {artista.tiene_horario
+                    ? `Vas a agendar directamente tu cita — ${artista.nombre} confirma por WhatsApp los detalles del diseño.`
+                    : `${artista.nombre} se pondrá en contacto contigo para coordinar la fecha después de tu pago.`}
+                </p>
+                <p className="text-2xl font-black mb-3" style={{ color: MP_BLUE }}>
+                  ${Number(artista.precio_agendar).toLocaleString('es-CO')} <span className="text-xs font-bold text-gray-400">COP</span>
+                </p>
+
+                <form onSubmit={hacerReserva} className="space-y-2.5">
+                  <input
+                    required
+                    type="text"
+                    placeholder="Tu nombre"
+                    value={resNombre}
+                    onChange={(e) => setResNombre(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:border-gray-500"
+                  />
+                  <input
+                    required
+                    type="text"
+                    placeholder="Tu WhatsApp (573XXXXXXXXX)"
+                    value={resTelefono}
+                    onChange={(e) => setResTelefono(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:border-gray-500"
+                  />
+                  <input
+                    required
+                    type="email"
+                    placeholder="Tu correo (ahí recibirás la confirmación)"
+                    value={resEmail}
+                    onChange={(e) => setResEmail(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:border-gray-500"
+                  />
+                  <textarea
+                    rows={2}
+                    placeholder="¿Qué tatuaje tienes en mente? (opcional)"
+                    value={resMensaje}
+                    onChange={(e) => setResMensaje(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:border-gray-500 resize-none"
+                  />
+                  {errorReserva && <p className="text-xs" style={{ color: ACCENT }}>{errorReserva}</p>}
+                  <button
+                    type="submit"
+                    disabled={enviandoReserva}
+                    className="w-full py-3 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-xs flex items-center justify-center gap-2"
+                    style={{ backgroundColor: MP_BLUE }}
+                  >
+                    {enviandoReserva ? (
+                      <LoaderCircle size={14} className="animate-spin" />
+                    ) : (
+                      <>
+                        Pagar con
+                        <img
+                          src={MP_LOGO_URL}
+                          alt="Mercado Pago"
+                          className="h-4"
+                          onError={(e) => { e.currentTarget.style.display = 'none' }}
+                        />
+                      </>
+                    )}
+                  </button>
+                  <p className="text-gray-400 text-[10px] text-center">Pago 100% seguro, procesado por Mercado Pago.</p>
+                  <button type="button" onClick={() => setReservando(false)} className="w-full text-center text-gray-400 text-[11px] uppercase tracking-widest py-1">
+                    Cancelar
+                  </button>
+                </form>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -1329,7 +1513,9 @@ export default function ArtistaLandingPage() {
             <div className="space-y-3 text-gray-600 text-sm leading-relaxed">
               <p>El WhatsApp y las redes de {artista.nombre} siguen siendo gratis para ti — puedes escribirle directo, cuando quieras.</p>
               <p>Agendar y abonar en línea es una vía adicional, pensada para avanzar más rápido: al confirmarse el pago, {artista.nombre} recibe de inmediato un correo con tus datos de contacto y la idea de tu tatuaje.</p>
-              <p>Con esa información completa, {artista.nombre} se pone en contacto contigo para coordinar la valoración, el diseño y, después, la fecha de tu cita — sin que tu solicitud se pierda entre otros mensajes.</p>
+              <p>{artista.tiene_horario
+                ? <>Eliges el día y la hora exacta en el calendario de {artista.nombre} — tu cita queda agendada de una vez, sin ir y venir por WhatsApp para cuadrar fecha.</>
+                : <>Con esa información completa, {artista.nombre} se pone en contacto contigo para coordinar la valoración, el diseño y, después, la fecha de tu cita — sin que tu solicitud se pierda entre otros mensajes.</>}</p>
               <p>El pago se procesa de forma segura por Mercado Pago — nunca compartes tus datos de tarjeta con el artista ni con INKognito.</p>
               <p className="font-bold text-gray-800">Es la forma más directa de convertir tu idea en una cita real.</p>
             </div>

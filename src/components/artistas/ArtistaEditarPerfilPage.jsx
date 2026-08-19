@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData, useSearchParams, useNavigate } from 'react-router-dom'
-import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette } from 'lucide-react'
+import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarX, CalendarCheck } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
@@ -40,14 +40,20 @@ export async function loader({ request }) {
   const token = new URL(request.url).searchParams.get('token')
   if (!token) return { token: null }
   try {
-    const [artistaRes, configRes] = await Promise.all([
+    const [artistaRes, configRes, horarioRes, bloqueosRes, reservasRes] = await Promise.all([
       fetch(`${PANEL_URL}/api/artistas-por-token?token=${encodeURIComponent(token)}`),
       fetch(`${PANEL_URL}/api/upload-config`),
+      fetch(`${PANEL_URL}/api/artistas-horario-por-token?token=${encodeURIComponent(token)}`),
+      fetch(`${PANEL_URL}/api/artistas-bloqueos-por-token?token=${encodeURIComponent(token)}`),
+      fetch(`${PANEL_URL}/api/artistas-reservas-por-token?token=${encodeURIComponent(token)}`),
     ])
     const artista = artistaRes.ok ? await artistaRes.json() : null
     const config = configRes.ok ? await configRes.json() : { cloud_name: null, upload_preset: null }
+    const horario = horarioRes.ok ? await horarioRes.json() : []
+    const bloqueos = bloqueosRes.ok ? await bloqueosRes.json() : []
+    const reservas = reservasRes.ok ? await reservasRes.json() : []
     if (!artista) return { token, artista: null, error: 'Este link ya no es válido — pídelo de nuevo.' }
-    return { token, artista, ...config }
+    return { token, artista, horario, bloqueos, reservas, ...config }
   } catch {
     return { token, artista: null, error: 'No pudimos cargar tu perfil — intenta de nuevo en un momento.' }
   }
@@ -510,7 +516,250 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
 // más simple que el de registro (ArtistaRegistroPage.jsx) — sin el panel
 // de vista previa en vivo, para no duplicar toda esa complejidad en una
 // pantalla de edición puntual.
-function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
+const DIAS_SEMANA = [
+  { db: 1, label: 'Lunes' },
+  { db: 2, label: 'Martes' },
+  { db: 3, label: 'Miércoles' },
+  { db: 4, label: 'Jueves' },
+  { db: 5, label: 'Viernes' },
+  { db: 6, label: 'Sábado' },
+  { db: 0, label: 'Domingo' },
+]
+
+// Horario semanal recurrente (fase 1 de agenda, 2026-08-19) — fuera del
+// <form> grande a propósito, mismo criterio que "Mis diseños en venta":
+// las 7 filas se guardan juntas en su propio endpoint
+// (POST /api/artistas-horario-por-token), sin depender del submit del
+// resto del perfil. Sin ninguna fila activa, el modal de "Reservar" del
+// perfil público sigue funcionando exactamente como antes (sin
+// calendario, coordina la fecha por WhatsApp) — nada se rompe por dejar
+// esto sin configurar.
+function HorarioSemanalSection({ token, horarioInicial }) {
+  const [filas, setFilas] = useState(() => DIAS_SEMANA.map(({ db }) => {
+    const existente = (horarioInicial || []).find((h) => h.dia_semana === db)
+    return {
+      dia_semana: db,
+      activo: existente?.activo ?? false,
+      hora_inicio: existente?.hora_inicio?.slice(0, 5) || '09:00',
+      hora_fin: existente?.hora_fin?.slice(0, 5) || '18:00',
+    }
+  }))
+  const [guardando, setGuardando] = useState(false)
+  const [guardado, setGuardado] = useState(false)
+  const [error, setError] = useState(null)
+
+  const actualizar = (dia_semana, campo, valor) => {
+    setGuardado(false)
+    setFilas((prev) => prev.map((f) => (f.dia_semana === dia_semana ? { ...f, [campo]: valor } : f)))
+  }
+
+  const guardar = async () => {
+    setError(null)
+    setGuardando(true)
+    try {
+      const res = await fetch(`${PANEL_URL}/api/artistas-horario-por-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, horario: filas }),
+      })
+      if (!res.ok) throw new Error()
+      setGuardado(true)
+    } catch {
+      setError('No pudimos guardar tu horario — intenta de nuevo.')
+    } finally {
+      setGuardando(false)
+    }
+  }
+
+  return (
+    <div className="mb-6 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5">
+      <p className={labelClass}><Clock size={12} className="inline -mt-0.5 mr-1" />Mi horario</p>
+      <p className="text-gray-500 text-[11px] leading-relaxed mb-4">
+        Los días y horas que actives acá son las franjas que un cliente puede reservar en tu calendario. Un día sin activar no aparece disponible.
+      </p>
+      <div className="space-y-2">
+        {DIAS_SEMANA.map(({ db, label }) => {
+          const fila = filas.find((f) => f.dia_semana === db)
+          return (
+            <div key={db} className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => actualizar(db, 'activo', !fila.activo)}
+                aria-pressed={fila.activo}
+                className={`flex-shrink-0 w-11 h-6 rounded-full transition-colors relative ${fila.activo ? 'bg-green-600' : 'bg-gray-300'}`}
+              >
+                <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${fila.activo ? 'translate-x-5' : 'translate-x-0.5'}`} />
+              </button>
+              <span className={`w-20 text-xs font-bold flex-shrink-0 ${fila.activo ? 'text-gray-900' : 'text-gray-400'}`}>{label}</span>
+              <input
+                type="time"
+                disabled={!fila.activo}
+                value={fila.hora_inicio}
+                onChange={(e) => actualizar(db, 'hora_inicio', e.target.value)}
+                className="flex-1 min-w-0 bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-xs disabled:opacity-40 disabled:bg-gray-100"
+              />
+              <span className="text-gray-400 text-xs flex-shrink-0">a</span>
+              <input
+                type="time"
+                disabled={!fila.activo}
+                value={fila.hora_fin}
+                onChange={(e) => actualizar(db, 'hora_fin', e.target.value)}
+                className="flex-1 min-w-0 bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-xs disabled:opacity-40 disabled:bg-gray-100"
+              />
+            </div>
+          )
+        })}
+      </div>
+      {error && <p className="text-red-600 text-xs mt-3">{error}</p>}
+      <button
+        type="button"
+        onClick={guardar}
+        disabled={guardando}
+        className="w-full mt-4 py-2.5 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60"
+        style={{ backgroundColor: BTN }}
+      >
+        {guardando ? 'Guardando...' : guardado ? '✓ Horario guardado' : 'Guardar horario'}
+      </button>
+    </div>
+  )
+}
+
+// Bloqueos puntuales (vacaciones, día libre, almuerzo) — mismo criterio de
+// endpoint aparte que el horario semanal.
+function BloqueosSection({ token, bloqueosInicial }) {
+  const [bloqueos, setBloqueos] = useState(bloqueosInicial || [])
+  const [fecha, setFecha] = useState('')
+  const [todoElDia, setTodoElDia] = useState(true)
+  const [horaInicio, setHoraInicio] = useState('12:00')
+  const [horaFin, setHoraFin] = useState('13:00')
+  const [motivo, setMotivo] = useState('')
+  const [agregando, setAgregando] = useState(false)
+  const [error, setError] = useState(null)
+
+  const agregar = async (e) => {
+    e.preventDefault()
+    setError(null)
+    setAgregando(true)
+    try {
+      const res = await fetch(`${PANEL_URL}/api/artistas-bloqueos-por-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token, fecha,
+          hora_inicio: todoElDia ? null : horaInicio,
+          hora_fin: todoElDia ? null : horaFin,
+          motivo,
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || '')
+      setBloqueos((prev) => [...prev, data].sort((a, b) => a.fecha.localeCompare(b.fecha)))
+      setFecha(''); setMotivo(''); setTodoElDia(true)
+    } catch (err) {
+      setError(err.message || 'No pudimos agregar el bloqueo — intenta de nuevo.')
+    } finally {
+      setAgregando(false)
+    }
+  }
+
+  const eliminar = async (id) => {
+    setBloqueos((prev) => prev.filter((b) => b.id !== id))
+    try {
+      await fetch(`${PANEL_URL}/api/artistas-bloqueos-eliminar-por-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, id }),
+      })
+    } catch {
+      // Si falla, el bloqueo sigue existiendo del lado del panel — se
+      // corrige solo en el siguiente refresh de la página.
+    }
+  }
+
+  return (
+    <div className="mb-6 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5">
+      <p className={labelClass}><CalendarX size={12} className="inline -mt-0.5 mr-1" />Días y horas bloqueadas</p>
+      <p className="text-gray-500 text-[11px] leading-relaxed mb-4">
+        Vacaciones, un día libre puntual, o el almuerzo — lo que bloquees acá no aparece disponible en tu calendario, aunque ese día esté activo arriba.
+      </p>
+
+      {bloqueos.length > 0 && (
+        <div className="space-y-1.5 mb-4">
+          {bloqueos.map((b) => (
+            <div key={b.id} className="flex items-center justify-between gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs">
+              <span className="text-gray-700">
+                <strong>{b.fecha?.slice(0, 10)}</strong>{b.hora_inicio ? ` · ${b.hora_inicio.slice(0, 5)}–${b.hora_fin?.slice(0, 5)}` : ' · Todo el día'}
+                {b.motivo && <span className="text-gray-400"> — {b.motivo}</span>}
+              </span>
+              <button type="button" onClick={() => eliminar(b.id)} aria-label="Quitar bloqueo" className="flex-shrink-0 text-gray-400 hover:text-red-600 transition-colors">
+                <Trash2 size={14} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <form onSubmit={agregar} className="space-y-2">
+        <input required type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs" />
+        <label className="flex items-center gap-2 text-xs text-gray-600">
+          <input type="checkbox" checked={todoElDia} onChange={(e) => setTodoElDia(e.target.checked)} />
+          Todo el día
+        </label>
+        {!todoElDia && (
+          <div className="flex items-center gap-2">
+            <input type="time" value={horaInicio} onChange={(e) => setHoraInicio(e.target.value)} className="flex-1 bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-xs" />
+            <span className="text-gray-400 text-xs">a</span>
+            <input type="time" value={horaFin} onChange={(e) => setHoraFin(e.target.value)} className="flex-1 bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-xs" />
+          </div>
+        )}
+        <input type="text" value={motivo} onChange={(e) => setMotivo(e.target.value)} placeholder="Motivo (opcional)" className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs" />
+        {error && <p className="text-red-600 text-xs">{error}</p>}
+        <button
+          type="submit"
+          disabled={agregando}
+          className="w-full py-2.5 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-1.5"
+          style={{ backgroundColor: BTN }}
+        >
+          <Plus size={13} /> {agregando ? 'Agregando...' : 'Agregar bloqueo'}
+        </button>
+      </form>
+    </div>
+  )
+}
+
+// Solo lectura — próximas citas ya pagadas, para que el artista no
+// dependa únicamente del correo de confirmación si lo pierde (Jose,
+// 2026-08-19, agregado a esta misma fase en vez de esperar al dashboard
+// completo de Fase 2).
+function ProximasCitasSection({ reservasIniciales }) {
+  const reservas = reservasIniciales || []
+  if (reservas.length === 0) return null
+  return (
+    <div className="mb-6 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5">
+      <p className={labelClass}><CalendarCheck size={12} className="inline -mt-0.5 mr-1" />Mis próximas citas</p>
+      <div className="space-y-2 mt-3">
+        {reservas.map((r) => (
+          <div key={r.id} className="bg-white border border-gray-200 rounded-lg px-3 py-2.5">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-black text-gray-900">
+                {r.fecha_slot ? `${r.fecha_slot.slice(0, 10)} · ${r.hora_inicio_slot?.slice(0, 5)}–${r.hora_fin_slot?.slice(0, 5)}` : 'Sin fecha agendada aún'}
+              </span>
+              <span className="text-[11px] font-bold text-green-600">${Number(r.monto_pagado).toLocaleString('es-CO')}</span>
+            </div>
+            <p className="text-gray-500 text-[11px] mt-1">{r.cliente_nombre || 'Cliente'} · {r.cliente_email}</p>
+            {r.cliente_telefono && (
+              <a href={`https://wa.me/${r.cliente_telefono}`} target="_blank" rel="noreferrer" className="text-[11px] font-bold text-green-700 mt-1 inline-block">
+                Escribirle por WhatsApp →
+              </a>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioInicial, bloqueosInicial, reservasInicial }) {
   const [searchParams] = useSearchParams()
   const mp = searchParams.get('mp')
   const [form, setForm] = useState({
@@ -520,6 +769,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
     no_tatua: artista.no_tatua || '',
     precio_nivel: artista.precio_nivel ?? '', disponibilidad: artista.disponibilidad || '',
     precio_agendar: artista.precio_agendar ?? '', precio_sesion_texto: artista.precio_sesion_texto || '',
+    duracion_franja_min: artista.duracion_franja_min || 60,
     foto_url: artista.foto_url || '', foto_url_2: artista.foto_url_2 || '',
     foto_trabajo_1: artista.foto_trabajo_1 || '', foto_trabajo_2: artista.foto_trabajo_2 || '', foto_trabajo_3: artista.foto_trabajo_3 || '',
     google_maps_url: artista.google_maps_url || '',
@@ -1088,6 +1338,25 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
             </div>
             <p className="text-gray-400 text-[11px] mt-1">Opcional — no te compromete a cobrar exactamente eso, pero da contexto para que quien te escribe ya venga con una expectativa clara. Muchos artistas prefieren dejarlo vacío y solo publicar "Para agendar", sin exponer sus tarifas — también funciona bien así.</p>
           </div>
+          {/* Calendario real (fase 1 de agenda, 2026-08-19) — duración de
+              franja es un escalar simple de artistas, vive en el mismo
+              formulario que los precios. El horario semanal y los bloqueos
+              (uno-a-muchos) viven aparte, en HorarioSemanalSection/
+              BloqueosSection debajo de este formulario. */}
+          <div className="mt-3">
+            <label className={labelClass}>Duración de cada cita</label>
+            <select
+              className={inputClass}
+              value={form.duracion_franja_min}
+              onChange={(e) => setForm((f) => ({ ...f, duracion_franja_min: e.target.value }))}
+            >
+              <option value={30}>30 minutos</option>
+              <option value={60}>1 hora</option>
+              <option value={90}>1 hora y media</option>
+              <option value={120}>2 horas</option>
+            </select>
+            <p className="text-gray-400 text-[11px] mt-1">Así calculamos las franjas de tu calendario — configúralo abajo en "Mi horario".</p>
+          </div>
         </div>
 
         {error && <p className="text-sm" style={{ color: ACCENT }}>{error}</p>}
@@ -1102,6 +1371,12 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
         </button>
       </form>
       </div>
+
+      <div className="px-4 mt-6">
+        <ProximasCitasSection reservasIniciales={reservasInicial} />
+        <HorarioSemanalSection token={token} horarioInicial={horarioInicial} />
+        <BloqueosSection token={token} bloqueosInicial={bloqueosInicial} />
+      </div>
       </>
       )}
     </div>
@@ -1109,7 +1384,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
 }
 
 export default function ArtistaEditarPerfilPage() {
-  const { token, artista, error, cloud_name, upload_preset } = useLoaderData()
+  const { token, artista, error, cloud_name, upload_preset, horario, bloqueos, reservas } = useLoaderData()
   const navigate = useNavigate()
 
   // Guardar el token válido para la próxima visita, y limpiar uno guardado
@@ -1147,7 +1422,7 @@ export default function ArtistaEditarPerfilPage() {
             <div className="px-4"><PedirLinkForm /></div>
           )
         ) : (
-          <FormularioEdicion token={token} artista={artista} cloud_name={cloud_name} upload_preset={upload_preset} />
+          <FormularioEdicion token={token} artista={artista} cloud_name={cloud_name} upload_preset={upload_preset} horarioInicial={horario} bloqueosInicial={bloqueos} reservasInicial={reservas} />
         )}
       </div>
       <footer className="border-t border-gray-200 py-6 px-4">
