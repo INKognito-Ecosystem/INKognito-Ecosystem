@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import ProductImageGallery from '../ProductImageGallery'
 
@@ -165,7 +166,17 @@ export default function SupplyProductCard({ item, categoria, showEstudioBadge = 
             SupplyCategoryPage.jsx a nivel de página, sin tocar — esta es
             la excepción puntual cuando el producto viene de otra parte. */}
         {showEstudioBadge && proveedorNombre && (
-          <p className="text-[8px] font-bold uppercase tracking-wide text-blue-400">Suministrado por {proveedorNombre}</p>
+          proveedorId ? (
+            <Link
+              to={`/supply/estudio/${proveedorId}`}
+              onClick={(e) => e.stopPropagation()}
+              className="text-[8px] font-bold uppercase tracking-wide text-blue-400 hover:text-blue-300 underline underline-offset-2 w-fit"
+            >
+              Suministrado por {proveedorNombre}
+            </Link>
+          ) : (
+            <p className="text-[8px] font-bold uppercase tracking-wide text-blue-400">Suministrado por {proveedorNombre}</p>
+          )
         )}
         <h3 className="text-xs font-black uppercase leading-tight text-white">{item.name}</h3>
         {resolvedPrice && <p className="text-white font-bold text-sm">{resolvedPrice}</p>}

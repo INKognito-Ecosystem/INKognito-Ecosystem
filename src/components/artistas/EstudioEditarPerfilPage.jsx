@@ -659,7 +659,10 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
             <p className="text-gray-400 text-[10px] -mt-1.5">Si ya alguien cargó este producto antes, elígelo de la lista para no repetir categoría/marca/descripción.</p>
             <input className={inputClass} placeholder='Variante — talla, sabor, color... o "Único" si no aplica' value={nuevo.variant} onChange={(e) => setNuevo((n) => ({ ...n, variant: e.target.value }))} />
             <div className="grid grid-cols-2 gap-2">
-              <input className={inputClass} type="number" min="1" placeholder="Precio en COP" value={nuevo.price} onChange={(e) => setNuevo((n) => ({ ...n, price: e.target.value }))} />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold pointer-events-none">$</span>
+                <input className={inputClass.replace('px-4', 'pl-7 pr-4')} type="number" min="1" placeholder="Precio en COP" value={nuevo.price} onChange={(e) => setNuevo((n) => ({ ...n, price: e.target.value }))} />
+              </div>
               <input className={inputClass} type="number" min="0" placeholder="Stock" value={nuevo.stock} onChange={(e) => setNuevo((n) => ({ ...n, stock: e.target.value }))} />
             </div>
             <ComboboxBuscable
@@ -879,6 +882,10 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
   return (
     <div className="max-w-3xl mx-auto px-4">
       <p className="text-gray-500 text-sm text-center mb-6 pt-2">Hola {estudio.nombre} — toca "Editar" para cambiar los datos del estudio, o cualquier foto para reemplazarla.</p>
+
+      {searchParams.get('bienvenida') === '1' && (
+        <p className="text-sm text-center mb-4 py-2 rounded-lg bg-green-50 text-green-700 font-bold">✓ Tu correo quedó confirmado — ya puedes editar tu perfil</p>
+      )}
 
       {SLOTS_ESTUDIO.map(({ key }) => (
         <input
@@ -1172,8 +1179,15 @@ export default function EstudioEditarPerfilPage() {
           <FormularioEdicionEstudio token={token} estudio={estudio} cloud_name={cloud_name} upload_preset={upload_preset} invitaciones={invitaciones} />
         )}
       </div>
-      <footer className="border-t border-gray-100 py-6 text-center">
-        <p className="text-gray-400 text-[11px]">© {new Date().getFullYear()} Tattoo Artist Colombia — Todos los derechos reservados.</p>
+      <footer className="border-t border-gray-200 py-6 px-4">
+        <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-400 text-[12px] gap-3">
+          <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Colombia — Todos los derechos reservados.</p>
+          <div className="flex items-center gap-4">
+            <Link to="/tattoo-artist-colombia/terminos" className="text-gray-400 hover:text-gray-700 transition-colors">Términos</Link>
+            <Link to="/tattoo-artist-colombia/privacidad" className="text-gray-400 hover:text-gray-700 transition-colors">Privacidad</Link>
+            <span className="text-gray-300">Desarrollado por INKognito</span>
+          </div>
+        </div>
       </footer>
     </div>
   )

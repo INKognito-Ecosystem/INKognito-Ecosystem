@@ -475,7 +475,17 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
               />
               <p className="text-gray-400 text-[10px] mt-1">Esta descripción es lo más importante para que la persona decida comprar — sé específico, no genérico.</p>
             </div>
-            <input className={inputClass} type="number" min="1" placeholder="Precio en COP" value={nuevo.precio} onChange={(e) => setNuevo((n) => ({ ...n, precio: e.target.value }))} />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold pointer-events-none">$</span>
+              <input
+                className={inputClass.replace('px-4', 'pl-7 pr-4')}
+                type="number"
+                min="1"
+                placeholder="Precio en COP"
+                value={nuevo.precio}
+                onChange={(e) => setNuevo((n) => ({ ...n, precio: e.target.value }))}
+              />
+            </div>
 
             <button
               type="button"
@@ -598,6 +608,9 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
       <div className="px-4 max-w-3xl mx-auto">
         <p className="text-gray-500 text-sm text-center mb-6 pt-2">Hola {artista.nombre} — toca "Editar" junto a tu nombre para cambiar tus datos, o cualquier foto para reemplazarla.</p>
 
+        {searchParams.get('bienvenida') === '1' && (
+          <p className="text-sm text-center mb-4 py-2 rounded-lg bg-green-50 text-green-700 font-bold">✓ Tu correo quedó confirmado — ya puedes editar tu perfil</p>
+        )}
         {mp === 'ok' && (
           <p className="text-sm text-center mb-4 py-2 rounded-lg bg-green-50 text-green-700 font-bold">✓ Mercado Pago conectado</p>
         )}
@@ -1053,20 +1066,26 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset }) {
           </p>
           <div>
             <label className={labelClass}>Para agendar (COP)</label>
-            <input
-              type="number" min="0" className={inputClass} value={form.precio_agendar}
-              onChange={(e) => setForm((f) => ({ ...f, precio_agendar: e.target.value }))}
-              placeholder="Ej: 50000"
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold pointer-events-none">$</span>
+              <input
+                type="number" min="0" className={inputClass.replace('px-4', 'pl-7 pr-4')} value={form.precio_agendar}
+                onChange={(e) => setForm((f) => ({ ...f, precio_agendar: e.target.value }))}
+                placeholder="Ej: 50000"
+              />
+            </div>
             <p className="text-gray-400 text-[11px] mt-1">Esto es lo que el cliente paga para agendar contigo — no un anticipo parcial, es el monto completo de la reserva. Con solo este campo ya puedes empezar a recibir reservas pagas.</p>
           </div>
           <div className="mt-3">
             <label className={labelClass}>El valor de mi sesión (COP, opcional)</label>
-            <input
-              type="number" min="0" className={inputClass} value={form.precio_sesion_texto}
-              onChange={(e) => setForm((f) => ({ ...f, precio_sesion_texto: e.target.value }))}
-              placeholder="Ej: 150000"
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold pointer-events-none">$</span>
+              <input
+                type="number" min="0" className={inputClass.replace('px-4', 'pl-7 pr-4')} value={form.precio_sesion_texto}
+                onChange={(e) => setForm((f) => ({ ...f, precio_sesion_texto: e.target.value }))}
+                placeholder="Ej: 150000"
+              />
+            </div>
             <p className="text-gray-400 text-[11px] mt-1">Opcional — no te compromete a cobrar exactamente eso, pero da contexto para que quien te escribe ya venga con una expectativa clara. Muchos artistas prefieren dejarlo vacío y solo publicar "Para agendar", sin exponer sus tarifas — también funciona bien así.</p>
           </div>
         </div>
