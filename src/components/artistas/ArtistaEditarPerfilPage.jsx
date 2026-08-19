@@ -814,7 +814,6 @@ function CalendarioBloqueosSection({ token }) {
 // un bloqueo simple.
 function ModalDiaManual({ token, iso, onClose, onGuardado }) {
   const [motivo, setMotivo] = useState('')
-  const [conCliente, setConCliente] = useState(false)
   const [clienteNombre, setClienteNombre] = useState('')
   const [clienteEmail, setClienteEmail] = useState('')
   const [clienteTelefono, setClienteTelefono] = useState('')
@@ -831,9 +830,9 @@ function ModalDiaManual({ token, iso, onClose, onGuardado }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           token, fecha: iso, motivo,
-          cliente_nombre: conCliente ? clienteNombre : null,
-          cliente_email: conCliente ? clienteEmail : null,
-          cliente_telefono: conCliente ? clienteTelefono : null,
+          cliente_nombre: clienteNombre || null,
+          cliente_email: clienteEmail || null,
+          cliente_telefono: clienteTelefono || null,
         }),
       })
       const data = await res.json().catch(() => ({}))
@@ -849,28 +848,28 @@ function ModalDiaManual({ token, iso, onClose, onGuardado }) {
   return (
     <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center px-4 py-8" onClick={() => !guardando && onClose()}>
       <div className="bg-white rounded-2xl w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
-        <p className="font-black uppercase text-sm mb-1">{iso}</p>
-        <p className="text-gray-500 text-xs mb-3">¿Qué va a pasar este día? Lo más probable es que sea un tatuaje que ya coordinaste por fuera de la plataforma.</p>
+        <p className="font-black uppercase text-sm mb-1">Registrar cita — {iso}</p>
+        <p className="text-gray-500 text-xs mb-3">Deja constancia de la cita agendada por fuera de la plataforma. Los datos del cliente son opcionales, pero le permiten recibir un recordatorio por correo un día antes.</p>
         <form onSubmit={guardar} className="space-y-2.5">
-          <textarea
-            required
-            rows={2}
-            placeholder="Ej: Diseño de manga para Juan Pérez"
-            value={motivo}
-            onChange={(e) => setMotivo(e.target.value)}
-            className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none"
-          />
-          <label className="flex items-center gap-2 text-xs text-gray-600">
-            <input type="checkbox" checked={conCliente} onChange={(e) => setConCliente(e.target.checked)} />
-            Tengo los datos del cliente (para poder avisarle un día antes)
-          </label>
-          {conCliente && (
-            <div className="space-y-2 pl-1 border-l-2 border-gray-200 pl-3">
-              <input type="text" placeholder="Nombre del cliente" value={clienteNombre} onChange={(e) => setClienteNombre(e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-xs" />
-              <input type="email" placeholder="Correo (para el recordatorio)" value={clienteEmail} onChange={(e) => setClienteEmail(e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-xs" />
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1 block">Detalle de la cita</label>
+            <textarea
+              required
+              rows={2}
+              placeholder="Ej: Diseño de manga para Juan Pérez"
+              value={motivo}
+              onChange={(e) => setMotivo(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none"
+            />
+          </div>
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1 block">Datos del cliente (opcional)</label>
+            <div className="space-y-2">
+              <input type="text" placeholder="Nombre" value={clienteNombre} onChange={(e) => setClienteNombre(e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-xs" />
+              <input type="email" placeholder="Correo" value={clienteEmail} onChange={(e) => setClienteEmail(e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-xs" />
               <input type="text" placeholder="WhatsApp (573XXXXXXXXX)" value={clienteTelefono} onChange={(e) => setClienteTelefono(e.target.value)} className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-xs" />
             </div>
-          )}
+          </div>
           {error && <p className="text-red-600 text-xs">{error}</p>}
           <button
             type="submit"
