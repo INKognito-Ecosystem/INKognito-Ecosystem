@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData, useSearchParams, useNavigate } from 'react-router-dom'
-import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarX, CalendarCheck } from 'lucide-react'
+import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarX, CalendarCheck, ChevronLeft, ChevronRight, Lock } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
 import EditarPerfilTabs from './EditarPerfilTabs'
+import { MESES_CALENDARIO, celdasDelMes } from './calendarioUtil'
 import { DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO } from '../../data/colombiaGeo'
 import { OPCIONES_DISPONIBILIDAD, DISPONIBILIDAD_COLOR, DISPONIBILIDAD_TEXTO } from './disponibilidad'
 
@@ -48,20 +49,22 @@ export async function loader({ request }) {
   const token = new URL(request.url).searchParams.get('token')
   if (!token) return { token: null }
   try {
-    const [artistaRes, configRes, horarioRes, bloqueosRes, reservasRes] = await Promise.all([
+    // artistas-bloqueos-por-token ya NO se precarga acá (2026-08-19) — el
+    // calendario de bloqueos del artista ahora consulta su propio estado
+    // por mes vía /api/artistas-calendario-por-token, no necesita la
+    // lista plana completa de antemano.
+    const [artistaRes, configRes, horarioRes, reservasRes] = await Promise.all([
       fetch(`${PANEL_URL}/api/artistas-por-token?token=${encodeURIComponent(token)}`),
       fetch(`${PANEL_URL}/api/upload-config`),
       fetch(`${PANEL_URL}/api/artistas-horario-por-token?token=${encodeURIComponent(token)}`),
-      fetch(`${PANEL_URL}/api/artistas-bloqueos-por-token?token=${encodeURIComponent(token)}`),
       fetch(`${PANEL_URL}/api/artistas-reservas-por-token?token=${encodeURIComponent(token)}`),
     ])
     const artista = artistaRes.ok ? await artistaRes.json() : null
     const config = configRes.ok ? await configRes.json() : { cloud_name: null, upload_preset: null }
     const horario = horarioRes.ok ? await horarioRes.json() : []
-    const bloqueos = bloqueosRes.ok ? await bloqueosRes.json() : []
     const reservas = reservasRes.ok ? await reservasRes.json() : []
     if (!artista) return { token, artista: null, error: 'Este link ya no es válido — pídelo de nuevo.' }
-    return { token, artista, horario, bloqueos, reservas, ...config }
+    return { token, artista, horario, reservas, ...config }
   } catch {
     return { token, artista: null, error: 'No pudimos cargar tu perfil — intenta de nuevo en un momento.' }
   }
@@ -634,103 +637,122 @@ function HorarioSemanalSection({ token, horarioInicial }) {
 
 // Bloqueos puntuales (vacaciones, día libre, almuerzo) — mismo criterio de
 // endpoint aparte que el horario semanal.
-function BloqueosSection({ token, bloqueosInicial }) {
-  const [bloqueos, setBloqueos] = useState(bloqueosInicial || [])
-  const [fecha, setFecha] = useState('')
-  const [todoElDia, setTodoElDia] = useState(true)
-  const [horaInicio, setHoraInicio] = useState('12:00')
-  const [horaFin, setHoraFin] = useState('13:00')
-  const [motivo, setMotivo] = useState('')
-  const [agregando, setAgregando] = useState(false)
+// Calendario de bloqueos (2026-08-19, Jose: "debería aparecer el
+// calendario, y seleccionar directamente el día... que este se bloquee,
+// esto sería más intuitivo") — reemplaza el formulario de fecha+checkbox
+// de antes. Mismo grid de mes que ArtistaLandingPage.jsx (celdasDelMes de
+// calendarioUtil.js), pero acá el click alterna bloqueado/disponible en
+// vez de avanzar al siguiente paso de una reserva.
+function CalendarioBloqueosSection({ token }) {
+  const hoyBase = new Date()
+  const [mesVisible, setMesVisible] = useState({ year: hoyBase.getFullYear(), month: hoyBase.getMonth() })
+  const [dias, setDias] = useState({})
+  const [cargando, setCargando] = useState(false)
   const [error, setError] = useState(null)
 
-  const agregar = async (e) => {
-    e.preventDefault()
-    setError(null)
-    setAgregando(true)
-    try {
-      const res = await fetch(`${PANEL_URL}/api/artistas-bloqueos-por-token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          token, fecha,
-          hora_inicio: todoElDia ? null : horaInicio,
-          hora_fin: todoElDia ? null : horaFin,
-          motivo,
-        }),
-      })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || '')
-      setBloqueos((prev) => [...prev, data].sort((a, b) => a.fecha.localeCompare(b.fecha)))
-      setFecha(''); setMotivo(''); setTodoElDia(true)
-    } catch (err) {
-      setError(err.message || 'No pudimos agregar el bloqueo — intenta de nuevo.')
-    } finally {
-      setAgregando(false)
-    }
+  useEffect(() => {
+    const { year, month } = mesVisible
+    const desde = `${year}-${String(month + 1).padStart(2, '0')}-01`
+    const hasta = new Date(year, month + 1, 0)
+    const hastaStr = `${hasta.getFullYear()}-${String(hasta.getMonth() + 1).padStart(2, '0')}-${String(hasta.getDate()).padStart(2, '0')}`
+    setCargando(true)
+    fetch(`${PANEL_URL}/api/artistas-calendario-por-token?token=${encodeURIComponent(token)}&desde=${desde}&hasta=${hastaStr}`)
+      .then((r) => (r.ok ? r.json() : {}))
+      .then(setDias)
+      .catch(() => setDias({}))
+      .finally(() => setCargando(false))
+  }, [token, mesVisible])
+
+  const cambiarMes = (delta) => {
+    setMesVisible(({ year, month }) => {
+      const d = new Date(year, month + delta, 1)
+      return { year: d.getFullYear(), month: d.getMonth() }
+    })
   }
 
-  const eliminar = async (id) => {
-    setBloqueos((prev) => prev.filter((b) => b.id !== id))
-    try {
-      await fetch(`${PANEL_URL}/api/artistas-bloqueos-eliminar-por-token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, id }),
-      })
-    } catch {
-      // Si falla, el bloqueo sigue existiendo del lado del panel — se
-      // corrige solo en el siguiente refresh de la página.
+  const clickDia = async (iso) => {
+    const info = dias[iso]
+    if (!info || info.estado === 'reservado' || info.estado === 'cerrado') return
+    setError(null)
+    if (info.estado === 'disponible') {
+      setDias((prev) => ({ ...prev, [iso]: { estado: 'bloqueado' } }))
+      try {
+        const res = await fetch(`${PANEL_URL}/api/artistas-bloqueos-por-token`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, fecha: iso, hora_inicio: null, hora_fin: null, motivo: null }),
+        })
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error()
+        setDias((prev) => ({ ...prev, [iso]: { estado: 'bloqueado', bloqueo_id: data.id } }))
+      } catch {
+        setDias((prev) => ({ ...prev, [iso]: { estado: 'disponible' } }))
+        setError('No pudimos bloquear ese día — intenta de nuevo.')
+      }
+    } else if (info.estado === 'bloqueado') {
+      setDias((prev) => ({ ...prev, [iso]: { estado: 'disponible' } }))
+      try {
+        const res = await fetch(`${PANEL_URL}/api/artistas-bloqueos-eliminar-por-token`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, id: info.bloqueo_id }),
+        })
+        if (!res.ok) throw new Error()
+      } catch {
+        setDias((prev) => ({ ...prev, [iso]: info }))
+        setError('No pudimos desbloquear ese día — intenta de nuevo.')
+      }
     }
   }
 
   return (
     <div className="mb-6 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5">
-      <p className={labelClass}><CalendarX size={12} className="inline -mt-0.5 mr-1" />Días y horas bloqueadas</p>
+      <p className={labelClass}><CalendarX size={12} className="inline -mt-0.5 mr-1" />Días bloqueados</p>
       <p className="text-gray-500 text-[11px] leading-relaxed mb-4">
-        Vacaciones, un día libre puntual, o el almuerzo — lo que bloquees acá no aparece disponible en tu calendario, aunque ese día esté activo arriba.
+        Toca un día para bloquearlo (vacaciones, día libre) o desbloquearlo — un día con ✕ verde ya tiene una cita real pagada, ese no se puede tocar desde acá.
       </p>
 
-      {bloqueos.length > 0 && (
-        <div className="space-y-1.5 mb-4">
-          {bloqueos.map((b) => (
-            <div key={b.id} className="flex items-center justify-between gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs">
-              <span className="text-gray-700">
-                <strong>{b.fecha?.slice(0, 10)}</strong>{b.hora_inicio ? ` · ${b.hora_inicio.slice(0, 5)}–${b.hora_fin?.slice(0, 5)}` : ' · Todo el día'}
-                {b.motivo && <span className="text-gray-400"> — {b.motivo}</span>}
-              </span>
-              <button type="button" onClick={() => eliminar(b.id)} aria-label="Quitar bloqueo" className="flex-shrink-0 text-gray-400 hover:text-red-600 transition-colors">
-                <Trash2 size={14} />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <form onSubmit={agregar} className="space-y-2">
-        <input required type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs" />
-        <label className="flex items-center gap-2 text-xs text-gray-600">
-          <input type="checkbox" checked={todoElDia} onChange={(e) => setTodoElDia(e.target.checked)} />
-          Todo el día
-        </label>
-        {!todoElDia && (
-          <div className="flex items-center gap-2">
-            <input type="time" value={horaInicio} onChange={(e) => setHoraInicio(e.target.value)} className="flex-1 bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-xs" />
-            <span className="text-gray-400 text-xs">a</span>
-            <input type="time" value={horaFin} onChange={(e) => setHoraFin(e.target.value)} className="flex-1 bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-xs" />
-          </div>
-        )}
-        <input type="text" value={motivo} onChange={(e) => setMotivo(e.target.value)} placeholder="Motivo (opcional)" className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs" />
-        {error && <p className="text-red-600 text-xs">{error}</p>}
-        <button
-          type="submit"
-          disabled={agregando}
-          className="w-full py-2.5 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-1.5"
-          style={{ backgroundColor: BTN }}
-        >
-          <Plus size={13} /> {agregando ? 'Agregando...' : 'Agregar bloqueo'}
+      <div className="flex items-center justify-between mb-2">
+        <button type="button" onClick={() => cambiarMes(-1)} className="p-1 text-gray-400 hover:text-gray-700">
+          <ChevronLeft size={16} />
         </button>
-      </form>
+        <span className="text-xs font-black uppercase">{MESES_CALENDARIO[mesVisible.month]} {mesVisible.year}</span>
+        <button type="button" onClick={() => cambiarMes(1)} className="p-1 text-gray-400 hover:text-gray-700">
+          <ChevronRight size={16} />
+        </button>
+      </div>
+      <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-gray-400 mb-1">
+        {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map((d, i) => <span key={i}>{d}</span>)}
+      </div>
+      <div className="grid grid-cols-7 gap-1">
+        {celdasDelMes(mesVisible.year, mesVisible.month).map((c, i) => {
+          if (!c) return <span key={i} />
+          const info = dias[c.iso]
+          const estado = info?.estado
+          const clickeable = estado === 'disponible' || estado === 'bloqueado'
+          const estilos = {
+            disponible: 'bg-white border border-gray-300 text-gray-700 hover:border-gray-500',
+            bloqueado: 'bg-red-50 border border-red-200 text-red-600',
+            reservado: 'bg-green-600 text-white',
+            cerrado: 'bg-transparent text-gray-300',
+          }
+          return (
+            <button
+              key={i}
+              type="button"
+              disabled={!clickeable}
+              onClick={() => clickDia(c.iso)}
+              className={`aspect-square rounded-lg text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition-colors ${estilos[estado] || 'text-gray-300'}`}
+            >
+              {c.dia}
+              {estado === 'bloqueado' && <X size={9} />}
+              {estado === 'reservado' && <Lock size={9} />}
+            </button>
+          )
+        })}
+      </div>
+      {cargando && <p className="text-center text-gray-400 text-[11px] mt-3">Cargando...</p>}
+      {error && <p className="text-red-600 text-xs mt-3">{error}</p>}
     </div>
   )
 }
@@ -767,7 +789,7 @@ function ProximasCitasSection({ reservasIniciales }) {
   )
 }
 
-function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioInicial, bloqueosInicial, reservasInicial }) {
+function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioInicial, reservasInicial }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const mp = searchParams.get('mp')
   // Pestaña activa en la URL (2026-08-19) — mismo patrón que ?mp=/
@@ -805,6 +827,25 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
   // en el formulario de abajo — son datos que necesitan más cuidado
   // (selects, validaciones), no reemplazo de texto suelto.
   const [editandoHero, setEditandoHero] = useState(false)
+  // Tooltip de onboarding sobre el botón "Editar" (2026-08-19, Jose: "esta
+  // demás [el texto de arriba] ahora que hay un botón, mejor educamos a
+  // las personas con las cards que ya implementamos") — mismo patrón
+  // exacto que el tooltip de "Para agendar" en ArtistaLandingPage.jsx.
+  // Arranca en `false` a propósito — el servidor no tiene localStorage,
+  // así que debe coincidir con el HTML inicial (evita mismatch de
+  // hidratación).
+  const [tooltipEditarVisible, setTooltipEditarVisible] = useState(false)
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem('kg_tooltip_editar_visto')) setTooltipEditarVisible(true)
+    } catch {
+      // localStorage puede fallar en navegación privada — sin tooltip, no rompe nada
+    }
+  }, [])
+  const cerrarTooltipEditar = () => {
+    try { localStorage.setItem('kg_tooltip_editar_visto', '1') } catch {}
+    setTooltipEditarVisible(false)
+  }
 
   const set = (campo) => (e) => setForm((f) => ({ ...f, [campo]: e.target.value }))
   const setDepartamento = (nuevo) => setForm((f) => ({ ...f, departamento: nuevo, municipio: '' }))
@@ -874,8 +915,6 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           ArtistaEditarPerfilPage, prop titulo). La instrucción corta se
           queda, sí aporta algo que el navbar no dice. */}
       <div className="px-4 max-w-3xl mx-auto">
-        <p className="text-gray-500 text-sm text-center mb-6 pt-2">Hola {artista.nombre} — toca "Editar" junto a tu nombre para cambiar tus datos, o cualquier foto para reemplazarla.</p>
-
         {searchParams.get('bienvenida') === '1' && (
           <p className="text-sm text-center mb-4 py-2 rounded-lg bg-green-50 text-green-700 font-bold">✓ Tu correo quedó confirmado — ya puedes editar tu perfil</p>
         )}
@@ -1011,6 +1050,25 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
               <span className="flex-shrink-0 text-xs font-bold tracking-widest text-gray-500 pt-0.5">{'$'.repeat(Number(form.precio_nivel))}</span>
             )}
           </div>
+
+          {/* Tooltip de onboarding sobre "Editar" (2026-08-19) — mismo
+              patrón que el de "Para agendar" en ArtistaLandingPage.jsx.
+              Ancla en el div `relative` de arriba (982), no dentro del
+              flex de la fila del nombre, para no empujar el layout. */}
+          {tooltipEditarVisible && (
+            <div className="absolute z-20 top-full right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left">
+              <span className="absolute -top-1.5 right-6 w-3 h-3 bg-gray-900 rotate-45" />
+              <p className="text-xs leading-relaxed text-gray-200">
+                Toca "Editar" para cambiar tu nombre, especialidad, bio y redes — o cualquier foto, para reemplazarla.
+              </p>
+              <button
+                onClick={cerrarTooltipEditar}
+                className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
+              >
+                Entendido
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="mt-6 space-y-2">
@@ -1389,7 +1447,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
         </div>
         <div>
           <ProximasCitasSection reservasIniciales={reservasInicial} />
-          <BloqueosSection token={token} bloqueosInicial={bloqueosInicial} />
+          <CalendarioBloqueosSection token={token} />
         </div>
       </div>
       </div>
@@ -1400,7 +1458,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
 }
 
 export default function ArtistaEditarPerfilPage() {
-  const { token, artista, error, cloud_name, upload_preset, horario, bloqueos, reservas } = useLoaderData()
+  const { token, artista, error, cloud_name, upload_preset, horario, reservas } = useLoaderData()
   const navigate = useNavigate()
 
   // Guardar el token válido para la próxima visita, y limpiar uno guardado
@@ -1438,7 +1496,7 @@ export default function ArtistaEditarPerfilPage() {
             <div className="px-4"><PedirLinkForm /></div>
           )
         ) : (
-          <FormularioEdicion token={token} artista={artista} cloud_name={cloud_name} upload_preset={upload_preset} horarioInicial={horario} bloqueosInicial={bloqueos} reservasInicial={reservas} />
+          <FormularioEdicion token={token} artista={artista} cloud_name={cloud_name} upload_preset={upload_preset} horarioInicial={horario} reservasInicial={reservas} />
         )}
       </div>
       <footer className="border-t border-gray-200 py-6 px-4">

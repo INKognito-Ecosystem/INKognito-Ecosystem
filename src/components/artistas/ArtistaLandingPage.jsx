@@ -8,6 +8,7 @@ import { idDesdeParam } from './artistaSlug'
 import { DISPONIBILIDAD_COLOR, DISPONIBILIDAD_TEXTO } from './disponibilidad'
 import { urlGoogleMaps } from './mapaUrl'
 import { cloudinaryFill, cloudinaryLimit } from '../../lib/cloudinary'
+import { MESES_CALENDARIO, _pad2, fechaISO, celdasDelMes } from './calendarioUtil'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const ACCENT = '#B3202F'
@@ -50,22 +51,11 @@ const formatearValorSesion = (texto) => {
   return `$${Number(limpio).toLocaleString('es-CO')}`
 }
 
-// Calendario real (fase 1 de agenda, 2026-08-19) — utilidades de fecha
-// hechas a mano, sin librería (el mes tiene aritmética simple, no amerita
-// una dependencia nueva en el frontend).
-const MESES_CALENDARIO = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-const _pad2 = (n) => String(n).padStart(2, '0')
-const fechaISO = (d) => `${d.getFullYear()}-${_pad2(d.getMonth() + 1)}-${_pad2(d.getDate())}`
-// Grid de 7 columnas empezando en lunes — devuelve null en las celdas
-// vacías antes del día 1 / después del último día del mes.
-const celdasDelMes = (year, month) => {
-  const primerDia = new Date(year, month, 1)
-  const totalDias = new Date(year, month + 1, 0).getDate()
-  const offset = (primerDia.getDay() + 6) % 7 // Date.getDay(): 0=domingo → offset para que lunes quede primero
-  const celdas = Array(offset).fill(null)
-  for (let dia = 1; dia <= totalDias; dia++) celdas.push({ dia, iso: fechaISO(new Date(year, month, dia)) })
-  return celdas
-}
+// Calendario real (fase 1 de agenda, 2026-08-19) — MESES_CALENDARIO/
+// fechaISO/celdasDelMes viven en calendarioUtil.js (compartidas con el
+// calendario de bloqueos del artista en ArtistaEditarPerfilPage.jsx).
+// formatearHora12 se queda acá — el calendario del artista trabaja a
+// nivel de día, no formatea horas.
 const formatearHora12 = (hhmm) => {
   const [h, m] = hhmm.split(':').map(Number)
   const ampm = h < 12 ? 'AM' : 'PM'

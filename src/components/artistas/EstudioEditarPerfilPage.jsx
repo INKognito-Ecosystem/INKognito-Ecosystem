@@ -819,6 +819,21 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
   const [guardado, setGuardado] = useState(false)
   const [error, setError] = useState(null)
   const [editandoHero, setEditandoHero] = useState(false)
+  // Tooltip de onboarding sobre el botón "Editar" (2026-08-19) — mismo
+  // patrón exacto que ArtistaEditarPerfilPage.jsx / el de "Para agendar"
+  // en ArtistaLandingPage.jsx, misma key de localStorage (cada página
+  // corre en su propio dominio de token, no hay riesgo de que una
+  // "consuma" el tooltip de la otra).
+  const [tooltipEditarVisible, setTooltipEditarVisible] = useState(false)
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem('kg_tooltip_editar_visto')) setTooltipEditarVisible(true)
+    } catch {}
+  }, [])
+  const cerrarTooltipEditar = () => {
+    try { localStorage.setItem('kg_tooltip_editar_visto', '1') } catch {}
+    setTooltipEditarVisible(false)
+  }
   const [ubicando, setUbicando] = useState(false)
   const fileInputs = useRef({})
 
@@ -883,8 +898,6 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
   return (
     <div className="max-w-3xl lg:max-w-none mx-auto">
       <div className="px-4 max-w-3xl mx-auto">
-        <p className="text-gray-500 text-sm text-center mb-6 pt-2">Hola {estudio.nombre} — toca "Editar" para cambiar los datos del estudio, o cualquier foto para reemplazarla.</p>
-
         {searchParams.get('bienvenida') === '1' && (
           <p className="text-sm text-center mb-4 py-2 rounded-lg bg-green-50 text-green-700 font-bold">✓ Tu correo quedó confirmado — ya puedes editar tu perfil</p>
         )}
@@ -958,6 +971,23 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
             {editandoHero ? 'Listo' : 'Editar'}
           </button>
         </div>
+
+        {/* Tooltip de onboarding sobre "Editar" (2026-08-19) — mismo
+            patrón que ArtistaEditarPerfilPage.jsx. */}
+        {tooltipEditarVisible && (
+          <div className="absolute z-20 top-full right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left">
+            <span className="absolute -top-1.5 right-6 w-3 h-3 bg-gray-900 rotate-45" />
+            <p className="text-xs leading-relaxed text-gray-200">
+              Toca "Editar" para cambiar el nombre, ubicación y redes de tu estudio — o cualquier foto, para reemplazarla.
+            </p>
+            <button
+              onClick={cerrarTooltipEditar}
+              className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
+            >
+              Entendido
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Guía de formato ideal (2026-08-07, Jose: "las fotos tienen mucho
