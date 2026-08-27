@@ -1223,13 +1223,13 @@ export default function EstudioEditarPerfilPage() {
       <NavbarArtistas titulo="Editar mi estudio" />
       <div className="flex-1 pt-20 md:pt-24 pb-16 w-full">
         {!token || !estudio ? (
-          error ? (
-            <div className="text-center max-w-sm mx-auto px-4">
-              <p className="text-gray-500 text-sm leading-relaxed">{error}</p>
-            </div>
-          ) : (
-            <div className="px-4"><PedirLinkForm /></div>
-          )
+          // Mismo bug real que ArtistaEditarPerfilPage.jsx (2026-08-26) —
+          // un token guardado vencido dejaba al estudio en una pantalla de
+          // error sin ningún formulario para pedir un link nuevo.
+          <div className="px-4">
+            {error && <p className="text-gray-500 text-sm leading-relaxed text-center max-w-sm mx-auto mb-6">{error}</p>}
+            <PedirLinkForm />
+          </div>
         ) : (
           <FormularioEdicionEstudio token={token} estudio={estudio} cloud_name={cloud_name} upload_preset={upload_preset} invitaciones={invitaciones} />
         )}

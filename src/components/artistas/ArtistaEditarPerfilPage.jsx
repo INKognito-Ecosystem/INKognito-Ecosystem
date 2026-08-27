@@ -1621,13 +1621,16 @@ export default function ArtistaEditarPerfilPage() {
           padding va sección por sección, no en el contenedor general. */}
       <div className="flex-1 pt-20 md:pt-24 pb-16 w-full">
         {!token || !artista ? (
-          error ? (
-            <div className="text-center max-w-sm mx-auto px-4">
-              <p className="text-gray-500 text-sm leading-relaxed">{error}</p>
-            </div>
-          ) : (
-            <div className="px-4"><PedirLinkForm /></div>
-          )
+          // Bug real (2026-08-26, Jose: "no me deja poner el correo... o no
+          // carga, o me devuelve al perfil") — antes, si el token guardado
+          // en el navegador venció, esta rama SOLO mostraba el error, sin
+          // ningún formulario para pedir un link nuevo — pantalla sin
+          // salida. Ahora el error (si lo hay) se ve arriba del formulario,
+          // nunca en su lugar.
+          <div className="px-4">
+            {error && <p className="text-gray-500 text-sm leading-relaxed text-center max-w-sm mx-auto mb-6">{error}</p>}
+            <PedirLinkForm />
+          </div>
         ) : (
           <FormularioEdicion token={token} artista={artista} cloud_name={cloud_name} upload_preset={upload_preset} horarioInicial={horario} reservasInicial={reservas} />
         )}
