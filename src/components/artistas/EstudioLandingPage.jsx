@@ -286,6 +286,7 @@ export default function EstudioLandingPage() {
           <div className="flex items-center gap-4">
             <Link to="/tattoo-artist-colombia/terminos" className="text-gray-400 hover:text-gray-700 transition-colors">Términos</Link>
             <Link to="/tattoo-artist-colombia/privacidad" className="text-gray-400 hover:text-gray-700 transition-colors">Privacidad</Link>
+            <span className="text-gray-300">Desarrollado por INKognito</span>
           </div>
         </div>
       </footer>
