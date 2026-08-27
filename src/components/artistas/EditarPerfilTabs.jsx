@@ -23,9 +23,15 @@ export default function EditarPerfilTabs({ tabs, activeTab, onChange, children }
   }
 
   return (
-    <div className="lg:flex lg:gap-6 lg:items-start lg:px-4 lg:mt-8">
-      {/* Barra móvil — botón ☰ + nombre de la pestaña activa */}
-      <div className="lg:hidden flex items-center px-4 py-3 border-y border-gray-200 mt-6 mb-2 bg-gray-50">
+    <div className="lg:flex lg:gap-6 lg:items-start lg:px-4 -mt-4">
+      {/* Barra móvil — botón ☰ + nombre de la pestaña activa. `-mt-4` en el
+          contenedor (2026-08-26, Jose: "sigue siendo mal, pegalo mas al
+          navbar") — el padre (ArtistaEditarPerfilPage/EstudioEditarPerfilPage)
+          aplica pt-20 md:pt-24 para despejar el navbar fijo (h-16/md:h-20),
+          lo que deja un colchón extra de 16px en ambos breakpoints; el
+          -mt-4 (16px) lo cancela para que la barra quede pegada justo
+          debajo del navbar. */}
+      <div className="lg:hidden flex items-center px-4 py-3 border-y border-gray-200 mb-2 bg-gray-50">
         <button
           type="button"
           onClick={() => setMenuAbierto(true)}

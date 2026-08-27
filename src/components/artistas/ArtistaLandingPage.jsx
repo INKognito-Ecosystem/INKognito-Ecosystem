@@ -874,9 +874,18 @@ export default function ArtistaLandingPage() {
                     arriba) — anidarlo adentro lo recortaría contra el
                     borde de la card, igual que le pasó al hero del
                     buscador con su propio overflow-hidden. */}
+                {/* Flecha condicional (2026-08-26, auditoría de tooltips
+                    desfasados) — la caja se queda fija en left-4 (el ancho
+                    w-72 ya alcanza a cubrir ambos casos), pero "Para
+                    agendar" NO siempre es el primer bloque de la fila:
+                    cuando también se muestra "Valor de mi sesión" (arriba,
+                    flex gap-6), "Para agendar" queda desplazado a la
+                    derecha y la flecha fija en left-6 apuntaba al bloque
+                    equivocado. Con solo "Para agendar" en la fila, left-6
+                    sigue siendo correcto. */}
                 {tooltipAgendarVisible && (
                   <div className="absolute z-20 top-full mt-3 left-4 w-72 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left">
-                    <span className="absolute -top-1.5 left-6 w-3 h-3 bg-gray-900 rotate-45" />
+                    <span className={`absolute -top-1.5 w-3 h-3 bg-gray-900 rotate-45 ${artista.precio_sesion_texto ? 'left-32' : 'left-6'}`} />
                     <p className="text-xs leading-relaxed text-gray-200">
                       "Para agendar" es un abono para reservar tu cita — no el precio completo del tatuaje. El resto se paga directo con {artista.nombre}, el día de tu sesión.
                     </p>

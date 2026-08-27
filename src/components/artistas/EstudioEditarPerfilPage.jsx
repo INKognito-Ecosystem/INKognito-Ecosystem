@@ -962,32 +962,37 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
               <h1 className="text-base sm:text-xl font-black uppercase leading-tight truncate">{form.nombre || 'Nombre del estudio'}</h1>
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => setEditandoHero((v) => !v)}
-            className="flex-shrink-0 flex items-center gap-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-colors"
-          >
-            <Pencil size={10} />
-            {editandoHero ? 'Listo' : 'Editar'}
-          </button>
-        </div>
-
-        {/* Tooltip de onboarding sobre "Editar" (2026-08-19) — mismo
-            patrón que ArtistaEditarPerfilPage.jsx. */}
-        {tooltipEditarVisible && (
-          <div className="absolute z-20 top-full right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left">
-            <span className="absolute -top-1.5 right-6 w-3 h-3 bg-gray-900 rotate-45" />
-            <p className="text-xs leading-relaxed text-gray-200">
-              Toca "Editar" para cambiar el nombre, ubicación y redes de tu estudio — o cualquier foto, para reemplazarla.
-            </p>
+          <div className="relative flex-shrink-0">
             <button
-              onClick={cerrarTooltipEditar}
-              className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
+              type="button"
+              onClick={() => setEditandoHero((v) => !v)}
+              className="flex items-center gap-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-colors"
             >
-              Entendido
+              <Pencil size={10} />
+              {editandoHero ? 'Listo' : 'Editar'}
             </button>
+
+            {/* Tooltip de onboarding sobre "Editar" (2026-08-19, corregido
+                2026-08-26) — mismo fix que ArtistaEditarPerfilPage.jsx: ancla
+                directo al wrapper del botón (no al hero completo), así la
+                flecha siempre apunta a "Editar" sin importar el ancho de
+                pantalla. */}
+            {tooltipEditarVisible && (
+              <div className="absolute z-20 top-full right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left">
+                <span className="absolute -top-1.5 right-3 w-3 h-3 bg-gray-900 rotate-45" />
+                <p className="text-xs leading-relaxed text-gray-200">
+                  Toca "Editar" para cambiar el nombre, ubicación y redes de tu estudio — o cualquier foto, para reemplazarla.
+                </p>
+                <button
+                  onClick={cerrarTooltipEditar}
+                  className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
+                >
+                  Entendido
+                </button>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       {/* Guía de formato ideal (2026-08-07, Jose: "las fotos tienen mucho

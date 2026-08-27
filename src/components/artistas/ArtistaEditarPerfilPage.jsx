@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData, useSearchParams, useNavigate } from 'react-router-dom'
-import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarX, CalendarCheck, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarDays, CalendarCheck, ChevronLeft, ChevronRight } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
@@ -592,16 +592,27 @@ function HorarioSemanalSection({ token, horarioInicial }) {
         {DIAS_SEMANA.map(({ db, label }) => {
           const fila = filas.find((f) => f.dia_semana === db)
           return (
-            <div key={db} className="flex items-center gap-2">
+            <div key={db} className="flex items-center gap-3">
+              {/* Toggle "se monta encima del día" (2026-08-26, reportado en
+                  móvil) — no es un bug de layout: gap-2/gap-3 y los anchos
+                  fijos ya dejan espacio de sobra. Es el resaltado nativo del
+                  navegador al tocar el botón (tap-highlight de Android +
+                  anillo de foco por defecto), que no respeta el
+                  rounded-full y se ve como un rectángulo que invade el
+                  texto de al lado — solo aparece en los días que se
+                  tocaron (quedan enfocados), nunca en "Domingo" si no se
+                  tocó. Se apaga el resaltado nativo y se reemplaza por un
+                  anillo propio, contenido dentro del botón (ring-inset). */}
               <button
                 type="button"
                 onClick={() => actualizar(db, 'activo', !fila.activo)}
                 aria-pressed={fila.activo}
-                className={`flex-shrink-0 w-11 h-6 rounded-full transition-colors relative ${fila.activo ? 'bg-green-600' : 'bg-gray-300'}`}
+                style={{ WebkitTapHighlightColor: 'transparent' }}
+                className={`flex-shrink-0 w-11 h-6 rounded-full transition-colors relative outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500 ${fila.activo ? 'bg-green-600' : 'bg-gray-300'}`}
               >
                 <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${fila.activo ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </button>
-              <span className={`w-20 text-xs font-bold flex-shrink-0 ${fila.activo ? 'text-gray-900' : 'text-gray-400'}`}>{label}</span>
+              <span className={`w-20 pl-2 text-xs font-bold flex-shrink-0 ${fila.activo ? 'text-gray-900' : 'text-gray-400'}`}>{label}</span>
               <input
                 type="time"
                 disabled={!fila.activo}
@@ -714,9 +725,9 @@ function CalendarioBloqueosSection({ token }) {
 
   return (
     <div className="mb-6 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5">
-      <p className={labelClass}><CalendarX size={12} className="inline -mt-0.5 mr-1" />Días bloqueados</p>
+      <p className={labelClass}><CalendarDays size={12} className="inline -mt-0.5 mr-1" />Mi agenda</p>
       <p className="text-gray-500 text-[11px] leading-relaxed mb-4">
-        Toca un día disponible para anotar qué va a pasar (o bloquearlo sin más), toca uno bloqueado para liberarlo, o toca uno con ✓ verde para ver los datos de esa cita.
+        Este calendario es tu agenda completa — anota también los tatuajes que coordines por fuera de INKognito (WhatsApp, en persona) para que no se te crucen las fechas. Toca un día disponible para anotar qué va a pasar (o bloquearlo sin más), toca uno bloqueado para liberarlo, o toca uno con ✓ verde para ver los datos de esa cita.
       </p>
 
       <div className="flex items-center justify-between mb-2">
@@ -1094,7 +1105,14 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           antes (las clases lg: no hacen nada por debajo de ese
           breakpoint), en desktop se parte en dos bloques lado a lado. */}
       <div className={activeTab === 'perfil' ? 'block' : 'hidden'}>
-      <div>
+      {/* lg:max-w-2xl (2026-08-26, Jose: "que deje un espacio a la derecha
+          para publicidad, como Facebook") — sin mx-auto a propósito, para
+          que el espacio libre quede pegado a la derecha (no repartido a
+          los dos lados). Solo en PC: en móvil el viewport ya es más
+          angosto que 2xl, así que esto no cambia nada ahí. Ojo: solo esta
+          pestaña — "Mis diseños" y "Reservas y agenda" se quedan a lo
+          ancho del contenedor como estaban. */}
+      <div className="lg:max-w-3xl">
       <div className="w-full h-40 sm:h-56 md:h-72 bg-gray-100 overflow-hidden relative">
         {form.foto_url_2 && <img src={form.foto_url_2} alt="" className="w-full h-full object-cover" />}
         <button
@@ -1141,14 +1159,38 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
                 ) : (
                   <h1 className="text-base sm:text-xl md:text-2xl font-black uppercase leading-tight truncate">{form.nombre || 'Tu nombre'}</h1>
                 )}
-                <button
-                  type="button"
-                  onClick={() => setEditandoHero((v) => !v)}
-                  className="flex-shrink-0 flex items-center gap-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-colors"
-                >
-                  <Pencil size={10} />
-                  {editandoHero ? 'Listo' : 'Editar'}
-                </button>
+                <div className="relative flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setEditandoHero((v) => !v)}
+                    className="flex items-center gap-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-colors"
+                  >
+                    <Pencil size={10} />
+                    {editandoHero ? 'Listo' : 'Editar'}
+                  </button>
+
+                  {/* Tooltip de onboarding sobre "Editar" (2026-08-19,
+                      corregido 2026-08-26) — antes anclaba al div `relative`
+                      de todo el hero (ancho completo de la columna), así que
+                      la flecha apuntaba lejos del botón real, y peor entre
+                      más ancha la pantalla (PC). Ahora ancla directo a este
+                      wrapper del botón, así la flecha siempre cae sobre
+                      "Editar" sin importar cuánto ocupe el nombre. */}
+                  {tooltipEditarVisible && (
+                    <div className="absolute z-20 top-full right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left">
+                      <span className="absolute -top-1.5 right-3 w-3 h-3 bg-gray-900 rotate-45" />
+                      <p className="text-xs leading-relaxed text-gray-200">
+                        Toca "Editar" para cambiar tu nombre, especialidad, bio y redes — o cualquier foto, para reemplazarla.
+                      </p>
+                      <button
+                        onClick={cerrarTooltipEditar}
+                        className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
+                      >
+                        Entendido
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="mt-1 space-y-0.5">
                 <span className="flex items-center gap-1 text-[9px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 truncate">
@@ -1179,25 +1221,6 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
               <span className="flex-shrink-0 text-xs font-bold tracking-widest text-gray-500 pt-0.5">{'$'.repeat(Number(form.precio_nivel))}</span>
             )}
           </div>
-
-          {/* Tooltip de onboarding sobre "Editar" (2026-08-19) — mismo
-              patrón que el de "Para agendar" en ArtistaLandingPage.jsx.
-              Ancla en el div `relative` de arriba (982), no dentro del
-              flex de la fila del nombre, para no empujar el layout. */}
-          {tooltipEditarVisible && (
-            <div className="absolute z-20 top-full right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left">
-              <span className="absolute -top-1.5 right-6 w-3 h-3 bg-gray-900 rotate-45" />
-              <p className="text-xs leading-relaxed text-gray-200">
-                Toca "Editar" para cambiar tu nombre, especialidad, bio y redes — o cualquier foto, para reemplazarla.
-              </p>
-              <button
-                onClick={cerrarTooltipEditar}
-                className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
-              >
-                Entendido
-              </button>
-            </div>
-          )}
         </div>
 
         <div className="mt-6 space-y-2">
@@ -1470,7 +1493,10 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           hero en una grilla de 2 columnas; ahora es su propia pestaña,
           sin compartir ancho con nada. */}
       <div className={activeTab === 'disenos' ? 'block' : 'hidden'}>
-      <div className="px-4 lg:px-0">
+      {/* lg:max-w-3xl (2026-08-26) — mismo espacio para publicidad que en
+          "Mi perfil" (ver comentario ahí). Solo PC, sin mx-auto: se pega
+          a la izquierda, el hueco queda a la derecha. */}
+      <div className="px-4 lg:px-0 lg:max-w-3xl">
 
       <MisDisenosSection token={token} cloud_name={cloud_name} upload_preset={upload_preset} mpConectado={artista.mp_conectado} />
 
@@ -1482,6 +1508,10 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           horario semanal, bloqueos y próximas citas que estaban debajo,
           todo en un solo lugar. */}
       <div className={activeTab === 'agenda' ? 'block' : 'hidden'}>
+      {/* lg:max-w-3xl envolviendo el form Y la grilla de horario/bloqueos/
+          citas de más abajo — mismo espacio para publicidad que en "Mi
+          perfil"/"Mis diseños". Solo PC, sin mx-auto. */}
+      <div className="lg:max-w-3xl">
       <div className="px-4 lg:px-0">
       <form onSubmit={guardar} className="space-y-4">
         {/* Reservas con anticipo (fase 2, 2026-08-06) — un solo campo
@@ -1506,7 +1536,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
         <div className="pt-2 border-t border-gray-100">
           <p className="text-gray-400 text-[11px] uppercase tracking-widest mb-1.5 pt-3">Reservas con anticipo</p>
           <p className="text-gray-500 text-[11px] leading-relaxed mb-3">
-            Un cliente que ya pagó para agendar es distinto a uno que solo escribió — no compite con otros mensajes, y tú recibes su contacto completo al instante. Actívalo y aparece un botón "Reservar" en tu perfil, sin reemplazar tu WhatsApp.
+            Un pago confirmado pesa distinto a un mensaje más: el cliente ya se comprometió con dinero real, y tú recibes su nombre, teléfono y correo al instante. Define "Para agendar" abajo y el botón "Reservar" aparece en tu perfil — sin tocar tu WhatsApp.
           </p>
           <div>
             <label className={labelClass}>Para agendar (COP)</label>
@@ -1518,7 +1548,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
                 placeholder="Ej: 50000"
               />
             </div>
-            <p className="text-gray-400 text-[11px] mt-1">Es el monto completo que el cliente paga para reservar contigo — no un anticipo parcial de un total mayor.</p>
+            <p className="text-gray-400 text-[11px] mt-1">El cliente paga este monto completo, al momento, por Mercado Pago — se descuenta del valor total de la sesión que te paga después, en persona. No es un cobro adicional.</p>
           </div>
           <div className="mt-3">
             <label className={labelClass}>El valor de mi sesión (COP, opcional)</label>
@@ -1530,7 +1560,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
                 placeholder="Ej: 150000"
               />
             </div>
-            <p className="text-gray-400 text-[11px] mt-1">Opcional — publícalo solo si es un valor real que respaldas, el mismo que le dirías a un cliente que pregunta directamente. Si tu tarifa varía mucho según el diseño, mejor déjalo vacío y publica solo "Para agendar" — es preferible no mostrar un número a mostrar uno que no vas a cumplir.</p>
+            <p className="text-gray-400 text-[11px] mt-1">A diferencia de "Para agendar", este número nunca se cobra: es la referencia que el cliente ve en tu perfil antes de escribirte.</p>
           </div>
           {/* Anticipación mínima (2026-08-19, Jose: "cada artista debería
               poder elegir su propio mínimo... unos manejan diseños
@@ -1553,7 +1583,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
               <option value={8}>8 días</option>
               <option value={15}>15 días</option>
             </select>
-            <p className="text-gray-400 text-[11px] mt-1">Cuánto tiempo mínimo de anticipación pides antes de una cita — bajo si atiendes turistas de paso, alto si tus diseños necesitan más planeación.</p>
+            <p className="text-gray-400 text-[11px] mt-1">Cuántos días de anticipación exiges como mínimo para una cita agendada en línea — bajo si atiendes trabajo de paso o turistas, alto si tus diseños necesitan tiempo real de planeación.</p>
           </div>
         </div>
 
@@ -1582,6 +1612,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           <ProximasCitasSection reservasIniciales={reservasInicial} />
           <CalendarioBloqueosSection token={token} />
         </div>
+      </div>
       </div>
       </div>
 
