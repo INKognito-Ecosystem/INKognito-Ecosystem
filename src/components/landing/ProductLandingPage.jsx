@@ -290,14 +290,29 @@ export default function ProductLandingPage() {
               ? (
                 <>
                   <div className="relative">
+                    {/* square (2026-08-27, Jose: "las imágenes... son
+                        gigantes... por muy grande que sean se adapten...
+                        ¿esto no se supone que ya lo habíamos corregido?")
+                        — el 2026-08-09 esto quedó a propósito SIN square
+                        (comentario en ProductImageGallery.jsx: "la foto
+                        grande de ProductLandingPage sigue mostrando la
+                        imagen completa tal cual"), para no recortar nada.
+                        Con Supply multi-tenant, fotos de estudios de
+                        cualquier proporción/resolución ya no tenían un
+                        formato consistente (una vertical de celular se
+                        veía enorme). cloudinarySquare usa c_pad (rellena
+                        con fondo blanco), no c_fill — se sigue viendo la
+                        foto completa sin recortar, solo dentro de un
+                        lienzo 800×800 fijo en vez de a su tamaño crudo. */}
                     <ProductImageGallery
                       images={images}
                       alt={product.name}
                       activeIndex={imgIdx}
                       onIndexChange={setImgIdx}
-                      containerClassName="rounded-xl border border-zinc-800 overflow-hidden"
-                      imgClassName="w-full h-auto"
+                      containerClassName="rounded-xl border border-zinc-800 overflow-hidden aspect-square bg-white"
+                      imgClassName="w-full h-full object-contain"
                       eager
+                      square
                     />
                     {/* Insignia de marca sobre la foto — mismo logo que
                         IndustriasWarlockPage.jsx, solo Mobiliario/Warlock
@@ -541,10 +556,26 @@ export default function ProductLandingPage() {
                         <span>Suministrado por Nutri House — punto físico en Chigorodó</span>
                       </div>
                     )}
-                    <div className="flex items-center gap-3 text-zinc-400 text-xs">
-                      <Truck size={13} className="shrink-0" style={{ color: accent }} />
-                      <span>Envío con Eljach Mensajería Express — 1 a 2 días en Urabá (Chigorodó, Apartadó, Carepa, Turbo), con pago contraentrega</span>
-                    </div>
+                    {/* Supply es multi-tenant (fase 4/5): cada producto puede
+                        venir de un estudio distinto, cada uno con su propia
+                        logística — ya no todo sale de Eljach en Urabá como
+                        cuando Supply era solo el inventario de Jose (Jose,
+                        2026-08-27: "ya no se maneja como antes, ni lo
+                        transporta Eljach... debe ser universal"). Store y
+                        Suplementos siguen siendo de un solo proveedor, ahí
+                        el texto específico de Eljach/Urabá sigue siendo
+                        cierto. */}
+                    {isSupply ? (
+                      <div className="flex items-center gap-3 text-zinc-400 text-xs">
+                        <Truck size={13} className="shrink-0" style={{ color: accent }} />
+                        <span>Envío y forma de pago los coordina {variant?.estudio_nombre_supply || product.estudio_nombre_supply || 'el vendedor'} directamente contigo al confirmar tu pedido</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-3 text-zinc-400 text-xs">
+                        <Truck size={13} className="shrink-0" style={{ color: accent }} />
+                        <span>Envío con Eljach Mensajería Express — 1 a 2 días en Urabá (Chigorodó, Apartadó, Carepa, Turbo), con pago contraentrega</span>
+                      </div>
+                    )}
                   </>
                 )}
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
@@ -552,8 +583,10 @@ export default function ProductLandingPage() {
                   <span>Agenda tu pedido en línea o por WhatsApp — tú eliges, sin intermediarios</span>
                 </div>
                 {/* Ya dice "envío a toda Colombia" en la línea de arriba para
-                    mobiliario — esta línea sería redundante/confusa ahí. */}
-                {!esMobiliario && (
+                    mobiliario — esta línea sería redundante/confusa ahí. Para
+                    Supply tampoco aplica: sin una zona base fija por
+                    vendedor, "fuera de Urabá" ya no significa nada. */}
+                {!esMobiliario && !isSupply && (
                   <div className="flex items-center gap-3 text-zinc-400 text-xs">
                     <Globe size={13} className="shrink-0" style={{ color: accent }} />
                     <span>¿Fuera de Urabá? También enviamos a toda Colombia — tiempo y costo se coordinan al confirmar (sin contraentrega fuera de la zona)</span>

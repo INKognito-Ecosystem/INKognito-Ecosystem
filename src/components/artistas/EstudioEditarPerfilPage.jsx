@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLoaderData, useNavigate, useSearchParams } from 'react-router-dom'
-import { Camera, LoaderCircle, Mail, Pencil, MapPin, Users, UserPlus, X, Navigation, Check, Trash2, ShoppingBag, ExternalLink, Wallet, ChevronDown, Copy } from 'lucide-react'
+import { Camera, LoaderCircle, Mail, Pencil, MapPin, Users, UserPlus, X, Navigation, Check, Trash2, ShoppingBag, ExternalLink, Wallet, ChevronDown, CopyPlus, Eye, Plus, Link2 } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
@@ -247,7 +247,12 @@ function MiEquipoSection({ token, artistas, invitacionesIniciales, esEmpresa }) 
 // completo sin tocar. Las páginas de categoría de Supply son rutas fijas
 // por texto exacto, un valor libre dejaría el producto sin ninguna
 // página real donde aparecer.
-const SUPPLY_CATEGORIAS = ['Tintas', 'Cartuchos', 'Agujas', 'Máquinas', 'Guantes', 'Cuidados', 'Fuentes', 'Accesorios', 'Mobiliario', 'Combos', 'Recursos']
+// Sin "Recursos" (2026-08-27, Jose: "elimina recursos de esta elección,
+// pues estos solo los subo yo de momento") — esa categoría es para
+// contenido educativo curado (ebooks/cursos afiliados, ver AprendePage.jsx
+// y categoria='Recursos' con tipo='afiliado'), no inventario físico que un
+// estudio suba por su cuenta.
+const SUPPLY_CATEGORIAS = ['Tintas', 'Cartuchos', 'Agujas', 'Máquinas', 'Guantes', 'Cuidados', 'Fuentes', 'Accesorios', 'Mobiliario', 'Combos']
 // Mismo set fijo que INV_MARCAS.supply en el panel (public/index.html) —
 // copia local, mismo criterio que SUPPLY_CATEGORIAS de arriba.
 const SUPPLY_MARCAS = [
@@ -360,8 +365,32 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
   const [varianteDe, setVarianteDe] = useState(null)
   const fileInput = useRef(null)
   const masterSearchTimer = useRef(null)
-  const formRef = useRef(null)
   const cargadoRef = useRef(false)
+  // Tabla tipo Excel (2026-08-27, Jose: "como hemos venido organizando los
+  // del panel... si son muchos que se vean bien organizados en columnas,
+  // no cards grandes") — reemplaza las cards de imagen grande por filas
+  // agrupadas por producto (expandibles si hay más de una variante),
+  // mismo espíritu que el inventario del panel admin. El formulario ya no
+  // está siempre visible: ahora es un modal, abierto por el botón
+  // "Agregar producto" o al tocar "Ver"/"Editar" en una fila.
+  const [formAbierto, setFormAbierto] = useState(false)
+  const [verGrupo, setVerGrupo] = useState(null)
+  const [grupoExpandido, setGrupoExpandido] = useState(null)
+  // Link público por producto (2026-08-27, Jose: "que se pueda hacer
+  // publicidad con ese link... hazlo visible para mirarlo") — el
+  // mecanismo YA existe end-to-end: /p/:id (ProductLandingPage.jsx) lee
+  // /api/product/:id, que ya hace JOIN con estudios y ya muestra
+  // "Suministrado por X" + enruta el pago Split a la cuenta de ESTE
+  // estudio, dinámico por producto. Solo faltaba mostrarlo — cualquier
+  // id de variante del grupo sirve, la landing agrupa todas las
+  // variantes del mismo producto igual que acá.
+  const [linkCopiado, setLinkCopiado] = useState(false)
+  const copiarLink = (url) => {
+    navigator.clipboard.writeText(url).then(() => {
+      setLinkCopiado(true)
+      setTimeout(() => setLinkCopiado(false), 1500)
+    }).catch(() => {})
+  }
 
   useEffect(() => {
     if (!open || cargadoRef.current) return
@@ -399,8 +428,17 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
     setVarianteDe(null)
     setMasterResults([])
     setNuevo({ product: p.product, variant: p.variant || '', price: p.price, stock: p.stock, categoria: p.categoria, marca: p.marca || '', image_url: p.image_url || '', descripcion: p.descripcion || '', descripcionAuto: false, master_product_id: null })
+    setFormAbierto(true)
   }
-  const cancelarEdicion = () => { setEditando(null); setVarianteDe(null); setNuevo(PRODUCTO_VACIO); setMasterResults([]); setError(null) }
+  const cancelarEdicion = () => { setEditando(null); setVarianteDe(null); setNuevo(PRODUCTO_VACIO); setMasterResults([]); setError(null); setFormAbierto(false) }
+  const abrirNuevoProducto = () => {
+    setError(null)
+    setEditando(null)
+    setVarianteDe(null)
+    setMasterResults([])
+    setNuevo(PRODUCTO_VACIO)
+    setFormAbierto(true)
+  }
 
   // Agregar una variante (talla, sabor, color...) de un producto propio ya
   // cargado — a diferencia de "editar", esto SIEMPRE crea una fila nueva
@@ -414,7 +452,7 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
     setVarianteDe(p.product)
     setMasterResults([])
     setNuevo({ product: p.product, variant: '', price: p.price || '', stock: '', categoria: p.categoria, marca: p.marca || '', image_url: '', descripcion: p.descripcion || '', descripcionAuto: false, master_product_id: p.master_product_id || null })
-    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    setFormAbierto(true)
   }
 
   // Catálogo maestro — buscar un producto ya cargado por otro proveedor
@@ -581,137 +619,285 @@ function MisProductosSupplySection({ token, cloud_name, upload_preset }) {
             <p className="text-gray-400 text-xs text-center py-4">Cargando...</p>
           ) : (
             <>
-              {grupos.length > 0 && (
-            <div className="flex gap-2.5 overflow-x-auto pb-2 mb-4 snap-x snap-mandatory scrollbar-hide">
-              {grupos.map((g) => {
-                const portada = g.variantes.find((v) => v.image_url)?.image_url
-                return (
-                  <div key={g.product} className="w-[85%] sm:w-64 flex-shrink-0 snap-start rounded-lg overflow-hidden border-2 border-gray-200 bg-white">
-                    <div className="relative h-28">
-                      {portada ? (
-                        <img src={portada} alt={g.product} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300 text-xs">Sin foto</div>
-                      )}
-                      <div className="absolute top-1 left-1 bg-black/60 text-white text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full truncate max-w-[70%]">{g.categoria}</div>
-                      <button type="button" onClick={() => agregarVariante(g.variantes[0])} aria-label="Agregar variante de este producto" title="Agregar variante (talla, sabor, color...)" className="absolute top-1 right-1 flex items-center justify-center w-6 h-6 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors">
-                        <Copy size={11} />
-                      </button>
+              <button
+                type="button"
+                onClick={abrirNuevoProducto}
+                className="w-full mb-4 py-2.5 flex items-center justify-center gap-1.5 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity"
+                style={{ backgroundColor: BTN }}
+              >
+                <Plus size={14} />
+                Agregar producto a mi tienda
+              </button>
+
+              {grupos.length === 0 ? (
+                <p className="text-gray-400 text-xs text-center py-6">Todavía no tienes productos — agrega el primero arriba.</p>
+              ) : (
+                /* Tabla tipo Excel (2026-08-27, Jose: "como hemos venido
+                   organizando los del panel... si son muchos que se vean
+                   bien organizados en columnas" — y luego, al ocultar las
+                   columnas en móvil: "eso no se ve en móvil", quería el
+                   encabezado también ahí, no solo en PC). Columnas fijas
+                   SIEMPRE visibles (mismo grid-cols en header y filas, en
+                   cualquier tamaño de pantalla) — si no caben todas en un
+                   celular angosto, la tabla scrollea horizontal en vez de
+                   esconder columnas, igual que Excel/Sheets en el celular. */
+                <div className="border border-gray-200 rounded-lg overflow-x-auto">
+                  <div className="min-w-[454px]">
+                    <div className="grid grid-cols-[minmax(190px,1fr)_60px_40px_116px] gap-2 px-3 py-2 bg-gray-100 border-b border-gray-200 text-[9px] font-bold uppercase tracking-wide text-gray-400">
+                      <span>Producto</span>
+                      <span className="text-right">Precio</span>
+                      <span className="text-center">Stock</span>
+                      <span className="text-right">Acciones</span>
                     </div>
-                    <p className="font-black text-xs px-2.5 pt-2 truncate">{g.product}</p>
-                    <div className="px-2.5 pb-2.5 pt-1 space-y-1">
-                      {g.variantes.map((v) => (
-                        <div key={v.id} className={`flex items-center justify-between text-[10px] rounded-md px-1.5 py-1 ${v.is_active ? 'bg-gray-50' : 'bg-gray-50 opacity-50'}`}>
-                          <span className="truncate flex-1">{v.variant || 'Única'} — ${Number(v.price).toLocaleString('es-CO')}</span>
-                          <div className="flex items-center gap-1.5 text-gray-500 flex-shrink-0 ml-1.5">
-                            <button type="button" onClick={() => iniciarEdicion(v)} aria-label="Editar variante"><Pencil size={10} /></button>
-                            <button type="button" onClick={() => toggleActivo(v)} className="underline">{v.is_active ? 'Ocultar' : 'Mostrar'}</button>
-                            <button type="button" onClick={() => borrar(v)} aria-label="Borrar variante"><Trash2 size={10} /></button>
+                    <div className="divide-y divide-gray-100">
+                      {grupos.map((g) => {
+                        const portada = g.variantes.find((v) => v.image_url)?.image_url
+                        const unaSola = g.variantes.length === 1
+                        const expandido = grupoExpandido === g.product
+                        return (
+                          <div key={g.product}>
+                            <div className="grid grid-cols-[minmax(190px,1fr)_60px_40px_116px] gap-2 items-center px-3 py-2 hover:bg-gray-50 transition-colors">
+                              <button
+                                type="button"
+                                onClick={() => !unaSola && setGrupoExpandido((cur) => cur === g.product ? null : g.product)}
+                                className={`flex items-center gap-2 min-w-0 text-left ${unaSola ? 'cursor-default' : ''}`}
+                              >
+                                <div className="w-8 h-8 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
+                                  {portada ? <img src={portada} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gray-300 text-[8px]">Sin foto</div>}
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="font-bold text-xs text-gray-900 truncate">{g.product}</p>
+                                  <p className="text-[10px] text-gray-400 truncate">
+                                    {g.categoria}
+                                    {!unaSola && ` · ${g.variantes.length} variantes`}
+                                  </p>
+                                </div>
+                              </button>
+                              {unaSola ? (
+                                <>
+                                  <span className="text-xs text-gray-700 text-right">${Number(g.variantes[0].price).toLocaleString('es-CO')}</span>
+                                  <span className="text-xs text-gray-700 text-center">{g.variantes[0].stock}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span />
+                                  <span />
+                                </>
+                              )}
+                              <div className="flex items-center justify-end gap-2.5 text-gray-400 flex-shrink-0">
+                              <button type="button" onClick={() => setVerGrupo(g)} aria-label="Ver producto" title="Ver"><Eye size={14} /></button>
+                              <button type="button" onClick={() => agregarVariante(g.variantes[0])} aria-label="Agregar variante" title="Agregar variante (talla, sabor, color...)"><CopyPlus size={13} /></button>
+                              {unaSola ? (
+                                <>
+                                  <button type="button" onClick={() => iniciarEdicion(g.variantes[0])} aria-label="Editar producto" title="Editar"><Pencil size={13} /></button>
+                                  <button type="button" onClick={() => borrar(g.variantes[0])} aria-label="Borrar producto" title="Borrar"><Trash2 size={13} /></button>
+                                </>
+                              ) : (
+                                <button type="button" onClick={() => setGrupoExpandido((cur) => cur === g.product ? null : g.product)} aria-label="Ver variantes" title="Variantes">
+                                  <ChevronDown size={14} className={`transition-transform ${expandido ? 'rotate-180' : ''}`} />
+                                </button>
+                              )}
+                            </div>
                           </div>
+
+                          {!unaSola && expandido && (
+                            <div className="px-3 pb-2 pt-1 space-y-1 bg-gray-50">
+                              {g.variantes.map((v) => (
+                                <div key={v.id} className={`flex items-center justify-between gap-2 text-[11px] rounded-md px-2.5 py-1.5 bg-white border border-gray-100 ${v.is_active ? '' : 'opacity-50'}`}>
+                                  <span className="truncate flex-1">{v.variant || 'Única'}</span>
+                                  <span className="text-gray-500 flex-shrink-0">${Number(v.price).toLocaleString('es-CO')}</span>
+                                  <span className="text-gray-400 flex-shrink-0 w-14 text-right">Stock {v.stock}</span>
+                                  <div className="flex items-center gap-1.5 text-gray-400 flex-shrink-0">
+                                    <button type="button" onClick={() => iniciarEdicion(v)} aria-label="Editar variante"><Pencil size={11} /></button>
+                                    <button type="button" onClick={() => toggleActivo(v)} className="underline">{v.is_active ? 'Ocultar' : 'Mostrar'}</button>
+                                    <button type="button" onClick={() => borrar(v)} aria-label="Borrar variante"><Trash2 size={11} /></button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                      ))}
+                      )
+                    })}
                     </div>
                   </div>
-                )
-              })}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Modal: agregar/editar producto — ya no vive siempre visible
+              en la sección (Jose, 2026-08-27), se abre con "Agregar
+              producto a mi tienda" o al tocar "Editar"/"Agregar variante"
+              en una fila. */}
+          {formAbierto && (
+            <div className="fixed inset-0 z-[60] bg-black/60 flex items-end sm:items-center justify-center px-0 sm:px-4" onClick={cancelarEdicion}>
+              <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm max-h-[92vh] overflow-y-auto p-4" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs font-black uppercase text-gray-700">{editando ? 'Editando producto' : varianteDe ? 'Nueva variante' : 'Agregar producto'}</p>
+                  <button type="button" onClick={cancelarEdicion} aria-label="Cerrar" className="text-gray-400"><X size={18} /></button>
+                </div>
+                <div className="space-y-2.5">
+                  {varianteDe && (
+                    <div className="bg-gray-100 rounded-md px-2.5 py-1.5">
+                      <p className="text-[10px] text-gray-600">Nueva variante de <span className="font-black">{varianteDe}</span> — quedará agrupada con el mismo producto.</p>
+                    </div>
+                  )}
+                  <input type="file" accept="image/*" ref={fileInput} style={{ display: 'none' }} onChange={(e) => subirFoto(e.target.files?.[0])} />
+                  <button type="button" onClick={() => fileInput.current?.click()} className="w-full aspect-video rounded-lg bg-white border border-gray-200 text-gray-400 overflow-hidden relative">
+                    {nuevo.image_url ? (
+                      <img src={nuevo.image_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                    ) : subiendo ? (
+                      <div className="w-full h-full flex items-center justify-center"><LoaderCircle size={16} className="animate-spin" /></div>
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center gap-1">
+                        <Camera size={16} />
+                        <span className="text-[10px] font-bold uppercase">Foto del producto</span>
+                      </div>
+                    )}
+                  </button>
+
+                  <div className="relative">
+                    <input className={`${inputClass} ${varianteDe ? 'bg-gray-100 text-gray-500' : ''}`} placeholder="Nombre del producto" autoComplete="off" readOnly={!!varianteDe} value={nuevo.product} onChange={(e) => onProductInput(e.target.value)} />
+                    {masterResults.length > 0 && (
+                      <div className="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                        {masterResults.map((r) => (
+                          <button type="button" key={r.id} onClick={() => seleccionarMaster(r)} className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 border-b border-gray-100 last:border-0 flex items-center justify-between gap-2">
+                            <span className="truncate">{r.product}{r.marca && <span className="text-gray-400"> — {r.marca}</span>}</span>
+                            <span className="text-gray-400 text-[10px] flex-shrink-0">{r.categoria}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-gray-400 text-[10px] -mt-1.5">Si ya alguien cargó este producto antes, elígelo de la lista para no repetir categoría/marca/descripción.</p>
+                  <input className={inputClass} placeholder='Variante — talla, sabor, color... o "Único" si no aplica' value={nuevo.variant} onChange={(e) => setNuevo((n) => ({ ...n, variant: e.target.value }))} />
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold pointer-events-none">$</span>
+                      <input className={inputClass.replace('px-4', 'pl-7 pr-4')} type="number" min="1" placeholder="Precio en COP" value={nuevo.price} onChange={(e) => setNuevo((n) => ({ ...n, price: e.target.value }))} />
+                    </div>
+                    <input className={inputClass} type="number" min="0" placeholder="Stock" value={nuevo.stock} onChange={(e) => setNuevo((n) => ({ ...n, stock: e.target.value }))} />
+                  </div>
+                  <ComboboxBuscable
+                    value={nuevo.categoria}
+                    options={SUPPLY_CATEGORIAS}
+                    placeholder="Categoría"
+                    inputClassName={inputClass}
+                    disabled={categoriaMarcaBloqueada}
+                    onChange={(categoria) => {
+                      // Al cambiar de categoría, si la marca elegida ya no
+                      // aplica ahí (ej. venía de Tintas y ahora es Cartuchos),
+                      // se limpia — evita dejar una marca incoherente guardada.
+                      const marcasValidas = marcasParaCategoria(categoria)
+                      const marcaSigueValida = marcasValidas.includes(nuevo.marca)
+                      setNuevo((n) => ({ ...n, categoria, marca: marcaSigueValida ? n.marca : '' }))
+                      prefillDescripcion(categoria, marcaSigueValida ? nuevo.marca : '')
+                    }}
+                  />
+                  <ComboboxBuscable
+                    value={nuevo.marca}
+                    options={marcasParaCategoria(nuevo.categoria)}
+                    labelFor={SUPPLY_MARCA_LABEL}
+                    placeholder="Marca (opcional)"
+                    inputClassName={inputClass}
+                    disabled={categoriaMarcaBloqueada}
+                    onChange={(marca) => { setNuevo((n) => ({ ...n, marca })); prefillDescripcion(nuevo.categoria, marca) }}
+                  />
+                  {nuevo.master_product_id && !varianteDe && (
+                    <div className="flex items-center justify-between bg-green-50 rounded-md px-2.5 py-1.5 -mt-1">
+                      <p className="text-[10px] text-green-700">✓ Categoría y marca reales — vinculadas al catálogo maestro.</p>
+                      <button type="button" onClick={() => setNuevo((n) => ({ ...n, master_product_id: null }))} className="text-gray-400 text-[10px] font-bold uppercase underline flex-shrink-0 ml-2">No es este</button>
+                    </div>
+                  )}
+                  <textarea rows={2} className={inputClass} placeholder="Descripción (opcional)" value={nuevo.descripcion} onChange={(e) => setNuevo((n) => ({ ...n, descripcion: e.target.value, descripcionAuto: false }))} />
+
+                  {error && <p className="text-red-600 text-xs">{error}</p>}
+
+                  <button
+                    type="button"
+                    onClick={guardar}
+                    disabled={guardando}
+                    className="w-full py-2.5 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60"
+                    style={{ backgroundColor: BTN }}
+                  >
+                    {guardando ? 'Guardando...' : editando ? 'Guardar cambios' : '+ Agregar producto'}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
-          <div ref={formRef} className="border border-dashed border-gray-300 rounded-lg p-3 space-y-2.5">
-            {editando && (
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-black uppercase text-gray-700">Editando producto</p>
-                <button type="button" onClick={cancelarEdicion} className="text-gray-400 text-[10px] font-bold uppercase underline">Cancelar</button>
-              </div>
-            )}
-            {varianteDe && (
-              <div className="flex items-center justify-between bg-gray-100 rounded-md px-2.5 py-1.5">
-                <p className="text-[10px] text-gray-600">Nueva variante de <span className="font-black">{varianteDe}</span> — quedará en la misma card en Supply.</p>
-                <button type="button" onClick={cancelarEdicion} className="text-gray-400 text-[10px] font-bold uppercase underline flex-shrink-0 ml-2">Cancelar</button>
-              </div>
-            )}
-            <input type="file" accept="image/*" ref={fileInput} style={{ display: 'none' }} onChange={(e) => subirFoto(e.target.files?.[0])} />
-            <button type="button" onClick={() => fileInput.current?.click()} className="w-full aspect-video rounded-lg bg-white border border-gray-200 text-gray-400 overflow-hidden relative">
-              {nuevo.image_url ? (
-                <img src={nuevo.image_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
-              ) : subiendo ? (
-                <div className="w-full h-full flex items-center justify-center"><LoaderCircle size={16} className="animate-spin" /></div>
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center gap-1">
-                  <Camera size={16} />
-                  <span className="text-[10px] font-bold uppercase">Foto del producto</span>
+          {/* Modal: ver detalle de un producto (2026-08-27, nuevo — antes
+              la única forma de ver la foto/descripción era la card grande;
+              con la tabla compacta hace falta un botón dedicado). */}
+          {verGrupo && (
+            <div className="fixed inset-0 z-[60] bg-black/60 flex items-end sm:items-center justify-center px-0 sm:px-4" onClick={() => setVerGrupo(null)}>
+              <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm max-h-[92vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                {/* aspect-square (2026-08-27, Jose: "la imagen es exagerada,
+                    no está manteniendo el tamaño que ya hemos organizado vía
+                    Cloudinary") — antes aspect-video (16:9); las fotos de
+                    producto se suben y se ven en todos lados en cuadrado
+                    (mismo criterio que SupplyCategoryPage.jsx, la tienda
+                    pública real), este modal era el único lugar mostrándolas
+                    panorámicas. */}
+                <div className="w-full aspect-square bg-gray-100">
+                  {verGrupo.variantes.find((v) => v.image_url)?.image_url ? (
+                    <img src={verGrupo.variantes.find((v) => v.image_url).image_url} alt={verGrupo.product} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">Sin foto</div>
+                  )}
                 </div>
-              )}
-            </button>
+                <div className="p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-black text-sm truncate">{verGrupo.product}</p>
+                      <p className="text-[10px] text-gray-400 uppercase tracking-wide truncate">{verGrupo.categoria}{verGrupo.variantes[0]?.marca ? ` · ${verGrupo.variantes[0].marca}` : ''}</p>
+                    </div>
+                    <button type="button" onClick={() => setVerGrupo(null)} aria-label="Cerrar" className="text-gray-400 flex-shrink-0"><X size={18} /></button>
+                  </div>
+                  {verGrupo.variantes[0]?.descripcion && (
+                    <p className="text-gray-600 text-xs leading-relaxed mt-2">{verGrupo.variantes[0].descripcion}</p>
+                  )}
+                  <div className="mt-3 space-y-1.5">
+                    {verGrupo.variantes.map((v) => (
+                      <div key={v.id} className={`flex items-center justify-between text-xs rounded-md px-2.5 py-1.5 bg-gray-50 ${v.is_active ? '' : 'opacity-50'}`}>
+                        <span className="truncate flex-1">{v.variant || 'Única'}</span>
+                        <span className="text-gray-600 flex-shrink-0 mx-2">${Number(v.price).toLocaleString('es-CO')}</span>
+                        <span className="text-gray-400 flex-shrink-0">Stock: {v.stock}</span>
+                      </div>
+                    ))}
+                  </div>
 
-            <div className="relative">
-              <input className={`${inputClass} ${varianteDe ? 'bg-gray-100 text-gray-500' : ''}`} placeholder="Nombre del producto" autoComplete="off" readOnly={!!varianteDe} value={nuevo.product} onChange={(e) => onProductInput(e.target.value)} />
-              {masterResults.length > 0 && (
-                <div className="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                  {masterResults.map((r) => (
-                    <button type="button" key={r.id} onClick={() => seleccionarMaster(r)} className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 border-b border-gray-100 last:border-0 flex items-center justify-between gap-2">
-                      <span className="truncate">{r.product}{r.marca && <span className="text-gray-400"> — {r.marca}</span>}</span>
-                      <span className="text-gray-400 text-[10px] flex-shrink-0">{r.categoria}</span>
-                    </button>
-                  ))}
+                  <div className="mt-4 pt-3 border-t border-gray-100">
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1.5">Link para compartir este producto</p>
+                    <div className="flex items-center gap-2">
+                      <p className="flex-1 min-w-0 text-[11px] text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-2 truncate">
+                        {`${import.meta.env.VITE_SITE_URL}/p/${verGrupo.variantes[0].id}`}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => copiarLink(`${import.meta.env.VITE_SITE_URL}/p/${verGrupo.variantes[0].id}`)}
+                        className="flex-shrink-0 flex items-center gap-1 px-3 py-2 rounded-lg text-white text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
+                        style={{ backgroundColor: BTN }}
+                      >
+                        {linkCopiado ? <Check size={12} /> : <Link2 size={12} />}
+                        {linkCopiado ? 'Copiado' : 'Copiar'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => { const primera = verGrupo.variantes[0]; setVerGrupo(null); iniciarEdicion(primera) }}
+                    className="w-full mt-3 py-2.5 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity"
+                    style={{ backgroundColor: BTN }}
+                  >
+                    Editar
+                  </button>
                 </div>
-              )}
-            </div>
-            <p className="text-gray-400 text-[10px] -mt-1.5">Si ya alguien cargó este producto antes, elígelo de la lista para no repetir categoría/marca/descripción.</p>
-            <input className={inputClass} placeholder='Variante — talla, sabor, color... o "Único" si no aplica' value={nuevo.variant} onChange={(e) => setNuevo((n) => ({ ...n, variant: e.target.value }))} />
-            <div className="grid grid-cols-2 gap-2">
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold pointer-events-none">$</span>
-                <input className={inputClass.replace('px-4', 'pl-7 pr-4')} type="number" min="1" placeholder="Precio en COP" value={nuevo.price} onChange={(e) => setNuevo((n) => ({ ...n, price: e.target.value }))} />
               </div>
-              <input className={inputClass} type="number" min="0" placeholder="Stock" value={nuevo.stock} onChange={(e) => setNuevo((n) => ({ ...n, stock: e.target.value }))} />
             </div>
-            <ComboboxBuscable
-              value={nuevo.categoria}
-              options={SUPPLY_CATEGORIAS}
-              placeholder="Categoría"
-              inputClassName={inputClass}
-              disabled={categoriaMarcaBloqueada}
-              onChange={(categoria) => {
-                // Al cambiar de categoría, si la marca elegida ya no
-                // aplica ahí (ej. venía de Tintas y ahora es Cartuchos),
-                // se limpia — evita dejar una marca incoherente guardada.
-                const marcasValidas = marcasParaCategoria(categoria)
-                const marcaSigueValida = marcasValidas.includes(nuevo.marca)
-                setNuevo((n) => ({ ...n, categoria, marca: marcaSigueValida ? n.marca : '' }))
-                prefillDescripcion(categoria, marcaSigueValida ? nuevo.marca : '')
-              }}
-            />
-            <ComboboxBuscable
-              value={nuevo.marca}
-              options={marcasParaCategoria(nuevo.categoria)}
-              labelFor={SUPPLY_MARCA_LABEL}
-              placeholder="Marca (opcional)"
-              inputClassName={inputClass}
-              disabled={categoriaMarcaBloqueada}
-              onChange={(marca) => { setNuevo((n) => ({ ...n, marca })); prefillDescripcion(nuevo.categoria, marca) }}
-            />
-            {nuevo.master_product_id && !varianteDe && (
-              <div className="flex items-center justify-between bg-green-50 rounded-md px-2.5 py-1.5 -mt-1">
-                <p className="text-[10px] text-green-700">✓ Categoría y marca reales — vinculadas al catálogo maestro.</p>
-                <button type="button" onClick={() => setNuevo((n) => ({ ...n, master_product_id: null }))} className="text-gray-400 text-[10px] font-bold uppercase underline flex-shrink-0 ml-2">No es este</button>
-              </div>
-            )}
-            <textarea rows={2} className={inputClass} placeholder="Descripción (opcional)" value={nuevo.descripcion} onChange={(e) => setNuevo((n) => ({ ...n, descripcion: e.target.value, descripcionAuto: false }))} />
-
-            {error && <p className="text-red-600 text-xs">{error}</p>}
-
-            <button
-              type="button"
-              onClick={guardar}
-              disabled={guardando}
-              className="w-full py-2.5 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60"
-              style={{ backgroundColor: BTN }}
-            >
-              {guardando ? 'Guardando...' : editando ? 'Guardar cambios' : '+ Agregar producto'}
-            </button>
-          </div>
-            </>
           )}
         </div>
       )}
@@ -1126,7 +1312,16 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
           mismo criterio que ya decide si aparece en tabsEstudio. */}
       {estudio.vende_supply && (
       <div className={activeTab === 'supply' ? 'block' : 'hidden'}>
-      <div className="px-4 max-w-3xl mx-auto lg:mx-0 space-y-4">
+      {/* lg:pt-6 (2026-08-27, Jose: "ese texto está demasiado cerca del
+          navbar... solo pasa en PC") — el -mt-4 de EditarPerfilTabs.jsx
+          pega la barra de pestañas al navbar a propósito (pedido en esa
+          misma sesión), y en móvil el propio botón ☰ actúa de colchón
+          visual antes del contenido. En desktop no hay nada intermedio:
+          el sidebar de pestañas no ocupa la fila de arriba del contenido,
+          así que el primer campo de esta pestaña (sin padding propio, a
+          diferencia de "Mi equipo" que ya trae py-5 en su card) quedaba
+          pegado directo al navbar. */}
+      <div className="px-4 max-w-3xl mx-auto lg:mx-0 lg:pt-6 space-y-4">
           <div>
             <label className={labelClass}>Nombre para mostrar en Supply (opcional)</label>
             <input value={form.nombre_supply} onChange={set('nombre_supply')} placeholder={form.nombre || 'Nombre del estudio'} className={inputClass} />

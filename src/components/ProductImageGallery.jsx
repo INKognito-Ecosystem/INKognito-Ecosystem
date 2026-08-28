@@ -25,9 +25,11 @@ export default function ProductImageGallery({
   onImgError,
   // square (2026-08-09, Pilar 2 Cloudinary): opt-in — tarjetas de catálogo
   // (Supply/Store/Suplementos) lo activan para pasar de recorte
-  // (object-cover) a relleno con fondo blanco. Por defecto false: la foto
-  // grande de ProductLandingPage sigue mostrando la imagen completa tal
-  // cual, sin forzar cuadrado.
+  // (object-cover) a relleno con fondo blanco. La foto grande de
+  // ProductLandingPage también lo activa desde 2026-08-27 (antes se
+  // dejaba sin square a propósito para mostrar la imagen "tal cual" —
+  // con Supply multi-tenant, fotos de estudios de cualquier proporción
+  // ya no tenían un formato consistente entre sí).
   square = false,
 }) {
   const [internalIdx, setInternalIdx] = useState(0)
