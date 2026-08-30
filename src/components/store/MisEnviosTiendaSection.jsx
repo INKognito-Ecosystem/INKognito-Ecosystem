@@ -20,6 +20,7 @@ export default function MisEnviosTiendaSection({ token }) {
   const [pendientes, setPendientes] = useState(null)
   const [enCamino, setEnCamino] = useState([])
   const [municipioTienda, setMunicipioTienda] = useState(null)
+  const [zonaFiltro, setZonaFiltro] = useState('')
   const [transportadoras, setTransportadoras] = useState([])
   const [asignando, setAsignando] = useState(null)
   const [error, setError] = useState(null)
@@ -38,16 +39,24 @@ export default function MisEnviosTiendaSection({ token }) {
   useEffect(cargar, [token])
 
   useEffect(() => {
-    if (!municipioTienda) return
-    // Zona de origen de la recogida es el municipio propio de la tienda
-    // (normalizado a las claves de flete_tabla) — mismo criterio que
-    // valida el servidor en /api/estudios-envios-asignar-por-token.
+    // Precarga el filtro con el municipio propio de la tienda (normalizado a
+    // las claves de flete_tabla) — pero solo como punto de partida: el select
+    // de abajo lo deja cambiar (2026-08-30, Jose: "debería poder filtrar por
+    // municipio para ver el servicio de transporte más cercano"). Por eso el
+    // guard es "aún no hay filtro elegido", no "cambió el municipio" — así
+    // este efecto no pisa una elección manual en un re-render.
+    if (!municipioTienda || zonaFiltro) return
     const zona = municipioTienda.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z]/g, '')
-    fetch(`${PANEL_URL}/api/transportadoras?municipio=${encodeURIComponent(zona)}`)
+    if (ZONAS_FLETE[zona]) setZonaFiltro(zona)
+  }, [municipioTienda, zonaFiltro])
+
+  useEffect(() => {
+    if (!zonaFiltro) { setTransportadoras([]); return }
+    fetch(`${PANEL_URL}/api/transportadoras?municipio=${encodeURIComponent(zonaFiltro)}`)
       .then((r) => r.ok ? r.json() : [])
       .then(setTransportadoras)
       .catch(() => setTransportadoras([]))
-  }, [municipioTienda])
+  }, [zonaFiltro])
 
   const asignar = async (compraId, transportadoraId) => {
     setError(null)
@@ -76,7 +85,21 @@ export default function MisEnviosTiendaSection({ token }) {
         Compras aprobadas listas para recoger — elige con qué transportadora de Ruta del Golfo la vas a enviar.
       </p>
 
-      {!transportadoras.length && pendientes.length > 0 && (
+      <div className="mb-4">
+        <label className="text-[9px] font-bold uppercase tracking-wide text-gray-400 mb-1.5 block">Buscar transportadora en</label>
+        <select
+          value={zonaFiltro}
+          onChange={(e) => setZonaFiltro(e.target.value)}
+          className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-gray-500"
+        >
+          <option value="">Selecciona una zona...</option>
+          {Object.entries(ZONAS_FLETE).map(([key, label]) => (
+            <option key={key} value={key}>{label}</option>
+          ))}
+        </select>
+      </div>
+
+      {zonaFiltro && !transportadoras.length && pendientes.length > 0 && (
         <p className="text-amber-600 text-xs bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4">
           Todavía no hay transportadoras activas en tu zona — coordina la entrega directo con el cliente mientras tanto.
         </p>
