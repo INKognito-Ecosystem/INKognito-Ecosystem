@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { FaWhatsapp } from 'react-icons/fa'
 
 const STRIPE_PATTERN = {
   backgroundImage: 'repeating-linear-gradient(45deg,transparent,transparent 19px,rgba(201,168,76,1) 19px,rgba(201,168,76,1) 20px)',
@@ -31,16 +30,6 @@ export default function FooterStore({ paginaTienda = false }) {
               Réplicas premium con entrega a domicilio en los 4 municipios
               de la región.
             </p>
-            <div className="flex gap-5">
-              <a
-                href="https://wa.me/573207911013"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-500 hover:text-[#C9A84C] transition-all duration-300"
-              >
-                <FaWhatsapp size={20} />
-              </a>
-            </div>
           </div>
 
           {/* DERECHA — CATEGORÍAS */}
