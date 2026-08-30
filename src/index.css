@@ -44,3 +44,26 @@ html {
   opacity: 1;
   filter: blur(0);
 }
+
+/* TechMarquee.jsx — franja "construido con" (2026-08-30). Mismo patrón que
+   nav-progress-slide arriba: keyframes global + clase de animación
+   (Tailwind v4 no genera keyframes arbitrarios sin @theme). La lista de
+   logos llega duplicada 2x desde el componente, así que deslizar -50% del
+   ancho total hace que la segunda copia entre justo donde salió la
+   primera — el loop no se nota. */
+@keyframes tech-marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.tech-marquee-track {
+  animation: tech-marquee-scroll 32s linear infinite;
+  will-change: transform;
+}
+.tech-marquee-track:hover {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tech-marquee-track {
+    animation: none;
+  }
+}

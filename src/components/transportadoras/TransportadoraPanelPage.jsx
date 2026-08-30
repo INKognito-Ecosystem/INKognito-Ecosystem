@@ -214,18 +214,26 @@ function EnviosSection({ token, envios: enviosIniciales }) {
     <div className="space-y-3">
       {envios.map((e) => (
         <div key={e.id} className="border border-gray-200 rounded-xl p-4">
-          <div className="flex items-start justify-between gap-2 mb-2">
-            <div className="min-w-0">
-              <p className="font-black text-sm truncate">{e.tienda_nombre_display}</p>
-              <p className="text-gray-400 text-[10px] uppercase tracking-wide">{e.cliente_nombre || 'Cliente'} · {e.cliente_telefono}</p>
-            </div>
+          <div className="flex items-start justify-between gap-2 mb-3">
+            <p className="text-gray-400 text-[10px] uppercase tracking-wide">Pedido #{e.id}</p>
             <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full flex-shrink-0 ${
               e.estado === 'entregado' ? 'bg-green-100 text-green-700' : e.estado === 'recogido' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'
             }`}>{e.estado}</span>
           </div>
-          <div className="flex items-center gap-1.5 text-gray-600 text-xs mb-1">
-            <MapPin size={12} className="flex-shrink-0" />
-            {ZONAS_FLETE[e.municipio_origen] || e.municipio_origen} → {ZONAS_FLETE[e.municipio_destino] || e.municipio_destino}
+
+          <div className="flex items-start gap-1.5 text-gray-700 text-xs mb-2.5">
+            <MapPin size={12} className="flex-shrink-0 mt-0.5 text-gray-400" />
+            <div className="min-w-0">
+              <p className="text-[9px] font-bold uppercase tracking-wide text-gray-400">Recoger en · {e.tienda_nombre_display}</p>
+              <p className="truncate">{e.tienda_direccion || 'Sin dirección — coordina por WhatsApp'}, {ZONAS_FLETE[e.municipio_origen] || e.municipio_origen}</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-1.5 text-gray-700 text-xs mb-2.5">
+            <MapPin size={12} className="flex-shrink-0 mt-0.5 text-gray-400" />
+            <div className="min-w-0">
+              <p className="text-[9px] font-bold uppercase tracking-wide text-gray-400">Entregar a · {e.cliente_nombre || 'Cliente'} · {e.cliente_telefono}</p>
+              <p className="truncate">{e.cliente_direccion || 'Sin dirección — coordina por WhatsApp'}, {ZONAS_FLETE[e.municipio_destino] || e.municipio_destino}</p>
+            </div>
           </div>
           <div className="flex items-center gap-1.5 text-gray-600 text-xs mb-3">
             <Package size={12} className="flex-shrink-0" />

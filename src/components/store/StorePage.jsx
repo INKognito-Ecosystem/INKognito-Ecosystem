@@ -1,9 +1,11 @@
 import { Link, useLoaderData } from 'react-router-dom'
+import { motion } from 'motion/react'
 import { STORE_HOURS } from '../../config/business'
 import { FaWhatsapp } from 'react-icons/fa'
 import { Truck, Shield, Clock, Star, Award } from 'lucide-react'
 import NavbarStore from './NavbarStore'
 import FooterStore from './FooterStore'
+import TechMarquee from '../TechMarquee'
 import StoreProductCard from './StoreProductCard'
 import CoverflowRow from '../CoverflowRow'
 import { fetchCatalogCategoriaItems, toProdCard } from '../../hooks/useCatalog'
@@ -65,6 +67,18 @@ const guarantees = [
     desc: `${STORE_HOURS.weekdays.label} de ${STORE_HOURS.weekdays.hours}. Siempre disponibles para resolver tus dudas.`,
   },
 ]
+
+// Aparición con fade + deslizamiento leve al entrar en pantalla (2026-08-30,
+// Jose — probando en Store el mismo lenguaje de "scroll" que se ve en
+// fractaill.com; ver TechMarquee.jsx). `viewport:{once:true}` evita que se
+// repita si el usuario vuelve a pasar por la misma sección. No se aplica al
+// HERO — ese ya está visible al cargar, no tiene sentido hacerlo esperar.
+const REVEAL = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.2 },
+  transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+}
 
 const storeJsonLd = {
   "@context": "https://schema.org",
@@ -187,12 +201,12 @@ export default function StorePage() {
                   Logística · Cobertura
                 </p>
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="flex items-center justify-center bg-white rounded-xl p-2 flex-shrink-0 w-14 h-14">
-                    <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
+                  <div className="flex items-center justify-center bg-[#C9A84C]/10 border border-[#C9A84C]/30 rounded-xl p-2 flex-shrink-0 w-14 h-14">
+                    <Truck size={26} className="text-[#C9A84C]" />
                   </div>
                   <div>
-                    <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Eljach Mensajería Express</p>
-                    <p className="text-zinc-500 text-xs mt-0.5">Aliado logístico · Contra entrega</p>
+                    <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
+                    <p className="text-zinc-500 text-xs mt-0.5">Transportadoras verificadas</p>
                   </div>
                 </div>
                 <div className="space-y-2.5 mb-6">
@@ -217,7 +231,7 @@ export default function StorePage() {
       </section>
 
       {/* ── CATEGORÍAS ── */}
-      <section id="categorias" className="bg-gray-50 pt-3 md:pt-6 pb-8 md:pb-12 px-6">
+      <motion.section {...REVEAL} id="categorias" className="bg-gray-50 pt-3 md:pt-6 pb-8 md:pb-12 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="mb-4 md:mb-8">
             <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs mb-2">
@@ -277,10 +291,10 @@ export default function StorePage() {
             })}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── DESTACADOS ── */}
-      <section id="destacados" className="bg-white pt-3 md:pt-6 pb-8 md:pb-12 px-6">
+      <motion.section {...REVEAL} id="destacados" className="bg-white pt-3 md:pt-6 pb-8 md:pb-12 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="mb-4 md:mb-8">
             <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs mb-2">
@@ -314,11 +328,11 @@ export default function StorePage() {
             </CoverflowRow>
           )}
         </div>
-      </section>
+      </motion.section>
 
       {/* ── LOGÍSTICA + GARANTÍAS + CONTACTO — solo desktop (dark, 3 col) ── */}
       <div className="hidden md:block">
-        <section className="bg-black text-white py-14 px-6">
+        <motion.section {...REVEAL} className="bg-black text-white py-14 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="grid lg:grid-cols-3 gap-12">
 
@@ -330,12 +344,12 @@ export default function StorePage() {
                 {/* Urabá — cobertura directa */}
                 <p className="text-zinc-500 text-[10px] uppercase tracking-widest mb-3">Urabá — Entrega directa</p>
                 <div className="flex gap-3 mb-4">
-                  <div className="flex items-center justify-center bg-white rounded-xl p-2 flex-shrink-0 w-14 h-14">
-                    <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
+                  <div className="flex items-center justify-center bg-[#C9A84C]/10 border border-[#C9A84C]/30 rounded-xl p-2 flex-shrink-0 w-14 h-14">
+                    <Truck size={26} className="text-[#C9A84C]" />
                   </div>
                   <div className="flex flex-col justify-center bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 flex-1">
-                    <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Eljach Mensajería Express</p>
-                    <p className="text-zinc-500 text-xs mt-0.5">Aliado logístico · Contra entrega</p>
+                    <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
+                    <p className="text-zinc-500 text-xs mt-0.5">Transportadoras verificadas</p>
                   </div>
                 </div>
 
@@ -389,29 +403,26 @@ export default function StorePage() {
                 </div>
               </div>
 
-              {/* COL 3: CONTACTO */}
+              {/* COL 3: CONTACTO — reescrito 2026-08-30 (Jose: "aquí se
+                  alojan productos de diferentes tiendas, nosotros le
+                  prestamos la infraestructura digital para su negocio")
+                  — ya no hay un WhatsApp único de "INKognito Store" (se
+                  quitó el botón), así que el texto deja de prometer
+                  atención directa nuestra y aclara que cada tienda
+                  responde por su cuenta, mismo criterio que las
+                  políticas de INK. */}
               <div>
-                <p className="uppercase tracking-[0.25em] text-[#C9A84C]/70 text-[10px] mb-4">Contacto</p>
-                <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Hablemos</h2>
+                <p className="uppercase tracking-[0.25em] text-[#C9A84C]/70 text-[10px] mb-4">Cómo Funciona</p>
+                <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Tiendas Independientes</h2>
                 <p className="text-zinc-400 text-base leading-relaxed mb-7">
-                  ¿Buscas un modelo específico? ¿Quieres saber disponibilidad de tu talla?
-                  Escríbenos y te respondemos en minutos.
+                  INKognito Store reúne tiendas de ropa y calzado de Urabá — cada una gestiona sus propios pedidos.
+                  Entra al perfil de la tienda que te interesa y escríbele directo por WhatsApp.
                 </p>
-                <a
-                  href="https://wa.me/573207911013?text=Hola,%20quiero%20información%20sobre%20INKognito%20Store"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-3 w-full py-4 px-6 rounded-xl border text-white uppercase tracking-[0.2em] font-semibold transition-all duration-300 hover:shadow-[0_0_30px_rgba(201,168,76,0.2)] hover:border-[#C9A84C] mb-5"
-                  style={{ borderColor: 'rgba(201,168,76,0.3)', backgroundColor: 'rgba(201,168,76,0.04)' }}
-                >
-                  <FaWhatsapp size={22} />
-                  Hablar con INKognito Store
-                </a>
                 <p className="text-zinc-600 uppercase tracking-[0.2em] text-xs mb-6">
                   {STORE_HOURS.weekdays.label} · {STORE_HOURS.weekdays.hours}
                 </p>
                 <div className="flex flex-col gap-3">
-                  {['Réplicas premium de alta calidad','Cobertura en toda la región de Urabá','Atención personalizada por WhatsApp','Cambios de talla garantizados','Pago contraentrega disponible'].map(item => (
+                  {['Réplicas premium de alta calidad','Cobertura en toda la región de Urabá','Contacto directo con cada tienda','Tiendas verificadas por INKognito','Pago contraentrega disponible'].map(item => (
                     <div key={item} className="flex items-center gap-3">
                       <span className="text-[#C9A84C] text-sm flex-shrink-0">✓</span>
                       <span className="text-zinc-400 text-sm">{item}</span>
@@ -422,22 +433,22 @@ export default function StorePage() {
 
             </div>
           </div>
-        </section>
+        </motion.section>
       </div>
 
       {/* ── LLEGAMOS DONDE ESTÁS — solo móvil ── */}
-      <section id="contacto" className="md:hidden bg-black text-white border-t border-zinc-900 px-6 py-8">
+      <motion.section {...REVEAL} id="contacto" className="md:hidden bg-black text-white border-t border-zinc-900 px-6 py-8">
         <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">Llegamos donde estás</h2>
         <p className="text-zinc-400 text-sm leading-relaxed mb-5">
-          Contamos con transportadora aliada para entregas seguras y con pago contraentrega en toda la región de Urabá.
+          Entregas seguras con Ruta del Golfo, nuestra red de transportadoras verificadas en toda la región de Urabá.
         </p>
         <div className="flex gap-2 mb-5">
-          <div className="flex items-center justify-center bg-white rounded-xl p-1 flex-shrink-0 aspect-square w-16">
-            <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
+          <div className="flex items-center justify-center bg-[#C9A84C]/10 border border-[#C9A84C]/30 rounded-xl flex-shrink-0 aspect-square w-16">
+            <Truck size={28} className="text-[#C9A84C]" />
           </div>
           <div className="flex flex-col justify-center bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 flex-1">
-            <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Eljach Mensajería Express</p>
-            <p className="text-zinc-500 text-[10px] mt-0.5">Entregas locales y contra entrega</p>
+            <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
+            <p className="text-zinc-500 text-[10px] mt-0.5">Transportadoras verificadas</p>
           </div>
         </div>
         {/* Municipios con tiempos */}
@@ -466,35 +477,32 @@ export default function StorePage() {
 
         {/* Garantías */}
         <div className="flex flex-col gap-2 mb-5">
-          {['Pago contraentrega disponible','Atención personalizada por WhatsApp','Cobertura en toda la región de Urabá'].map(g => (
+          {['Pago contraentrega disponible','Contacto directo con cada tienda','Cobertura en toda la región de Urabá'].map(g => (
             <div key={g} className="flex items-center gap-2">
               <span className="font-bold text-sm" style={{ color: '#C9A84C' }}>✓</span>
               <span className="text-zinc-400 text-xs">{g}</span>
             </div>
           ))}
         </div>
-        <a
-          href="https://wa.me/573207911013?text=Hola%2C%20quiero%20hacer%20un%20pedido%20en%20INKognito%20Store"
-          target="_blank" rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 w-full py-4 rounded-xl border text-white font-bold uppercase tracking-[0.15em] text-sm transition-all duration-300 hover:shadow-[0_0_20px_rgba(201,168,76,0.3)]"
-          style={{ borderColor: 'rgba(201,168,76,0.4)', backgroundColor: 'rgba(201,168,76,0.04)' }}
-        >
-          📱 Hacer mi pedido ahora
-        </a>
-      </section>
+      </motion.section>
+
+      <TechMarquee />
 
       {/* ── TIENDAS ALIADAS — discreta, a nivel de pie (Store multitenant,
           2026-08-29). El punto es que un comprador pueda llegar al
           directorio sin depender de un link que una tienda le mandó —
           por eso vive acá, alcanzable desde el hub, no escondida. */}
-      <section className="bg-white border-t border-gray-100 px-6 py-8 text-center">
-        <p className="text-gray-500 text-xs mb-2">
-          ¿Buscas una tienda específica? <Link to="/store/tiendas" className="font-bold underline underline-offset-2 hover:text-[#C9A84C]">Ver tiendas verificadas →</Link>
-        </p>
-        <p className="text-gray-400 text-[11px]">
-          ¿Tienes una tienda de ropa o calzado en Urabá? <Link to="/tattoo-artist-colombia/tienda/unete" className="underline underline-offset-2 hover:text-[#C9A84C]">Regístrala acá</Link>
-        </p>
-      </section>
+      <motion.section {...REVEAL} className="bg-white border-t border-gray-100 px-6 py-6 text-center">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+          <p className="text-gray-500 text-xs">
+            ¿Buscas una tienda específica? <Link to="/store/tiendas" className="font-bold underline underline-offset-2 hover:text-[#C9A84C]">Ver tiendas verificadas →</Link>
+          </p>
+          <span className="text-gray-300 text-xs hidden sm:inline">·</span>
+          <p className="text-gray-400 text-[11px]">
+            ¿Tienes una tienda de ropa o calzado en Urabá? <Link to="/tattoo-artist-colombia/tienda/unete" className="underline underline-offset-2 hover:text-[#C9A84C]">Regístrala acá</Link>
+          </p>
+        </div>
+      </motion.section>
 
       <FooterStore />
 

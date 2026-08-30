@@ -28,6 +28,7 @@ export default function EditarPerfilTiendaSection({ token, estudio, cloud_name, 
     bio: estudio.bio || '', instagram: estudio.instagram || '', facebook: estudio.facebook || '', whatsapp: estudio.whatsapp || '',
     logo_url: estudio.logo_url || '',
     google_maps_url: estudio.google_maps_url || '',
+    direccion: estudio.direccion || '',
   })
   const [subiendo, setSubiendo] = useState(false)
   const [guardando, setGuardando] = useState(false)
@@ -74,6 +75,13 @@ export default function EditarPerfilTiendaSection({ token, estudio, cloud_name, 
 
   const guardar = async (e) => {
     e.preventDefault()
+    // Dirección exacta requerida (2026-08-30, Jose: "déjala como
+    // requisito en el formulario de registro y luego en editar perfil")
+    // — sin esto, Ruta del Golfo no tiene cómo recoger un pedido.
+    if (!form.direccion.trim()) {
+      setError('La dirección exacta es obligatoria.')
+      return
+    }
     setError(null)
     setGuardando(true)
     try {
@@ -144,6 +152,12 @@ export default function EditarPerfilTiendaSection({ token, estudio, cloud_name, 
           <label className={labelClass}>Municipio *</label>
           <ComboboxBuscable value={form.municipio} onChange={setMunicipio} options={municipiosDisponibles} disabled={!form.departamento} placeholder="Escribe para buscar..." inputClassName={inputClass} />
         </div>
+      </div>
+
+      <div>
+        <label className={labelClass}>Dirección exacta *</label>
+        <input required value={form.direccion} onChange={set('direccion')} placeholder="Calle, carrera, barrio..." className={inputClass} />
+        <p className="text-gray-400 text-[10px] mt-1">Para que Ruta del Golfo sepa dónde recoger tus pedidos — nunca se muestra públicamente.</p>
       </div>
 
       <div>

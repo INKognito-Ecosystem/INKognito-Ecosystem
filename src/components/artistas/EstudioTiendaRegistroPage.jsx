@@ -54,7 +54,7 @@ const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb
 export default function EstudioTiendaRegistroPage() {
   const { cloud_name, upload_preset, captchaA, captchaB } = useLoaderData()
   const [form, setForm] = useState({
-    nombre: '', departamento: '', municipio: '', lat: null, lng: null, bio: '', instagram: '', facebook: '', whatsapp: '', email: '',
+    nombre: '', departamento: '', municipio: '', direccion: '', lat: null, lng: null, bio: '', instagram: '', facebook: '', whatsapp: '', email: '',
     logo_url: '',
     sitio_web: '', // honeypot
   })
@@ -116,8 +116,8 @@ export default function EstudioTiendaRegistroPage() {
 
   const enviar = async (e) => {
     e.preventDefault()
-    if (!form.nombre.trim() || !form.departamento || !form.municipio || !form.whatsapp.trim() || !form.email.trim()) {
-      setError('Nombre, departamento, municipio, WhatsApp y correo son obligatorios.')
+    if (!form.nombre.trim() || !form.departamento || !form.municipio || !form.direccion.trim() || !form.whatsapp.trim() || !form.email.trim()) {
+      setError('Nombre, departamento, municipio, dirección, WhatsApp y correo son obligatorios.')
       return
     }
     if (!form.facebook.trim() && !form.instagram.trim()) {
@@ -206,6 +206,12 @@ export default function EstudioTiendaRegistroPage() {
                 <label className={labelClass}>Municipio *</label>
                 <ComboboxBuscable value={form.municipio} onChange={setMunicipio} options={municipiosDisponibles} disabled={!form.departamento} placeholder={form.departamento ? 'Escribe para buscar...' : 'Elige antes el departamento'} inputClassName={inputClass} />
               </div>
+            </div>
+
+            <div>
+              <label className={labelClass}>Dirección exacta *</label>
+              <input required className={inputClass} value={form.direccion} onChange={set('direccion')} placeholder="Calle, carrera, barrio..." />
+              <p className="text-gray-400 text-[10px] mt-1">Para que Ruta del Golfo sepa dónde recoger tus pedidos — nunca se muestra públicamente.</p>
             </div>
 
             <div>

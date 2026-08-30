@@ -175,8 +175,16 @@ export default function EstudioTiendaPage() {
     <div className="min-h-screen bg-white text-gray-900">
       <NavbarCategoryStore pageName={nombreTienda} hideMenu />
 
+      {/* Perfil (avatar/nombre/badge/bio/redes) en max-w-3xl, igual que
+          EstudioLandingPage.jsx ("INK") — antes la bio tenía su propio
+          max-w-xl + mx-auto anidado dentro de un max-w-7xl, así que se
+          autocentraba distinto al resto del bloque y quedaba desfasada
+          en PC (2026-08-30, Jose). El catálogo/grid de productos más
+          abajo se queda en max-w-7xl a propósito — necesita el ancho
+          para mostrar varias columnas, a diferencia de un perfil de
+          solo texto como el de INK. */}
       <div className="bg-gray-50 pt-20 md:pt-24 pb-9 px-4 md:px-6">
-        <div className="max-w-7xl mx-auto flex items-start gap-3 sm:gap-6">
+        <div className="max-w-3xl mx-auto flex items-start gap-3 sm:gap-6">
           <div className="w-16 h-16 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full border-4 border-white bg-white shadow-md overflow-hidden flex-shrink-0">
             {estudio.logo_url ? (
               <img src={estudio.logo_url} alt={nombreTienda} className="w-full h-full object-cover" />
@@ -197,7 +205,7 @@ export default function EstudioTiendaPage() {
                     condición de pago: cualquier tienda que llega a esta
                     página ya es, por construcción, activo=TRUE. */}
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-white text-[10px] font-black uppercase tracking-widest bg-green-600 mt-2">
-                  <CheckCircle2 size={12} /> Tienda registrada en INKognito
+                  <CheckCircle2 size={12} /> Tienda verificada
                 </span>
               </div>
               {/* Botón hamburguesa (2026-08-30) — SOLO se renderiza si el
@@ -246,14 +254,19 @@ export default function EstudioTiendaPage() {
         </div>
 
         {estudio.bio && (
-          <div className="max-w-7xl mx-auto mt-6 max-w-xl">
+          <div className="max-w-3xl mx-auto mt-6">
             <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3.5">
               <p className="text-gray-700 text-sm leading-relaxed">{estudio.bio}</p>
             </div>
           </div>
         )}
+        {/* Dirección exacta — a propósito NUNCA se muestra acá (2026-08-30,
+            Jose, revirtiendo su propia idea inicial: "no la hagas visible
+            en el perfil de la tienda, esto será meramente por logística")
+            — solo la usan la transportadora (recogida) y el checkout
+            (entrega), nunca el catálogo público. */}
         {(estudio.instagram || estudio.facebook || estudio.whatsapp) && (
-          <div className="max-w-7xl mx-auto flex items-center gap-3 mt-4">
+          <div className="max-w-3xl mx-auto flex items-center gap-3 mt-4">
             {estudio.whatsapp && (
               <a href={`https://wa.me/${estudio.whatsapp}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-white text-xs font-bold" style={{ backgroundColor: '#25D366' }}>
                 <FaWhatsapp size={13} /> WhatsApp

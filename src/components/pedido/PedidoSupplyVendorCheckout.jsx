@@ -23,7 +23,7 @@ const COMPRAR_ENDPOINT = { supply: 'estudios-supply-comprar', store: 'estudios-t
 // cart.vendorLock está seteado (ver SupplyCartContext.jsx/StoreCartContext.jsx).
 export default function PedidoSupplyVendorCheckout({ cart, module = 'supply' }) {
   const { items, vendorLock, total } = cart
-  const [form, setForm] = useState({ nombre: '', telefono: '', email: '', municipio: '', mensaje: '' })
+  const [form, setForm] = useState({ nombre: '', telefono: '', email: '', municipio: '', direccion: '', mensaje: '' })
   const [enviando, setEnviando] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -42,7 +42,7 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply' }) 
   // municipio de entrega; sin eso no hay forma de calcular el flete de un
   // envío ni de saber si es reparto dentro del mismo municipio. Solo
   // Store lo exige — Supply no cambia.
-  const formCompleto = Boolean(form.telefono && form.email && (module !== 'store' || form.municipio))
+  const formCompleto = Boolean(form.telefono && form.email && (module !== 'store' || (form.municipio && form.direccion.trim())))
 
   const enviar = async (e) => {
     e.preventDefault()
@@ -67,7 +67,7 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply' }) 
           cliente_nombre: form.nombre || null,
           cliente_telefono: form.telefono,
           cliente_email: form.email,
-          ...(module === 'store' ? { cliente_municipio: form.municipio } : {}),
+          ...(module === 'store' ? { cliente_municipio: form.municipio, cliente_direccion: form.direccion.trim() } : {}),
           mensaje: form.mensaje || null,
         }),
       })
@@ -117,12 +117,15 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply' }) 
             <input type="tel" value={form.telefono} onChange={e => update('telefono', e.target.value)} placeholder="Tu WhatsApp o teléfono *" required className={inputCls} />
             <input type="email" value={form.email} onChange={e => update('email', e.target.value)} placeholder="Tu correo *" required className={inputCls} />
             {module === 'store' && (
-              <select value={form.municipio} onChange={e => update('municipio', e.target.value)} required className={inputCls}>
-                <option value="">Tu municipio de entrega *</option>
-                {Object.entries(ZONAS_FLETE).map(([key, label]) => (
-                  <option key={key} value={key}>{label}</option>
-                ))}
-              </select>
+              <>
+                <select value={form.municipio} onChange={e => update('municipio', e.target.value)} required className={inputCls}>
+                  <option value="">Tu municipio de entrega *</option>
+                  {Object.entries(ZONAS_FLETE).map(([key, label]) => (
+                    <option key={key} value={key}>{label}</option>
+                  ))}
+                </select>
+                <input type="text" value={form.direccion} onChange={e => update('direccion', e.target.value)} placeholder="Dirección exacta — calle, carrera, barrio *" required className={inputCls} />
+              </>
             )}
             <textarea value={form.mensaje} onChange={e => update('mensaje', e.target.value)} placeholder="Mensaje para el proveedor (opcional)" rows={2} className={inputCls} />
           </div>
