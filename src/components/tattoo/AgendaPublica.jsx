@@ -50,7 +50,17 @@ async function subirImagenReferencia(file) {
 // cita queda en 'pending' en el panel, Jose confirma precio/anticipo aparte.
 // La disponibilidad ('Pequeño' caben 2/día, 'Mediano'/'Grande' ocupan el día
 // completo) se re-valida siempre en el servidor — esto solo es la vista.
-export default function AgendaPublica() {
+// showHeading (2026-08-30) — AgendaEnLineaPage.jsx ya trae su propio
+// título "Agenda tu Cita" arriba de todo; sin esto se repetía dos veces
+// en esa página. Por defecto true — no cambia nada donde ya se usa
+// (JhumaneztattooAgenda.jsx, que no tiene ese título en ningún otro lado).
+// compactTop (2026-08-30, Jose: "lo que sigue después del título está muy
+// lejos") — el py-10 md:py-16 de abajo está pensado para separar esta
+// sección de lo que sea que venga arriba (Gallery en JhumaneztattooAgenda.jsx);
+// en AgendaEnLineaPage.jsx eso duplicaba el espacio ya dejado por el título
+// de esa página. Solo achica el padding SUPERIOR — el inferior (antes del
+// footer) se queda igual en los dos casos.
+export default function AgendaPublica({ showHeading = true, compactTop = false }) {
   const [disponibilidad, setDisponibilidad] = useState({})
   const [monthOffset, setMonthOffset] = useState(0)
   const [form, setForm] = useState({ client_name: '', client_phone: '', design: '', location: '', locationOtro: '', size: '', hora_preferida: '' })
@@ -185,7 +195,7 @@ export default function AgendaPublica() {
 
   if (estado === 'ok') {
     return (
-      <section id="contacto" className="py-10 md:py-16 px-4 bg-black border-t border-white/5">
+      <section id="contacto" className={`${compactTop ? 'pt-2 md:pt-4 pb-10 md:pb-16' : 'py-10 md:py-16'} px-4 bg-black border-t border-white/5`}>
         <div className="max-w-md mx-auto text-center">
           <CheckCircle2 size={48} className="text-green-500 mx-auto mb-4" />
           <h3 className="text-2xl font-black uppercase italic mb-3">¡Solicitud recibida!</h3>
@@ -199,11 +209,13 @@ export default function AgendaPublica() {
   }
 
   return (
-    <section id="contacto" className="py-10 md:py-16 px-4 bg-black border-t border-white/5">
+    <section id="contacto" className={`${compactTop ? 'pt-2 md:pt-4 pb-10 md:pb-16' : 'py-10 md:py-16'} px-4 bg-black border-t border-white/5`}>
       <div className="max-w-[1320px] mx-auto">
-        <h2 className="text-3xl md:text-5xl font-black uppercase italic mb-3 text-center">
-          Agenda tu <span className="text-zinc-600">Cita</span>
-        </h2>
+        {showHeading && (
+          <h2 className="text-3xl md:text-5xl font-black uppercase italic mb-3 text-center">
+            Agenda tu <span className="text-zinc-600">Cita</span>
+          </h2>
+        )}
         <p className="text-gray-500 text-sm text-center max-w-md mx-auto mb-8">
           Todos los campos son obligatorios: son los que nos permiten darte un precio exacto antes de tu cita.
         </p>
