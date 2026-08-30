@@ -18,7 +18,12 @@ export async function loader({ request }) {
     const data = await res.json()
     if (!res.ok) return { ok: false, error: data.error || 'No pudimos confirmar el correo.' }
     if (data.tokenEdicion) {
-      return redirect(`/tattoo-artist-colombia/estudio/mi-perfil?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`)
+      // Store multitenant (2026-08-30) — una tienda no tiene dashboard
+      // aparte, su perfil y su catálogo son la misma página.
+      const destino = data.tipo === 'tienda'
+        ? `/store/estudio/${data.id}?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`
+        : `/tattoo-artist-colombia/estudio/mi-perfil?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`
+      return redirect(destino)
     }
     return { ok: true, id: data.id, nombre: data.nombre, tipo: data.tipo }
   } catch {

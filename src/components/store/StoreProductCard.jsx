@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import ProductImageGallery from '../ProductImageGallery'
 
@@ -66,10 +67,11 @@ function SizeSelector({ sizes, selIdx, onChange }) {
   )
 }
 
-export default function StoreProductCard({ product, category, sizes }) {
+export default function StoreProductCard({ product, category, sizes, showEstudioBadge = true }) {
   const { items, addItem } = useStoreCart()
   const [selIdx, setSelIdx] = useState(0)
   const [showDesc, setShowDesc] = useState(false)
+  const [bloqueoMsg, setBloqueoMsg] = useState(null)
 
   const selectedSize = sizes?.[selIdx] || ''
   // El botón refleja el carrito real, no un timer — antes decía "Agregado"
@@ -103,10 +105,25 @@ export default function StoreProductCard({ product, category, sizes }) {
   // (reportado 2026-08-02).
   const description = selectedVariant?.descripcion || product.tag
 
+  // Store multitenant (2026-08-29) — dueño real de la variante
+  // seleccionada, mismo criterio que SupplyProductCard.jsx: con fallback
+  // al nivel de producto por si la variante no trae su propio dato.
+  const proveedorId     = selectedVariant?.estudio_id ?? product._item?.estudio_id ?? null
+  const proveedorNombre = selectedVariant?.estudio_nombre_display || selectedVariant?.estudio_nombre || product._item?.estudio_nombre_display || product._item?.estudio_nombre || null
+  const proveedorMp     = selectedVariant?.estudio_mp_conectado ?? product._item?.estudio_mp_conectado ?? false
+
   const handleAdd = () => {
     const variantId = product._item?.variantes?.find(v => v.variant === selectedSize)?.id
       ?? product._item?.variantes?.[0]?.id ?? null
-    addItem({ ...product, inventoryId: variantId }, category, selectedSize)
+    const resultado = addItem({ ...product, inventoryId: variantId }, category, selectedSize, {
+      estudioId:     proveedorId,
+      estudioNombre: proveedorNombre,
+      mpConectado:   !!proveedorMp,
+    })
+    if (resultado && !resultado.ok) {
+      setBloqueoMsg(`Ya tienes productos de ${resultado.nombreActual} en tu carrito — termina esa compra antes de agregar de otra tienda.`)
+      setTimeout(() => setBloqueoMsg(null), 5000)
+    }
   }
 
   return (
@@ -130,6 +147,22 @@ export default function StoreProductCard({ product, category, sizes }) {
       </div>
 
       <div className="p-3 flex flex-col flex-1 gap-1.5 min-h-0">
+        {/* Store multitenant (2026-08-29) — insignia por card solo para
+            productos de una tienda conectada, mismo patrón exacto que
+            SupplyProductCard.jsx. */}
+        {showEstudioBadge && proveedorNombre && (
+          proveedorId ? (
+            <Link
+              to={`/store/estudio/${proveedorId}`}
+              onClick={(e) => e.stopPropagation()}
+              className="text-[8px] font-bold uppercase tracking-wide text-[#8a7127] hover:text-[#C9A84C] underline underline-offset-2 w-fit"
+            >
+              Vendido por {proveedorNombre}
+            </Link>
+          ) : (
+            <p className="text-[8px] font-bold uppercase tracking-wide text-[#8a7127]">Vendido por {proveedorNombre}</p>
+          )
+        )}
         <h3 className="text-xs md:text-sm font-black uppercase leading-tight text-gray-900">
           {product.name}
         </h3>
@@ -155,6 +188,9 @@ export default function StoreProductCard({ product, category, sizes }) {
         </div>
       </div>
 
+      {bloqueoMsg && (
+        <p className="px-3 pb-2 text-[9px] leading-snug text-amber-700 bg-amber-50">{bloqueoMsg}</p>
+      )}
       <button
         onClick={handleAdd}
         className={`w-full py-2.5 font-bold uppercase tracking-[0.1em] text-[10px] md:text-xs flex-shrink-0 transition-all duration-300 ${

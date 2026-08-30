@@ -19,6 +19,9 @@ export default [
   index('components/ecosystem/InkognitoHome.jsx'),
   route('jhumaneztattoo', 'routes/HomePage.jsx'),
   route('jhumaneztattoo/agenda', 'routes/JhumaneztattooAgenda.jsx'),
+  // Landing mínima — solo el formulario de agenda, sin hero ni portafolio
+  // (2026-08-30, Jose). Ver AgendaEnLineaPage.jsx.
+  route('agendaenlinea', 'routes/AgendaEnLineaPage.jsx'),
   route('portafolio', 'routes/PortfolioPage.jsx'),
   route('cuidados', 'components/tattoo/CuidadosPage.jsx'),
   route('p/:id', 'components/landing/ProductLandingPage.jsx'),
@@ -74,6 +77,14 @@ export default [
   route('store/zapatos-casuales', 'components/store/categories/ZapatosCasualesPage.jsx'),
   route('store/guayos', 'components/store/categories/GuayosPage.jsx'),
   route('store/tenis-guayo', 'components/store/categories/TenisGuayoPage.jsx'),
+  // Store multitenant (2026-08-29) — catálogo de una tienda conectada,
+  // mismo patrón que supply/estudio/:id de arriba.
+  route('store/estudio/:id', 'components/store/EstudioTiendaPage.jsx'),
+  route('store/compra/resultado', 'components/store/TiendaCompraResultadoPage.jsx'),
+  // Directorio simple de tiendas — a propósito sin buscador/filtros, su
+  // función es verificación independiente, no comparación (ver
+  // TiendasDirectorioPage.jsx).
+  route('store/tiendas', 'components/store/TiendasDirectorioPage.jsx'),
 
   // Gym
   route('gym', 'components/gym/GymPage.jsx'),
@@ -127,5 +138,12 @@ export default [
   // link público hacia ella (Jose: "las marcas las sigo creando yo...
   // este no debe ser público"); se comparte la URL a mano.
   route('tattoo-artist-colombia/marca/unete', 'components/artistas/EstudioMarcaRegistroPage.jsx'),
+  // Store multitenant (2026-08-29) — registro de tienda, público desde
+  // el día uno (a diferencia de la marca de arriba). Se mantiene bajo el
+  // mismo namespace tattoo-artist-colombia/ porque toda la gestión de
+  // cuenta (verificar, editar-por-token, OAuth de Mercado Pago) ya vive
+  // ahí sin importar `tipo` — solo el catálogo de la tienda vive en
+  // /store/estudio/:id, ver el bloque Store más abajo.
+  route('tattoo-artist-colombia/tienda/unete', 'components/artistas/EstudioTiendaRegistroPage.jsx'),
   route('artista/:id', 'components/artistas/ArtistaLandingPage.jsx'),
 ]

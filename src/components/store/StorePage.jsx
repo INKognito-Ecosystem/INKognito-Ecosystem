@@ -483,6 +483,19 @@ export default function StorePage() {
         </a>
       </section>
 
+      {/* ── TIENDAS ALIADAS — discreta, a nivel de pie (Store multitenant,
+          2026-08-29). El punto es que un comprador pueda llegar al
+          directorio sin depender de un link que una tienda le mandó —
+          por eso vive acá, alcanzable desde el hub, no escondida. */}
+      <section className="bg-white border-t border-gray-100 px-6 py-8 text-center">
+        <p className="text-gray-500 text-xs mb-2">
+          ¿Buscas una tienda específica? <Link to="/store/tiendas" className="font-bold underline underline-offset-2 hover:text-[#C9A84C]">Ver tiendas verificadas →</Link>
+        </p>
+        <p className="text-gray-400 text-[11px]">
+          ¿Tienes una tienda de ropa o calzado en Urabá? <Link to="/tattoo-artist-colombia/tienda/unete" className="underline underline-offset-2 hover:text-[#C9A84C]">Regístrala acá</Link>
+        </p>
+      </section>
+
       <FooterStore />
 
     </main>

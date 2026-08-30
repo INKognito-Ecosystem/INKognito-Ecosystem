@@ -5,21 +5,28 @@ const STRIPE_PATTERN = {
   backgroundImage: 'repeating-linear-gradient(45deg,transparent,transparent 19px,rgba(201,168,76,1) 19px,rgba(201,168,76,1) 20px)',
 }
 
-export default function FooterStore() {
+// paginaTienda (2026-08-30, Jose) — mismo criterio que hideMenu en
+// NavbarCategoryStore.jsx: el catálogo de UNA tienda (EstudioTiendaPage.jsx)
+// no debe repetir la navegación genérica de Store (esas categorías son
+// "lo mismo del navbar", que ya se quitó ahí) — acá también se oculta,
+// y el bloque de marca de la izquierda baja de tamaño (Jose: "las letras
+// están como muy grandes") ya que sin la columna de categorías al lado
+// quedaría ocupando todo el ancho.
+export default function FooterStore({ paginaTienda = false }) {
   return (
     <footer id="contacto" className="relative overflow-hidden border-t border-gray-200 bg-gray-50 px-6 py-10 md:py-12 lg:py-16">
       <div className="absolute inset-0 opacity-[0.13]" style={STRIPE_PATTERN} />
       <div className="relative z-10 max-w-7xl mx-auto">
 
-        <div className="grid md:grid-cols-2 gap-12">
+        <div className={paginaTienda ? '' : 'grid md:grid-cols-2 gap-12'}>
 
           {/* IZQUIERDA */}
           <div>
-            <h2 className="text-2xl font-black uppercase tracking-[0.15em] mb-4">
+            <h2 className="font-black uppercase tracking-[0.15em] mb-4 text-2xl">
               <span className="text-gray-900">INK</span>
               <span className="text-[#C9A84C]">OGNITO STORE</span>
             </h2>
-            <p className="text-gray-600 leading-relaxed max-w-sm mb-6">
+            <p className={`text-gray-600 leading-relaxed max-w-sm mb-6 ${paginaTienda ? 'text-sm' : ''}`}>
               Tienda online de ropa y calzado, con proveedores verificados.
               Réplicas premium con entrega a domicilio en los 4 municipios
               de la región.
@@ -37,6 +44,7 @@ export default function FooterStore() {
           </div>
 
           {/* DERECHA — CATEGORÍAS */}
+          {!paginaTienda && (
           <div>
             <p className="uppercase tracking-[0.25em] text-gray-700 text-sm mb-6 font-semibold">
               Categorías
@@ -62,6 +70,7 @@ export default function FooterStore() {
               </Link>
             </div>
           </div>
+          )}
 
         </div>
 

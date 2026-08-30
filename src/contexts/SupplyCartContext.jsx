@@ -25,18 +25,24 @@ export function SupplyCartProvider({ children }) {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)) } catch {}
   }, [items, hydrated])
 
-  // Un proveedor con Mercado Pago propio a la vez (fase 5, 2026-08-07) —
-  // el Split de Mercado Pago reparte un pago hacia UNA sola cuenta
-  // conectada por preferencia, así que mezclar dos proveedores conectados
-  // (o un proveedor conectado con productos directos de INKognito) no se
-  // puede cobrar en un solo checkout. La mayoría del tráfico real entra ya
-  // filtrado por proveedor (desde su perfil en el buscador), así que esto
-  // casi nunca se siente como una restricción real.
+  // Un solo dueño por carrito a la vez — generalizado 2026-08-30 (Jose:
+  // "esos pedidos como sabrá la tienda cuando alguien agendó en línea").
+  // Antes solo bloqueaba mezclar proveedores CONECTADOS a Mercado Pago;
+  // un proveedor SIN conectar igual necesita quedar solo en el carrito —
+  // si se mezcla con productos directos de INKognito (o de otro
+  // proveedor), el checkout cae al flujo genérico de Nequi/contraentrega,
+  // que le pagaría A INKOGNITO por un producto que no es suyo, y el
+  // proveedor real nunca se entera del pedido (ver PedidoOnlinePage.jsx,
+  // que ahora bloquea el checkout en vez de dejarlo caer a ese flujo
+  // cuando detecta un proveedor sin conectar). Regla simple: el carrito
+  // solo puede tener productos de UN dueño — todos de un mismo
+  // proveedor (conectado o no), o todos directos de INKognito, nunca
+  // mezclados.
   const addItem = useCallback((product, category, opts = {}) => {
     const { estudioId = null, estudioNombre = null, mpConectado = false } = opts
-    const bloqueadoPor = items.find(i => i.mpConectado)
-    if (bloqueadoPor && (!mpConectado || estudioId !== bloqueadoPor.estudioId)) {
-      return { ok: false, motivo: 'otro_proveedor', nombreActual: bloqueadoPor.estudioNombre }
+    const primero = items[0]
+    if (primero && (primero.estudioId || null) !== estudioId) {
+      return { ok: false, motivo: 'otro_proveedor', nombreActual: primero.estudioNombre || 'la tienda general' }
     }
     const key = `${category}-${product.id}`
     setItems(prev => {
@@ -49,7 +55,7 @@ export function SupplyCartProvider({ children }) {
     return { ok: true }
   }, [items])
 
-  const vendorLock = items.find(i => i.mpConectado) || null
+  const vendorLock = items.find(i => i.estudioId) || null
 
   const removeItem = useCallback((key) => {
     setItems(prev => prev.filter(i => i.key !== key))

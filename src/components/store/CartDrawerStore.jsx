@@ -7,7 +7,7 @@ import { useStoreCart } from '../../contexts/StoreCartContext'
 const GOLD = '#C9A84C'
 
 export default function CartDrawerStore({ open, onClose }) {
-  const { items, removeItem, changeQty, clearCart, total, count } = useStoreCart()
+  const { items, removeItem, changeQty, clearCart, total, count, vendorLock } = useStoreCart()
 
   useEffect(() => {
     if (!open) return
@@ -193,22 +193,30 @@ export default function CartDrawerStore({ open, onClose }) {
               Agendar Pedido en Línea
             </Link>
 
-            {/* WHATSAPP */}
-            <a
-              href={buildWhatsAppMessage()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-3 w-full py-4 rounded-xl text-white uppercase tracking-[0.2em] text-xs font-bold transition-all duration-300 hover:shadow-[0_0_25px_rgba(201,168,76,0.25)]"
-              style={{
-                border: `1px solid rgba(201,168,76,0.4)`,
-                backgroundColor: 'rgba(201,168,76,0.06)',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = GOLD }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)' }}
-            >
-              <FaWhatsapp size={18} />
-              Realizar Pedido por WhatsApp
-            </a>
+            {/* WHATSAPP — oculto si el carrito está bloqueado a una tienda
+                con Mercado Pago propio (2026-08-30, Jose) — ese pedido tiene
+                que pagarse por Split, directo a la cuenta de la tienda; un
+                pedido coordinado por WhatsApp (al número de INKognito, no
+                al de la tienda) no tiene cómo pagarle a quien no es dueño
+                del producto. Mismo criterio que ya usa PedidoSupplyVendorCheckout.jsx
+                (ese formulario tampoco ofrece WhatsApp). */}
+            {!vendorLock && (
+              <a
+                href={buildWhatsAppMessage()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-3 w-full py-4 rounded-xl text-white uppercase tracking-[0.2em] text-xs font-bold transition-all duration-300 hover:shadow-[0_0_25px_rgba(201,168,76,0.25)]"
+                style={{
+                  border: `1px solid rgba(201,168,76,0.4)`,
+                  backgroundColor: 'rgba(201,168,76,0.06)',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = GOLD }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)' }}
+              >
+                <FaWhatsapp size={18} />
+                Realizar Pedido por WhatsApp
+              </a>
+            )}
 
             {/* LIMPIAR */}
             <button

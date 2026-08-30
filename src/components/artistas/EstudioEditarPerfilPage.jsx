@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useLoaderData, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, redirect, useLoaderData, useNavigate, useSearchParams } from 'react-router-dom'
 import { Camera, LoaderCircle, Mail, Pencil, MapPin, Users, UserPlus, X, Navigation, Check, Trash2, ShoppingBag, ExternalLink, Wallet, ChevronDown, CopyPlus, Eye, Plus, Link2 } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
@@ -24,20 +24,30 @@ const MP_LOGO_URL = 'https://http2.mlstatic.com/frontend-assets/mp-web-navigatio
 export async function loader({ request }) {
   const token = new URL(request.url).searchParams.get('token')
   if (!token) return { token: null }
+  let estudio = null, invitaciones = [], config = { cloud_name: null, upload_preset: null }
   try {
     const [estudioRes, configRes, invitacionesRes] = await Promise.all([
       fetch(`${PANEL_URL}/api/estudios-por-token?token=${encodeURIComponent(token)}`),
       fetch(`${PANEL_URL}/api/upload-config`),
       fetch(`${PANEL_URL}/api/estudios-invitaciones-por-token?token=${encodeURIComponent(token)}`),
     ])
-    const estudio = estudioRes.ok ? await estudioRes.json() : null
-    const config = configRes.ok ? await configRes.json() : { cloud_name: null, upload_preset: null }
-    const invitaciones = invitacionesRes.ok ? await invitacionesRes.json() : []
-    if (!estudio) return { token, estudio: null, error: 'Este link ya no es válido — pídelo de nuevo.' }
-    return { token, estudio, invitaciones, ...config }
+    estudio = estudioRes.ok ? await estudioRes.json() : null
+    config = configRes.ok ? await configRes.json() : config
+    invitaciones = invitacionesRes.ok ? await invitacionesRes.json() : []
   } catch {
     return { token, estudio: null, error: 'No pudimos cargar tu estudio — intenta de nuevo en un momento.' }
   }
+  if (!estudio) return { token, estudio: null, error: 'Este link ya no es válido — pídelo de nuevo.' }
+  // Store multitenant (2026-08-30) — una tienda ya no tiene dashboard
+  // aparte: su perfil y su catálogo son la misma página. Fuera de
+  // cualquier try/catch a propósito — throw redirect() es un Response,
+  // no un error, un catch genérico lo tragaría (mismo criterio que
+  // EstudioSupplyPage.jsx/EstudioLandingPage.jsx). Cubre de una sola vez
+  // todas las puertas de entrada a este dashboard para una tienda:
+  // verificación, reenvío de link, bookmarks viejos, y el propio
+  // localStorage de este componente (más abajo).
+  if (estudio.tipo === 'tienda') throw redirect(`/store/estudio/${estudio.id}?token=${token}`)
+  return { token, estudio, invitaciones, ...config }
 }
 
 export function meta() {
@@ -977,7 +987,9 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
   // "Supply" solo aparece en el menú si el estudio tiene vende_supply
   // activo. Si la URL trae un ?tab= que ya no aplica (ej. se desactivó
   // Supply), cae de vuelta a "Mi perfil" en vez de mostrar una pestaña
-  // fantasma.
+  // fantasma. Este dashboard ya solo atiende estudio/empresa — una
+  // tienda (tipo='tienda') nunca llega acá, el loader la redirige a su
+  // propia página (ver EstudioTiendaPage.jsx) antes de renderizar nada.
   const tabsEstudio = [
     { key: 'perfil', label: 'Mi perfil', icon: MapPin },
     { key: 'equipo', label: estudio.tipo === 'empresa' ? 'Patrocinados' : 'Mi equipo', icon: Users },

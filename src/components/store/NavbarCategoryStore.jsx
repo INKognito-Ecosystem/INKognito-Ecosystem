@@ -7,7 +7,13 @@ import logoStore from '../../assets/milogo/store.webp'
 import AnimatedWordmark from '../AnimatedWordmark'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 
-export default function NavbarCategoryStore({ pageName }) {
+// hideMenu (2026-08-30, Jose) — el catálogo de una tienda (EstudioTiendaPage.jsx)
+// ya tiene su propio botón de gestión en el hero (solo el dueño lo ve) —
+// el menú hamburguesa genérico de Store (categorías/Ecosistema/etc.) ahí
+// competía visualmente con ese botón y no aporta nada específico a esa
+// página, así que se puede ocultar sin afectar el resto de Store (sigue
+// con su comportamiento normal en las páginas de categoría/directorio).
+export default function NavbarCategoryStore({ pageName, hideMenu = false }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { count } = useStoreCart()
@@ -62,19 +68,21 @@ export default function NavbarCategoryStore({ pageName }) {
                 )}
               </button>
 
-              <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="text-zinc-400 hover:text-[#C9A84C] transition-all duration-300"
-              >
-                {menuOpen ? <X size={20} /> : <Menu size={20} />}
-              </button>
+              {!hideMenu && (
+                <button
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  className="text-zinc-400 hover:text-[#C9A84C] transition-all duration-300"
+                >
+                  {menuOpen ? <X size={20} /> : <Menu size={20} />}
+                </button>
+              )}
             </div>
 
           </div>
         </div>
 
         {/* DROPDOWN */}
-        {menuOpen && (
+        {!hideMenu && menuOpen && (
           <div className="absolute right-4 top-16 md:top-20 bg-black border border-zinc-800 w-56 z-50">
             <Link to="/store" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
               Inicio Store

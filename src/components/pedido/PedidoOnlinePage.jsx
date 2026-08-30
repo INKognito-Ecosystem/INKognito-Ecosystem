@@ -109,31 +109,41 @@ export default function PedidoOnlinePage() {
   const [pagarProductoAhora, setPagarProductoAhora] = useState(false)
   const submitted = useRef(false)
 
-  // Verificación EN VIVO del proveedor conectado (fase 5, 2026-08-07) —
-  // bug real: SupplyCartContext guarda si el proveedor tenía Mercado Pago
-  // conectado en el momento exacto de agregar el producto al carrito. Si
-  // el comprador lo agregó ANTES de que el proveedor conectara su cuenta
-  // (o con el catálogo cacheado del lado del cliente, ver useCatalog.js),
-  // ese dato queda "congelado" en falso y el botón de pago nunca aparece,
-  // aunque el proveedor ya esté conectado. Se revalida acá, justo antes
-  // del checkout, contra /api/estudios/:id (siempre fresco, sin caché) en
-  // vez de confiar en el valor guardado por ítem.
-  const [vendorLive, setVendorLive] = useState(null)
+  // Verificación EN VIVO del proveedor (fase 5, 2026-08-07; ampliada
+  // 2026-08-30) — bug real original: SupplyCartContext guarda si el
+  // proveedor tenía Mercado Pago conectado en el momento exacto de
+  // agregar el producto, así que ese dato podía quedar "congelado" en
+  // falso. Se revalida acá, justo antes del checkout, contra
+  // /api/estudios/:id (siempre fresco, sin caché). `vendorInfo` guarda
+  // la respuesta completa (no solo cuando ya está conectado) — hace
+  // falta para poder BLOQUEAR el checkout cuando el proveedor existe
+  // pero todavía no conecta su cuenta (ver más abajo), en vez de dejarlo
+  // caer al formulario genérico de Nequi/contraentrega — ese pago
+  // llegaría a la cuenta de INKognito por un producto que no es suyo, y
+  // el proveedor real nunca se entera del pedido (Jose, 2026-08-30).
+  const [vendorInfo, setVendorInfo] = useState(null)
   const [vendorChecking, setVendorChecking] = useState(false)
-  const estudioIdsEnCarrito = module === 'supply'
-    ? [...new Set(supplyCart.items.map(i => i.estudioId).filter(Boolean))]
+  // Store multitenant (2026-08-29) — mismo mecanismo de revalidación en
+  // vivo que ya tenía Supply, extendido a Store: ambos módulos permiten
+  // un carrito bloqueado a un proveedor con Mercado Pago propio.
+  const VENDOR_LOCK_MODULES = ['supply', 'store']
+  const estudioIdsEnCarrito = VENDOR_LOCK_MODULES.includes(module)
+    ? [...new Set(cart?.items.map(i => i.estudioId).filter(Boolean))]
     : []
   useEffect(() => {
-    if (estudioIdsEnCarrito.length !== 1) { setVendorLive(null); return }
+    if (estudioIdsEnCarrito.length !== 1) { setVendorInfo(null); return }
     let active = true
     setVendorChecking(true)
     fetch(`${PANEL_URL}/api/estudios/${estudioIdsEnCarrito[0]}`)
       .then(r => r.ok ? r.json() : null)
-      .then(d => { if (active) setVendorLive(d && d.mp_conectado ? { estudioId: d.id, estudioNombre: d.nombre_supply || d.nombre } : null) })
-      .catch(() => { if (active) setVendorLive(null) })
+      .then(d => { if (active) setVendorInfo(d || null) })
+      .catch(() => { if (active) setVendorInfo(null) })
       .finally(() => { if (active) setVendorChecking(false) })
     return () => { active = false }
   }, [estudioIdsEnCarrito.join(',')])
+
+  const vendorNombreVivo = vendorInfo ? ((module === 'store' ? vendorInfo.nombre_tienda : vendorInfo.nombre_supply) || vendorInfo.nombre) : null
+  const vendorLive = vendorInfo?.mp_conectado ? { estudioId: vendorInfo.id, estudioNombre: vendorNombreVivo } : null
 
   useEffect(() => {
     fetch(`${PANEL_URL}/api/visual/flete`)
@@ -307,7 +317,7 @@ export default function PedidoOnlinePage() {
   // Eljach, paga directo por Split), ver PedidoSupplyVendorCheckout.jsx.
   // vendorLive (no cart.vendorLock) es la fuente de verdad — ver el efecto
   // de arriba, evita el bug de "conectado pero el botón no aparece".
-  if (module === 'supply' && estudioIdsEnCarrito.length === 1 && vendorChecking && !vendorLive) {
+  if (VENDOR_LOCK_MODULES.includes(module) && estudioIdsEnCarrito.length === 1 && vendorChecking && !vendorInfo) {
     return (
       <>
         <section className="min-h-[60vh] flex items-center justify-center py-16 px-4 bg-black">
@@ -318,10 +328,52 @@ export default function PedidoOnlinePage() {
     )
   }
 
-  if (module === 'supply' && vendorLive) {
+  if (VENDOR_LOCK_MODULES.includes(module) && vendorLive) {
     return (
       <>
-        <PedidoSupplyVendorCheckout cart={{ ...cart, vendorLock: vendorLive }} />
+        <PedidoSupplyVendorCheckout cart={{ ...cart, vendorLock: vendorLive }} module={module} />
+        <MiniFooter moduleLabel={MODULE_LABELS[module]} />
+      </>
+    )
+  }
+
+  // Proveedor real pero SIN Mercado Pago conectado todavía (2026-08-30,
+  // Jose) — a propósito NO cae al formulario genérico de abajo: ese pago
+  // (Nequi o contraentrega) le llegaría a INKognito por un producto que
+  // no es suyo, y el proveedor nunca se enteraría del pedido (esa
+  // información solo le llega vía el webhook del checkout de Split, que
+  // acá no puede correr sin una cuenta conectada). Se ofrece contactar a
+  // la tienda directo por SU propio WhatsApp — nunca el de INKognito.
+  if (VENDOR_LOCK_MODULES.includes(module) && estudioIdsEnCarrito.length === 1 && vendorInfo && !vendorInfo.mp_conectado) {
+    return (
+      <>
+        <section className="min-h-[60vh] flex items-center justify-center py-16 px-4 bg-black">
+          <div className="max-w-md mx-auto text-center">
+            <Landmark size={40} className="text-amber-500 mx-auto mb-4" />
+            <h3 className="text-xl font-black uppercase italic mb-3 text-white">Pago en línea no disponible todavía</h3>
+            <p className="text-gray-400 leading-relaxed mb-6">
+              {vendorNombreVivo || 'Esta tienda'} todavía no conecta su cuenta de pago, así que no podemos procesar este pedido en línea por ahora.
+            </p>
+            {vendorInfo.whatsapp ? (
+              <a
+                href={`https://wa.me/${vendorInfo.whatsapp}?text=${encodeURIComponent(`Hola, quiero comprar un producto de tu catálogo en INKognito ${module === 'store' ? 'Store' : 'Supply'}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-green-600 text-white font-black py-3.5 px-8 rounded uppercase tracking-widest text-sm hover:bg-green-500 transition-all"
+              >
+                <FaWhatsapp size={16} />
+                Escribirle directo por WhatsApp
+              </a>
+            ) : (
+              <p className="text-gray-500 text-sm">Intenta más tarde, o quita este producto del carrito.</p>
+            )}
+            <div className="mt-6">
+              <Link to={`/${module}`} className="text-gray-500 hover:text-gray-300 text-xs">
+                ← Volver a {MODULE_LABELS[module]}
+              </Link>
+            </div>
+          </div>
+        </section>
         <MiniFooter moduleLabel={MODULE_LABELS[module]} />
       </>
     )

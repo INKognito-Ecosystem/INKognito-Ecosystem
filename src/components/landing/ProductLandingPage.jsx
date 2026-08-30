@@ -175,6 +175,14 @@ export default function ProductLandingPage() {
   // del resto de Supply — fabrican en Bogotá, envío nacional, sin
   // contraentrega confirmada aún (2026-08-01).
   const esMobiliario     = isSupply && product.categoria === 'Mobiliario'
+  // Store multitenant (2026-08-29) — mismo problema que ya se corrigió
+  // para Supply (badge/envío fijo que asumía un solo proveedor): un
+  // producto de Store puede ahora venir de una tienda real, con su
+  // propia logística, no siempre de Eljach/Jose. Se detecta igual que
+  // Supply — si hay nombre de proveedor resuelto, es que hay estudio_id
+  // real detrás (la query hace LEFT JOIN, sin fila no hay nombre).
+  const nombreProveedorStore = variant?.estudio_nombre_display || product.estudio_nombre_display || null
+  const esStoreConProveedor  = product.module === 'store' && !!nombreProveedorStore
   // Nutri House suministra las 5 categorías de Suple (2026-08-03, confirmado
   // por Jose, incluida Accesorios) — a diferencia de Warlock/Tommy no hay
   // exclusiones por categoría/marca.
@@ -205,25 +213,36 @@ export default function ProductLandingPage() {
   const cartModule = CART_MODULE[product.module]
   const cart = { supply: supplyCart, store: storeCart, gym: gymCart, suplementos: supleCart }[cartModule]
   const [bloqueoMsg, setBloqueoMsg] = useState(null)
+  // Store multitenant (2026-08-29) — esta página es la misma /p/:id para
+  // cualquier módulo, así que el vendor-lock ya no puede depender solo de
+  // isSupply (antes hardcodeado a Supply porque Store nunca tenía
+  // estudio_id). Dueño de la VARIANTE activa, no de la fila con la que se
+  // aterrizó en esta página — el catálogo maestro permite que variantes
+  // del mismo producto pertenezcan a proveedores distintos (reportado
+  // 2026-08-09). Fallback a nivel de producto por compatibilidad.
+  const tieneVendorLock = ['supply', 'store'].includes(product.module)
+  const vendorOpts = tieneVendorLock ? {
+    estudioId:     variant?.estudio_id ?? product.estudio_id ?? null,
+    estudioNombre: variant?.estudio_nombre_display || variant?.estudio_nombre || product.estudio_nombre_display || product.estudio_nombre || null,
+    mpConectado:   !!(variant?.estudio_mp_conectado ?? product.estudio_mp_conectado),
+  } : undefined
   const handlePedidoOnline = () => {
     if (sinStock || !cart) return
     const productId = product.name + (variant?.variant ? '-' + variant.variant : '')
-    const resultado = cart.addItem({
+    const productoParaCarrito = {
       id:          productId,
       inventoryId: variant?.id ?? null,
       name:        product.name + (variant?.variant ? ` (${variant.variant})` : ''),
       price:       variant?.price ? '$' + Math.round(variant.price).toLocaleString('es-CO') : '—',
       brand:       product.categoria || '',
       image:       imageUrl || '',
-    }, product.categoria, isSupply ? {
-      // Dueño de la VARIANTE activa, no de la fila con la que se aterrizó
-      // en esta página — el catálogo maestro permite que variantes del
-      // mismo producto pertenezcan a proveedores distintos (reportado
-      // 2026-08-09). Fallback a nivel de producto por compatibilidad.
-      estudioId:     variant?.estudio_id ?? product.estudio_id ?? null,
-      estudioNombre: variant?.estudio_nombre_supply || variant?.estudio_nombre || product.estudio_nombre_supply || product.estudio_nombre || null,
-      mpConectado:   !!(variant?.estudio_mp_conectado ?? product.estudio_mp_conectado),
-    } : undefined)
+    }
+    // StoreCartContext.addItem toma (product, category, size, opts) — 4
+    // posicionales, distinto de SupplyCartContext.addItem (product,
+    // category, opts) — no pueden compartir una sola llamada posicional.
+    const resultado = cartModule === 'store'
+      ? cart.addItem(productoParaCarrito, product.categoria, variant?.variant || '', vendorOpts)
+      : cart.addItem(productoParaCarrito, product.categoria, vendorOpts)
     if (resultado && resultado.ok === false) {
       setBloqueoMsg(`Ya tienes productos de ${resultado.nombreActual} en tu carrito — termina esa compra antes de agregar de otro proveedor.`)
       return
@@ -550,6 +569,12 @@ export default function ProductLandingPage() {
                         <span>Suministrado por {variant?.estudio_nombre_supply || product.estudio_nombre_supply}</span>
                       </div>
                     )}
+                    {esStoreConProveedor && (
+                      <div className="flex items-center gap-3 text-zinc-400 text-xs">
+                        <ShieldCheck size={13} className="shrink-0" style={{ color: accent }} />
+                        <span>Vendido por {nombreProveedorStore}</span>
+                      </div>
+                    )}
                     {esNutriHouse && (
                       <div className="flex items-center gap-3 text-zinc-400 text-xs">
                         <ShieldCheck size={13} className="shrink-0" style={{ color: accent }} />
@@ -565,10 +590,10 @@ export default function ProductLandingPage() {
                         Suplementos siguen siendo de un solo proveedor, ahí
                         el texto específico de Eljach/Urabá sigue siendo
                         cierto. */}
-                    {isSupply ? (
+                    {isSupply || esStoreConProveedor ? (
                       <div className="flex items-center gap-3 text-zinc-400 text-xs">
                         <Truck size={13} className="shrink-0" style={{ color: accent }} />
-                        <span>Envío y forma de pago los coordina {variant?.estudio_nombre_supply || product.estudio_nombre_supply || 'el vendedor'} directamente contigo al confirmar tu pedido</span>
+                        <span>Envío y forma de pago los coordina {variant?.estudio_nombre_supply || product.estudio_nombre_supply || nombreProveedorStore || 'el vendedor'} directamente contigo al confirmar tu pedido</span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-3 text-zinc-400 text-xs">
@@ -585,8 +610,12 @@ export default function ProductLandingPage() {
                 {/* Ya dice "envío a toda Colombia" en la línea de arriba para
                     mobiliario — esta línea sería redundante/confusa ahí. Para
                     Supply tampoco aplica: sin una zona base fija por
-                    vendedor, "fuera de Urabá" ya no significa nada. */}
-                {!esMobiliario && !isSupply && (
+                    vendedor, "fuera de Urabá" ya no significa nada. Mismo
+                    criterio para un producto de Store con tienda real
+                    detrás (2026-08-29) — sin proveedor real, sigue siendo
+                    el inventario propio de INKognito, ahí el texto de
+                    Eljach/Urabá sigue siendo cierto. */}
+                {!esMobiliario && !isSupply && !esStoreConProveedor && (
                   <div className="flex items-center gap-3 text-zinc-400 text-xs">
                     <Globe size={13} className="shrink-0" style={{ color: accent }} />
                     <span>¿Fuera de Urabá? También enviamos a toda Colombia — tiempo y costo se coordinan al confirmar (sin contraentrega fuera de la zona)</span>

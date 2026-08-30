@@ -5,13 +5,22 @@ import { Landmark, ShoppingBag } from 'lucide-react'
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const inputCls = 'w-full bg-zinc-900 border border-gray-700 text-white p-3.5 rounded outline-none placeholder:text-gray-600'
 
-// Checkout dedicado para un carrito de Supply bloqueado a un proveedor con
-// Mercado Pago propio (fase 5, 2026-08-07) — sin nequi/contraentrega, sin
-// dirección/flete/Eljach: el proveedor coordina la entrega directo con el
-// comprador por WhatsApp después de pagar, mismo criterio que las reservas
-// de artista. Reemplaza el formulario normal de PedidoOnlinePage.jsx solo
-// cuando cart.vendorLock está seteado (ver SupplyCartContext.jsx).
-export default function PedidoSupplyVendorCheckout({ cart }) {
+// Endpoint de compra por módulo — Store multitenant (2026-08-29) reusa
+// este mismo componente en vez de clonarlo: a diferencia de los
+// endpoints de backend (donde categoría/talla sí divergen de verdad
+// entre Supply y Store, ver server.js), este componente de presentación
+// no tiene ninguna lógica que cambie entre módulos — solo el endpoint y
+// el link de "seguir agregando" difieren.
+const COMPRAR_ENDPOINT = { supply: 'estudios-supply-comprar', store: 'estudios-tienda-comprar' }
+
+// Checkout dedicado para un carrito de Supply/Store bloqueado a un
+// proveedor con Mercado Pago propio (fase 5, 2026-08-07; extendido a
+// Store 2026-08-29) — sin nequi/contraentrega, sin dirección/flete/
+// Eljach: el proveedor coordina la entrega directo con el comprador por
+// WhatsApp después de pagar, mismo criterio que las reservas de artista.
+// Reemplaza el formulario normal de PedidoOnlinePage.jsx solo cuando
+// cart.vendorLock está seteado (ver SupplyCartContext.jsx/StoreCartContext.jsx).
+export default function PedidoSupplyVendorCheckout({ cart, module = 'supply' }) {
   const { items, vendorLock, total } = cart
   const [form, setForm] = useState({ nombre: '', telefono: '', email: '', mensaje: '' })
   const [enviando, setEnviando] = useState(false)
@@ -36,7 +45,7 @@ export default function PedidoSupplyVendorCheckout({ cart }) {
     setEnviando(true)
     setErrorMsg('')
     try {
-      const res = await fetch(`${PANEL_URL}/api/estudios-supply-comprar`, {
+      const res = await fetch(`${PANEL_URL}/api/${COMPRAR_ENDPOINT[module]}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -93,7 +102,7 @@ export default function PedidoSupplyVendorCheckout({ cart }) {
             </div>
           </div>
 
-          <Link to="/supply" className="inline-block text-gray-500 hover:text-gray-300 text-xs">
+          <Link to={`/${module}`} className="inline-block text-gray-500 hover:text-gray-300 text-xs">
             + Seguir agregando productos de {vendorLock.estudioNombre}
           </Link>
 

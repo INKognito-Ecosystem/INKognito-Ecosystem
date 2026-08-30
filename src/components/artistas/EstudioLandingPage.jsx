@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData, redirect } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import { MapPin, Users, Building2, ShoppingBag, Award } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
@@ -16,13 +16,21 @@ const BTN = '#374151'
 // cada card sigue enlazando al perfil completo real del artista.
 export async function loader({ params }) {
   const id = idDesdeParam(params.id)
+  let estudio = null
   try {
     const res = await fetch(`${PANEL_URL}/api/estudios/${id}`)
-    if (!res.ok) return { estudio: null }
-    return { estudio: await res.json() }
+    estudio = res.ok ? await res.json() : null
   } catch {
-    return { estudio: null }
+    estudio = null
   }
+  // Store multitenant (2026-08-29) — una tienda (tipo='tienda') no tiene
+  // perfil en este namespace de tatuadores, solo su catálogo en
+  // /store/estudio/:id. Cierra el caso de una URL adivinada/compartida a
+  // mano con el id numérico de una tienda — el redirect va FUERA del
+  // try/catch de arriba a propósito (throw redirect() es un Response, no
+  // un error, mismo criterio que EstudioSupplyPage.jsx).
+  if (estudio?.tipo === 'tienda') throw redirect(`/store/estudio/${estudio.id}`)
+  return { estudio }
 }
 
 export function meta({ data }) {
