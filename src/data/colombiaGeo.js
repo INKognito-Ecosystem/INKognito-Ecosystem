@@ -1212,6 +1212,25 @@ export const MUNICIPIOS_POR_DEPARTAMENTO = {
 export const DEPARTAMENTOS_TIENDA = ["Antioquia"]
 export const MUNICIPIOS_URABA_TIENDA = ["Apartadó", "Carepa", "Chigorodó", "Turbo"]
 
+// "Ruta del Golfo" — transportadoras multitenant (2026-08-30). Distinto de
+// MUNICIPIOS_URABA_TIENDA de arriba: esas son solo los 4 municipios reales
+// (dónde queda una tienda), esto son las 10 zonas reales de
+// settings.flete_tabla (4 municipios + 6 corregimientos) — la granularidad
+// que de verdad importa para cobertura de reparto y cálculo de flete.
+// Mismas claves/etiquetas que ya usa public/index.html (panel admin).
+export const ZONAS_FLETE = {
+  chigorodo: "Chigorodó",
+  carepa: "Carepa",
+  casaverde: "Casa Verde",
+  reposo: "El Reposo",
+  currulao: "Currulao",
+  apartado: "Apartadó",
+  riogrande: "Río Grande",
+  eltres: "El Tres",
+  coldesa: "Coldesa",
+  turbo: "Turbo",
+}
+
 export const DEPARTAMENTOS = [
   "Amazonas",
   "Antioquia",

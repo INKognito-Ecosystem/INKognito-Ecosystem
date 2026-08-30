@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Landmark, ShoppingBag } from 'lucide-react'
+import { ZONAS_FLETE } from '../../data/colombiaGeo'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const inputCls = 'w-full bg-zinc-900 border border-gray-700 text-white p-3.5 rounded outline-none placeholder:text-gray-600'
@@ -22,7 +23,7 @@ const COMPRAR_ENDPOINT = { supply: 'estudios-supply-comprar', store: 'estudios-t
 // cart.vendorLock está seteado (ver SupplyCartContext.jsx/StoreCartContext.jsx).
 export default function PedidoSupplyVendorCheckout({ cart, module = 'supply' }) {
   const { items, vendorLock, total } = cart
-  const [form, setForm] = useState({ nombre: '', telefono: '', email: '', mensaje: '' })
+  const [form, setForm] = useState({ nombre: '', telefono: '', email: '', municipio: '', mensaje: '' })
   const [enviando, setEnviando] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -37,7 +38,11 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply' }) 
   }, [])
 
   const update = (campo, valor) => setForm(f => ({ ...f, [campo]: valor }))
-  const formCompleto = Boolean(form.telefono && form.email)
+  // "Ruta del Golfo" (2026-08-30) — el checkout de Store nunca pedía
+  // municipio de entrega; sin eso no hay forma de calcular el flete de un
+  // envío ni de saber si es reparto dentro del mismo municipio. Solo
+  // Store lo exige — Supply no cambia.
+  const formCompleto = Boolean(form.telefono && form.email && (module !== 'store' || form.municipio))
 
   const enviar = async (e) => {
     e.preventDefault()
@@ -62,6 +67,7 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply' }) 
           cliente_nombre: form.nombre || null,
           cliente_telefono: form.telefono,
           cliente_email: form.email,
+          ...(module === 'store' ? { cliente_municipio: form.municipio } : {}),
           mensaje: form.mensaje || null,
         }),
       })
@@ -110,6 +116,14 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply' }) 
             <input type="text" value={form.nombre} onChange={e => update('nombre', e.target.value)} placeholder="Tu nombre" className={inputCls} />
             <input type="tel" value={form.telefono} onChange={e => update('telefono', e.target.value)} placeholder="Tu WhatsApp o teléfono *" required className={inputCls} />
             <input type="email" value={form.email} onChange={e => update('email', e.target.value)} placeholder="Tu correo *" required className={inputCls} />
+            {module === 'store' && (
+              <select value={form.municipio} onChange={e => update('municipio', e.target.value)} required className={inputCls}>
+                <option value="">Tu municipio de entrega *</option>
+                {Object.entries(ZONAS_FLETE).map(([key, label]) => (
+                  <option key={key} value={key}>{label}</option>
+                ))}
+              </select>
+            )}
             <textarea value={form.mensaje} onChange={e => update('mensaje', e.target.value)} placeholder="Mensaje para el proveedor (opcional)" rows={2} className={inputCls} />
           </div>
 

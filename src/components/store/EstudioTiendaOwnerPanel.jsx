@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { X, ExternalLink, ChevronLeft, Pencil, ShoppingBag, Wallet, ChevronRight, Copy, Check } from 'lucide-react'
+import { X, ExternalLink, ChevronLeft, Pencil, ShoppingBag, Wallet, ChevronRight, Copy, Check, Truck } from 'lucide-react'
 import EditarPerfilTiendaSection from './EditarPerfilTiendaSection'
 import MisVentasTiendaSection from './MisVentasTiendaSection'
 import MisProductosTiendaSection from './MisProductosTiendaSection'
+import MisEnviosTiendaSection from './MisEnviosTiendaSection'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const SITE_URL = import.meta.env.VITE_SITE_URL
@@ -14,9 +15,11 @@ const OPCIONES = [
   { key: 'perfil', label: 'Editar mi perfil', icon: Pencil },
   { key: 'productos', label: 'Mis productos en Store', icon: ShoppingBag },
   { key: 'ventas', label: 'Mis ventas', icon: Wallet },
+  // "Ruta del Golfo" (2026-08-30) — elegir transportadora por compra.
+  { key: 'envios', label: 'Mis envíos', icon: Truck },
 ]
 
-const TITULOS = { perfil: 'Editar mi perfil', productos: 'Mis productos en Store', ventas: 'Mis ventas' }
+const TITULOS = { perfil: 'Editar mi perfil', productos: 'Mis productos en Store', ventas: 'Mis ventas', envios: 'Mis envíos' }
 
 // Panel de gestión de la tienda (Store multitenant, 2026-08-30) — lo que
 // abre el botón hamburguesa que solo ve el dueño en EstudioTiendaPage.jsx.
@@ -145,6 +148,10 @@ export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, up
 
         {vista === 'ventas' && (
           <MisVentasTiendaSection token={token} />
+        )}
+
+        {vista === 'envios' && (
+          <MisEnviosTiendaSection token={token} />
         )}
       </div>
     </div>

@@ -158,4 +158,13 @@ export default [
   // /store/estudio/:id, ver el bloque Store más abajo.
   route('tattoo-artist-colombia/tienda/unete', 'components/artistas/EstudioTiendaRegistroPage.jsx'),
   route('artista/:id', 'components/artistas/ArtistaLandingPage.jsx'),
+
+  // "Ruta del Golfo" — transportadoras multitenant (2026-08-30). Namespace
+  // propio, a propósito FUERA de /store y de /tattoo-artist-colombia —
+  // genérico desde el día uno para poder conectar con otros módulos más
+  // adelante (Jose: "que crezca más allá de Store el día de mañana"), sin
+  // marca ni navbar de ninguno de los dos.
+  route('transportadoras/unete', 'components/transportadoras/TransportadoraRegistroPage.jsx'),
+  route('transportadoras/verificar', 'components/transportadoras/TransportadoraVerificarPage.jsx'),
+  route('transportadoras/mi-panel', 'components/transportadoras/TransportadoraPanelPage.jsx'),
 ]
