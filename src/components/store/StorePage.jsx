@@ -6,10 +6,12 @@ import { Truck, Shield, Clock, Star, Award } from 'lucide-react'
 import NavbarStore from './NavbarStore'
 import FooterStore from './FooterStore'
 import TechMarquee from '../TechMarquee'
+import LlegamosDondeEstas from './LlegamosDondeEstas'
 import StoreProductCard from './StoreProductCard'
 import CoverflowRow from '../CoverflowRow'
 import { fetchCatalogCategoriaItems, toProdCard } from '../../hooks/useCatalog'
 import { CATEGORY_GROUPS } from '../../data/storeCategories'
+import { ZONAS_FLETE } from '../../data/colombiaGeo'
 const ogStore = '/og/store.webp'
 
 const STRIPE_PATTERN = {
@@ -178,8 +180,8 @@ export default function StorePage() {
               {/* STATS */}
               <div className="mt-8 md:mt-16 grid grid-cols-3 gap-6 max-w-xl mx-auto md:mx-0">
                 <div className="text-center md:text-left">
-                  <p className="text-3xl md:text-5xl font-black text-[#C9A84C]">4</p>
-                  <p className="text-gray-600 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Municipios</p>
+                  <p className="text-3xl md:text-5xl font-black text-[#C9A84C]">10</p>
+                  <p className="text-gray-600 uppercase tracking-[0.2em] text-[10px] md:text-xs mt-1">Zonas cubiertas</p>
                 </div>
                 <div className="text-center md:text-left border-x md:border-x-0 md:border-l border-gray-300 md:pl-6">
                   <p className="text-3xl md:text-5xl font-black text-[#C9A84C]">+6</p>
@@ -209,12 +211,9 @@ export default function StorePage() {
                     <p className="text-zinc-500 text-xs mt-0.5">Transportadoras verificadas</p>
                   </div>
                 </div>
-                <div className="space-y-2.5 mb-6">
-                  {[{name:'Chigorodó',time:'1–2 días'},{name:'Carepa',time:'1–2 días'},{name:'Apartadó',time:'1–2 días'},{name:'Turbo',time:'2–3 días'}].map(c => (
-                    <div key={c.name} className="flex items-center justify-between border-b border-zinc-900 pb-2">
-                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{c.name}</span>
-                      <span className="text-zinc-600 text-[10px] uppercase tracking-[0.12em]">{c.time}</span>
-                    </div>
+                <div className="flex flex-wrap gap-1.5 mb-6">
+                  {Object.values(ZONAS_FLETE).map((z) => (
+                    <span key={z} className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{z}</span>
                   ))}
                 </div>
                 <div className="border-t border-zinc-800 pt-6">
@@ -341,9 +340,7 @@ export default function StorePage() {
                 <p className="uppercase tracking-[0.25em] text-[#C9A84C]/70 text-[10px] mb-4">Logística · Cobertura</p>
                 <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Llegamos donde estás</h2>
 
-                {/* Urabá — cobertura directa */}
-                <p className="text-zinc-500 text-[10px] uppercase tracking-widest mb-3">Urabá — Entrega directa</p>
-                <div className="flex gap-3 mb-4">
+                <div className="flex gap-3 mb-5">
                   <div className="flex items-center justify-center bg-[#C9A84C]/10 border border-[#C9A84C]/30 rounded-xl p-2 flex-shrink-0 w-14 h-14">
                     <Truck size={26} className="text-[#C9A84C]" />
                   </div>
@@ -353,26 +350,14 @@ export default function StorePage() {
                   </div>
                 </div>
 
-                {/* Municipios con tiempos */}
-                <div className="flex flex-col gap-1.5 mb-3">
-                  {[
-                    { name: 'Chigorodó', time: '1–2 días' },
-                    { name: 'Carepa',    time: '1–2 días' },
-                    { name: 'Apartadó', time: '1–2 días' },
-                    { name: 'Turbo',    time: '2–3 días' },
-                  ].map(c => (
-                    <div key={c.name} className="flex items-center justify-between py-1.5 border-b border-zinc-900">
-                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{c.name}</span>
-                      <span className="text-zinc-600 text-[10px] uppercase tracking-[0.12em]">{c.time}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Corregimientos y sectores */}
-                <p className="text-zinc-700 text-[9px] uppercase tracking-widest mb-2">Corregimientos y sectores</p>
+                {/* Sin días por municipio a propósito — con varias
+                    transportadoras pudiendo conectarse, el tiempo real varía
+                    y en varios casos será más rápido que una ruta fija
+                    (2026-08-30, Jose). */}
+                <p className="text-zinc-500 text-[10px] uppercase tracking-widest mb-2">Zonas de cobertura</p>
                 <div className="flex flex-wrap gap-1.5 mb-5">
-                  {['Currulao','El Tres','Coldesa','Río Grande','El Reposo','Casa Verde'].map(z => (
-                    <span key={z} className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-zinc-800 text-zinc-500 bg-zinc-900">{z}</span>
+                  {Object.values(ZONAS_FLETE).map((z) => (
+                    <span key={z} className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{z}</span>
                   ))}
                 </div>
 
@@ -436,54 +421,10 @@ export default function StorePage() {
         </motion.section>
       </div>
 
-      {/* ── LLEGAMOS DONDE ESTÁS — solo móvil ── */}
-      <motion.section {...REVEAL} id="contacto" className="md:hidden bg-black text-white border-t border-zinc-900 px-6 py-8">
-        <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">Llegamos donde estás</h2>
-        <p className="text-zinc-400 text-sm leading-relaxed mb-5">
-          Entregas seguras con Ruta del Golfo, nuestra red de transportadoras verificadas en toda la región de Urabá.
-        </p>
-        <div className="flex gap-2 mb-5">
-          <div className="flex items-center justify-center bg-[#C9A84C]/10 border border-[#C9A84C]/30 rounded-xl flex-shrink-0 aspect-square w-16">
-            <Truck size={28} className="text-[#C9A84C]" />
-          </div>
-          <div className="flex flex-col justify-center bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 flex-1">
-            <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
-            <p className="text-zinc-500 text-[10px] mt-0.5">Transportadoras verificadas</p>
-          </div>
-        </div>
-        {/* Municipios con tiempos */}
-        <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">Urabá — Entrega directa</p>
-        <div className="flex flex-col gap-1 mb-3">
-          {[{n:'Chigorodó',t:'1–2 días'},{n:'Carepa',t:'1–2 días'},{n:'Apartadó',t:'1–2 días'},{n:'Turbo',t:'2–3 días'}].map(c => (
-            <div key={c.n} className="flex items-center justify-between border-b border-zinc-900 py-1">
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{c.n}</span>
-              <span className="text-zinc-600 text-[9px] uppercase tracking-widest">{c.t}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Corregimientos y sectores */}
-        <p className="text-zinc-700 text-[9px] uppercase tracking-widest mb-1.5">Corregimientos y sectores</p>
-        <div className="flex flex-wrap gap-1 mb-3">
-          {['Currulao','El Tres','Coldesa','Río Grande','El Reposo','Casa Verde'].map(c => (
-            <span key={c} className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full border border-zinc-800 text-zinc-600 bg-zinc-900">{c}</span>
-          ))}
-        </div>
-
-        {/* Nacional — sutil */}
-        <p className="text-zinc-700 text-[9px] leading-relaxed mb-4">
-          ¿Fuera de Urabá? También enviamos al resto de Colombia — tiempo y costo se coordinan al confirmar.
-        </p>
-
-        {/* Garantías */}
-        <div className="flex flex-col gap-2 mb-5">
-          {['Pago contraentrega disponible','Contacto directo con cada tienda','Cobertura en toda la región de Urabá'].map(g => (
-            <div key={g} className="flex items-center gap-2">
-              <span className="font-bold text-sm" style={{ color: '#C9A84C' }}>✓</span>
-              <span className="text-zinc-400 text-xs">{g}</span>
-            </div>
-          ))}
-        </div>
+      {/* ── LLEGAMOS DONDE ESTÁS — solo móvil, componente compartido con
+          las páginas de categoría (ver LlegamosDondeEstas.jsx) ── */}
+      <motion.section {...REVEAL} id="contacto">
+        <LlegamosDondeEstas />
       </motion.section>
 
       <TechMarquee />

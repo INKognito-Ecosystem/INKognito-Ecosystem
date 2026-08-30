@@ -2,6 +2,7 @@ import { Link, useLoaderData } from 'react-router-dom'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import NavbarCategoryStore from '../NavbarCategoryStore'
 import FooterStore from '../FooterStore'
+import LlegamosDondeEstas from '../LlegamosDondeEstas'
 import AccordionCardStore from '../AccordionCardStore'
 import { FaWhatsapp } from 'react-icons/fa'
 import StoreProductCard from '../StoreProductCard'
@@ -15,7 +16,7 @@ export async function loader() {
 
 export function meta() {
   const title = 'Teniguayos | INKognito Store — Urabá'
-  const description = 'Tenis multideporte para sintético, polvo de ladrillo y calle en Urabá. Versatilidad total, despacho con Eljach a toda la región. Pago contraentrega.'
+  const description = 'Tenis multideporte para sintético, polvo de ladrillo y calle en Urabá. Versatilidad total, despacho con Ruta del Golfo a toda la región. Pago contraentrega.'
   return [
     { title },
     { name: 'description', content: description },
@@ -42,7 +43,7 @@ const faqs = [
   },
   {
     q: '¿Cómo llegan a mi municipio y en cuánto tiempo?',
-    a: 'Despachamos con Eljach Mensajería Express, ruta diaria a toda la zona de Urabá. Entrega estimada de 1 a 2 días hábiles a Chigorodó, Carepa, Apartadó y Turbo. Pago contraentrega: pagas cuando recibes el paquete, sin adelantos.',
+    a: 'Despachamos con Ruta del Golfo, nuestra red de transportadoras verificadas en toda la región de Urabá — el tiempo exacto depende de la transportadora y la zona. Pago contraentrega: pagas cuando recibes el paquete, sin adelantos.',
   },
   {
     q: '¿Qué pasa si la talla no me queda?',
@@ -97,7 +98,7 @@ export default function TenisGuayoPage() {
           <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none mb-2 text-gray-900 text-center md:text-left">Teniguayos</h1>
           <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4 text-center md:text-left">Multisuperficie • Sintético • Calle</p>
           <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg text-justify [hyphens:auto]">
-            El calzado más versátil de Urabá: rinde en sintético, polvo de ladrillo y calle sin cambiar de par. La opción inteligente para quien juega donde se pueda y quiere un solo calzado para todo. Despachamos con Eljach a toda la región — pago contraentrega.
+            El calzado más versátil de Urabá: rinde en sintético, polvo de ladrillo y calle sin cambiar de par. La opción inteligente para quien juega donde se pueda y quiere un solo calzado para todo. Despachamos con Ruta del Golfo a toda la región — pago contraentrega.
           </p>
         </div>
       </div>
@@ -166,44 +167,7 @@ export default function TenisGuayoPage() {
         </div>
       </div>
 
-      {/* LLEGAMOS DONDE ESTÁS — solo móvil */}
-      <div className="md:hidden bg-black text-white border-t border-zinc-900 px-6 py-8">
-        <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">Llegamos donde estás</h2>
-        <p className="text-zinc-400 text-sm leading-relaxed mb-5">
-          Contamos con transportadora aliada para entregas seguras y con pago contraentrega en toda la región de Urabá.
-        </p>
-        <div className="flex gap-2 mb-5">
-          <div className="flex items-center justify-center bg-white rounded-xl p-1 flex-shrink-0 aspect-square w-16">
-            <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
-          </div>
-          <div className="flex flex-col justify-center bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 flex-1">
-            <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Eljach Mensajería Express</p>
-            <p className="text-zinc-500 text-[10px] mt-0.5">Entregas locales y contra entrega</p>
-          </div>
-        </div>
-        <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">Zonas de cobertura</p>
-        <div className="flex flex-wrap gap-1.5 mb-5">
-          {['Chigorodó','Carepa','Apartadó','Turbo','Currulao','El Tres','Coldesa','Río Grande','El Reposo','Casa Verde'].map(c => (
-            <span key={c} className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{c}</span>
-          ))}
-        </div>
-        <div className="flex flex-col gap-2 mb-5">
-          {['Pago contraentrega disponible','Atención personalizada por WhatsApp','Cobertura en toda la región de Urabá'].map(g => (
-            <div key={g} className="flex items-center gap-2">
-              <span className="font-bold text-sm" style={{ color: '#C9A84C' }}>✓</span>
-              <span className="text-zinc-400 text-xs">{g}</span>
-            </div>
-          ))}
-        </div>
-        <a
-          href="https://wa.me/573207911013?text=Hola%2C%20quiero%20hacer%20un%20pedido%20en%20INKognito%20Store"
-          target="_blank" rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 w-full py-4 rounded-xl border text-white font-bold uppercase tracking-[0.15em] text-sm transition-all duration-300 hover:shadow-[0_0_20px_rgba(201,168,76,0.3)]"
-          style={{ borderColor: 'rgba(201,168,76,0.4)', backgroundColor: 'rgba(201,168,76,0.04)' }}
-        >
-          📱 Hacer mi pedido ahora
-        </a>
-      </div>
+      <LlegamosDondeEstas />
 
       <FooterStore />
     </>
