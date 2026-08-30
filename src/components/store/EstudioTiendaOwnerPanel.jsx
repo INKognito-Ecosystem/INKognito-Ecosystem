@@ -76,19 +76,6 @@ export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, up
 
         {vista === 'menu' && (
           <div className="space-y-4">
-            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-              <label className={labelClass}>Link para tus clientes</label>
-              <p className="text-gray-500 text-[11px] mb-2.5">Comparte este — nunca el que usas tú para entrar aquí.</p>
-              <button
-                type="button"
-                onClick={copiarLinkPublico}
-                className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg bg-white border border-amber-300 text-left hover:border-amber-400 transition-colors"
-              >
-                <span className="text-xs font-mono text-gray-700 truncate">{linkPublico}</span>
-                {copiado ? <Check size={16} className="text-green-600 flex-shrink-0" /> : <Copy size={16} className="text-amber-600 flex-shrink-0" />}
-              </button>
-            </div>
-
             <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
               {OPCIONES.map(({ key, label, icon: Icon }) => (
                 <button
@@ -125,6 +112,19 @@ export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, up
               )}
               {mpStatus === 'ok' && <p className="text-green-600 text-[11px] font-bold mt-1.5">¡Mercado Pago conectado!</p>}
               {mpStatus === 'error' && <p className="text-red-600 text-[11px] font-bold mt-1.5">No pudimos conectar tu cuenta — intenta de nuevo.</p>}
+            </div>
+
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <label className={labelClass}>Link para tus clientes</label>
+              <p className="text-gray-500 text-[11px] mb-2.5">Comparte este — nunca el que usas tú para entrar aquí.</p>
+              <button
+                type="button"
+                onClick={copiarLinkPublico}
+                className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg bg-white border border-amber-300 text-left hover:border-amber-400 transition-colors"
+              >
+                <span className="text-xs font-mono text-gray-700 truncate">{linkPublico}</span>
+                {copiado ? <Check size={16} className="text-green-600 flex-shrink-0" /> : <Copy size={16} className="text-amber-600 flex-shrink-0" />}
+              </button>
             </div>
           </div>
         )}

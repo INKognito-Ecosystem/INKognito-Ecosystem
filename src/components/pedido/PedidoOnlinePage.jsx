@@ -368,8 +368,15 @@ export default function PedidoOnlinePage() {
               <p className="text-gray-500 text-sm">Intenta más tarde, o quita este producto del carrito.</p>
             )}
             <div className="mt-6">
-              <Link to={`/${module}`} className="text-gray-500 hover:text-gray-300 text-xs">
-                ← Volver a {MODULE_LABELS[module]}
+              {/* 2026-08-30 (Jose: "me mandó al ecosistema, y no a la
+                  tienda en la que estaba parado") — antes volvía siempre
+                  al módulo genérico (/store, /supply); ahora vuelve al
+                  perfil del proveedor específico del que venía el carrito. */}
+              <Link
+                to={module === 'store' ? `/store/${vendorInfo.slug || `estudio/${vendorInfo.id}`}` : `/supply/estudio/${vendorInfo.id}`}
+                className="text-gray-500 hover:text-gray-300 text-xs"
+              >
+                ← Volver a {vendorNombreVivo || MODULE_LABELS[module]}
               </Link>
             </div>
           </div>
