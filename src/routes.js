@@ -78,13 +78,25 @@ export default [
   route('store/guayos', 'components/store/categories/GuayosPage.jsx'),
   route('store/tenis-guayo', 'components/store/categories/TenisGuayoPage.jsx'),
   // Store multitenant (2026-08-29) — catálogo de una tienda conectada,
-  // mismo patrón que supply/estudio/:id de arriba.
+  // mismo patrón que supply/estudio/:id de arriba. store/estudio/:id se
+  // queda vivo como link viejo — el loader redirige a /store/:slug en
+  // cuanto la tienda tiene uno (2026-08-30, Jose: "que no sea tan largo,
+  // /store/nombredelatienda"). :slug SIEMPRE se declara DESPUÉS de las
+  // rutas fijas de arriba (ropa-dama, tiendas, etc.) — React Router
+  // prioriza el segmento estático sobre el dinámico sin importar el
+  // orden, pero además el backend (STORE_SLUGS_RESERVADOS en server.js)
+  // nunca deja que una tienda se registre con esos nombres, así que no
+  // hay choque real posible en ningún sentido.
   route('store/estudio/:id', 'components/store/EstudioTiendaPage.jsx'),
   route('store/compra/resultado', 'components/store/TiendaCompraResultadoPage.jsx'),
   // Directorio simple de tiendas — a propósito sin buscador/filtros, su
   // función es verificación independiente, no comparación (ver
   // TiendasDirectorioPage.jsx).
   route('store/tiendas', 'components/store/TiendasDirectorioPage.jsx'),
+  // id explícito — dos route() no pueden compartir el mismo archivo sin
+  // un id propio (React Router lo deriva del path del archivo por
+  // defecto, y ya está tomado por store/estudio/:id de arriba).
+  route('store/:slug', 'components/store/EstudioTiendaPage.jsx', { id: 'store-tienda-slug' }),
 
   // Gym
   route('gym', 'components/gym/GymPage.jsx'),

@@ -27,7 +27,7 @@ const PRODUCTO_VACIO_TIENDA = { product: '', variant: '', price: '', stock: '', 
 // en su propia pantalla dentro de EstudioTiendaOwnerPanel.jsx, la
 // navegación del panel YA decide cuándo se muestra, no hace falta un
 // segundo toggle acá adentro.
-export default function MisProductosTiendaSection({ token, cloud_name, upload_preset, estudioId }) {
+export default function MisProductosTiendaSection({ token, cloud_name, upload_preset, estudioId, estudioSlug }) {
   const [productos, setProductos] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [subiendo, setSubiendo] = useState(false)
@@ -227,7 +227,7 @@ export default function MisProductosTiendaSection({ token, cloud_name, upload_pr
           </p>
           {estudioId && (
             <a
-              href={`/store/estudio/${estudioId}`}
+              href={`/store/${estudioSlug || `estudio/${estudioId}`}`}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-1.5 mb-4 text-xs font-bold uppercase tracking-widest text-gray-700 hover:text-gray-900 underline underline-offset-2"

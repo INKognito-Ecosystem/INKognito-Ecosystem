@@ -38,7 +38,7 @@ export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, up
   // (con su ?token= en la barra del navegador); si la copia y comparte
   // tal cual, un cliente que la abra vería este mismo panel de gestión.
   // Este botón arma la versión limpia, sin token, para compartir.
-  const linkPublico = `${SITE_URL}/store/estudio/${estudio.id}`
+  const linkPublico = `${SITE_URL}/store/${estudio.slug || `estudio/${estudio.id}`}`
   const copiarLinkPublico = async () => {
     try {
       await navigator.clipboard.writeText(linkPublico)
@@ -140,7 +140,7 @@ export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, up
         )}
 
         {vista === 'productos' && (
-          <MisProductosTiendaSection token={token} cloud_name={cloud_name} upload_preset={upload_preset} estudioId={estudio.id} />
+          <MisProductosTiendaSection token={token} cloud_name={cloud_name} upload_preset={upload_preset} estudioId={estudio.id} estudioSlug={estudio.slug} />
         )}
 
         {vista === 'ventas' && (

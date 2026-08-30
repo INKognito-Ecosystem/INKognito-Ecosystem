@@ -19,9 +19,12 @@ export async function loader({ request }) {
     if (!res.ok) return { ok: false, error: data.error || 'No pudimos confirmar el correo.' }
     if (data.tokenEdicion) {
       // Store multitenant (2026-08-30) — una tienda no tiene dashboard
-      // aparte, su perfil y su catálogo son la misma página.
+      // aparte, su perfil y su catálogo son la misma página. Usa el
+      // link corto de una vez si ya tiene slug (siempre lo tiene desde
+      // el registro — ver POST /api/estudios-solicitud) en vez de
+      // pasar primero por /store/estudio/:id y esperar el redirect.
       const destino = data.tipo === 'tienda'
-        ? `/store/estudio/${data.id}?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`
+        ? `/store/${data.slug || `estudio/${data.id}`}?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`
         : `/tattoo-artist-colombia/estudio/mi-perfil?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`
       return redirect(destino)
     }

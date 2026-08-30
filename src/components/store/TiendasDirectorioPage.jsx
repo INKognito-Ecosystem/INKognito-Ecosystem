@@ -58,7 +58,7 @@ export default function TiendasDirectorioPage() {
             {tiendas.map((t) => (
               <Link
                 key={t.id}
-                to={`/store/estudio/${t.id}`}
+                to={`/store/${t.slug || `estudio/${t.id}`}`}
                 className="rounded-xl border border-gray-200 hover:border-[#C9A84C] bg-white overflow-hidden transition-colors"
               >
                 <div className="relative h-28 bg-gray-100">

@@ -33,14 +33,27 @@ export async function loader({ params, request }) {
   const token = url.searchParams.get('token')
   let estudio = null, products = [], esDueno = false, cloud_name = null, upload_preset = null
   try {
-    const [estudioRes, catalogo] = await Promise.all([
-      fetch(`${PANEL_URL}/api/estudios/${params.id}`),
-      fetchCatalogEstudio('store', params.id),
-    ])
+    const estudioRes = params.slug
+      ? await fetch(`${PANEL_URL}/api/estudios-por-slug/${encodeURIComponent(params.slug)}`)
+      : await fetch(`${PANEL_URL}/api/estudios/${params.id}`)
     estudio = estudioRes.ok ? await estudioRes.json() : null
-    products = catalogo.products
   } catch {
     estudio = null
+  }
+  // Link viejo con id numérico (2026-08-30, Jose: "que no sea tan largo")
+  // — si la tienda ya tiene slug, esa es la URL canónica; redirige
+  // preservando ?token= y cualquier otro parámetro (?bienvenida=1, ?mp=ok).
+  // fetchCatalogEstudio necesita el id numérico igual (filtra por
+  // inventory.estudio_id), así que se pide después, ya con `estudio`
+  // resuelto por cualquiera de los dos caminos.
+  if (params.id && estudio?.slug) {
+    throw redirect(`/store/${estudio.slug}${url.search}`)
+  }
+  if (estudio) {
+    try {
+      const catalogo = await fetchCatalogEstudio('store', estudio.id)
+      products = catalogo.products
+    } catch {}
   }
   if (estudio?.catalogo_url) {
     const externo = /^https?:\/\//.test(estudio.catalogo_url)
@@ -82,7 +95,7 @@ export function meta({ data }) {
   return [
     { title },
     { name: 'description', content: description },
-    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/store/estudio/${estudio.id}` },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/store/${estudio.slug || `estudio/${estudio.id}`}` },
   ]
 }
 
