@@ -111,6 +111,12 @@ export default function StoreProductCard({ product, category, sizes, showEstudio
   const proveedorId     = selectedVariant?.estudio_id ?? product._item?.estudio_id ?? null
   const proveedorNombre = selectedVariant?.estudio_nombre_display || selectedVariant?.estudio_nombre || product._item?.estudio_nombre_display || product._item?.estudio_nombre || null
   const proveedorMp     = selectedVariant?.estudio_mp_conectado ?? product._item?.estudio_mp_conectado ?? false
+  // Link corto (2026-08-30, Jose: "asegúrate de que sea el link correcto
+  // y no el que deja ver el botón hamburguesa") — el link viejo con id
+  // YA era seguro (nunca lleva ?token=, así que el botón de gestión
+  // nunca aparece), pero no era el link canónico bonito. Con slug ya
+  // apunta directo a la URL corta, sin depender del redirect.
+  const proveedorSlug   = selectedVariant?.estudio_slug ?? product._item?.estudio_slug ?? null
 
   const handleAdd = () => {
     const variantId = product._item?.variantes?.find(v => v.variant === selectedSize)?.id
@@ -153,7 +159,7 @@ export default function StoreProductCard({ product, category, sizes, showEstudio
         {showEstudioBadge && proveedorNombre && (
           proveedorId ? (
             <Link
-              to={`/store/estudio/${proveedorId}`}
+              to={`/store/${proveedorSlug || `estudio/${proveedorId}`}`}
               onClick={(e) => e.stopPropagation()}
               className="text-[8px] font-bold uppercase tracking-wide text-[#8a7127] hover:text-[#C9A84C] underline underline-offset-2 w-fit"
             >
