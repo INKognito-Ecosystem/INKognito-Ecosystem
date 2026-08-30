@@ -88,6 +88,7 @@ function PerfilSection({ token, transportadora, onSaved }) {
   const [form, setForm] = useState({
     nombre: transportadora.nombre || '', whatsapp: transportadora.whatsapp || '',
     bio: transportadora.bio || '', logo_url: transportadora.logo_url || '',
+    municipio: transportadora.municipio || '',
     zonas_cobertura: transportadora.zonas_cobertura || [],
   })
   const [subiendo, setSubiendo] = useState(false)
@@ -156,6 +157,15 @@ function PerfilSection({ token, transportadora, onSaved }) {
       <div>
         <label className={labelClass}>WhatsApp</label>
         <input className={inputClass} value={form.whatsapp} onChange={set('whatsapp')} />
+      </div>
+      <div>
+        <label className={labelClass}>Municipio de tu empresa</label>
+        <select className={inputClass} value={form.municipio} onChange={set('municipio')}>
+          <option value="">Selecciona...</option>
+          {Object.entries(ZONAS_FLETE).map(([key, label]) => (
+            <option key={key} value={key}>{label}</option>
+          ))}
+        </select>
       </div>
       <div>
         <label className={labelClass}>Zonas que cubres</label>

@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { useLoaderData } from 'react-router-dom'
 import { CheckCircle2, Camera, LoaderCircle } from 'lucide-react'
 import ZonasCoberturaCheckboxes from './ZonasCoberturaCheckboxes'
+import { ZONAS_FLETE } from '../../data/colombiaGeo'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const ACCENT = '#0057D9'
@@ -40,7 +41,7 @@ const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb
 export default function TransportadoraRegistroPage() {
   const { cloud_name, upload_preset, captchaA, captchaB } = useLoaderData()
   const [form, setForm] = useState({
-    nombre: '', whatsapp: '', email: '', bio: '', logo_url: '', zonas_cobertura: [],
+    nombre: '', whatsapp: '', email: '', bio: '', logo_url: '', municipio: '', zonas_cobertura: [],
     sitio_web: '', // honeypot
   })
   const [subiendo, setSubiendo] = useState(false)
@@ -75,6 +76,10 @@ export default function TransportadoraRegistroPage() {
     e.preventDefault()
     if (!form.nombre.trim() || !form.whatsapp.trim() || !form.email.trim()) {
       setError('Nombre, WhatsApp y correo son obligatorios.')
+      return
+    }
+    if (!form.municipio) {
+      setError('Elige el municipio donde está tu empresa.')
       return
     }
     if (!form.zonas_cobertura.length) {
@@ -160,6 +165,17 @@ export default function TransportadoraRegistroPage() {
               <label className={labelClass}>Correo *</label>
               <input required type="email" className={inputClass} value={form.email} onChange={set('email')} placeholder="tucorreo@ejemplo.com" />
               <p className="text-gray-400 text-[10px] mt-1">Te mandamos un link para confirmar el registro — sin esto no queda activo.</p>
+            </div>
+
+            <div>
+              <label className={labelClass}>Municipio de tu empresa *</label>
+              <select required className={inputClass} value={form.municipio} onChange={set('municipio')}>
+                <option value="">Selecciona...</option>
+                {Object.entries(ZONAS_FLETE).map(([key, label]) => (
+                  <option key={key} value={key}>{label}</option>
+                ))}
+              </select>
+              <p className="text-gray-400 text-[10px] mt-1">Dónde tienes tu sede — puede ser distinto de las zonas que cubres abajo.</p>
             </div>
 
             <div>

@@ -109,7 +109,12 @@ export default function MisEnviosTiendaSection({ token }) {
                     ) : (
                       <Truck size={14} className="text-gray-400 flex-shrink-0" />
                     )}
-                    {asignando === c.id ? '...' : t.nombre}
+                    {asignando === c.id ? '...' : (
+                      <span>
+                        {t.nombre}
+                        {t.municipio_base && <span className="font-normal text-gray-400"> · {ZONAS_FLETE[t.municipio_base] || t.municipio_base}</span>}
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -135,7 +140,10 @@ export default function MisEnviosTiendaSection({ token }) {
                   ) : (
                     <Truck size={14} className="text-gray-400 flex-shrink-0" />
                   )}
-                  <span className="text-xs font-bold text-gray-700">{e.transportadora_nombre}</span>
+                  <span className="text-xs font-bold text-gray-700">
+                    {e.transportadora_nombre}
+                    {e.transportadora_municipio && <span className="font-normal text-gray-400"> · {ZONAS_FLETE[e.transportadora_municipio] || e.transportadora_municipio}</span>}
+                  </span>
                 </div>
               </div>
             ))}
