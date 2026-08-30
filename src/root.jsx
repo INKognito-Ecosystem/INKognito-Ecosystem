@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect } from 'react'
-import { Meta, Links, Outlet, Scripts, useLocation, useNavigation, useNavigationType } from 'react-router'
+import { Meta, Links, Outlet, Scripts, useLocation, useMatches, useNavigation, useNavigationType } from 'react-router'
 import { HelmetProvider } from 'react-helmet-async'
 import { SupplyCartProvider } from './contexts/SupplyCartContext'
 import { StoreCartProvider } from './contexts/StoreCartContext'
@@ -240,6 +240,89 @@ function useAnalyticsScripts() {
   }, [])
 }
 
+const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+
+// Deriva el módulo de negocio del pathname — reglas fijas sobre el árbol
+// real de rutas (ver routes.js), no heurística. Todo lo de tatuajes vive
+// fuera de un prefijo único (/jhumaneztattoo, /tattoo-artist-colombia,
+// /artista/:id, /portafolio, /cuidados, /agendaenlinea), así que se listan
+// explícitamente; el resto de módulos ya vive bajo un solo prefijo.
+function moduloDesdeRuta(pathname) {
+  if (pathname === '/') return 'home'
+  if (pathname.startsWith('/supply')) return 'supply'
+  if (pathname.startsWith('/store')) return 'store'
+  if (pathname.startsWith('/gym')) return 'gym'
+  if (pathname.startsWith('/suplementos')) return 'suplementos'
+  if (
+    pathname.startsWith('/jhumaneztattoo') ||
+    pathname.startsWith('/tattoo-artist-colombia') ||
+    pathname.startsWith('/artista/') ||
+    pathname === '/portafolio' || pathname === '/cuidados' || pathname === '/agendaenlinea'
+  ) return 'tattoo'
+  return 'otro'
+}
+
+// UUID persistente en localStorage — sin cookies, sin consentimiento. Solo
+// distingue "visitas únicas" de "vistas totales" en el panel; no identifica
+// a la persona. Si localStorage falla (modo privado), el tracking sigue
+// funcionando, solo se pierde esa deduplicación para esa sesión.
+function visitorIdPersistente() {
+  try {
+    const KEY = 'inkognito_visitor_id'
+    let id = localStorage.getItem(KEY)
+    if (!id) { id = crypto.randomUUID(); localStorage.setItem(KEY, id) }
+    return id
+  } catch { return null }
+}
+
+// Registra cada cambio de ruta contra el panel — analítica propia
+// multitenant, admin-only en el panel (ver GET /api/stats/visitas).
+// Client-only a propósito (después de hidratar): no ve tráfico sin JS ni
+// bots — tradeoff aceptado, la meta es señal de interés humano real por
+// tenant, no volumen crudo de SEO (GA4, ya cargado por useAnalyticsScripts
+// arriba, sigue siendo la fuente para eso).
+function PageVisitTracker() {
+  const { pathname } = useLocation()
+  const matches = useMatches()
+
+  useEffect(() => {
+    // .data del match más profundo (la página hoja actual) — el resto de
+    // matches en la cadena (layouts) no llevan loader propio relevante acá.
+    const data = matches[matches.length - 1]?.data
+    const estudio = data?.estudio
+    const artista = data?.artista
+
+    // fuente solo se llena cuando la página coincide con una de las 3
+    // páginas de perfil que sí generan ingreso — mismos 3 valores que usa
+    // el UNION ALL de GET /api/stats/multitenant en el panel, para poder
+    // cruzar visitas contra ventas por (fuente, tenant_id) sin adivinar.
+    let fuente = null
+    if (estudio && pathname.startsWith('/store/')) fuente = 'tienda'
+    else if (estudio && pathname.startsWith('/supply/estudio/')) fuente = 'supply'
+    else if (artista && pathname.startsWith('/artista/')) fuente = 'reservas'
+
+    const payload = {
+      path: pathname,
+      modulo: moduloDesdeRuta(pathname),
+      fuente,
+      estudio_id: estudio?.id ?? null,
+      estudio_tipo: estudio?.tipo ?? null,
+      artista_id: artista?.id ?? null,
+      visitor_id: visitorIdPersistente(),
+    }
+
+    fetch(`${PANEL_URL}/api/visitas`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      keepalive: true, // que sobreviva si el usuario navega/cierra antes de resolver
+    }).catch(() => {}) // fire-and-forget — un fallo de tracking nunca debe verse por el visitante
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]) // NO 'matches' en deps — es un array nuevo en cada render aunque el loader data no cambie; solo debe disparar en cambio real de ruta
+
+  return null
+}
+
 export default function Root() {
   useAnalyticsScripts()
   return (
@@ -250,6 +333,7 @@ export default function Root() {
             <SupleCartProvider>
               <ScrollToHash />
               <NavigationProgress />
+              <PageVisitTracker />
               <Outlet />
             </SupleCartProvider>
           </GymCartProvider>
