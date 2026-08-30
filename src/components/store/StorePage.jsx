@@ -203,11 +203,11 @@ export default function StorePage() {
                 <p className="text-zinc-500 uppercase tracking-[0.3em] text-xs mb-4">
                   Logística · Cobertura
                 </p>
-                <div className="flex items-center gap-3 mb-6">
+                <div className="flex items-center gap-3 mb-6 bg-white rounded-xl px-4 py-3">
                   <img src={rutaDelGolfoLogo} alt="Ruta del Golfo" className="w-14 h-14 flex-shrink-0" />
                   <div>
-                    <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
-                    <p className="text-zinc-500 text-xs mt-0.5">Transportadoras verificadas</p>
+                    <p className="text-gray-900 text-sm font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
+                    <p className="text-gray-500 text-xs mt-0.5">Transportadoras verificadas</p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mb-6">
@@ -339,11 +339,11 @@ export default function StorePage() {
                 <p className="uppercase tracking-[0.25em] text-[#C9A84C]/70 text-[10px] mb-4">Logística · Cobertura</p>
                 <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Llegamos donde estás</h2>
 
-                <div className="flex gap-3 mb-5">
+                <div className="flex items-center gap-3 mb-5 bg-white rounded-xl px-4 py-3">
                   <img src={rutaDelGolfoLogo} alt="Ruta del Golfo" className="w-14 h-14 flex-shrink-0" />
-                  <div className="flex flex-col justify-center bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 flex-1">
-                    <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
-                    <p className="text-zinc-500 text-xs mt-0.5">Transportadoras verificadas</p>
+                  <div>
+                    <p className="text-gray-900 text-sm font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
+                    <p className="text-gray-500 text-xs mt-0.5">Transportadoras verificadas</p>
                   </div>
                 </div>
 

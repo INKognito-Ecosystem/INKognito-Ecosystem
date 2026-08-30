@@ -21,11 +21,11 @@ export default function LlegamosDondeEstas() {
       <p className="text-zinc-400 text-sm leading-relaxed mb-5">
         Entregas seguras con Ruta del Golfo, nuestra red de transportadoras verificadas en toda la región de Urabá.
       </p>
-      <div className="flex gap-2 mb-5">
-        <img src={rutaDelGolfoLogo} alt="Ruta del Golfo" className="w-16 h-16 flex-shrink-0" />
-        <div className="flex flex-col justify-center bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 flex-1">
-          <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
-          <p className="text-zinc-500 text-[10px] mt-0.5">Transportadoras verificadas</p>
+      <div className="flex items-center gap-3 mb-5 bg-white rounded-xl px-3 py-2.5">
+        <img src={rutaDelGolfoLogo} alt="Ruta del Golfo" className="w-14 h-14 flex-shrink-0" />
+        <div>
+          <p className="text-gray-900 text-xs font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
+          <p className="text-gray-500 text-[10px] mt-0.5">Transportadoras verificadas</p>
         </div>
       </div>
       <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">Zonas de cobertura</p>
