@@ -17,10 +17,6 @@ const GARANTIAS = ['Pago contraentrega disponible', 'Contacto directo con cada t
 export default function LlegamosDondeEstas() {
   return (
     <div className="md:hidden bg-black text-white border-t border-zinc-900 px-6 py-8">
-      <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">Llegamos donde estás</h2>
-      <p className="text-zinc-400 text-sm leading-relaxed mb-5">
-        Entregas seguras con Ruta del Golfo, nuestra red de transportadoras verificadas en toda la región de Urabá.
-      </p>
       <div className="flex items-center gap-3 mb-5 bg-white rounded-xl px-3 py-2.5">
         <img src={rutaDelGolfoLogo} alt="Ruta del Golfo" className="w-14 h-14 flex-shrink-0" />
         <div>
@@ -28,6 +24,10 @@ export default function LlegamosDondeEstas() {
           <p className="text-gray-500 text-[10px] mt-0.5">Transportadoras verificadas</p>
         </div>
       </div>
+      <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">Llegamos donde estás</h2>
+      <p className="text-zinc-400 text-sm leading-relaxed mb-5">
+        Entregas seguras con Ruta del Golfo, nuestra red de transportadoras verificadas en toda la región de Urabá.
+      </p>
       <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">Zonas de cobertura</p>
       <div className="flex flex-wrap gap-1.5 mb-5">
         {Object.values(ZONAS_FLETE).map((z) => (

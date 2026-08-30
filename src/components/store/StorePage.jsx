@@ -337,15 +337,16 @@ export default function StorePage() {
               {/* COL 1: LOGÍSTICA */}
               <div>
                 <p className="uppercase tracking-[0.25em] text-[#C9A84C]/70 text-[10px] mb-4">Logística · Cobertura</p>
-                <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Llegamos donde estás</h2>
 
-                <div className="flex items-center gap-3 mb-5 bg-white rounded-xl px-4 py-3">
+                <div className="flex items-center gap-3 mb-6 bg-white rounded-xl px-4 py-3">
                   <img src={rutaDelGolfoLogo} alt="Ruta del Golfo" className="w-14 h-14 flex-shrink-0" />
                   <div>
                     <p className="text-gray-900 text-sm font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
                     <p className="text-gray-500 text-xs mt-0.5">Transportadoras verificadas</p>
                   </div>
                 </div>
+
+                <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Llegamos donde estás</h2>
 
                 {/* Sin días por municipio a propósito — con varias
                     transportadoras pudiendo conectarse, el tiempo real varía
