@@ -3,7 +3,7 @@ import { Link, useLoaderData } from 'react-router-dom'
 import { CheckCircle2, Camera, LoaderCircle, Navigation, Check } from 'lucide-react'
 import NavbarCategoryStore from '../store/NavbarCategoryStore'
 import ComboboxBuscable from './ComboboxBuscable'
-import { DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO, municipioDesdeNombreIP } from '../../data/colombiaGeo'
+import { DEPARTAMENTOS_TIENDA, MUNICIPIOS_URABA_TIENDA, municipioDesdeNombreIP } from '../../data/colombiaGeo'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 // Dorado de Store (2026-08-30, corrección de Jose: "este es clonado de lo
@@ -70,7 +70,10 @@ export default function EstudioTiendaRegistroPage() {
   const set = (campo) => (e) => setForm((f) => ({ ...f, [campo]: e.target.value }))
   const setDepartamento = (nuevo) => setForm((f) => ({ ...f, departamento: nuevo, municipio: '' }))
   const setMunicipio = (nuevo) => setForm((f) => ({ ...f, municipio: nuevo }))
-  const municipiosDisponibles = MUNICIPIOS_POR_DEPARTAMENTO[form.departamento] || []
+  // Cobertura real de Store es solo Urabá de momento (2026-08-30, Jose)
+  // — la lista de municipios ya no depende del departamento elegido
+  // (solo hay uno posible), queda fija en los 4 municipios de la zona.
+  const municipiosDisponibles = MUNICIPIOS_URABA_TIENDA
 
   const usarMiUbicacion = () => {
     setUbicacionError(null)
@@ -197,7 +200,7 @@ export default function EstudioTiendaRegistroPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className={labelClass}>Departamento *</label>
-                <ComboboxBuscable value={form.departamento} onChange={setDepartamento} options={DEPARTAMENTOS} placeholder="Escribe para buscar..." inputClassName={inputClass} />
+                <ComboboxBuscable value={form.departamento} onChange={setDepartamento} options={DEPARTAMENTOS_TIENDA} placeholder="Escribe para buscar..." inputClassName={inputClass} />
               </div>
               <div>
                 <label className={labelClass}>Municipio *</label>

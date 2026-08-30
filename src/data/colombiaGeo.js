@@ -1200,6 +1200,18 @@ export const MUNICIPIOS_POR_DEPARTAMENTO = {
   ]
 }
 
+// Store — cobertura real de momento es solo Urabá (2026-08-30, Jose:
+// "ocultemos los demás departamentos, solo mostremos Antioquia, y solo
+// los municipios de la zona de Urabá") — usado en el registro y en el
+// perfil de tienda (EstudioTiendaRegistroPage.jsx / EditarPerfilTiendaSection.jsx)
+// en vez de los DEPARTAMENTOS/MUNICIPIOS_POR_DEPARTAMENTO completos que sí
+// usan artistas/estudios/empresas de Supply (esos sí tienen alcance
+// nacional). Nombres con la misma tilde exacta que ya usa el resto del
+// archivo (Apartadó/Chigorodó), para que coincidan con
+// MUNICIPIOS_POR_DEPARTAMENTO.Antioquia.
+export const DEPARTAMENTOS_TIENDA = ["Antioquia"]
+export const MUNICIPIOS_URABA_TIENDA = ["Apartadó", "Carepa", "Chigorodó", "Turbo"]
+
 export const DEPARTAMENTOS = [
   "Amazonas",
   "Antioquia",

@@ -50,6 +50,17 @@ export default function MisProductosTiendaSection({ token, cloud_name, upload_pr
     }).catch(() => {})
   }
 
+  // Bloquea el scroll de la página de atrás mientras cualquiera de los
+  // dos modales de acción (agregar/editar producto, "ojito" de ver
+  // producto) está abierto (2026-08-30, Jose: "por debajo se sigue
+  // haciendo scroll y no se queda fijo el modal") — mismo patrón que ya
+  // usa CartDrawerStore.jsx.
+  const hayModalAbierto = formAbierto || !!verGrupo
+  useEffect(() => {
+    document.body.style.overflow = hayModalAbierto ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [hayModalAbierto])
+
   useEffect(() => {
     fetch(`${PANEL_URL}/api/estudios-inventario-tienda-por-token?token=${encodeURIComponent(token)}`)
       .then((r) => r.ok ? r.json() : [])
