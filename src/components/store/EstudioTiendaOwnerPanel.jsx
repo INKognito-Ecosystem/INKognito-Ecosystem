@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { X, ExternalLink, ChevronLeft, Pencil, ShoppingBag, Wallet, ChevronRight } from 'lucide-react'
+import { X, ExternalLink, ChevronLeft, Pencil, ShoppingBag, Wallet, ChevronRight, Copy, Check } from 'lucide-react'
 import EditarPerfilTiendaSection from './EditarPerfilTiendaSection'
 import MisVentasTiendaSection from './MisVentasTiendaSection'
 import MisProductosTiendaSection from './MisProductosTiendaSection'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+const SITE_URL = import.meta.env.VITE_SITE_URL
 const MP_BLUE = '#3483FA'
 const MP_LOGO_URL = 'https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.21.0/mercadopago/logo__large@2x.png'
 const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb-1.5 block'
@@ -29,6 +30,22 @@ const TITULOS = { perfil: 'Editar mi perfil', productos: 'Mis productos en Store
 // estado + un botón, no amerita su propia pantalla).
 export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, upload_preset, mpStatus, onClose, onEstudioUpdate }) {
   const [vista, setVista] = useState('menu')
+  const [copiado, setCopiado] = useState(false)
+
+  // Link para clientes (2026-08-30, Jose: "no tiene forma de ver el link
+  // que deberá compartir para que las personas no vean ese botón") — la
+  // única URL a la que el dueño tiene acceso naturalmente es la SUYA
+  // (con su ?token= en la barra del navegador); si la copia y comparte
+  // tal cual, un cliente que la abra vería este mismo panel de gestión.
+  // Este botón arma la versión limpia, sin token, para compartir.
+  const linkPublico = `${SITE_URL}/store/estudio/${estudio.id}`
+  const copiarLinkPublico = async () => {
+    try {
+      await navigator.clipboard.writeText(linkPublico)
+      setCopiado(true)
+      setTimeout(() => setCopiado(false), 1500)
+    } catch {}
+  }
 
   // "Mis productos en Store" (2026-08-30, Jose) — es una tabla, se ve
   // apretada en el ancho angosto del drawer normal; en PC ocupa toda la
@@ -59,6 +76,19 @@ export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, up
 
         {vista === 'menu' && (
           <div className="space-y-4">
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <label className={labelClass}>Link para tus clientes</label>
+              <p className="text-gray-500 text-[11px] mb-2.5">Comparte este — nunca el que usas tú para entrar aquí.</p>
+              <button
+                type="button"
+                onClick={copiarLinkPublico}
+                className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg bg-white border border-amber-300 text-left hover:border-amber-400 transition-colors"
+              >
+                <span className="text-xs font-mono text-gray-700 truncate">{linkPublico}</span>
+                {copiado ? <Check size={16} className="text-green-600 flex-shrink-0" /> : <Copy size={16} className="text-amber-600 flex-shrink-0" />}
+              </button>
+            </div>
+
             <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
               {OPCIONES.map(({ key, label, icon: Icon }) => (
                 <button
