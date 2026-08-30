@@ -1,5 +1,5 @@
-import { Truck } from 'lucide-react'
 import { ZONAS_FLETE } from '../../data/colombiaGeo'
+import rutaDelGolfoLogo from '../../assets/milogo/rutadelgolfologo.png'
 
 const GARANTIAS = ['Pago contraentrega disponible', 'Contacto directo con cada tienda', 'Cobertura en toda la región de Urabá']
 
@@ -22,9 +22,7 @@ export default function LlegamosDondeEstas() {
         Entregas seguras con Ruta del Golfo, nuestra red de transportadoras verificadas en toda la región de Urabá.
       </p>
       <div className="flex gap-2 mb-5">
-        <div className="flex items-center justify-center bg-[#C9A84C]/10 border border-[#C9A84C]/30 rounded-xl flex-shrink-0 aspect-square w-16">
-          <Truck size={28} className="text-[#C9A84C]" />
-        </div>
+        <img src={rutaDelGolfoLogo} alt="Ruta del Golfo" className="w-16 h-16 flex-shrink-0" />
         <div className="flex flex-col justify-center bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 flex-1">
           <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
           <p className="text-zinc-500 text-[10px] mt-0.5">Transportadoras verificadas</p>

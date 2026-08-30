@@ -12,6 +12,7 @@ import CoverflowRow from '../CoverflowRow'
 import { fetchCatalogCategoriaItems, toProdCard } from '../../hooks/useCatalog'
 import { CATEGORY_GROUPS } from '../../data/storeCategories'
 import { ZONAS_FLETE } from '../../data/colombiaGeo'
+import rutaDelGolfoLogo from '../../assets/milogo/rutadelgolfologo.png'
 const ogStore = '/og/store.webp'
 
 const STRIPE_PATTERN = {
@@ -203,9 +204,7 @@ export default function StorePage() {
                   Logística · Cobertura
                 </p>
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="flex items-center justify-center bg-[#C9A84C]/10 border border-[#C9A84C]/30 rounded-xl p-2 flex-shrink-0 w-14 h-14">
-                    <Truck size={26} className="text-[#C9A84C]" />
-                  </div>
+                  <img src={rutaDelGolfoLogo} alt="Ruta del Golfo" className="w-14 h-14 flex-shrink-0" />
                   <div>
                     <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
                     <p className="text-zinc-500 text-xs mt-0.5">Transportadoras verificadas</p>
@@ -341,9 +340,7 @@ export default function StorePage() {
                 <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Llegamos donde estás</h2>
 
                 <div className="flex gap-3 mb-5">
-                  <div className="flex items-center justify-center bg-[#C9A84C]/10 border border-[#C9A84C]/30 rounded-xl p-2 flex-shrink-0 w-14 h-14">
-                    <Truck size={26} className="text-[#C9A84C]" />
-                  </div>
+                  <img src={rutaDelGolfoLogo} alt="Ruta del Golfo" className="w-14 h-14 flex-shrink-0" />
                   <div className="flex flex-col justify-center bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 flex-1">
                     <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
                     <p className="text-zinc-500 text-xs mt-0.5">Transportadoras verificadas</p>
