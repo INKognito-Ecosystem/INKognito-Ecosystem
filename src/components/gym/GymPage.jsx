@@ -106,6 +106,7 @@ export default function GymPage() {
   const [historiaModalOpen, setHistoriaModalOpen] = useState(false)
   const [precioPlanos, setPrecioPlanos]           = useState(10000)
   const [planoMuestras, setPlanoMuestras]         = useState([null, null, null])
+  const [creaciones, setCreaciones]               = useState(null)
 
   useEffect(() => {
     fetch(`${PANEL_URL}/api/visual/gym`)
@@ -119,6 +120,13 @@ export default function GymPage() {
         ])
       })
       .catch(() => {})
+    // "Mis creaciones" (2026-08-31) — antes era un placeholder fijo
+    // ("Próximamente"), sin backend ni forma de subir fotos. Ahora se
+    // administra desde el panel (Imágenes → Gym — Mis creaciones).
+    fetch(`${PANEL_URL}/api/gym-creaciones`)
+      .then(r => r.json())
+      .then(setCreaciones)
+      .catch(() => setCreaciones([]))
   }, [])
 
   const scrollToSection = (id) => {
@@ -297,10 +305,31 @@ export default function GymPage() {
             <div className="clear-both" />
           </div>
 
-          <div className="border border-gray-800 bg-gray-900/30 rounded-2xl py-20 text-center">
-            <p className="text-gray-500 uppercase tracking-[0.25em] text-sm mb-2">Próximamente</p>
-            <p className="text-gray-600 text-sm">Estamos cargando el portafolio de máquinas</p>
-          </div>
+          {creaciones?.length ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+              {creaciones.map((c) => (
+                <div key={c.id} className="group relative aspect-square overflow-hidden rounded-xl border border-gray-800 bg-gray-900">
+                  <img
+                    src={c.image_url}
+                    alt={c.titulo || 'Máquina construida por INKognito Gym'}
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  {(c.titulo || c.categoria) && (
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent px-3 py-2.5">
+                      {c.titulo && <p className="text-white text-xs md:text-sm font-bold leading-tight">{c.titulo}</p>}
+                      {c.categoria && <p className="text-gray-400 text-[10px] uppercase tracking-wide">{c.categoria}</p>}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="border border-gray-800 bg-gray-900/30 rounded-2xl py-20 text-center">
+              <p className="text-gray-500 uppercase tracking-[0.25em] text-sm mb-2">Próximamente</p>
+              <p className="text-gray-600 text-sm">Estamos cargando el portafolio de máquinas</p>
+            </div>
+          )}
         </div>
       </section>
 
