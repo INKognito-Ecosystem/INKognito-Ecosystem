@@ -88,6 +88,7 @@ function PerfilSection({ token, transportadora, onSaved }) {
   const [form, setForm] = useState({
     nombre: transportadora.nombre || '', whatsapp: transportadora.whatsapp || '',
     bio: transportadora.bio || '', logo_url: transportadora.logo_url || '',
+    facebook: transportadora.facebook || '',
     municipio: transportadora.municipio || '',
     zonas_cobertura: transportadora.zonas_cobertura || [],
   })
@@ -170,6 +171,10 @@ function PerfilSection({ token, transportadora, onSaved }) {
       <div>
         <label className={labelClass}>Zonas que cubres</label>
         <ZonasCoberturaCheckboxes value={form.zonas_cobertura} onChange={(zonas) => setForm((f) => ({ ...f, zonas_cobertura: zonas }))} />
+      </div>
+      <div>
+        <label className={labelClass}>Facebook</label>
+        <input className={inputClass} value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." />
       </div>
       <div>
         <label className={labelClass}>Bio</label>

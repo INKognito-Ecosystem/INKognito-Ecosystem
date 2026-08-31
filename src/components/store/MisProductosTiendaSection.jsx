@@ -7,13 +7,17 @@ const BTN = '#374151'
 const inputClass = 'w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-500 transition-colors'
 
 // Store multitenant (2026-08-29) — mismas 7 categorías fijas que ya usan
-// las páginas de categoría de Store (src/data/storeCategories.jsx), un
-// valor libre dejaría el producto sin ninguna página real donde
-// aparecer, mismo criterio que SUPPLY_CATEGORIAS en Supply. Sin
-// equivalente de SUPPLY_MARCAS/MARCAS_POR_CATEGORIA — Store no tiene
-// páginas curadas por marca como sí tiene Supply, así que `marca` acá es
-// texto libre en vez de una lista cerrada.
-const STORE_CATEGORIAS_ESTUDIO = ['Ropa Dama', 'Ropa Caballeros', 'Zapatos Deportivos', 'Zapatos Casuales', 'Guayos', 'Teniguayos', 'Ropa General']
+// las páginas de categoría de Store (src/data/storeCategories.jsx), para
+// que el producto también aparezca en la navegación por categoría del
+// sitio, mismo criterio que SUPPLY_CATEGORIAS en Supply. Sin equivalente
+// de SUPPLY_MARCAS/MARCAS_POR_CATEGORIA — Store no tiene páginas curadas
+// por marca como sí tiene Supply, así que `marca` acá es texto libre en
+// vez de una lista cerrada.
+// 'Accesorios' (2026-08-31, Jose: tiendas subirán gorras) no tiene página
+// de categoría propia todavía — el producto igual aparece en el catálogo
+// de SU tienda (EstudioTiendaPage.jsx filtra por lo que haya, no por esta
+// lista fija), solo no navega desde una card de categoría en el hub.
+const STORE_CATEGORIAS_ESTUDIO = ['Ropa Dama', 'Ropa Caballeros', 'Zapatos Deportivos', 'Zapatos Casuales', 'Guayos', 'Teniguayos', 'Ropa General', 'Accesorios']
 const PRODUCTO_VACIO_TIENDA = { product: '', variant: '', price: '', stock: '', categoria: STORE_CATEGORIAS_ESTUDIO[0], marca: '', image_url: '', descripcion: '', descripcionAuto: false, master_product_id: null }
 
 // "Mis productos en Store" (Store multitenant) — relocada 2026-08-30 al

@@ -41,7 +41,7 @@ const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb
 export default function TransportadoraRegistroPage() {
   const { cloud_name, upload_preset, captchaA, captchaB } = useLoaderData()
   const [form, setForm] = useState({
-    nombre: '', whatsapp: '', email: '', bio: '', logo_url: '', municipio: '', zonas_cobertura: [],
+    nombre: '', whatsapp: '', email: '', bio: '', logo_url: '', facebook: '', municipio: '', zonas_cobertura: [],
     sitio_web: '', // honeypot
   })
   const [subiendo, setSubiendo] = useState(false)
@@ -181,6 +181,11 @@ export default function TransportadoraRegistroPage() {
             <div>
               <label className={labelClass}>Zonas que cubres *</label>
               <ZonasCoberturaCheckboxes value={form.zonas_cobertura} onChange={(zonas) => setForm((f) => ({ ...f, zonas_cobertura: zonas }))} />
+            </div>
+
+            <div>
+              <label className={labelClass}>Facebook (opcional)</label>
+              <input className={inputClass} value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." />
             </div>
 
             <div>
