@@ -108,6 +108,7 @@ export default function GymPage() {
   const [planoMuestras, setPlanoMuestras]         = useState([null, null, null])
   const [creaciones, setCreaciones]               = useState(null)
   const [creacionSeleccionada, setCreacionSeleccionada] = useState(null)
+  const [creacionImgActiva, setCreacionImgActiva]       = useState(0)
 
   useEffect(() => {
     fetch(`${PANEL_URL}/api/visual/gym`)
@@ -312,8 +313,13 @@ export default function GymPage() {
                 <button
                   key={c.id}
                   type="button"
-                  onClick={() => c.descripcion && setCreacionSeleccionada(c)}
-                  className={`group relative aspect-square overflow-hidden rounded-xl border border-gray-800 bg-gray-900 text-left ${c.descripcion ? 'cursor-pointer' : 'cursor-default'}`}
+                  onClick={() => {
+                    const abre = c.descripcion || (c.image_urls?.length > 1)
+                    if (!abre) return
+                    setCreacionImgActiva(0)
+                    setCreacionSeleccionada(c)
+                  }}
+                  className={`group relative aspect-square overflow-hidden rounded-xl border border-gray-800 bg-gray-900 text-left ${(c.descripcion || c.image_urls?.length > 1) ? 'cursor-pointer' : 'cursor-default'}`}
                 >
                   <img
                     src={c.image_url}
@@ -442,9 +448,9 @@ export default function GymPage() {
         </div>
       )}
 
-      {/* MODAL DETALLE DE CREACIÓN — solo se abre si la pieza tiene
-          descripción (el título/categoría ya se ven en la card, sin
-          necesidad de un clic extra cuando no hay nada más que contar). */}
+      {/* MODAL DETALLE DE CREACIÓN — solo se abre si hay algo que no cabe
+          en la card: descripción, o más de una foto para ver en galería
+          (el título/categoría ya se ven en la card sin necesidad de clic). */}
       {creacionSeleccionada && (
         <div
           className="fixed inset-0 bg-black/80 z-[80] flex items-center justify-center p-4 overflow-y-auto"
@@ -460,10 +466,24 @@ export default function GymPage() {
               className="absolute top-4 right-5 text-white/70 hover:text-white text-2xl leading-none bg-black/40 rounded-full w-8 h-8 flex items-center justify-center border-none cursor-pointer z-10"
             >✕</button>
             <img
-              src={creacionSeleccionada.image_url}
+              src={creacionSeleccionada.image_urls?.[creacionImgActiva] || creacionSeleccionada.image_url}
               alt={creacionSeleccionada.titulo || 'Máquina construida por INKognito Gym'}
               className="w-full max-h-[45vh] object-cover"
             />
+            {creacionSeleccionada.image_urls?.length > 1 && (
+              <div className="flex gap-2 p-3 bg-gray-950">
+                {creacionSeleccionada.image_urls.map((url, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setCreacionImgActiva(i)}
+                    className={`w-14 h-14 rounded-lg overflow-hidden border-2 flex-shrink-0 ${i === creacionImgActiva ? 'border-white' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                  >
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
             <div className="p-6 md:p-8">
               {creacionSeleccionada.categoria && (
                 <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-2">{creacionSeleccionada.categoria}</p>
