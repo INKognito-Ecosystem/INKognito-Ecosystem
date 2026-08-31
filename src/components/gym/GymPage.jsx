@@ -107,6 +107,7 @@ export default function GymPage() {
   const [precioPlanos, setPrecioPlanos]           = useState(10000)
   const [planoMuestras, setPlanoMuestras]         = useState([null, null, null])
   const [creaciones, setCreaciones]               = useState(null)
+  const [creacionSeleccionada, setCreacionSeleccionada] = useState(null)
 
   useEffect(() => {
     fetch(`${PANEL_URL}/api/visual/gym`)
@@ -308,7 +309,12 @@ export default function GymPage() {
           {creaciones?.length ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
               {creaciones.map((c) => (
-                <div key={c.id} className="group relative aspect-square overflow-hidden rounded-xl border border-gray-800 bg-gray-900">
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => c.descripcion && setCreacionSeleccionada(c)}
+                  className={`group relative aspect-square overflow-hidden rounded-xl border border-gray-800 bg-gray-900 text-left ${c.descripcion ? 'cursor-pointer' : 'cursor-default'}`}
+                >
                   <img
                     src={c.image_url}
                     alt={c.titulo || 'Máquina construida por INKognito Gym'}
@@ -321,7 +327,7 @@ export default function GymPage() {
                       {c.categoria && <p className="text-gray-400 text-[10px] uppercase tracking-wide">{c.categoria}</p>}
                     </div>
                   )}
-                </div>
+                </button>
               ))}
             </div>
           ) : (
@@ -432,6 +438,41 @@ export default function GymPage() {
             </p>
 
             <p className="text-white font-black uppercase tracking-[0.15em] text-sm">— Jose</p>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DETALLE DE CREACIÓN — solo se abre si la pieza tiene
+          descripción (el título/categoría ya se ven en la card, sin
+          necesidad de un clic extra cuando no hay nada más que contar). */}
+      {creacionSeleccionada && (
+        <div
+          className="fixed inset-0 bg-black/80 z-[80] flex items-center justify-center p-4 overflow-y-auto"
+          onClick={() => setCreacionSeleccionada(null)}
+        >
+          <div
+            className="relative bg-gray-950 border border-gray-800 rounded-2xl w-full max-w-xl mx-auto my-auto overflow-hidden max-h-[90vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setCreacionSeleccionada(null)}
+              aria-label="Cerrar"
+              className="absolute top-4 right-5 text-white/70 hover:text-white text-2xl leading-none bg-black/40 rounded-full w-8 h-8 flex items-center justify-center border-none cursor-pointer z-10"
+            >✕</button>
+            <img
+              src={creacionSeleccionada.image_url}
+              alt={creacionSeleccionada.titulo || 'Máquina construida por INKognito Gym'}
+              className="w-full max-h-[45vh] object-cover"
+            />
+            <div className="p-6 md:p-8">
+              {creacionSeleccionada.categoria && (
+                <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-2">{creacionSeleccionada.categoria}</p>
+              )}
+              {creacionSeleccionada.titulo && (
+                <h3 className="text-white text-xl md:text-2xl font-black uppercase leading-tight mb-4">{creacionSeleccionada.titulo}</h3>
+              )}
+              <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-line">{creacionSeleccionada.descripcion}</p>
+            </div>
           </div>
         </div>
       )}
