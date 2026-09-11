@@ -34,6 +34,14 @@ export function SupleCartProvider({ children }) {
     })
   }, [])
 
+  // Reemplaza TODO el carrito por un único producto (2026-09-11) — ver
+  // comentario en StoreCartContext.jsx (mismo motivo).
+  const setSingleItem = useCallback((product, category) => {
+    const key = `${category}-${product.id}`
+    setItems([{ key, ...product, category, qty: 1 }])
+    return { ok: true }
+  }, [])
+
   const removeItem = useCallback((key) => {
     setItems(prev => prev.filter(i => i.key !== key))
   }, [])
@@ -56,7 +64,7 @@ export function SupleCartProvider({ children }) {
   }, 0)
 
   return (
-    <SupleCartContext.Provider value={{ items, addItem, removeItem, changeQty, clearCart, count, total }}>
+    <SupleCartContext.Provider value={{ items, addItem, setSingleItem, removeItem, changeQty, clearCart, count, total }}>
       {children}
     </SupleCartContext.Provider>
   )

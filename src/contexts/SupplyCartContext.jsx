@@ -55,6 +55,16 @@ export function SupplyCartProvider({ children }) {
     return { ok: true }
   }, [items])
 
+  // Reemplaza TODO el carrito por un único producto (2026-09-11) — ver
+  // comentario gemelo en StoreCartContext.jsx (mismo motivo, mismo bug
+  // corregido en ProductLandingPage.jsx).
+  const setSingleItem = useCallback((product, category, opts = {}) => {
+    const { estudioId = null, estudioNombre = null, mpConectado = false } = opts
+    const key = `${category}-${product.id}`
+    setItems([{ key, ...product, category, qty: 1, estudioId, estudioNombre, mpConectado }])
+    return { ok: true }
+  }, [])
+
   const vendorLock = items.find(i => i.estudioId) || null
 
   const removeItem = useCallback((key) => {
@@ -79,7 +89,7 @@ export function SupplyCartProvider({ children }) {
   }, 0)
 
   return (
-    <SupplyCartContext.Provider value={{ items, addItem, removeItem, changeQty, clearCart, count, total, vendorLock }}>
+    <SupplyCartContext.Provider value={{ items, addItem, setSingleItem, removeItem, changeQty, clearCart, count, total, vendorLock }}>
       {children}
     </SupplyCartContext.Provider>
   )

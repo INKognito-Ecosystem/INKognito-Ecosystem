@@ -237,12 +237,24 @@ export default function ProductLandingPage() {
       brand:       product.categoria || '',
       image:       imageUrl || '',
     }
-    // StoreCartContext.addItem toma (product, category, size, opts) — 4
-    // posicionales, distinto de SupplyCartContext.addItem (product,
-    // category, opts) — no pueden compartir una sola llamada posicional.
+    // Esta landing es un link directo de UN SOLO producto (pensada para
+    // publicidad) — el pedido que arma siempre debe ser justo ese
+    // producto, nunca lo que haya en el carrito compartido de Store/Supply/
+    // Gym/Suple de antes. addItem() suma sobre lo que ya había (y hace
+    // clearCart()+addItem() encadenados no alcanza: addItem lee `items`
+    // capturado en el render anterior, así que el chequeo de "un solo
+    // proveedor por carrito" seguía viendo el carrito viejo un instante
+    // después de limpiarlo). setSingleItem() reemplaza el carrito entero
+    // de una — reportado 2026-09-11 con "Tenis Runner Street": el checkout
+    // mostraba productos de otra sesión, y volver atrás + reintentar sumaba
+    // +1 a la cantidad del MISMO producto cada vez en vez de quedarse en
+    // $182.000.
+    // StoreCartContext.setSingleItem toma (product, category, size, opts) —
+    // 4 posicionales, distinto de SupplyCartContext (product, category,
+    // opts) — no pueden compartir una sola llamada posicional.
     const resultado = cartModule === 'store'
-      ? cart.addItem(productoParaCarrito, product.categoria, variant?.variant || '', vendorOpts)
-      : cart.addItem(productoParaCarrito, product.categoria, vendorOpts)
+      ? cart.setSingleItem(productoParaCarrito, product.categoria, variant?.variant || '', vendorOpts)
+      : cart.setSingleItem(productoParaCarrito, product.categoria, vendorOpts)
     if (resultado && resultado.ok === false) {
       setBloqueoMsg(`Ya tienes productos de ${resultado.nombreActual} en tu carrito — termina esa compra antes de agregar de otro proveedor.`)
       return

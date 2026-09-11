@@ -34,6 +34,16 @@ export function GymCartProvider({ children }) {
     })
   }, [])
 
+  // Reemplaza TODO el carrito por un único producto (2026-09-11) — ver
+  // comentario en StoreCartContext.jsx (mismo motivo). `opts` no se usa acá
+  // (Gym no tiene vendor-lock), pero se acepta para que ProductLandingPage
+  // pueda llamar a los 4 carritos con la misma forma.
+  const setSingleItem = useCallback((product, category) => {
+    const key = `${category}-${product.id}`
+    setItems([{ key, ...product, category, qty: 1 }])
+    return { ok: true }
+  }, [])
+
   const removeItem = useCallback((key) => {
     setItems(prev => prev.filter(i => i.key !== key))
   }, [])
@@ -56,7 +66,7 @@ export function GymCartProvider({ children }) {
   }, 0)
 
   return (
-    <GymCartContext.Provider value={{ items, addItem, removeItem, changeQty, clearCart, count, total }}>
+    <GymCartContext.Provider value={{ items, addItem, setSingleItem, removeItem, changeQty, clearCart, count, total }}>
       {children}
     </GymCartContext.Provider>
   )

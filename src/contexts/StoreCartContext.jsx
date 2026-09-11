@@ -50,6 +50,20 @@ export function StoreCartProvider({ children }) {
     return { ok: true }
   }, [items])
 
+  // Reemplaza TODO el carrito por un único producto (2026-09-11) — la usa
+  // la landing de un solo producto (ProductLandingPage, pensada para
+  // publicidad/links directos): a diferencia de addItem, no hereda ni
+  // consulta nada del carrito anterior (ni el vendor-lock contra lo viejo,
+  // ni cantidad acumulada de clics repetidos) — siempre deja el carrito en
+  // exactamente 1 unidad de este producto. Ver comentario en
+  // ProductLandingPage.jsx para el bug real que esto corrige.
+  const setSingleItem = useCallback((product, category, size = '', opts = {}) => {
+    const { estudioId = null, estudioNombre = null, mpConectado = false } = opts
+    const key = `${category}-${product.id}-${size}`
+    setItems([{ key, ...product, category, size, qty: 1, estudioId, estudioNombre, mpConectado }])
+    return { ok: true }
+  }, [])
+
   const vendorLock = items.find(i => i.estudioId) || null
 
   const removeItem = useCallback((key) => {
@@ -74,7 +88,7 @@ export function StoreCartProvider({ children }) {
   }, 0)
 
   return (
-    <StoreCartContext.Provider value={{ items, addItem, removeItem, changeQty, clearCart, count, total, vendorLock }}>
+    <StoreCartContext.Provider value={{ items, addItem, setSingleItem, removeItem, changeQty, clearCart, count, total, vendorLock }}>
       {children}
     </StoreCartContext.Provider>
   )
