@@ -9,6 +9,13 @@ const ACCENT = '#0057D9'
 const inputClass = 'w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-500 transition-colors'
 const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb-1.5 block'
 
+// "Perfil completo" — Fase 2 del onboarding (2026-09-11, propuesta
+// aprobada). Nada de esto es obligatorio: la transportadora ya quedó
+// activa solo con lo de arriba (Fase 1), esto es para que su ficha
+// pública se vea más completa cuando tenga tiempo de llenarlo.
+const TIPOS_CARGA_OPCIONES = ['Documentos', 'Paquetes', 'Carga pesada']
+const TIPOS_VEHICULO_OPCIONES = ['Moto', 'Camioneta', 'Camión']
+
 // Panel de la transportadora — "Ruta del Golfo" (2026-08-30). A diferencia
 // de EstudioTiendaPage.jsx (catálogo público + panel de dueño fusionados),
 // una transportadora no tiene página pública que nadie navega — esta
@@ -91,6 +98,14 @@ function PerfilSection({ token, transportadora, onSaved }) {
     facebook: transportadora.facebook || '',
     municipio: transportadora.municipio || '',
     zonas_cobertura: transportadora.zonas_cobertura || [],
+    // Perfil completo (Fase 2) — todo opcional.
+    nit: transportadora.nit || '',
+    direccion: transportadora.direccion || '',
+    tipos_carga: transportadora.tipos_carga || [],
+    tipos_vehiculo: transportadora.tipos_vehiculo || [],
+    horario_texto: transportadora.horario_texto || '',
+    tiempo_entrega_estimado: transportadora.tiempo_entrega_estimado || '',
+    acepta_contraentrega: transportadora.acepta_contraentrega !== false,
   })
   const [subiendo, setSubiendo] = useState(false)
   const [guardando, setGuardando] = useState(false)
@@ -98,6 +113,10 @@ function PerfilSection({ token, transportadora, onSaved }) {
   const [error, setError] = useState(null)
 
   const set = (campo) => (e) => setForm((f) => ({ ...f, [campo]: e.target.value }))
+  const toggleEnLista = (campo, valor) => setForm((f) => ({
+    ...f,
+    [campo]: f[campo].includes(valor) ? f[campo].filter((v) => v !== valor) : [...f[campo], valor],
+  }))
 
   const subirFoto = async (file) => {
     if (!file) return
@@ -179,6 +198,70 @@ function PerfilSection({ token, transportadora, onSaved }) {
       <div>
         <label className={labelClass}>Bio</label>
         <textarea rows={3} className={inputClass} value={form.bio} onChange={set('bio')} />
+      </div>
+
+      {/* Perfil completo — Fase 2, todo opcional (2026-09-11). Separado con un
+          título propio para que quede claro que lo de arriba ya es
+          suficiente y esto es un extra, no un segundo formulario obligatorio. */}
+      <div className="pt-5 mt-2 border-t border-gray-200">
+        <p className="text-sm font-black uppercase tracking-wide text-gray-900 mb-1">Perfil completo</p>
+        <p className="text-gray-400 text-xs mb-4">Opcional — mientras más completes, más confianza le da tu ficha a quien te elige.</p>
+
+        <div className="space-y-4">
+          <div>
+            <label className={labelClass}>Tipos de carga que aceptas</label>
+            <div className="flex flex-wrap gap-2">
+              {TIPOS_CARGA_OPCIONES.map((op) => (
+                <label key={op} className="flex items-center gap-1.5 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 cursor-pointer">
+                  <input type="checkbox" checked={form.tipos_carga.includes(op)} onChange={() => toggleEnLista('tipos_carga', op)} className="accent-gray-700" />
+                  {op}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className={labelClass}>Tipos de vehículo</label>
+            <div className="flex flex-wrap gap-2">
+              {TIPOS_VEHICULO_OPCIONES.map((op) => (
+                <label key={op} className="flex items-center gap-1.5 text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 cursor-pointer">
+                  <input type="checkbox" checked={form.tipos_vehiculo.includes(op)} onChange={() => toggleEnLista('tipos_vehiculo', op)} className="accent-gray-700" />
+                  {op}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className={labelClass}>Horario habitual</label>
+            <input className={inputClass} value={form.horario_texto} onChange={set('horario_texto')} placeholder="Ej: Lunes a sábado, 7am – 5pm" />
+          </div>
+
+          <div>
+            <label className={labelClass}>Tiempo estimado de entrega</label>
+            <input className={inputClass} value={form.tiempo_entrega_estimado} onChange={set('tiempo_entrega_estimado')} placeholder="Ej: 24 a 48 horas" />
+          </div>
+
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.acepta_contraentrega}
+              onChange={(e) => setForm((f) => ({ ...f, acepta_contraentrega: e.target.checked }))}
+              className="w-4 h-4 accent-gray-700"
+            />
+            <span className="text-sm text-gray-700">Acepto pago contraentrega</span>
+          </label>
+
+          <div>
+            <label className={labelClass}>Dirección de tu oficina (si tienes)</label>
+            <input className={inputClass} value={form.direccion} onChange={set('direccion')} />
+          </div>
+
+          <div>
+            <label className={labelClass}>NIT (opcional)</label>
+            <input className={inputClass} value={form.nit} onChange={set('nit')} />
+          </div>
+        </div>
       </div>
 
       {!transportadora.activo && (
