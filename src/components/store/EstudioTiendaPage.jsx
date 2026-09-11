@@ -1,6 +1,6 @@
 import { useLoaderData, redirect, useNavigate, useSearchParams } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
-import { CheckCircle2, MapPin, Menu } from 'lucide-react'
+import { CheckCircle2, MapPin, Menu, Bell } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import FooterStore from './FooterStore'
 import NavbarCategoryStore from './NavbarCategoryStore'
@@ -132,6 +132,38 @@ export default function EstudioTiendaPage() {
     setTooltipVisible(false)
   }
 
+  // Campana de notificaciones (2026-09-11, Jose: "el botón hamburguesa...
+  // debe funcionar como campana que notifica"). Sin websockets — polling
+  // simple cada 25s mientras el dueño tiene la página abierta, mismo
+  // criterio de "no hace falta más que eso" ya usado en otras partes del
+  // proyecto. onNotifVista limpia el contador localmente de una (no
+  // espera la respuesta) y avisa al backend en paralelo.
+  const [notif, setNotif] = useState({ ventas_nuevas: 0, envios_actualizados: 0 })
+  useEffect(() => {
+    if (!esDueno || !token) return
+    let cancelado = false
+    const cargarNotif = () => {
+      fetch(`${PANEL_URL}/api/estudios-notificaciones-por-token?token=${encodeURIComponent(token)}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => { if (data && !cancelado) setNotif(data) })
+        .catch(() => {})
+    }
+    cargarNotif()
+    const intervalo = setInterval(cargarNotif, 25000)
+    return () => { cancelado = true; clearInterval(intervalo) }
+  }, [esDueno, token])
+
+  const marcarNotifVista = (tipo) => {
+    setNotif((n) => ({ ...n, [tipo === 'ventas' ? 'ventas_nuevas' : 'envios_actualizados']: 0 }))
+    fetch(`${PANEL_URL}/api/estudios-notificaciones-vistas-por-token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, tipo }),
+    }).catch(() => {})
+  }
+
+  const totalNotif = (notif.ventas_nuevas || 0) + (notif.envios_actualizados || 0)
+
   // Recordar el acceso del dueño (2026-08-30) — mismo patrón exacto que
   // EstudioEditarPerfilPage.jsx: si esta carga trajo un token válido, se
   // guarda para no tener que volver a pegarlo cada vez que el dueño
@@ -217,10 +249,15 @@ export default function EstudioTiendaPage() {
                   <button
                     type="button"
                     onClick={() => { setPanelAbierto(true); cerrarTooltip() }}
-                    aria-label="Gestionar mi tienda"
-                    className="flex items-center justify-center w-9 h-9 rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                    aria-label={totalNotif > 0 ? `Gestionar mi tienda — ${totalNotif} notificación${totalNotif === 1 ? '' : 'es'} nueva${totalNotif === 1 ? '' : 's'}` : 'Gestionar mi tienda'}
+                    className="relative flex items-center justify-center w-9 h-9 rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
                   >
-                    <Menu size={20} />
+                    {totalNotif > 0 ? <Bell size={20} className="text-amber-600" /> : <Menu size={20} />}
+                    {totalNotif > 0 && (
+                      <span className="absolute top-0.5 right-0.5 min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full bg-red-600 text-white text-[9px] font-black leading-none">
+                        {totalNotif > 9 ? '9+' : totalNotif}
+                      </span>
+                    )}
                   </button>
                   {tooltipVisible && (
                     <div className="absolute z-20 top-full right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left">
@@ -334,6 +371,8 @@ export default function EstudioTiendaPage() {
           cloud_name={cloud_name}
           upload_preset={upload_preset}
           mpStatus={searchParams.get('mp')}
+          notif={notif}
+          onNotifVista={marcarNotifVista}
           onClose={() => setPanelAbierto(false)}
           onEstudioUpdate={(nuevo) => setEstudio((e) => ({ ...e, ...nuevo }))}
         />

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { X, ExternalLink, ChevronLeft, Pencil, ShoppingBag, Wallet, ChevronRight, Copy, Check, Truck } from 'lucide-react'
 import EditarPerfilTiendaSection from './EditarPerfilTiendaSection'
 import MisVentasTiendaSection from './MisVentasTiendaSection'
@@ -31,9 +31,26 @@ const TITULOS = { perfil: 'Editar mi perfil', productos: 'Mis productos en Store
 // NavbarArtistas.jsx), cada opción es su propia pantalla con botón
 // "← Volver". Mercado Pago se queda en el menú mismo (es solo un
 // estado + un botón, no amerita su propia pantalla).
-export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, upload_preset, mpStatus, onClose, onEstudioUpdate }) {
-  const [vista, setVista] = useState('menu')
+export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, upload_preset, mpStatus, notif, onNotifVista, onClose, onEstudioUpdate }) {
+  // Campana de notificaciones (2026-09-11, Jose) — si al abrir el panel
+  // hay avisos de UN SOLO tipo pendiente, aterriza directo en esa
+  // pantalla en vez del menú (con las dos a la vez, no hay una respuesta
+  // obvia de a cuál ir primero, así que se queda en el menú con ambas
+  // marcadas). El useEffect de abajo limpia el contador apenas se
+  // aterriza o se navega a esa sección, sea por el salto automático o
+  // por un clic normal en el menú.
+  const [vista, setVista] = useState(() => {
+    const hayVentas = (notif?.ventas_nuevas || 0) > 0
+    const hayEnvios = (notif?.envios_actualizados || 0) > 0
+    if (hayVentas && !hayEnvios) return 'ventas'
+    if (hayEnvios && !hayVentas) return 'envios'
+    return 'menu'
+  })
   const [copiado, setCopiado] = useState(false)
+
+  useEffect(() => {
+    if (vista === 'ventas' || vista === 'envios') onNotifVista?.(vista)
+  }, [vista])
 
   // Link para clientes (2026-08-30, Jose: "no tiene forma de ver el link
   // que deberá compartir para que las personas no vean ese botón") — la
@@ -80,18 +97,26 @@ export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, up
         {vista === 'menu' && (
           <div className="space-y-4">
             <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
-              {OPCIONES.map(({ key, label, icon: Icon }) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setVista(key)}
-                  className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors"
-                >
-                  <Icon size={16} className="text-gray-400 flex-shrink-0" />
-                  <span className="flex-1 text-sm font-bold text-gray-900">{label}</span>
-                  <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
-                </button>
-              ))}
+              {OPCIONES.map(({ key, label, icon: Icon }) => {
+                const conteoNotif = key === 'ventas' ? notif?.ventas_nuevas : key === 'envios' ? notif?.envios_actualizados : 0
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setVista(key)}
+                    className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors"
+                  >
+                    <Icon size={16} className="text-gray-400 flex-shrink-0" />
+                    <span className="flex-1 text-sm font-bold text-gray-900">{label}</span>
+                    {conteoNotif > 0 && (
+                      <span className="min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-600 text-white text-[10px] font-black leading-none flex-shrink-0">
+                        {conteoNotif > 9 ? '9+' : conteoNotif}
+                      </span>
+                    )}
+                    <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
+                  </button>
+                )
+              })}
             </div>
 
             <div className="border-t border-gray-200 pt-4">
