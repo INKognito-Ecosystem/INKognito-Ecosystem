@@ -56,7 +56,7 @@ export default function SupplyProveedoresPage() {
     <div className="min-h-screen bg-gray-950 text-white">
       <NavbarCategory pageName="Proveedores" />
 
-      <div className="relative overflow-hidden pt-20 md:pt-28 pb-10 px-6">
+      <div className="relative overflow-hidden pt-20 md:pt-28 pb-4 px-6">
         <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
         <div className="relative z-10 max-w-5xl mx-auto text-center">
           <p className="uppercase tracking-[0.25em] text-blue-400/70 text-xs mb-2">INKognito Supply</p>
@@ -67,12 +67,12 @@ export default function SupplyProveedoresPage() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-6 md:py-10">
+      <div className="max-w-5xl mx-auto px-6 pb-6 md:pb-10">
         {proveedores.length === 0 ? (
           <p className="text-zinc-600 text-sm text-center py-10">Todavía no hay proveedores registrados.</p>
         ) : (
           <>
-            <div className="relative max-w-sm mx-auto mb-8">
+            <div className="relative max-w-sm mx-auto mt-4 mb-6">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
               <input
                 type="text"
@@ -85,42 +85,33 @@ export default function SupplyProveedoresPage() {
             {proveedoresFiltrados.length === 0 ? (
               <p className="text-zinc-600 text-sm text-center py-10">Ningún proveedor coincide con "{busqueda}".</p>
             ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {proveedoresFiltrados.map((p) => (
-              <Link
-                key={p.id}
-                to={`/supply/estudio/${p.id}`}
-                className="rounded-xl border border-zinc-800 hover:border-blue-500 bg-zinc-950 overflow-hidden transition-colors"
-              >
-                <div className="relative h-28 bg-zinc-900">
-                  {p.foto_portada ? (
-                    <img src={cloudinaryFill(p.foto_portada, 250, 150)} alt="" className="w-full h-full object-cover" loading="lazy" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-zinc-700 text-3xl font-black">{p.nombre_supply?.[0]?.toUpperCase() || '?'}</div>
-                  )}
-                  <span className="absolute top-2 left-2 flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full text-white bg-blue-600">
-                    <ShieldCheck size={10} /> Verificado
-                  </span>
-                </div>
-                <div className="p-3">
-                  <div className="flex items-center gap-2 flex-nowrap">
-                    <div className="w-7 h-7 rounded-full overflow-hidden bg-zinc-900 flex-shrink-0 flex items-center justify-center">
+              <div className="max-w-xl mx-auto flex flex-col divide-y divide-zinc-800 border-t border-b border-zinc-800">
+                {proveedoresFiltrados.map((p) => (
+                  <Link
+                    key={p.id}
+                    to={`/supply/estudio/${p.id}`}
+                    className="flex items-center gap-3 py-3 hover:bg-zinc-900 transition-colors"
+                  >
+                    <div className="w-11 h-11 rounded-full overflow-hidden bg-zinc-900 border border-zinc-800 flex-shrink-0 flex items-center justify-center">
                       {p.logo_url
-                        ? <img src={cloudinaryFill(p.logo_url, 80, 80)} alt={p.nombre_supply} className="w-full h-full object-cover" loading="lazy" />
-                        : <span className="text-zinc-700 text-[10px] font-black">{p.nombre_supply?.[0]?.toUpperCase() || '?'}</span>}
+                        ? <img src={cloudinaryFill(p.logo_url, 100, 100)} alt={p.nombre_supply} className="w-full h-full object-cover" loading="lazy" />
+                        : <span className="text-zinc-600 text-sm font-black">{p.nombre_supply?.[0]?.toUpperCase() || '?'}</span>}
                     </div>
-                    <p className="font-black uppercase text-xs leading-tight truncate text-white min-w-0 flex-1">{p.nombre_supply}</p>
-                  </div>
-                  {p.municipio && (
-                    <p className="text-zinc-500 text-[10px] uppercase tracking-wide mt-1.5 flex items-center gap-1 truncate">
-                      <MapPin size={10} className="flex-shrink-0" />
-                      {p.municipio}{p.departamento ? `, ${p.departamento}` : ''}
-                    </p>
-                  )}
-                </div>
-              </Link>
-            ))}
-          </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-black uppercase text-sm text-white truncate flex items-center gap-1.5">
+                        {p.nombre_supply}
+                        <ShieldCheck size={12} className="text-blue-400 flex-shrink-0" />
+                      </p>
+                      {p.municipio && (
+                        <p className="text-zinc-500 text-xs flex items-center gap-1 truncate mt-0.5">
+                          <MapPin size={10} className="flex-shrink-0" />
+                          {p.municipio}{p.departamento ? `, ${p.departamento}` : ''}
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
             )}
           </>
         )}
