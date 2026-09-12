@@ -42,15 +42,22 @@ export function meta() {
 // ya usado en el buscador de producto/proveedor de SupplyCategoryPage.jsx.
 const normaliza = (s) => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 
+// Mismo "Cargar más" que SupplyCategoryPage.jsx — no renderizar todos los
+// proveedores de una si el directorio crece.
+const PAGE_SIZE = 12
+
 export default function SupplyProveedoresPage() {
   const { proveedores } = useLoaderData()
   const [busqueda, setBusqueda] = useState('')
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   const proveedoresFiltrados = useMemo(() => {
     if (!busqueda.trim()) return proveedores
     const q = normaliza(busqueda)
     return proveedores.filter(p => normaliza(p.nombre_supply).includes(q) || normaliza(p.municipio).includes(q))
   }, [proveedores, busqueda])
+
+  const handleBusqueda = (e) => { setBusqueda(e.target.value); setVisibleCount(PAGE_SIZE) }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -77,7 +84,7 @@ export default function SupplyProveedoresPage() {
               <input
                 type="text"
                 value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
+                onChange={handleBusqueda}
                 placeholder="Buscar por nombre o ciudad"
                 className="w-full bg-zinc-900 border border-zinc-800 text-zinc-300 text-sm rounded-lg pl-9 pr-3 py-2.5 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500"
               />
@@ -85,33 +92,46 @@ export default function SupplyProveedoresPage() {
             {proveedoresFiltrados.length === 0 ? (
               <p className="text-zinc-600 text-sm text-center py-10">Ningún proveedor coincide con "{busqueda}".</p>
             ) : (
-              <div className="max-w-xl mx-auto flex flex-col divide-y divide-zinc-800 border-t border-b border-zinc-800">
-                {proveedoresFiltrados.map((p) => (
-                  <Link
-                    key={p.id}
-                    to={`/supply/estudio/${p.id}`}
-                    className="flex items-center gap-3 py-3 hover:bg-zinc-900 transition-colors"
-                  >
-                    <div className="w-11 h-11 rounded-full overflow-hidden bg-zinc-900 border border-zinc-800 flex-shrink-0 flex items-center justify-center">
-                      {p.logo_url
-                        ? <img src={cloudinaryFill(p.logo_url, 100, 100)} alt={p.nombre_supply} className="w-full h-full object-cover" loading="lazy" />
-                        : <span className="text-zinc-600 text-sm font-black">{p.nombre_supply?.[0]?.toUpperCase() || '?'}</span>}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-black uppercase text-sm text-white truncate flex items-center gap-1.5">
-                        {p.nombre_supply}
-                        <ShieldCheck size={12} className="text-blue-400 flex-shrink-0" />
-                      </p>
-                      {p.municipio && (
-                        <p className="text-zinc-500 text-xs flex items-center gap-1 truncate mt-0.5">
-                          <MapPin size={10} className="flex-shrink-0" />
-                          {p.municipio}{p.departamento ? `, ${p.departamento}` : ''}
+              <>
+                <div className="max-w-xl mx-auto flex flex-col divide-y divide-zinc-800 border-t border-b border-zinc-800">
+                  {proveedoresFiltrados.slice(0, visibleCount).map((p) => (
+                    <Link
+                      key={p.id}
+                      to={`/supply/estudio/${p.id}`}
+                      className="flex items-center gap-3 py-3 hover:bg-zinc-900 transition-colors"
+                    >
+                      <div className="w-11 h-11 rounded-full overflow-hidden bg-zinc-900 border border-zinc-800 flex-shrink-0 flex items-center justify-center">
+                        {p.logo_url
+                          ? <img src={cloudinaryFill(p.logo_url, 100, 100)} alt={p.nombre_supply} className="w-full h-full object-cover" loading="lazy" />
+                          : <span className="text-zinc-600 text-sm font-black">{p.nombre_supply?.[0]?.toUpperCase() || '?'}</span>}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-black uppercase text-sm text-white truncate flex items-center gap-1.5">
+                          {p.nombre_supply}
+                          <ShieldCheck size={12} className="text-blue-400 flex-shrink-0" />
                         </p>
-                      )}
-                    </div>
-                  </Link>
-                ))}
-              </div>
+                        {p.municipio && (
+                          <p className="text-zinc-500 text-xs flex items-center gap-1 truncate mt-0.5">
+                            <MapPin size={10} className="flex-shrink-0" />
+                            {p.municipio}{p.departamento ? `, ${p.departamento}` : ''}
+                          </p>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+                {visibleCount < proveedoresFiltrados.length && (
+                  <div className="flex justify-center mt-6">
+                    <button
+                      type="button"
+                      onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+                      className="px-6 py-2.5 border border-blue-500/40 text-blue-400 text-xs font-bold uppercase tracking-[0.15em] rounded hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
+                    >
+                      Ver más ({proveedoresFiltrados.length - visibleCount} más)
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </>
         )}
