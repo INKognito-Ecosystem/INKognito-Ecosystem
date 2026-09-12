@@ -128,11 +128,21 @@ export default function EditarPerfilSupplySection({ token, estudio, cloud_name, 
         <input value={form.nombre} onChange={set('nombre')} className={inputClass} />
       </div>
 
-      <div>
-        <label className={labelClass}>Nombre para mostrar en Supply (opcional)</label>
-        <input value={form.nombre_supply} onChange={set('nombre_supply')} placeholder={form.nombre || 'Nombre del negocio'} className={inputClass} />
-        <p className="text-gray-400 text-[10px] mt-1">Si lo dejas vacío, se muestra el mismo nombre de arriba.</p>
-      </div>
+      {/* Nombre para mostrar en Supply — SOLO tiene sentido para un
+          estudio de tatuaje (tipo='estudio'), que de verdad puede tener
+          dos identidades distintas: su nombre real y el que usa para
+          vender en Supply. Un proveedor/empresa NATIVO de Supply (Jose,
+          2026-09-13: "esto solo se le pide a un estudio, cuando el
+          registro es nativo no puede pedir ese requisito") nunca tuvo una
+          segunda identidad que distinguir — pedirle este campo aparte es
+          redundante, ya escribió su nombre arriba. */}
+      {estudio.tipo === 'estudio' && (
+        <div>
+          <label className={labelClass}>Nombre para mostrar en Supply (opcional)</label>
+          <input value={form.nombre_supply} onChange={set('nombre_supply')} placeholder={form.nombre || 'Nombre del negocio'} className={inputClass} />
+          <p className="text-gray-400 text-[10px] mt-1">Si lo dejas vacío, se muestra el mismo nombre de arriba.</p>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-3">
         <div>
