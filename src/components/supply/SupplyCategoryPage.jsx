@@ -190,27 +190,22 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
     return Array.from(map, ([id, v]) => ({ id, ...v }))
   }, [products])
 
-  // Agrupados por ciudad (Jose, 2026-09-12: "relacionarlo con el lugar de
-  // donde es el supply") — con muchos proveedores, escanear por ciudad es
-  // más rápido que una lista plana de nombres. Sin ciudad cargada cae a un
-  // grupo aparte en vez de desaparecer.
-  const proveedoresPorCiudad = useMemo(() => {
-    const grupos = new Map()
-    for (const p of proveedores) {
-      const key = p.municipio || 'Otras ciudades'
-      if (!grupos.has(key)) grupos.set(key, [])
-      grupos.get(key).push(p)
-    }
-    return Array.from(grupos, ([ciudad, lista]) => ({ ciudad, lista })).sort((a, b) => a.ciudad.localeCompare(b.ciudad))
+  // Ordenados por ciudad (Jose, 2026-09-12: "relacionarlo con el lugar de
+  // donde es el supply") — la ciudad va pegada al nombre en cada fila (no
+  // como encabezado aparte: era una etiqueta gris tan chica que Jose no la
+  // notaba con un solo proveedor). El orden por ciudad igual agrupa
+  // visualmente a los de la misma ciudad uno seguido del otro.
+  const proveedoresOrdenados = useMemo(() => {
+    return [...proveedores].sort((a, b) =>
+      (a.municipio || '').localeCompare(b.municipio || '') || a.nombre.localeCompare(b.nombre)
+    )
   }, [proveedores])
 
   const proveedoresFiltrados = useMemo(() => {
-    if (!provBusqueda.trim()) return proveedoresPorCiudad
+    if (!provBusqueda.trim()) return proveedoresOrdenados
     const q = normaliza(provBusqueda)
-    return proveedoresPorCiudad
-      .map(g => ({ ciudad: g.ciudad, lista: g.lista.filter(p => normaliza(p.nombre).includes(q) || normaliza(g.ciudad).includes(q)) }))
-      .filter(g => g.lista.length > 0)
-  }, [proveedoresPorCiudad, provBusqueda])
+    return proveedoresOrdenados.filter(p => normaliza(p.nombre).includes(q) || normaliza(p.municipio).includes(q))
+  }, [proveedoresOrdenados, provBusqueda])
 
   // Precio de referencia: el más bajo entre variantes (patrón "desde $X" ya
   // usado en la card). Recencia: el id más alto entre variantes — son filas
@@ -359,21 +354,26 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                       <div className="max-h-60 overflow-y-auto border-t border-zinc-800">
                         {proveedoresFiltrados.length === 0 ? (
                           <p className="px-3 py-3 text-xs text-zinc-600">Ningún proveedor coincide</p>
-                        ) : proveedoresFiltrados.map(g => (
-                          <div key={g.ciudad}>
-                            <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-zinc-600">{g.ciudad}</p>
-                            {g.lista.map(p => (
-                              <button
-                                key={p.id}
-                                type="button"
-                                onClick={() => { setProvFiltro(String(p.id)); setVisibleCount(PAGE_SIZE); setProvBusqueda(''); setProvAbierto(false) }}
-                                className={`w-full text-left px-3 py-2 text-xs transition-colors ${
-                                  provFiltro === String(p.id) ? 'text-blue-400 bg-blue-500/10 font-bold' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
-                                }`}
-                              >
-                                {p.nombre}
-                              </button>
-                            ))}
+                        ) : proveedoresFiltrados.map(p => (
+                          <div key={p.id} className="flex items-center">
+                            <button
+                              type="button"
+                              onClick={() => { setProvFiltro(String(p.id)); setVisibleCount(PAGE_SIZE); setProvBusqueda(''); setProvAbierto(false) }}
+                              className={`flex-1 min-w-0 text-left px-3 py-2 text-xs truncate transition-colors ${
+                                provFiltro === String(p.id) ? 'text-blue-400 bg-blue-500/10 font-bold' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
+                              }`}
+                            >
+                              {p.nombre}
+                              {p.municipio && <span className="text-zinc-600 font-normal"> · {p.municipio}</span>}
+                            </button>
+                            <Link
+                              to={`/supply/estudio/${p.id}`}
+                              onClick={(e) => e.stopPropagation()}
+                              title={`Ver catálogo completo de ${p.nombre}`}
+                              className="flex-shrink-0 px-2.5 py-2 text-zinc-600 hover:text-blue-400 transition-colors"
+                            >
+                              <ExternalLink size={12} />
+                            </Link>
                           </div>
                         ))}
                       </div>
