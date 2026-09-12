@@ -1,11 +1,21 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'motion/react'
 import { Drill, PenTool, PlugZap, Droplet, Crosshair, Hand, ShieldCheck, Toolbox, BedDouble, Package } from 'lucide-react'
 import CoverflowRow from '../CoverflowRow'
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
   backgroundSize: '18px 18px',
+}
+
+// Mismo patrón de aparición al hacer scroll que StorePage.jsx — Jose notó
+// que Supply se quedó sin esto mientras Store sí lo tenía (2026-09-12).
+const REVEAL = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.2 },
+  transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
 }
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
@@ -49,7 +59,7 @@ export default function CategoriesSupply({ categorias = {} }) {
   })
 
   return (
-    <section id="categorias" className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950">
+    <motion.section {...REVEAL} id="categorias" className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950">
       <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
       <div className="relative z-10 max-w-7xl mx-auto">
 
@@ -132,6 +142,6 @@ export default function CategoriesSupply({ categorias = {} }) {
         </CoverflowRow>
 
       </div>
-    </section>
+    </motion.section>
   )
 }

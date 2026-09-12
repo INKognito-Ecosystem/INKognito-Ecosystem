@@ -2,16 +2,17 @@ import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../SupplyCategoryPage'
 import { fetchCatalogCategoria, fetchSupplyFaq } from '../../../hooks/useCatalog'
 
-// Mobiliario es Industrias Warlock — fabrican en Bogotá y envían a todo el
-// país, no es un proveedor local de Urabá como el resto de Supply. Por eso
-// esta categoría (a diferencia de las demás) no promete Urabá/Chigorodó ni
-// contraentrega — Jose aún no ha confirmado esa opción con ellos
-// (2026-08-01, ver project_proveedor_warlock_mobiliario).
+// La página de CATEGORÍA debe quedar neutra/universal — no asumir un solo
+// proveedor por nombre (Jose, 2026-09-12: "somos el sistema digital, cada
+// proveedor es responsable"). Antes asumía 100% Industrias Warlock (fabrica
+// en Bogotá, sin contraentrega); la atribución real ahora vive por producto
+// en cada card (ver SupplyProductCard.jsx) y en la página propia de la marca
+// (IndustriasWarlockPage.jsx), no acá.
 const TITLE = 'Mobiliario'
 const CATEGORIA = 'Mobiliario'
 const SLUG = 'furniture'
-const DESC = 'Mobiliario profesional para estudios de tatuaje — Industrias Warlock. Camillas, sillas y almacenamiento, con envío a toda Colombia.'
-const INTRO = 'Tu espacio dice más de ti que cualquier otro elemento. La diferencia entre un cuarto y un estudio empieza por el mueble que el cliente toca primero. Mobiliario de Industrias Warlock, fabricado en Bogotá con envío a todo el país.'
+const DESC = 'Mobiliario profesional para estudios de tatuaje — camillas, sillas y almacenamiento, con envío a toda Colombia.'
+const INTRO = 'Tu espacio dice más de ti que cualquier otro elemento. La diferencia entre un cuarto y un estudio empieza por el mueble que el cliente toca primero.'
 
 const guide = [
   { icon: '🛏️', title: 'Camilla reclinable', text: 'Altura regulable, tapizado resistente y reclinacion para distintas zonas del cuerpo.' },
@@ -30,7 +31,7 @@ export async function loader() {
 }
 
 export function meta() {
-  const title = `${TITLE} para tatuadores | Industrias Warlock — INKognito Supply`
+  const title = `${TITLE} para tatuadores en Colombia | INKognito Supply`
   return [
     { title },
     { name: 'description', content: DESC },

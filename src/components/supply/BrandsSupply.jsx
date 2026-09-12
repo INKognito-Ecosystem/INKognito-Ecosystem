@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'motion/react'
 import CoverflowRow from '../CoverflowRow'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
@@ -11,6 +12,15 @@ const brandKey = (name) => 'supply_brand_' + name.toLowerCase()
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
   backgroundSize: '18px 18px',
+}
+
+// Mismo patrón de aparición al hacer scroll que StorePage.jsx — Jose notó
+// que Supply se quedó sin esto mientras Store sí lo tenía (2026-09-12).
+const REVEAL = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.2 },
+  transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
 }
 
 // Decisión de Jose (2026-07-30): reducir a estas 7 marcas destacadas en el
@@ -52,7 +62,8 @@ export default function BrandsSupply() {
   }, [])
 
   return (
-    <section
+    <motion.section
+      {...REVEAL}
       id="marcas"
       className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950 border-t border-zinc-900"
     >
@@ -104,6 +115,6 @@ export default function BrandsSupply() {
         </CoverflowRow>
 
       </div>
-    </section>
+    </motion.section>
   )
 }

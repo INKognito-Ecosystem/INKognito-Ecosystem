@@ -1,4 +1,5 @@
 import { useLoaderData } from 'react-router-dom'
+import { motion } from 'motion/react'
 import NavbarSupply from './NavbarSupply'
 import HeroSupply from './HeroSupply'
 import CategoriesSupply from './CategoriesSupply'
@@ -13,6 +14,17 @@ const ogSupply = '/og/supply.webp'
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
   backgroundSize: '18px 18px',
+}
+
+// Mismo patrón de aparición al hacer scroll que StorePage.jsx — Jose notó
+// que Supply se quedó sin esto mientras Store sí lo tenía (2026-09-12). El
+// hero queda afuera a propósito: ya está visible al cargar, no tiene
+// sentido hacerlo esperar.
+const REVEAL = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.2 },
+  transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
 }
 import { Link } from 'react-router-dom'
 import { SUPPLY_HOURS } from '../../config/business'
@@ -72,7 +84,7 @@ export default function SupplyPage() {
     <BrandsSupply />
 
     {/* SECCIÓN EDUCACIÓN — Cursos, Kit, Recursos */}
-    <section className="relative overflow-hidden bg-gray-950 border-t border-zinc-900 py-8 md:py-16">
+    <motion.section {...REVEAL} className="relative overflow-hidden bg-gray-950 border-t border-zinc-900 py-8 md:py-16">
       <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         <div className="mb-6">
@@ -161,10 +173,10 @@ export default function SupplyPage() {
 
         </div>
       </div>
-    </section>
+    </motion.section>
 
     {/* ── COBERTURA + CONTACTO — solo móvil ────────────────────── */}
-    <section id="contacto" className="relative overflow-hidden md:hidden border-t border-zinc-900 bg-gray-950 px-6 py-8">
+    <motion.section {...REVEAL} id="contacto" className="relative overflow-hidden md:hidden border-t border-zinc-900 bg-gray-950 px-6 py-8">
       <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
       <div className="relative z-10">
       <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">Llegamos donde estás</h2>
@@ -188,10 +200,10 @@ export default function SupplyPage() {
         📱 Hacer mi pedido ahora
       </a>
       </div>
-    </section>
+    </motion.section>
 
     {/* ── LOGÍSTICA + GARANTÍAS + CONTACTO — solo desktop ── */}
-    <section id="contacto-desktop" className="relative overflow-hidden hidden md:block bg-gray-950 border-t border-zinc-900 px-6 py-14">
+    <motion.section {...REVEAL} id="contacto-desktop" className="relative overflow-hidden hidden md:block bg-gray-950 border-t border-zinc-900 px-6 py-14">
       <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
       <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-3 gap-12">
 
@@ -266,7 +278,7 @@ export default function SupplyPage() {
         </div>
 
       </div>
-    </section>
+    </motion.section>
 
     <TechMarquee />
 

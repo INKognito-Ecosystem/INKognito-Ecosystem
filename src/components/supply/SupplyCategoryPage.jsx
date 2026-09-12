@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'motion/react'
 import NavbarCategory from './NavbarCategory'
 import FooterSupply from './FooterSupply'
 import AccordionCard from './AccordionCard'
@@ -81,21 +82,32 @@ const WA = '573207911013'
 // Tommy Tattoo Supply asumiendo que TODO lo de ink/cartuchos/agujas/etc.
 // venía de ahí, pero con proveedores propios (fase 5, 2026-08-07) eso ya
 // no es cierto: un producto de la misma categoría puede venir de otro
-// estudio/empresa. La atribución real ahora es por producto (ver
-// SupplyProductCard.jsx, item.estudio_nombre_supply) — Tommy no muestra
-// nada hasta que se registre como empresa proveedora. Mobiliario sigue
-// siendo 100% Industrias Warlock (sin excepciones todavía), por eso
-// conserva su insignia fija — mismo criterio que supplierBadge en
-// BrandCatalogSection.jsx.
+// estudio/empresa. La atribución real es por producto (ver
+// SupplyProductCard.jsx, item.estudio_nombre_supply) — cada card ya
+// muestra "Suministrado por X". Mobiliario tenía la misma excepción fija
+// nombrando a Industrias Warlock, pero la página de categoría debe quedar
+// neutra/universal (Jose, 2026-09-12: "somos el sistema digital, cada
+// proveedor es responsable") — se retiró, la atribución por producto ya
+// cubre esto igual que en el resto de categorías.
 const DEFAULT_BADGE = null
 const CATEGORY_BADGE = {
-  Mobiliario: 'Producto de Industrias Warlock — mobiliario fabricado en Bogotá, envío a toda Colombia',
   Combos: null,
 }
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
   backgroundSize: '18px 18px',
+}
+
+// Mismo patrón de aparición al hacer scroll que StorePage.jsx/SupplyPage.jsx
+// — Jose notó que las páginas de categoría de Supply se quedaron sin esto
+// (2026-09-12). El hero (título/intro/insignia) queda afuera a propósito:
+// ya está visible al cargar, no tiene sentido hacerlo esperar.
+const REVEAL = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.2 },
+  transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
 }
 
 function AfiliadoCard({ item }) {
@@ -302,7 +314,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
         </div>
 
         {/* PRODUCTOS FÍSICOS — grid en los tres anchos (2/3/4 columnas) */}
-        <div className="pb-10 max-w-7xl mx-auto">
+        <motion.div {...REVEAL} className="pb-10 max-w-7xl mx-auto">
           {products.length > 0 && (
             <div className="flex flex-nowrap items-center gap-2 px-6 mb-5">
               <div className="relative flex-1 min-w-0">
@@ -447,13 +459,13 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
               )}
             </>
           )}
-        </div>
+        </motion.div>
 
         {/* RECURSOS DIGITALES AFILIADOS — sección fija, siempre visible */}
         {(() => {
           const copy = AFILIADO_COPY[categoria] || { badge: `Recursos para ${title.toLowerCase()}`, title: 'Lleva tu técnica al siguiente nivel', desc: `Selección curada para dominar ${title.toLowerCase()}.` }
           return (
-          <div className="pb-10 max-w-7xl mx-auto px-6">
+          <motion.div {...REVEAL} className="pb-10 max-w-7xl mx-auto px-6">
             <div className="border-t-2 border-blue-500/20 pt-8 mb-6">
               <p className="text-blue-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ {copy.badge}</p>
               <h2 className="text-xl md:text-2xl font-black uppercase leading-none text-white">
@@ -484,14 +496,14 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                 </a>
               </div>
             )}
-          </div>
+          </motion.div>
           )
         })()}
 
 
         {/* ACORDEONES — guía de compra y FAQ */}
         {(guide?.length > 0 || faqs?.length > 0) && (
-          <div className="px-6 pb-16 max-w-7xl mx-auto flex flex-col gap-4">
+          <motion.div {...REVEAL} className="px-6 pb-16 max-w-7xl mx-auto flex flex-col gap-4">
 
             {guide?.length > 0 && (
               <AccordionCard
@@ -530,7 +542,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
               </AccordionCard>
             )}
 
-          </div>
+          </motion.div>
         )}
 
         <FooterSupply />

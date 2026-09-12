@@ -466,20 +466,22 @@ export default function PedidoOnlinePage() {
               {/* RELLENO — explica la alianza con Eljach y por qué cambia el
                   método de pago según la ciudad, en vez de dejarlo vacío.
                   Mobiliario tiene su propio texto: aunque la ciudad esté en
-                  la ruta de Eljach, ese pedido igual va por Nequi (Warlock
-                  envía por su cuenta desde Bogotá), así que el texto
-                  genérico de "contraentrega si estás en la ruta" sería
-                  engañoso para ese caso. */}
+                  la ruta de Eljach, ese pedido igual va por Nequi (el
+                  proveedor de mobiliario despacha por su cuenta), así que
+                  el texto genérico de "contraentrega si estás en la ruta"
+                  sería engañoso para ese caso. Texto neutro a propósito —
+                  no nombra al proveedor puntual (2026-09-12, ver nota en
+                  SupplyCategoryPage.jsx). */}
               <div className="mt-6 flex-1 min-h-[110px] bg-gradient-to-br from-zinc-900 to-black border border-white/10 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-center">
                 <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-green-600/10" />
                 {tieneMobiliario ? (
                   <>
                     <h3 className="relative text-white text-lg font-black uppercase italic mb-2">
-                      Envío de Industrias Warlock
+                      Envío de mobiliario
                     </h3>
                     <p className="relative text-gray-400 text-[13px] leading-relaxed">
-                      El mobiliario se fabrica y despacha desde Bogotá a cualquier parte de Colombia.
-                      Se paga por Nequi antes del despacho — aún no tenemos contraentrega para estos productos.
+                      El mobiliario se fabrica bajo pedido y se despacha a cualquier parte de Colombia.
+                      Se paga por Nequi antes del despacho — aún no tenemos contraentrega para esta categoría.
                     </p>
                   </>
                 ) : tieneMaquinaGym ? (
@@ -535,7 +537,7 @@ export default function PedidoOnlinePage() {
               </div>
               {tieneMobiliario && (
                 <p className="text-amber-500/90 text-[12px] leading-relaxed">
-                  El envío del mobiliario corre por cuenta del cliente — Industrias Warlock coordina el despacho y la transportadora que lleve el producto cobra el flete directamente al entregar.
+                  El envío del mobiliario corre por cuenta del cliente — el proveedor coordina el despacho y la transportadora que lleve el producto cobra el flete directamente al entregar.
                 </p>
               )}
               {tieneMaquinaGym && (
