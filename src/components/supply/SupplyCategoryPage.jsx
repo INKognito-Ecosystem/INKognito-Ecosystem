@@ -6,7 +6,7 @@ import AccordionCard from './AccordionCard'
 import SupplyProductCard from './SupplyProductCard'
 import { useScrolled } from '../../hooks/useScrolled'
 import { FaWhatsapp } from 'react-icons/fa'
-import { ExternalLink, Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package, ArrowLeft, ArrowRight } from 'lucide-react'
+import { ExternalLink, Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package, ArrowLeft, ArrowRight, Search } from 'lucide-react'
 import { getAdjacentCategories } from '../../data/supplyCategoriesOrder'
 
 const CAT_ICONS = {
@@ -147,6 +147,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [provFiltro, setProvFiltro] = useState('todos')
   const [orden, setOrden] = useState('recientes')
+  const [busqueda, setBusqueda] = useState('')
 
   // Un producto = un estudio (el panel agrupa por product+estudio_id desde
   // 2026-08-09, ver fetchCatalogEstudio en useCatalog.js) — filtrar por
@@ -169,15 +170,26 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
   // proxy más simple sin tocar el backend.
   const precioRef = (item) => Math.min(...(item.variantes ?? []).map(v => Number(v.price) || Infinity))
   const idRef = (item) => Math.max(0, ...(item.variantes ?? []).map(v => Number(v.id) || 0))
+  // Sin tildes/mayúsculas para que "cartucho" encuentre "Cartúcho" — mismo
+  // criterio de búsqueda insensible a acentos usado en otros buscadores del
+  // ecosistema (ej. directorio de artistas).
+  const normaliza = (s) => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 
   const visibleProducts = useMemo(() => {
     let list = provFiltro === 'todos' ? products : products.filter(p => String(p.estudio_id) === provFiltro)
+    // La búsqueda solo corre sobre `products` de ESTA categoría (el prop que
+    // ya llega filtrado por categoría desde el loader) — nunca puede traer
+    // resultados de otra categoría aunque coincida el nombre.
+    if (busqueda.trim()) {
+      const q = normaliza(busqueda)
+      list = list.filter(p => normaliza(p.name).includes(q))
+    }
     list = [...list]
     if (orden === 'precio_asc') list.sort((a, b) => precioRef(a) - precioRef(b))
     else if (orden === 'precio_desc') list.sort((a, b) => precioRef(b) - precioRef(a))
     else list.sort((a, b) => idRef(b) - idRef(a))
     return list
-  }, [products, provFiltro, orden])
+  }, [products, provFiltro, orden, busqueda])
 
   const cambiarFiltro = (setter) => (e) => { setter(e.target.value); setVisibleCount(PAGE_SIZE) }
 
@@ -253,14 +265,24 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
         {/* PRODUCTOS FÍSICOS — grid en los tres anchos (2/3/4 columnas) */}
         <div className="pb-10 max-w-7xl mx-auto">
           {products.length > 0 && (
-            <div className="flex flex-wrap items-center gap-3 px-6 mb-5">
+            <div className="flex flex-nowrap items-center gap-2 px-6 mb-5">
+              <div className="relative flex-1 min-w-0">
+                <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
+                <input
+                  type="text"
+                  value={busqueda}
+                  onChange={cambiarFiltro(setBusqueda)}
+                  placeholder="Buscar producto"
+                  className="w-full min-w-0 bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-lg pl-8 pr-2 py-2 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500"
+                />
+              </div>
               {proveedores.length > 1 && (
                 <select
                   value={provFiltro}
                   onChange={cambiarFiltro(setProvFiltro)}
-                  className="bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs font-bold uppercase tracking-wider rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+                  className="flex-shrink-0 w-[92px] sm:w-auto bg-zinc-900 border border-zinc-800 text-zinc-300 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-lg px-2 sm:px-3 py-2 focus:outline-none focus:border-blue-500"
                 >
-                  <option value="todos">Todos los proveedores</option>
+                  <option value="todos">Proveedores</option>
                   {proveedores.map(p => (
                     <option key={p.id} value={String(p.id)}>{p.nombre}</option>
                   ))}
@@ -269,9 +291,9 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
               <select
                 value={orden}
                 onChange={cambiarFiltro(setOrden)}
-                className="bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs font-bold uppercase tracking-wider rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+                className="flex-shrink-0 w-[92px] sm:w-auto bg-zinc-900 border border-zinc-800 text-zinc-300 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-lg px-2 sm:px-3 py-2 focus:outline-none focus:border-blue-500"
               >
-                <option value="recientes">Más recientes</option>
+                <option value="recientes">Recientes</option>
                 <option value="precio_asc">Menor precio</option>
                 <option value="precio_desc">Mayor precio</option>
               </select>
