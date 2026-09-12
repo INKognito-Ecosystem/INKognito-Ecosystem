@@ -1,4 +1,4 @@
-import { useLoaderData, redirect } from 'react-router-dom'
+import { useLoaderData, redirect, useSearchParams } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { Award, MapPin, Menu } from 'lucide-react'
 import FooterSupply from './FooterSupply'
@@ -20,7 +20,7 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-pro
 // con vende_supply activo tiene esta misma página, sin tocar código.
 export async function loader({ params, request }) {
   const token = new URL(request.url).searchParams.get('token')
-  let estudio = null, products = [], esDueno = false
+  let estudio = null, products = [], esDueno = false, cloud_name = null, upload_preset = null
   try {
     const [estudioRes, catalogo] = await Promise.all([
       fetch(`${PANEL_URL}/api/estudios/${params.id}`),
@@ -59,13 +59,28 @@ export async function loader({ params, request }) {
       const porTokenRes = await fetch(`${PANEL_URL}/api/estudios-por-token?token=${encodeURIComponent(token)}`)
       if (porTokenRes.ok) {
         const porToken = await porTokenRes.json()
-        if (porToken.id === estudio.id) esDueno = true
+        if (porToken.id === estudio.id) {
+          esDueno = true
+          // Bug real (2026-09-12): GET /api/estudios/:id (público) devuelve
+          // nombre_supply con COALESCE(nombre_supply, nombre) — para mostrar
+          // algo siempre en el hero está bien, pero como valor INICIAL del
+          // formulario de edición eso "congela" el nombre viejo apenas se
+          // guarda cualquier cambio (el form manda ese mismo valor de vuelta
+          // como si el proveedor lo hubiera escrito a mano). estudios-por-
+          // token sí trae el valor real (puede ser null) — se usa ese para
+          // la edición, sin perder distribuidor_oficial del objeto público.
+          estudio.nombre_supply = porToken.nombre_supply
+          const configRes = await fetch(`${PANEL_URL}/api/upload-config`)
+          const config = configRes.ok ? await configRes.json() : {}
+          cloud_name = config.cloud_name || null
+          upload_preset = config.upload_preset || null
+        }
       }
     } catch {
       esDueno = false
     }
   }
-  return { estudio, products, esDueno, token: esDueno ? token : null }
+  return { estudio, products, esDueno, token: esDueno ? token : null, cloud_name, upload_preset }
 }
 
 export function meta({ data }) {
@@ -87,8 +102,20 @@ export function meta({ data }) {
 }
 
 export default function EstudioSupplyPage() {
-  const { estudio, products, esDueno, token } = useLoaderData()
-  const [panelAbierto, setPanelAbierto] = useState(false)
+  const loaderData = useLoaderData()
+  const [searchParams] = useSearchParams()
+  const { products, esDueno, token, cloud_name, upload_preset } = loaderData
+  const [estudio, setEstudio] = useState(loaderData.estudio)
+  useEffect(() => { setEstudio(loaderData.estudio) }, [loaderData.estudio])
+
+  // Abre el panel solo si ya se sabe que es el dueño Y viene de un
+  // contexto donde tiene sentido verlo de una (recién verificó su correo,
+  // o acaba de volver de conectar Mercado Pago) — mismo criterio que
+  // EstudioTiendaPage.jsx. Sin esto, un proveedor recién registrado nunca
+  // veía el link para compartir a menos que encontrara el botón solo.
+  const [panelAbierto, setPanelAbierto] = useState(
+    () => esDueno && (searchParams.get('bienvenida') === '1' || searchParams.get('mp') != null)
+  )
 
   // Tooltip de onboarding sobre el botón de gestión (2026-09-12) — mismo
   // patrón que EstudioTiendaPage.jsx (localStorage propio, una sola vez).
@@ -273,7 +300,14 @@ export default function EstudioSupplyPage() {
       <FooterSupply />
 
       {panelAbierto && (
-        <EstudioSupplyOwnerPanel estudio={estudio} token={token} onClose={() => setPanelAbierto(false)} />
+        <EstudioSupplyOwnerPanel
+          estudio={estudio}
+          token={token}
+          cloud_name={cloud_name}
+          upload_preset={upload_preset}
+          onClose={() => setPanelAbierto(false)}
+          onEstudioUpdate={(nuevo) => setEstudio((e) => ({ ...e, ...nuevo }))}
+        />
       )}
     </div>
   )

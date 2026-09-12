@@ -23,8 +23,16 @@ export async function loader({ request }) {
       // link corto de una vez si ya tiene slug (siempre lo tiene desde
       // el registro — ver POST /api/estudios-solicitud) en vez de
       // pasar primero por /store/estudio/:id y esperar el redirect.
+      // 'proveedor' (Supply nativo, 2026-09-12) — mismo criterio: NO es
+      // un estudio de tatuaje, su perfil de tatuajes/buscador de INK no
+      // le aplica en nada. Bug real encontrado por Jose: antes caía en
+      // el else de abajo y terminaba en /tattoo-artist-colombia/estudio/
+      // mi-perfil (navbar/colores de INK), sin ver nunca su catálogo de
+      // Supply real ni el botón de gestión de EstudioSupplyPage.jsx.
       const destino = data.tipo === 'tienda'
         ? `/store/${data.slug || `estudio/${data.id}`}?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`
+        : data.tipo === 'proveedor'
+        ? `/supply/estudio/${data.id}?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`
         : `/tattoo-artist-colombia/estudio/mi-perfil?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`
       return redirect(destino)
     }
