@@ -3,9 +3,10 @@ import NavbarSupply from './NavbarSupply'
 import HeroSupply from './HeroSupply'
 import CategoriesSupply from './CategoriesSupply'
 import BrandsSupply from './BrandsSupply'
+import TechMarquee from '../TechMarquee'
 import FooterSupply from './FooterSupply'
 import { FaWhatsapp } from 'react-icons/fa'
-import { ShieldCheck, GraduationCap, Package, BookOpen } from 'lucide-react'
+import { GraduationCap, Package, BookOpen } from 'lucide-react'
 import { fetchCatalogFull } from '../../hooks/useCatalog'
 const ogSupply = '/og/supply.webp'
 
@@ -168,46 +169,11 @@ export default function SupplyPage() {
       <div className="relative z-10">
       <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">Llegamos donde estás</h2>
       <p className="text-zinc-400 text-sm leading-relaxed mb-5">
-        Contamos con transportadora aliada para entregas seguras y con pago contraentrega en toda la región de Urabá.
-      </p>
-      <div className="flex gap-2 mb-5">
-        <div className="flex items-center justify-center bg-white rounded-xl p-1 flex-shrink-0 aspect-square w-16">
-          <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
-        </div>
-        <div className="flex flex-col justify-center bg-black border border-zinc-800 rounded-xl px-3 py-2 flex-1">
-          <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Eljach Mensajería Express</p>
-          <p className="text-zinc-500 text-[10px] mt-0.5">Aliado logístico · Contra entrega</p>
-        </div>
-      </div>
-      <div className="flex gap-2 mb-5">
-        <div className="flex items-center justify-center bg-blue-500/10 border border-blue-500/30 rounded-xl flex-shrink-0 aspect-square w-16">
-          <ShieldCheck className="text-blue-400" size={26} />
-        </div>
-        <div className="flex flex-col justify-center bg-black border border-zinc-800 rounded-xl px-3 py-2 flex-1">
-          <p className="text-white text-xs font-bold uppercase tracking-wide leading-tight">Tommy Tattoo Supply</p>
-          <p className="text-zinc-500 text-[10px] mt-0.5">Aliado comercial · Punto físico en Carepa</p>
-        </div>
-      </div>
-      <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">Urabá — Entrega directa</p>
-      <div className="flex flex-col gap-1 mb-3">
-        {[{n:'Chigorodó',t:'1–2 días'},{n:'Carepa',t:'1–2 días'},{n:'Apartadó',t:'1–2 días'},{n:'Turbo',t:'2–3 días'}].map(c => (
-          <div key={c.n} className="flex items-center justify-between border-b border-zinc-900 py-1">
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-blue-500/30 text-blue-400 bg-blue-500/5">{c.n}</span>
-            <span className="text-zinc-600 text-[9px] uppercase tracking-widest">{c.t}</span>
-          </div>
-        ))}
-      </div>
-      <p className="text-zinc-700 text-[9px] uppercase tracking-widest mb-1.5">Corregimientos y sectores</p>
-      <div className="flex flex-wrap gap-1 mb-3">
-        {['Currulao','El Tres','Coldesa','Río Grande','El Reposo','Casa Verde'].map(c => (
-          <span key={c} className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full border border-zinc-800 text-zinc-600 bg-zinc-900">{c}</span>
-        ))}
-      </div>
-      <p className="text-zinc-700 text-[9px] leading-relaxed mb-4">
-        ¿Fuera de Urabá? También enviamos al resto de Colombia — tiempo y costo se coordinan al confirmar.
+        Trabajamos con proveedores verificados en distintas ciudades del país — cada uno coordina
+        contigo el envío y la forma de pago directamente al confirmar tu pedido.
       </p>
       <div className="flex flex-col gap-2 mb-5">
-        {['Pago contraentrega disponible','Atención personalizada por WhatsApp','Cobertura en toda la región de Urabá'].map(g => (
+        {['Proveedores verificados en todo el país','Atención personalizada por WhatsApp','Envíos a toda Colombia'].map(g => (
           <div key={g} className="flex items-center gap-2">
             <span className="text-green-500 text-sm font-bold">✓</span>
             <span className="text-zinc-400 text-xs">{g}</span>
@@ -233,44 +199,15 @@ export default function SupplyPage() {
         <div>
           <p className="uppercase tracking-[0.25em] text-blue-400/70 text-[10px] mb-4">Logística · Cobertura</p>
           <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Llegamos donde estás</h2>
-          <div className="flex gap-3 mb-4">
-            <div className="flex items-center justify-center bg-white rounded-xl p-2 flex-shrink-0 w-14 h-14">
-              <img src="/eljach.png" alt="Eljach" className="w-full h-full object-contain" />
-            </div>
-            <div className="flex flex-col justify-center bg-black border border-zinc-800 rounded-xl px-4 py-2.5 flex-1">
-              <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Eljach Mensajería Express</p>
-              <p className="text-zinc-500 text-xs mt-0.5">Aliado logístico · Contra entrega</p>
-            </div>
-          </div>
-          <div className="flex gap-3 mb-4">
-            <div className="flex items-center justify-center bg-blue-500/10 border border-blue-500/30 rounded-xl flex-shrink-0 w-14 h-14">
-              <ShieldCheck className="text-blue-400" size={28} />
-            </div>
-            <div className="flex flex-col justify-center bg-black border border-zinc-800 rounded-xl px-4 py-2.5 flex-1">
-              <p className="text-white text-sm font-bold uppercase tracking-wide leading-tight">Tommy Tattoo Supply</p>
-              <p className="text-zinc-500 text-xs mt-0.5">Aliado comercial · Punto físico en Carepa</p>
-            </div>
-          </div>
-          <p className="text-zinc-500 text-[10px] uppercase tracking-widest mb-3">Urabá — Entrega directa</p>
-          <div className="flex flex-col gap-1.5 mb-3">
-            {[{name:'Chigorodó',time:'1–2 días'},{name:'Carepa',time:'1–2 días'},{name:'Apartadó',time:'1–2 días'},{name:'Turbo',time:'2–3 días'}].map(c => (
-              <div key={c.name} className="flex items-center justify-between py-1.5 border-b border-zinc-900">
-                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-blue-500/30 text-blue-400 bg-blue-500/5">{c.name}</span>
-                <span className="text-zinc-600 text-[10px] uppercase tracking-[0.12em]">{c.time}</span>
-              </div>
-            ))}
-          </div>
-          <p className="text-zinc-700 text-[9px] uppercase tracking-widest mb-2">Corregimientos y sectores</p>
-          <div className="flex flex-wrap gap-1.5 mb-5">
-            {['Currulao','El Tres','Coldesa','Río Grande','El Reposo','Casa Verde'].map(z => (
-              <span key={z} className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-zinc-800 text-zinc-500 bg-zinc-900">{z}</span>
-            ))}
-          </div>
+          <p className="text-zinc-400 text-sm leading-relaxed mb-5">
+            Trabajamos con proveedores verificados en distintas ciudades del país — cada uno
+            coordina contigo el envío y la forma de pago directamente al confirmar tu pedido.
+          </p>
           <div className="border-t border-zinc-800 pt-4">
-            <p className="text-zinc-500 text-[10px] uppercase tracking-widest mb-1.5">Resto de Colombia</p>
+            <p className="text-zinc-500 text-[10px] uppercase tracking-widest mb-1.5">Cobertura nacional</p>
             <p className="text-zinc-600 text-xs leading-relaxed">
-              ¿Estás fuera de Urabá? Podemos enviarte tu pedido a cualquier parte del país.
-              Tiempo y costo de envío se coordinan al confirmar el pedido.
+              Enviamos a cualquier parte de Colombia. Tiempo y costo de envío se coordinan con
+              el proveedor al confirmar el pedido.
             </p>
           </div>
         </div>
@@ -281,11 +218,11 @@ export default function SupplyPage() {
           <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Compra con Confianza</h2>
           <div className="flex flex-col gap-4">
             {[
-              {t:'Proveedor verificado',         d:'Tommy Tattoo Supply, productos para Urabá, envío nacional, con punto físico en Carepa, Antioquia, Colombia.'},
+              {t:'Proveedores verificados',      d:'Estudios y empresas verificadas en distintas ciudades de Colombia, con catálogo propio.'},
               {t:'Productos originales',         d:'Tintas, cartuchos y agujas de marcas certificadas. Calidad garantizada en cada pedido.'},
-              {t:'Pago contraentrega',           d:'Paga cuando recibas tu pedido en Urabá. Sin riesgos, sin adelantos innecesarios.'},
+              {t:'Pago contraentrega',           d:'Disponible donde el proveedor lo ofrezca. Sin riesgos, sin adelantos innecesarios.'},
               {t:'Soporte por WhatsApp',         d:'Asesoría personalizada antes, durante y después de tu compra.'},
-              {t:'Entregas en Urabá con Eljach', d:'Transportadora aliada con cobertura en los 4 municipios principales y sus sectores.'},
+              {t:'Envíos a toda Colombia',       d:'Cada proveedor coordina contigo tiempo y costo de envío al confirmar el pedido.'},
               {t:'Atención personalizada',       d:'Te acompañamos en la elección del producto correcto para tu nivel y disciplina.'},
             ].map((g,i) => (
               <div key={i} className="flex items-start gap-3">
@@ -330,6 +267,8 @@ export default function SupplyPage() {
 
       </div>
     </section>
+
+    <TechMarquee />
 
     <FooterSupply />
 
