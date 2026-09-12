@@ -1,6 +1,7 @@
 import { useLoaderData, redirect, useSearchParams } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { Award, MapPin, Menu } from 'lucide-react'
+import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import FooterSupply from './FooterSupply'
 import NavbarCategory from './NavbarCategory'
 import BrandCatalogSection from './BrandCatalogSection'
@@ -186,7 +187,7 @@ export default function EstudioSupplyPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <NavbarCategory pageName={nombreSupply} />
+      <NavbarCategory pageName={nombreSupply} hideMenu />
 
       {/* HERO blanco (2026-08-09, Jose: "el fondo del hero debera ser
           blanco") — mismo look que el perfil del estudio/artista en el
@@ -275,6 +276,31 @@ export default function EstudioSupplyPage() {
             )}
           </div>
         </div>
+
+        {/* Redes + WhatsApp (2026-09-13) — mismo bloque que ya usa
+            EstudioTiendaPage.jsx en Store; acá nunca se había agregado, así
+            que un proveedor con sus redes cargadas en su perfil no las veía
+            reflejadas en su propio catálogo. Bio queda afuera a propósito
+            (Jose: "de momento no activemos la bio"). */}
+        {(estudio.instagram || estudio.facebook || estudio.whatsapp) && (
+          <div className="max-w-7xl mx-auto flex items-center gap-3 mt-4">
+            {estudio.whatsapp && (
+              <a href={`https://wa.me/${estudio.whatsapp}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-white text-xs font-bold" style={{ backgroundColor: '#25D366' }}>
+                <FaWhatsapp size={13} /> WhatsApp
+              </a>
+            )}
+            {estudio.instagram && (
+              <a href={estudio.instagram} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center w-8 h-8 rounded-full text-white bg-gray-900">
+                <FaInstagram size={14} />
+              </a>
+            )}
+            {estudio.facebook && (
+              <a href={estudio.facebook} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center w-8 h-8 rounded-full text-white bg-gray-900">
+                <FaFacebook size={14} />
+              </a>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="pt-8 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">

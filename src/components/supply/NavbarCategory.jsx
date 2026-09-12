@@ -7,7 +7,14 @@ import logoSupply from '../../assets/milogo/supply.webp'
 import AnimatedWordmark from '../AnimatedWordmark'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 
-export default function NavbarCategory({ pageName }) {
+// hideMenu (2026-09-13, Jose) — mismo criterio que NavbarCategoryStore.jsx:
+// el catálogo de un proveedor (EstudioSupplyPage.jsx) ya tiene su propio
+// botón de gestión en el hero (solo el dueño lo ve), y de paso confundía al
+// dueño mismo — entró a su propio catálogo, abrió ESTE menú genérico en vez
+// del suyo, navegó, y al volver perdió el ?token= de la URL (por eso el
+// botón de gestión "desaparecía" y parecía un bug). Se oculta sin afectar
+// el resto de Supply (categorías/directorio de marcas siguen igual).
+export default function NavbarCategory({ pageName, hideMenu = false }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { count } = useSupplyCart()
@@ -59,19 +66,21 @@ export default function NavbarCategory({ pageName }) {
                 )}
               </button>
 
-              <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="text-zinc-400 hover:text-white transition-all duration-300"
-              >
-                {menuOpen ? <X size={20} /> : <Menu size={20} />}
-              </button>
+              {!hideMenu && (
+                <button
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  className="text-zinc-400 hover:text-white transition-all duration-300"
+                >
+                  {menuOpen ? <X size={20} /> : <Menu size={20} />}
+                </button>
+              )}
             </div>
 
           </div>
         </div>
 
         {/* MENÚ DESPLEGABLE */}
-        {menuOpen && (
+        {!hideMenu && menuOpen && (
           <div className="fixed left-0 right-0 top-16 md:top-20 bg-black border-t border-zinc-800 z-50 max-h-[calc(100vh-4rem)] overflow-y-auto">
             <Link to="/supply" onClick={() => setMenuOpen(false)}
               className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
