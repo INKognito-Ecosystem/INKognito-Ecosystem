@@ -1,5 +1,6 @@
+import { useMemo, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
-import { MapPin, ShieldCheck } from 'lucide-react'
+import { MapPin, ShieldCheck, Search } from 'lucide-react'
 import NavbarCategory from './NavbarCategory'
 import FooterSupply from './FooterSupply'
 import { cloudinaryFill } from '../../lib/cloudinary'
@@ -37,8 +38,19 @@ export function meta() {
   ]
 }
 
+// Sin tildes/mayúsculas — mismo criterio de búsqueda insensible a acentos
+// ya usado en el buscador de producto/proveedor de SupplyCategoryPage.jsx.
+const normaliza = (s) => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+
 export default function SupplyProveedoresPage() {
   const { proveedores } = useLoaderData()
+  const [busqueda, setBusqueda] = useState('')
+
+  const proveedoresFiltrados = useMemo(() => {
+    if (!busqueda.trim()) return proveedores
+    const q = normaliza(busqueda)
+    return proveedores.filter(p => normaliza(p.nombre_supply).includes(q) || normaliza(p.municipio).includes(q))
+  }, [proveedores, busqueda])
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -59,8 +71,22 @@ export default function SupplyProveedoresPage() {
         {proveedores.length === 0 ? (
           <p className="text-zinc-600 text-sm text-center py-10">Todavía no hay proveedores registrados.</p>
         ) : (
+          <>
+            <div className="relative max-w-sm mx-auto mb-8">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
+              <input
+                type="text"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                placeholder="Buscar por nombre o ciudad"
+                className="w-full bg-zinc-900 border border-zinc-800 text-zinc-300 text-sm rounded-lg pl-9 pr-3 py-2.5 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500"
+              />
+            </div>
+            {proveedoresFiltrados.length === 0 ? (
+              <p className="text-zinc-600 text-sm text-center py-10">Ningún proveedor coincide con "{busqueda}".</p>
+            ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {proveedores.map((p) => (
+            {proveedoresFiltrados.map((p) => (
               <Link
                 key={p.id}
                 to={`/supply/estudio/${p.id}`}
@@ -95,6 +121,8 @@ export default function SupplyProveedoresPage() {
               </Link>
             ))}
           </div>
+            )}
+          </>
         )}
 
         <div className="mt-12 text-center border-t border-zinc-800 pt-8">
