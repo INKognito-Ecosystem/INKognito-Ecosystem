@@ -1,15 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, redirect, useLoaderData, useNavigate, useSearchParams } from 'react-router-dom'
-import { Camera, LoaderCircle, Mail, Pencil, MapPin, Users, UserPlus, X, Navigation, Check, Trash2, ShoppingBag, ExternalLink, Wallet, ChevronDown, CopyPlus, Eye, Plus, Link2, ChevronLeft, ChevronRight, Copy } from 'lucide-react'
+import { Camera, LoaderCircle, Mail, Pencil, MapPin, Users, UserPlus, X, Navigation, Check, ShoppingBag, ExternalLink, ChevronLeft, ChevronRight, Copy } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
 import { DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO } from '../../data/colombiaGeo'
-// "Mis productos en Supply" y "Mis ventas" (extraídos 2026-09-12 a
-// src/components/supply/ — mismo criterio que Store: se reutilizan tal
-// cual dentro de EstudioSupplyOwnerPanel.jsx, sin duplicar esta lógica.
-import MisProductosSupplySection from '../supply/MisProductosSupplySection'
-import MisVentasSupplySection from '../supply/MisVentasSupplySection'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const SITE_URL = import.meta.env.VITE_SITE_URL
@@ -17,8 +12,6 @@ const SITE_URL = import.meta.env.VITE_SITE_URL
 // (2026-08-06) — key propia para no chocar con el token del artista.
 const EDIT_TOKEN_KEY = 'estudio_edit_token'
 const BTN = '#374151'
-const MP_BLUE = '#3483FA'
-const MP_LOGO_URL = 'https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.21.0/mercadopago/logo__large@2x.png'
 
 // Dashboard de estudio (fase 3 del directorio, 2026-08-06) — mellizo
 // simplificado de ArtistaEditarPerfilPage.jsx: mismo mecanismo de sesión
@@ -252,14 +245,9 @@ function MiEquipoSection({ token, artistas, invitacionesIniciales, esEmpresa }) 
   )
 }
 
-function FormularioEdicionEstudio({ token, estudio: estudioInicial, cloud_name, upload_preset, invitaciones }) {
+function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, invitaciones }) {
   const [searchParams] = useSearchParams()
-  const mp = searchParams.get('mp')
-  // vende_supply local (2026-09-13) — separado del resto de `estudio`
-  // porque es el único campo que puede cambiar EN VIVO en esta pantalla
-  // (al autoactivar la tienda de Supply, ver activarSupply más abajo),
-  // sin necesitar recargar la página.
-  const [estudio, setEstudio] = useState(estudioInicial)
+  const navigate = useNavigate()
 
   // Panel unificado (2026-09-13, Jose: "el formato de editar mi estudio es
   // confuso... debería haber un mismo panel, sumamente completo... el
@@ -281,10 +269,16 @@ function FormularioEdicionEstudio({ token, estudio: estudioInicial, cloud_name, 
   const puedeAutoactivarSupply = estudio.tipo === 'estudio'
   const muestraSupply = estudio.vende_supply || puedeAutoactivarSupply
 
-  const [vista, setVista] = useState(() => (mp != null ? 'supply' : 'menu'))
+  const [vista, setVista] = useState('menu')
 
   const linkPerfil = `${SITE_URL}/tattoo-artist-colombia/estudio/${estudio.id}`
   const linkSupply = `${SITE_URL}/supply/${estudio.slug || `estudio/${estudio.id}`}`
+  // Ruta relativa + token (2026-09-13) — a diferencia de linkSupply de
+  // arriba (absoluto, para copiar y compartir con clientes), esto es
+  // para el propio Link de react-router de "Tienda en Supply": navega
+  // con SU token puesto, para que EstudioSupplyPage.jsx lo reconozca
+  // como dueño y muestre el botón hamburguesa de gestión.
+  const rutaSupplyPropia = `/supply/${estudio.slug || `estudio/${estudio.id}`}?token=${encodeURIComponent(token)}`
   const [copiadoPerfil, setCopiadoPerfil] = useState(false)
   const [copiadoSupply, setCopiadoSupply] = useState(false)
   const copiarLinkPerfil = () => {
@@ -313,10 +307,13 @@ function FormularioEdicionEstudio({ token, estudio: estudioInicial, cloud_name, 
       })
       if (!res.ok) throw new Error()
       const data = await res.json()
-      setEstudio((e) => ({ ...e, ...data }))
+      // Directo al catálogo real recién activado (2026-09-13, Jose: "este
+      // botón abre la tienda de la misma forma que se le muestra a un
+      // proveedor nativo") — no hace falta quedarse en esta pantalla ni
+      // actualizar estado local, ya no hay nada más que mostrar acá.
+      navigate(`/supply/${data.slug || `estudio/${data.id}`}?token=${encodeURIComponent(token)}&bienvenida=1`)
     } catch {
       setErrorActivarSupply('No pudimos activarla — intenta de nuevo en un momento.')
-    } finally {
       setActivandoSupply(false)
     }
   }
@@ -461,12 +458,33 @@ function FormularioEdicionEstudio({ token, estudio: estudioInicial, cloud_name, 
                 <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
               </button>
             )}
+            {/* "Tienda en Supply" (2026-09-13, Jose: "debería abrir
+                primeramente el como se ve el perfil en realidad, y con su
+                botón hamburguesa para los cambios... literalmente este
+                botón abre la tienda de la misma forma que se le muestra a
+                un proveedor nativo") — si ya está activa, esto NO abre una
+                vista propia acá: navega derecho al catálogo real
+                (EstudioSupplyPage.jsx), con su token puesto, donde ya
+                existe el mismo panel de gestión (hamburguesa → editar
+                perfil/productos/ventas/Mercado Pago) que ya construimos
+                para proveedores nativos — un solo lugar, no dos paneles
+                de Supply distintos. Si aún no está activa, sí abre una
+                vista acá mismo con el botón de autoactivar (no hay
+                catálogo real todavía al que navegar). */}
             {muestraSupply && (
-              <button type="button" onClick={() => setVista('supply')} className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors">
-                <ShoppingBag size={16} className="text-gray-400 flex-shrink-0" />
-                <span className="flex-1 text-sm font-bold text-gray-900">Tienda en Supply</span>
-                <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
-              </button>
+              estudio.vende_supply ? (
+                <Link to={rutaSupplyPropia} className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors">
+                  <ShoppingBag size={16} className="text-gray-400 flex-shrink-0" />
+                  <span className="flex-1 text-sm font-bold text-gray-900">Tienda en Supply</span>
+                  <ExternalLink size={14} className="text-gray-300 flex-shrink-0" />
+                </Link>
+              ) : (
+                <button type="button" onClick={() => setVista('supply')} className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors">
+                  <ShoppingBag size={16} className="text-gray-400 flex-shrink-0" />
+                  <span className="flex-1 text-sm font-bold text-gray-900">Tienda en Supply</span>
+                  <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
+                </button>
+              )
             )}
           </div>
 
@@ -557,7 +575,7 @@ function FormularioEdicionEstudio({ token, estudio: estudioInicial, cloud_name, 
               <div className="absolute z-20 top-full right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left">
                 <span className="absolute -top-1.5 right-3 w-3 h-3 bg-gray-900 rotate-45" />
                 <p className="text-xs leading-relaxed text-gray-200">
-                  Toca "Editar" para cambiar el nombre, ubicación y redes de tu estudio — o cualquier foto, para reemplazarla.
+                  Toca "Editar" para cambiar el nombre o la descripción — la ubicación, redes y fotos ya están siempre listas para editar más abajo.
                 </p>
                 <button
                   onClick={cerrarTooltipEditar}
@@ -601,8 +619,13 @@ function FormularioEdicionEstudio({ token, estudio: estudioInicial, cloud_name, 
         </div>
       </div>
 
-      {editandoHero && (
-        <div className="mt-6 space-y-4 max-w-xl">
+      {/* Ubicación/redes SIEMPRE visibles (2026-09-13, Jose: "creo que
+          deberia mostrarce siempre y no esperar a dar editar") — "Editar"
+          ahora solo controla nombre+bio (los dos campos de arriba que
+          alternan entre texto plano e input/textarea); estos campos son
+          inputs de toda la vida, no tiene sentido esconderlos detrás de
+          ese mismo botón. */}
+      <div className="mt-6 space-y-4 max-w-xl">
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>Departamento *</label>
@@ -656,12 +679,7 @@ function FormularioEdicionEstudio({ token, estudio: estudioInicial, cloud_name, 
             <input value={form.google_maps_url} onChange={set('google_maps_url')} placeholder="https://maps.app.goo.gl/..." className={inputClass} />
             <p className="text-gray-400 text-[10px] mt-1">Si ya tienes ficha de tu negocio en Google Maps, pégala acá — el botón de ubicación de tu perfil abrirá esa ficha real en vez de un pin genérico. No reemplaza la ubicación exacta de arriba, es un extra: no afecta el orden del buscador.</p>
           </div>
-        </div>
-      )}
-
-      {!editandoHero && (
-        <p className="text-gray-400 text-[10px] mt-2 flex items-center gap-1"><MapPin size={10} />{form.municipio ? `${form.municipio}${form.departamento ? ', ' + form.departamento : ''}` : 'Sin ubicación'}</p>
-      )}
+      </div>
 
       {/* fase 6.2 (2026-08-07) — link a su propio catálogo (interno o
           externo), solo para marcas/empresas. Reusa el mismo mecanismo
@@ -699,105 +717,34 @@ function FormularioEdicionEstudio({ token, estudio: estudioInicial, cloud_name, 
       </div>
       )}
 
-      {/* "Tienda en Supply" — visible si ya vende_supply, O si el estudio
-          puede autoactivarla (tipo='estudio', ver puedeAutoactivarSupply
-          arriba). Adentro, dos estados: sin activar (CTA de un clic) vs.
-          ya activa (panel completo, sin cambios respecto a la versión
-          anterior). */}
-      {muestraSupply && (
+      {/* "Tienda en Supply" — esta vista SOLO existe para el caso "aún no
+          activa" (ver el Link vs. botón en el menú, arriba): en cuanto
+          vende_supply es true, el ítem del menú ya no entra acá, navega
+          derecho al catálogo real. El panel de gestión completo
+          (nombre para Supply, Mercado Pago, cajas surtidas, productos,
+          ventas) ya NO se duplica en este archivo — vive un solo lugar,
+          EstudioSupplyOwnerPanel.jsx, igual para estudio/empresa/
+          proveedor. */}
+      {puedeAutoactivarSupply && !estudio.vende_supply && (
       <div className={vista === 'supply' ? 'block' : 'hidden'}>
-      <div className="px-4 max-w-3xl mx-auto lg:mx-0 space-y-4">
-        {!estudio.vende_supply ? (
-          // CTA de autoactivación (2026-09-13, Jose: "el mismo estudio desde
-          // su dashboard debería habilitar que tiene una tienda en línea").
-          <div className="text-center py-10 max-w-sm mx-auto">
-            <ShoppingBag size={40} className="mx-auto mb-4 text-gray-300" />
-            <h2 className="text-lg font-black uppercase mb-2">Activa tu tienda en Supply</h2>
-            <p className="text-gray-500 text-sm leading-relaxed mb-6">
-              Vende insumos de tatuaje directo a otros tatuadores, con tu propio catálogo dentro de INKognito Supply — sin pasar por nadie.
-            </p>
-            {errorActivarSupply && <p className="text-red-600 text-xs mb-3">{errorActivarSupply}</p>}
-            <button
-              type="button"
-              onClick={activarSupply}
-              disabled={activandoSupply}
-              className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
-              style={{ backgroundColor: BTN }}
-            >
-              {activandoSupply ? 'Activando...' : 'Activar mi tienda en Supply'}
-            </button>
-          </div>
-        ) : (
-        <>
-          <div>
-            <label className={labelClass}>Nombre para mostrar en Supply (opcional)</label>
-            <input value={form.nombre_supply} onChange={set('nombre_supply')} placeholder={form.nombre || 'Nombre del estudio'} className={inputClass} />
-            <p className="text-gray-400 text-[10px] mt-1">Si vendes insumos además de tatuar, puedes usar un nombre distinto acá (ej. "INKognito Supply") — si lo dejas vacío, se muestra el mismo nombre de tu perfil.</p>
-          </div>
-
-          {/* Mercado Pago Split (fase 5, 2026-08-07) — mismo patrón que
-              ArtistaEditarPerfilPage.jsx: sin esto conectado, un comprador
-              no puede pagarte directo por tus productos de Supply. */}
-          <div>
-            <label className={labelClass}>Mercado Pago</label>
-            {estudio.mp_conectado ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border" style={{ borderColor: MP_BLUE }}>
-                <img src={MP_LOGO_URL} alt="Mercado Pago" className="h-4" onError={(e) => { e.currentTarget.style.display = 'none' }} />
-                <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: MP_BLUE }}>Conectado</span>
-              </span>
-            ) : (
-              <a
-                href={`${PANEL_URL}/api/estudios-mp-conectar?token=${encodeURIComponent(token)}`}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-white text-[11px] font-black uppercase tracking-widest shadow-md hover:opacity-90 transition-opacity"
-                style={{ backgroundColor: MP_BLUE }}
-              >
-                Conecta Mercado Pago <ExternalLink size={12} />
-              </a>
-            )}
-            {!estudio.mp_conectado && (
-              <p className="text-gray-400 text-[10px] mt-1.5">Sin esto conectado, nadie puede pagarte por tus productos de Supply — la plata te llega directo a tu cuenta, sin pasar por INKognito.</p>
-            )}
-            {mp === 'ok' && <p className="text-green-600 text-[11px] font-bold mt-1.5">¡Mercado Pago conectado!</p>}
-            {mp === 'error' && <p className="text-red-600 text-[11px] font-bold mt-1.5">No pudimos conectar tu cuenta — intenta de nuevo.</p>}
-          </div>
-
-          {/* Cajas surtidas de cartuchos (2026-08-09) — reencuadrado el
-              mismo día: en vez de que solo Jose active esto por
-              proveedor, cada proveedor lo prende/apaga él mismo acá,
-              igual que ya autogestiona su inventario. Solo tiene efecto
-              si además hay productos reales en categoría Cartuchos (ver
-              EstudioSupplyPage.jsx) — sin eso, no hay de qué armar la
-              caja aunque el interruptor esté prendido. */}
-          <div className="border-t border-gray-200 pt-4">
-            <label className="flex items-center gap-2.5 cursor-pointer">
-              <input type="checkbox" checked={form.vende_cajas_surtidas} onChange={(e) => setForm((f) => ({ ...f, vende_cajas_surtidas: e.target.checked }))} className="w-4 h-4" />
-              <span className={labelClass}>Ofrecer cajas surtidas de cartuchos</span>
-            </label>
-            <p className="text-gray-400 text-[10px] mt-1 mb-3">Le muestra a tus clientes un armador de cajas de 20 cartuchos (calibre y referencia a su gusto) en tu propia tienda de Supply — usa tus productos de Cartuchos ya cargados como referencia de precio, no necesitas subir nada aparte.</p>
-            {form.vende_cajas_surtidas && (
-              <div>
-                <label className={labelClass}>Recargo por armar la caja (%)</label>
-                <input type="number" min="0" step="1" value={form.recargo_caja_surtida_pct} onChange={(e) => setForm((f) => ({ ...f, recargo_caja_surtida_pct: Number(e.target.value) || 0 }))} className={inputClass} style={{ maxWidth: '140px' }} />
-                <p className="text-gray-400 text-[10px] mt-1">0% = la caja surtida cuesta lo mismo que una caja completa de esa referencia. Súbelo si quieres cobrar de más por armarla a la medida.</p>
-              </div>
-            )}
-          </div>
-
-          <MisVentasSupplySection token={token} />
-          <MisProductosSupplySection token={token} cloud_name={cloud_name} upload_preset={upload_preset} />
-
-          {error && <p className="text-red-600 text-sm text-center mt-4">{error}</p>}
+      <div className="px-4 max-w-3xl mx-auto lg:mx-0">
+        <div className="text-center py-10 max-w-sm mx-auto">
+          <ShoppingBag size={40} className="mx-auto mb-4 text-gray-300" />
+          <h2 className="text-lg font-black uppercase mb-2">Activa tu tienda en Supply</h2>
+          <p className="text-gray-500 text-sm leading-relaxed mb-6">
+            Vende insumos de tatuaje directo a otros tatuadores, con tu propio catálogo dentro de INKognito Supply — sin pasar por nadie.
+          </p>
+          {errorActivarSupply && <p className="text-red-600 text-xs mb-3">{errorActivarSupply}</p>}
           <button
             type="button"
-            onClick={guardar}
-            disabled={guardando}
-            className="w-full mt-4 py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
+            onClick={activarSupply}
+            disabled={activandoSupply}
+            className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
             style={{ backgroundColor: BTN }}
           >
-            {guardando ? 'Guardando...' : guardado ? '✓ Guardado' : 'Guardar cambios'}
+            {activandoSupply ? 'Activando...' : 'Activar mi tienda en Supply'}
           </button>
-        </>
-        )}
+        </div>
       </div>
       </div>
       )}
