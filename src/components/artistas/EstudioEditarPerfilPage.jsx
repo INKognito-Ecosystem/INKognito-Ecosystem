@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, redirect, useLoaderData, useNavigate, useSearchParams } from 'react-router-dom'
-import { Camera, LoaderCircle, Mail, Pencil, MapPin, Users, UserPlus, X, Navigation, Check, Trash2, ShoppingBag, ExternalLink, Wallet, ChevronDown, CopyPlus, Eye, Plus, Link2 } from 'lucide-react'
+import { Camera, LoaderCircle, Mail, Pencil, MapPin, Users, UserPlus, X, Navigation, Check, Trash2, ShoppingBag, ExternalLink, Wallet, ChevronDown, CopyPlus, Eye, Plus, Link2, ChevronLeft, ChevronRight, Copy } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
-import EditarPerfilTabs from './EditarPerfilTabs'
 import { DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO } from '../../data/colombiaGeo'
 // "Mis productos en Supply" y "Mis ventas" (extraídos 2026-09-12 a
 // src/components/supply/ — mismo criterio que Store: se reutilizan tal
@@ -13,6 +12,7 @@ import MisProductosSupplySection from '../supply/MisProductosSupplySection'
 import MisVentasSupplySection from '../supply/MisVentasSupplySection'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+const SITE_URL = import.meta.env.VITE_SITE_URL
 // Mismo mecanismo de sesión persistida que ArtistaEditarPerfilPage.jsx
 // (2026-08-06) — key propia para no chocar con el token del artista.
 const EDIT_TOKEN_KEY = 'estudio_edit_token'
@@ -61,6 +61,7 @@ export function meta() {
 
 const inputClass = 'w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-500 transition-colors'
 const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb-1.5 block'
+const VISTA_TITULOS = { perfil: 'Editar mi perfil', supply: 'Tienda en Supply' }
 
 // Pantalla 1 — sin token: solo pide el correo y dispara el envío del link.
 function PedirLinkForm() {
@@ -251,31 +252,75 @@ function MiEquipoSection({ token, artistas, invitacionesIniciales, esEmpresa }) 
   )
 }
 
-function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, invitaciones }) {
-  const [searchParams, setSearchParams] = useSearchParams()
+function FormularioEdicionEstudio({ token, estudio: estudioInicial, cloud_name, upload_preset, invitaciones }) {
+  const [searchParams] = useSearchParams()
   const mp = searchParams.get('mp')
-  // Pestañas (2026-08-19) — mismo patrón que ArtistaEditarPerfilPage.jsx:
-  // "Supply" solo aparece en el menú si el estudio tiene vende_supply
-  // activo. Si la URL trae un ?tab= que ya no aplica (ej. se desactivó
-  // Supply), cae de vuelta a "Mi perfil" en vez de mostrar una pestaña
-  // fantasma. Este dashboard ya solo atiende estudio/empresa/proveedor —
-  // una tienda (tipo='tienda') nunca llega acá, el loader la redirige a su
-  // propia página (ver EstudioTiendaPage.jsx) antes de renderizar nada.
-  // "Mi equipo"/"Patrocinados" no aplica a 'proveedor' (Supply nativo,
-  // 2026-09-12) — patrocinar/invitar artistas es un tema de marcas, no
-  // de un negocio que solo vende insumos.
-  const tabsEstudio = [
-    { key: 'perfil', label: 'Mi perfil', icon: MapPin },
-    ...(estudio.tipo === 'proveedor' ? [] : [{ key: 'equipo', label: estudio.tipo === 'empresa' ? 'Patrocinados' : 'Mi equipo', icon: Users }]),
-    ...(estudio.vende_supply ? [{ key: 'supply', label: 'Supply', icon: ShoppingBag }] : []),
-  ]
-  const tabPedido = searchParams.get('tab')
-  const activeTab = tabsEstudio.some((t) => t.key === tabPedido) ? tabPedido : 'perfil'
-  const cambiarTab = (key) => {
-    const next = new URLSearchParams(searchParams)
-    next.set('tab', key)
-    setSearchParams(next, { replace: true })
+  // vende_supply local (2026-09-13) — separado del resto de `estudio`
+  // porque es el único campo que puede cambiar EN VIVO en esta pantalla
+  // (al autoactivar la tienda de Supply, ver activarSupply más abajo),
+  // sin necesitar recargar la página.
+  const [estudio, setEstudio] = useState(estudioInicial)
+
+  // Panel unificado (2026-09-13, Jose: "el formato de editar mi estudio es
+  // confuso... debería haber un mismo panel, sumamente completo... el
+  // patrón que ya trae el panel me gusta") — mismo espíritu de menú +
+  // vista con flecha de regreso que EstudioSupplyOwnerPanel.jsx/
+  // EstudioTiendaOwnerPanel.jsx, reemplaza el sidebar/hamburguesa de
+  // EditarPerfilTabs.jsx (que Jose sentía confuso, y donde meter encima
+  // todo el panel de gestión de Supply hubiera sido "mucha carga"). Este
+  // dashboard ya solo atiende estudio/empresa/proveedor — una tienda
+  // (tipo='tienda') nunca llega acá, el loader la redirige a su propia
+  // página (ver EstudioTiendaPage.jsx) antes de renderizar nada.
+  const esProveedor = estudio.tipo === 'proveedor'
+  const esEmpresa = estudio.tipo === 'empresa'
+  // Autogestionable SOLO para estudio (Jose, 2026-09-13: "solo es para
+  // estudios, para marcas aún no") — una marca sigue viendo esta sección
+  // nada más si Jose YA le activó vende_supply a mano; un estudio la ve
+  // SIEMPRE (activa o no) para poder prender su propia tienda él mismo. Un
+  // proveedor nativo ya nace con esto activo (ver server.js).
+  const puedeAutoactivarSupply = estudio.tipo === 'estudio'
+  const muestraSupply = estudio.vende_supply || puedeAutoactivarSupply
+
+  const [vista, setVista] = useState(() => (mp != null ? 'supply' : 'menu'))
+
+  const linkPerfil = `${SITE_URL}/tattoo-artist-colombia/estudio/${estudio.id}`
+  const linkSupply = `${SITE_URL}/supply/${estudio.slug || `estudio/${estudio.id}`}`
+  const [copiadoPerfil, setCopiadoPerfil] = useState(false)
+  const [copiadoSupply, setCopiadoSupply] = useState(false)
+  const copiarLinkPerfil = () => {
+    navigator.clipboard.writeText(linkPerfil).then(() => {
+      setCopiadoPerfil(true)
+      setTimeout(() => setCopiadoPerfil(false), 1500)
+    }).catch(() => {})
   }
+  const copiarLinkSupply = () => {
+    navigator.clipboard.writeText(linkSupply).then(() => {
+      setCopiadoSupply(true)
+      setTimeout(() => setCopiadoSupply(false), 1500)
+    }).catch(() => {})
+  }
+
+  const [activandoSupply, setActivandoSupply] = useState(false)
+  const [errorActivarSupply, setErrorActivarSupply] = useState(null)
+  const activarSupply = async () => {
+    setErrorActivarSupply(null)
+    setActivandoSupply(true)
+    try {
+      const res = await fetch(`${PANEL_URL}/api/estudios-activar-supply-por-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      setEstudio((e) => ({ ...e, ...data }))
+    } catch {
+      setErrorActivarSupply('No pudimos activarla — intenta de nuevo en un momento.')
+    } finally {
+      setActivandoSupply(false)
+    }
+  }
+
   const [form, setForm] = useState({
     nombre: estudio.nombre || '', departamento: estudio.departamento || '', municipio: estudio.municipio || '',
     lat: estudio.lat ?? null, lng: estudio.lng ?? null,
@@ -386,9 +431,68 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
         />
       ))}
 
-      <EditarPerfilTabs tabs={tabsEstudio} activeTab={activeTab} onChange={cambiarTab}>
+      <div className="px-4 max-w-md mx-auto lg:max-w-3xl">
+        <div className="flex items-center gap-2 mb-5 sticky top-16 md:top-20 bg-white pt-3 pb-2 -mx-4 px-4 z-10 border-b border-gray-100">
+          {vista !== 'menu' ? (
+            <button type="button" onClick={() => setVista('menu')} aria-label="Volver" className="text-gray-400 hover:text-gray-700 flex-shrink-0">
+              <ChevronLeft size={20} />
+            </button>
+          ) : (
+            <span className="w-5 flex-shrink-0" />
+          )}
+          <p className="flex-1 text-sm font-black uppercase tracking-widest text-gray-900">
+            {vista === 'menu' ? 'Panel de tu estudio' : vista === 'equipo' ? (esEmpresa ? 'Patrocinados' : 'Mis artistas') : VISTA_TITULOS[vista]}
+          </p>
+        </div>
+      </div>
 
-      <div className={activeTab === 'perfil' ? 'block' : 'hidden'}>
+      {vista === 'menu' && (
+        <div className="px-4 max-w-md mx-auto space-y-4">
+          <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
+            <button type="button" onClick={() => setVista('perfil')} className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors">
+              <Pencil size={16} className="text-gray-400 flex-shrink-0" />
+              <span className="flex-1 text-sm font-bold text-gray-900">Editar mi perfil</span>
+              <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
+            </button>
+            {!esProveedor && (
+              <button type="button" onClick={() => setVista('equipo')} className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors">
+                <Users size={16} className="text-gray-400 flex-shrink-0" />
+                <span className="flex-1 text-sm font-bold text-gray-900">{esEmpresa ? 'Patrocinados' : 'Mis artistas'}</span>
+                <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
+              </button>
+            )}
+            {muestraSupply && (
+              <button type="button" onClick={() => setVista('supply')} className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors">
+                <ShoppingBag size={16} className="text-gray-400 flex-shrink-0" />
+                <span className="flex-1 text-sm font-bold text-gray-900">Tienda en Supply</span>
+                <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
+              </button>
+            )}
+          </div>
+
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+            <label className={labelClass}>Link de tu perfil en el buscador</label>
+            <p className="text-gray-500 text-[11px] mb-2.5">Compártelo con quien quiera ver tu estudio en Tattoo Artist Colombia.</p>
+            <button type="button" onClick={copiarLinkPerfil} className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg bg-white border border-gray-300 text-left hover:border-gray-400 transition-colors">
+              <span className="text-xs font-mono text-gray-700 truncate">{linkPerfil}</span>
+              {copiadoPerfil ? <Check size={16} className="text-green-600 flex-shrink-0" /> : <Copy size={16} className="text-gray-400 flex-shrink-0" />}
+            </button>
+          </div>
+
+          {estudio.vende_supply && (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <label className={labelClass}>Link de tu tienda en Supply</label>
+              <p className="text-gray-500 text-[11px] mb-2.5">Comparte este con tus clientes para que compren directo.</p>
+              <button type="button" onClick={copiarLinkSupply} className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg bg-white border border-amber-300 text-left hover:border-amber-400 transition-colors">
+                <span className="text-xs font-mono text-gray-700 truncate">{linkSupply}</span>
+                {copiadoSupply ? <Check size={16} className="text-green-600 flex-shrink-0" /> : <Copy size={16} className="text-amber-600 flex-shrink-0" />}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className={vista === 'perfil' ? 'block' : 'hidden'}>
       <div className="px-4 max-w-3xl mx-auto lg:mx-0">
 
       <div className="w-full h-40 sm:h-56 bg-gray-100 overflow-hidden relative rounded-2xl">
@@ -585,29 +689,46 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
       </div>
       </div>
 
-      {/* Pestaña "Mi equipo"/"Patrocinados" (2026-08-19) — antes vivía
-          pegada debajo del hero; ahora es su propia pestaña, self-
-          contained (guarda aparte, no necesita el botón de arriba). */}
-      <div className={activeTab === 'equipo' ? 'block' : 'hidden'}>
+      {/* "Mis artistas"/"Patrocinados" (2026-08-19) — self-contained (guarda
+          aparte, no necesita el botón de arriba). */}
+      {!esProveedor && (
+      <div className={vista === 'equipo' ? 'block' : 'hidden'}>
       <div className="px-4 max-w-3xl mx-auto lg:mx-0">
-        <MiEquipoSection token={token} artistas={estudio.artistas} invitacionesIniciales={invitaciones} esEmpresa={estudio.tipo === 'empresa'} />
+        <MiEquipoSection token={token} artistas={estudio.artistas} invitacionesIniciales={invitaciones} esEmpresa={esEmpresa} />
       </div>
       </div>
+      )}
 
-      {/* Pestaña "Supply" (2026-08-19) — solo se monta si vende_supply,
-          mismo criterio que ya decide si aparece en tabsEstudio. */}
-      {estudio.vende_supply && (
-      <div className={activeTab === 'supply' ? 'block' : 'hidden'}>
-      {/* lg:pt-6 (2026-08-27, Jose: "ese texto está demasiado cerca del
-          navbar... solo pasa en PC") — el -mt-4 de EditarPerfilTabs.jsx
-          pega la barra de pestañas al navbar a propósito (pedido en esa
-          misma sesión), y en móvil el propio botón ☰ actúa de colchón
-          visual antes del contenido. En desktop no hay nada intermedio:
-          el sidebar de pestañas no ocupa la fila de arriba del contenido,
-          así que el primer campo de esta pestaña (sin padding propio, a
-          diferencia de "Mi equipo" que ya trae py-5 en su card) quedaba
-          pegado directo al navbar. */}
-      <div className="px-4 max-w-3xl mx-auto lg:mx-0 lg:pt-6 space-y-4">
+      {/* "Tienda en Supply" — visible si ya vende_supply, O si el estudio
+          puede autoactivarla (tipo='estudio', ver puedeAutoactivarSupply
+          arriba). Adentro, dos estados: sin activar (CTA de un clic) vs.
+          ya activa (panel completo, sin cambios respecto a la versión
+          anterior). */}
+      {muestraSupply && (
+      <div className={vista === 'supply' ? 'block' : 'hidden'}>
+      <div className="px-4 max-w-3xl mx-auto lg:mx-0 space-y-4">
+        {!estudio.vende_supply ? (
+          // CTA de autoactivación (2026-09-13, Jose: "el mismo estudio desde
+          // su dashboard debería habilitar que tiene una tienda en línea").
+          <div className="text-center py-10 max-w-sm mx-auto">
+            <ShoppingBag size={40} className="mx-auto mb-4 text-gray-300" />
+            <h2 className="text-lg font-black uppercase mb-2">Activa tu tienda en Supply</h2>
+            <p className="text-gray-500 text-sm leading-relaxed mb-6">
+              Vende insumos de tatuaje directo a otros tatuadores, con tu propio catálogo dentro de INKognito Supply — sin pasar por nadie.
+            </p>
+            {errorActivarSupply && <p className="text-red-600 text-xs mb-3">{errorActivarSupply}</p>}
+            <button
+              type="button"
+              onClick={activarSupply}
+              disabled={activandoSupply}
+              className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
+              style={{ backgroundColor: BTN }}
+            >
+              {activandoSupply ? 'Activando...' : 'Activar mi tienda en Supply'}
+            </button>
+          </div>
+        ) : (
+        <>
           <div>
             <label className={labelClass}>Nombre para mostrar en Supply (opcional)</label>
             <input value={form.nombre_supply} onChange={set('nombre_supply')} placeholder={form.nombre || 'Nombre del estudio'} className={inputClass} />
@@ -675,11 +796,11 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
           >
             {guardando ? 'Guardando...' : guardado ? '✓ Guardado' : 'Guardar cambios'}
           </button>
+        </>
+        )}
       </div>
       </div>
       )}
-
-      </EditarPerfilTabs>
     </div>
   )
 }

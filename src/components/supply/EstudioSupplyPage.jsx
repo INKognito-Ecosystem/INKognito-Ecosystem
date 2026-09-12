@@ -135,10 +135,19 @@ export default function EstudioSupplyPage() {
 
   // Tooltip de onboarding sobre el botón de gestión (2026-09-12) — mismo
   // patrón que EstudioTiendaPage.jsx (localStorage propio, una sola vez).
+  // Bug real (Jose, 2026-09-13): con bienvenida=1 el panel se auto-abre Y
+  // el tooltip se activaba al mismo tiempo, tapado detrás del panel (z
+  // más bajo) — recién se veía al CERRAR el panel, señalando un botón que
+  // el dueño ya usó. Si el panel se auto-abrió, el tooltip no tiene nada
+  // que enseñar — se marca como visto de una vez, sin mostrarlo nunca.
   const [tooltipVisible, setTooltipVisible] = useState(false)
   useEffect(() => {
     if (!esDueno) return
     try {
+      if (panelAbierto) {
+        localStorage.setItem('kg_tooltip_supply_panel_visto', '1')
+        return
+      }
       if (!localStorage.getItem('kg_tooltip_supply_panel_visto')) setTooltipVisible(true)
     } catch {}
   }, [esDueno])
