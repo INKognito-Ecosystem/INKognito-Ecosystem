@@ -19,17 +19,33 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-pro
 // por marca, copy escrito a mano), esta es dinámica: cualquier estudio
 // con vende_supply activo tiene esta misma página, sin tocar código.
 export async function loader({ params, request }) {
-  const token = new URL(request.url).searchParams.get('token')
+  const url = new URL(request.url)
+  const token = url.searchParams.get('token')
   let estudio = null, products = [], esDueno = false, cloud_name = null, upload_preset = null
   try {
-    const [estudioRes, catalogo] = await Promise.all([
-      fetch(`${PANEL_URL}/api/estudios/${params.id}`),
-      fetchCatalogEstudio('supply', params.id),
-    ])
+    const estudioRes = params.slug
+      ? await fetch(`${PANEL_URL}/api/estudios-por-slug/${encodeURIComponent(params.slug)}`)
+      : await fetch(`${PANEL_URL}/api/estudios/${params.id}`)
     estudio = estudioRes.ok ? await estudioRes.json() : null
-    products = catalogo.products
   } catch {
     estudio = null
+  }
+  // Link viejo con id numérico (2026-09-12, Jose: "debería llevar el
+  // nombre del negocio") — mismo criterio que EstudioTiendaPage.jsx: si
+  // ya tiene slug (todo estudio nuevo lo trae desde el registro, ver
+  // server.js), redirige a la URL bonita en vez de quedarse en /estudio/:id.
+  // Fuera del try/catch de arriba a propósito — throw redirect() es un
+  // Response, no un error.
+  if (params.id && estudio?.slug) {
+    throw redirect(`/supply/${estudio.slug}${url.search}`)
+  }
+  if (estudio) {
+    try {
+      const catalogo = await fetchCatalogEstudio('supply', estudio.id)
+      products = catalogo.products
+    } catch {
+      products = []
+    }
   }
   // fase 6.1 (2026-08-07, Jose) — una marca con landing propia ya hecha a
   // mano (marcasProfesionales/*.jsx) o su propio sitio externo no debe
@@ -97,7 +113,7 @@ export function meta({ data }) {
   return [
     { title },
     { name: 'description', content: description },
-    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/estudio/${estudio.id}` },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/${estudio.slug || `estudio/${estudio.id}`}` },
   ]
 }
 

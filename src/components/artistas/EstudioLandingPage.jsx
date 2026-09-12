@@ -56,7 +56,7 @@ export function meta({ data }) {
 // marcasProfesionales/*.jsx.
 function CatalogoCTA({ estudio }) {
   if (!(estudio.catalogo_url || (estudio.vende_supply && estudio.n_productos_supply > 0))) return null
-  const base = estudio.catalogo_url || `/supply/estudio/${estudio.id}`
+  const base = estudio.catalogo_url || `/supply/${estudio.slug || `estudio/${estudio.id}`}`
   const externo = /^https?:\/\//.test(base)
   const destino = externo ? base : `${base}${base.includes('?') ? '&' : '?'}flechas=0`
   const texto = estudio.tipo === 'empresa' ? 'Ver su catálogo' : 'Mi Supply en línea'

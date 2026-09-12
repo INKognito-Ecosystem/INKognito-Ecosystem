@@ -184,7 +184,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
     const map = new Map()
     for (const p of products) {
       if (p.estudio_id && p.estudio_nombre_supply && !map.has(p.estudio_id)) {
-        map.set(p.estudio_id, { nombre: p.estudio_nombre_supply, municipio: p.estudio_municipio || null })
+        map.set(p.estudio_id, { nombre: p.estudio_nombre_supply, municipio: p.estudio_municipio || null, slug: p.estudio_slug || null })
       }
     }
     return Array.from(map, ([id, v]) => ({ id, ...v }))
@@ -367,7 +367,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                               {p.municipio && <span className="text-zinc-600 font-normal"> · {p.municipio}</span>}
                             </button>
                             <Link
-                              to={`/supply/estudio/${p.id}`}
+                              to={`/supply/${p.slug || `estudio/${p.id}`}`}
                               onClick={(e) => e.stopPropagation()}
                               title={`Ver catálogo completo de ${p.nombre}`}
                               className="flex-shrink-0 px-2.5 py-2 text-zinc-600 hover:text-blue-400 transition-colors"

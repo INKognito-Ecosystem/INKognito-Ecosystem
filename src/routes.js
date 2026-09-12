@@ -74,6 +74,15 @@ export default [
   // vuelve el comprador tras pagar en Mercado Pago (back_urls de
   // POST /api/estudios-supply-comprar, panel).
   route('supply/compra/resultado', 'components/supply/SupplyCompraResultadoPage.jsx'),
+  // Link corto (2026-09-12, Jose: "debería llevar el nombre del
+  // negocio... como ya hace Store") — mismo patrón que store/:slug de
+  // abajo: SIEMPRE se declara DESPUÉS de las rutas fijas de arriba (React
+  // Router prioriza el segmento estático sin importar el orden, pero
+  // además SUPPLY_SLUGS_RESERVADOS en server.js nunca deja que un slug
+  // nuevo choque con esos nombres). /supply/estudio/:id se queda vivo
+  // como link viejo — el loader de EstudioSupplyPage.jsx redirige a
+  // /supply/:slug en cuanto el estudio tiene uno (todos desde 2026-09-12).
+  route('supply/:slug', 'components/supply/EstudioSupplyPage.jsx', { id: 'supply-estudio-slug' }),
 
   // Store
   route('store', 'components/store/StorePage.jsx'),

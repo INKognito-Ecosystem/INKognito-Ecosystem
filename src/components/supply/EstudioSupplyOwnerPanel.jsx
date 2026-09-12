@@ -37,8 +37,10 @@ export default function EstudioSupplyOwnerPanel({ estudio, token, cloud_name, up
   // Link para clientes (mismo razonamiento que en Store: la única URL que
   // el dueño conoce naturalmente es la SUYA, con su ?token= en la barra
   // del navegador — si la comparte tal cual, un cliente vería este mismo
-  // panel de gestión). Este botón arma la versión limpia, sin token.
-  const linkPublico = `${SITE_URL}/supply/estudio/${estudio.id}`
+  // panel de gestión). Este botón arma la versión limpia, sin token —
+  // con el nombre del negocio (slug) en vez de "estudio/<id>" en cuanto
+  // el estudio tiene uno (todos desde 2026-09-12, ver server.js).
+  const linkPublico = `${SITE_URL}/supply/${estudio.slug || `estudio/${estudio.id}`}`
   const copiarLinkPublico = async () => {
     try {
       await navigator.clipboard.writeText(linkPublico)

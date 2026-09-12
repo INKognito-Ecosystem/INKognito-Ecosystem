@@ -68,7 +68,7 @@ export default function CartuchosSurtidosPage() {
             {proveedores.map((p) => (
               <Link
                 key={p.id}
-                to={`/supply/estudio/${p.id}`}
+                to={`/supply/${p.slug || `estudio/${p.id}`}`}
                 className="flex items-center gap-4 border border-zinc-800 bg-zinc-900/40 rounded-2xl px-5 py-4 hover:border-blue-500 transition-all duration-300 group"
               >
                 {p.logo_url ? (

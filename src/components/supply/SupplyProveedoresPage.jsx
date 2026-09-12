@@ -96,7 +96,7 @@ export default function SupplyProveedoresPage() {
                   {proveedoresFiltrados.slice(0, visibleCount).map((p) => (
                     <Link
                       key={p.id}
-                      to={`/supply/estudio/${p.id}`}
+                      to={`/supply/${p.slug || `estudio/${p.id}`}`}
                       className="flex items-center gap-3 py-3 hover:bg-zinc-900 transition-colors"
                     >
                       <div className="w-11 h-11 rounded-full overflow-hidden bg-zinc-900 border border-zinc-800 flex-shrink-0 flex items-center justify-center">

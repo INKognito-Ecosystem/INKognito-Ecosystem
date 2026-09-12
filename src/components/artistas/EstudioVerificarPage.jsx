@@ -32,7 +32,7 @@ export async function loader({ request }) {
       const destino = data.tipo === 'tienda'
         ? `/store/${data.slug || `estudio/${data.id}`}?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`
         : data.tipo === 'proveedor'
-        ? `/supply/estudio/${data.id}?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`
+        ? `/supply/${data.slug || `estudio/${data.id}`}?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`
         : `/tattoo-artist-colombia/estudio/mi-perfil?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`
       return redirect(destino)
     }

@@ -298,7 +298,11 @@ function PageVisitTracker() {
     // cruzar visitas contra ventas por (fuente, tenant_id) sin adivinar.
     let fuente = null
     if (estudio && pathname.startsWith('/store/')) fuente = 'tienda'
-    else if (estudio && pathname.startsWith('/supply/estudio/')) fuente = 'supply'
+    // 2026-09-12: ya no solo /supply/estudio/:id — con slugs (mismo
+    // criterio que Store arriba, misma fila) la URL real es /supply/:slug;
+    // `estudio` ya viene null en cualquier página que no sea el perfil
+    // (categorías, etc.), así que basta con el prefijo del módulo.
+    else if (estudio && pathname.startsWith('/supply/')) fuente = 'supply'
     else if (artista && pathname.startsWith('/artista/')) fuente = 'reservas'
 
     const payload = {

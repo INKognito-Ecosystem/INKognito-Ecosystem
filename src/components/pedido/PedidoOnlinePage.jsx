@@ -373,7 +373,7 @@ export default function PedidoOnlinePage() {
                   al módulo genérico (/store, /supply); ahora vuelve al
                   perfil del proveedor específico del que venía el carrito. */}
               <Link
-                to={module === 'store' ? `/store/${vendorInfo.slug || `estudio/${vendorInfo.id}`}` : `/supply/estudio/${vendorInfo.id}`}
+                to={module === 'store' ? `/store/${vendorInfo.slug || `estudio/${vendorInfo.id}`}` : `/supply/${vendorInfo.slug || `estudio/${vendorInfo.id}`}`}
                 className="text-gray-500 hover:text-gray-300 text-xs"
               >
                 ← Volver a {vendorNombreVivo || MODULE_LABELS[module]}

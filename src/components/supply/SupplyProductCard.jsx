@@ -115,6 +115,7 @@ export default function SupplyProductCard({ item, categoria, showEstudioBadge = 
   // viejos, pero la variante siempre gana si trae su propio dato.
   const proveedorId      = sel.estudio_id ?? item.estudio_id ?? null
   const proveedorNombre  = sel.estudio_nombre_supply || sel.estudio_nombre || item.estudio_nombre_supply || item.estudio_nombre || null
+  const proveedorSlug    = sel.estudio_slug || item.estudio_slug || null
   const proveedorMp      = sel.estudio_mp_conectado ?? item.estudio_mp_conectado ?? false
 
   const productId = item.name + (sel.variant ? '-' + sel.variant : '')
@@ -168,7 +169,7 @@ export default function SupplyProductCard({ item, categoria, showEstudioBadge = 
         {showEstudioBadge && proveedorNombre && (
           proveedorId ? (
             <Link
-              to={`/supply/estudio/${proveedorId}`}
+              to={`/supply/${proveedorSlug || `estudio/${proveedorId}`}`}
               onClick={(e) => e.stopPropagation()}
               className="text-[8px] font-bold uppercase tracking-wide text-blue-400 hover:text-blue-300 underline underline-offset-2 w-fit"
             >
