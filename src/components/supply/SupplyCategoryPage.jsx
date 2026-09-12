@@ -6,7 +6,7 @@ import AccordionCard from './AccordionCard'
 import SupplyProductCard from './SupplyProductCard'
 import { useScrolled } from '../../hooks/useScrolled'
 import { FaWhatsapp } from 'react-icons/fa'
-import { ExternalLink, Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package, ArrowLeft, ArrowRight, Search } from 'lucide-react'
+import { ExternalLink, Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package, ArrowLeft, ArrowRight, Search, SlidersHorizontal } from 'lucide-react'
 import { getAdjacentCategories } from '../../data/supplyCategoriesOrder'
 
 const CAT_ICONS = {
@@ -186,7 +186,6 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
     }
     list = [...list]
     if (orden === 'precio_asc') list.sort((a, b) => precioRef(a) - precioRef(b))
-    else if (orden === 'precio_desc') list.sort((a, b) => precioRef(b) - precioRef(a))
     else list.sort((a, b) => idRef(b) - idRef(a))
     return list
   }, [products, provFiltro, orden, busqueda])
@@ -288,15 +287,17 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                   ))}
                 </select>
               )}
-              <select
-                value={orden}
-                onChange={cambiarFiltro(setOrden)}
-                className="flex-shrink-0 w-[92px] sm:w-auto bg-zinc-900 border border-zinc-800 text-zinc-300 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-lg px-2 sm:px-3 py-2 focus:outline-none focus:border-blue-500"
-              >
-                <option value="recientes">Recientes</option>
-                <option value="precio_asc">Menor precio</option>
-                <option value="precio_desc">Mayor precio</option>
-              </select>
+              <div className="relative flex-shrink-0">
+                <SlidersHorizontal size={12} className="absolute left-2 sm:left-2.5 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
+                <select
+                  value={orden}
+                  onChange={cambiarFiltro(setOrden)}
+                  className="w-[92px] sm:w-auto bg-zinc-900 border border-zinc-800 text-zinc-300 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-lg pl-7 sm:pl-8 pr-2 sm:pr-3 py-2 focus:outline-none focus:border-blue-500"
+                >
+                  <option value="recientes">Recientes</option>
+                  <option value="precio_asc">Menor precio</option>
+                </select>
+              </div>
             </div>
           )}
           {products.length === 0 ? (
