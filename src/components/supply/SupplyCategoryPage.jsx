@@ -308,9 +308,9 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
               >
                 <div className="flex flex-col gap-5">
                   {faqs.map((faq, i) => (
-                    <div key={i} className={i < faqs.length - 1 ? 'pb-5 border-b border-zinc-800' : ''}>
-                      <p className="font-bold text-white text-sm mb-2">{faq.q}</p>
-                      <p className="text-zinc-500 text-sm leading-relaxed">{faq.a}</p>
+                    <div key={faq.id ?? i} className={i < faqs.length - 1 ? 'pb-5 border-b border-zinc-800' : ''}>
+                      <p className="font-bold text-white text-sm mb-2">{faq.pregunta}</p>
+                      <p className="text-zinc-500 text-sm leading-relaxed">{faq.respuesta}</p>
                     </div>
                   ))}
                 </div>
