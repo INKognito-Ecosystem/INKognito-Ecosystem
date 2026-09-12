@@ -6,7 +6,7 @@ import AccordionCard from './AccordionCard'
 import SupplyProductCard from './SupplyProductCard'
 import { useScrolled } from '../../hooks/useScrolled'
 import { FaWhatsapp } from 'react-icons/fa'
-import { ExternalLink, Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package, ArrowLeft, ArrowRight, Search, SlidersHorizontal } from 'lucide-react'
+import { ExternalLink, Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package, ArrowLeft, ArrowRight, Search, SlidersHorizontal, MapPin } from 'lucide-react'
 import { getAdjacentCategories } from '../../data/supplyCategoriesOrder'
 
 const CAT_ICONS = {
@@ -153,33 +153,64 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
   const [provFiltro, setProvFiltro] = useState('todos')
   const [orden, setOrden] = useState('recientes')
   const [busqueda, setBusqueda] = useState('')
+  const [provBusqueda, setProvBusqueda] = useState('')
 
-  // Botón de orden: solo ícono, las opciones (texto) aparecen en un panel
-  // al pulsarlo (Jose, 2026-09-12) — mismo patrón de "cerrar al hacer clic
-  // afuera" ya usado en otros pickers del ecosistema.
+  // Botones de orden y proveedor: solo ícono, las opciones (texto) aparecen
+  // en un panel al pulsarlos (Jose, 2026-09-12) — se cierran solos al hacer
+  // clic afuera de cualquiera de los dos.
   const [ordenAbierto, setOrdenAbierto] = useState(false)
+  const [provAbierto, setProvAbierto] = useState(false)
   const ordenRef = useRef(null)
+  const provRef = useRef(null)
   useEffect(() => {
     function onClickFuera(e) {
       if (ordenRef.current && !ordenRef.current.contains(e.target)) setOrdenAbierto(false)
+      if (provRef.current && !provRef.current.contains(e.target)) setProvAbierto(false)
     }
     document.addEventListener('mousedown', onClickFuera)
     return () => document.removeEventListener('mousedown', onClickFuera)
   }, [])
 
+  // Sin tildes/mayúsculas para que "cartucho" encuentre "Cartúcho" — mismo
+  // criterio de búsqueda insensible a acentos usado en otros buscadores del
+  // ecosistema (ej. directorio de artistas).
+  const normaliza = (s) => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+
   // Un producto = un estudio (el panel agrupa por product+estudio_id desde
   // 2026-08-09, ver fetchCatalogEstudio en useCatalog.js) — filtrar por
   // item.estudio_id es seguro, nunca mezcla proveedores dentro de un mismo
-  // item. Solo tiene sentido mostrar el filtro si hay más de un proveedor.
+  // item.
   const proveedores = useMemo(() => {
     const map = new Map()
     for (const p of products) {
       if (p.estudio_id && p.estudio_nombre_supply && !map.has(p.estudio_id)) {
-        map.set(p.estudio_id, p.estudio_nombre_supply)
+        map.set(p.estudio_id, { nombre: p.estudio_nombre_supply, municipio: p.estudio_municipio || null })
       }
     }
-    return Array.from(map, ([id, nombre]) => ({ id, nombre }))
+    return Array.from(map, ([id, v]) => ({ id, ...v }))
   }, [products])
+
+  // Agrupados por ciudad (Jose, 2026-09-12: "relacionarlo con el lugar de
+  // donde es el supply") — con muchos proveedores, escanear por ciudad es
+  // más rápido que una lista plana de nombres. Sin ciudad cargada cae a un
+  // grupo aparte en vez de desaparecer.
+  const proveedoresPorCiudad = useMemo(() => {
+    const grupos = new Map()
+    for (const p of proveedores) {
+      const key = p.municipio || 'Otras ciudades'
+      if (!grupos.has(key)) grupos.set(key, [])
+      grupos.get(key).push(p)
+    }
+    return Array.from(grupos, ([ciudad, lista]) => ({ ciudad, lista })).sort((a, b) => a.ciudad.localeCompare(b.ciudad))
+  }, [proveedores])
+
+  const proveedoresFiltrados = useMemo(() => {
+    if (!provBusqueda.trim()) return proveedoresPorCiudad
+    const q = normaliza(provBusqueda)
+    return proveedoresPorCiudad
+      .map(g => ({ ciudad: g.ciudad, lista: g.lista.filter(p => normaliza(p.nombre).includes(q) || normaliza(g.ciudad).includes(q)) }))
+      .filter(g => g.lista.length > 0)
+  }, [proveedoresPorCiudad, provBusqueda])
 
   // Precio de referencia: el más bajo entre variantes (patrón "desde $X" ya
   // usado en la card). Recencia: el id más alto entre variantes — son filas
@@ -188,10 +219,6 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
   // proxy más simple sin tocar el backend.
   const precioRef = (item) => Math.min(...(item.variantes ?? []).map(v => Number(v.price) || Infinity))
   const idRef = (item) => Math.max(0, ...(item.variantes ?? []).map(v => Number(v.id) || 0))
-  // Sin tildes/mayúsculas para que "cartucho" encuentre "Cartúcho" — mismo
-  // criterio de búsqueda insensible a acentos usado en otros buscadores del
-  // ecosistema (ej. directorio de artistas).
-  const normaliza = (s) => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 
   const visibleProducts = useMemo(() => {
     let list = provFiltro === 'todos' ? products : products.filter(p => String(p.estudio_id) === provFiltro)
@@ -294,16 +321,65 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                 />
               </div>
               {proveedores.length > 0 && (
-                <select
-                  value={provFiltro}
-                  onChange={cambiarFiltro(setProvFiltro)}
-                  className="flex-shrink-0 w-[92px] sm:w-auto bg-zinc-900 border border-zinc-800 text-zinc-300 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-lg px-2 sm:px-3 py-2 focus:outline-none focus:border-blue-500"
-                >
-                  <option value="todos">Proveedores</option>
-                  {proveedores.map(p => (
-                    <option key={p.id} value={String(p.id)}>{p.nombre}</option>
-                  ))}
-                </select>
+                <div className="relative flex-shrink-0" ref={provRef}>
+                  <button
+                    type="button"
+                    onClick={() => setProvAbierto(o => !o)}
+                    aria-label="Filtrar por proveedor"
+                    aria-expanded={provAbierto}
+                    className={`flex items-center justify-center w-9 h-9 bg-zinc-900 border rounded-lg transition-colors ${
+                      provAbierto || provFiltro !== 'todos' ? 'border-blue-500 text-blue-400' : 'border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
+                    }`}
+                  >
+                    <MapPin size={14} />
+                  </button>
+                  {provAbierto && (
+                    <div className="absolute right-0 top-full mt-1.5 z-20 w-64 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl overflow-hidden">
+                      <div className="p-2 border-b border-zinc-800">
+                        <div className="relative">
+                          <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
+                          <input
+                            type="text"
+                            value={provBusqueda}
+                            onChange={(e) => setProvBusqueda(e.target.value)}
+                            placeholder="Buscar proveedor o ciudad"
+                            className="w-full bg-zinc-950 border border-zinc-800 text-zinc-300 text-xs rounded-md pl-7 pr-2 py-1.5 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500"
+                          />
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => { setProvFiltro('todos'); setVisibleCount(PAGE_SIZE); setProvBusqueda(''); setProvAbierto(false) }}
+                        className={`w-full text-left px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors ${
+                          provFiltro === 'todos' ? 'text-blue-400 bg-blue-500/10' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
+                        }`}
+                      >
+                        Todos los proveedores
+                      </button>
+                      <div className="max-h-60 overflow-y-auto border-t border-zinc-800">
+                        {proveedoresFiltrados.length === 0 ? (
+                          <p className="px-3 py-3 text-xs text-zinc-600">Ningún proveedor coincide</p>
+                        ) : proveedoresFiltrados.map(g => (
+                          <div key={g.ciudad}>
+                            <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-zinc-600">{g.ciudad}</p>
+                            {g.lista.map(p => (
+                              <button
+                                key={p.id}
+                                type="button"
+                                onClick={() => { setProvFiltro(String(p.id)); setVisibleCount(PAGE_SIZE); setProvBusqueda(''); setProvAbierto(false) }}
+                                className={`w-full text-left px-3 py-2 text-xs transition-colors ${
+                                  provFiltro === String(p.id) ? 'text-blue-400 bg-blue-500/10 font-bold' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
+                                }`}
+                              >
+                                {p.nombre}
+                              </button>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
               <div className="relative flex-shrink-0" ref={ordenRef}>
                 <button
