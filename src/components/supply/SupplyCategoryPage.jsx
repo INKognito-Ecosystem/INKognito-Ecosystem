@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import NavbarCategory from './NavbarCategory'
 import FooterSupply from './FooterSupply'
@@ -133,10 +134,17 @@ function AfiliadoCard({ item }) {
 // meta() (título/description/canonical) también quedó en cada wrapper, no
 // acá — evita mezclar <Seo>/Helmet con meta() en la misma ruta (rompe la
 // hidratación, ver nota en HomePage.jsx).
+// Cuántos productos se muestran de entrada — antes se renderizaban TODOS de
+// una (sin límite), lo que iba a pesar cada vez más a medida que estudios y
+// proveedores subieran su propio catálogo a la misma categoría. "Cargar más"
+// evita eso sin tocar la card ni el fetch: solo se revela de a bloques.
+const PAGE_SIZE = 12
+
 export default function SupplyCategoryPage({ title, categoria, slug, intro, guide, faqs, products = [], afiliados = [], extraCTA = null }) {
   const CatIcon = CAT_ICONS[categoria] || null
   const { prev, next } = getAdjacentCategories(slug)
   const scrolled = useScrolled()
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   return (
     <>
@@ -226,13 +234,23 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
               </a>
             </div>
           ) : (
-            <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-0 px-6 md:px-6 pb-3 md:pb-0 scrollbar-hide">
-              {products.map(item => (
-                <div key={`${item.name}-${item.estudio_id ?? 'x'}`} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">
-                  <SupplyProductCard item={item} categoria={categoria} />
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-6">
+                {products.slice(0, visibleCount).map(item => (
+                  <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={categoria} />
+                ))}
+              </div>
+              {visibleCount < products.length && (
+                <div className="flex justify-center mt-6 px-6">
+                  <button
+                    onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+                    className="px-6 py-2.5 border border-blue-500/40 text-blue-400 text-xs font-bold uppercase tracking-[0.15em] rounded hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
+                  >
+                    Cargar más ({products.length - visibleCount} más)
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
 
