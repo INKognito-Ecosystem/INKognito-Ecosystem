@@ -53,11 +53,11 @@ const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb
 export default function EstudioProveedorSupplyRegistroPage() {
   const { cloud_name, upload_preset, captchaA, captchaB } = useLoaderData()
   const [form, setForm] = useState({
-    nombre: '', departamento: '', municipio: '', lat: null, lng: null, bio: '', instagram: '', facebook: '', whatsapp: '', email: '',
-    logo_url: '', foto_portada: '',
+    nombre: '', departamento: '', municipio: '', lat: null, lng: null, instagram: '', facebook: '', whatsapp: '', email: '',
+    logo_url: '',
     sitio_web: '', // honeypot
   })
-  const [subiendo, setSubiendo] = useState(null)
+  const [subiendo, setSubiendo] = useState(false)
   const [enviando, setEnviando] = useState(false)
   const [enviado, setEnviado] = useState(false)
   const [error, setError] = useState(null)
@@ -91,10 +91,10 @@ export default function EstudioProveedorSupplyRegistroPage() {
     )
   }
 
-  const elegirFoto = (slot) => fileInputs.current[slot]?.click()
-  const subirFoto = async (slot, file) => {
+  const elegirFoto = () => fileInputs.current.logo_url?.click()
+  const subirFoto = async (file) => {
     if (!file || !cloud_name || !upload_preset) return
-    setSubiendo(slot)
+    setSubiendo(true)
     try {
       const fd = new FormData()
       fd.append('file', file)
@@ -102,11 +102,11 @@ export default function EstudioProveedorSupplyRegistroPage() {
       fd.append('folder', 'inkognito-supply-proveedores')
       const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, { method: 'POST', body: fd })
       const data = await res.json()
-      if (data.secure_url) setForm((f) => ({ ...f, [slot]: data.secure_url }))
+      if (data.secure_url) setForm((f) => ({ ...f, logo_url: data.secure_url }))
     } catch {
       setError('No pudimos subir esa foto — intenta de nuevo.')
     } finally {
-      setSubiendo(null)
+      setSubiendo(false)
     }
   }
 
@@ -169,30 +169,21 @@ export default function EstudioProveedorSupplyRegistroPage() {
             Vende insumos o equipos de tatuaje directo a tatuadores de toda Colombia, con tu propio catálogo en INKognito Supply.
           </p>
 
-          {SLOTS_PROVEEDOR_REG.map(({ key }) => (
-            <input
-              key={key}
-              type="file"
-              accept="image/*"
-              ref={(el) => { fileInputs.current[key] = el }}
-              style={{ display: 'none' }}
-              onChange={(e) => subirFoto(key, e.target.files?.[0])}
-            />
-          ))}
+          <input
+            type="file"
+            accept="image/*"
+            ref={(el) => { fileInputs.current.logo_url = el }}
+            style={{ display: 'none' }}
+            onChange={(e) => subirFoto(e.target.files?.[0])}
+          />
 
-          <div className="flex items-center gap-3 mb-5">
-            <button type="button" onClick={() => elegirFoto('logo_url')} className="relative w-16 h-16 rounded-full bg-gray-100 border border-gray-300 overflow-hidden flex-shrink-0">
+          <div className="flex flex-col items-center mb-5">
+            <button type="button" onClick={elegirFoto} className="relative w-16 h-16 rounded-full bg-gray-100 border border-gray-300 overflow-hidden flex-shrink-0">
               {form.logo_url ? <img src={form.logo_url} alt="" className="w-full h-full object-cover" /> : <Camera size={18} className="absolute inset-0 m-auto text-gray-400" />}
-              {subiendo === 'logo_url' && <LoaderCircle size={16} className="animate-spin absolute inset-0 m-auto text-gray-600" />}
+              {subiendo && <LoaderCircle size={16} className="animate-spin absolute inset-0 m-auto text-gray-600" />}
             </button>
-            <button type="button" onClick={() => elegirFoto('foto_portada')} className="relative flex-1 h-16 rounded-lg bg-gray-100 border border-gray-300 overflow-hidden">
-              {form.foto_portada ? <img src={form.foto_portada} alt="" className="w-full h-full object-cover" /> : <span className="absolute inset-0 flex items-center justify-center text-gray-400 text-[11px] font-bold uppercase tracking-wide gap-1"><Camera size={13} />Portada</span>}
-              {subiendo === 'foto_portada' && <LoaderCircle size={16} className="animate-spin absolute inset-0 m-auto text-gray-600" />}
-            </button>
+            <p className="text-gray-400 text-[10px] mt-2">Logo: cuadrado, mínimo 400×400px</p>
           </div>
-          <p className="text-gray-400 text-[10px] text-center -mt-3 mb-5">
-            Logo: cuadrado, mínimo 400×400px · Portada: horizontal, ideal 1200×400px
-          </p>
 
           <form onSubmit={enviar} className="space-y-4">
             <div>
@@ -226,11 +217,6 @@ export default function EstudioProveedorSupplyRegistroPage() {
                 Opcional — sin esto, igual aparece asociada a su municipio.
               </p>
               {ubicacionError && <p className="text-gray-400 text-[10px] mt-1 text-center">{ubicacionError}</p>}
-            </div>
-
-            <div>
-              <label className={labelClass}>Bio</label>
-              <textarea rows={3} className={inputClass} value={form.bio} onChange={set('bio')} placeholder="Cuenta sobre el negocio — qué vende, trayectoria" />
             </div>
 
             <div>
@@ -293,5 +279,3 @@ export default function EstudioProveedorSupplyRegistroPage() {
     </div>
   )
 }
-
-const SLOTS_PROVEEDOR_REG = [{ key: 'logo_url' }, { key: 'foto_portada' }]
