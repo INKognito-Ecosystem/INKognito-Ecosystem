@@ -293,7 +293,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                   className="w-full min-w-0 bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-lg pl-8 pr-2 py-2 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500"
                 />
               </div>
-              {proveedores.length > 1 && (
+              {proveedores.length > 0 && (
                 <select
                   value={provFiltro}
                   onChange={cambiarFiltro(setProvFiltro)}
