@@ -82,7 +82,7 @@ export default function NavbarGym() {
 
         {/* DROPDOWN MÓVIL */}
         {menuOpen && (
-          <div className="absolute right-4 top-16 md:top-20 bg-gray-950 border border-gray-700 w-56 z-50">
+          <div className="fixed left-0 right-0 top-16 md:top-20 bg-gray-950 border-t border-gray-700 z-50 max-h-[calc(100vh-4rem)] overflow-y-auto">
             <Link to="/gym"                 onClick={close} className={MOBILE_LINK}>Inicio</Link>
             <Link to="/gym/maquinas-pedido" onClick={close} className={MOBILE_LINK}>Máquinas</Link>
             <button                         onClick={goToPlanos} className={MOBILE_BTN}>Planos</button>

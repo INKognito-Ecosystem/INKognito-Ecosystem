@@ -83,7 +83,7 @@ export default function NavbarStore() {
 
             {/* DROPDOWN */}
             {menuOpen && (
-              <div className="absolute right-4 top-16 md:top-20 bg-black border border-zinc-800 w-56 z-50">
+              <div className="fixed left-0 right-0 top-16 md:top-20 bg-black border-t border-zinc-800 z-50 max-h-[calc(100vh-4rem)] overflow-y-auto">
                 <button onClick={() => { scrollTo('categorias'); setMenuOpen(false) }} className="block w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
                   Categorías
                 </button>

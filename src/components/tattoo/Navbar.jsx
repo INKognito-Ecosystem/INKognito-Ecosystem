@@ -66,7 +66,7 @@ export default function Navbar({ showInicio = false }) {
 
         {/* DROPDOWN */}
         {menuOpen && (
-          <div className="absolute right-4 top-full bg-white border border-gray-200 shadow-xl w-56 z-50 rounded-lg overflow-hidden">
+          <div className="absolute left-0 right-0 top-full bg-white border-t border-gray-200 shadow-xl z-50 max-h-[calc(100vh-5rem)] overflow-y-auto">
 
             {showInicio && (
               <Link prefetch="intent" to="/jhumaneztattoo" onClick={() => setMenuOpen(false)} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-black hover:bg-gray-50 transition-all duration-300 border-b border-gray-100">

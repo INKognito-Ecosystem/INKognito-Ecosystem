@@ -72,7 +72,7 @@ export default function NavbarCategory({ pageName }) {
 
         {/* MENÚ DESPLEGABLE */}
         {menuOpen && (
-          <div className="absolute right-4 top-16 md:top-20 bg-black border border-zinc-800 w-56 z-50">
+          <div className="fixed left-0 right-0 top-16 md:top-20 bg-black border-t border-zinc-800 z-50 max-h-[calc(100vh-4rem)] overflow-y-auto">
             <Link to="/supply" onClick={() => setMenuOpen(false)}
               className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
               Inicio
