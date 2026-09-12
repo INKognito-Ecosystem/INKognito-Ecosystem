@@ -1,10 +1,11 @@
 import { useLoaderData, redirect } from 'react-router-dom'
-import { useMemo, useState } from 'react'
-import { Award, MapPin } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { Award, MapPin, Menu } from 'lucide-react'
 import FooterSupply from './FooterSupply'
 import NavbarCategory from './NavbarCategory'
 import BrandCatalogSection from './BrandCatalogSection'
 import CajaSurtidaWidget from './CajaSurtidaWidget'
+import EstudioSupplyOwnerPanel from './EstudioSupplyOwnerPanel'
 import { fetchCatalogEstudio } from '../../hooks/useCatalog'
 import { SUPPLY_CATEGORIES_ORDER } from '../../data/supplyCategoriesOrder'
 import { urlGoogleMaps } from '../artistas/mapaUrl'
@@ -17,8 +18,9 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-pro
 // diferencia de las páginas de marca (Tommy, Warlock — un archivo fijo
 // por marca, copy escrito a mano), esta es dinámica: cualquier estudio
 // con vende_supply activo tiene esta misma página, sin tocar código.
-export async function loader({ params }) {
-  let estudio = null, products = []
+export async function loader({ params, request }) {
+  const token = new URL(request.url).searchParams.get('token')
+  let estudio = null, products = [], esDueno = false
   try {
     const [estudioRes, catalogo] = await Promise.all([
       fetch(`${PANEL_URL}/api/estudios/${params.id}`),
@@ -45,7 +47,25 @@ export async function loader({ params }) {
     const destino = externo ? estudio.catalogo_url : `${estudio.catalogo_url}${estudio.catalogo_url.includes('?') ? '&' : '?'}flechas=0`
     throw redirect(destino)
   }
-  return { estudio, products }
+  // Botón de gestión (2026-09-12, Jose: "como en las tiendas de Store, que
+  // me dé el link que debo compartir") — mismo mecanismo de verificación
+  // que EstudioTiendaPage.jsx: el token de la URL debe ser el de ESTE
+  // estudio, no solo un token válido de cualquier otro. La gestión en sí
+  // (editar perfil, productos, ventas, Mercado Pago) ya existe en
+  // /estudio/mi-perfil — este botón solo la hace fácil de encontrar desde
+  // acá, sin duplicar esos formularios.
+  if (estudio && token) {
+    try {
+      const porTokenRes = await fetch(`${PANEL_URL}/api/estudios-por-token?token=${encodeURIComponent(token)}`)
+      if (porTokenRes.ok) {
+        const porToken = await porTokenRes.json()
+        if (porToken.id === estudio.id) esDueno = true
+      }
+    } catch {
+      esDueno = false
+    }
+  }
+  return { estudio, products, esDueno, token: esDueno ? token : null }
 }
 
 export function meta({ data }) {
@@ -67,7 +87,22 @@ export function meta({ data }) {
 }
 
 export default function EstudioSupplyPage() {
-  const { estudio, products } = useLoaderData()
+  const { estudio, products, esDueno, token } = useLoaderData()
+  const [panelAbierto, setPanelAbierto] = useState(false)
+
+  // Tooltip de onboarding sobre el botón de gestión (2026-09-12) — mismo
+  // patrón que EstudioTiendaPage.jsx (localStorage propio, una sola vez).
+  const [tooltipVisible, setTooltipVisible] = useState(false)
+  useEffect(() => {
+    if (!esDueno) return
+    try {
+      if (!localStorage.getItem('kg_tooltip_supply_panel_visto')) setTooltipVisible(true)
+    } catch {}
+  }, [esDueno])
+  const cerrarTooltip = () => {
+    try { localStorage.setItem('kg_tooltip_supply_panel_visto', '1') } catch {}
+    setTooltipVisible(false)
+  }
 
   if (!estudio) {
     return (
@@ -125,19 +160,54 @@ export default function EstudioSupplyPage() {
             )}
           </div>
 
-          <div className="relative max-w-md pb-4 min-w-0">
-            <div className="bg-gray-100 border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3.5">
-              <p className="uppercase tracking-[0.25em] text-gray-400 text-[10px] font-black mb-1">Catálogo de</p>
-              <h1 className="text-lg sm:text-2xl font-black uppercase leading-tight">{nombreSupply}</h1>
-              {/* Insignia "Distribuidor Oficial" (fase 6, 2026-08-07) —
-                  tarifa fija de patrocinio, no comisión (la venta acá no
-                  necesariamente pasa por el carrito). Color ámbar a
-                  propósito, distinto del azul de toda la identidad de
-                  Supply, para que se lea como un sello aparte. */}
-              {estudio.distribuidor_oficial && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-black text-[10px] font-black uppercase tracking-widest bg-amber-400 mt-2">
-                  <Award size={12} /> Distribuidor Oficial
-                </span>
+          <div className="relative max-w-md pb-4 min-w-0 flex-1">
+            <div className="bg-gray-100 border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3.5 flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="uppercase tracking-[0.25em] text-gray-400 text-[10px] font-black mb-1">Catálogo de</p>
+                <h1 className="text-lg sm:text-2xl font-black uppercase leading-tight">{nombreSupply}</h1>
+                {/* Insignia "Distribuidor Oficial" (fase 6, 2026-08-07) —
+                    tarifa fija de patrocinio, no comisión (la venta acá no
+                    necesariamente pasa por el carrito). Color ámbar a
+                    propósito, distinto del azul de toda la identidad de
+                    Supply, para que se lea como un sello aparte. */}
+                {estudio.distribuidor_oficial && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-black text-[10px] font-black uppercase tracking-widest bg-amber-400 mt-2">
+                    <Award size={12} /> Distribuidor Oficial
+                  </span>
+                )}
+              </div>
+              {/* Botón hamburguesa (2026-09-12) — SOLO se renderiza si el
+                  loader confirmó que el token de la URL es de este mismo
+                  estudio. Un cliente normal nunca ve esto ni rastro de él
+                  en el HTML. Abre el panel con el link para compartir y
+                  accesos directos a editar perfil/productos/ventas (ya
+                  construidos en /estudio/mi-perfil — este botón no los
+                  duplica, solo los hace fáciles de encontrar desde acá). */}
+              {esDueno && (
+                <div className="relative flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => { setPanelAbierto(true); cerrarTooltip() }}
+                    aria-label="Gestionar mi catálogo"
+                    className="flex items-center justify-center w-9 h-9 rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition-colors"
+                  >
+                    <Menu size={20} />
+                  </button>
+                  {tooltipVisible && (
+                    <div className="absolute z-20 top-full right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left">
+                      <span className="absolute -top-1.5 right-3 w-3 h-3 bg-gray-900 rotate-45" />
+                      <p className="text-xs leading-relaxed text-gray-200">
+                        Toca acá para copiar el link de tu catálogo, editar tu perfil, subir productos y ver tus ventas.
+                      </p>
+                      <button
+                        onClick={cerrarTooltip}
+                        className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
+                      >
+                        Entendido
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
             {estudio.municipio && (
@@ -201,6 +271,10 @@ export default function EstudioSupplyPage() {
       </div>
 
       <FooterSupply />
+
+      {panelAbierto && (
+        <EstudioSupplyOwnerPanel estudio={estudio} token={token} onClose={() => setPanelAbierto(false)} />
+      )}
     </div>
   )
 }
