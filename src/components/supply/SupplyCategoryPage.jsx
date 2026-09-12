@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import NavbarCategory from './NavbarCategory'
 import FooterSupply from './FooterSupply'
@@ -145,6 +145,41 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
   const { prev, next } = getAdjacentCategories(slug)
   const scrolled = useScrolled()
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+  const [provFiltro, setProvFiltro] = useState('todos')
+  const [orden, setOrden] = useState('recientes')
+
+  // Un producto = un estudio (el panel agrupa por product+estudio_id desde
+  // 2026-08-09, ver fetchCatalogEstudio en useCatalog.js) — filtrar por
+  // item.estudio_id es seguro, nunca mezcla proveedores dentro de un mismo
+  // item. Solo tiene sentido mostrar el filtro si hay más de un proveedor.
+  const proveedores = useMemo(() => {
+    const map = new Map()
+    for (const p of products) {
+      if (p.estudio_id && p.estudio_nombre_supply && !map.has(p.estudio_id)) {
+        map.set(p.estudio_id, p.estudio_nombre_supply)
+      }
+    }
+    return Array.from(map, ([id, nombre]) => ({ id, nombre }))
+  }, [products])
+
+  // Precio de referencia: el más bajo entre variantes (patrón "desde $X" ya
+  // usado en la card). Recencia: el id más alto entre variantes — son filas
+  // de inventory con SERIAL, así que un id mayor es una fila más nueva; no
+  // hay un created_at expuesto en el catálogo público, así que este es el
+  // proxy más simple sin tocar el backend.
+  const precioRef = (item) => Math.min(...(item.variantes ?? []).map(v => Number(v.price) || Infinity))
+  const idRef = (item) => Math.max(0, ...(item.variantes ?? []).map(v => Number(v.id) || 0))
+
+  const visibleProducts = useMemo(() => {
+    let list = provFiltro === 'todos' ? products : products.filter(p => String(p.estudio_id) === provFiltro)
+    list = [...list]
+    if (orden === 'precio_asc') list.sort((a, b) => precioRef(a) - precioRef(b))
+    else if (orden === 'precio_desc') list.sort((a, b) => precioRef(b) - precioRef(a))
+    else list.sort((a, b) => idRef(b) - idRef(a))
+    return list
+  }, [products, provFiltro, orden])
+
+  const cambiarFiltro = (setter) => (e) => { setter(e.target.value); setVisibleCount(PAGE_SIZE) }
 
   return (
     <>
@@ -215,8 +250,33 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
           )}
         </div>
 
-        {/* PRODUCTOS FÍSICOS — scroll horizontal en móvil, grid en desktop */}
+        {/* PRODUCTOS FÍSICOS — grid en los tres anchos (2/3/4 columnas) */}
         <div className="pb-10 max-w-7xl mx-auto">
+          {products.length > 1 && (
+            <div className="flex flex-wrap items-center gap-3 px-6 mb-5">
+              {proveedores.length > 1 && (
+                <select
+                  value={provFiltro}
+                  onChange={cambiarFiltro(setProvFiltro)}
+                  className="bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs font-bold uppercase tracking-wider rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+                >
+                  <option value="todos">Todos los proveedores</option>
+                  {proveedores.map(p => (
+                    <option key={p.id} value={String(p.id)}>{p.nombre}</option>
+                  ))}
+                </select>
+              )}
+              <select
+                value={orden}
+                onChange={cambiarFiltro(setOrden)}
+                className="bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs font-bold uppercase tracking-wider rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+              >
+                <option value="recientes">Más recientes</option>
+                <option value="precio_asc">Menor precio</option>
+                <option value="precio_desc">Mayor precio</option>
+              </select>
+            </div>
+          )}
           {products.length === 0 ? (
             <div className="mx-6 border border-blue-500/20 bg-zinc-950 rounded-2xl p-10 text-center">
               <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2">Sin stock por el momento</p>
@@ -236,17 +296,17 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
           ) : (
             <>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-6">
-                {products.slice(0, visibleCount).map(item => (
+                {visibleProducts.slice(0, visibleCount).map(item => (
                   <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={categoria} />
                 ))}
               </div>
-              {visibleCount < products.length && (
+              {visibleCount < visibleProducts.length && (
                 <div className="flex justify-center mt-6 px-6">
                   <button
                     onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
                     className="px-6 py-2.5 border border-blue-500/40 text-blue-400 text-xs font-bold uppercase tracking-[0.15em] rounded hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
                   >
-                    Cargar más ({products.length - visibleCount} más)
+                    Cargar más ({visibleProducts.length - visibleCount} más)
                   </button>
                 </div>
               )}
