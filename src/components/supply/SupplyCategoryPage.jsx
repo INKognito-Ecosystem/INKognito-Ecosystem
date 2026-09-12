@@ -252,7 +252,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
 
         {/* PRODUCTOS FÍSICOS — grid en los tres anchos (2/3/4 columnas) */}
         <div className="pb-10 max-w-7xl mx-auto">
-          {products.length > 1 && (
+          {products.length > 0 && (
             <div className="flex flex-wrap items-center gap-3 px-6 mb-5">
               {proveedores.length > 1 && (
                 <select
