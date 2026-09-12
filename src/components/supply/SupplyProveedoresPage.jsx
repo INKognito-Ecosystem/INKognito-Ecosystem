@@ -137,12 +137,13 @@ export default function SupplyProveedoresPage() {
 
         <div className="mt-12 text-center border-t border-zinc-800 pt-8">
           {/* Corregido (2026-09-12, Jose): el CTA mandaba a WhatsApp
-              personal en vez de al formulario real de autoregistro
-              (EstudioMarcaRegistroPage.jsx) — se deja público acá, mismo
-              criterio que tienda/unete en Store. */}
+              personal, luego a /marca/unete (que es para marcas curadas
+              a mano por Jose, un tema aparte) — ahora va al registro
+              propio de proveedor nativo de Supply, autogestionable, sin
+              pasar por Jose. Ver EstudioProveedorSupplyRegistroPage.jsx. */}
           <p className="text-zinc-500 text-sm mb-3">¿Tienes insumos o equipos para tatuadores?</p>
           <Link
-            to="/tattoo-artist-colombia/marca/unete"
+            to="/supply/proveedores/unete"
             className="inline-block px-6 py-3 bg-blue-500 text-white font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-blue-600 transition"
           >
             Regístrate como proveedor

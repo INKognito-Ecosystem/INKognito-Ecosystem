@@ -987,12 +987,15 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
   // "Supply" solo aparece en el menú si el estudio tiene vende_supply
   // activo. Si la URL trae un ?tab= que ya no aplica (ej. se desactivó
   // Supply), cae de vuelta a "Mi perfil" en vez de mostrar una pestaña
-  // fantasma. Este dashboard ya solo atiende estudio/empresa — una
-  // tienda (tipo='tienda') nunca llega acá, el loader la redirige a su
+  // fantasma. Este dashboard ya solo atiende estudio/empresa/proveedor —
+  // una tienda (tipo='tienda') nunca llega acá, el loader la redirige a su
   // propia página (ver EstudioTiendaPage.jsx) antes de renderizar nada.
+  // "Mi equipo"/"Patrocinados" no aplica a 'proveedor' (Supply nativo,
+  // 2026-09-12) — patrocinar/invitar artistas es un tema de marcas, no
+  // de un negocio que solo vende insumos.
   const tabsEstudio = [
     { key: 'perfil', label: 'Mi perfil', icon: MapPin },
-    { key: 'equipo', label: estudio.tipo === 'empresa' ? 'Patrocinados' : 'Mi equipo', icon: Users },
+    ...(estudio.tipo === 'proveedor' ? [] : [{ key: 'equipo', label: estudio.tipo === 'empresa' ? 'Patrocinados' : 'Mi equipo', icon: Users }]),
     ...(estudio.vende_supply ? [{ key: 'supply', label: 'Supply', icon: ShoppingBag }] : []),
   ]
   const tabPedido = searchParams.get('tab')

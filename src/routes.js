@@ -67,6 +67,9 @@ export default [
   // a store/tiendas: deja verificar por cuenta propia que un proveedor es
   // real, sin depender de un link que el mismo proveedor mandó.
   route('supply/proveedores', 'components/supply/SupplyProveedoresPage.jsx'),
+  // Registro de proveedor nativo de Supply (2026-09-12) — mismo criterio
+  // público que marca/tienda de arriba, ver EstudioProveedorSupplyRegistroPage.jsx.
+  route('supply/proveedores/unete', 'components/artistas/EstudioProveedorSupplyRegistroPage.jsx'),
   // Proveedores de Supply con pago directo (fase 5, 2026-08-07) — a donde
   // vuelve el comprador tras pagar en Mercado Pago (back_urls de
   // POST /api/estudios-supply-comprar, panel).
