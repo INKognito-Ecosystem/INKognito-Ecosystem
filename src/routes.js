@@ -63,6 +63,10 @@ export default [
   // estudio-vendedor (vende_supply activo), a diferencia de las marcas de
   // arriba (archivo fijo por marca) esta ruta sirve a cualquier estudio.
   route('supply/estudio/:id', 'components/supply/EstudioSupplyPage.jsx'),
+  // Directorio público de proveedores de Supply (2026-09-12) — equivalente
+  // a store/tiendas: deja verificar por cuenta propia que un proveedor es
+  // real, sin depender de un link que el mismo proveedor mandó.
+  route('supply/proveedores', 'components/supply/SupplyProveedoresPage.jsx'),
   // Proveedores de Supply con pago directo (fase 5, 2026-08-07) — a donde
   // vuelve el comprador tras pagar en Mercado Pago (back_urls de
   // POST /api/estudios-supply-comprar, panel).

@@ -85,6 +85,10 @@ export default function NavbarCategory({ pageName }) {
               className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
               Marcas
             </Link>
+            <Link to="/supply/proveedores" onClick={() => setMenuOpen(false)}
+              className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
+              Proveedores
+            </Link>
             <Link to="/supply#destacados" onClick={() => setMenuOpen(false)}
               className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
               Destacados
