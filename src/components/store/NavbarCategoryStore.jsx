@@ -7,12 +7,15 @@ import logoStore from '../../assets/milogo/store.webp'
 import AnimatedWordmark from '../AnimatedWordmark'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 
-// hideMenu (2026-08-30, Jose) — el catálogo de una tienda (EstudioTiendaPage.jsx)
-// ya tiene su propio botón de gestión en el hero (solo el dueño lo ve) —
-// el menú hamburguesa genérico de Store (categorías/Ecosistema/etc.) ahí
-// competía visualmente con ese botón y no aporta nada específico a esa
-// página, así que se puede ocultar sin afectar el resto de Store (sigue
-// con su comportamiento normal en las páginas de categoría/directorio).
+// hideMenu (2026-08-30, Jose; corregido 2026-09-13) — el catálogo de una
+// tienda (EstudioTiendaPage.jsx) ya tiene su propio botón de gestión en el
+// hero (solo el dueño lo ve). Al principio se ocultaba el menú genérico
+// SIEMPRE en esa página, pero eso también lo escondía para un visitante
+// normal que llega buscando desde el módulo — debe ver la navegación de
+// siempre. Ahora EstudioTiendaPage.jsx pasa hideMenu={esDueno}: solo se
+// oculta cuando quien mira la página es de verdad el dueño (token
+// verificado), momento en el que su propio botón de gestión reemplaza al
+// menú genérico en vez de competir con él.
 export default function NavbarCategoryStore({ pageName, hideMenu = false }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)

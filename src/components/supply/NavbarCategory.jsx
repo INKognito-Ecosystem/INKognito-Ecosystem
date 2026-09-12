@@ -9,11 +9,11 @@ import InkognitoModuleMenu from '../InkognitoModuleMenu'
 
 // hideMenu (2026-09-13, Jose) — mismo criterio que NavbarCategoryStore.jsx:
 // el catálogo de un proveedor (EstudioSupplyPage.jsx) ya tiene su propio
-// botón de gestión en el hero (solo el dueño lo ve), y de paso confundía al
-// dueño mismo — entró a su propio catálogo, abrió ESTE menú genérico en vez
-// del suyo, navegó, y al volver perdió el ?token= de la URL (por eso el
-// botón de gestión "desaparecía" y parecía un bug). Se oculta sin afectar
-// el resto de Supply (categorías/directorio de marcas siguen igual).
+// botón de gestión en el hero, visible SOLO para el dueño verificado por
+// token. EstudioSupplyPage.jsx pasa hideMenu={esDueno} — un visitante
+// normal que llega buscando desde el módulo sigue viendo el menú genérico
+// de siempre; el menú solo se reemplaza por el botón de gestión cuando de
+// verdad es el dueño el que mira la página.
 export default function NavbarCategory({ pageName, hideMenu = false }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)

@@ -205,7 +205,7 @@ export default function EstudioTiendaPage() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
-      <NavbarCategoryStore pageName={nombreTienda} hideMenu />
+      <NavbarCategoryStore pageName={nombreTienda} hideMenu={esDueno} />
 
       {/* Perfil (avatar/nombre/badge/bio/redes) en max-w-3xl, igual que
           EstudioLandingPage.jsx ("INK") — antes la bio tenía su propio

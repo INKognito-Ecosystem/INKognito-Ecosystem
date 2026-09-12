@@ -1,4 +1,4 @@
-import { useLoaderData, redirect, useSearchParams } from 'react-router-dom'
+import { useLoaderData, redirect, useSearchParams, useNavigate } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { Award, MapPin, Menu } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
@@ -12,6 +12,7 @@ import { SUPPLY_CATEGORIES_ORDER } from '../../data/supplyCategoriesOrder'
 import { urlGoogleMaps } from '../artistas/mapaUrl'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+const EDIT_TOKEN_KEY_PREFIX = 'supply_edit_token_'
 
 // Supply multitenant (fase 4, 2026-08-07) — catálogo filtrado de un
 // estudio-vendedor específico, a donde llega alguien que entró desde su
@@ -120,10 +121,35 @@ export function meta({ data }) {
 
 export default function EstudioSupplyPage() {
   const loaderData = useLoaderData()
+  const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { products, esDueno, token, cloud_name, upload_preset } = loaderData
   const [estudio, setEstudio] = useState(loaderData.estudio)
   useEffect(() => { setEstudio(loaderData.estudio) }, [loaderData.estudio])
+
+  // Recordar el acceso del dueño (2026-09-13) — mismo patrón exacto que
+  // EstudioTiendaPage.jsx: si esta carga trajo un token válido, se guarda
+  // para no tener que volver a pegarlo cada vez que el dueño vuelve a su
+  // propio catálogo (ej. buscándose a sí mismo desde el módulo, sin
+  // token en el link); si no hay token en la URL pero sí uno guardado
+  // para este mismo estudio, se agrega a la URL para que el loader lo
+  // revalide. Antes esto solo existía en Store — acá el dueño de Supply
+  // nunca recuperaba su acceso solo, tenía que guardar el link con
+  // ?token= a mano.
+  useEffect(() => {
+    if (!estudio) return
+    const key = EDIT_TOKEN_KEY_PREFIX + estudio.id
+    if (esDueno && token) {
+      try { localStorage.setItem(key, token) } catch {}
+      return
+    }
+    if (!searchParams.get('token')) {
+      try {
+        const guardado = localStorage.getItem(key)
+        if (guardado) navigate(`?token=${encodeURIComponent(guardado)}`, { replace: true })
+      } catch {}
+    }
+  }, [estudio, esDueno, token])
 
   // Abre el panel solo si ya se sabe que es el dueño Y viene de un
   // contexto donde tiene sentido verlo de una (recién verificó su correo,
@@ -187,7 +213,7 @@ export default function EstudioSupplyPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <NavbarCategory pageName={nombreSupply} hideMenu />
+      <NavbarCategory pageName={nombreSupply} hideMenu={esDueno} />
 
       {/* HERO blanco (2026-08-09, Jose: "el fondo del hero debera ser
           blanco") — mismo look que el perfil del estudio/artista en el
