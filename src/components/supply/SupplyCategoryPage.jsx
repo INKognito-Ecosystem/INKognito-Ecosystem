@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import NavbarCategory from './NavbarCategory'
 import FooterSupply from './FooterSupply'
@@ -140,6 +140,11 @@ function AfiliadoCard({ item }) {
 // evita eso sin tocar la card ni el fetch: solo se revela de a bloques.
 const PAGE_SIZE = 12
 
+const ORDEN_OPTIONS = [
+  { value: 'recientes',  label: 'Recientes' },
+  { value: 'precio_asc', label: 'Menor precio' },
+]
+
 export default function SupplyCategoryPage({ title, categoria, slug, intro, guide, faqs, products = [], afiliados = [], extraCTA = null }) {
   const CatIcon = CAT_ICONS[categoria] || null
   const { prev, next } = getAdjacentCategories(slug)
@@ -148,6 +153,19 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
   const [provFiltro, setProvFiltro] = useState('todos')
   const [orden, setOrden] = useState('recientes')
   const [busqueda, setBusqueda] = useState('')
+
+  // Botón de orden: solo ícono, las opciones (texto) aparecen en un panel
+  // al pulsarlo (Jose, 2026-09-12) — mismo patrón de "cerrar al hacer clic
+  // afuera" ya usado en otros pickers del ecosistema.
+  const [ordenAbierto, setOrdenAbierto] = useState(false)
+  const ordenRef = useRef(null)
+  useEffect(() => {
+    function onClickFuera(e) {
+      if (ordenRef.current && !ordenRef.current.contains(e.target)) setOrdenAbierto(false)
+    }
+    document.addEventListener('mousedown', onClickFuera)
+    return () => document.removeEventListener('mousedown', onClickFuera)
+  }, [])
 
   // Un producto = un estudio (el panel agrupa por product+estudio_id desde
   // 2026-08-09, ver fetchCatalogEstudio en useCatalog.js) — filtrar por
@@ -287,16 +305,34 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                   ))}
                 </select>
               )}
-              <div className="relative flex-shrink-0">
-                <SlidersHorizontal size={12} className="absolute left-2 sm:left-2.5 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
-                <select
-                  value={orden}
-                  onChange={cambiarFiltro(setOrden)}
-                  className="w-[92px] sm:w-auto bg-zinc-900 border border-zinc-800 text-zinc-300 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-lg pl-7 sm:pl-8 pr-2 sm:pr-3 py-2 focus:outline-none focus:border-blue-500"
+              <div className="relative flex-shrink-0" ref={ordenRef}>
+                <button
+                  type="button"
+                  onClick={() => setOrdenAbierto(o => !o)}
+                  aria-label="Ordenar por"
+                  aria-expanded={ordenAbierto}
+                  className={`flex items-center justify-center w-9 h-9 bg-zinc-900 border rounded-lg transition-colors ${
+                    ordenAbierto ? 'border-blue-500 text-blue-400' : 'border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
+                  }`}
                 >
-                  <option value="recientes">Recientes</option>
-                  <option value="precio_asc">Menor precio</option>
-                </select>
+                  <SlidersHorizontal size={14} />
+                </button>
+                {ordenAbierto && (
+                  <div className="absolute right-0 top-full mt-1.5 z-20 min-w-[140px] bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-xl">
+                    {ORDEN_OPTIONS.map(o => (
+                      <button
+                        key={o.value}
+                        type="button"
+                        onClick={() => { setOrden(o.value); setVisibleCount(PAGE_SIZE); setOrdenAbierto(false) }}
+                        className={`w-full text-left px-3 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors ${
+                          orden === o.value ? 'text-blue-400 bg-blue-500/10' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+                        }`}
+                      >
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
