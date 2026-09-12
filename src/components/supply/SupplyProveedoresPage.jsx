@@ -6,7 +6,6 @@ import FooterSupply from './FooterSupply'
 import { cloudinaryFill } from '../../lib/cloudinary'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
-const WA = '573207911013'
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
@@ -137,19 +136,17 @@ export default function SupplyProveedoresPage() {
         )}
 
         <div className="mt-12 text-center border-t border-zinc-800 pt-8">
-          {/* A diferencia de Store (tienda/unete, público desde el día uno),
-              el registro de marca/proveedor de Supply lo sigue curando Jose
-              directamente (ver EstudioMarcaRegistroPage.jsx — sin link
-              público a propósito) — acá solo se ofrece el contacto por
-              WhatsApp, no un formulario de autoregistro abierto. */}
+          {/* Corregido (2026-09-12, Jose): el CTA mandaba a WhatsApp
+              personal en vez de al formulario real de autoregistro
+              (EstudioMarcaRegistroPage.jsx) — se deja público acá, mismo
+              criterio que tienda/unete en Store. */}
           <p className="text-zinc-500 text-sm mb-3">¿Tienes insumos o equipos para tatuadores?</p>
-          <a
-            href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero registrarme como proveedor en INKognito Supply.')}`}
-            target="_blank" rel="noopener noreferrer"
+          <Link
+            to="/tattoo-artist-colombia/marca/unete"
             className="inline-block px-6 py-3 bg-blue-500 text-white font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-blue-600 transition"
           >
-            Escríbenos para ser proveedor
-          </a>
+            Regístrate como proveedor
+          </Link>
         </div>
       </div>
 
