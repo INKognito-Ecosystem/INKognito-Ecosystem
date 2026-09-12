@@ -49,7 +49,7 @@ const ORGANIZATION_JSONLD = {
           '@type': 'SiteNavigationElement',
           position: 2,
           name: 'INKognito Supply — Insumos para tatuadores',
-          description: 'Máquinas, tintas, cartuchos y accesorios para tatuadores en Urabá, Antioquia. Despacho a toda Colombia.',
+          description: 'Máquinas, tintas, cartuchos y accesorios para tatuadores, con proveedores verificados y despacho a toda Colombia.',
           url: 'https://inkognito-ecosystem.com/supply',
         },
         {

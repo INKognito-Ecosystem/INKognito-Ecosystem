@@ -32,7 +32,7 @@ export async function loader({ request }) {
 
 export function meta() {
   const title = 'Royal Three | Insumos para tatuadores — INKognito Supply'
-  const description = 'Cremas, jabones y productos de bioseguridad Royal Three para estudios de tatuaje profesionales. Disponibles en Urabá, Colombia.'
+  const description = 'Cremas, jabones y productos de bioseguridad Royal Three para estudios de tatuaje profesionales. Disponibles en toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },

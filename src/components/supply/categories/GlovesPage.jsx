@@ -24,7 +24,7 @@ export async function loader() {
 }
 
 export function meta() {
-  const title = `${TITLE} para tatuadores en Urabá | INKognito Supply — Chigorodó`
+  const title = `${TITLE} para tatuadores en Colombia | INKognito Supply`
   return [
     { title },
     { name: 'description', content: DESC },

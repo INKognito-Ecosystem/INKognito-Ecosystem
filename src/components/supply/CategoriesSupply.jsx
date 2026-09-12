@@ -62,7 +62,7 @@ export default function CategoriesSupply({ categorias = {} }) {
             hasta el mobiliario del estudio: cada categoría está pensada para el flujo real de
             trabajo de un tatuador profesional. Tintas certificadas, cartuchos con membrana de
             seguridad, fuentes estables y accesorios que no fallan a mitad de sesión — con stock
-            verificado y despacho rápido a Chigorodó, Apartadó, Turbo y Carepa.
+            verificado y despacho a todo el país.
           </p>
           <div className="clear-both" />
         </div>

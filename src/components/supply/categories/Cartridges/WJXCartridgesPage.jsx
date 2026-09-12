@@ -19,7 +19,7 @@ export async function loader() {
 
 export function meta() {
   const title = 'Cartuchos WJX | INKognito Supply — Colombia'
-  const description = 'Cartuchos WJX de alta precisión para líneas y sombras. Compatibles con máquinas tipo pen. Disponibles en Urabá, Colombia.'
+  const description = 'Cartuchos WJX de alta precisión para líneas y sombras. Compatibles con máquinas tipo pen. Disponibles en toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },

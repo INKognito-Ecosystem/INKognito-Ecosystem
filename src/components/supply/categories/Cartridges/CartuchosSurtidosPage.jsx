@@ -31,7 +31,7 @@ export async function loader() {
 }
 
 export function meta() {
-  const title = 'Cajas Surtidas de Cartuchos | INKognito Supply — Chigorodó'
+  const title = 'Cajas Surtidas de Cartuchos | INKognito Supply'
   const description = 'Elige con qué proveedor armar tu caja de 20 cartuchos surtida a tu gusto — marca, calibre y referencia exacta que necesitas.'
   return [
     { title },

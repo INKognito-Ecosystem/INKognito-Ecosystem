@@ -15,7 +15,7 @@ export async function loader() {
 
 export function meta() {
   const title = 'Cartuchos EZ Tattoo | INKognito Supply — Colombia'
-  const description = 'Cartuchos EZ en RL, RS, Magnum y Curved Magnum. Excelente relación calidad-precio para realismo, black and grey y lettering. Disponibles en Urabá, Colombia.'
+  const description = 'Cartuchos EZ en RL, RS, Magnum y Curved Magnum. Excelente relación calidad-precio para realismo, black and grey y lettering. Disponibles en toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },

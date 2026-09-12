@@ -32,7 +32,7 @@ export async function loader({ request }) {
 
 export function meta() {
   const title = 'Tattoo Vision | Sistemas visuales para tatuadores — INKognito Supply'
-  const description = 'Lámparas, gafas y sistemas de visión Tattoo Vision para tatuadores profesionales. Precisión óptica en cada sesión. Disponibles en Urabá, Colombia.'
+  const description = 'Lámparas, gafas y sistemas de visión Tattoo Vision para tatuadores profesionales. Precisión óptica en cada sesión. Disponibles en toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },

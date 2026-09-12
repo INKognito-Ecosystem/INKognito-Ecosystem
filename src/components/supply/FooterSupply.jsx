@@ -32,7 +32,7 @@ export default function FooterSupply() {
           <div>
 
             <p className="text-zinc-500 leading-relaxed max-w-sm text-sm">
-              Tienda online de insumos para tatuadores — productos de proveedores locales y nacionales verificados y reconocidos.
+              Tienda online de insumos para tatuadores — productos de proveedores locales y nacionales verificados.
             </p>
 
           </div>

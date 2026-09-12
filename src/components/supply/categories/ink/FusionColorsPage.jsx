@@ -15,7 +15,7 @@ export async function loader() {
 
 export function meta() {
   const title = 'Tintas Fusion Ink | INKognito Supply — Colombia'
-  const description = 'Fusion Ink: pigmentos vibrantes y stencil-friendly para color americano y neotradicional. Disponibles en Urabá, Colombia.'
+  const description = 'Fusion Ink: pigmentos vibrantes y stencil-friendly para color americano y neotradicional. Disponibles en toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },

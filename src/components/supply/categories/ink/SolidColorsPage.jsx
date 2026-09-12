@@ -15,7 +15,7 @@ export async function loader() {
 
 export function meta() {
   const title = 'Tintas Solid Ink | INKognito Supply — Colombia'
-  const description = 'Solid Ink: paleta de colores puros y consistentes para realismo y acuarela. Disponibles en Urabá, Colombia.'
+  const description = 'Solid Ink: paleta de colores puros y consistentes para realismo y acuarela. Disponibles en toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },

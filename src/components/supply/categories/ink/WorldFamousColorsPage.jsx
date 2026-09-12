@@ -15,7 +15,7 @@ export async function loader() {
 
 export function meta() {
   const title = 'Tintas World Famous | INKognito Supply — Colombia'
-  const description = 'World Famous Ink: alta pigmentación, cicatrización limpia y colores que retienen brillantez con el tiempo. Disponibles en Urabá, Colombia.'
+  const description = 'World Famous Ink: alta pigmentación, cicatrización limpia y colores que retienen brillantez con el tiempo. Disponibles en toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },

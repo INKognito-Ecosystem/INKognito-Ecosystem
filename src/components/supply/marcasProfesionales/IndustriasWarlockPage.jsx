@@ -38,7 +38,7 @@ export async function loader({ request }) {
 
 export function meta() {
   const title = 'Industrias Warlock | INKognito Supply — Colombia'
-  const description = 'Industrias Warlock: mobiliario profesional para estudios de tatuaje — camillas, sillas y equipamiento para tu espacio de trabajo. Disponible en Urabá, Colombia.'
+  const description = 'Industrias Warlock: mobiliario profesional para estudios de tatuaje — camillas, sillas y equipamiento para tu espacio de trabajo. Disponible en toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },

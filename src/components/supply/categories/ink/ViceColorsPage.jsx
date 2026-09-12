@@ -19,7 +19,7 @@ export async function loader() {
 
 export function meta() {
   const title = 'Tintas Vice Colors | INKognito Supply — Colombia'
-  const description = 'Catálogo completo de Vice Colors: negros, grises, rojos, azules, pieles y más. Tintas premium para realismo y neotradicional. Disponibles en Urabá, despacho a Colombia.'
+  const description = 'Catálogo completo de Vice Colors: negros, grises, rojos, azules, pieles y más. Tintas premium para realismo y neotradicional. Disponibles en toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },

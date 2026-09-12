@@ -15,7 +15,7 @@ export async function loader() {
 
 export function meta() {
   const title = 'Tintas Eternal Ink | INKognito Supply — Colombia'
-  const description = 'Eternal Ink: base acuosa, sin acrílicos, paleta extensa de colores y negros. Cicatrización limpia y brillo duradero. Disponibles en Urabá, despacho a Colombia.'
+  const description = 'Eternal Ink: base acuosa, sin acrílicos, paleta extensa de colores y negros. Cicatrización limpia y brillo duradero. Disponibles en toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },

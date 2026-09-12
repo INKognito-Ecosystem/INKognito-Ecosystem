@@ -10,7 +10,7 @@ export async function loader() {
 
 export function meta() {
   const title = 'Tintas Intenze | INKognito Supply — Colombia'
-  const description = 'Intenze: alta pigmentación, fórmula estéril y vegana. Zuper Black, True Black y gama completa de colores. Disponibles en Urabá, despacho a Colombia.'
+  const description = 'Intenze: alta pigmentación, fórmula estéril y vegana. Zuper Black, True Black y gama completa de colores. Disponibles en toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },

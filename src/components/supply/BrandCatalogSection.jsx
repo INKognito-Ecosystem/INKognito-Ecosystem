@@ -13,9 +13,10 @@ const WA = '573207911013'
 // y filtra por `p.marca === '<slug>'`.
 // supplierBadge: texto de la insignia de confianza sobre el proveedor —
 // cada página de marca puede pasar la suya (ver IndustriasWarlockPage.jsx).
-// Por defecto asume Tommy Tattoo Supply porque hoy todas las marcas de
-// ink/cartuchos vienen de ahí; pasar null para no mostrar ninguna insignia.
-const TOMMY_BADGE = 'Suministrado por Tommy Tattoo Supply — marca reconocida en Urabá'
+// Sin default (2026-09-12): Supply pasó a ser nacional/multi-proveedor
+// (fase 5), así que ya no se puede asumir que un proveedor fijo (Tommy
+// Tattoo Supply) esté detrás de cualquier marca — la atribución real ahora
+// es dinámica por producto (ver SupplyProductCard.jsx, estudio_nombre_supply).
 
 // whatsapp (2026-08-07, bug real reportado por Jose): antes SIEMPRE usaba
 // el WhatsApp de INKognito acá, aunque la página fuera de un proveedor con
@@ -24,7 +25,7 @@ const TOMMY_BADGE = 'Suministrado por Tommy Tattoo Supply — marca reconocida e
 // a INKognito en vez de al proveedor. Opcional, cae al número de INKognito
 // si no se pasa (las 4 páginas de marcasProfesionales/ no tienen un
 // WhatsApp propio registrado, siguen igual que siempre).
-export default function BrandCatalogSection({ brandName, products = [], supplierBadge = TOMMY_BADGE, whatsapp = WA, showEstudioBadge = true }) {
+export default function BrandCatalogSection({ brandName, products = [], supplierBadge = null, whatsapp = WA, showEstudioBadge = true }) {
   if (products.length === 0) {
     return (
       <div className="border border-zinc-800 bg-zinc-950 rounded-2xl p-10 md:p-16 text-center">

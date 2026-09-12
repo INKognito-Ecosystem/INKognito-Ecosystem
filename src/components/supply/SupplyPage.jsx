@@ -22,7 +22,7 @@ const supplyJsonLd = {
   "@type": "Store",
   "@id": `${import.meta.env.VITE_SITE_URL}/supply#business`,
   "name": "INKognito Supply",
-  "description": "Tienda online de insumos y equipos profesionales para tatuadores, con productos de proveedores locales y nacionales verificados. Máquinas, tintas, cartuchos, agujas y accesorios. Con base en Urabá, Antioquia. Despacho a toda Colombia por solicitud.",
+  "description": "Tienda online de insumos y equipos profesionales para tatuadores, con productos de proveedores locales y nacionales verificados. Máquinas, tintas, cartuchos, agujas y accesorios. Despacho a toda Colombia.",
   "url": `${import.meta.env.VITE_SITE_URL}/supply`,
   "telephone": "+57-320-791-1013",
   "address": {
@@ -31,7 +31,7 @@ const supplyJsonLd = {
     "addressRegion": "Antioquia",
     "addressCountry": "CO"
   },
-  "areaServed": ["Chigorodó","Apartadó","Turbo","Carepa","Mutatá","Colombia por solicitud"]
+  "areaServed": "Colombia"
 }
 
 export async function loader() {
@@ -39,8 +39,8 @@ export async function loader() {
 }
 
 export function meta() {
-  const title = 'INKognito Supply | Insumos y equipos para tatuaje en Urabá'
-  const description = 'Tienda online de insumos para tatuadores — máquinas, cartuchos, tintas, agujas y accesorios de proveedores locales y nacionales verificados y reconocidos. Con base en Urabá (Apartadó, Turbo, Carepa), despacho a toda Colombia.'
+  const title = 'INKognito Supply | Insumos y equipos para tatuaje en Colombia'
+  const description = 'Tienda online de insumos para tatuadores — máquinas, cartuchos, tintas, agujas y accesorios de proveedores locales y nacionales verificados. Despacho a toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },

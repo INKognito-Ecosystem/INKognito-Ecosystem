@@ -5,8 +5,8 @@ import { fetchCatalogCategoria, fetchSupplyFaq } from '../../../../hooks/useCata
 const TITLE = 'Tintas'
 const CATEGORIA = 'Tintas'
 const SLUG = 'ink'
-const DESC = 'Tintas y pigmentos profesionales para tatuaje en Chigorodó, Urabá. Alta densidad, larga duración. Marcas como Vice Colors, Dynamic, Eternal. Envíos a Apartadó, Turbo y toda la región.'
-const INTRO = `Tintas y pigmentos de alta densidad para tatuadores profesionales en Chigorodó, Urabá. Colores con alta concentración de pigmento, formulados para definición nítida, larga duración y cicatrización limpia. Disponibles en 1oz, 2oz y 4oz según existencias.`
+const DESC = 'Tintas y pigmentos profesionales para tatuaje, con envíos a toda Colombia. Alta densidad, larga duración. Marcas como Vice Colors, Dynamic, Eternal.'
+const INTRO = `Tintas y pigmentos de alta densidad para tatuadores profesionales en toda Colombia. Colores con alta concentración de pigmento, formulados para definición nítida, larga duración y cicatrización limpia. Disponibles en 1oz, 2oz y 4oz según existencias.`
 
 const guide = [
   { icon: '🎨', title: 'Negros y grises', text: 'Esenciales para realismo y sombras. Busca alta densidad para trazo limpio y negros absolutos sin dilución. Los negros de calidad mantienen el color sin desvanecer con los años.' },
@@ -26,7 +26,7 @@ export async function loader() {
 }
 
 export function meta() {
-  const title = `${TITLE} para tatuadores en Urabá | INKognito Supply — Chigorodó`
+  const title = `${TITLE} para tatuadores en Colombia | INKognito Supply`
   return [
     { title },
     { name: 'description', content: DESC },

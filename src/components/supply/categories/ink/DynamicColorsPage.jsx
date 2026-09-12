@@ -6,7 +6,7 @@ import BrandCatalogSection from '../../BrandCatalogSection'
 import SupplyFAQ from '../../SupplyFAQ'
 export function meta() {
   const title = 'Tintas Dynamic | INKognito Supply — Colombia'
-  const description = 'Dynamic Black, Triple Black y colores clásicos. Pigmentos densos y fluidos para black and grey y estilo tradicional. Disponibles en Urabá, despacho a Colombia.'
+  const description = 'Dynamic Black, Triple Black y colores clásicos. Pigmentos densos y fluidos para black and grey y estilo tradicional. Disponibles en toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },

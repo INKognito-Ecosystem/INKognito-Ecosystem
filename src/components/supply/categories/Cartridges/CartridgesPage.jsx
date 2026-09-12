@@ -6,8 +6,8 @@ import { fetchCatalogCategoria, fetchSupplyFaq } from '../../../../hooks/useCata
 const TITLE = 'Cartuchos'
 const CATEGORIA = 'Cartuchos'
 const SLUG = 'cartridges'
-const DESC = 'Cartuchos para tatuar en Chigorodó, Urabá. Liner, shader, magnum y bugpin. Con membrana de seguridad. Compatibles con rotativas. Envíos a Apartadó, Turbo, Carepa y toda la región.'
-const INTRO = `Cartuchos profesionales para máquinas rotativas en Chigorodó, Urabá. Agujas encapsuladas con membrana de seguridad, flujo de tinta controlado y punta de precisión. Compatible con la mayoría de máquinas rotativas del mercado.`
+const DESC = 'Cartuchos para tatuar, con envíos a toda Colombia. Liner, shader, magnum y bugpin. Con membrana de seguridad. Compatibles con rotativas.'
+const INTRO = `Cartuchos profesionales para máquinas rotativas, disponibles en toda Colombia. Agujas encapsuladas con membrana de seguridad, flujo de tinta controlado y punta de precisión. Compatible con la mayoría de máquinas rotativas del mercado.`
 
 const guide = [
   { icon: '📐', title: 'Liner (RL)', text: 'Redondas en línea. Para trazos finos, contornos y trabajo en línea. Cuanto menor el número, más fino el trazo. Los RL3 y RL5 son los más versátiles.' },
@@ -27,7 +27,7 @@ export async function loader() {
 }
 
 export function meta() {
-  const title = `${TITLE} para tatuadores en Urabá | INKognito Supply — Chigorodó`
+  const title = `${TITLE} para tatuadores en Colombia | INKognito Supply`
   return [
     { title },
     { name: 'description', content: DESC },

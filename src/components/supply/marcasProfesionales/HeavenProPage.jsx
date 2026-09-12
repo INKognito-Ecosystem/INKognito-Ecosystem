@@ -41,7 +41,7 @@ export async function loader({ request }) {
 
 export function meta() {
   const title = 'Heaven Pro | Cuidado de tatuajes — INKognito Supply'
-  const description = 'Heaven Pro: crema y toallitas de limpieza para usar durante la sesión, crema de cicatrización para después. Línea completa para el tatuador y para vender a tus clientes. Disponibles en Urabá, Colombia.'
+  const description = 'Heaven Pro: crema y toallitas de limpieza para usar durante la sesión, crema de cicatrización para después. Línea completa para el tatuador y para vender a tus clientes. Disponibles en toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },
