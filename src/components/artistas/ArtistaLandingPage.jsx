@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
-import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle, Building2, Award, Tag } from 'lucide-react'
+import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle, Building2, Award, Tag, ClipboardList } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { municipioDesdeNombreIP } from '../../data/colombiaGeo'
 import { idDesdeParam } from './artistaSlug'
@@ -850,13 +850,17 @@ export default function ArtistaLandingPage() {
                     sin ser un candado (WhatsApp sigue gratis). v11 (Jose:
                     "estiró la card, no la estires, solo ubícalo abajo a la
                     izquierda") — posición absoluta como la insignia de MP,
-                    ya no ocupa su propio renglón en el flujo normal. */}
+                    ya no ocupa su propio renglón en el flujo normal.
+                    v16 (2026-09-13, Jose: renombrar + insignia con ícono,
+                    misma referencia visual de "tarjeta" que la franja de
+                    arriba) — de link subrayado suelto a badge/pill propio. */}
                 <button
                   type="button"
                   onClick={() => setMostrarTerminos(true)}
-                  className="absolute bottom-2 left-4 z-10 text-[10px] text-gray-400 underline decoration-gray-500 hover:text-gray-200 transition-colors"
+                  className="absolute bottom-2 left-4 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/30 text-[9px] font-bold uppercase tracking-wide text-gray-300 hover:text-white hover:bg-black/50 transition-colors"
                 >
-                  Términos y condiciones
+                  <ClipboardList size={11} className="flex-shrink-0" />
+                  Ver condiciones y flujo de reserva
                 </button>
 
                 {/* Tooltip de onboarding sobre "Para agendar" (2026-08-11)
