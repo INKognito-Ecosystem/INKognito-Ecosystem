@@ -1604,41 +1604,44 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           </button>
         </div>
         {editandoHero ? (
-          <div className="grid grid-cols-2 border-t border-gray-200">
-            <div className="border-r border-gray-200 p-3">
-              <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-1 mb-1"><FaFacebook size={10} /> Facebook</label>
-              <input value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." className="w-full text-xs bg-transparent border-b border-gray-300 focus:outline-none" />
+          <>
+            <div className="grid grid-cols-2 border-t border-gray-200">
+              <div className="border-r border-gray-200 p-3">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-1 mb-1"><FaFacebook size={10} /> Facebook</label>
+                <input value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." className="w-full text-xs bg-transparent border-b border-gray-300 focus:outline-none" />
+              </div>
+              <div className="p-3">
+                <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-1 mb-1"><FaInstagram size={10} /> Instagram</label>
+                <input value={form.instagram} onChange={set('instagram')} placeholder="https://instagram.com/..." className="w-full text-xs bg-transparent border-b border-gray-300 focus:outline-none" />
+              </div>
             </div>
-            <div className="p-3">
-              <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-1 mb-1"><FaInstagram size={10} /> Instagram</label>
-              <input value={form.instagram} onChange={set('instagram')} placeholder="https://instagram.com/..." className="w-full text-xs bg-transparent border-b border-gray-300 focus:outline-none" />
+            <div className="border-t border-b border-gray-200 p-3">
+              <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-1 mb-1"><FaWhatsapp size={10} /> WhatsApp *</label>
+              <input required value={form.whatsapp} onChange={set('whatsapp')} placeholder="573..." className="w-full text-xs bg-transparent border-b border-gray-300 focus:outline-none" />
             </div>
-          </div>
+          </>
         ) : (
-          <div className="grid grid-cols-2 w-full border-t border-gray-200">
-            <div className={`flex items-center justify-center gap-1.5 py-2 border-r border-gray-200 ${form.facebook ? 'text-gray-500' : 'text-gray-300'}`}>
-              <FaFacebook size={13} />
-              <span className="text-[10px] font-bold uppercase tracking-wide">Facebook</span>
-            </div>
-            <div className={`flex items-center justify-center gap-1.5 py-2 ${form.instagram ? 'text-gray-500' : 'text-gray-300'}`}>
-              <FaInstagram size={13} />
-              <span className="text-[10px] font-bold uppercase tracking-wide">Instagram</span>
-            </div>
+          // Iconos circulares en una sola fila pegados a la izquierda
+          // (2026-09-13, Jose: "deberán verse como se ve las redes de
+          // estudios") — mismo patrón exacto que EstudioLandingPage.jsx,
+          // reemplaza la grilla de 2 columnas con texto + la barra verde
+          // de WhatsApp a todo el ancho que traía antes. Colores de marca
+          // (2026-09-13, Jose: "dale sus colores característicos a los
+          // demás como se lo diste a WhatsApp") — azul de Facebook,
+          // degradado de Instagram, en vez del gris BTN parejo.
+          <div className="flex items-center gap-3 px-4 py-3 border-t border-b border-gray-200">
+            {form.whatsapp && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-white text-xs font-bold" style={{ backgroundColor: '#25D366' }}>
+                <FaWhatsapp size={13} /> WhatsApp
+              </span>
+            )}
+            <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-white ${form.facebook ? '' : 'opacity-30'}`} style={{ backgroundColor: '#1877F2' }}>
+              <FaFacebook size={14} />
+            </span>
+            <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-white bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 ${form.instagram ? '' : 'opacity-30'}`}>
+              <FaInstagram size={14} />
+            </span>
           </div>
-        )}
-
-        {editandoHero ? (
-          <div className="border-t border-b border-gray-200 p-3">
-            <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-1 mb-1"><FaWhatsapp size={10} /> WhatsApp *</label>
-            <input required value={form.whatsapp} onChange={set('whatsapp')} placeholder="573..." className="w-full text-xs bg-transparent border-b border-gray-300 focus:outline-none" />
-          </div>
-        ) : form.whatsapp ? (
-          <div className="flex items-center justify-center gap-1.5 py-2.5 border-t border-b border-gray-200 bg-green-600 text-white font-bold uppercase tracking-wide text-[11px]">
-            <FaWhatsapp size={14} />
-            Contactar al artista
-          </div>
-        ) : (
-          <div className="border-t border-b border-gray-200" />
         )}
       </div>
 

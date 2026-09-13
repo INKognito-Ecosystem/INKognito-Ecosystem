@@ -853,13 +853,17 @@ export default function ArtistaLandingPage() {
                     ya no ocupa su propio renglón en el flujo normal.
                     v16 (2026-09-13, Jose: renombrar + insignia con ícono,
                     misma referencia visual de "tarjeta" que la franja de
-                    arriba) — de link subrayado suelto a badge/pill propio. */}
+                    arriba) — de link subrayado suelto a badge/pill propio.
+                    v17 (2026-09-13, Jose: "centrado justo debajo del botón
+                    Agendar sesión, texto un poco más chico") — de
+                    left-4 a centrado (left-1/2 -translate-x-1/2), texto
+                    de 9px a 8px. */}
                 <button
                   type="button"
                   onClick={() => setMostrarTerminos(true)}
-                  className="absolute bottom-2 left-4 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/30 text-[9px] font-bold uppercase tracking-wide text-gray-300 hover:text-white hover:bg-black/50 transition-colors"
+                  className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/30 text-[8px] font-bold uppercase tracking-wide text-gray-300 hover:text-white hover:bg-black/50 transition-colors whitespace-nowrap"
                 >
-                  <ClipboardList size={11} className="flex-shrink-0" />
+                  <ClipboardList size={10} className="flex-shrink-0" />
                   Ver condiciones y flujo de reserva
                 </button>
 
@@ -996,48 +1000,53 @@ export default function ArtistaLandingPage() {
           </div>
         )}
 
-        {/* REDES SOCIALES — Facebook e Instagram, en 2 bloques a todo el
-            ancho de la COLUMNA del perfil. v2 (2026-08-06, Jose: "ubicar
-            la sesión redes sociales en la parte de abajo, antes del
-            footer") — se movió desde justo debajo del encabezado hasta
-            acá, ya que la prioridad de la página ahora es la agenda en
-            línea y los diseños en venta primero. Si el artista todavía no
-            tiene el link cargado, el bloque se queda visible pero
-            deshabilitado con un aviso, nunca se oculta. */}
+        {/* REDES SOCIALES — WhatsApp/Facebook/Instagram, en una fila de
+            íconos. v2 (2026-08-06, Jose: "ubicar la sesión redes sociales
+            en la parte de abajo, antes del footer") — se movió desde
+            justo debajo del encabezado hasta acá, ya que la prioridad de
+            la página ahora es la agenda en línea y los diseños en venta
+            primero. Facebook/Instagram siguen visibles aunque el artista
+            no los haya cargado (atenuados, con aviso al tocar), nunca se
+            ocultan del todo. */}
         <div className="mt-6 max-w-3xl mx-auto">
-          {/* Empujón sutil hacia Agenda en línea (2026-08-06, Jose) — tono
-              de invitación, no de advertencia: WhatsApp se queda gratis y
-              abierto como siempre, esto solo recuerda que la opción de
-              pago existe más arriba. Solo aparece si el artista activó
-              "para agendar". Centrado (Jose) — ya no hay una etiqueta
-              "Redes sociales" a su izquierda con la que alinearse; los
-              íconos de Facebook/Instagram de abajo ya se explican solos. */}
-          {artista.precio_agendar && (
-            <p className="px-4 text-gray-500 text-[11px] mb-3 text-center">¿Prefieres asegurar tu cupo? Agenda en línea más arriba ↑</p>
-          )}
-          {/* Tamaño reducido (2026-09-13, Jose: "reducir el tamaño visual
-              del botón de WhatsApp y redes sociales para que actúen como
-              vías secundarias de consulta, manteniendo el foco comercial
-              en la pasarela de agendamiento") — menos padding, íconos e
-              texto más chicos, y WhatsApp pasa de negrita/mayúscula ancha
-              a un tratamiento más discreto. La agenda en línea de arriba
-              se queda como la acción principal de la página. */}
-          <div className={`grid grid-cols-2 w-full border-t border-gray-200 ${waLink ? '' : 'border-b'}`}>
+          {/* Iconos circulares en una sola fila pegados a la izquierda
+              (2026-09-13, Jose: "deberán verse como se ve las redes de
+              estudios") — mismo patrón exacto que EstudioLandingPage.jsx.
+              Reemplaza la grilla de 2 columnas con texto + la barra verde
+              de WhatsApp a todo el ancho (2026-09-13, un intento anterior
+              de hacerlas "más discretas" reduciendo el tamaño de esa
+              misma barra). Facebook/Instagram siguen mostrándose siempre
+              — a diferencia de estudios, si el artista no los ha subido
+              el ícono queda atenuado y avisa con un toast al tocarlo
+              (mostrarAvisoRed), en vez de desaparecer del todo.
+              Colores de marca (2026-09-13, Jose: "dale sus colores
+              característicos a los demás como se lo diste a WhatsApp")
+              — a diferencia de EstudioLandingPage.jsx (que usa el gris
+              BTN parejo para los tres), acá cada red lleva su propio
+              color: azul de Facebook, degradado de Instagram. */}
+          <div className="flex items-center gap-3 px-4 py-4 border-t border-gray-200">
+            {waLink && (
+              <a
+                href={waLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={trackWhatsappClick}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-white text-xs font-bold"
+                style={{ backgroundColor: '#25D366' }}
+              >
+                <FaWhatsapp size={13} /> WhatsApp
+              </a>
+            )}
             <a
               href={artista.facebook || undefined}
               target={artista.facebook ? '_blank' : undefined}
               rel={artista.facebook ? 'noopener noreferrer' : undefined}
               onClick={artista.facebook ? undefined : (e) => { e.preventDefault(); mostrarAvisoRed('Facebook') }}
               aria-disabled={!artista.facebook}
-              className={`flex items-center justify-center gap-1.5 py-2 border-r border-gray-200 transition-colors ${
-                artista.facebook ? 'text-gray-500 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-pointer'
-              }`}
+              className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-white transition-opacity ${artista.facebook ? 'hover:opacity-80' : 'opacity-30'}`}
+              style={{ backgroundColor: '#1877F2' }}
             >
-              <FaFacebook size={13} />
-              <span className="flex flex-col items-start leading-tight">
-                <span className="text-[10px] font-bold uppercase tracking-wide">Facebook</span>
-                {!artista.facebook && <span className="text-[8px] font-medium normal-case tracking-normal text-gray-300">Aún no se ha subido</span>}
-              </span>
+              <FaFacebook size={14} />
             </a>
             <a
               href={artista.instagram || undefined}
@@ -1045,32 +1054,22 @@ export default function ArtistaLandingPage() {
               rel={artista.instagram ? 'noopener noreferrer' : undefined}
               onClick={artista.instagram ? undefined : (e) => { e.preventDefault(); mostrarAvisoRed('Instagram') }}
               aria-disabled={!artista.instagram}
-              className={`flex items-center justify-center gap-1.5 py-2 transition-colors ${
-                artista.instagram ? 'text-gray-500 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-pointer'
-              }`}
+              className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-white transition-opacity bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 ${artista.instagram ? 'hover:opacity-80' : 'opacity-30'}`}
             >
-              <FaInstagram size={13} />
-              <span className="flex flex-col items-start leading-tight">
-                <span className="text-[10px] font-bold uppercase tracking-wide">Instagram</span>
-                {!artista.instagram && <span className="text-[8px] font-medium normal-case tracking-normal text-gray-300">Aún no se ha subido</span>}
-              </span>
+              <FaInstagram size={14} />
             </a>
           </div>
 
-          {/* CONTACTAR AL ARTISTA — se queda justo debajo de redes
-              sociales, viajan juntos como un solo bloque (2026-08-04 /
-              2026-08-06). */}
-          {waLink && (
-            <a
-              href={waLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={trackWhatsappClick}
-              className="flex items-center justify-center gap-1.5 py-2.5 border-b border-gray-200 bg-green-600 text-white font-bold uppercase tracking-wide hover:bg-green-500 transition-colors text-[11px]"
-            >
-              <FaWhatsapp size={14} />
-              Contactar al artista
-            </a>
+          {/* Empujón hacia Agenda en línea + invitación a redes
+              (2026-09-13, Jose) — reemplaza el "¿Prefieres asegurar tu
+              cupo?..." que vivía ANTES de los íconos (2026-08-06); mismo
+              mensaje de fondo, ahora debajo, en un solo texto que además
+              invita a seguir las redes recién mostradas arriba. Mismo
+              gate que el texto anterior — solo aparece si el artista
+              activó "para agendar", ya que la primera frase referencia
+              esa opción. */}
+          {artista.precio_agendar && (
+            <p className="px-4 pt-3 text-gray-500 text-[11px] text-center">La forma más rápida y segura de agendar tu cita es en línea ↑. Explora mis redes sociales para ver mi portafolio completo y testimonios.</p>
           )}
         </div>
 
