@@ -57,6 +57,24 @@ export default function ComboboxBuscable({ value, onChange, options, placeholder
 
   const abrir = () => { setFiltro(''); setAbierto(true) }
 
+  // Cerrar + validar lo escrito (2026-09-13, Jose: "el botón que permite
+  // desplegar, al darle allí mismo, debería también [cerrarlo] — si no
+  // agrego un día, no se oculta") — antes esta lógica solo vivía en
+  // onBlur; el botón de la flecha llamaba siempre a abrir(), nunca a
+  // cerrar, así que tocarlo dos veces (abrir, volver a tocar el mismo
+  // botón) nunca lo cerraba — solo un blur real (tocar OTRO campo) o
+  // clic afuera lo hacían. Se extrae para reusarla también como el
+  // "cerrar" del toggle de abajo.
+  const cerrarYValidar = () => {
+    setAbierto(false)
+    if (texto.trim() === '') { setTexto(''); if (value !== '') onChange(''); return }
+    const match = options.find((o) => normalize(getLabel(o)) === normalize(texto))
+    if (match) { setTexto(textoInicial(match)); if (match !== value) onChange(match) }
+    else setTexto(textoInicial(value))
+  }
+
+  const alternar = () => { if (abierto) cerrarYValidar(); else abrir() }
+
   const elegir = (opcion) => {
     setTexto(textoInicial(opcion))
     setFiltro('')
@@ -78,13 +96,7 @@ export default function ComboboxBuscable({ value, onChange, options, placeholder
             if (e.target.value === '') onChange('')
           }}
           onFocus={(e) => { abrir(); e.target.select() }}
-          onBlur={() => {
-            setAbierto(false)
-            if (texto.trim() === '') { setTexto(''); if (value !== '') onChange(''); return }
-            const match = options.find((o) => normalize(getLabel(o)) === normalize(texto))
-            if (match) { setTexto(textoInicial(match)); if (match !== value) onChange(match) }
-            else setTexto(textoInicial(value))
-          }}
+          onBlur={cerrarYValidar}
           placeholder={placeholder}
           className={inputClassName}
           style={texto ? { paddingRight: '2.75rem' } : undefined}
@@ -110,11 +122,11 @@ export default function ComboboxBuscable({ value, onChange, options, placeholder
         {!disabled && (
           <button
             type="button"
-            aria-label="Desplegar opciones"
-            onMouseDown={(e) => { e.preventDefault(); abrir() }}
+            aria-label={abierto ? 'Ocultar opciones' : 'Desplegar opciones'}
+            onMouseDown={(e) => { e.preventDefault(); alternar() }}
             className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400"
           >
-            <ChevronDown size={15} />
+            <ChevronDown size={15} className={`transition-transform ${abierto ? 'rotate-180' : ''}`} />
           </button>
         )}
       </div>

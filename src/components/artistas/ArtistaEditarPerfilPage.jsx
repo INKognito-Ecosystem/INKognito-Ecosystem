@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData, useSearchParams, useNavigate } from 'react-router-dom'
-import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarDays, CalendarCheck, ChevronLeft, ChevronRight, Banknote, ChevronDown } from 'lucide-react'
+import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarDays, CalendarCheck, ChevronLeft, ChevronRight, Banknote, ChevronDown, Upload } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
@@ -141,16 +141,20 @@ function PedirLinkForm() {
   )
 }
 
+// Microcopy (2026-09-13, Jose: reescritura de la tarjeta "Mis diseños" a
+// un tono más profesional) — badgeCorto es lo que se ve en la miniatura
+// (espacio mínimo, top-left), label/hint es lo que se ve en el selector
+// del formulario.
 const TIPOS_DISENO = [
   {
-    value: 'tatuaje', label: 'Diseño de tatuaje',
-    hint: 'Se tatúa en una sola persona — desaparece de la venta al venderse',
-    placeholderDescripcion: 'Cuéntale a quien lo vea por qué vale la pena — qué representa este diseño, qué se siente tatuárselo, para quién es. Esto es lo que van a leer antes de comprar.',
+    value: 'tatuaje', label: 'Obra exclusiva', badgeCorto: 'Exclusivo',
+    hint: 'Se retira del catálogo tras su venta',
+    placeholderDescripcion: 'Detalla el concepto, dimensiones sugeridas o zona corporal recomendada.',
   },
   {
-    value: 'lamina', label: 'Lámina / print',
-    hint: 'Para enmarcar — se puede vender a varios clientes',
-    placeholderDescripcion: 'Cuéntale a quien lo vea por qué vale la pena — qué representa este diseño, dónde se vería bien enmarcado, para quién sería un buen regalo. Esto es lo que van a leer antes de comprar.',
+    value: 'lamina', label: 'Reproducción / Print', badgeCorto: 'Print',
+    hint: 'Venta continuada',
+    placeholderDescripcion: 'Detalla el concepto, dimensiones sugeridas o zona corporal recomendada.',
   },
 ]
 
@@ -163,9 +167,9 @@ const TIPOS_DISENO = [
 // propios endpoints.
 const NUEVO_VACIO = { tipo: 'tatuaje', titulo: '', descripcion: '', precio: '', imagen_url: '', imagen_url_2: '', imagen_url_3: '' }
 const SLOTS_DISENO = [
-  { key: 'imagen_url', label: 'Foto 1' },
-  { key: 'imagen_url_2', label: 'Foto 2' },
-  { key: 'imagen_url_3', label: 'Foto 3' },
+  { key: 'imagen_url', label: 'Portada' },
+  { key: 'imagen_url_2', label: 'Secundaria 1' },
+  { key: 'imagen_url_3', label: 'Secundaria 2' },
 ]
 
 function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
@@ -214,6 +218,28 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
   }
 
   const quitarFoto = (slot) => setNuevo((n) => ({ ...n, [slot]: '' }))
+
+  // Reordenar fotos con drag & drop (2026-09-13, Jose) — arrastrar una foto
+  // sobre otro slot intercambia las dos (la portada puede pasar a ser
+  // secundaria y viceversa). Solo un slot con foto puede iniciar el
+  // arrastre (dragKeyRef); soltar sobre cualquier slot (con o sin foto)
+  // hace el swap. No reemplaza el flujo táctil de siempre (tocar para
+  // reemplazar, ✕ para quitar) — es un atajo adicional, así que si el
+  // navegador no dispara bien estos eventos en un celular puntual, nada se
+  // rompe, solo no está ese atajo.
+  const dragKeyRef = useRef(null)
+  const iniciarArrastre = (slot) => (e) => {
+    if (!nuevo[slot]) { e.preventDefault(); return }
+    dragKeyRef.current = slot
+    e.dataTransfer.effectAllowed = 'move'
+  }
+  const soltarEn = (slot) => (e) => {
+    e.preventDefault()
+    const origen = dragKeyRef.current
+    dragKeyRef.current = null
+    if (!origen || origen === slot) return
+    setNuevo((n) => ({ ...n, [origen]: n[slot], [slot]: n[origen] }))
+  }
 
   const iniciarEdicion = (d) => {
     setError(null)
@@ -373,7 +399,7 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
                 <div key={d.id} className={`relative w-[42%] sm:w-40 md:w-44 flex-shrink-0 snap-start aspect-square rounded-lg overflow-hidden border-2 ${editando === d.id ? '' : d.activo ? 'border-gray-200' : 'border-gray-200 opacity-50'}`} style={editando === d.id ? { borderColor: ACCENT } : {}}>
                   <img src={d.imagen_url} alt={d.titulo || 'Diseño'} className="w-full h-full object-cover" />
                   <div className="absolute top-1 left-1 bg-black/60 text-white text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full">
-                    {d.tipo === 'lamina' ? 'Lámina' : 'Tatuaje'}
+                    {TIPOS_DISENO.find((t) => t.value === d.tipo)?.badgeCorto || d.tipo}
                   </div>
                   <button
                     type="button"
@@ -386,8 +412,19 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
                   <div className="absolute bottom-0 inset-x-0 bg-black/70 text-white text-[10px] px-1.5 py-1 flex items-center justify-between">
                     <span className="font-bold">${Number(d.precio).toLocaleString('es-CO')}</span>
                     <div className="flex items-center gap-1.5">
-                      <button type="button" onClick={() => toggleActivo(d)} className="underline">
-                        {d.activo ? 'Ocultar' : 'Mostrar'}
+                      {/* Switch de estado (2026-09-13, Jose) — reemplaza el
+                          botón de texto "Ocultar"/"Mostrar" por un
+                          interruptor, mismo patrón visual que el toggle de
+                          días en Mi horario, en tamaño reducido para caber
+                          en esta barra angosta. */}
+                      <button
+                        type="button"
+                        onClick={() => toggleActivo(d)}
+                        aria-pressed={d.activo}
+                        aria-label={d.activo ? 'Publicado — tocar para ocultar' : 'Oculto — tocar para publicar'}
+                        className={`flex-shrink-0 w-7 h-4 rounded-full transition-colors relative ${d.activo ? 'bg-green-500' : 'bg-gray-500'}`}
+                      >
+                        <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${d.activo ? 'translate-x-3.5' : 'translate-x-0.5'}`} />
                       </button>
                       <button type="button" onClick={() => borrarDiseno(d)} aria-label="Borrar diseño">
                         <Trash2 size={11} />
@@ -400,10 +437,16 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
           )}
 
           {/* Formulario — agrega uno nuevo, o edita el que se seleccionó
-              con el lápiz de arriba (mismo formulario, distinto modo). */}
-          <div className="border border-dashed border-gray-300 rounded-lg p-3 space-y-2.5">
+              con el lápiz de arriba (mismo formulario, distinto modo).
+              Dos columnas en desktop (2026-09-13, Jose): fotos a la
+              izquierda, campos a la derecha con el botón anclado al final
+              — md:grid estira ambas columnas a la misma altura por
+              defecto, así que flex-col + mt-auto en el botón lo deja
+              siempre a la altura del borde inferior de las fotos, sin
+              importar cuánto texto tenga el formulario ese día. */}
+          <div className="border border-dashed border-gray-300 rounded-lg p-3 md:p-4">
             {editando && (
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-3">
                 <p className="text-xs font-black uppercase" style={{ color: ACCENT }}>Editando diseño</p>
                 <button type="button" onClick={cancelarEdicion} className="text-gray-400 text-[10px] font-bold uppercase underline">Cancelar</button>
               </div>
@@ -418,107 +461,140 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
                 onChange={(e) => subirImagen(key, e.target.files?.[0])}
               />
             ))}
-            <p className="text-gray-400 text-[10px]">Hasta 3 fotos — la primera es obligatoria (ej: el diseño solo), las otras 2 son opcionales (ej: sobre piel, otro ángulo). Toca una foto para reemplazarla, o la ✕ para quitarla.</p>
-            <div className="grid grid-cols-3 gap-2">
-              {SLOTS_DISENO.map(({ key, label }, i) => (
-                <div key={key} className="relative aspect-square">
-                  <button
-                    type="button"
-                    onClick={() => elegirFoto(key)}
-                    className="w-full h-full rounded-lg bg-gray-50 border border-gray-200 text-gray-400 overflow-hidden"
-                  >
-                    {nuevo[key] ? (
-                      <img src={nuevo[key]} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                    ) : subiendo === key ? (
-                      <div className="w-full h-full flex items-center justify-center"><LoaderCircle size={14} className="animate-spin" /></div>
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center gap-1">
-                        <Camera size={13} />
-                        <span className="text-[8px] font-bold uppercase">{label}</span>
-                      </div>
-                    )}
-                  </button>
-                  {/* Solo las fotos 2 y 3 se pueden quitar del todo — la
-                      primera es obligatoria, siempre tiene que quedar al
-                      menos una. */}
-                  {nuevo[key] && i > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => quitarFoto(key)}
-                      aria-label={`Quitar ${label}`}
-                      className="absolute -top-1.5 -right-1.5 flex items-center justify-center w-5 h-5 rounded-full bg-gray-700 text-white hover:bg-gray-900 transition-colors"
+
+            <div className="md:grid md:grid-cols-2 md:gap-6">
+              {/* Columna izquierda — material gráfico */}
+              <div className="space-y-2.5">
+                <div>
+                  <p className={labelClass}>Material gráfico</p>
+                  <p className="text-gray-400 text-[10px] leading-relaxed">Carga hasta 3 imágenes en alta resolución. La primera imagen se utilizará como portada principal.</p>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {SLOTS_DISENO.map(({ key, label }, i) => (
+                    <div
+                      key={key}
+                      className="relative aspect-square"
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={soltarEn(key)}
                     >
-                      <X size={11} />
-                    </button>
+                      <button
+                        type="button"
+                        draggable={!!nuevo[key]}
+                        onDragStart={iniciarArrastre(key)}
+                        onClick={() => elegirFoto(key)}
+                        className={`w-full h-full rounded-lg bg-gray-50 border border-gray-200 text-gray-400 overflow-hidden ${nuevo[key] ? 'cursor-move' : ''}`}
+                      >
+                        {nuevo[key] ? (
+                          <img src={nuevo[key]} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
+                        ) : subiendo === key ? (
+                          <div className="w-full h-full flex items-center justify-center"><LoaderCircle size={14} className="animate-spin" /></div>
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center gap-1">
+                            <Upload size={13} />
+                            <span className="text-[8px] font-bold uppercase">{label}</span>
+                          </div>
+                        )}
+                      </button>
+                      {/* Solo las fotos 2 y 3 se pueden quitar del todo —
+                          la primera es obligatoria, siempre tiene que
+                          quedar al menos una. */}
+                      {nuevo[key] && i > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => quitarFoto(key)}
+                          aria-label={`Quitar ${label}`}
+                          className="absolute -top-1.5 -right-1.5 flex items-center justify-center w-5 h-5 rounded-full bg-gray-700 text-white hover:bg-gray-900 transition-colors"
+                        >
+                          <X size={11} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <p className="text-gray-400 text-[10px]">Toca una foto para reemplazarla, o arrástrala sobre otro cuadro para intercambiarlas.</p>
+              </div>
+
+              {/* Columna derecha — tipo + campos + acción principal */}
+              <div className="mt-4 md:mt-0 flex flex-col space-y-2.5">
+                <div>
+                  <p className={labelClass}>Tipo de publicación</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {TIPOS_DISENO.map((t) => {
+                      const conteo = (disenos || []).filter((d) => d.tipo === t.value).length
+                      return (
+                        <button
+                          key={t.value}
+                          type="button"
+                          onClick={() => setNuevo((n) => ({ ...n, tipo: t.value }))}
+                          className={`px-2 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wide transition-colors ${nuevo.tipo === t.value ? 'text-white' : 'text-gray-500 border-gray-300'}`}
+                          style={nuevo.tipo === t.value ? { backgroundColor: BTN, borderColor: BTN } : {}}
+                        >
+                          {t.label} ({conteo}/5)
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <p className="text-gray-400 text-[10px] mt-1">{TIPOS_DISENO.find((t) => t.value === nuevo.tipo)?.hint}</p>
+                  {/* Límite de 5 por categoría (2026-08-06, Jose) — se
+                      avisa antes de que intente subir fotos y le rebote
+                      el error del backend; no aplica si está editando
+                      uno que ya existe. */}
+                  {!editando && (disenos || []).filter((d) => d.tipo === nuevo.tipo).length >= 5 && (
+                    <p className="text-xs font-bold mt-1" style={{ color: ACCENT }}>
+                      Ya tienes el máximo de 5 {nuevo.tipo === 'lamina' ? 'láminas' : 'diseños de tatuaje'} — borra uno para agregar otro.
+                    </p>
                   )}
                 </div>
-              ))}
-            </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              {TIPOS_DISENO.map((t) => {
-                const conteo = (disenos || []).filter((d) => d.tipo === t.value).length
-                return (
-                  <button
-                    key={t.value}
-                    type="button"
-                    onClick={() => setNuevo((n) => ({ ...n, tipo: t.value }))}
-                    className={`px-2 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wide transition-colors ${nuevo.tipo === t.value ? 'text-white' : 'text-gray-500 border-gray-300'}`}
-                    style={nuevo.tipo === t.value ? { backgroundColor: BTN, borderColor: BTN } : {}}
-                  >
-                    {t.label} ({conteo}/5)
-                  </button>
-                )
-              })}
-            </div>
-            <p className="text-gray-400 text-[10px] -mt-1">{TIPOS_DISENO.find((t) => t.value === nuevo.tipo)?.hint}</p>
-            {/* Límite de 5 por categoría (2026-08-06, Jose) — se avisa
-                antes de que intente subir fotos y le rebote el error del
-                backend; no aplica si está editando uno que ya existe. */}
-            {!editando && (disenos || []).filter((d) => d.tipo === nuevo.tipo).length >= 5 && (
-              <p className="text-xs font-bold" style={{ color: ACCENT }}>
-                Ya tienes el máximo de 5 {nuevo.tipo === 'lamina' ? 'láminas' : 'diseños de tatuaje'} — borra uno para agregar otro.
-              </p>
-            )}
+                <div>
+                  <label className={labelClass}>Nombre de la obra</label>
+                  <input className={inputClass} placeholder="Ej. Composición geométrica I" value={nuevo.titulo} onChange={(e) => setNuevo((n) => ({ ...n, titulo: e.target.value }))} />
+                </div>
 
-            <input className={inputClass} placeholder="Título (opcional)" value={nuevo.titulo} onChange={(e) => setNuevo((n) => ({ ...n, titulo: e.target.value }))} />
-            <div>
-              <textarea
-                rows={4}
-                className={inputClass}
-                placeholder={TIPOS_DISENO.find((t) => t.value === nuevo.tipo)?.placeholderDescripcion}
-                value={nuevo.descripcion}
-                onChange={(e) => setNuevo((n) => ({ ...n, descripcion: e.target.value }))}
-              />
-              <p className="text-gray-400 text-[10px] mt-1">Esta descripción es lo más importante para que la persona decida comprar — sé específico, no genérico.</p>
-            </div>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold pointer-events-none">$</span>
-              <input
-                className={inputClass.replace('px-4', 'pl-7 pr-4')}
-                type="number"
-                min="1"
-                placeholder="Precio en COP"
-                value={nuevo.precio}
-                onChange={(e) => setNuevo((n) => ({ ...n, precio: e.target.value }))}
-              />
-            </div>
+                <div>
+                  <label className={labelClass}>Descripción y concepto</label>
+                  <textarea
+                    rows={4}
+                    className={inputClass}
+                    placeholder={TIPOS_DISENO.find((t) => t.value === nuevo.tipo)?.placeholderDescripcion}
+                    value={nuevo.descripcion}
+                    onChange={(e) => setNuevo((n) => ({ ...n, descripcion: e.target.value }))}
+                  />
+                  <p className="text-gray-400 text-[10px] mt-1">Sé específico: esto es lo que se lee antes de comprar.</p>
+                </div>
 
-            <button
-              type="button"
-              onClick={editando ? guardarEdicion : agregarDiseno}
-              disabled={subiendo || guardando || (!editando && (disenos || []).filter((d) => d.tipo === nuevo.tipo).length >= 5)}
-              className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-lg border-2 text-xs font-black uppercase tracking-widest disabled:opacity-60"
-              style={{ borderColor: BTN, color: BTN }}
-            >
-              {guardando ? <LoaderCircle size={14} className="animate-spin" /> : editando ? <Check size={14} /> : <Plus size={14} />}
-              {editando ? 'Guardar cambios' : 'Agregar diseño'}
-            </button>
+                <div>
+                  <label className={labelClass}>Precio de venta (COP)</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold pointer-events-none">$</span>
+                    <input
+                      className={inputClass.replace('px-4', 'pl-7 pr-4')}
+                      type="number"
+                      min="1"
+                      placeholder="0"
+                      value={nuevo.precio}
+                      onChange={(e) => setNuevo((n) => ({ ...n, precio: e.target.value }))}
+                    />
+                  </div>
+                </div>
+
+                {error && <p className="text-sm" style={{ color: ACCENT }}>{error}</p>}
+
+                <button
+                  type="button"
+                  onClick={editando ? guardarEdicion : agregarDiseno}
+                  disabled={subiendo || guardando || (!editando && (disenos || []).filter((d) => d.tipo === nuevo.tipo).length >= 5)}
+                  className="w-full mt-auto flex items-center justify-center gap-1.5 py-2.5 rounded-lg border-2 text-xs font-black uppercase tracking-widest disabled:opacity-60"
+                  style={{ borderColor: BTN, color: BTN }}
+                >
+                  {guardando ? <LoaderCircle size={14} className="animate-spin" /> : editando ? <Check size={14} /> : <Plus size={14} />}
+                  {editando ? 'Guardar cambios' : 'Publicar en catálogo'}
+                </button>
+              </div>
+            </div>
           </div>
         </>
       )}
-
-      {error && <p className="text-sm mt-3" style={{ color: ACCENT }}>{error}</p>}
     </div>
   )
 }
