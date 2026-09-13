@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData, useSearchParams, useNavigate } from 'react-router-dom'
-import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarDays, CalendarCheck, ChevronLeft, ChevronRight, Banknote, ChevronDown, Upload } from 'lucide-react'
+import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarDays, CalendarCheck, ChevronLeft, ChevronRight, Banknote, ChevronDown, Upload } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
@@ -411,25 +411,25 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
                   </button>
                   <div className="absolute bottom-0 inset-x-0 bg-black/70 text-white text-[10px] px-1.5 py-1 flex items-center justify-between">
                     <span className="font-bold">${Number(d.precio).toLocaleString('es-CO')}</span>
-                    <div className="flex items-center gap-1.5">
-                      {/* Switch de estado (2026-09-13, Jose) — reemplaza el
-                          botón de texto "Ocultar"/"Mostrar" por un
-                          interruptor, mismo patrón visual que el toggle de
-                          días en Mi horario, en tamaño reducido para caber
-                          en esta barra angosta. */}
-                      <button
-                        type="button"
-                        onClick={() => toggleActivo(d)}
-                        aria-pressed={d.activo}
-                        aria-label={d.activo ? 'Publicado — tocar para ocultar' : 'Oculto — tocar para publicar'}
-                        className={`flex-shrink-0 w-7 h-4 rounded-full transition-colors relative ${d.activo ? 'bg-green-500' : 'bg-gray-500'}`}
-                      >
-                        <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${d.activo ? 'translate-x-3.5' : 'translate-x-0.5'}`} />
-                      </button>
-                      <button type="button" onClick={() => borrarDiseno(d)} aria-label="Borrar diseño">
-                        <Trash2 size={11} />
-                      </button>
-                    </div>
+                    {/* Switch de estado (2026-09-13, Jose) — reemplaza el
+                        botón de texto "Ocultar"/"Mostrar" por un
+                        interruptor, mismo patrón visual que el toggle de
+                        días en Mi horario. El ícono de borrar que vivía
+                        acá al lado (2026-09-13, Jose: "borré un diseño sin
+                        culpa, pusiste ese botón verde y gris encima de
+                        ocultar y el icono eliminar") se quitó de esta
+                        franja tan angosta — borrar ahora vive dentro de
+                        "Editando diseño", con más espacio y una
+                        confirmación antes de ejecutarse. */}
+                    <button
+                      type="button"
+                      onClick={() => toggleActivo(d)}
+                      aria-pressed={d.activo}
+                      aria-label={d.activo ? 'Publicado — tocar para ocultar' : 'Oculto — tocar para publicar'}
+                      className={`flex-shrink-0 w-7 h-4 rounded-full transition-colors relative ${d.activo ? 'bg-green-500' : 'bg-gray-500'}`}
+                    >
+                      <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${d.activo ? 'translate-x-3.5' : 'translate-x-0.5'}`} />
+                    </button>
                   </div>
                 </div>
               ))}
@@ -448,7 +448,28 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
             {editando && (
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs font-black uppercase" style={{ color: ACCENT }}>Editando diseño</p>
-                <button type="button" onClick={cancelarEdicion} className="text-gray-400 text-[10px] font-bold uppercase underline">Cancelar</button>
+                <div className="flex items-center gap-3">
+                  {/* Borrar diseño (2026-09-13, Jose) — movido acá desde la
+                      miniatura (ver nota más arriba) y con confirmación:
+                      es la única acción de esta sección que no se puede
+                      deshacer, así que necesita más espacio y una pausa
+                      antes de ejecutarse, a diferencia de ocultar/mostrar
+                      que es instantáneo y reversible. Aplica igual a
+                      diseños de tatuaje y láminas — no hay distinción por
+                      tipo. */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const d = (disenos || []).find((x) => x.id === editando)
+                      if (d && window.confirm('¿Borrar este diseño? No se puede deshacer.')) borrarDiseno(d)
+                    }}
+                    className="text-[10px] font-bold uppercase underline"
+                    style={{ color: ACCENT }}
+                  >
+                    Borrar diseño
+                  </button>
+                  <button type="button" onClick={cancelarEdicion} className="text-gray-400 text-[10px] font-bold uppercase underline">Cancelar</button>
+                </div>
               </div>
             )}
             {SLOTS_DISENO.map(({ key }) => (
