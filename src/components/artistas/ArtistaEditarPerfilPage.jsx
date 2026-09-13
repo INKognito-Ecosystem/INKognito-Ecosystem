@@ -1490,9 +1490,36 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
               columna, igual que la portada. */}
           <div className="relative">
             <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border border-gray-500/30 shadow-lg">
+              {/* Franja superior oscura tipo tarjeta bancaria (2026-09-13,
+                  Jose: referencia visual de una Visa/tarjeta de crédito) —
+                  mismo cambio que ArtistaLandingPage.jsx (el perfil
+                  público real): el título pasa a su propia franja sólida,
+                  y el indicador de Mercado Pago (conectado o invitación a
+                  conectar) se muda acá desde la insignia flotante que
+                  vivía abajo del todo. */}
+              <div className="flex items-center justify-between gap-3 px-4 py-2.5 bg-gray-900">
+                <p className="text-[11px] font-black uppercase tracking-widest text-white">Agenda en línea</p>
+                {artista.mp_conectado ? (
+                  <span className="flex-shrink-0 flex items-center px-2.5 py-1 rounded-full bg-white">
+                    <img
+                      src={MP_LOGO_URL}
+                      alt="Mercado Pago"
+                      className="h-4"
+                      onError={(e) => { e.currentTarget.style.display = 'none' }}
+                    />
+                  </span>
+                ) : (
+                  <a
+                    href={`${PANEL_URL}/api/artistas-mp-conectar?token=${encodeURIComponent(token)}`}
+                    className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full text-white text-[9px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
+                    style={{ backgroundColor: MP_BLUE }}
+                  >
+                    Conectar <ExternalLink size={10} />
+                  </a>
+                )}
+              </div>
               <div className="h-px bg-gradient-to-r from-transparent via-gray-300/50 to-transparent" />
-              <div className="pt-2.5 px-4 pb-7">
-                <p className="text-[11px] font-black uppercase tracking-widest mb-3 text-gray-300">Agenda en línea</p>
+              <div className="pt-3 px-4 pb-7">
                 <div className="space-y-2.5">
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Valor base por sesión</p>
@@ -1516,33 +1543,12 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
               </div>
             </div>
 
-            {/* Mercado Pago — insignia real si ya está conectado, o una
-                invitación a conectarlo si no (2026-08-06, Jose: "solo
-                cuando el artista se registre... si no, algo informativo
-                que lo invite a hacerlo"). Sin esto conectado, la card de
-                Agenda en línea no puede cobrar de verdad aunque tenga
-                precios llenos. */}
-            {artista.mp_conectado ? (
-              <span
-                className="absolute -bottom-3 right-4 flex items-center px-2.5 py-1 rounded-full bg-white border shadow-md"
-                style={{ borderColor: MP_BLUE }}
-              >
-                <img
-                  src={MP_LOGO_URL}
-                  alt="Mercado Pago"
-                  className="h-4"
-                  onError={(e) => { e.currentTarget.style.display = 'none' }}
-                />
-              </span>
-            ) : (
-              <a
-                href={`${PANEL_URL}/api/artistas-mp-conectar?token=${encodeURIComponent(token)}`}
-                className="absolute -bottom-3 right-4 flex items-center gap-1 px-2.5 py-1 rounded-full text-white text-[9px] font-black uppercase tracking-widest shadow-md hover:opacity-90 transition-opacity"
-                style={{ backgroundColor: MP_BLUE }}
-              >
-                Conecta Mercado Pago <ExternalLink size={10} />
-              </a>
-            )}
+            {/* Mercado Pago (conectado o invitación a conectar) se movió a
+                la franja oscura de arriba (2026-09-13) — sin esto
+                conectado, la card de Agenda en línea no puede cobrar de
+                verdad aunque tenga precios llenos, así que la invitación
+                se queda igual de visible, solo que en la franja del
+                título en vez de flotando abajo. */}
           </div>
           {!artista.mp_conectado && (
             <p className="text-gray-400 text-[11px] max-w-xl mt-5">Sin esto conectado, nadie puede pagarte para agendar — conéctalo para empezar a recibir esos pagos directo a tu cuenta.</p>

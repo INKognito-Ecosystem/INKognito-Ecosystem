@@ -774,8 +774,29 @@ export default function ArtistaLandingPage() {
               // puede sobresalir sin que se le corte nada.
               <div className="relative mt-2 max-w-xl">
                 <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border border-gray-500/30 shadow-2xl shadow-gray-900/40">
+                  {/* Franja superior oscura tipo tarjeta bancaria (2026-09-13,
+                      Jose: referencia visual de una Visa/tarjeta de crédito
+                      — "RESERVA OFICIAL" en franja oscura + logo de Mercado
+                      Pago al frente) — el título pasa de texto suelto sobre
+                      el degradado a su propia franja sólida, y el logo de MP
+                      se muda acá desde la insignia flotante que vivía abajo
+                      del todo (ver nota vieja más abajo, ya retirada). Sin
+                      tocar la forma/posición del resto de la información. */}
+                  <div className="flex items-center justify-between gap-3 px-4 py-2.5 bg-gray-900">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-white">Agenda en línea</p>
+                    {artista.mp_conectado && (
+                      <span className="flex-shrink-0 flex items-center px-2.5 py-1 rounded-full bg-white">
+                        <img
+                          src={MP_LOGO_URL}
+                          alt="Mercado Pago"
+                          className="h-4"
+                          onError={(e) => { e.currentTarget.style.display = 'none' }}
+                        />
+                      </span>
+                    )}
+                  </div>
                   <div className="h-px bg-gradient-to-r from-transparent via-gray-300/50 to-transparent" />
-                  <div className="pt-2.5 px-4 pb-7">
+                  <div className="pt-3 px-4 pb-7">
                     {/* v6 (2026-08-06, Jose: quitar "Reserva tu cita" + su
                         frase, título nuevo "Agenda en línea" — card más
                         angosta verticalmente; números más chicos; botón AL
@@ -787,9 +808,9 @@ export default function ArtistaLandingPage() {
                         directamente a esa tarjeta") — de dos bloques lado
                         a lado + botón aparte (v9-v13) a una sola columna:
                         valor base arriba, anticipo abajo con su
-                        micro-texto, botón de ancho completo al final. */}
-                    <p className="text-[11px] font-black uppercase tracking-widest mb-3 text-gray-300">Agenda en línea</p>
-
+                        micro-texto, botón de ancho completo al final.
+                        v15 (2026-09-13): el título "Agenda en línea" se
+                        movió a la franja oscura de arriba. */}
                     <div className="space-y-2.5">
                       {artista.precio_sesion_texto && (
                         <div className="flex items-center justify-between gap-3">
@@ -818,42 +839,11 @@ export default function ArtistaLandingPage() {
                   </div>
                 </div>
 
-                {/* Insignia de confianza de Mercado Pago (2026-08-06) — se
-                    movió acá desde el encabezado del perfil (Jose: ahí
-                    competía con precio/disponibilidad, que son datos del
-                    artista, no de la transacción). No se duplica también
-                    junto a "Comprar" de cada diseño ni dentro de los
-                    modales de pago — esos ya tienen su propia línea "Pago
-                    100% seguro, procesado por Mercado Pago", sería
-                    redundante repetirlo ahí.
-                    v8 (Jose): esquina inferior derecha, mitad afuera/mitad
-                    adentro — mismo mecanismo que el avatar sobre la
-                    portada (posición absoluta + mitad de su propio alto
-                    hacia afuera del borde). */}
-                {/* v10 (2026-08-06, Jose: "quita el texto pago seguro, y
-                    solo deja el logo") — sin texto ni ícono de tarjeta, el
-                    badge se queda en una sola línea siempre (ya no hay nada
-                    que pueda forzarlo a partirse en dos). */}
-                {/* z-10 (2026-08-06, Jose: "cuando me paro en la card de
-                    diseños de láminas, este se superpone y tapa el
-                    botoncito de mercado pago... siempre se mantenga por
-                    debajo") — sin z-index, la sección de Diseños (que
-                    viene después en el DOM) puede pintarse encima de esta
-                    insignia cuando se abre/expande y su contenido se
-                    acerca al borde inferior de la card de Agenda. */}
-                {artista.mp_conectado && (
-                  <span
-                    className="absolute -bottom-3 right-4 z-10 flex items-center px-2.5 py-1 rounded-full bg-white border shadow-md"
-                    style={{ borderColor: MP_BLUE }}
-                  >
-                    <img
-                      src={MP_LOGO_URL}
-                      alt="Mercado Pago"
-                      className="h-4"
-                      onError={(e) => { e.currentTarget.style.display = 'none' }}
-                    />
-                  </span>
-                )}
+                {/* Insignia de Mercado Pago — vivía flotante en la esquina
+                    inferior derecha (2026-08-06 a v14); v15 (2026-09-13,
+                    Jose: "que el logo de mercado pago pase al frente,
+                    algo parecido a una tarjeta Visa/crédito") la mudó a la
+                    franja oscura de arriba, junto al título. */}
 
                 {/* Términos y condiciones (2026-08-06, Jose) — explica por
                     qué conviene agendar en línea en vez de solo WhatsApp,
