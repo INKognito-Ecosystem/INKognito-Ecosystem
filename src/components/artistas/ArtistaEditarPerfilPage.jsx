@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData, useSearchParams, useNavigate } from 'react-router-dom'
-import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarDays, CalendarCheck, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarDays, CalendarCheck, ChevronLeft, ChevronRight, Banknote } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
@@ -537,6 +537,18 @@ const DIAS_SEMANA = [
   { db: 0, label: 'Domingo' },
 ]
 
+// Opciones de hora en pasos de 30 min, de 6:00am a 11:30pm (2026-09-13,
+// Jose: "sustituir los campos de texto sueltos por... select estilizados")
+// — reemplaza el <input type="time"> nativo (se ve distinto en cada
+// navegador/celular) por un <select> con el mismo estilo del resto del
+// formulario.
+const OPCIONES_HORA = Array.from({ length: 36 }, (_, i) => {
+  const totalMin = 6 * 60 + i * 30
+  const h = String(Math.floor(totalMin / 60)).padStart(2, '0')
+  const m = String(totalMin % 60).padStart(2, '0')
+  return `${h}:${m}`
+})
+
 // Horario semanal recurrente (fase 1 de agenda, 2026-08-19) — fuera del
 // <form> grande a propósito, mismo criterio que "Mis diseños en venta":
 // las 7 filas se guardan juntas en su propio endpoint
@@ -562,6 +574,18 @@ function HorarioSemanalSection({ token, horarioInicial }) {
   const actualizar = (dia_semana, campo, valor) => {
     setGuardado(false)
     setFilas((prev) => prev.map((f) => (f.dia_semana === dia_semana ? { ...f, [campo]: valor } : f)))
+  }
+
+  // "Copiar horario a toda la semana" (2026-09-13, Jose: "botón de acción
+  // rápida... para optimizar la configuración") — toma Lunes como día de
+  // referencia y aplica sus horas + activo a los 7 días, para no tener que
+  // repetir la misma configuración uno por uno cuando el horario es igual
+  // toda la semana.
+  const copiarATodaLaSemana = () => {
+    const lunes = filas.find((f) => f.dia_semana === 1)
+    if (!lunes) return
+    setGuardado(false)
+    setFilas((prev) => prev.map((f) => ({ ...f, activo: true, hora_inicio: lunes.hora_inicio, hora_fin: lunes.hora_fin })))
   }
 
   const guardar = async () => {
@@ -613,25 +637,36 @@ function HorarioSemanalSection({ token, horarioInicial }) {
                 <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${fila.activo ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </button>
               <span className={`w-20 pl-2 text-xs font-bold flex-shrink-0 ${fila.activo ? 'text-gray-900' : 'text-gray-400'}`}>{label}</span>
-              <input
-                type="time"
+              <select
                 disabled={!fila.activo}
                 value={fila.hora_inicio}
                 onChange={(e) => actualizar(db, 'hora_inicio', e.target.value)}
                 className="flex-1 min-w-0 bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-xs disabled:opacity-40 disabled:bg-gray-100"
-              />
+              >
+                {!OPCIONES_HORA.includes(fila.hora_inicio) && <option value={fila.hora_inicio}>{fila.hora_inicio}</option>}
+                {OPCIONES_HORA.map((h) => <option key={h} value={h}>{h}</option>)}
+              </select>
               <span className="text-gray-400 text-xs flex-shrink-0">a</span>
-              <input
-                type="time"
+              <select
                 disabled={!fila.activo}
                 value={fila.hora_fin}
                 onChange={(e) => actualizar(db, 'hora_fin', e.target.value)}
                 className="flex-1 min-w-0 bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-xs disabled:opacity-40 disabled:bg-gray-100"
-              />
+              >
+                {!OPCIONES_HORA.includes(fila.hora_fin) && <option value={fila.hora_fin}>{fila.hora_fin}</option>}
+                {OPCIONES_HORA.map((h) => <option key={h} value={h}>{h}</option>)}
+              </select>
             </div>
           )
         })}
       </div>
+      <button
+        type="button"
+        onClick={copiarATodaLaSemana}
+        className="w-full mt-3 py-2 text-xs font-bold uppercase tracking-widest rounded-lg border border-gray-300 text-gray-600 hover:border-gray-400 hover:text-gray-900 transition-colors"
+      >
+        Copiar horario a toda la semana
+      </button>
       {error && <p className="text-red-600 text-xs mt-3">{error}</p>}
       <button
         type="button"
@@ -726,9 +761,18 @@ function CalendarioBloqueosSection({ token }) {
   return (
     <div className="mb-6 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5">
       <p className={labelClass}><CalendarDays size={12} className="inline -mt-0.5 mr-1" />Mi agenda</p>
-      <p className="text-gray-500 text-[11px] leading-relaxed mb-4">
-        Este calendario es tu agenda completa — anota también los tatuajes que coordines por fuera de INKognito (WhatsApp, en persona) para que no se te crucen las fechas. Toca un día disponible para anotar qué va a pasar (o bloquearlo sin más), toca uno bloqueado para liberarlo, o toca uno con ✓ verde para ver los datos de esa cita.
+      <p className="text-gray-500 text-[11px] leading-relaxed mb-3">
+        Tu agenda completa — anota también las citas que coordines por fuera de INKognito para que no se te crucen las fechas. Toca un día para gestionarlo.
       </p>
+
+      {/* Leyenda de colores (2026-09-13, Jose) — mismos colores que usan
+          las celdas del calendario más abajo, para que el significado de
+          cada estado se lea de un vistazo antes de tocar nada. */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mb-3 text-[10px] font-bold text-gray-500">
+        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-green-600 flex-shrink-0" />Confirmada</span>
+        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-white border border-gray-300 flex-shrink-0" />Disponible</span>
+        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-red-50 border border-red-200 flex-shrink-0" />Bloqueada</span>
+      </div>
 
       <div className="flex items-center justify-between mb-2">
         <button type="button" onClick={() => cambiarMes(-1)} className="p-1 text-gray-400 hover:text-gray-700">
@@ -1526,20 +1570,17 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
             sesión, así que debe ser números") — se muestra junto a "Para
             agendar" en una grilla simétrica en el perfil, dos precios
             reales se ven mejor que un precio al lado de una oración. */}
-        {/* Copy con beneficio, no solo descripción técnica (2026-08-06,
-            Jose: "esa card en editar debe estar muy bien optimizada para
-            que el artista decida usarla, por ahí ganaremos la comisión")
-            — antes solo explicaba qué hacía cada campo; ahora explica por
-            qué le conviene al artista activarlo, mismo argumento ya
-            probado en el modal "Términos y condiciones" del perfil
-            público, pero dirigido a él, no al cliente. */}
-        <div className="pt-2 border-t border-gray-100">
-          <p className="text-gray-400 text-[11px] uppercase tracking-widest mb-1.5 pt-3">Reservas con anticipo</p>
-          <p className="text-gray-500 text-[11px] leading-relaxed mb-3">
-            Un pago confirmado pesa distinto a un mensaje más: el cliente ya se comprometió con dinero real, y tú recibes su nombre, teléfono y correo al instante. Define "Para agendar" abajo y el botón "Reservar" aparece en tu perfil — sin tocar tu WhatsApp.
+        {/* Tarjeta "Parámetros de reserva y pagos" (2026-09-13, Jose: pasar
+            a estructura de tarjetas, igual que Mi horario/Mi agenda más
+            abajo, con copy corto y directo en vez de la explicación de
+            beneficio de la versión anterior). */}
+        <div className="mb-6 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5">
+          <p className={labelClass}><Banknote size={12} className="inline -mt-0.5 mr-1" />Depósito de reserva</p>
+          <p className="text-gray-500 text-[11px] leading-relaxed mb-4">
+            Pago inicial para confirmar una cita en línea — se descuenta del valor total de la sesión.
           </p>
           <div>
-            <label className={labelClass}>Para agendar (COP)</label>
+            <label className={labelClass}>Monto del anticipo</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold pointer-events-none">$</span>
               <input
@@ -1548,10 +1589,10 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
                 placeholder="Ej: 50000"
               />
             </div>
-            <p className="text-gray-400 text-[11px] mt-1">El cliente paga este monto completo, al momento, por Mercado Pago — se descuenta del valor total de la sesión que te paga después, en persona. No es un cobro adicional.</p>
+            <p className="text-gray-400 text-[11px] mt-1">Se cobra por Mercado Pago al confirmar la cita, y se descuenta del valor total de la sesión.</p>
           </div>
           <div className="mt-3">
-            <label className={labelClass}>El valor de mi sesión (COP, opcional)</label>
+            <label className={labelClass}>Valor base por sesión (opcional)</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold pointer-events-none">$</span>
               <input
@@ -1560,16 +1601,10 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
                 placeholder="Ej: 150000"
               />
             </div>
-            <p className="text-gray-400 text-[11px] mt-1">A diferencia de "Para agendar", este número nunca se cobra: es la referencia que el cliente ve en tu perfil antes de escribirte.</p>
+            <p className="text-gray-400 text-[11px] mt-1">Precio de referencia que ve el cliente en tu perfil — nunca se cobra.</p>
           </div>
-          {/* Anticipación mínima (2026-08-19, Jose: "cada artista debería
-              poder elegir su propio mínimo... unos manejan diseños
-              complejos, otros atienden turistas que no esperan mucho") —
-              reemplaza a "Duración de cada cita", que perdió su función
-              real ahora que las horas son libres (ver paso 2 del modal de
-              reserva del cliente). */}
           <div className="mt-3">
-            <label className={labelClass}>Anticipación mínima para reservar</label>
+            <label className={labelClass}>Anticipación mínima</label>
             <select
               className={inputClass}
               value={form.anticipacion_min_dias}
@@ -1583,20 +1618,20 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
               <option value={8}>8 días</option>
               <option value={15}>15 días</option>
             </select>
-            <p className="text-gray-400 text-[11px] mt-1">Cuántos días de anticipación exiges como mínimo para una cita agendada en línea — bajo si atiendes trabajo de paso o turistas, alto si tus diseños necesitan tiempo real de planeación.</p>
+            <p className="text-gray-400 text-[11px] mt-1">Días mínimos de anticipación para agendar una cita.</p>
           </div>
+
+          {error && <p className="text-sm mt-3" style={{ color: ACCENT }}>{error}</p>}
+
+          <button
+            type="submit"
+            disabled={guardando}
+            className="w-full mt-4 py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
+            style={{ backgroundColor: BTN }}
+          >
+            {guardando ? 'Guardando...' : guardado ? '✓ Guardado' : 'Guardar cambios'}
+          </button>
         </div>
-
-        {error && <p className="text-sm" style={{ color: ACCENT }}>{error}</p>}
-
-        <button
-          type="submit"
-          disabled={guardando}
-          className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
-          style={{ backgroundColor: BTN }}
-        >
-          {guardando ? 'Guardando...' : guardado ? '✓ Guardado' : 'Guardar cambios'}
-        </button>
       </form>
       </div>
 
