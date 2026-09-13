@@ -67,3 +67,24 @@ html {
     animation: none;
   }
 }
+
+/* BrandsMarquee.jsx — prueba de logos de marcas en scroll (2026-09-13),
+   mismo patrón y mismo motivo de duplicar 2x que tech-marquee arriba, solo
+   con su propia clase para no acoplar un componente al nombre del otro.
+   Un poco más lento (40s vs 32s) porque hay más logos por copia. */
+@keyframes brands-marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.brands-marquee-track {
+  animation: brands-marquee-scroll 40s linear infinite;
+  will-change: transform;
+}
+.brands-marquee-track:hover {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .brands-marquee-track {
+    animation: none;
+  }
+}

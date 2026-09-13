@@ -5,7 +5,10 @@ import CoverflowRow from '../CoverflowRow'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
-const brandKey = (name) => 'supply_brand_' + name.toLowerCase()
+// Exportados (2026-09-13) para que BrandsMarquee.jsx (prueba en el hero,
+// mismo scroll infinito que TechMarquee.jsx pero con logos de marcas) los
+// reuse sin duplicar la lista — sin cambios de comportamiento acá.
+export const brandKey = (name) => 'supply_brand_' + name.toLowerCase()
   .replace(/[áéíóú]/g, c => ({á:'a',é:'e',í:'i',ó:'o',ú:'u'})[c])
   .replace(/[^a-z0-9]/g, '_').replace(/_+/g,'_').replace(/^_|_$/g,'')
 
@@ -28,7 +31,7 @@ const REVEAL = {
 // Solid Ink) siguen existiendo como páginas reales, ya conectadas a
 // inventario real y sin productos/precios inventados, solo que no se listan
 // acá. Si se necesitan de nuevo, sus rutas ya funcionan.
-const brands = [
+export const brands = [
   { name: 'TATTOO VISION', to: '/supply/brands/tattoo-vision' },
   // Antes era Kwadron (cartuchos) — reemplazada por Industrias Warlock
   // (mobiliario), decisión de Jose (2026-08-01). Ubicada de segunda a

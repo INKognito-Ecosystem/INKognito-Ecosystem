@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import BrandsMarquee from './BrandsMarquee'
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
@@ -32,32 +32,22 @@ export default function HeroSupply() {
           </h1>
 
           <p className="mt-3 text-zinc-400 text-lg leading-relaxed max-w-xl mx-auto">
-            Tienda online que reúne productos de proveedores locales y
-            nacionales, verificados y reconocidos. Stock real, calidad
-            garantizada y el respaldo que tu trabajo exige.
+            Ecosistema de distribución de insumos profesionales. Red de
+            proveedores verificados con stock real y alcance nacional. La
+            infraestructura digital que potencia tu trabajo.
           </p>
 
-          {/* BOTONES — ancho completo en móvil, flex en desktop */}
-          <div className="grid grid-cols-3 md:flex md:flex-wrap md:justify-center gap-3 mt-6 md:mt-10">
-            <Link
-              to="/supply/ink/vice-colors"
-              className="text-center py-3 border border-blue-500 text-white uppercase tracking-wider text-[11px] md:text-sm md:px-6 hover:bg-blue-500 transition-all duration-300"
-            >
-              Vice Colors
-            </Link>
-            <Link
-              to="/supply/brands/tattoo-vision"
-              className="text-center py-3 border border-blue-500 text-white uppercase tracking-wider text-[11px] md:text-sm md:px-6 hover:bg-blue-500 transition-all duration-300"
-            >
-              Tattoo Vision
-            </Link>
-            <Link
-              to="/supply/brands/heaven-pro"
-              className="text-center py-3 border border-blue-500 text-white uppercase tracking-wider text-[11px] md:text-sm md:px-6 hover:bg-blue-500 transition-all duration-300"
-            >
-              Heaven Pro
-            </Link>
-          </div>
+          {/* Prueba (2026-09-13, Jose: "tomar los logos de las marcas de
+              Supply y hacer un carrusel como el de las tecnologías
+              usadas") — mismo scroll infinito que TechMarquee.jsx, ahora
+              con los logos de marcas de Supply. Los botones (Vice Colors /
+              Tattoo Vision / Heaven Pro) que vivían acá se quitaron (Jose,
+              2026-09-13) y se reemplazaron por este mismo carrusel con su
+              propia frase encima. */}
+          <p className="mt-8 md:mt-10 text-center text-[10px] md:text-xs uppercase tracking-[0.3em] text-zinc-500 font-semibold">
+            Marcas referentes en la industria
+          </p>
+          <BrandsMarquee />
 
           <p className="mt-5 text-center text-xs italic tracking-wide text-zinc-400">
             “De un tatuador, para tatuadores.”

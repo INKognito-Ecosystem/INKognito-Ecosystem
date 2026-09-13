@@ -68,11 +68,8 @@ export default function CategoriesSupply({ categorias = {} }) {
             Categorías
           </h2>
           <p className="text-zinc-500 text-sm leading-relaxed text-justify [hyphens:auto]">
-            Insumos y equipos para cada etapa del trabajo profesional. Desde la primera aguja
-            hasta el mobiliario del estudio: cada categoría está pensada para el flujo real de
-            trabajo de un tatuador profesional. Tintas certificadas, cartuchos con membrana de
-            seguridad, fuentes estables y accesorios que no fallan a mitad de sesión — con stock
-            verificado y despacho a todo el país.
+            Insumos y equipos para cada etapa del trabajo profesional. — Stock verificado de
+            tiendas en todo el país.
           </p>
           <div className="clear-both" />
         </div>
