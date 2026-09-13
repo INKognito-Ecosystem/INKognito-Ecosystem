@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
-import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle, Building2, Award } from 'lucide-react'
+import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle, Building2, Award, Tag } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { municipioDesdeNombreIP } from '../../data/colombiaGeo'
 import { idDesdeParam } from './artistaSlug'
@@ -563,32 +563,45 @@ export default function ArtistaLandingPage() {
             <div className="min-w-0 pt-2 pl-[108px] sm:pl-[144px] md:pl-[176px] flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <h1 className="text-base sm:text-xl md:text-2xl font-black uppercase leading-tight truncate">{artista.nombre}</h1>
-                {/* Ciudad y especialidad apiladas, cada una en su propia
-                    línea (2026-08-06, Jose) — antes iban lado a lado en una
-                    sola fila. */}
-                <div className="mt-1 space-y-0.5">
-                  {/* Enlace real a Google Maps (2026-08-07, Jose) — v2:
-                      "como botón no es claro... debería ser sensible" — el
-                      texto subrayado no se leía como botón real y el área
-                      de toque era muy chica en celular. Ahora es un botón
-                      con fondo/borde visibles y feedback al tocar
-                      (active:). Link propio si lo pegó, si no el punto
-                      exacto capturado, si no búsqueda por
-                      nombre+municipio. Nunca queda sin link. */}
+                {/* Barra de insignias (2026-09-13, Jose: "agrupar la
+                    ubicación, el estilo principal y la categoría de precio
+                    en una sola barra de insignias debajo del nombre") —
+                    antes ubicación y estilo iban apiladas en su propia
+                    línea cada una (2026-08-06) y el precio vivía aparte,
+                    pegado al borde derecho de toda la fila (ver más abajo,
+                    donde solo queda disponibilidad). Se unifican acá con
+                    un separador "•" — el link de Maps sigue siendo un
+                    <a> real (mismo mecanismo de siempre: link propio, o el
+                    punto capturado, o búsqueda por nombre+municipio), solo
+                    que ahora comparte el mismo tratamiento visual plano
+                    que estilo/precio en vez de su propio botón con borde. */}
+                <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[9px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500">
                   <a
                     href={urlGoogleMaps(artista)}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-[9px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-600 hover:text-gray-900 hover:bg-gray-50 active:scale-95 transition-all border border-gray-300 rounded-full px-2 py-0.5 max-w-full truncate"
+                    className="inline-flex items-center gap-1 hover:text-gray-900 transition-colors max-w-full truncate"
                   >
                     <MapPin size={10} className="flex-shrink-0" />
                     <span className="truncate">{artista.municipio}{artista.departamento ? `, ${artista.departamento}` : ''}</span>
                   </a>
                   {artista.estilo && (
-                    <span className="flex items-center gap-1 text-[9px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500 truncate">
-                      <Palette size={10} className="flex-shrink-0" />
-                      <span className="truncate">{artista.estilo}</span>
-                    </span>
+                    <>
+                      <span className="text-gray-300">•</span>
+                      <span className="flex items-center gap-1 truncate">
+                        <Palette size={10} className="flex-shrink-0" />
+                        <span className="truncate">{artista.estilo}</span>
+                      </span>
+                    </>
+                  )}
+                  {artista.precio_nivel && (
+                    <>
+                      <span className="text-gray-300">•</span>
+                      <span className="flex items-center gap-1 flex-shrink-0">
+                        <Tag size={10} className="flex-shrink-0" />
+                        {'$'.repeat(artista.precio_nivel)}
+                      </span>
+                    </>
                   )}
                   {/* Cruce con el estudio (fase 3, 2026-08-06) — v2 (Jose:
                       "el artista no le pertenece al estudio" — se quita el
@@ -616,17 +629,6 @@ export default function ArtistaLandingPage() {
                   )}
                 </div>
               </div>
-
-              {/* Precio (2026-08-06, Jose: "esa información va a
-                  aparecer... por el lado derecho de la pantalla" — antes
-                  vivía en su propia fila debajo de todo el encabezado,
-                  empujando la bio hacia abajo; ahora comparte la misma
-                  fila que nombre/ubicación, alineado a la derecha).
-                  Disponibilidad ya no va acá — se movió arriba de la
-                  card "Sobre mí" (ver más abajo). */}
-              {artista.precio_nivel && (
-                <span className="flex-shrink-0 text-xs font-bold tracking-widest text-gray-500 pt-0.5">{'$'.repeat(artista.precio_nivel)}</span>
-              )}
             </div>
           </div>
 
@@ -778,39 +780,41 @@ export default function ArtistaLandingPage() {
                         frase, título nuevo "Agenda en línea" — card más
                         angosta verticalmente; números más chicos; botón AL
                         FRENTE de los precios, no debajo).
-                        v7 (Jose: "deja mucho espacio" — menos padding). */}
-                    <p className="text-[11px] font-black uppercase tracking-widest mb-2 text-gray-300">Agenda en línea</p>
+                        v7 (Jose: "deja mucho espacio" — menos padding).
+                        v14 (2026-09-13, Jose: "en lugar de dos recuadros
+                        idénticos y flotantes, encuádralos dentro de una
+                        sola tarjeta de contratación... ancla el botón
+                        directamente a esa tarjeta") — de dos bloques lado
+                        a lado + botón aparte (v9-v13) a una sola columna:
+                        valor base arriba, anticipo abajo con su
+                        micro-texto, botón de ancho completo al final. */}
+                    <p className="text-[11px] font-black uppercase tracking-widest mb-3 text-gray-300">Agenda en línea</p>
 
-                    {/* v13 (2026-08-06, Jose): probamos pegar "Agendar" a
-                        "Para agendar" (v12) pero el hueco vacío solo se
-                        movió al lado derecho de la card en vez del medio —
-                        de vuelta a v9: botón fijo contra el borde derecho
-                        vía justify-between. */}
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-6">
-                        {artista.precio_sesion_texto && (
-                          <div className="min-w-0">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-0.5 whitespace-nowrap text-center">Valor de mi sesión</p>
-                            <p className="text-base font-black text-white leading-snug truncate text-center">{formatearValorSesion(artista.precio_sesion_texto)}</p>
-                          </div>
-                        )}
-
-                        <div className="min-w-0">
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-0.5 whitespace-nowrap text-center">Para agendar</p>
-                          <p className="text-base font-black text-white whitespace-nowrap text-center">
-                            ${Number(artista.precio_agendar).toLocaleString('es-CO')}
-                          </p>
+                    <div className="space-y-2.5">
+                      {artista.precio_sesion_texto && (
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Valor base por sesión</p>
+                          <p className="text-base font-black text-white whitespace-nowrap">{formatearValorSesion(artista.precio_sesion_texto)}</p>
                         </div>
+                      )}
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Anticipo de reserva</p>
+                          <p className="text-[9px] text-gray-500 leading-tight">Se descuenta del valor total en el estudio</p>
+                        </div>
+                        <p className="text-base font-black text-white whitespace-nowrap">
+                          ${Number(artista.precio_agendar).toLocaleString('es-CO')}
+                        </p>
                       </div>
-
-                      <button
-                        type="button"
-                        onClick={abrirReserva}
-                        className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white text-gray-900 font-black uppercase tracking-widest text-[11px] hover:opacity-90 transition-opacity"
-                      >
-                        Agendar
-                      </button>
                     </div>
+
+                    <button
+                      type="button"
+                      onClick={abrirReserva}
+                      className="w-full mt-4 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg bg-white text-gray-900 font-black uppercase tracking-widest text-[11px] hover:opacity-90 transition-opacity"
+                    >
+                      Agendar sesión
+                    </button>
                   </div>
                 </div>
 
@@ -874,20 +878,16 @@ export default function ArtistaLandingPage() {
                     arriba) — anidarlo adentro lo recortaría contra el
                     borde de la card, igual que le pasó al hero del
                     buscador con su propio overflow-hidden. */}
-                {/* Flecha condicional (2026-08-26, auditoría de tooltips
-                    desfasados) — la caja se queda fija en left-4 (el ancho
-                    w-72 ya alcanza a cubrir ambos casos), pero "Para
-                    agendar" NO siempre es el primer bloque de la fila:
-                    cuando también se muestra "Valor de mi sesión" (arriba,
-                    flex gap-6), "Para agendar" queda desplazado a la
-                    derecha y la flecha fija en left-6 apuntaba al bloque
-                    equivocado. Con solo "Para agendar" en la fila, left-6
-                    sigue siendo correcto. */}
+                {/* Flecha (2026-09-13) — ya no depende de si también se
+                    muestra "Valor base por sesión": con la tarjeta v14 en
+                    columna (no en fila), "Anticipo de reserva" siempre
+                    empieza en el mismo borde izquierdo, se muestre o no el
+                    bloque de arriba. */}
                 {tooltipAgendarVisible && (
                   <div className="absolute z-20 top-full mt-3 left-4 w-72 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left">
-                    <span className={`absolute -top-1.5 w-3 h-3 bg-gray-900 rotate-45 ${artista.precio_sesion_texto ? 'left-32' : 'left-6'}`} />
+                    <span className="absolute -top-1.5 left-6 w-3 h-3 bg-gray-900 rotate-45" />
                     <p className="text-xs leading-relaxed text-gray-200">
-                      "Para agendar" es un abono para reservar tu cita — no el precio completo del tatuaje. El resto se paga directo con {artista.nombre}, el día de tu sesión.
+                      "Anticipo de reserva" es un abono descontable del total — no el precio completo del tatuaje. El resto se paga directo con {artista.nombre}, el día de tu sesión.
                     </p>
                     <button
                       onClick={cerrarTooltipAgendar}
@@ -1021,6 +1021,13 @@ export default function ArtistaLandingPage() {
           {artista.precio_agendar && (
             <p className="px-4 text-gray-500 text-[11px] mb-3 text-center">¿Prefieres asegurar tu cupo? Agenda en línea más arriba ↑</p>
           )}
+          {/* Tamaño reducido (2026-09-13, Jose: "reducir el tamaño visual
+              del botón de WhatsApp y redes sociales para que actúen como
+              vías secundarias de consulta, manteniendo el foco comercial
+              en la pasarela de agendamiento") — menos padding, íconos e
+              texto más chicos, y WhatsApp pasa de negrita/mayúscula ancha
+              a un tratamiento más discreto. La agenda en línea de arriba
+              se queda como la acción principal de la página. */}
           <div className={`grid grid-cols-2 w-full border-t border-gray-200 ${waLink ? '' : 'border-b'}`}>
             <a
               href={artista.facebook || undefined}
@@ -1028,14 +1035,14 @@ export default function ArtistaLandingPage() {
               rel={artista.facebook ? 'noopener noreferrer' : undefined}
               onClick={artista.facebook ? undefined : (e) => { e.preventDefault(); mostrarAvisoRed('Facebook') }}
               aria-disabled={!artista.facebook}
-              className={`flex items-center justify-center gap-2.5 py-3.5 border-r border-gray-200 transition-colors ${
-                artista.facebook ? 'text-gray-700 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-pointer'
+              className={`flex items-center justify-center gap-1.5 py-2 border-r border-gray-200 transition-colors ${
+                artista.facebook ? 'text-gray-500 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-pointer'
               }`}
             >
-              <FaFacebook size={18} />
+              <FaFacebook size={13} />
               <span className="flex flex-col items-start leading-tight">
-                <span className="text-xs sm:text-sm font-bold uppercase tracking-widest">Facebook</span>
-                {!artista.facebook && <span className="text-[9px] font-medium normal-case tracking-normal text-gray-300">Aún no se ha subido</span>}
+                <span className="text-[10px] font-bold uppercase tracking-wide">Facebook</span>
+                {!artista.facebook && <span className="text-[8px] font-medium normal-case tracking-normal text-gray-300">Aún no se ha subido</span>}
               </span>
             </a>
             <a
@@ -1044,14 +1051,14 @@ export default function ArtistaLandingPage() {
               rel={artista.instagram ? 'noopener noreferrer' : undefined}
               onClick={artista.instagram ? undefined : (e) => { e.preventDefault(); mostrarAvisoRed('Instagram') }}
               aria-disabled={!artista.instagram}
-              className={`flex items-center justify-center gap-2.5 py-3.5 transition-colors ${
-                artista.instagram ? 'text-gray-700 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-pointer'
+              className={`flex items-center justify-center gap-1.5 py-2 transition-colors ${
+                artista.instagram ? 'text-gray-500 hover:bg-gray-50 cursor-pointer' : 'text-gray-300 cursor-pointer'
               }`}
             >
-              <FaInstagram size={18} />
+              <FaInstagram size={13} />
               <span className="flex flex-col items-start leading-tight">
-                <span className="text-xs sm:text-sm font-bold uppercase tracking-widest">Instagram</span>
-                {!artista.instagram && <span className="text-[9px] font-medium normal-case tracking-normal text-gray-300">Aún no se ha subido</span>}
+                <span className="text-[10px] font-bold uppercase tracking-wide">Instagram</span>
+                {!artista.instagram && <span className="text-[8px] font-medium normal-case tracking-normal text-gray-300">Aún no se ha subido</span>}
               </span>
             </a>
           </div>
@@ -1065,9 +1072,9 @@ export default function ArtistaLandingPage() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={trackWhatsappClick}
-              className="flex items-center justify-center gap-2.5 py-3.5 border-b border-gray-200 bg-green-600 text-white font-black uppercase tracking-widest hover:bg-green-500 transition-colors text-sm"
+              className="flex items-center justify-center gap-1.5 py-2.5 border-b border-gray-200 bg-green-600 text-white font-bold uppercase tracking-wide hover:bg-green-500 transition-colors text-[11px]"
             >
-              <FaWhatsapp size={18} />
+              <FaWhatsapp size={14} />
               Contactar al artista
             </a>
           )}

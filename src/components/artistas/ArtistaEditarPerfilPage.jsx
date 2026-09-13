@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData, useSearchParams, useNavigate } from 'react-router-dom'
-import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarDays, CalendarCheck, ChevronLeft, ChevronRight, Banknote, ChevronDown, Upload } from 'lucide-react'
+import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarDays, CalendarCheck, ChevronLeft, ChevronRight, Banknote, ChevronDown, Upload } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
@@ -416,27 +416,32 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
                   </button>
                   <div className="absolute bottom-0 inset-x-0 bg-black/70 text-white text-[10px] px-1.5 py-1 flex items-center justify-between">
                     <span className="font-bold">${Number(d.precio).toLocaleString('es-CO')}</span>
-                    {/* Switch de estado (2026-09-13, Jose) — reemplaza el
-                        botón de texto "Ocultar"/"Mostrar". El diseño
-                        original tenía un círculo blanco deslizante encima
-                        del fondo verde/gris (patrón "switch" de Mi
-                        horario) — Jose lo vio como dos botones distintos
-                        superpuestos y pidió dejar uno solo: un único botón
-                        de color sólido, verde=público, gris=oculto, sin
-                        la perilla blanca encima. El borrar que vivía acá
-                        al lado (2026-09-13, Jose: "borré un diseño sin
-                        culpa, pusiste ese botón verde y gris encima de
-                        ocultar y el icono eliminar") se quitó de esta
-                        franja tan angosta — borrar ahora vive dentro de
-                        "Editando diseño", con más espacio y una
-                        confirmación antes de ejecutarse. */}
-                    <button
-                      type="button"
-                      onClick={() => toggleActivo(d)}
-                      aria-pressed={d.activo}
-                      aria-label={d.activo ? 'Publicado — tocar para ocultar' : 'Oculto — tocar para publicar'}
-                      className={`flex-shrink-0 w-5 h-5 rounded-full transition-colors ${d.activo ? 'bg-green-500' : 'bg-gray-500'}`}
-                    />
+                    <div className="flex items-center gap-2.5">
+                      {/* Switch de estado (2026-09-13, Jose) — un solo
+                          botón de color sólido (verde=público,
+                          gris=oculto), sin la perilla blanca que traía
+                          antes (se leía como dos botones superpuestos). */}
+                      <button
+                        type="button"
+                        onClick={() => toggleActivo(d)}
+                        aria-pressed={d.activo}
+                        aria-label={d.activo ? 'Publicado — tocar para ocultar' : 'Oculto — tocar para publicar'}
+                        className={`flex-shrink-0 w-5 h-5 rounded-full transition-colors ${d.activo ? 'bg-green-500' : 'bg-gray-500'}`}
+                      />
+                      {/* Borrar (2026-09-13, Jose: "y la opción de
+                          eliminar? agrégala al lado del botón") — vuelve a
+                          vivir acá, pero esta vez SIEMPRE pide confirmar
+                          antes de ejecutar el DELETE real; la vez anterior
+                          no tenía ninguna confirmación y un toque de más
+                          bastó para borrar un diseño de verdad. */}
+                      <button
+                        type="button"
+                        onClick={() => { if (window.confirm('¿Borrar este diseño? No se puede deshacer.')) borrarDiseno(d) }}
+                        aria-label="Borrar diseño"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -666,6 +671,13 @@ const OPCIONES_HORA = Array.from({ length: 36 }, (_, i) => {
 // para mostrar el nombre de una marca en vez de su slug guardado.
 const ANTICIPACION_OPCIONES = [0, 1, 2, 3, 5, 8, 15]
 const ANTICIPACION_LABELS = { 0: 'Mismo día', 1: '1 día', 2: '2 días', 3: '3 días', 5: '5 días', 8: '8 días', 15: '15 días' }
+
+// Rango tarifario (2026-09-13, Jose) — mismo valor numérico guardado de
+// siempre (1-4, ver precio_nivel), solo con un descriptor junto al
+// símbolo en el selector de edición. El perfil público sigue mostrando
+// solo los signos "$" (ver ArtistaLandingPage.jsx) — el nombre es una
+// ayuda para el artista al elegir, no algo que el cliente final lee.
+const PRECIO_LABELS = { 1: '$ Accesible', 2: '$$ Estándar', 3: '$$$ Premium', 4: '$$$$ Exclusivo' }
 
 // Selector de hora compacto (2026-09-13, Jose: "en móvil me abre un modal
 // grande y feo como por defecto... ningún selector de algo debería verse
@@ -1480,26 +1492,27 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
             <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border border-gray-500/30 shadow-lg">
               <div className="h-px bg-gradient-to-r from-transparent via-gray-300/50 to-transparent" />
               <div className="pt-2.5 px-4 pb-7">
-                <p className="text-[11px] font-black uppercase tracking-widest mb-2 text-gray-300">Agenda en línea</p>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-6">
-                    <div className="min-w-0">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-0.5 whitespace-nowrap">Valor de mi sesión</p>
-                      <p className="text-base font-black text-white whitespace-nowrap">
-                        {form.precio_sesion_texto ? `$${Number(form.precio_sesion_texto).toLocaleString('es-CO')}` : '$X'}
-                      </p>
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-0.5 whitespace-nowrap">Para agendar</p>
-                      <p className="text-base font-black text-white whitespace-nowrap">
-                        {form.precio_agendar ? `$${Number(form.precio_agendar).toLocaleString('es-CO')}` : '$X'}
-                      </p>
-                    </div>
+                <p className="text-[11px] font-black uppercase tracking-widest mb-3 text-gray-300">Agenda en línea</p>
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Valor base por sesión</p>
+                    <p className="text-base font-black text-white whitespace-nowrap">
+                      {form.precio_sesion_texto ? `$${Number(form.precio_sesion_texto).toLocaleString('es-CO')}` : '$X'}
+                    </p>
                   </div>
-                  <span className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white text-gray-900 font-black uppercase tracking-widest text-[11px]">
-                    Agendar
-                  </span>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Anticipo de reserva</p>
+                      <p className="text-[9px] text-gray-500 leading-tight">Se descuenta del valor total en el estudio</p>
+                    </div>
+                    <p className="text-base font-black text-white whitespace-nowrap">
+                      {form.precio_agendar ? `$${Number(form.precio_agendar).toLocaleString('es-CO')}` : '$X'}
+                    </p>
+                  </div>
                 </div>
+                <span className="w-full mt-4 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg bg-white text-gray-900 font-black uppercase tracking-widest text-[11px]">
+                  Agendar sesión
+                </span>
               </div>
             </div>
 
@@ -1597,13 +1610,13 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           </div>
         ) : (
           <div className="grid grid-cols-2 w-full border-t border-gray-200">
-            <div className={`flex items-center justify-center gap-2.5 py-3.5 border-r border-gray-200 ${form.facebook ? 'text-gray-700' : 'text-gray-300'}`}>
-              <FaFacebook size={18} />
-              <span className="text-xs sm:text-sm font-bold uppercase tracking-widest">Facebook</span>
+            <div className={`flex items-center justify-center gap-1.5 py-2 border-r border-gray-200 ${form.facebook ? 'text-gray-500' : 'text-gray-300'}`}>
+              <FaFacebook size={13} />
+              <span className="text-[10px] font-bold uppercase tracking-wide">Facebook</span>
             </div>
-            <div className={`flex items-center justify-center gap-2.5 py-3.5 ${form.instagram ? 'text-gray-700' : 'text-gray-300'}`}>
-              <FaInstagram size={18} />
-              <span className="text-xs sm:text-sm font-bold uppercase tracking-widest">Instagram</span>
+            <div className={`flex items-center justify-center gap-1.5 py-2 ${form.instagram ? 'text-gray-500' : 'text-gray-300'}`}>
+              <FaInstagram size={13} />
+              <span className="text-[10px] font-bold uppercase tracking-wide">Instagram</span>
             </div>
           </div>
         )}
@@ -1614,8 +1627,8 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
             <input required value={form.whatsapp} onChange={set('whatsapp')} placeholder="573..." className="w-full text-xs bg-transparent border-b border-gray-300 focus:outline-none" />
           </div>
         ) : form.whatsapp ? (
-          <div className="flex items-center justify-center gap-2.5 py-3.5 border-t border-b border-gray-200 bg-green-600 text-white font-black uppercase tracking-widest text-sm">
-            <FaWhatsapp size={18} />
+          <div className="flex items-center justify-center gap-1.5 py-2.5 border-t border-b border-gray-200 bg-green-600 text-white font-bold uppercase tracking-wide text-[11px]">
+            <FaWhatsapp size={14} />
             Contactar al artista
           </div>
         ) : (
@@ -1628,65 +1641,92 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           con anticipo"; ahora cada pestaña guarda por su cuenta, mismo
           estado `form` de siempre así que no se pierde nada al cambiar de
           pestaña. */}
-      <div className="px-4 lg:px-0 mt-8">
+      {/* Divisor estructural (2026-09-13, Jose: "la sección de edición
+          inferior debe estar claramente delimitada... con un título
+          funcional") — separa la vista previa (edición in situ de
+          arriba) de este formulario propiamente dicho, con cambio de
+          fondo + borde, no solo espacio en blanco. */}
+      <div className="px-4 lg:px-0 mt-10 pt-6 border-t border-gray-200 bg-gray-50/60">
+        <p className="text-gray-400 text-[11px] font-black uppercase tracking-widest text-center mb-5">Configuración de ubicación y parámetros</p>
+      </div>
+      <div className="px-4 lg:px-0">
       <form onSubmit={guardar} className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className={labelClass}>Departamento *</label>
-            <ComboboxBuscable value={form.departamento} onChange={setDepartamento} options={DEPARTAMENTOS} placeholder="Escribe para buscar..." inputClassName={inputClass} />
+        {/* Bloques con encabezado propio (2026-09-13, Jose: "dividir los
+            campos de edición en bloques... Ubicación y Negocio /
+            Parámetros de Servicio") — mismo tratamiento de tarjeta que ya
+            usan Mi horario/Mi agenda/Depósito de reserva, no un accordion
+            nuevo: la página ya tiene su propio nivel de pestañas (Mi
+            perfil/Mis diseños/Reservas y agenda), anidar otro mecanismo de
+            colapsar adentro sumaría una capa de interacción sin necesidad
+            — el mismo objetivo (que no se lea como un formulario largo
+            sin cortes) ya queda resuelto con encabezado + tarjeta. */}
+        <div className="-mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5 space-y-3">
+          <p className={labelClass}>📍 Ubicación y Negocio</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={labelClass}>Departamento *</label>
+              <ComboboxBuscable value={form.departamento} onChange={setDepartamento} options={DEPARTAMENTOS} placeholder="Escribe para buscar..." inputClassName={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Municipio *</label>
+              <ComboboxBuscable value={form.municipio} onChange={setMunicipio} options={municipiosDisponibles} disabled={!form.departamento} placeholder="Escribe para buscar..." inputClassName={inputClass} />
+            </div>
           </div>
+
           <div>
-            <label className={labelClass}>Municipio *</label>
-            <ComboboxBuscable value={form.municipio} onChange={setMunicipio} options={municipiosDisponibles} disabled={!form.departamento} placeholder="Escribe para buscar..." inputClassName={inputClass} />
+            <div className="flex items-center justify-between mb-1.5">
+              <label className={labelClass}>Posicionamiento por cercanía</label>
+              {form.lat && <span className="text-[10px] font-bold text-green-600">🟢 Activado</span>}
+            </div>
+            <button
+              type="button"
+              onClick={usarMiUbicacion}
+              disabled={ubicando}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60 bg-white"
+              style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: '#4B5563', color: '#4B5563' }}
+            >
+              {ubicando ? <LoaderCircle size={14} className="animate-spin" /> : form.lat ? <Check size={14} /> : <Navigation size={14} />}
+              {ubicando ? 'Ubicando...' : form.lat ? 'Actualizar ubicación' : 'Activar mi ubicación'}
+            </button>
+            <p className="text-gray-400 text-[10px] mt-1.5 text-center">Utilizado para priorizar tu perfil en búsquedas locales.</p>
+          </div>
+
+          <div>
+            <label className={labelClass}>Enlace a Google Maps</label>
+            <input className={inputClass} value={form.google_maps_url} onChange={set('google_maps_url')} placeholder="https://maps.app.goo.gl/..." />
+            <p className="text-gray-400 text-[10px] mt-1">Redirige al cliente a la ficha oficial de tu estudio.</p>
           </div>
         </div>
 
-        <div>
-          <button
-            type="button"
-            onClick={usarMiUbicacion}
-            disabled={ubicando}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60"
-            style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: '#4B5563', color: '#4B5563' }}
-          >
-            {ubicando ? <LoaderCircle size={14} className="animate-spin" /> : form.lat ? <Check size={14} /> : <Navigation size={14} />}
-            {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación exacta guardada' : 'Actualizar mi ubicación exacta'}
-          </button>
-          <p className="text-gray-400 text-[10px] mt-1.5 text-center">Actívalo siempre — es lo único que ordena tu perfil por cercanía real en el buscador, tengas o no link de Google Maps.</p>
-        </div>
-
-        <div>
-          <label className={labelClass}>Link de Google Maps (opcional)</label>
-          <input className={inputClass} value={form.google_maps_url} onChange={set('google_maps_url')} placeholder="https://maps.app.goo.gl/..." />
-          <p className="text-gray-400 text-[10px] mt-1">Si ya tienes ficha de tu estudio/local en Google Maps, pégala acá — el botón de ubicación de tu perfil abrirá esa ficha real en vez de un pin genérico. No reemplaza la ubicación exacta de arriba, es un extra: no afecta el orden del buscador.</p>
-        </div>
-
-        <div>
-          <label className={labelClass}>No tatúas (opcional)</label>
-          <input className={inputClass} value={form.no_tatua} onChange={set('no_tatua')} placeholder="Ej: rostro, manos, zonas genitales" />
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
+        <div className="-mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5 space-y-3">
+          <p className={labelClass}>⚙️ Parámetros de Servicio</p>
           <div>
-            <label className={labelClass}>Precio</label>
-            <ComboboxBuscable
-              value={form.precio_nivel}
-              onChange={(v) => setForm((f) => ({ ...f, precio_nivel: v }))}
-              options={['', 1, 2, 3, 4]}
-              labelFor={(v) => (v === '' ? 'Sin elegir' : '$'.repeat(v))}
-              placeholder="Sin elegir"
-              inputClassName={inputClass}
-            />
+            <label className={labelClass}>Restricciones de servicio</label>
+            <input className={inputClass} value={form.no_tatua} onChange={set('no_tatua')} placeholder="Zonas o tipos de trabajo no realizados." />
           </div>
-          <div>
-            <label className={labelClass}>Disponibilidad</label>
-            <ComboboxBuscable
-              value={form.disponibilidad}
-              onChange={(v) => setForm((f) => ({ ...f, disponibilidad: v }))}
-              options={OPCIONES_DISPONIBILIDAD}
-              placeholder="Elige..."
-              inputClassName={inputClass}
-            />
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={labelClass}>Rango tarifario</label>
+              <ComboboxBuscable
+                value={form.precio_nivel}
+                onChange={(v) => setForm((f) => ({ ...f, precio_nivel: v }))}
+                options={['', 1, 2, 3, 4]}
+                labelFor={(v) => (v === '' ? 'Sin elegir' : PRECIO_LABELS[v])}
+                placeholder="Sin elegir"
+                inputClassName={inputClass}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Estado de agenda</label>
+              <ComboboxBuscable
+                value={form.disponibilidad}
+                onChange={(v) => setForm((f) => ({ ...f, disponibilidad: v }))}
+                options={OPCIONES_DISPONIBILIDAD}
+                placeholder="Elige..."
+                inputClassName={inputClass}
+              />
+            </div>
           </div>
         </div>
 
