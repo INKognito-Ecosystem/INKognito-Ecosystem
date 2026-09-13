@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData, useSearchParams, useNavigate } from 'react-router-dom'
-import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarDays, CalendarCheck, ChevronLeft, ChevronRight, Banknote } from 'lucide-react'
+import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarDays, CalendarCheck, ChevronLeft, ChevronRight, Banknote, ChevronDown } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
@@ -549,6 +549,67 @@ const OPCIONES_HORA = Array.from({ length: 36 }, (_, i) => {
   return `${h}:${m}`
 })
 
+// Anticipación mínima — mismo criterio que OPCIONES_HORA de arriba: el
+// <select> nativo se reemplaza por ComboboxBuscable (2026-09-13, Jose:
+// "ningún selector de algo debería verse feo"). ANTICIPACION_LABELS
+// mapea el número guardado (días) al texto que se muestra, vía la prop
+// labelFor de ComboboxBuscable — mismo mecanismo que ya usa MisProductosSupplySection.jsx
+// para mostrar el nombre de una marca en vez de su slug guardado.
+const ANTICIPACION_OPCIONES = [0, 1, 2, 3, 5, 8, 15]
+const ANTICIPACION_LABELS = { 0: 'Mismo día', 1: '1 día', 2: '2 días', 3: '3 días', 5: '5 días', 8: '8 días', 15: '15 días' }
+
+// Selector de hora compacto (2026-09-13, Jose: "en móvil me abre un modal
+// grande y feo como por defecto... ningún selector de algo debería verse
+// feo") — un <select> nativo dispara el picker nativo del sistema
+// operativo (rueda de iOS, diálogo de Android), pesado y desconectado del
+// resto del diseño para una lista de 36 horas. No reusa ComboboxBuscable
+// tal cual (ese trae un input de texto + botón de limpiar pensado para
+// listas largas como municipios) porque acá el espacio es angosto — una
+// fila con toggle + día + 2 selectores de hora — así que es un dropdown
+// más chico, mismo mecanismo (botón + panel absoluto que se cierra al
+// hacer clic afuera) que ya usan los filtros de "ordenar"/"proveedor" en
+// SupplyCategoryPage.jsx.
+function HoraSelector({ value, onChange, disabled, options }) {
+  const [abierto, setAbierto] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const onClickFuera = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setAbierto(false)
+    }
+    document.addEventListener('mousedown', onClickFuera)
+    return () => document.removeEventListener('mousedown', onClickFuera)
+  }, [])
+
+  return (
+    <div className="relative flex-1 min-w-0" ref={ref}>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setAbierto((a) => !a)}
+        className="w-full flex items-center justify-between gap-1 bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-xs text-gray-900 disabled:opacity-40 disabled:bg-gray-100"
+      >
+        {value}
+        <ChevronDown size={12} className="text-gray-400 flex-shrink-0" />
+      </button>
+      {abierto && !disabled && (
+        <div className="absolute z-20 mt-1 left-0 w-20 max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
+          {options.map((h) => (
+            <button
+              key={h}
+              type="button"
+              onMouseDown={(e) => { e.preventDefault(); onChange(h); setAbierto(false) }}
+              className={`block w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 ${h === value ? 'font-bold text-gray-900' : 'text-gray-600'}`}
+            >
+              {h}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // Horario semanal recurrente (fase 1 de agenda, 2026-08-19) — fuera del
 // <form> grande a propósito, mismo criterio que "Mis diseños en venta":
 // las 7 filas se guardan juntas en su propio endpoint
@@ -637,25 +698,19 @@ function HorarioSemanalSection({ token, horarioInicial }) {
                 <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${fila.activo ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </button>
               <span className={`w-20 pl-2 text-xs font-bold flex-shrink-0 ${fila.activo ? 'text-gray-900' : 'text-gray-400'}`}>{label}</span>
-              <select
+              <HoraSelector
                 disabled={!fila.activo}
                 value={fila.hora_inicio}
-                onChange={(e) => actualizar(db, 'hora_inicio', e.target.value)}
-                className="flex-1 min-w-0 bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-xs disabled:opacity-40 disabled:bg-gray-100"
-              >
-                {!OPCIONES_HORA.includes(fila.hora_inicio) && <option value={fila.hora_inicio}>{fila.hora_inicio}</option>}
-                {OPCIONES_HORA.map((h) => <option key={h} value={h}>{h}</option>)}
-              </select>
+                onChange={(h) => actualizar(db, 'hora_inicio', h)}
+                options={OPCIONES_HORA.includes(fila.hora_inicio) ? OPCIONES_HORA : [fila.hora_inicio, ...OPCIONES_HORA]}
+              />
               <span className="text-gray-400 text-xs flex-shrink-0">a</span>
-              <select
+              <HoraSelector
                 disabled={!fila.activo}
                 value={fila.hora_fin}
-                onChange={(e) => actualizar(db, 'hora_fin', e.target.value)}
-                className="flex-1 min-w-0 bg-white border border-gray-300 rounded-lg px-2 py-1.5 text-xs disabled:opacity-40 disabled:bg-gray-100"
-              >
-                {!OPCIONES_HORA.includes(fila.hora_fin) && <option value={fila.hora_fin}>{fila.hora_fin}</option>}
-                {OPCIONES_HORA.map((h) => <option key={h} value={h}>{h}</option>)}
-              </select>
+                onChange={(h) => actualizar(db, 'hora_fin', h)}
+                options={OPCIONES_HORA.includes(fila.hora_fin) ? OPCIONES_HORA : [fila.hora_fin, ...OPCIONES_HORA]}
+              />
             </div>
           )
         })}
@@ -1505,17 +1560,24 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className={labelClass}>Precio</label>
-            <select className={inputClass} value={form.precio_nivel} onChange={set('precio_nivel')}>
-              <option value="">Sin elegir</option>
-              {[1, 2, 3, 4].map((n) => <option key={n} value={n}>{'$'.repeat(n)}</option>)}
-            </select>
+            <ComboboxBuscable
+              value={form.precio_nivel}
+              onChange={(v) => setForm((f) => ({ ...f, precio_nivel: v }))}
+              options={['', 1, 2, 3, 4]}
+              labelFor={(v) => (v === '' ? 'Sin elegir' : '$'.repeat(v))}
+              placeholder="Sin elegir"
+              inputClassName={inputClass}
+            />
           </div>
           <div>
             <label className={labelClass}>Disponibilidad</label>
-            <select className={inputClass} value={form.disponibilidad} onChange={set('disponibilidad')}>
-              <option value="">Sin elegir</option>
-              {OPCIONES_DISPONIBILIDAD.map((d) => <option key={d} value={d}>{d}</option>)}
-            </select>
+            <ComboboxBuscable
+              value={form.disponibilidad}
+              onChange={(v) => setForm((f) => ({ ...f, disponibilidad: v }))}
+              options={OPCIONES_DISPONIBILIDAD}
+              placeholder="Elige..."
+              inputClassName={inputClass}
+            />
           </div>
         </div>
 
@@ -1605,19 +1667,14 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           </div>
           <div className="mt-3">
             <label className={labelClass}>Anticipación mínima</label>
-            <select
-              className={inputClass}
+            <ComboboxBuscable
               value={form.anticipacion_min_dias}
-              onChange={(e) => setForm((f) => ({ ...f, anticipacion_min_dias: e.target.value }))}
-            >
-              <option value={0}>Mismo día</option>
-              <option value={1}>1 día</option>
-              <option value={2}>2 días</option>
-              <option value={3}>3 días</option>
-              <option value={5}>5 días</option>
-              <option value={8}>8 días</option>
-              <option value={15}>15 días</option>
-            </select>
+              onChange={(v) => setForm((f) => ({ ...f, anticipacion_min_dias: v }))}
+              options={ANTICIPACION_OPCIONES}
+              labelFor={(v) => ANTICIPACION_LABELS[v] ?? `${v} días`}
+              placeholder="Elige..."
+              inputClassName={inputClass}
+            />
             <p className="text-gray-400 text-[11px] mt-1">Días mínimos de anticipación para agendar una cita.</p>
           </div>
 
