@@ -1526,27 +1526,53 @@ export default function ArtistaLandingPage() {
         </div>
       )}
 
-      {/* Términos y condiciones de "Agenda en línea" (2026-08-06) — texto
-          persuasivo, no un candado: WhatsApp/redes se quedan gratis y
-          abiertos, esto es una vía adicional. El punto de venta real es
-          que el artista recibe de inmediato los datos de contacto + la
-          idea del tatuaje por correo, en vez de depender de encontrar el
-          mensaje entre WhatsApp. */}
+      {/* Términos y condiciones de "Agenda en línea" (2026-08-06, texto
+          reescrito 2026-09-13, Jose) — pasó de párrafos corridos a 4
+          pasos numerados (confirmación de fecha, pago, abono, contacto),
+          más fácil de escanear que un bloque de texto persuasivo. */}
       {mostrarTerminos && (
         <div
           className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center px-4 py-8"
           onClick={() => setMostrarTerminos(false)}
         >
           <div className="bg-white rounded-2xl w-full max-w-sm max-h-full overflow-y-auto p-5" onClick={(e) => e.stopPropagation()}>
-            <p className="font-black uppercase text-base leading-tight mb-3">Cómo funciona agendar en línea</p>
-            <div className="space-y-3 text-gray-600 text-sm leading-relaxed">
-              <p>El WhatsApp y las redes de {artista.nombre} siguen siendo gratis para ti — puedes escribirle directo, cuando quieras.</p>
-              <p>Agendar y abonar en línea es una vía adicional, pensada para avanzar más rápido: al confirmarse el pago, {artista.nombre} recibe de inmediato un correo con tus datos de contacto y la idea de tu tatuaje.</p>
-              <p>{artista.tiene_horario
-                ? <>Eliges el día y la hora exacta en el calendario de {artista.nombre} — tu cita queda agendada de una vez, sin ir y venir por WhatsApp para cuadrar fecha.</>
-                : <>Con esa información completa, {artista.nombre} se pone en contacto contigo para coordinar la valoración, el diseño y, después, la fecha de tu cita — sin que tu solicitud se pierda entre otros mensajes.</>}</p>
-              <p>El pago se procesa de forma segura por Mercado Pago — nunca compartes tus datos de tarjeta con el artista ni con INKognito.</p>
-              <p className="font-bold text-gray-800">Es la forma más directa de convertir tu idea en una cita real.</p>
+            <p className="font-black uppercase text-base leading-tight mb-4">Cómo funciona agendar en línea</p>
+            <div className="space-y-4">
+              {/* 4 pasos numerados (2026-09-13, Jose) — reemplaza el texto
+                  corrido anterior. El paso 1 sigue ramificado según si el
+                  artista tiene calendario configurado (artista.tiene_horario)
+                  — el texto de Jose describe el caso CON calendario; sin
+                  uno, la cita no se "bloquea sola", el artista coordina la
+                  fecha directo, mismo criterio que ya usaba el paso 3 del
+                  formulario de reserva más arriba. */}
+              {[
+                {
+                  titulo: 'Confirmación de fecha',
+                  texto: artista.tiene_horario
+                    ? 'Seleccionas el día y la hora disponibles en el calendario oficial. La cita queda bloqueada automáticamente en la agenda.'
+                    : `Envías tu solicitud con la fecha que prefieres — ${artista.nombre} se pone en contacto directo contigo para confirmar el día y la hora exactos.`,
+                },
+                {
+                  titulo: 'Procesamiento seguro de pago',
+                  texto: 'El anticipo se procesa mediante Mercado Pago con cifrado de alta seguridad. Ni el artista ni la plataforma almacenan información financiera.',
+                },
+                {
+                  titulo: 'Abono a tu cuenta',
+                  texto: 'El valor abonado se descuenta automáticamente del saldo total a cancelar el día de tu cita.',
+                },
+                {
+                  titulo: 'Contacto de coordinación',
+                  texto: `Al confirmarse el pago, ${artista.nombre} recibe los detalles de la solicitud para ponerse en contacto directo contigo e iniciar la preparación del diseño.`,
+                },
+              ].map((paso, i) => (
+                <div key={paso.titulo} className="flex gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-100 text-gray-700 text-xs font-black flex items-center justify-center">{i + 1}</span>
+                  <div className="min-w-0">
+                    <p className="font-bold text-gray-800 text-sm">{paso.titulo}</p>
+                    <p className="text-gray-600 text-sm leading-relaxed mt-0.5">{paso.texto}</p>
+                  </div>
+                </div>
+              ))}
             </div>
             <button type="button" onClick={() => setMostrarTerminos(false)} className="w-full mt-5 py-3 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity text-xs" style={{ backgroundColor: BTN }}>
               Entendido
