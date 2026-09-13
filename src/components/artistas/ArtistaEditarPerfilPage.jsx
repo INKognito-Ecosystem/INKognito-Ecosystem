@@ -144,17 +144,22 @@ function PedirLinkForm() {
 // Microcopy (2026-09-13, Jose: reescritura de la tarjeta "Mis diseños" a
 // un tono más profesional) — badgeCorto es lo que se ve en la miniatura
 // (espacio mínimo, top-left), label/hint es lo que se ve en el selector
-// del formulario.
+// del formulario. placeholderTitulo/placeholderDescripcion diferenciados
+// por tipo (2026-09-13, Jose: "si cambio de obra exclusiva a obra
+// digital, las descripciones deben ser diferenciales, no puede ser el
+// mismo") — antes eran un solo texto genérico para ambos tipos.
 const TIPOS_DISENO = [
   {
     value: 'tatuaje', label: 'Obra exclusiva', badgeCorto: 'Exclusivo',
     hint: 'Se retira del catálogo tras su venta',
-    placeholderDescripcion: 'Detalla el concepto, dimensiones sugeridas o zona corporal recomendada.',
+    placeholderTitulo: 'Ej. Mandala geométrico',
+    placeholderDescripcion: 'Detalla el concepto y la zona corporal recomendada para este diseño.',
   },
   {
-    value: 'lamina', label: 'Reproducción / Print', badgeCorto: 'Print',
+    value: 'lamina', label: 'Obra digital / Print', badgeCorto: 'Print',
     hint: 'Venta continuada',
-    placeholderDescripcion: 'Detalla el concepto, dimensiones sugeridas o zona corporal recomendada.',
+    placeholderTitulo: 'Ej. Composición geométrica I',
+    placeholderDescripcion: 'Detalla el concepto y las dimensiones sugeridas para enmarcar esta pieza.',
   },
 ]
 
@@ -412,10 +417,14 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
                   <div className="absolute bottom-0 inset-x-0 bg-black/70 text-white text-[10px] px-1.5 py-1 flex items-center justify-between">
                     <span className="font-bold">${Number(d.precio).toLocaleString('es-CO')}</span>
                     {/* Switch de estado (2026-09-13, Jose) — reemplaza el
-                        botón de texto "Ocultar"/"Mostrar" por un
-                        interruptor, mismo patrón visual que el toggle de
-                        días en Mi horario. El ícono de borrar que vivía
-                        acá al lado (2026-09-13, Jose: "borré un diseño sin
+                        botón de texto "Ocultar"/"Mostrar". El diseño
+                        original tenía un círculo blanco deslizante encima
+                        del fondo verde/gris (patrón "switch" de Mi
+                        horario) — Jose lo vio como dos botones distintos
+                        superpuestos y pidió dejar uno solo: un único botón
+                        de color sólido, verde=público, gris=oculto, sin
+                        la perilla blanca encima. El borrar que vivía acá
+                        al lado (2026-09-13, Jose: "borré un diseño sin
                         culpa, pusiste ese botón verde y gris encima de
                         ocultar y el icono eliminar") se quitó de esta
                         franja tan angosta — borrar ahora vive dentro de
@@ -426,10 +435,8 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
                       onClick={() => toggleActivo(d)}
                       aria-pressed={d.activo}
                       aria-label={d.activo ? 'Publicado — tocar para ocultar' : 'Oculto — tocar para publicar'}
-                      className={`flex-shrink-0 w-7 h-4 rounded-full transition-colors relative ${d.activo ? 'bg-green-500' : 'bg-gray-500'}`}
-                    >
-                      <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${d.activo ? 'translate-x-3.5' : 'translate-x-0.5'}`} />
-                    </button>
+                      className={`flex-shrink-0 w-5 h-5 rounded-full transition-colors ${d.activo ? 'bg-green-500' : 'bg-gray-500'}`}
+                    />
                   </div>
                 </div>
               ))}
@@ -562,14 +569,19 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
                       uno que ya existe. */}
                   {!editando && (disenos || []).filter((d) => d.tipo === nuevo.tipo).length >= 5 && (
                     <p className="text-xs font-bold mt-1" style={{ color: ACCENT }}>
-                      Ya tienes el máximo de 5 {nuevo.tipo === 'lamina' ? 'láminas' : 'diseños de tatuaje'} — borra uno para agregar otro.
+                      Ya tienes el máximo de 5 {nuevo.tipo === 'lamina' ? 'obras digitales' : 'diseños de tatuaje'} — borra uno para agregar otro.
                     </p>
                   )}
                 </div>
 
                 <div>
                   <label className={labelClass}>Nombre de la obra</label>
-                  <input className={inputClass} placeholder="Ej. Composición geométrica I" value={nuevo.titulo} onChange={(e) => setNuevo((n) => ({ ...n, titulo: e.target.value }))} />
+                  <input
+                    className={inputClass}
+                    placeholder={TIPOS_DISENO.find((t) => t.value === nuevo.tipo)?.placeholderTitulo}
+                    value={nuevo.titulo}
+                    onChange={(e) => setNuevo((n) => ({ ...n, titulo: e.target.value }))}
+                  />
                 </div>
 
                 <div>
