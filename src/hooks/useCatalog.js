@@ -1,142 +1,169 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
-// Cache a nivel de módulo: evita re-fetch y el flash de "cargando" al navegar
-// entre categorías del mismo módulo (misma lógica que useSupplyVisual).
-const cache = {}
-const inflight = {}
-
-function fetchCatalog(module) {
-  if (cache[module]) return Promise.resolve(cache[module])
-  if (!inflight[module]) {
-    inflight[module] = fetch(`${PANEL_URL}/api/catalog/${module}`)
-      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
-      .then(data => { cache[module] = data; delete inflight[module]; return data })
-      .catch(e => { delete inflight[module]; throw e })
-  }
-  return inflight[module]
-}
-
-/**
- * Fetches the product catalog from the panel.
- * Returns { categorias, allProducts, loading, error }
- * categorias = { "Tintas": [{name, image_url, variantes}], "Espumas": [...] }
- *
- * @param {string} module  'supply' | 'store' | 'suplementos' | 'gym'
- * @param {string} [categoria]  optional filter — returns only that category's products
- */
-export function useCatalog(module, categoria = null) {
-  const [data, setData] = useState(() => cache[module] || null)
-  const [loading, setLoading] = useState(() => !cache[module])
-  const [error, setError] = useState(null)
-
-  useEffect(() => {
-    if (!module) return
-    if (cache[module]) {
-      setData(cache[module])
-      setLoading(false)
-      return
-    }
-    let active = true
-    setLoading(true); setError(null)
-    fetchCatalog(module)
-      .then(d => { if (active) { setData(d); setLoading(false) } })
-      .catch(e => { if (active) { setError(e.message); setLoading(false) } })
-    return () => { active = false }
-  }, [module])
-
-  const full = data || {}
-  const categorias = categoria ? { [categoria]: full[categoria] || [] } : full
-  const allProducts = Object.values(categorias).flat()
-
-  return { categorias, allProducts, loading, error }
-}
-
-/**
- * Versión para loader (servidor): trae el catálogo de una sola categoría ya
- * separado en físicos/afiliados, lista para usar directo en un route module
- * (`export async function loader() { return fetchCatalogCategoria(...) }`).
- * No usa el cache de módulo (ese es para el cliente) — cada request de
- * servidor es independiente.
- */
-export async function fetchCatalogCategoria(module, categoria) {
+// ─── Paginación real por cursor (2026-09-14) ──────────────────────────
+// `/api/catalog/:module` con categoria/marca/estudio_id/tipo/q/orden/
+// limit/cursor ya no trae el módulo completo — ver plan en
+// C:\Users\USUARIO\.claude\plans\typed-toasting-lampson.md y la
+// implementación en inkognito-panel/src/server.js (línea ~8236). Un solo
+// punto de entrada de bajo nivel (fetchCatalogPage) que tanto los loaders
+// (primera página, servidor) como las interacciones del cliente (buscar,
+// ordenar, filtrar por proveedor, "cargar más") usan directamente — sin
+// pasar por el cache de fetchCatalog(), porque cada combinación de
+// filtros/cursor es una consulta distinta, no "el catálogo" completo.
+export async function fetchCatalogPage(module, { categoria, marca, estudioId, tipo, q, orden, limit = 24, cursor } = {}) {
+  const params = new URLSearchParams()
+  if (categoria) params.set('categoria', categoria)
+  if (marca) params.set('marca', marca)
+  if (estudioId != null) params.set('estudio_id', String(estudioId))
+  if (tipo) params.set('tipo', tipo)
+  if (q) params.set('q', q)
+  if (orden) params.set('orden', orden)
+  params.set('limit', String(limit))
+  if (cursor) params.set('cursor', cursor)
   try {
-    const res = await fetch(`${PANEL_URL}/api/catalog/${module}`)
+    const res = await fetch(`${PANEL_URL}/api/catalog/${module}?${params}`)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return await res.json()
+  } catch {
+    return { items: [], nextCursor: null, hasMore: false }
+  }
+}
+
+/**
+ * Modo liviano `{categoria: cantidad}` — para grillas tipo "Categorías" que
+ * antes traían el módulo completo solo para hacer `.length` por categoría.
+ */
+export async function fetchCatalogCounts(module) {
+  try {
+    const res = await fetch(`${PANEL_URL}/api/catalog/${module}?counts=1`)
+    if (!res.ok) return {}
+    return await res.json()
+  } catch {
+    return {}
+  }
+}
+
+/** Proveedores distintos que venden en una categoría — para el filtro de proveedor. */
+export async function fetchCatalogProviders(module, categoria) {
+  try {
+    const res = await fetch(`${PANEL_URL}/api/catalog/${module}?categoria=${encodeURIComponent(categoria)}&providers=1`)
+    if (!res.ok) return []
     const data = await res.json()
-    const items = data[categoria] || []
+    return data.providers || []
+  } catch {
+    return []
+  }
+}
+
+/**
+ * Versión para loader (servidor): primera página de una categoría, ya
+ * separada en físicos (paginados de verdad, PAGE_SIZE a la vez) y
+ * afiliados (lista completa — son recursos curados, no inventario con
+ * volumen real, así que no necesitan "cargar más"), más el listado de
+ * proveedores para el filtro. Reemplaza al viejo fetchCatalogCategoria que
+ * traía el módulo entero y filtraba en JS.
+ */
+export async function fetchCatalogCategoria(module, categoria, { limit = 12, orden, q } = {}) {
+  try {
+    const [fisicos, afiliadosPage, providers] = await Promise.all([
+      fetchCatalogPage(module, { categoria, tipo: 'fisico', limit, orden, q }),
+      fetchCatalogPage(module, { categoria, tipo: 'afiliado', limit: 100 }),
+      fetchCatalogProviders(module, categoria),
+    ])
     return {
-      products: items.filter(p => !p.tipo || p.tipo === 'fisico'),
-      afiliados: items.filter(p => p.tipo === 'afiliado'),
+      products: fisicos.items,
+      nextCursor: fisicos.nextCursor,
+      hasMore: fisicos.hasMore,
+      afiliados: afiliadosPage.items,
+      providers,
     }
   } catch {
-    return { products: [], afiliados: [] }
+    return { products: [], nextCursor: null, hasMore: false, afiliados: [], providers: [] }
   }
 }
 
 /**
- * Versión para loader (servidor): trae los productos de una sola categoría,
- * sin separar físicos/afiliados (para módulos como Store/Gym que no usan ese
- * campo `tipo`) — shape plano `{ items }`, listo para `useLoaderData()`.
+ * Versión para loader (servidor): primera página de productos de una sola
+ * categoría, sin separar físicos/afiliados (para módulos como Store/Gym que
+ * no usan ese campo `tipo` para separar secciones) — shape `{ items,
+ * nextCursor, hasMore }`, listo para `useLoaderData()` + useLoadMore().
+ *
+ * Fase 2 (2026-09-14) — antes traía el MÓDULO COMPLETO vía fetchRawCatalog
+ * solo para quedarse con `data[categoria]`; ahora pide directo esa
+ * categoría, paginada, al servidor.
  */
-export async function fetchCatalogCategoriaItems(module, categoria) {
-  try {
-    const res = await fetch(`${PANEL_URL}/api/catalog/${module}`)
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    const data = await res.json()
-    return { items: data[categoria] || [] }
-  } catch {
-    return { items: [] }
-  }
+export async function fetchCatalogCategoriaItems(module, categoria, { limit = 24 } = {}) {
+  const { items, nextCursor, hasMore } = await fetchCatalogPage(module, { categoria, limit })
+  return { items, nextCursor, hasMore }
 }
 
 /**
- * Versión para loader (servidor): trae el catálogo completo de un módulo,
- * ya agrupado por categoría, en el mismo shape que produce `useCatalog`
- * (`{ categorias, allProducts }`) — para usar en route modules tipo
- * `SupplyPage`/`StorePage`/`GymPage` que muestran todas las categorías juntas.
+ * Versión para loader (servidor): primera página (hasta 100) de productos de
+ * un módulo filtrados por `marca` (el mismo slug que usa la ruta de esa
+ * marca, ej. 'wjx') — para las páginas de "Marca Profesional" en Supply
+ * (WJX, Kwadron, Vice Colors...). Antes traía el módulo completo y filtraba
+ * en JS; ahora el filtro vive en el servidor. `nextCursor`/`hasMore` quedan
+ * disponibles para que la página agregue "cargar más" con useLoadMore() si
+ * algún día una marca supera los 100 productos — hoy ninguna lo hace.
  */
-export async function fetchCatalogFull(module) {
-  try {
-    const res = await fetch(`${PANEL_URL}/api/catalog/${module}`)
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    const categorias = await res.json()
-    return { categorias, allProducts: Object.values(categorias).flat() }
-  } catch {
-    return { categorias: {}, allProducts: [] }
-  }
-}
-
-/**
- * Versión para loader (servidor): productos de un módulo filtrados por
- * `marca` (el mismo slug que usa la ruta de esa marca, ej. 'wjx') — para las
- * páginas de "Marca Profesional" en Supply (WJX, Kwadron, Vice Colors...).
- * Reusa fetchCatalogFull en vez de pegarle a un endpoint aparte — el filtro
- * por marca vive acá, no en el panel.
- */
-export async function fetchCatalogMarca(module, marca) {
-  const { allProducts } = await fetchCatalogFull(module)
-  return { products: allProducts.filter(p => p.marca === marca) }
+export async function fetchCatalogMarca(module, marca, { limit = 100 } = {}) {
+  const { items, nextCursor, hasMore } = await fetchCatalogPage(module, { marca, limit })
+  return { products: items, nextCursor, hasMore }
 }
 
 /**
  * Supply multitenant (fase 4, 2026-08-07) — productos de un módulo
  * cargados por un estudio-vendedor específico (`inventory.estudio_id`),
  * para la vista filtrada que se abre desde el perfil de ese estudio en
- * Tattoo Artist Colombia. Mismo criterio que fetchCatalogMarca: filtro
- * sobre el catálogo ya cacheado, sin pegarle a un endpoint aparte.
- *
- * Filtro simple por el `estudio_id` del producto agrupado — desde
- * 2026-08-09 el panel agrupa por product+estudio_id (no solo product), así
- * que cada grupo pertenece a un solo dueño por construcción; ya no hace
- * falta filtrar variante por variante (eso fue un parche intermedio para
- * cuando distintos proveedores SÍ podían mezclarse dentro de un mismo
- * grupo — decisión de Jose: cada proveedor tiene su propia card).
+ * Tattoo Artist Colombia. Antes reusaba fetchCatalogFull + filter (traía el
+ * módulo entero); ahora pide directo por estudio_id al servidor.
  */
-export async function fetchCatalogEstudio(module, estudioId) {
-  const { allProducts } = await fetchCatalogFull(module)
-  return { products: allProducts.filter((p) => p.estudio_id === Number(estudioId)) }
+export async function fetchCatalogEstudio(module, estudioId, { limit = 100 } = {}) {
+  const { items, nextCursor, hasMore } = await fetchCatalogPage(module, { estudioId, limit })
+  return { products: items, nextCursor, hasMore }
+}
+
+/**
+ * Hook genérico de "cargar más" sobre fetchCatalogPage (2026-09-14) — para
+ * vistas SIN filtros propios que convertir (páginas de marca/estudio de
+ * Supply, y fase 2: categorías de Store/Suplementos/Gym): reciben la
+ * primera página ya resuelta por el loader y solo necesitan poder pedir
+ * más. `filters` fijo por instancia (marca/estudioId/categoria/tipo) — si
+ * cambia (ej. el usuario navega a otra marca sin remontar el componente),
+ * reinicia desde la página inicial en vez de seguir acumulando de la marca
+ * anterior.
+ */
+export function useLoadMore(module, filters, initial) {
+  const filtersKey = JSON.stringify(filters)
+  const [items, setItems] = useState(initial.items || [])
+  const [cursor, setCursor] = useState(initial.nextCursor || null)
+  const [hasMore, setHasMore] = useState(!!initial.hasMore)
+  const [loading, setLoading] = useState(false)
+  const [key, setKey] = useState(filtersKey)
+
+  if (filtersKey !== key) {
+    setKey(filtersKey)
+    setItems(initial.items || [])
+    setCursor(initial.nextCursor || null)
+    setHasMore(!!initial.hasMore)
+  }
+
+  async function loadMore() {
+    if (!hasMore || loading) return
+    setLoading(true)
+    try {
+      const page = await fetchCatalogPage(module, { ...filters, cursor })
+      setItems(prev => [...prev, ...page.items])
+      setCursor(page.nextCursor)
+      setHasMore(page.hasMore)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return { items, hasMore, loading, loadMore }
 }
 
 /**

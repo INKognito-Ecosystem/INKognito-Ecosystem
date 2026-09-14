@@ -24,6 +24,7 @@ export async function loader({ params, request }) {
   const url = new URL(request.url)
   const token = url.searchParams.get('token')
   let estudio = null, products = [], esDueno = false, cloud_name = null, upload_preset = null
+
   try {
     const estudioRes = params.slug
       ? await fetch(`${PANEL_URL}/api/estudios-por-slug/${encodeURIComponent(params.slug)}`)

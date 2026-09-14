@@ -14,8 +14,11 @@ const GRID_PATTERN = {
 
 const WA = '573207911013'
 
+// limit:100 (2026-09-14, paginación real) — recursos gratuitos curados a
+// mano, no inventario masivo; mismo criterio que los afiliados de Supply:
+// acotado y generoso, sin UI de "cargar más".
 export async function loader() {
-  return fetchCatalogCategoriaItems('gym', 'Recursos')
+  return fetchCatalogCategoriaItems('gym', 'Recursos', { limit: 100 })
 }
 
 export function meta() {

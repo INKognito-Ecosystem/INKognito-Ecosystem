@@ -38,7 +38,7 @@ export function meta() {
 }
 
 export default function CartridgesPage() {
-  const { products, afiliados, faqs } = useLoaderData()
+  const { products, afiliados, nextCursor, hasMore, providers, faqs } = useLoaderData()
   return (
     <SupplyCategoryPage
       title={TITLE}
@@ -49,6 +49,9 @@ export default function CartridgesPage() {
       guide={guide}
       faqs={faqs}
       products={products}
+      nextCursor={nextCursor}
+      hasMore={hasMore}
+      providers={providers}
       afiliados={afiliados}
       extraCTA={
         <Link

@@ -18,13 +18,12 @@ export const CAT_ICONS = {
   'Accesorios':  Dumbbell,
 }
 
-export default function CategoriesSuple({ categorias = {} }) {
-  // Mapa de categoría (nombre exacto de inventory.categoria) → cantidad de
-  // productos disponibles — mismo cálculo que CategoriesSupply.jsx.
-  const stockPorCat = {}
-  Object.entries(categorias).forEach(([cat, items]) => {
-    stockPorCat[cat] = items.length
-  })
+// `counts` (2026-09-14, paginación real, fase 2) — antes recibía
+// `categorias` (el catálogo completo del módulo) solo para hacer `.length`;
+// ahora recibe directo `{categoria: cantidad}` desde
+// fetchCatalogCounts('suplementos'), mismo cambio que CategoriesSupply.jsx.
+export default function CategoriesSuple({ counts = {} }) {
+  const stockPorCat = counts
 
   return (
     <section id="categorias" className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950">

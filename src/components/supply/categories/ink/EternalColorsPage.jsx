@@ -3,7 +3,7 @@ import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
 import SupplyFAQ from '../../SupplyFAQ'
-import { fetchCatalogMarca, fetchSupplyFaq } from '../../../../hooks/useCatalog'
+import { fetchCatalogMarca, fetchSupplyFaq, useLoadMore } from '../../../../hooks/useCatalog'
 
 export async function loader() {
   const [catalogo, faqItems] = await Promise.all([
@@ -29,7 +29,8 @@ export function meta() {
 // inventados ("$XX.XXX") con un botón que sí agregaba al carrito real. Ahora
 // usa BrandCatalogSection con productos reales filtrados por `marca='eternal'`.
 export default function EternalColorsPage() {
-  const { products, faqItems } = useLoaderData()
+  const { products: productosIniciales, nextCursor, hasMore, faqItems } = useLoaderData()
+  const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { marca: 'eternal' }, { items: productosIniciales, nextCursor, hasMore })
   return (
     <div className="min-h-screen bg-black text-white">
       <NavbarCategory pageName="Eternal Ink" />
@@ -58,7 +59,7 @@ export default function EternalColorsPage() {
           </div>
         </div>
 
-        <BrandCatalogSection brandName="Eternal Ink" products={products} />
+        <BrandCatalogSection brandName="Eternal Ink" products={products} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} />
 
         <SupplyFAQ items={faqItems} nombre="Eternal Ink" />
 

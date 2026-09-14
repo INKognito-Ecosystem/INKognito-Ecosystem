@@ -7,7 +7,7 @@ import SupplyFAQ from '../SupplyFAQ'
 import { getAdjacentBrands } from '../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../hooks/useScrolled'
-import { fetchCatalogEstudio, fetchSupplyFaq } from '../../../hooks/useCatalog'
+import { fetchCatalogEstudio, fetchSupplyFaq, useLoadMore } from '../../../hooks/useCatalog'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 // fase 6.1 (2026-08-07) — id real en `estudios` vinculado a esta marca,
@@ -65,7 +65,8 @@ function InsigniaDistribuidorOficial() {
 }
 
 export default function HeavenProPage() {
-  const { products, distribuidorOficial, mostrarFlechas, faqItems } = useLoaderData()
+  const { products: productosIniciales, nextCursor, hasMore, distribuidorOficial, mostrarFlechas, faqItems } = useLoaderData()
+  const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { estudioId: ESTUDIO_ID }, { items: productosIniciales, nextCursor, hasMore })
   const logoUrl = useSupplyVisual('supply_brand_heaven_pro')
   const { prev, next } = getAdjacentBrands(5)
   const scrolled = useScrolled()
@@ -158,7 +159,7 @@ export default function HeavenProPage() {
         {/* supplierBadge={null}: Heaven Pro no viene de Tommy Tattoo Supply
             (excepción confirmada por Jose, 2026-08-01, junto con Tattoo
             Vision e Industrias Warlock). */}
-        <BrandCatalogSection brandName="Heaven Pro" products={products} supplierBadge={null} />
+        <BrandCatalogSection brandName="Heaven Pro" products={products} supplierBadge={null} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} />
 
         <SupplyFAQ items={faqItems} nombre="Heaven Pro" />
 

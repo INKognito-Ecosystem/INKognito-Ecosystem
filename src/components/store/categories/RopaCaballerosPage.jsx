@@ -6,7 +6,7 @@ import LlegamosDondeEstas from '../LlegamosDondeEstas'
 import AccordionCardStore from '../AccordionCardStore'
 import { FaWhatsapp } from 'react-icons/fa'
 import StoreProductCard from '../StoreProductCard'
-import { fetchCatalogCategoriaItems, toProdCard } from '../../../hooks/useCatalog'
+import { fetchCatalogCategoriaItems, toProdCard, useLoadMore } from '../../../hooks/useCatalog'
 import { getAdjacentCategories } from '../../../data/storeCategoriesOrder'
 import { useScrolled } from '../../../hooks/useScrolled'
 
@@ -52,7 +52,9 @@ const faqs = [
 ]
 
 export default function RopaCaballerosPage() {
-  const { items: catalogItems } = useLoaderData()
+  const { items: itemsIniciales, nextCursor, hasMore } = useLoaderData()
+  const { items: catalogItems, hasMore: hayMasProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } =
+    useLoadMore('store', { categoria: 'Ropa Caballeros' }, { items: itemsIniciales, nextCursor, hasMore })
   const { prev, next } = getAdjacentCategories('ropa-caballeros')
   const scrolled = useScrolled()
 
@@ -129,6 +131,7 @@ export default function RopaCaballerosPage() {
               </a>
             </div>
           ) : (
+            <>
             <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
               {catalogItems.map(item => {
                 const prod = toProdCard(item)
@@ -144,6 +147,18 @@ export default function RopaCaballerosPage() {
                 )
               })}
             </div>
+            {hayMasProductos && (
+              <div className="flex justify-center mt-6">
+                <button
+                  onClick={cargarMasProductos}
+                  disabled={cargandoMasProductos}
+                  className="px-6 py-2.5 border border-[#C9A84C]/40 text-[#C9A84C] text-xs font-bold uppercase tracking-[0.15em] rounded hover:border-[#C9A84C] hover:bg-[#C9A84C]/10 transition-all duration-300 disabled:opacity-50"
+                >
+                  {cargandoMasProductos ? 'Cargando…' : 'Cargar más'}
+                </button>
+              </div>
+            )}
+            </>
           )}
         </div>
       </div>

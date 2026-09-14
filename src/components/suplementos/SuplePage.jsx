@@ -3,7 +3,7 @@ import NavbarSuple from './NavbarSuple'
 import FooterSuple from './FooterSuple'
 import CategoriesSuple, { CAT_ICONS } from './CategoriesSuple'
 import { SUPLE_CATEGORIES_ORDER } from '../../data/supleCategoriesOrder'
-import { fetchCatalogFull } from '../../hooks/useCatalog'
+import { fetchCatalogCounts, fetchCatalogPage } from '../../hooks/useCatalog'
 import { ExternalLink, Dumbbell } from 'lucide-react'
 
 const WA = '573207911013'
@@ -15,8 +15,16 @@ const DOT_PATTERN = {
   backgroundSize: '18px 18px',
 }
 
+// fetchCatalogCounts (2026-09-14, paginación real, fase 2) — antes traía el
+// módulo completo (fetchCatalogFull) solo para que CategoriesSuple hiciera
+// `.length` por categoría y para filtrar afiliados en memoria; ahora pide
+// el conteo agregado y los afiliados por separado, cada uno acotado.
 export async function loader() {
-  return fetchCatalogFull('suplementos')
+  const [counts, afiliadosPage] = await Promise.all([
+    fetchCatalogCounts('suplementos'),
+    fetchCatalogPage('suplementos', { tipo: 'afiliado', limit: 100 }),
+  ])
+  return { counts, afiliados: afiliadosPage.items }
 }
 
 export function meta() {
@@ -32,8 +40,7 @@ export function meta() {
 }
 
 export default function SuplePage() {
-  const { allProducts: apiProds, categorias } = useLoaderData()
-  const apiAfiliados = apiProds.filter(item => item.tipo === 'afiliado')
+  const { counts, afiliados: apiAfiliados } = useLoaderData()
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -168,7 +175,7 @@ export default function SuplePage() {
         </div>
       </section>
 
-      <CategoriesSuple categorias={categorias} />
+      <CategoriesSuple counts={counts} />
 
       {/* ── SUPLEMENTOS AFILIADOS — sección fija, siempre visible ── */}
       <section className="border-t-2 border-[#9E9E9E]/20 bg-[#0c0c0c] px-4 md:px-6 py-10 md:py-14">

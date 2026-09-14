@@ -18,7 +18,7 @@ export function meta() {
 import { getAdjacentBrands } from '../../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../../hooks/useScrolled'
-import { fetchCatalogMarca, fetchSupplyFaq } from '../../../../hooks/useCatalog'
+import { fetchCatalogMarca, fetchSupplyFaq, useLoadMore } from '../../../../hooks/useCatalog'
 
 export async function loader() {
   const [catalogo, faqItems] = await Promise.all([
@@ -34,7 +34,8 @@ const DOT_PATTERN = {
 }
 
 export default function DynamicColorsPage() {
-  const { products, faqItems } = useLoaderData()
+  const { products: productosIniciales, nextCursor, hasMore, faqItems } = useLoaderData()
+  const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { marca: 'dynamic' }, { items: productosIniciales, nextCursor, hasMore })
   const logoUrl = useSupplyVisual('supply_brand_dynamic')
   const { prev, next } = getAdjacentBrands(4)
   const scrolled = useScrolled()
@@ -123,7 +124,7 @@ export default function DynamicColorsPage() {
           </div>
         </div>
 
-        <BrandCatalogSection brandName="Dynamic" products={products} />
+        <BrandCatalogSection brandName="Dynamic" products={products} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} />
 
         <SupplyFAQ items={faqItems} nombre="Dynamic" />
 

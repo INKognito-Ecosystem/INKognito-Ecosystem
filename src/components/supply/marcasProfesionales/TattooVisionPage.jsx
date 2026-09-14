@@ -7,7 +7,7 @@ import SupplyFAQ from '../SupplyFAQ'
 import { getAdjacentBrands } from '../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../hooks/useScrolled'
-import { fetchCatalogMarca, fetchSupplyFaq } from '../../../hooks/useCatalog'
+import { fetchCatalogMarca, fetchSupplyFaq, useLoadMore } from '../../../hooks/useCatalog'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 // fase 6.1 (2026-08-07) — id real en `estudios` vinculado a esta marca,
@@ -56,7 +56,8 @@ function InsigniaDistribuidorOficial() {
 }
 
 export default function TattooVisionPage() {
-  const { products, distribuidorOficial, mostrarFlechas, faqItems } = useLoaderData()
+  const { products: productosIniciales, nextCursor, hasMore, distribuidorOficial, mostrarFlechas, faqItems } = useLoaderData()
+  const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { marca: 'tattoo-vision' }, { items: productosIniciales, nextCursor, hasMore })
   const logoUrl = useSupplyVisual('supply_brand_tattoo_vision')
   const { prev, next } = getAdjacentBrands(0)
   const scrolled = useScrolled()
@@ -149,7 +150,7 @@ export default function TattooVisionPage() {
         {/* supplierBadge={null}: Tattoo Vision no viene de Tommy Tattoo
             Supply (excepción confirmada por Jose, 2026-08-01, junto con
             Heaven Pro e Industrias Warlock). */}
-        <BrandCatalogSection brandName="Tattoo Vision" products={products} supplierBadge={null} />
+        <BrandCatalogSection brandName="Tattoo Vision" products={products} supplierBadge={null} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} />
 
         <SupplyFAQ items={faqItems} nombre="Tattoo Vision" />
 

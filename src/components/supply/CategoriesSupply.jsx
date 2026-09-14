@@ -45,12 +45,15 @@ const categories = [
 // useEffect, así que cada vez que la página se remontaba (cualquier
 // navegación de vuelta) arrancaba de nuevo en `{}` antes de que llegara
 // la respuesta. Ahora llega ya resuelto desde el loader, sin parpadeo.
-export default function CategoriesSupply({ categorias = {}, imgs = {} }) {
-  // Mapa de categoría → cantidad de productos disponibles
-  const stockPorCat = {}
-  Object.entries(categorias).forEach(([cat, items]) => {
-    stockPorCat[cat] = items.length
-  })
+//
+// `counts` (2026-09-14, paginación real) — antes este componente recibía
+// `categorias` (el catálogo completo del módulo, agrupado) solo para hacer
+// `.length` por categoría; el loader de SupplyPage.jsx ya no trae el
+// catálogo completo, así que ahora recibe directamente `{categoria:
+// cantidad}` desde fetchCatalogCounts('supply') — mismo número, sin
+// transferir ni un producto de más.
+export default function CategoriesSupply({ counts = {}, imgs = {} }) {
+  const stockPorCat = counts
 
   return (
     <motion.section {...REVEAL} id="categorias" className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-gray-950">

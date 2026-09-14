@@ -7,6 +7,7 @@ import { useSupleCart } from '../../contexts/SupleCartContext'
 import { FaWhatsapp } from 'react-icons/fa'
 import { ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react'
 import { getAdjacentSupleCategories } from '../../data/supleCategoriesOrder'
+import { useLoadMore } from '../../hooks/useCatalog'
 import logoNutriHouse from '../../assets/milogo/nutrihouse.webp'
 
 const WA = '573207911013'
@@ -23,10 +24,15 @@ const DOT_PATTERN = {
   backgroundSize: '18px 18px',
 }
 
-export default function SupleCategoryPage({ title, categoria, slug, intro, products = [] }) {
+// nextCursor/hasMore (2026-09-14, paginación real, fase 2) — `products` ya
+// no es la categoría completa, es solo la primera página; useLoadMore trae
+// el resto bajo pedido en vez de un techo silencioso en el primer límite.
+export default function SupleCategoryPage({ title, categoria, slug, intro, products: productosIniciales = [], nextCursor = null, hasMore = false }) {
   const { prev, next } = getAdjacentSupleCategories(slug)
   const scrolled = useScrolled()
   const { addItem, items: cartItems } = useSupleCart()
+  const { items: products, hasMore: hayMasProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } =
+    useLoadMore('suplementos', { categoria }, { items: productosIniciales, nextCursor, hasMore })
 
   const handleAddToCart = (p, sel = {}) => {
     const precio = sel.price
@@ -149,11 +155,24 @@ export default function SupleCategoryPage({ title, categoria, slug, intro, produ
               </a>
             </div>
           ) : (
-            <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-6 md:mx-0 md:px-6 pb-2 md:pb-0 scrollbar-hide">
-              {productosCard.map((p) => (
-                <SuplCard key={p.id} p={p} onAddToCart={handleAddToCart} enCarrito={cartItems.some(i => i.key === `suplementos-${p.id}`)} />
-              ))}
-            </div>
+            <>
+              <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-6 md:mx-0 md:px-6 pb-2 md:pb-0 scrollbar-hide">
+                {productosCard.map((p) => (
+                  <SuplCard key={p.id} p={p} onAddToCart={handleAddToCart} enCarrito={cartItems.some(i => i.key === `suplementos-${p.id}`)} />
+                ))}
+              </div>
+              {hayMasProductos && (
+                <div className="flex justify-center mt-6 px-6">
+                  <button
+                    onClick={cargarMasProductos}
+                    disabled={cargandoMasProductos}
+                    className="px-6 py-2.5 border border-[#9E9E9E]/40 text-[#9E9E9E] text-xs font-bold uppercase tracking-[0.15em] rounded hover:border-[#9E9E9E] hover:bg-[#9E9E9E]/10 transition-all duration-300 disabled:opacity-50"
+                  >
+                    {cargandoMasProductos ? 'Cargando…' : 'Cargar más'}
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
 

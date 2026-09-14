@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
-import { fetchCatalogFull } from '../../../hooks/useCatalog'
+import { fetchCatalogPage } from '../../../hooks/useCatalog'
 import { useGymCart } from '../../../contexts/GymCartContext'
 import { Wrench, ExternalLink, ArrowLeft, ArrowRight } from 'lucide-react'
 import { getAdjacentCategories } from '../../../data/gymCategoriesOrder'
@@ -33,8 +33,16 @@ const LOCAL_IMAGES = {
   'dominadas y fondos': imgFondosDominadas,
 }
 
+// Paginación real (2026-09-14) — antes traía TODO gym (fetchCatalogFull)
+// solo para filtrar en JS por tipo/categoria; máquinas soldadas a pedido
+// son contenido curado a mano (no inventario masivo), así que limit:100
+// alcanza sin necesitar "cargar más" — mismo criterio que Cursos/Recursos.
 export async function loader() {
-  return fetchCatalogFull('gym')
+  const [maquinasPage, afiliadosPage] = await Promise.all([
+    fetchCatalogPage('gym', { tipo: 'fisico', limit: 100 }),
+    fetchCatalogPage('gym', { categoria: 'Materiales', tipo: 'afiliado', limit: 100 }),
+  ])
+  return { maquinas: maquinasPage.items, afiliadosMateriales: afiliadosPage.items }
 }
 
 export function meta() {
@@ -56,9 +64,7 @@ export default function MaquinasPedidoPage() {
   // cards se renderizan inline (no en un sub-componente propio) alcanza con
   // guardar el id en vez de un estado local por card (2026-08-02).
   const [showDescId, setShowDescId] = useState(null)
-  const { allProducts: gymAllProds } = useLoaderData()
-  const apiMaquinas   = gymAllProds.filter(p => p.tipo !== 'afiliado')
-  const gymAfiliados  = gymAllProds.filter(p => p.tipo === 'afiliado' && p.categoria === 'Materiales')
+  const { maquinas: apiMaquinas, afiliadosMateriales: gymAfiliados } = useLoaderData()
   const { addItem, items: cartItems } = useGymCart()
   const { prev, next } = getAdjacentCategories('maquinas-pedido')
   const scrolled = useScrolled()

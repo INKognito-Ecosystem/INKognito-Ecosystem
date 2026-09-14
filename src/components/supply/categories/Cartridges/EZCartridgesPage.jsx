@@ -3,7 +3,7 @@ import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
 import SupplyFAQ from '../../SupplyFAQ'
-import { fetchCatalogMarca, fetchSupplyFaq } from '../../../../hooks/useCatalog'
+import { fetchCatalogMarca, fetchSupplyFaq, useLoadMore } from '../../../../hooks/useCatalog'
 
 export async function loader() {
   const [catalogo, faqItems] = await Promise.all([
@@ -31,7 +31,8 @@ export function meta() {
 // que el resto de páginas de marca, con productos reales filtrados por
 // `marca='ez-tattoo'` desde el inventario del panel.
 export default function EZCartridgesPage() {
-  const { products, faqItems } = useLoaderData()
+  const { products: productosIniciales, nextCursor, hasMore, faqItems } = useLoaderData()
+  const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { marca: 'ez-tattoo' }, { items: productosIniciales, nextCursor, hasMore })
   return (
     <div className="min-h-screen bg-black text-white">
       <NavbarCategory pageName="EZ Tattoo" />
@@ -59,7 +60,7 @@ export default function EZCartridgesPage() {
 
         </div>
 
-        <BrandCatalogSection brandName="EZ Tattoo" products={products} />
+        <BrandCatalogSection brandName="EZ Tattoo" products={products} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} />
 
         <SupplyFAQ items={faqItems} nombre="EZ Tattoo" />
 

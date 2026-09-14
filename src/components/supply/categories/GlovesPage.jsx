@@ -35,7 +35,7 @@ export function meta() {
 }
 
 export default function GlovesPage() {
-  const { products, afiliados, faqs } = useLoaderData()
+  const { products, afiliados, nextCursor, hasMore, providers, faqs } = useLoaderData()
   return (
     <SupplyCategoryPage
       title={TITLE}
@@ -46,6 +46,9 @@ export default function GlovesPage() {
       guide={guide}
       faqs={faqs}
       products={products}
+      nextCursor={nextCursor}
+      hasMore={hasMore}
+      providers={providers}
       afiliados={afiliados}
     />
   )

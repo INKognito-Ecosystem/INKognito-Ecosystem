@@ -6,6 +6,7 @@ import FooterSupply from './FooterSupply'
 import AccordionCard from './AccordionCard'
 import SupplyProductCard from './SupplyProductCard'
 import { useScrolled } from '../../hooks/useScrolled'
+import { fetchCatalogPage } from '../../hooks/useCatalog'
 import { FaWhatsapp } from 'react-icons/fa'
 import { ExternalLink, Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package, ArrowLeft, ArrowRight, Search, SlidersHorizontal, MapPin } from 'lucide-react'
 import { getAdjacentCategories } from '../../data/supplyCategoriesOrder'
@@ -140,16 +141,24 @@ function AfiliadoCard({ item }) {
 }
 
 
-// products/afiliados llegan resueltos por el loader de cada ruta (los ~10
-// wrapper de src/components/supply/categories/*) — ya no se llama useCatalog
-// acá adentro, así el servidor manda el catálogo real en el primer HTML.
-// meta() (título/description/canonical) también quedó en cada wrapper, no
-// acá — evita mezclar <Seo>/Helmet con meta() en la misma ruta (rompe la
-// hidratación, ver nota en HomePage.jsx).
-// Cuántos productos se muestran de entrada — antes se renderizaban TODOS de
-// una (sin límite), lo que iba a pesar cada vez más a medida que estudios y
-// proveedores subieran su propio catálogo a la misma categoría. "Cargar más"
-// evita eso sin tocar la card ni el fetch: solo se revela de a bloques.
+// products/afiliados/providers llegan resueltos por el loader de cada ruta
+// (los ~10 wrapper de src/components/supply/categories/*) — ya no se llama
+// useCatalog acá adentro, así el servidor manda la primera página real en
+// el primer HTML. meta() (título/description/canonical) también quedó en
+// cada wrapper, no acá — evita mezclar <Seo>/Helmet con meta() en la misma
+// ruta (rompe la hidratación, ver nota en HomePage.jsx).
+//
+// Paginación real por cursor (2026-09-14) — antes `products` traía la
+// categoría COMPLETA y busqueda/orden/provFiltro filtraban en memoria sobre
+// ese array ya cargado; "Cargar más" solo revelaba de a bloques de un array
+// que ya estaba entero en el cliente. Con proveedores/estudios subiendo su
+// propio catálogo a la misma categoría, eso no tiene techo — ahora
+// `products`/`nextCursor`/`hasMore` son solo la PRIMERA página (PAGE_SIZE),
+// y cada cambio de búsqueda/orden/proveedor dispara una consulta nueva al
+// servidor (fetchCatalogPage) en vez de refiltrar un array local. El
+// listado de proveedores (`providers`) también viene del servidor —ya no
+// se puede derivar de "todos los productos cargados", porque ya no todos
+// están cargados.
 const PAGE_SIZE = 12
 
 const ORDEN_OPTIONS = [
@@ -157,11 +166,24 @@ const ORDEN_OPTIONS = [
   { value: 'precio_asc', label: 'Menor precio' },
 ]
 
-export default function SupplyCategoryPage({ title, categoria, slug, intro, guide, faqs, products = [], afiliados = [], extraCTA = null }) {
+export default function SupplyCategoryPage({ title, categoria, slug, intro, guide, faqs, products = [], nextCursor = null, hasMore = false, providers = [], afiliados = [], extraCTA = null }) {
   const CatIcon = CAT_ICONS[categoria] || null
   const { prev, next } = getAdjacentCategories(slug)
   const scrolled = useScrolled()
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+
+  // Si la categoría tiene stock alguna vez, en base a la primera página
+  // servida por el loader — a diferencia de `items` (que sí cambia con
+  // cada búsqueda/filtro), esto decide entre el estado vacío "todavía no
+  // vendemos esto" (con CTA de WhatsApp) y "sin resultados para tu
+  // búsqueda" (con botón de quitar filtros) más abajo.
+  const hayStockInicial = products.length > 0
+
+  const [items, setItems] = useState(products)
+  const [cursor, setCursor] = useState(nextCursor)
+  const [masDisponible, setMasDisponible] = useState(hasMore)
+  const [cargandoMas, setCargandoMas] = useState(false)
+  const [cargandoFiltro, setCargandoFiltro] = useState(false)
+
   const [provFiltro, setProvFiltro] = useState('todos')
   const [orden, setOrden] = useState('recientes')
   const [busqueda, setBusqueda] = useState('')
@@ -185,22 +207,11 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
 
   // Sin tildes/mayúsculas para que "cartucho" encuentre "Cartúcho" — mismo
   // criterio de búsqueda insensible a acentos usado en otros buscadores del
-  // ecosistema (ej. directorio de artistas).
+  // ecosistema (ej. directorio de artistas). Sigue viva acá SOLO para el
+  // filtro de proveedor (lista corta, ya cargada completa) — la búsqueda de
+  // producto ahora la resuelve el servidor (ILIKE, no acento-insensible;
+  // ver nota en server.js).
   const normaliza = (s) => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
-
-  // Un producto = un estudio (el panel agrupa por product+estudio_id desde
-  // 2026-08-09, ver fetchCatalogEstudio en useCatalog.js) — filtrar por
-  // item.estudio_id es seguro, nunca mezcla proveedores dentro de un mismo
-  // item.
-  const proveedores = useMemo(() => {
-    const map = new Map()
-    for (const p of products) {
-      if (p.estudio_id && p.estudio_nombre_supply && !map.has(p.estudio_id)) {
-        map.set(p.estudio_id, { nombre: p.estudio_nombre_supply, municipio: p.estudio_municipio || null, slug: p.estudio_slug || null })
-      }
-    }
-    return Array.from(map, ([id, v]) => ({ id, ...v }))
-  }, [products])
 
   // Ordenados por ciudad (Jose, 2026-09-12: "relacionarlo con el lugar de
   // donde es el supply") — la ciudad va pegada al nombre en cada fila (no
@@ -208,10 +219,10 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
   // notaba con un solo proveedor). El orden por ciudad igual agrupa
   // visualmente a los de la misma ciudad uno seguido del otro.
   const proveedoresOrdenados = useMemo(() => {
-    return [...proveedores].sort((a, b) =>
-      (a.municipio || '').localeCompare(b.municipio || '') || a.nombre.localeCompare(b.nombre)
-    )
-  }, [proveedores])
+    return providers
+      .map(p => ({ id: p.estudio_id, nombre: p.nombre, municipio: p.municipio || null, slug: p.slug || null }))
+      .sort((a, b) => (a.municipio || '').localeCompare(b.municipio || '') || a.nombre.localeCompare(b.nombre))
+  }, [providers])
 
   const proveedoresFiltrados = useMemo(() => {
     if (!provBusqueda.trim()) return proveedoresOrdenados
@@ -219,30 +230,40 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
     return proveedoresOrdenados.filter(p => normaliza(p.nombre).includes(q) || normaliza(p.municipio).includes(q))
   }, [proveedoresOrdenados, provBusqueda])
 
-  // Precio de referencia: el más bajo entre variantes (patrón "desde $X" ya
-  // usado en la card). Recencia: el id más alto entre variantes — son filas
-  // de inventory con SERIAL, así que un id mayor es una fila más nueva; no
-  // hay un created_at expuesto en el catálogo público, así que este es el
-  // proxy más simple sin tocar el backend.
-  const precioRef = (item) => Math.min(...(item.variantes ?? []).map(v => Number(v.price) || Infinity))
-  const idRef = (item) => Math.max(0, ...(item.variantes ?? []).map(v => Number(v.id) || 0))
+  // Cada cambio de búsqueda/orden/proveedor pide una página NUEVA al
+  // servidor (cursor reiniciado) — se salta en el primer render porque esa
+  // primera página ya llegó resuelta por el loader (SSR), no tiene sentido
+  // repetirla apenas monta. Búsqueda lleva debounce (300ms); orden/proveedor
+  // son selección directa, sin debounce.
+  const primerRender = useRef(true)
+  useEffect(() => {
+    if (primerRender.current) { primerRender.current = false; return }
+    let activo = true
+    setCargandoFiltro(true)
+    const estudioId = provFiltro === 'todos' ? undefined : provFiltro
+    const demora = busqueda ? 300 : 0
+    const timer = setTimeout(async () => {
+      const page = await fetchCatalogPage('supply', { categoria, tipo: 'fisico', limit: PAGE_SIZE, orden, q: busqueda.trim() || undefined, estudioId })
+      if (!activo) return
+      setItems(page.items)
+      setCursor(page.nextCursor)
+      setMasDisponible(page.hasMore)
+      setCargandoFiltro(false)
+    }, demora)
+    return () => { activo = false; clearTimeout(timer) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orden, busqueda, provFiltro])
 
-  const visibleProducts = useMemo(() => {
-    let list = provFiltro === 'todos' ? products : products.filter(p => String(p.estudio_id) === provFiltro)
-    // La búsqueda solo corre sobre `products` de ESTA categoría (el prop que
-    // ya llega filtrado por categoría desde el loader) — nunca puede traer
-    // resultados de otra categoría aunque coincida el nombre.
-    if (busqueda.trim()) {
-      const q = normaliza(busqueda)
-      list = list.filter(p => normaliza(p.name).includes(q))
-    }
-    list = [...list]
-    if (orden === 'precio_asc') list.sort((a, b) => precioRef(a) - precioRef(b))
-    else list.sort((a, b) => idRef(b) - idRef(a))
-    return list
-  }, [products, provFiltro, orden, busqueda])
-
-  const cambiarFiltro = (setter) => (e) => { setter(e.target.value); setVisibleCount(PAGE_SIZE) }
+  async function cargarMas() {
+    if (!masDisponible || cargandoMas) return
+    setCargandoMas(true)
+    const estudioId = provFiltro === 'todos' ? undefined : provFiltro
+    const page = await fetchCatalogPage('supply', { categoria, tipo: 'fisico', limit: PAGE_SIZE, orden, q: busqueda.trim() || undefined, estudioId, cursor })
+    setItems(prev => [...prev, ...page.items])
+    setCursor(page.nextCursor)
+    setMasDisponible(page.hasMore)
+    setCargandoMas(false)
+  }
 
   return (
     <>
@@ -302,7 +323,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
           {intro && (
             <p className="relative z-10 text-zinc-400 text-base md:text-lg leading-relaxed max-w-3xl text-justify [hyphens:auto]">{intro}</p>
           )}
-          {products.length > 0 && (categoria in CATEGORY_BADGE ? CATEGORY_BADGE[categoria] : DEFAULT_BADGE) && (
+          {hayStockInicial && (categoria in CATEGORY_BADGE ? CATEGORY_BADGE[categoria] : DEFAULT_BADGE) && (
             <div className="relative z-10 flex items-center gap-2 text-xs text-zinc-400 bg-zinc-900/60 border border-zinc-800 rounded-lg px-3 py-2 w-fit mt-4">
               <ShieldCheck size={14} className="shrink-0 text-blue-400" />
               <span>{categoria in CATEGORY_BADGE ? CATEGORY_BADGE[categoria] : DEFAULT_BADGE}</span>
@@ -315,19 +336,19 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
 
         {/* PRODUCTOS FÍSICOS — grid en los tres anchos (2/3/4 columnas) */}
         <motion.div {...REVEAL} className="pb-10 max-w-7xl mx-auto">
-          {products.length > 0 && (
+          {hayStockInicial && (
             <div className="flex flex-nowrap items-center gap-2 px-6 mb-5">
               <div className="relative flex-1 min-w-0">
                 <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
                 <input
                   type="text"
                   value={busqueda}
-                  onChange={cambiarFiltro(setBusqueda)}
+                  onChange={(e) => setBusqueda(e.target.value)}
                   placeholder="Buscar producto"
                   className="w-full min-w-0 bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-lg pl-8 pr-2 py-2 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500"
                 />
               </div>
-              {proveedores.length > 0 && (
+              {proveedoresOrdenados.length > 0 && (
                 <div className="relative flex-shrink-0" ref={provRef}>
                   <button
                     type="button"
@@ -356,7 +377,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                       </div>
                       <button
                         type="button"
-                        onClick={() => { setProvFiltro('todos'); setVisibleCount(PAGE_SIZE); setProvBusqueda(''); setProvAbierto(false) }}
+                        onClick={() => { setProvFiltro('todos'); setProvBusqueda(''); setProvAbierto(false) }}
                         className={`w-full text-left px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors ${
                           provFiltro === 'todos' ? 'text-blue-400 bg-blue-500/10' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
                         }`}
@@ -370,7 +391,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                           <div key={p.id} className="flex items-center">
                             <button
                               type="button"
-                              onClick={() => { setProvFiltro(String(p.id)); setVisibleCount(PAGE_SIZE); setProvBusqueda(''); setProvAbierto(false) }}
+                              onClick={() => { setProvFiltro(String(p.id)); setProvBusqueda(''); setProvAbierto(false) }}
                               className={`flex-1 min-w-0 text-left px-3 py-2 text-xs truncate transition-colors ${
                                 provFiltro === String(p.id) ? 'text-blue-400 bg-blue-500/10 font-bold' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
                               }`}
@@ -411,7 +432,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                       <button
                         key={o.value}
                         type="button"
-                        onClick={() => { setOrden(o.value); setVisibleCount(PAGE_SIZE); setOrdenAbierto(false) }}
+                        onClick={() => { setOrden(o.value); setOrdenAbierto(false) }}
                         className={`w-full text-left px-3 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors ${
                           orden === o.value ? 'text-blue-400 bg-blue-500/10' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
                         }`}
@@ -424,7 +445,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
               </div>
             </div>
           )}
-          {products.length === 0 ? (
+          {!hayStockInicial ? (
             <div className="mx-6 border border-blue-500/20 bg-zinc-950 rounded-2xl p-10 text-center">
               <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2">Sin stock por el momento</p>
               <p className="text-white text-lg font-black uppercase mb-2">Próximamente disponible</p>
@@ -440,24 +461,36 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                 Avisarme cuando haya stock →
               </a>
             </div>
+          ) : items.length === 0 && !cargandoFiltro ? (
+            <div className="mx-6 border border-zinc-800 bg-zinc-950 rounded-2xl p-8 text-center">
+              <p className="text-zinc-400 text-sm mb-4">Ningún producto coincide con tu búsqueda o filtro.</p>
+              <button
+                type="button"
+                onClick={() => { setBusqueda(''); setProvFiltro('todos') }}
+                className="text-blue-400 text-xs font-bold uppercase tracking-widest hover:text-blue-300 transition-colors"
+              >
+                Quitar filtros
+              </button>
+            </div>
           ) : (
-            <>
+            <div className={`transition-opacity duration-200 ${cargandoFiltro ? 'opacity-50' : 'opacity-100'}`}>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-6">
-                {visibleProducts.slice(0, visibleCount).map(item => (
+                {items.map(item => (
                   <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={categoria} />
                 ))}
               </div>
-              {visibleCount < visibleProducts.length && (
+              {masDisponible && (
                 <div className="flex justify-center mt-6 px-6">
                   <button
-                    onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
-                    className="px-6 py-2.5 border border-blue-500/40 text-blue-400 text-xs font-bold uppercase tracking-[0.15em] rounded hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300"
+                    onClick={cargarMas}
+                    disabled={cargandoMas}
+                    className="px-6 py-2.5 border border-blue-500/40 text-blue-400 text-xs font-bold uppercase tracking-[0.15em] rounded hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300 disabled:opacity-50"
                   >
-                    Cargar más ({visibleProducts.length - visibleCount} más)
+                    {cargandoMas ? 'Cargando…' : 'Cargar más'}
                   </button>
                 </div>
               )}
-            </>
+            </div>
           )}
         </motion.div>
 

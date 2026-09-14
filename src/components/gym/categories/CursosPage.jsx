@@ -8,8 +8,11 @@ import { useScrolled } from '../../../hooks/useScrolled'
 
 const WA = '573207911013'
 
+// limit:100 (2026-09-14, paginación real) — contenido curado a mano
+// (cursos de Hotmart), no inventario masivo; mismo criterio que los
+// afiliados de Supply: acotado y generoso, sin UI de "cargar más".
 export async function loader() {
-  return fetchCatalogCategoriaItems('gym', 'Cursos')
+  return fetchCatalogCategoriaItems('gym', 'Cursos', { limit: 100 })
 }
 
 export function meta() {

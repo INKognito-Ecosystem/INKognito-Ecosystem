@@ -7,7 +7,7 @@ import SupplyFAQ from '../../SupplyFAQ'
 import { getAdjacentBrands } from '../../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../../hooks/useScrolled'
-import { fetchCatalogMarca, fetchSupplyFaq } from '../../../../hooks/useCatalog'
+import { fetchCatalogMarca, fetchSupplyFaq, useLoadMore } from '../../../../hooks/useCatalog'
 
 export async function loader() {
   const [catalogo, faqItems] = await Promise.all([
@@ -35,7 +35,8 @@ const DOT_PATTERN = {
 }
 
 export default function WJXCartridgesPage() {
-  const { products, faqItems } = useLoaderData()
+  const { products: productosIniciales, nextCursor, hasMore, faqItems } = useLoaderData()
+  const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { marca: 'wjx' }, { items: productosIniciales, nextCursor, hasMore })
   const logoUrl = useSupplyVisual('supply_brand_wjx')
   const { prev, next } = getAdjacentBrands(2)
   const scrolled = useScrolled()
@@ -144,7 +145,7 @@ export default function WJXCartridgesPage() {
           </div>
         </div>
 
-        <BrandCatalogSection brandName="WJX Tattoo" products={products} />
+        <BrandCatalogSection brandName="WJX Tattoo" products={products} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} />
 
         <SupplyFAQ items={faqItems} nombre="WJX" />
 

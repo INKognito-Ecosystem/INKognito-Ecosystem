@@ -2,7 +2,7 @@ import { useLoaderData } from 'react-router-dom'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
-import { fetchCatalogMarca } from '../../../../hooks/useCatalog'
+import { fetchCatalogMarca, useLoadMore } from '../../../../hooks/useCatalog'
 
 export async function loader() {
   return fetchCatalogMarca('supply', 'intenze')
@@ -24,7 +24,8 @@ export function meta() {
 // inventados ("$XX.XXX") con un botón que sí agregaba al carrito real. Ahora
 // usa BrandCatalogSection con productos reales filtrados por `marca='intenze'`.
 export default function IntenzeColorsPage() {
-  const { products } = useLoaderData()
+  const { products: productosIniciales, nextCursor, hasMore,  } = useLoaderData()
+  const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { marca: 'intenze' }, { items: productosIniciales, nextCursor, hasMore })
   return (
     <div className="min-h-screen bg-black text-white">
       <NavbarCategory pageName="Intenze Ink" />
@@ -53,7 +54,7 @@ export default function IntenzeColorsPage() {
           </div>
         </div>
 
-        <BrandCatalogSection brandName="Intenze Ink" products={products} />
+        <BrandCatalogSection brandName="Intenze Ink" products={products} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} />
 
       </div>
 

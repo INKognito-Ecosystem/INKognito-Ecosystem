@@ -25,7 +25,14 @@ const WA = '573207911013'
 // a INKognito en vez de al proveedor. Opcional, cae al número de INKognito
 // si no se pasa (las 4 páginas de marcasProfesionales/ no tienen un
 // WhatsApp propio registrado, siguen igual que siempre).
-export default function BrandCatalogSection({ brandName, products = [], supplierBadge = null, whatsapp = WA, showEstudioBadge = true }) {
+// hasMore/onLoadMore/loadingMore (2026-09-14, paginación real) — el loader
+// de cada página de marca ya no trae "todo lo de esta marca" de una vez
+// (fetchCatalogMarca pide como máximo 100 de entrada); sin esta salida,
+// una marca que algún día supere los 100 productos quedaría con un techo
+// silencioso. Opcionales: las páginas que todavía no los pasan (ninguna
+// marca hoy tiene más de 100) siguen mostrando el catálogo tal cual, sin
+// botón de más.
+export default function BrandCatalogSection({ brandName, products = [], supplierBadge = null, whatsapp = WA, showEstudioBadge = true, hasMore = false, onLoadMore = null, loadingMore = false }) {
   if (products.length === 0) {
     return (
       <div className="border border-zinc-800 bg-zinc-950 rounded-2xl p-10 md:p-16 text-center">
@@ -64,6 +71,17 @@ export default function BrandCatalogSection({ brandName, products = [], supplier
           </div>
         ))}
       </div>
+      {hasMore && onLoadMore && (
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={onLoadMore}
+            disabled={loadingMore}
+            className="px-6 py-2.5 border border-blue-500/40 text-blue-400 text-xs font-bold uppercase tracking-[0.15em] rounded hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300 disabled:opacity-50"
+          >
+            {loadingMore ? 'Cargando…' : 'Cargar más'}
+          </button>
+        </div>
+      )}
     </>
   )
 }

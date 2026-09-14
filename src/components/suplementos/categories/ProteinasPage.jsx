@@ -24,7 +24,7 @@ export function meta() {
 }
 
 export default function ProteinasPage() {
-  const { products } = useLoaderData()
+  const { products, nextCursor, hasMore } = useLoaderData()
   return (
     <SupleCategoryPage
       title={TITLE}
@@ -32,6 +32,8 @@ export default function ProteinasPage() {
       slug={SLUG}
       intro={INTRO}
       products={products}
+      nextCursor={nextCursor}
+      hasMore={hasMore}
     />
   )
 }

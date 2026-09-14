@@ -7,7 +7,7 @@ import SupplyFAQ from '../SupplyFAQ'
 import { getAdjacentBrands } from '../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../hooks/useScrolled'
-import { fetchCatalogMarca, fetchSupplyFaq } from '../../../hooks/useCatalog'
+import { fetchCatalogMarca, fetchSupplyFaq, useLoadMore } from '../../../hooks/useCatalog'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 // fase 6.1 (2026-08-07) — id real en `estudios` vinculado a esta marca,
@@ -56,7 +56,8 @@ function InsigniaDistribuidorOficial() {
 }
 
 export default function RoyalThreePage() {
-  const { products, distribuidorOficial, mostrarFlechas, faqItems } = useLoaderData()
+  const { products: productosIniciales, nextCursor, hasMore, distribuidorOficial, mostrarFlechas, faqItems } = useLoaderData()
+  const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { marca: 'royal-three' }, { items: productosIniciales, nextCursor, hasMore })
   const logoUrl = useSupplyVisual('supply_brand_royal_three')
   const { prev, next } = getAdjacentBrands(6)
   const scrolled = useScrolled()
@@ -144,7 +145,7 @@ export default function RoyalThreePage() {
           </div>
         </div>
 
-        <BrandCatalogSection brandName="Royal Three" products={products} />
+        <BrandCatalogSection brandName="Royal Three" products={products} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} />
 
         <SupplyFAQ items={faqItems} nombre="Royal Three" />
 

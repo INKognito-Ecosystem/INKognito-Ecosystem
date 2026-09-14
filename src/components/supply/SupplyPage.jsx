@@ -7,7 +7,7 @@ import BrandsSupply from './BrandsSupply'
 import TechMarquee from '../TechMarquee'
 import FooterSupply from './FooterSupply'
 import { GraduationCap, Package, BookOpen } from 'lucide-react'
-import { fetchCatalogFull } from '../../hooks/useCatalog'
+import { fetchCatalogCounts } from '../../hooks/useCatalog'
 const ogSupply = '/og/supply.webp'
 
 const DOT_PATTERN = {
@@ -54,13 +54,19 @@ const supplyJsonLd = {
 // esas imágenes acá, en el loader (mismo momento que ya trae el
 // catálogo), quedan listas ANTES del primer render — cero parpadeo, sin
 // importar si es la primera carga o una vuelta atrás.
+//
+// fetchCatalogCounts (2026-09-14, paginación real) — CategoriesSupply solo
+// necesita `{categoria: cantidad}`, nunca los productos en sí; antes este
+// loader traía el catálogo COMPLETO del módulo (fetchCatalogFull) solo
+// para que CategoriesSupply hiciera `.length` — el home de Supply ya no
+// transfiere ni un producto, solo el conteo agregado.
 export async function loader() {
   const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
-  const [catalogo, imgs] = await Promise.all([
-    fetchCatalogFull('supply'),
+  const [counts, imgs] = await Promise.all([
+    fetchCatalogCounts('supply'),
     fetch(`${PANEL_URL}/api/visual/supply`).then(r => r.ok ? r.json() : {}).catch(() => ({})),
   ])
-  return { ...catalogo, imgs }
+  return { counts, imgs }
 }
 
 export function meta() {
@@ -78,7 +84,7 @@ export function meta() {
 }
 
 export default function SupplyPage() {
-  const { categorias, imgs } = useLoaderData()
+  const { counts, imgs } = useLoaderData()
 
   return (
 
@@ -92,7 +98,7 @@ export default function SupplyPage() {
   <div className="border-b border-zinc-900"></div>
 </div>
 
-<CategoriesSupply categorias={categorias} imgs={imgs} />
+<CategoriesSupply counts={counts} imgs={imgs} />
 
     <BrandsSupply imgs={imgs} />
 

@@ -36,7 +36,7 @@ export function meta() {
 }
 
 export default function AftercarePage() {
-  const { products, afiliados, faqs } = useLoaderData()
+  const { products, afiliados, nextCursor, hasMore, providers, faqs } = useLoaderData()
   return (
     <SupplyCategoryPage
       title={TITLE}
@@ -47,6 +47,9 @@ export default function AftercarePage() {
       guide={guide}
       faqs={faqs}
       products={products}
+      nextCursor={nextCursor}
+      hasMore={hasMore}
+      providers={providers}
       afiliados={afiliados}
     />
   )
