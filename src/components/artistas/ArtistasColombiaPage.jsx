@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { Search, MapPin, Palette, BadgeCheck, ChevronRight, Navigation, LoaderCircle, Share2, Sparkles, Check, Building2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
-import { normalize, municipioDesdeNombreIP, getCoordsMunicipio, distanciaKm } from '../../data/colombiaGeo'
+import { municipioDesdeNombreIP, getCoordsMunicipio } from '../../data/colombiaGeo'
+import { useDirectorioBusqueda } from '../../hooks/useDirectorio'
 import { artistaUrl } from './artistaSlug'
 import { cloudinaryFill } from '../../lib/cloudinary'
 
-const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 // Psicología del color (2026-08-05, decisión final tras probar "todo
 // rojo" y "todo gris"): ninguno de los dos extremos — rojo repetido en
 // insignias/checkmarks/puntos compite consigo mismo y se lee como alerta,
@@ -15,38 +15,6 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-pro
 // pantalla (acá: "Unirme como artista") — el resto de elementos usa clases
 // gray-* de Tailwind directamente, ya no depende de esta constante.
 const ACCENT = '#B3202F'
-
-// Tolerancia a errores de tipeo en la búsqueda (2026-08-09, Jose: "cuál
-// es el problema de arreglar eso desde ya" — antes un typo como
-// "Medallin" en vez de "Medellín" no encontraba nada, aunque hubiera
-// poquísimos artistas en la base; no es un problema de escala, es de
-// calidad de búsqueda hoy mismo). Mismo algoritmo (Levenshtein) que ya
-// usa el panel para detectar productos parecidos en el catálogo maestro
-// (server.js, `_levenshtein`/`_similitudTexto`) — acá en el navegador
-// porque esta búsqueda es 100% client-side sobre la lista ya cargada.
-function levenshtein(a, b) {
-  const m = a.length, n = b.length
-  if (!m) return n
-  if (!n) return m
-  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0))
-  for (let i = 0; i <= m; i++) dp[i][0] = i
-  for (let j = 0; j <= n; j++) dp[0][j] = j
-  for (let i = 1; i <= m; i++) {
-    for (let j = 1; j <= n; j++) {
-      dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
-    }
-  }
-  return dp[m][n]
-}
-function similitud(a, b) {
-  const maxLen = Math.max(a.length, b.length) || 1
-  return 1 - levenshtein(a, b) / maxLen
-}
-// Umbral 0.75 — tolera 1-2 letras distintas en una palabra típica (ej.
-// "medallin" vs "medellin" ya da 0.875). Palabras de menos de 3 letras no
-// entran a esta comparación (demasiado cortas para que la similitud
-// signifique algo — "el"/"de" siempre estarían "cerca" de cualquier cosa).
-const UMBRAL_SIMILITUD = 0.75
 
 // Puntitos oscuros y muy sutiles sobre fondo blanco (antes eran claros
 // sobre negro) — mismo recurso visual, paleta invertida.
@@ -90,8 +58,8 @@ export async function loader({ request }) {
   // el caso sin señal (Chigorodó): ya no hay una rama especial que se
   // comporte distinto, todos empiezan igual, vacío, sin importar si su IP
   // resolvió o no. Los datos reales se piden bajo demanda desde el
-  // navegador (ver `cargarDatos` en el componente) recién cuando la
-  // persona escribe algo o toca "Cerca de ti".
+  // navegador (ver useDirectorioBusqueda en el componente) recién cuando
+  // la persona escribe algo o toca "Cerca de ti".
   return { ciudadDetectada, categoriaInicial }
 }
 
@@ -105,65 +73,6 @@ export function meta() {
     { property: 'og:description', content: description },
     { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/tattoo-artist-colombia` },
   ]
-}
-
-// Coordenadas reales de un artista: prioriza su punto EXACTO (lat/lng
-// propios, capturados con permiso al registrarse) sobre el centroide de
-// su municipio — es lo que distingue a dos artistas "del mismo municipio"
-// dentro de una ciudad grande (2026-08-05). Se usa tanto para ordenar el
-// listado de búsqueda como el carrusel "Artistas más cercanos".
-function coordsDeArtista(a) {
-  return (a.lat != null && a.lng != null) ? { lat: a.lat, lng: a.lng } : getCoordsMunicipio(a.departamento, a.municipio)
-}
-
-// Mismo criterio para estudios (fase 3, 2026-08-06) — punto exacto si lo
-// capturó (ver "Agregar ubicación exacta" en su dashboard), si no, el
-// centroide de su municipio.
-function coordsDeEstudio(e) {
-  return (e.lat != null && e.lng != null) ? { lat: e.lat, lng: e.lng } : getCoordsMunicipio(e.departamento, e.municipio)
-}
-
-// Ordena una lista por cercanía real a un punto — devuelve una copia
-// nueva, estable (sin coords conocidas quedan al final, sin alterar su
-// orden relativo). Si no hay `desde` (ubicación del visitante
-// desconocida), devuelve la lista tal cual llegó. `coordsFn` generalizado
-// (2026-08-06) para reusar esto mismo con estudios, sin duplicar la
-// lógica de ordenamiento — default artistas para no tocar los usos ya
-// existentes.
-function ordenarPorCercania(lista, desde, coordsFn = coordsDeArtista) {
-  if (!desde) return lista
-  return [...lista].sort((a, b) => {
-    const ca = coordsFn(a)
-    const cb = coordsFn(b)
-    if (!ca && !cb) return 0
-    if (!ca) return 1
-    if (!cb) return -1
-    return distanciaKm(desde.lat, desde.lng, ca.lat, ca.lng) - distanciaKm(desde.lat, desde.lng, cb.lat, cb.lng)
-  })
-}
-
-// "Cerca de ti" — radio real, no "todo el país ordenado" (2026-08-11,
-// Jose: "el botón cerca de mí debería tener un rango limitado" — con
-// razón: mostrar a alguien a 800km bajo un botón que dice "cerca de ti"
-// no tiene sentido). Filtra a los que están dentro de RADIO_CERCA_KM; si
-// NADIE cae dentro de ese radio, cae de respaldo a los 10 más cercanos
-// del país (para no dejar la pantalla vacía si sí existe alguien, aunque
-// esté lejos — Jose: "si hay un artista lo muestres" — pero acotado a 10,
-// no a todo lo que haya cargado).
-const RADIO_CERCA_KM = 50
-
-function filtrarCercaDeTi(lista, desde, coordsFn = coordsDeArtista) {
-  if (!desde) return ordenarPorCercania(lista, desde, coordsFn)
-  const conDistancia = lista
-    .map(item => {
-      const c = coordsFn(item)
-      return { item, km: c ? distanciaKm(desde.lat, desde.lng, c.lat, c.lng) : null }
-    })
-    .filter(x => x.km !== null)
-    .sort((a, b) => a.km - b.km)
-  const dentroDelRadio = conDistancia.filter(x => x.km <= RADIO_CERCA_KM)
-  const resultado = dentroDelRadio.length > 0 ? dentroDelRadio : conDistancia.slice(0, 10)
-  return resultado.map(x => x.item)
 }
 
 const DIAS_ARTISTA_NUEVO = 14
@@ -424,17 +333,22 @@ function ListingRow({ to, nombre, municipio, estilo, bio, foto, onVerInfo, kicke
 // — ahora es una sola card, siempre visible, con puntos de valor + ambos
 // CTA (unirse / compartir). El encabezado cambia según el estado de la
 // búsqueda, pero la card en sí nunca se oculta.
-function TarjetaReclutamiento({ query, total, compartir }) {
+// `hayResultados` (2026-09-14, paginación real) — antes era un conteo
+// exacto (`total`); con paginación por cursor ya no hay un total exacto
+// gratis en el cliente (contar de verdad exigiría el mismo recorrido
+// completo que la paginación evita) — mismo criterio que "Cargar más" en
+// Supply, que tampoco muestra cuántos faltan.
+function TarjetaReclutamiento({ query, hayResultados, compartir }) {
   const encabezado = !query
     ? '¿Eres tatuador? Únete gratis'
-    : total === 0
-      ? `Todavía no hay tatuadores para "${query}"`
-      : `Ya hay ${total} artista${total !== 1 ? 's' : ''} en "${query}"`
+    : hayResultados
+      ? `Ya hay artistas en "${query}"`
+      : `Todavía no hay tatuadores para "${query}"`
   const subtitulo = !query
     ? 'Crea tu perfil en minutos y empieza a aparecer en las búsquedas de tu zona.'
-    : total === 0
-      ? 'Sé el primero en aparecer aquí.'
-      : 'Súmate y aparece junto a ellos.'
+    : hayResultados
+      ? 'Súmate y aparece junto a ellos.'
+      : 'Sé el primero en aparecer aquí.'
 
   return (
     <div className="mt-6 rounded-xl border-2 border-gray-200 bg-gray-50 p-5 md:p-6">
@@ -500,17 +414,17 @@ function TarjetaReclutamiento({ query, total, compartir }) {
 // Pago (cobra directo, cero retención), autoservicio de catálogo. Pedido
 // explícito de Jose: "sumamente profesional... super informativa" — por
 // eso 5 puntos en vez de los 3 de la de artistas, no un calco reducido.
-function TarjetaReclutamientoEstudio({ query, total, compartir }) {
+function TarjetaReclutamientoEstudio({ query, hayResultados, compartir }) {
   const encabezado = !query
     ? '¿Tienes un estudio de tatuajes? Únete gratis'
-    : total === 0
-      ? `Todavía no hay estudios para "${query}"`
-      : `Ya hay ${total} estudio${total !== 1 ? 's' : ''} en "${query}"`
+    : hayResultados
+      ? `Ya hay estudios en "${query}"`
+      : `Todavía no hay estudios para "${query}"`
   const subtitulo = !query
     ? 'Crea el perfil de tu estudio, suma a tu equipo de artistas y abre tu propia tienda en INKognito Supply.'
-    : total === 0
-      ? 'Sé el primer estudio en aparecer aquí.'
-      : 'Súmate y aparece junto a ellos.'
+    : hayResultados
+      ? 'Súmate y aparece junto a ellos.'
+      : 'Sé el primer estudio en aparecer aquí.'
 
   return (
     <div className="mt-6 rounded-xl border-2 border-gray-200 bg-gray-50 p-5 md:p-6">
@@ -655,12 +569,8 @@ function ModalInfoArtista({ artista, onClose }) {
 export default function ArtistasColombiaPage() {
   const { ciudadDetectada, categoriaInicial } = useLoaderData()
   // Nada se precarga desde el servidor (2026-08-11, ver comentario en el
-  // loader) — arrancan vacíos y `cargarDatos()` los llena bajo demanda, la
+  // loader) — arranca vacío y useDirectorioBusqueda pide bajo demanda, la
   // primera vez que la persona escribe algo o toca "Cerca de ti".
-  const [artistasData, setArtistasData] = useState([])
-  const [estudiosData, setEstudiosData] = useState([])
-  const [datosCargados, setDatosCargados] = useState(false)
-  const [cargando, setCargando] = useState(false)
   const [query, setQuery] = useState('')
   const [ubicando, setUbicando] = useState(false)
   const [ubicacionError, setUbicacionError] = useState(null)
@@ -729,142 +639,52 @@ export default function ArtistasColombiaPage() {
   const listadoRef = useRef(null)
   const prevVacioRef = useRef(true)
 
-  const q = normalize(query.trim())
-  const palabrasQuery = q.split(/\s+/).filter(Boolean)
-  // Primero coincidencia exacta (rápida, cubre el 99% de los casos) — si
-  // ningún campo la tiene, recién ahí se prueba tolerancia a tipeo:
-  // CADA palabra escrita debe tener alguna palabra parecida (o contenida)
-  // en el campo, para que "juan realismo" siga exigiendo las dos cosas,
-  // no solo una.
-  const matches = (...campos) => {
-    if (q === '') return true
-    // Con 1 sola letra, la coincidencia exacta por substring matchea casi
-    // cualquier cosa (2026-08-11, Jose: "cualquier letra... activa todas
-    // las marcas de prueba" — "Heaven Pro" contiene casi cualquier letra
-    // suelta). Se pide al menos 2 caracteres antes de intentar coincidir,
-    // igual que la mayoría de buscadores — mientras se escribe la primera
-    // letra simplemente no hay resultados todavía, no resultados falsos.
-    if (q.length < 2) return false
-    if (campos.some(c => c && normalize(c).includes(q))) return true
-    return campos.some(c => {
-      if (!c) return false
-      const palabrasCampo = normalize(c).split(/\s+/).filter(Boolean)
-      return palabrasQuery.every(pq =>
-        pq.length < 3 || palabrasCampo.some(pc => pc.includes(pq) || similitud(pq, pc) >= UMBRAL_SIMILITUD)
-      )
-    })
-  }
+  // Búsqueda/orden/paginación real por cursor (2026-09-14) — ya no hay
+  // `matches()`/Levenshtein/Haversine en JS: el servidor filtra, ordena
+  // (por relevancia de texto o por distancia real) y pagina. El hook trae
+  // artistas Y estudios en paralelo siempre que hay búsqueda o "Cerca de
+  // ti" activo, así cambiar de pestaña sigue sin disparar un fetch nuevo.
+  const {
+    artistas: filtrados, hasMoreArtistas, cargandoMasArtistas, cargarMasArtistas,
+    estudios: estudiosData, hasMoreEstudios, cargandoMasEstudios, cargarMasEstudios,
+    cargando,
+  } = useDirectorioBusqueda({ query, misCoords, cercaDeTiActivo })
+  const hayBusqueda = query.trim().length >= 2
 
-  // Sin buscar nada todavía no se lista ningún artista (2026-08-11, Jose:
-  // "que solo si escribe algo o usa cerca de mí aparecen") — el fundador
-  // (Jose Humanez) tampoco tiene trato especial: se quitó el perfil fijo/
-  // destacado — "vamos a usar la plataforma como cualquier tatuador más"
-  // (Jose, 2026-08-04). Si quiere aparecer en el directorio, se registra
-  // igual que cualquier artista.
-  // La bio SÍ entra en la búsqueda (2026-08-05, Jose preguntó directo si
-  // ayudaba o si solo contaba el municipio — antes NO se incluía, así que
-  // era puramente informativa). Por eso el campo del formulario dejó de
-  // decir "bio corta, 1-2 líneas sobre ti" — ahora si un artista escribe
-  // "puntillismo" o "acuarela" en su bio, alguien que busque esa palabra
-  // sí lo va a encontrar, no solo por nombre/municipio/estilo.
-  // cercaDeTiActivo (2026-08-11, v2) — ya NO muestra todo lo cargado sin
-  // filtrar: usa `filtrarCercaDeTi` (radio real de RADIO_CERCA_KM, con
-  // respaldo a los 10 más cercanos si nadie cae dentro del radio) — ver
-  // su comentario más arriba en el archivo.
-  // a.departamento entra a la búsqueda (2026-08-11, bug real: escribir
-  // "Antioquia" no encontraba a un artista de Chigorodó — solo se
-  // comparaba nombre/municipio/estilo/bio, nunca el departamento).
-  let filtrados = cercaDeTiActivo
-    ? filtrarCercaDeTi(artistasData, misCoords, coordsDeArtista)
-    : (q.length >= 2 ? ordenarPorCercania(artistasData.filter(a => matches(a.nombre, a.municipio, a.departamento, a.estilo, a.bio)), misCoords) : [])
-  const total = filtrados.length
+  // Estudios reales vs. empresas proveedoras patrocinadas (fase 6,
+  // 2026-08-07) — ya viene resuelto por el servidor (GET /api/estudios
+  // solo incluye tipo='empresa' cuando hay búsqueda activa, "nunca como
+  // sugerencia pasiva"); acá solo se separan visualmente porque enlazan a
+  // un destino distinto (su catálogo de Supply, no un perfil de tatuaje).
+  const estudiosFiltrados = estudiosData.filter(e => e.tipo !== 'empresa')
+  const proveedoresFiltrados = estudiosData.filter(e => e.tipo === 'empresa')
 
-  // Estudios (fase 3, 2026-08-06) — mismo criterio de query que los
-  // artistas, resultado aparte (no interleaved en la misma lista, para no
-  // confundir un perfil individual con uno de equipo). `estudiosData`
-  // también puede traer empresas proveedoras con distribuidor_oficial=true
-  // (fase 6, 2026-08-07 — GET /api/estudios ya las incluye) — se separan
-  // acá porque enlazan a un destino distinto (su catálogo de Supply, no un
-  // perfil de tatuaje) y no deben mezclarse visualmente con estudios de
-  // tatuaje reales.
-  const estudiosReales = estudiosData.filter(e => e.tipo !== 'empresa')
-  const proveedoresOficiales = estudiosData.filter(e => e.tipo === 'empresa')
-
-  let estudiosFiltrados = cercaDeTiActivo
-    ? filtrarCercaDeTi(estudiosReales, misCoords, coordsDeEstudio)
-    : (q.length >= 2 ? ordenarPorCercania(estudiosReales.filter(e => matches(e.nombre, e.municipio, e.departamento, e.bio)), misCoords, coordsDeEstudio) : [])
-  const totalEstudios = estudiosFiltrados.length
-
-  // Proveedores oficiales (fase 6, 2026-08-07) — el producto real que se
-  // le vende a una marca por "Distribuidor Oficial": aparecer frente a
-  // esta misma audiencia de tatuadores buscando. Mismo patrón de query
-  // que estudios, sin ordenar por cercanía (son marcas nacionales, no
-  // tiene sentido "el más cercano"). NUNCA pasivas (fase 6.3, 2026-08-07)
-  // — a diferencia de artistas/estudios, ni "Ver todo" ni el filtro de
-  // categoría las muestran sin texto: solo aparecen si el visitante
-  // escribió algo que de verdad coincide con una. Formaliza en código lo
-  // que Jose ya había aprobado antes ("las marcas no aparecen como
-  // sugerencias, a diferencia de artistas y estudios") — hasta ahora era
-  // un accidente de la fórmula (sí aparecían con "Ver todo").
-  const proveedoresFiltrados = q === '' ? [] : proveedoresOficiales.filter(e => matches(e.nombre, e.municipio, e.departamento, e.bio))
-  const totalProveedores = proveedoresFiltrados.length
-
-  // Totales acotados a lo que la categoría activa realmente muestra
-  // (fase 6.3) — sin esto, el contador y el estado vacío contarían
-  // resultados de una categoría oculta por el filtro.
-  const totalArtistasVisible = categoria !== 'estudios' ? total : 0
-  const totalOrgVisible = categoria !== 'artistas' ? totalEstudios + totalProveedores : 0
-  const totalGeneral = totalArtistasVisible + totalOrgVisible
+  // Contador "X resultados" (2026-09-14) — ya no es un total exacto:
+  // contar de verdad en un directorio sin techo exige el mismo recorrido
+  // completo que la paginación evita (mismo criterio que "Cargar más" en
+  // Supply). Muestra lo cargado hasta ahora, con un "+" cuando se sabe que
+  // hay más — honesto sin fingir precisión que no existe.
+  const conteoVisible = categoria === 'artistas' ? filtrados.length : estudiosFiltrados.length + proveedoresFiltrados.length
+  const hayMasVisible = categoria === 'artistas' ? hasMoreArtistas : hasMoreEstudios
+  const hayResultadosVisible = conteoVisible > 0
 
   // Al iniciar la búsqueda (primera letra escrita) el teclado del celular
   // tapa las cards que aparecen debajo — scroll automático hacia el
   // listado apenas se empieza a escribir (Jose, 2026-08-03).
   useEffect(() => {
-    const vacio = q === ''
-    if (prevVacioRef.current && !vacio) {
+    if (prevVacioRef.current && hayBusqueda) {
       listadoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
-    prevVacioRef.current = vacio
-  }, [q])
-
-  // Trae el directorio completo bajo demanda (2026-08-11) — nada se pidió
-  // en el loader; esto se llama desde el navegador (ambos endpoints ya
-  // tienen CORS abierto) la primera vez que hace falta de verdad: al
-  // escribir 2+ caracteres o al tocar "Cerca de ti". Una sola vez por
-  // visita — `datosCargados` evita pedirlo de nuevo. No bloquea nada — si
-  // falla, simplemente no hay resultados todavía.
-  const cargarDatos = async () => {
-    if (datosCargados || cargando) return
-    setCargando(true)
-    try {
-      const [ar, er] = await Promise.all([
-        fetch(`${PANEL_URL}/api/artistas`),
-        fetch(`${PANEL_URL}/api/estudios`),
-      ])
-      setArtistasData(ar.ok ? await ar.json() : [])
-      setEstudiosData(er.ok ? await er.json() : [])
-      setDatosCargados(true)
-    } catch {
-      // silencioso
-    } finally {
-      setCargando(false)
-    }
-  }
-
-  useEffect(() => {
-    if (q.length >= 2 && !datosCargados && !cargando) {
-      cargarDatos()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q, datosCargados, cargando])
+    prevVacioRef.current = !hayBusqueda
+  }, [hayBusqueda])
 
   // v2 (2026-08-11, Jose: "la idea es que si hay un artista lo muestres")
   // — ya no fija el buscador al nombre del municipio más cercano (un
   // artista real en un municipio VECINO con nombre distinto simplemente no
-  // aparecía). Ahora "Cerca de ti" activa `cercaDeTiActivo`, que muestra
-  // TODO lo cargado ordenado por distancia real — GPS no depende de que la
-  // IP haya resuelto tu ciudad, así que esto funciona siempre que el
-  // navegador dé permiso, sin importar el caso de Chigorodó de arriba.
+  // aparecía). Ahora "Cerca de ti" activa `cercaDeTiActivo`, que pide al
+  // servidor todo dentro del radio real (o los 10 más cercanos del país si
+  // nadie cae dentro) — GPS no depende de que la IP haya resuelto tu
+  // ciudad, así que esto funciona siempre que el navegador dé permiso.
   const usarMiUbicacion = () => {
     cerrarTooltipUbicacion()
     setUbicacionError(null)
@@ -878,7 +698,6 @@ export default function ArtistasColombiaPage() {
         setMisCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
         setQuery('')
         setCercaDeTiActivo(true)
-        cargarDatos()
         setUbicando(false)
       },
       () => {
@@ -1113,9 +932,9 @@ export default function ArtistasColombiaPage() {
             (2026-08-11, antes también con `mostrarTodos`, eliminado junto
             con la pestaña Todos). Totales acotados a lo que la categoría
             activa realmente muestra. */}
-        {(q.length >= 2 || cercaDeTiActivo) && (
+        {(hayBusqueda || cercaDeTiActivo) && (
           <p className="text-gray-400 text-xs uppercase tracking-widest mb-4">
-            {totalGeneral} resultado{totalGeneral !== 1 ? 's' : ''}{cercaDeTiActivo ? ' cerca de ti' : <> para <span className="text-gray-600">"{query}"</span></>}
+            {conteoVisible}{hayMasVisible ? '+' : ''} resultado{conteoVisible !== 1 ? 's' : ''}{cercaDeTiActivo ? ' cerca de ti' : <> para <span className="text-gray-600">"{query}"</span></>}
           </p>
         )}
 
@@ -1170,14 +989,10 @@ export default function ArtistasColombiaPage() {
             <div className={categoria === 'estudios' ? 'grid grid-cols-1 sm:grid-cols-2 gap-3' : 'flex flex-col gap-3'}>
               {estudiosFiltrados.map(e => (
                 categoria === 'estudios' ? (() => {
-                  // Distancia aproximada (2026-08-09, Jose preguntó
-                  // explícitamente si esto se mostraba) — se calcula igual
-                  // que en la sección "Estudios cercanos", pero acá faltaba
-                  // pasarla al convertir el resultado de búsqueda en card
-                  // completa; el orden ya era por cercanía, solo faltaba el
-                  // número.
-                  const c = coordsDeEstudio(e)
-                  const distanciaTexto = misCoords && c ? distanciaKm(misCoords.lat, misCoords.lng, c.lat, c.lng).toFixed(1) : null
+                  // distancia_km ya viene calculada por el servidor
+                  // (2026-09-14) cuando se conoce la ubicación del
+                  // visitante — antes se calculaba acá con Haversine en JS.
+                  const distanciaTexto = e.distancia_km != null ? e.distancia_km.toFixed(1) : null
                   return <EstudioCercanoCard key={`estudio-${e.id}`} e={e} distanciaTexto={distanciaTexto} full onVerInfo={() => setModalArtista(e)} />
                 })() : (
                   <ListingRow
@@ -1196,6 +1011,25 @@ export default function ArtistasColombiaPage() {
           </div>
         )}
 
+        {/* "Cargar más" de estudios/proveedores — un solo botón para las
+            dos secciones de arriba (2026-09-14): ambas vienen del mismo
+            fetch paginado (GET /api/estudios), solo se separan en el
+            cliente por `tipo`, así que viven fuera de los `.length > 0` de
+            cada bloque — si una búsqueda solo trae proveedores, por
+            ejemplo, el bloque de Estudios no se monta pero igual puede
+            haber más por cargar. */}
+        {categoria !== 'artistas' && hasMoreEstudios && (
+          <div className="flex justify-center mb-5">
+            <button
+              onClick={cargarMasEstudios}
+              disabled={cargandoMasEstudios}
+              className="px-5 py-2 rounded-full border border-gray-400 text-gray-600 text-xs font-bold uppercase tracking-widest hover:border-gray-600 transition-colors disabled:opacity-50"
+            >
+              {cargandoMasEstudios ? 'Cargando…' : 'Cargar más'}
+            </button>
+          </div>
+        )}
+
         {/* LISTADO — oculto bajo el filtro "Estudios" (fase 6.3). v2
             (2026-08-09): mismo criterio que el bloque de Estudios de
             arriba — con "Artistas" activa, ArtistaCercanoCard de ancho
@@ -1208,8 +1042,10 @@ export default function ArtistasColombiaPage() {
           }>
             {filtrados.map(a => (
               categoria === 'artistas' ? (() => {
-                const c = coordsDeArtista(a)
-                const distanciaTexto = misCoords && c ? distanciaKm(misCoords.lat, misCoords.lng, c.lat, c.lng).toFixed(1) : null
+                // distancia_km ya viene calculada por el servidor
+                // (2026-09-14) cuando se conoce la ubicación del
+                // visitante — antes se calculaba acá con Haversine en JS.
+                const distanciaTexto = a.distancia_km != null ? a.distancia_km.toFixed(1) : null
                 return <ArtistaCercanoCard key={a.id} a={a} distanciaTexto={distanciaTexto} full onVerInfo={() => setModalArtista(a)} />
               })() : (
                 <ListingRow
@@ -1227,17 +1063,29 @@ export default function ArtistasColombiaPage() {
           </div>
         )}
 
+        {categoria !== 'estudios' && hasMoreArtistas && (
+          <div className="flex justify-center mb-5">
+            <button
+              onClick={cargarMasArtistas}
+              disabled={cargandoMasArtistas}
+              className="px-5 py-2 rounded-full border border-gray-400 text-gray-600 text-xs font-bold uppercase tracking-widest hover:border-gray-600 transition-colors disabled:opacity-50"
+            >
+              {cargandoMasArtistas ? 'Cargando…' : 'Cargar más'}
+            </button>
+          </div>
+        )}
+
         {/* Se muestra mientras se trae el directorio la primera vez (ver
-            `cargarDatos`) — evita que un "No hay resultados" parpadee
-            antes de tiempo. */}
-        {cargando && (q.length >= 2 || cercaDeTiActivo) && totalGeneral === 0 && (
+            useDirectorioBusqueda) — evita que un "No hay resultados"
+            parpadee antes de tiempo. */}
+        {cargando && (hayBusqueda || cercaDeTiActivo) && !hayResultadosVisible && (
           <div className="text-center py-6 text-gray-400 text-sm flex items-center justify-center gap-2">
             <LoaderCircle size={14} className="animate-spin" />
             Buscando...
           </div>
         )}
 
-        {!cargando && (q.length >= 2 || cercaDeTiActivo) && totalGeneral === 0 && (
+        {!cargando && (hayBusqueda || cercaDeTiActivo) && !hayResultadosVisible && (
           <div className="text-center py-6 text-gray-400 text-sm">
             No hay resultados por ahora.
           </div>
@@ -1253,7 +1101,7 @@ export default function ArtistasColombiaPage() {
             reclutamiento de ARTISTAS, no aplica mientras se navega solo
             estudios. */}
         {categoria !== 'estudios' && (
-          <TarjetaReclutamiento query={query} total={total} compartir={compartir} />
+          <TarjetaReclutamiento query={query} hayResultados={filtrados.length > 0} compartir={compartir} />
         )}
 
         {/* RECLUTAMIENTO DE ESTUDIOS (2026-08-09) — solo en la pestaña
@@ -1261,7 +1109,7 @@ export default function ArtistasColombiaPage() {
             muestran las dos a la vez, cada una tiene su propio botón
             rojo — "una sola acción principal por pantalla"). */}
         {categoria === 'estudios' && (
-          <TarjetaReclutamientoEstudio query={query} total={totalEstudios} compartir={compartir} />
+          <TarjetaReclutamientoEstudio query={query} hayResultados={estudiosFiltrados.length > 0} compartir={compartir} />
         )}
       </section>
 
