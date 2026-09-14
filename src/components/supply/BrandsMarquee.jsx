@@ -70,7 +70,7 @@ function BrandLogo({ brand, img }) {
 export default function BrandsMarquee({ imgs = {} }) {
   return (
     <div
-      className="relative mt-6 md:mt-10"
+      className="relative mt-6 md:mt-10 overflow-hidden"
       style={{
         maskImage: 'linear-gradient(90deg, transparent, black 8%, black 92%, transparent)',
         WebkitMaskImage: 'linear-gradient(90deg, transparent, black 8%, black 92%, transparent)',

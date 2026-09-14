@@ -22,7 +22,9 @@ const catKey = (cat) => 'supply_cat_' + cat.toLowerCase()
   .replace(/[áéíóú]/g, c => ({á:'a',é:'e',í:'i',ó:'o',ú:'u'})[c])
   .replace(/[^a-z0-9]/g, '_').replace(/_+/g,'_').replace(/^_|_$/g,'')
 
-const categories = [
+// Exportado (2026-09-14) para que MobileHomeSupply.jsx reuse la misma
+// lista en la tira de categorías-texto del home móvil, sin duplicarla.
+export const categories = [
   { name: 'Tintas',            path: '/supply/ink',            icon: Droplet,    cat: 'Tintas'      },
   { name: 'Cartuchos',         path: '/supply/cartridges',     icon: PenTool,    cat: 'Cartuchos'   },
   { name: 'Agujas',            path: '/supply/needles',        icon: Crosshair,  cat: 'Agujas'      },

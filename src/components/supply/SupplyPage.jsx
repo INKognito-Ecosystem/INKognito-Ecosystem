@@ -4,10 +4,11 @@ import NavbarSupply from './NavbarSupply'
 import HeroSupply from './HeroSupply'
 import CategoriesSupply from './CategoriesSupply'
 import BrandsSupply from './BrandsSupply'
+import MobileHomeSupply from './MobileHomeSupply'
 import TechMarquee from '../TechMarquee'
 import FooterSupply from './FooterSupply'
 import { GraduationCap, Package, BookOpen } from 'lucide-react'
-import { fetchCatalogCounts } from '../../hooks/useCatalog'
+import { fetchCatalogCounts, fetchCatalogPage } from '../../hooks/useCatalog'
 const ogSupply = '/og/supply.webp'
 
 const DOT_PATTERN = {
@@ -62,11 +63,15 @@ const supplyJsonLd = {
 // transfiere ni un producto, solo el conteo agregado.
 export async function loader() {
   const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
-  const [counts, imgs] = await Promise.all([
+  const [counts, imgs, productsInitial] = await Promise.all([
     fetchCatalogCounts('supply'),
     fetch(`${PANEL_URL}/api/visual/supply`).then(r => r.ok ? r.json() : {}).catch(() => ({})),
+    // Home móvil (MobileHomeSupply, 2026-09-14) — primera página del grid
+    // "Destacados", SSR igual que counts/imgs, mismo fetchCatalogPage de
+    // siempre (sin categoria = mezcla del módulo completo).
+    fetchCatalogPage('supply', { limit: 12 }),
   ])
-  return { counts, imgs }
+  return { counts, imgs, productsInitial }
 }
 
 export function meta() {
@@ -84,23 +89,29 @@ export function meta() {
 }
 
 export default function SupplyPage() {
-  const { counts, imgs } = useLoaderData()
+  const { counts, imgs, productsInitial } = useLoaderData()
 
   return (
 
     <main className="bg-gray-950 text-white">
 
-    <NavbarSupply />
+    {/* Home móvil (MobileHomeSupply, 2026-09-14) — formato marketplace,
+        reemplaza SOLO en móvil al bloque de abajo. Local por ahora. */}
+    <MobileHomeSupply imgs={imgs} initialProducts={productsInitial} />
+
+    <div className="hidden md:block">
+      <NavbarSupply />
 
       <HeroSupply imgs={imgs} />
 
-<div className="max-w-7xl mx-auto px-6 mt-2 md:mt-8">
-  <div className="border-b border-zinc-900"></div>
-</div>
+      <div className="max-w-7xl mx-auto px-6 mt-2 md:mt-8">
+        <div className="border-b border-zinc-900"></div>
+      </div>
 
-<CategoriesSupply counts={counts} imgs={imgs} />
+      <CategoriesSupply counts={counts} imgs={imgs} />
 
-    <BrandsSupply imgs={imgs} />
+      <BrandsSupply imgs={imgs} />
+    </div>
 
     {/* SECCIÓN EDUCACIÓN — Cursos, Kit, Recursos */}
     <motion.section {...REVEAL} className="relative overflow-hidden bg-gray-950 border-t border-zinc-900 py-8 md:py-16">
