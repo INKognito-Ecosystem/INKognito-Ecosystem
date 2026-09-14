@@ -2,7 +2,9 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import NavbarCategory from './NavbarCategory'
+import SupplyMobileNav from './SupplyMobileNav'
 import FooterSupply from './FooterSupply'
+import logoSupply from '../../assets/milogo/supply.webp'
 import AccordionCard from './AccordionCard'
 import SupplyProductCard from './SupplyProductCard'
 import { useScrolled } from '../../hooks/useScrolled'
@@ -10,19 +12,6 @@ import { fetchCatalogPage } from '../../hooks/useCatalog'
 import { FaWhatsapp } from 'react-icons/fa'
 import { ExternalLink, Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package, ArrowLeft, ArrowRight, Search, SlidersHorizontal, MapPin } from 'lucide-react'
 import { getAdjacentCategories } from '../../data/supplyCategoriesOrder'
-
-const CAT_ICONS = {
-  'Tintas':    Droplet,
-  'Cartuchos': PenTool,
-  'Agujas':    Crosshair,
-  'Maquinas':  Drill,
-  'Guantes':   Hand,
-  'Cuidados':  ShieldCheck,
-  'Fuentes':   PlugZap,
-  'Accesorios':Toolbox,
-  'Mobiliario':BedDouble,
-  'Combos':    Package,
-}
 
 const AFILIADO_COPY = {
   'Tintas': {
@@ -167,7 +156,6 @@ const ORDEN_OPTIONS = [
 ]
 
 export default function SupplyCategoryPage({ title, categoria, slug, intro, guide, faqs, products = [], nextCursor = null, hasMore = false, providers = [], afiliados = [], extraCTA = null }) {
-  const CatIcon = CAT_ICONS[categoria] || null
   const { prev, next } = getAdjacentCategories(slug)
   const scrolled = useScrolled()
 
@@ -196,10 +184,21 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
   const [provAbierto, setProvAbierto] = useState(false)
   const ordenRef = useRef(null)
   const provRef = useRef(null)
+  // Versión móvil de los mismos dropdowns (2026-09-15, buscador migrado a
+  // la barra superior) — refs propios porque un mismo ref no puede
+  // apuntar a dos elementos montados a la vez (el bloque de escritorio
+  // queda montado, solo oculto con `hidden md:flex`). El estado de datos
+  // (busqueda/orden/provFiltro) sí se comparte, son los mismos filtros.
+  const [ordenAbiertoM, setOrdenAbiertoM] = useState(false)
+  const [provAbiertoM, setProvAbiertoM] = useState(false)
+  const ordenRefM = useRef(null)
+  const provRefM = useRef(null)
   useEffect(() => {
     function onClickFuera(e) {
       if (ordenRef.current && !ordenRef.current.contains(e.target)) setOrdenAbierto(false)
       if (provRef.current && !provRef.current.contains(e.target)) setProvAbierto(false)
+      if (ordenRefM.current && !ordenRefM.current.contains(e.target)) setOrdenAbiertoM(false)
+      if (provRefM.current && !provRefM.current.contains(e.target)) setProvAbiertoM(false)
     }
     document.addEventListener('mousedown', onClickFuera)
     return () => document.removeEventListener('mousedown', onClickFuera)
@@ -267,13 +266,134 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
 
   return (
     <>
-      <NavbarCategory pageName={title} backPath="/supply" backLabel="Supply" />
+      <div className="hidden md:block">
+        <NavbarCategory pageName={title} backPath="/supply" backLabel="Supply" />
+      </div>
+
+      {/* Top bar compacta + tab bar inferior, solo móvil (2026-09-15) —
+          mismo patrón que MobileHomeSupply.jsx: el navbar fijo de arriba se
+          reemplaza por esto, nav/carrito/menú bajan a la barra inferior
+          (SupplyMobileNav, compartida por todas las categorías porque
+          SupplyCategoryPage.jsx es el componente compartido de todas). */}
+      <div className="md:hidden sticky top-0 z-40 flex items-center gap-2 px-4 py-2 bg-black border-b border-blue-500/20">
+        <Link to="/supply" aria-label="Volver a Supply" className="flex-shrink-0">
+          <img src={logoSupply} alt="INKognito Supply" className="w-12 h-12 object-contain" />
+        </Link>
+        <>
+          <div className="relative flex-1 min-w-0">
+            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
+              <input
+                type="text"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                placeholder={`Buscar en categoría ${title.toLowerCase()}`}
+                className="w-full min-w-0 bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-lg pl-8 pr-2 py-2 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500"
+              />
+            </div>
+            {proveedoresOrdenados.length > 0 && (
+              <div className="relative flex-shrink-0" ref={provRefM}>
+                <button
+                  type="button"
+                  onClick={() => setProvAbiertoM(o => !o)}
+                  aria-label="Filtrar por proveedor"
+                  aria-expanded={provAbiertoM}
+                  className={`flex items-center justify-center w-9 h-9 bg-zinc-900 border rounded-lg transition-colors ${
+                    provAbiertoM || provFiltro !== 'todos' ? 'border-blue-500 text-blue-400' : 'border-zinc-800 text-zinc-400'
+                  }`}
+                >
+                  <MapPin size={14} />
+                </button>
+                {provAbiertoM && (
+                  <div className="absolute right-0 top-full mt-1.5 z-20 w-64 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl overflow-hidden">
+                    <div className="p-2 border-b border-zinc-800">
+                      <div className="relative">
+                        <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
+                        <input
+                          type="text"
+                          value={provBusqueda}
+                          onChange={(e) => setProvBusqueda(e.target.value)}
+                          placeholder="Buscar proveedor o ciudad"
+                          className="w-full bg-zinc-950 border border-zinc-800 text-zinc-300 text-xs rounded-md pl-7 pr-2 py-1.5 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => { setProvFiltro('todos'); setProvBusqueda(''); setProvAbiertoM(false) }}
+                      className={`w-full text-left px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors ${
+                        provFiltro === 'todos' ? 'text-blue-400 bg-blue-500/10' : 'text-zinc-300'
+                      }`}
+                    >
+                      Todos los proveedores
+                    </button>
+                    <div className="max-h-60 overflow-y-auto border-t border-zinc-800">
+                      {proveedoresFiltrados.length === 0 ? (
+                        <p className="px-3 py-3 text-xs text-zinc-600">Ningún proveedor coincide</p>
+                      ) : proveedoresFiltrados.map(p => (
+                        <div key={p.id} className="flex items-center">
+                          <button
+                            type="button"
+                            onClick={() => { setProvFiltro(String(p.id)); setProvBusqueda(''); setProvAbiertoM(false) }}
+                            className={`flex-1 min-w-0 text-left px-3 py-2 text-xs truncate transition-colors ${
+                              provFiltro === String(p.id) ? 'text-blue-400 bg-blue-500/10 font-bold' : 'text-zinc-300'
+                            }`}
+                          >
+                            {p.nombre}
+                            {p.municipio && <span className="text-zinc-600 font-normal"> · {p.municipio}</span>}
+                          </button>
+                          <Link
+                            to={`/supply/${p.slug || `estudio/${p.id}`}`}
+                            onClick={(e) => e.stopPropagation()}
+                            title={`Ver catálogo completo de ${p.nombre}`}
+                            className="flex-shrink-0 px-2.5 py-2 text-zinc-600"
+                          >
+                            <ExternalLink size={12} />
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="relative flex-shrink-0" ref={ordenRefM}>
+              <button
+                type="button"
+                onClick={() => setOrdenAbiertoM(o => !o)}
+                aria-label="Ordenar por"
+                aria-expanded={ordenAbiertoM}
+                className={`flex items-center justify-center w-9 h-9 bg-zinc-900 border rounded-lg transition-colors ${
+                  ordenAbiertoM ? 'border-blue-500 text-blue-400' : 'border-zinc-800 text-zinc-400'
+                }`}
+              >
+                <SlidersHorizontal size={14} />
+              </button>
+              {ordenAbiertoM && (
+                <div className="absolute right-0 top-full mt-1.5 z-20 min-w-[140px] bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-xl">
+                  {ORDEN_OPTIONS.map(o => (
+                    <button
+                      key={o.value}
+                      type="button"
+                      onClick={() => { setOrden(o.value); setOrdenAbiertoM(false) }}
+                      className={`w-full text-left px-3 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors ${
+                        orden === o.value ? 'text-blue-400 bg-blue-500/10' : 'text-zinc-400'
+                      }`}
+                    >
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+        </>
+      </div>
+      <SupplyMobileNav active="categorias" />
 
       {scrolled && prev && (
         <Link
           to={`/supply/${prev.slug}`} replace
           aria-label={`Ver ${prev.name}`}
-          className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
+          className="fixed top-[76px] md:top-20 left-2 md:left-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
         >
           <ArrowLeft size={20} />
         </Link>
@@ -282,13 +402,13 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
         <Link
           to={`/supply/${next.slug}`} replace
           aria-label={`Ver ${next.name}`}
-          className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
+          className="fixed top-[76px] md:top-20 right-2 md:right-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
         >
           <ArrowRight size={20} />
         </Link>
       )}
 
-      <div className="bg-gray-950 pt-16 md:pt-24">
+      <div className="bg-gray-950 pt-0 pb-20 md:pt-24 md:pb-0">
 
         {/* HERO — H1 + ícono de categoría en móvil */}
         <div className="relative overflow-hidden px-6 max-w-7xl mx-auto pb-5 md:pb-10">
@@ -303,7 +423,8 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                 <ArrowLeft size={20} />
               </Link>
             )}
-            <p className="flex-1 text-center uppercase tracking-[0.25em] text-zinc-500 text-xs">Categoría</p>
+            <p className="md:hidden flex-1 text-center uppercase tracking-[0.25em] text-zinc-500 text-xs">{title}</p>
+            <p className="hidden md:block flex-1 text-center uppercase tracking-[0.25em] text-zinc-500 text-xs">Categoría</p>
             {next && (
               <Link
                 to={`/supply/${next.slug}`} replace
@@ -314,11 +435,8 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
               </Link>
             )}
           </div>
-          <div className="relative z-10 flex items-center justify-center gap-3 mb-4">
-            <h1 className="text-xl md:text-4xl font-black uppercase tracking-tight leading-none text-white text-center whitespace-nowrap">{title}</h1>
-            {CatIcon && (
-              <CatIcon size={48} className="text-zinc-800 flex-shrink-0 md:hidden" strokeWidth={1} />
-            )}
+          <div className="hidden md:flex relative z-10 items-center justify-center gap-3 mb-4">
+            <h1 className="text-4xl font-black uppercase tracking-tight leading-none text-white text-center whitespace-nowrap">{title}</h1>
           </div>
           {intro && (
             <p className="relative z-10 text-zinc-400 text-base md:text-lg leading-relaxed max-w-3xl text-justify [hyphens:auto]">{intro}</p>
@@ -336,15 +454,14 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
 
         {/* PRODUCTOS FÍSICOS — grid en los tres anchos (2/3/4 columnas) */}
         <motion.div {...REVEAL} className="pb-10 max-w-7xl mx-auto">
-          {hayStockInicial && (
-            <div className="flex flex-nowrap items-center gap-2 px-6 mb-5">
+          <div className="hidden md:flex flex-nowrap items-center gap-2 px-6 mb-5">
               <div className="relative flex-1 min-w-0">
                 <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
                 <input
                   type="text"
                   value={busqueda}
                   onChange={(e) => setBusqueda(e.target.value)}
-                  placeholder="Buscar producto"
+                  placeholder={`Buscar en categoría ${title.toLowerCase()}`}
                   className="w-full min-w-0 bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-lg pl-8 pr-2 py-2 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500"
                 />
               </div>
@@ -444,7 +561,6 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                 )}
               </div>
             </div>
-          )}
           {!hayStockInicial ? (
             <div className="mx-6 border border-blue-500/20 bg-zinc-950 rounded-2xl p-10 text-center">
               <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2">Sin stock por el momento</p>

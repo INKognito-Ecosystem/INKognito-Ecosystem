@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useLoaderData } from 'react-router-dom'
 import { motion } from 'motion/react'
 import NavbarSupply from './NavbarSupply'
@@ -88,8 +89,28 @@ export function meta() {
   ]
 }
 
+// Textos completos de Educación para el modal "Ver más" del home móvil
+// (2026-09-15) — las cards compactas muestran una versión recortada con
+// line-clamp-2, este es el texto íntegro, igual al que ya usa la versión
+// desktop, mismo patrón que "Ver descripción" en SupplyProductCard.jsx.
+const EDUCACION_DESC = {
+  cursos: {
+    titulo: 'Domina tu oficio',
+    texto: 'Formación en técnica, higiene y gestión de estudio. Acceso ilimitado para aprender a tu propio ritmo.',
+  },
+  kit: {
+    titulo: 'Equípate bien',
+    texto: 'Equipamiento inicial y configuraciones clave para armar tu mesa de trabajo con criterio profesional y sin sobrecostos.',
+  },
+  recursos: {
+    titulo: 'Conocimiento',
+    texto: 'Guías, plantillas y herramientas descargables diseñadas para potenciar tu técnica y el rendimiento de tu trabajo.',
+  },
+}
+
 export default function SupplyPage() {
   const { counts, imgs, productsInitial } = useLoaderData()
+  const [descAbierta, setDescAbierta] = useState(null)
 
   return (
 
@@ -113,15 +134,25 @@ export default function SupplyPage() {
       <BrandsSupply imgs={imgs} />
     </div>
 
-    {/* SECCIÓN EDUCACIÓN — Cursos, Kit, Recursos */}
-    <motion.section {...REVEAL} className="relative overflow-hidden bg-gray-950 border-t border-zinc-900 py-8 md:py-16">
+    {/* SECCIÓN EDUCACIÓN — Cursos, Kit, Recursos.
+        Encabezado con dos versiones (2026-09-15): la de siempre para
+        desktop (intacta, sin tocar), y una compacta para móvil que combine
+        visualmente con el resto del home nuevo (MobileHomeSupply) — mismo
+        criterio de "Destacados" ahí: título chico, sin el layout flotado. */}
+    <motion.section {...REVEAL} id="educacion" className="relative overflow-hidden bg-gray-950 border-t border-zinc-900 py-6 md:py-16">
       <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
-        <div className="mb-6">
-          <h2 className="float-left mr-6 md:mr-8 mb-2 text-2xl md:text-4xl font-black uppercase leading-none">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6">
+        <div className="mb-4 md:mb-6">
+          <h2 className="hidden md:block float-left mr-6 md:mr-8 mb-2 text-2xl md:text-4xl font-black uppercase leading-none">
             Educación
           </h2>
-          <p className="text-zinc-500 text-sm leading-relaxed text-justify [hyphens:auto]">
+          <h2 className="md:hidden text-lg font-black uppercase mb-1.5">Educación</h2>
+          <p className="hidden md:block text-zinc-500 text-sm leading-relaxed text-justify [hyphens:auto]">
+            Recursos formativos, kits esenciales y herramientas gratuitas seleccionadas para
+            perfeccionar tu técnica y gestionar tu trabajo. Formación práctica enfocada en el
+            crecimiento constante del artista.
+          </p>
+          <p className="md:hidden text-zinc-500 text-sm leading-relaxed">
             Recursos formativos, kits esenciales y herramientas gratuitas seleccionadas para
             perfeccionar tu técnica y gestionar tu trabajo. Formación práctica enfocada en el
             crecimiento constante del artista.
@@ -129,7 +160,93 @@ export default function SupplyPage() {
           <div className="clear-both" />
         </div>
 
-        <div className="flex md:grid md:grid-cols-3 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+        {/* Versión compacta solo móvil (2026-09-15, pedido de Jose): cards
+            angostas para que quepan 2 por pantalla (solo hay que deslizar
+            para ver la 3ra), ícono junto al título en vez de arriba. */}
+        <div className="md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 pb-2 scrollbar-hide">
+
+          <div className="group relative overflow-hidden snap-start flex-shrink-0 w-[44vw] border border-amber-500/20 bg-gradient-to-br from-zinc-900 to-black rounded-xl p-4 flex flex-col">
+            <div className="absolute -bottom-8 -left-8 w-24 h-24 rounded-full bg-amber-600/10" />
+            <div className="relative flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-full bg-zinc-900 border border-amber-500/20 flex items-center justify-center text-amber-400 flex-shrink-0">
+                <GraduationCap size={15} />
+              </div>
+              <h3 className="text-sm font-black uppercase leading-tight">Domina tu oficio.</h3>
+            </div>
+            <p className="relative text-zinc-400 text-[11px] leading-snug flex-1 line-clamp-2">
+              Formación en técnica, higiene y gestión de estudio. Acceso ilimitado para aprender a tu propio ritmo.
+            </p>
+            <button
+              type="button"
+              onClick={() => setDescAbierta('cursos')}
+              className="relative self-start text-zinc-500 text-[9.5px] font-bold uppercase tracking-wide underline underline-offset-2 mt-1 mb-3"
+            >
+              Ver más
+            </button>
+            <Link
+              to="/supply/aprende/cursos"
+              className="relative shrink-0 border border-amber-500/40 text-amber-400 text-[10px] font-black uppercase tracking-[0.1em] py-2 px-3 rounded-lg text-center"
+            >
+              Ver cursos →
+            </Link>
+          </div>
+
+          <div className="group relative overflow-hidden snap-start flex-shrink-0 w-[44vw] border border-blue-500/20 bg-gradient-to-br from-zinc-900 to-black rounded-xl p-4 flex flex-col">
+            <div className="absolute -bottom-8 -left-8 w-24 h-24 rounded-full bg-blue-500/10" />
+            <div className="relative flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-full bg-zinc-900 border border-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0">
+                <Package size={15} />
+              </div>
+              <h3 className="text-sm font-black uppercase leading-tight">Equípate bien</h3>
+            </div>
+            <p className="relative text-zinc-400 text-[11px] leading-snug flex-1 line-clamp-2">
+              Equipamiento inicial y configuraciones clave para tu mesa de trabajo, sin sobrecostos.
+            </p>
+            <button
+              type="button"
+              onClick={() => setDescAbierta('kit')}
+              className="relative self-start text-zinc-500 text-[9.5px] font-bold uppercase tracking-wide underline underline-offset-2 mt-1 mb-3"
+            >
+              Ver más
+            </button>
+            <Link
+              to="/supply/aprende/kit"
+              className="relative shrink-0 border border-blue-500/40 text-blue-400 text-[10px] font-black uppercase tracking-[0.1em] py-2 px-3 rounded-lg text-center"
+            >
+              Ver kit →
+            </Link>
+          </div>
+
+          <div className="group relative overflow-hidden snap-start flex-shrink-0 w-[44vw] border border-emerald-500/20 bg-gradient-to-br from-zinc-900 to-black rounded-xl p-4 flex flex-col">
+            <div className="absolute -bottom-8 -left-8 w-24 h-24 rounded-full bg-emerald-500/10" />
+            <div className="relative flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-full bg-zinc-900 border border-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0">
+                <BookOpen size={15} />
+              </div>
+              <h3 className="text-sm font-black uppercase leading-tight">Conocimiento</h3>
+            </div>
+            <p className="relative text-zinc-400 text-[11px] leading-snug flex-1 line-clamp-2">
+              Guías, plantillas y herramientas descargables para potenciar tu técnica.
+            </p>
+            <button
+              type="button"
+              onClick={() => setDescAbierta('recursos')}
+              className="relative self-start text-zinc-500 text-[9.5px] font-bold uppercase tracking-wide underline underline-offset-2 mt-1 mb-3"
+            >
+              Ver más
+            </button>
+            <Link
+              to="/supply/aprende/recursos"
+              className="relative shrink-0 border border-emerald-500/40 text-emerald-400 text-[10px] font-black uppercase tracking-[0.1em] py-2 px-3 rounded-lg text-center"
+            >
+              Ver recursos →
+            </Link>
+          </div>
+
+        </div>
+
+        {/* Versión original, sin tocar — solo desktop */}
+        <div className="hidden md:grid md:grid-cols-3 gap-4">
 
           {/* CARD CURSOS — mismo patrón de card usado en Eljach (Packages.jsx:
               fondo en degradado, no plano + hover con elevación/sombra) y en
@@ -205,6 +322,34 @@ export default function SupplyPage() {
       </div>
     </motion.section>
 
+    {/* Modal "Ver más" de Educación — mismo patrón que "Ver descripción" en
+        SupplyProductCard.jsx (sheet inferior, solo móvil). Vive AFUERA de
+        la sección (que tiene overflow-hidden para el patrón de puntos) —
+        anidado ahí adentro, el fixed del modal quedaba recortado por el
+        overflow-hidden del ancestro y el tab bar (z-40) se veía encima del
+        modal en la franja inferior (2026-09-15, reportado por Jose). */}
+    {descAbierta && (
+      <div
+        className="md:hidden fixed inset-0 z-50 bg-black/70 flex items-end"
+        onClick={() => setDescAbierta(null)}
+      >
+        <div
+          className="w-full max-w-md bg-zinc-950 border-t border-zinc-800 rounded-t-2xl p-5"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="text-xs font-black uppercase tracking-widest text-white">
+              {EDUCACION_DESC[descAbierta].titulo}
+            </h4>
+            <button onClick={() => setDescAbierta(null)} className="text-zinc-500 text-lg leading-none px-1">✕</button>
+          </div>
+          <p className="text-zinc-400 text-sm leading-relaxed">
+            {EDUCACION_DESC[descAbierta].texto}
+          </p>
+        </div>
+      </div>
+    )}
+
     {/* ── COBERTURA + CONTACTO — solo móvil ────────────────────── */}
     <motion.section {...REVEAL} id="contacto" className="relative overflow-hidden md:hidden border-t border-zinc-900 bg-gray-950 px-6 py-8">
       <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
@@ -249,6 +394,10 @@ export default function SupplyPage() {
     <TechMarquee />
 
     <FooterSupply />
+
+    {/* Espacio para que la tab bar fija de MobileHomeSupply no tape el
+        footer (Términos/Privacidad) — 2026-09-15, reportado por Jose. */}
+    <div className="h-20 md:hidden" />
 
     </main>
 

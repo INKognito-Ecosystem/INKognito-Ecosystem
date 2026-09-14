@@ -91,18 +91,29 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
       </div>
 
       {/* BANNER — más ancho que el resto, texto igual al de HeroSupply.jsx.
-          Compacto a pedido de Jose (2026-09-14): sin botón CTA, menos padding. */}
+          Compacto sin botón CTA (2026-09-14); un poco más alto (2026-09-15). */}
       <div
-        className="mx-2 mt-3 rounded-2xl border border-blue-500/30 px-4 py-4 relative overflow-hidden"
+        className="mx-2 mt-3 rounded-2xl border border-blue-500/30 px-4 py-6 relative overflow-hidden"
         style={{ background: 'radial-gradient(circle at 88% 28%, rgba(59,130,246,.28), transparent 55%), linear-gradient(145deg,#0e1626,#07090d)' }}
       >
-        <p className="text-blue-500 text-[9px] font-bold uppercase tracking-[0.3em] mb-1.5">INKognito Supply — Colombia</p>
+        <p className="text-blue-500 text-[9px] font-bold uppercase tracking-[0.3em] mb-2">INKognito Supply — Colombia</p>
         <h2 className="text-lg font-black uppercase leading-[0.95]">
           Professional <span className="text-blue-500">Tattoo</span> Equipment
         </h2>
-        <p className="text-zinc-400 text-[10.5px] mt-1.5 max-w-[230px] leading-snug">
+        <p className="text-zinc-400 text-[10.5px] mt-2 max-w-[230px] leading-snug">
           Ecosistema de distribución de insumos profesionales.
         </p>
+        {/* Checks de cobertura/confianza (2026-09-15) — texto completo, en
+            una sola fila, alineados a la altura de "profesionales." (2da
+            línea del subtítulo), aprovechando el espacio libre a su
+            derecha. Posición absoluta: no suma altura al banner. */}
+        <div className="absolute right-4 bottom-[26px] left-[108px] flex flex-nowrap justify-between gap-1">
+          {['Stock verificado', 'Despacho directo', 'Cobertura nacional'].map(g => (
+            <span key={g} className="flex items-center gap-0.5 text-[7.5px] font-bold text-zinc-300 whitespace-nowrap">
+              <span className="text-green-500">✓</span> {g}
+            </span>
+          ))}
+        </div>
       </div>
 
       {/* MARCAS — mismo BrandsMarquee y mismas frases del hero, justo debajo del banner */}
@@ -173,19 +184,33 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
 
       <CartDrawerSupply open={drawerOpen} onClose={() => setDrawerOpen(false)} />
 
-      {/* MENÚ — mismo contenido que el dropdown de NavbarSupply, en sheet inferior */}
+      {/* MENÚ — pantalla completa (2026-09-15, antes era un sheet chico que
+          dejaba ver el fondo; mismo contenido que el dropdown de NavbarSupply) */}
       {menuOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-end" onClick={() => setMenuOpen(false)}>
-          <div className="w-full bg-zinc-950 border-t border-zinc-800 rounded-t-2xl pb-6" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-900">
+        <div className="fixed inset-0 z-50 bg-zinc-950 flex flex-col">
+          <div className="flex-shrink-0 flex items-center justify-between px-5 py-4 border-b border-zinc-900">
+            <div className="flex items-center gap-2">
+              <img src={logoSupply} alt="INKognito Supply" className="w-12 h-12 object-contain" />
               <span className="text-xs font-black uppercase tracking-widest text-white">Menú</span>
-              <button onClick={() => setMenuOpen(false)} className="text-zinc-500"><X size={20} /></button>
             </div>
-            <Link to="/supply/proveedores" onClick={() => setMenuOpen(false)} className="block px-5 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400">
-              Proveedores
+            <button onClick={() => setMenuOpen(false)} className="text-zinc-400 p-1"><X size={22} /></button>
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            <Link to="/supply/proveedores" onClick={() => setMenuOpen(false)} className="block px-6 py-5 uppercase text-sm font-bold tracking-[0.2em] text-zinc-300 border-b border-zinc-900">
+              Tiendas verificadas
             </Link>
-            <InkognitoModuleMenu current="supply" textClassName="text-zinc-400" onNavigate={() => setMenuOpen(false)} />
-            <Link to="/" onClick={() => setMenuOpen(false)} className="block px-5 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400">
+            <Link to="/supply/proveedores/unete" onClick={() => setMenuOpen(false)} className="block px-6 py-5 uppercase text-sm font-bold tracking-[0.2em] text-blue-400 border-b border-zinc-900">
+              Registrar mi Supply
+            </Link>
+            <button
+              type="button"
+              onClick={() => { setMenuOpen(false); scrollToId('educacion') }}
+              className="block w-full text-left px-6 py-5 uppercase text-sm font-bold tracking-[0.2em] text-zinc-300 border-b border-zinc-900"
+            >
+              Educación para el artista
+            </button>
+            <InkognitoModuleMenu current="supply" textClassName="text-zinc-300 border-b border-zinc-900" onNavigate={() => setMenuOpen(false)} />
+            <Link to="/" onClick={() => setMenuOpen(false)} className="block px-6 py-5 uppercase text-sm font-bold tracking-[0.2em] text-zinc-300 border-b border-zinc-900">
               Ecosistema
             </Link>
           </div>

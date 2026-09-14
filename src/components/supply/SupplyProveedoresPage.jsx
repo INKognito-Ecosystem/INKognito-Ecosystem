@@ -28,8 +28,8 @@ export async function loader() {
 }
 
 export function meta() {
-  const title = 'Proveedores verificados | INKognito Supply'
-  const description = 'Directorio de estudios y empresas registradas como proveedores en INKognito Supply, en toda Colombia.'
+  const title = 'Tiendas verificadas | INKognito Supply'
+  const description = 'Directorio de tiendas y estudios verificados en INKognito Supply, en toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },
@@ -60,22 +60,22 @@ export default function SupplyProveedoresPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <NavbarCategory pageName="Proveedores" />
+      <NavbarCategory pageName="Tiendas verificadas" />
 
       <div className="relative overflow-hidden pt-20 md:pt-28 pb-4 px-6">
         <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
         <div className="relative z-10 max-w-5xl mx-auto text-center">
           <p className="uppercase tracking-[0.25em] text-blue-400/70 text-xs mb-2">INKognito Supply</p>
-          <h1 className="text-2xl md:text-4xl font-black uppercase leading-tight mb-3 text-white">Proveedores verificados</h1>
+          <h1 className="text-2xl md:text-4xl font-black uppercase leading-tight mb-3 text-white">Tiendas verificadas</h1>
           <p className="text-zinc-400 text-sm max-w-md mx-auto leading-relaxed">
-            Estudios y empresas reales, registrados en INKognito Supply, en toda Colombia.
+            Tiendas y estudios reales, verificados en INKognito Supply, en toda Colombia.
           </p>
         </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-6 pb-6 md:pb-10">
         {proveedores.length === 0 ? (
-          <p className="text-zinc-600 text-sm text-center py-10">Todavía no hay proveedores registrados.</p>
+          <p className="text-zinc-600 text-sm text-center py-10">Todavía no hay tiendas registradas.</p>
         ) : (
           <>
             <div className="relative max-w-sm mx-auto mt-4 mb-6">
@@ -89,7 +89,7 @@ export default function SupplyProveedoresPage() {
               />
             </div>
             {proveedoresFiltrados.length === 0 ? (
-              <p className="text-zinc-600 text-sm text-center py-10">Ningún proveedor coincide con "{busqueda}".</p>
+              <p className="text-zinc-600 text-sm text-center py-10">Ninguna tienda coincide con "{busqueda}".</p>
             ) : (
               <>
                 <div className="max-w-xl mx-auto flex flex-col divide-y divide-zinc-800 border-t border-b border-zinc-800">
@@ -146,7 +146,7 @@ export default function SupplyProveedoresPage() {
             to="/supply/proveedores/unete"
             className="inline-block px-6 py-3 bg-blue-500 text-white font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-blue-600 transition"
           >
-            Regístrate como proveedor
+            Registrar mi Supply
           </Link>
         </div>
       </div>

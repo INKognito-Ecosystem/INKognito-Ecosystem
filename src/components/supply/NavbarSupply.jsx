@@ -48,7 +48,7 @@ export default function NavbarSupply() {
                 Marcas
               </button>
               <Link to="/supply/proveedores" className="uppercase text-sm tracking-[0.2em] text-zinc-400 hover:text-white transition-all duration-300">
-                Proveedores
+                Tiendas verificadas
               </Link>
               <button onClick={() => scrollTo('contacto-desktop')} className="uppercase text-sm tracking-[0.2em] text-zinc-400 hover:text-white transition-all duration-300">
                 Contacto
@@ -96,7 +96,7 @@ export default function NavbarSupply() {
                 </button>
                 <Link to="/supply/proveedores" onClick={() => setMenuOpen(false)}
                   className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
-                  Proveedores
+                  Tiendas verificadas
                 </Link>
                 <InkognitoModuleMenu
                   current="supply"
