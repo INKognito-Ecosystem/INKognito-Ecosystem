@@ -44,8 +44,23 @@ const supplyJsonLd = {
   "areaServed": "Colombia"
 }
 
+// 2026-09-13, Jose: "al volver atrás, las imágenes de cada card de
+// categorías y marcas espabila — primero sin imagen, luego aparece" — las
+// 3 secciones (Categorías, Marcas, el carrusel del hero) pedían
+// `/api/visual/supply` cada una por su cuenta con su propio useEffect,
+// así que cada vez que se remonta la página (cualquier navegación de
+// vuelta, no solo un refresh real) arrancaban de nuevo en `{}` antes de
+// que la respuesta llegara — 3 fetches duplicados y 3 parpadeos. Al traer
+// esas imágenes acá, en el loader (mismo momento que ya trae el
+// catálogo), quedan listas ANTES del primer render — cero parpadeo, sin
+// importar si es la primera carga o una vuelta atrás.
 export async function loader() {
-  return fetchCatalogFull('supply')
+  const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+  const [catalogo, imgs] = await Promise.all([
+    fetchCatalogFull('supply'),
+    fetch(`${PANEL_URL}/api/visual/supply`).then(r => r.ok ? r.json() : {}).catch(() => ({})),
+  ])
+  return { ...catalogo, imgs }
 }
 
 export function meta() {
@@ -63,7 +78,7 @@ export function meta() {
 }
 
 export default function SupplyPage() {
-  const { categorias } = useLoaderData()
+  const { categorias, imgs } = useLoaderData()
 
   return (
 
@@ -71,15 +86,15 @@ export default function SupplyPage() {
 
     <NavbarSupply />
 
-      <HeroSupply />
+      <HeroSupply imgs={imgs} />
 
 <div className="max-w-7xl mx-auto px-6 mt-2 md:mt-8">
   <div className="border-b border-zinc-900"></div>
 </div>
 
-<CategoriesSupply categorias={categorias} />
+<CategoriesSupply categorias={categorias} imgs={imgs} />
 
-    <BrandsSupply />
+    <BrandsSupply imgs={imgs} />
 
     {/* SECCIÓN EDUCACIÓN — Cursos, Kit, Recursos */}
     <motion.section {...REVEAL} className="relative overflow-hidden bg-gray-950 border-t border-zinc-900 py-8 md:py-16">

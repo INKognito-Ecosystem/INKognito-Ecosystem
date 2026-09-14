@@ -1,9 +1,6 @@
-import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import CoverflowRow from '../CoverflowRow'
-
-const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
 // Exportados (2026-09-13) para que BrandsMarquee.jsx (prueba en el hero,
 // mismo scroll infinito que TechMarquee.jsx pero con logos de marcas) los
@@ -54,16 +51,13 @@ export const brands = [
   { name: 'ROYAL THREE', to: '/supply/brands/royal-three' },
 ]
 
-export default function BrandsSupply() {
-  const [imgs, setImgs] = useState({})
-
-  useEffect(() => {
-    fetch(`${PANEL_URL}/api/visual/supply`)
-      .then(r => r.json())
-      .then(data => setImgs(data || {}))
-      .catch(() => {})
-  }, [])
-
+// imgs viene del loader de SupplyPage.jsx (2026-09-13, Jose: "al volver
+// atrás... espabila primero sin imagen luego aparece") — antes este
+// componente pedía `/api/visual/supply` por su cuenta; al remontarse en
+// cada navegación de vuelta arrancaba en `{}` antes de que llegara la
+// respuesta, mostrando la marca sin logo un instante. Ahora llega ya
+// resuelto desde el loader, sin parpadeo.
+export default function BrandsSupply({ imgs = {} }) {
   return (
     <motion.section
       {...REVEAL}

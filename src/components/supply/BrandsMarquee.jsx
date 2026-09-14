@@ -1,8 +1,5 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { brands, brandKey } from './BrandsSupply'
-
-const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
 // Prueba (2026-09-13, Jose: "tomar los logos de las marcas de Supply y
 // hacer un carrusel como el que hacen las tecnologías usadas") — mismo
@@ -64,16 +61,13 @@ function BrandLogo({ brand, img }) {
   )
 }
 
-export default function BrandsMarquee() {
-  const [imgs, setImgs] = useState({})
-
-  useEffect(() => {
-    fetch(`${PANEL_URL}/api/visual/supply`)
-      .then((r) => r.json())
-      .then((data) => setImgs(data || {}))
-      .catch(() => {})
-  }, [])
-
+// imgs viene del loader de SupplyPage.jsx vía HeroSupply.jsx (2026-09-13,
+// Jose: "al volver atrás... espabila primero sin imagen luego aparece")
+// — antes este componente pedía `/api/visual/supply` por su cuenta (un
+// tercer fetch idéntico al de BrandsSupply.jsx y CategoriesSupply.jsx en
+// la misma página); ahora las 3 comparten el mismo dato ya resuelto,
+// sin parpadeo ni fetches duplicados.
+export default function BrandsMarquee({ imgs = {} }) {
   return (
     <div
       className="relative mt-6 md:mt-10"

@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { Drill, PenTool, PlugZap, Droplet, Crosshair, Hand, ShieldCheck, Toolbox, BedDouble, Package } from 'lucide-react'
@@ -17,8 +16,6 @@ const REVEAL = {
   viewport: { once: true, amount: 0.2 },
   transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
 }
-
-const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
 // Convierte el campo `cat` de cada categoría a la clave de settings usada en el panel
 const catKey = (cat) => 'supply_cat_' + cat.toLowerCase()
@@ -42,16 +39,13 @@ const categories = [
   { name: 'Combos',            path: '/supply/bundles',        icon: Package,    cat: 'Combos'      },
 ]
 
-export default function CategoriesSupply({ categorias = {} }) {
-  const [imgs, setImgs] = useState({})
-
-  useEffect(() => {
-    fetch(`${PANEL_URL}/api/visual/supply`)
-      .then(r => r.json())
-      .then(data => setImgs(data || {}))
-      .catch(() => {})
-  }, [])
-
+// imgs viene del loader de SupplyPage.jsx (2026-09-13, Jose: "al volver
+// atrás... espabila primero sin imagen luego aparece") — antes este
+// componente pedía `/api/visual/supply` por su cuenta con su propio
+// useEffect, así que cada vez que la página se remontaba (cualquier
+// navegación de vuelta) arrancaba de nuevo en `{}` antes de que llegara
+// la respuesta. Ahora llega ya resuelto desde el loader, sin parpadeo.
+export default function CategoriesSupply({ categorias = {}, imgs = {} }) {
   // Mapa de categoría → cantidad de productos disponibles
   const stockPorCat = {}
   Object.entries(categorias).forEach(([cat, items]) => {

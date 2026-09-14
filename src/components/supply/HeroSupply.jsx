@@ -5,7 +5,7 @@ const DOT_PATTERN = {
   backgroundSize: '18px 18px',
 }
 
-export default function HeroSupply() {
+export default function HeroSupply({ imgs = {} }) {
 
   // pt-20 (antes pt-16 en móvil, igual a la altura del navbar h-16 — el
   // título quedaba pegado al borde; pt-24 quedó muy separado, reportado por
@@ -47,7 +47,7 @@ export default function HeroSupply() {
           <p className="mt-8 md:mt-10 text-center text-[10px] md:text-xs uppercase tracking-[0.3em] text-zinc-500 font-semibold">
             Marcas referentes en la industria
           </p>
-          <BrandsMarquee />
+          <BrandsMarquee imgs={imgs} />
 
           <p className="mt-5 text-center text-xs italic tracking-wide text-zinc-400">
             “De un tatuador, para tatuadores.”
