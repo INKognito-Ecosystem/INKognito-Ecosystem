@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ExternalLink, BookOpen, Package, PlayCircle } from 'lucide-react'
+import { ExternalLink, BookOpen, Package, PlayCircle, ArrowLeft, ArrowRight } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa'
 import NavbarCategory from '../NavbarCategory'
 import FooterSupply from '../FooterSupply'
+import { getAdjacentAprende } from '../../../data/aprendeOrder'
 
 // Piezas compartidas por las 3 páginas de /supply/aprende/* (cursos, kit,
 // recursos) — 2026-09-13, Jose: "separemos las card de educación... cada
@@ -22,6 +24,15 @@ export const DOT_PATTERN = {
 }
 
 export function AfiliadoCard({ item, color }) {
+  // Descripción recortada a 3 líneas siempre, en cualquier pantalla
+  // (2026-09-13, Jose: "que se acorte siempre a 3 líneas... la card no
+  // deberá crecer, se abre la descripción en la parte inferior") — mismo
+  // mecanismo de hoja inferior que ya usa SupplyProductCard.jsx en
+  // Supply, pero sin el gate `md:hidden` de ese componente: acá el
+  // recorte aplica también en escritorio, porque estas cards viven en una
+  // grilla de hasta 5 columnas donde una descripción larga rompería la
+  // altura pareja de la fila.
+  const [showDesc, setShowDesc] = useState(false)
   const borderHover = `hover:border-${color}-500/50`
   const url = item.url_ventas || item.url_checkout
   const card = (
@@ -42,14 +53,38 @@ export function AfiliadoCard({ item, color }) {
       )}
       {/* Info */}
       <div className="p-4 flex flex-col gap-2 flex-1">
-        <span className={`text-[9px] font-black uppercase tracking-widest bg-${color}-500/15 text-${color}-400 border border-${color}-500/30 rounded-full px-2 py-0.5 self-start`}>
-          {item.categoria}
-        </span>
+        {/* Insignia de categoría quitada (2026-09-13, Jose: "esa palabra
+            arriba del título solo distingue en el panel, donde varias
+            categorías se mezclan en una tabla — acá cada página ya es una
+            sola categoría, repetirla en cada card es ruido") — el título
+            sube y la card queda más compacta con un elemento menos. */}
         <h3 className="font-black uppercase text-xs tracking-[0.08em] text-white leading-snug">
           {item.name}
         </h3>
         {item.descripcion && (
-          <p className="text-zinc-500 text-[10px] leading-relaxed flex-1">{item.descripcion}</p>
+          // 2 líneas de texto + 1 línea para "Ver descripción" = 3 líneas
+          // visibles siempre (2026-09-13, Jose: "sin color y seguido del
+          // texto", y que sean siempre 3 líneas, no 3 en una card y 4 en
+          // otra). Se probaron dos versiones antes de esta: (a) todo el
+          // párrafo con line-clamp-3 y el botón adentro, en línea — con
+          // descripciones largas el texto ya llenaba las 3 líneas por sí
+          // solo y el botón quedaba recortado, invisible (confirmado
+          // midiendo scrollHeight vs clientHeight); (b) recorte por
+          // cantidad fija de caracteres — funcionaba en desktop pero en
+          // las cards angostas de móvil (w-[44vw]) esos mismos caracteres
+          // ya no cabían en 3 líneas. Separar el botón en su propia línea
+          // (sin line-clamp, nunca se recorta) es lo único que garantiza
+          // que sea siempre visible sin importar el ancho de la card.
+          <div className="flex flex-col gap-0.5">
+            <p className="text-zinc-500 text-[10px] leading-relaxed line-clamp-2">{item.descripcion}</p>
+            <button
+              type="button"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowDesc(true) }}
+              className="text-zinc-500 text-[10px] leading-relaxed underline underline-offset-2 self-start"
+            >
+              Ver descripción
+            </button>
+          </div>
         )}
         {/* Acciones según tipo */}
         {item.categoria === 'Kit Externo' ? (
@@ -88,15 +123,38 @@ export function AfiliadoCard({ item, color }) {
     </div>
   )
 
-  // Cursos y Recursos → card completa es clickeable
-  if (item.categoria !== 'Kit Externo' && url) {
-    return (
-      <a href={url} target="_blank" rel="noopener noreferrer" className="contents">
-        {card}
-      </a>
-    )
-  }
-  return card
+  // Cursos y Recursos → card completa es clickeable. El botón "Ver
+  // descripción" ya hace preventDefault+stopPropagation en su onClick de
+  // arriba, así que abrir la hoja inferior no dispara además la
+  // navegación de este <a> que envuelve toda la card.
+  const wrapped = item.categoria !== 'Kit Externo' && url ? (
+    <a href={url} target="_blank" rel="noopener noreferrer" className="contents">
+      {card}
+    </a>
+  ) : card
+
+  return (
+    <>
+      {wrapped}
+      {showDesc && (
+        <div
+          className="fixed inset-0 z-50 bg-black/70 flex items-end justify-center"
+          onClick={() => setShowDesc(false)}
+        >
+          <div
+            className="w-full max-w-md bg-zinc-950 border-t border-zinc-800 rounded-t-2xl p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-xs font-black uppercase tracking-widest text-white">Descripción</h4>
+              <button onClick={() => setShowDesc(false)} className="text-zinc-500 text-lg leading-none px-1">✕</button>
+            </div>
+            <p className="text-zinc-400 text-sm leading-relaxed">{item.descripcion}</p>
+          </div>
+        </div>
+      )}
+    </>
+  )
 }
 
 // mostrarTitulo (default true) — en las páginas dedicadas (CursosPage,
@@ -143,24 +201,52 @@ export function SeccionAfiliados({ id, label, titulo, subtitulo, items, color, c
 // sección de afiliados (children) + CTA de vuelta a Supply + Footer.
 // Cada página (CursosPage/KitPage/RecursosPage) solo aporta su copy y su
 // <SeccionAfiliados>, no repite este esqueleto 3 veces.
-export function AprendePageShell({ eyebrow, titulo, descripcion, children }) {
+export function AprendePageShell({ eyebrow, titulo, descripcion, slug, children }) {
+  // Flechitas prev/next entre Cursos/Kit/Recursos (2026-09-13, Jose) —
+  // fijas en la esquina, pegadas al navbar (no empujan el título, que es
+  // lo que pasaba con la versión en línea de un intento anterior), mismo
+  // tamaño (20) que las de categorías pero sin círculo/fondo, tal como
+  // pidió.
+  const { prev, next } = getAdjacentAprende(slug)
+
   return (
     <div className="min-h-screen bg-gray-950 text-white">
 
       <NavbarCategory pageName="Aprende a Tatuar" backPath="/supply" backLabel="Supply" />
 
-      <div className="relative overflow-hidden bg-gray-950 pt-16 md:pt-24">
+      {prev && (
+        <Link
+          to={`/supply/aprende/${prev.slug}`} replace
+          aria-label={`Ver ${prev.name}`}
+          className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-500 hover:text-white transition-colors"
+        >
+          <ArrowLeft size={20} />
+        </Link>
+      )}
+      {next && (
+        <Link
+          to={`/supply/aprende/${next.slug}`} replace
+          aria-label={`Ver ${next.name}`}
+          className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-500 hover:text-white transition-colors"
+        >
+          <ArrowRight size={20} />
+        </Link>
+      )}
+
+      <div className="relative overflow-hidden bg-gray-950 pt-20 md:pt-28">
         <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
         <div className="relative z-10 px-6 max-w-7xl mx-auto pb-5 md:pb-8">
-          <p className="uppercase tracking-[0.25em] text-zinc-500 text-[10px] mb-2">
-            {eyebrow}
-          </p>
           <h1 className="text-3xl md:text-6xl font-black uppercase leading-none mb-3 text-white">
             {titulo}
           </h1>
-          <p className="text-zinc-400 text-sm md:text-lg leading-relaxed max-w-2xl">
+          <p className="text-zinc-400 text-sm md:text-lg leading-relaxed max-w-2xl mb-4">
             {descripcion}
           </p>
+          {/* Eyebrow (2026-09-13, Jose: primero pidió que bajara debajo de
+              la descripción arriba de las cards; luego, que quedara
+              ARRIBA de la línea que separa el hero de las cards, no
+              debajo — o sea, todavía dentro de este bloque del hero). */}
+          <p className="uppercase tracking-[0.25em] text-zinc-500 text-[10px]">{eyebrow}</p>
         </div>
       </div>
 

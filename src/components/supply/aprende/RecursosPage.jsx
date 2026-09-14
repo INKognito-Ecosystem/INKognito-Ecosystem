@@ -31,6 +31,7 @@ export default function RecursosPage() {
 
   return (
     <AprendePageShell
+      slug="recursos"
       eyebrow="Sin costo"
       titulo={<>Recursos<br /><span className="text-zinc-500">gratuitos.</span></>}
       descripcion="Guías, plantillas y herramientas descargables diseñadas para potenciar tu técnica y el rendimiento de tu trabajo."

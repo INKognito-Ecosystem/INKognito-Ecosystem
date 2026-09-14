@@ -32,9 +32,10 @@ export default function CursosPage() {
 
   return (
     <AprendePageShell
+      slug="cursos"
       eyebrow="Hotmart · Cursos digitales"
-      titulo={<>Formación que se nota<br /><span className="text-zinc-500">en tu trazo.</span></>}
-      descripcion="Desde fundamentos hasta especialización en realismo, sombras y color. Acceso de por vida, a tu ritmo."
+      titulo={<>Formación profesional para<br /><span className="text-zinc-500">elevar tu nivel</span></>}
+      descripcion="Cursos seleccionados para dominar técnicas avanzadas, gestionar tu estudio y escalar tu marca personal."
     >
       <SeccionAfiliados
         id="cursos"

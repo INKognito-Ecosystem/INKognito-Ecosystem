@@ -31,6 +31,7 @@ export default function KitPage() {
 
   return (
     <AprendePageShell
+      slug="kit"
       eyebrow="Amazon · AliExpress · Kit básico"
       titulo={<>El kit que respalda<br /><span className="text-zinc-500">tu práctica.</span></>}
       descripcion="Insumos seleccionados para trabajar con seriedad, sin sobrecostos."
