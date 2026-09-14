@@ -156,7 +156,7 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null }
             label="Para artistas"
             extraLinks={[
               { label: 'Editar mi perfil', to: '/tattoo-artist-colombia/mi-perfil' },
-              { label: 'Cursos', to: '/supply/aprende' },
+              { label: 'Cursos', to: '/supply/aprende/cursos' },
             ]}
             textClassName="text-gray-600 hover:text-gray-900 hover:bg-gray-50"
             onNavigate={close}

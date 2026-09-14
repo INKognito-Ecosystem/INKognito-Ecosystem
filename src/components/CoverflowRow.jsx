@@ -40,7 +40,18 @@ export default function CoverflowRow({ children, desktopClassName = '', slidesPe
         coverflowEffect={{ rotate: 0, stretch: 0, depth: 140, modifier: 1.4, slideShadows: false }}
         autoplay={autoplay ? { delay: autoplayDelay, disableOnInteraction: false, pauseOnMouseEnter: true } : false}
         speed={700}
-        className="coverflow-row md:hidden"
+        // md:hidden! (no solo md:hidden) — reportado 2026-09-13 en
+        // Categorías/Marcas de Supply: a partir de md, el swiper seguía
+        // visible ENCIMA del grid de escritorio (la slide central agrandada
+        // del efecto coverflow, flotando sobre el grid normal). Causa: el
+        // CSS base de Swiper (`swiper/css`) trae su propia regla
+        // `.swiper { display: block }` sin media query — misma
+        // especificidad que la utilidad `md:hidden` de Tailwind, y se
+        // inyecta después en el bundle, así que gana el empate. El `!`
+        // (sintaxis de Tailwind v4 para !important) fuerza que el
+        // display:none gane siempre a partir de md, sin depender del orden
+        // de carga del CSS de Swiper.
+        className="coverflow-row md:hidden!"
       >
         {items.map((child, i) => (
           <SwiperSlide key={i} className="!h-auto">{child}</SwiperSlide>

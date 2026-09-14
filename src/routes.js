@@ -58,7 +58,13 @@ export default [
   route('supply/brands/heaven-pro', 'components/supply/marcasProfesionales/HeavenProPage.jsx'),
   route('supply/brands/royal-three', 'components/supply/marcasProfesionales/RoyalThreePage.jsx'),
   route('supply/mobiliario/warlock', 'components/supply/marcasProfesionales/IndustriasWarlockPage.jsx'),
-  route('supply/aprende', 'components/supply/AprendePage.jsx'),
+  // 2026-09-13, Jose: "separemos las card de educación... cada uno deberá
+  // abrir su propio espacio" — antes una sola AprendePage.jsx con anclas
+  // #cursos/#kit/#recursos mostraba las 3 categorías juntas sin importar
+  // cuál card se tocara. Ahora cada una es su propia ruta/página.
+  route('supply/aprende/cursos', 'components/supply/aprende/CursosPage.jsx'),
+  route('supply/aprende/kit', 'components/supply/aprende/KitPage.jsx'),
+  route('supply/aprende/recursos', 'components/supply/aprende/RecursosPage.jsx'),
   // Supply multitenant (fase 4, 2026-08-07) — catálogo dinámico de un
   // estudio-vendedor (vende_supply activo), a diferencia de las marcas de
   // arriba (archivo fijo por marca) esta ruta sirve a cualquier estudio.

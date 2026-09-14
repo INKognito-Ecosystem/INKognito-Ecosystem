@@ -78,11 +78,9 @@ export default function BrandsSupply() {
             Marcas
           </h2>
           <p className="text-zinc-500 text-sm leading-relaxed text-justify [hyphens:auto]">
-            Marcas reconocidas en la industria del tatuaje. Esta sección es una guía de
-            referencia, no un catálogo cerrado: reunimos nombres que ya se ganaron su lugar
-            entre tatuadores dentro y fuera de Colombia, para ayudarte a identificar qué buscar
-            según tu estilo y necesidad. Escríbenos si quieres orientación sobre alguna en
-            particular.
+            Reunimos las marcas más reconocidas del sector en un solo lugar. Consulta la oferta
+            de distintos proveedores nacionales, compara alternativas y selecciona los productos
+            ideales para tu trabajo.
           </p>
           <div className="clear-both" />
         </div>

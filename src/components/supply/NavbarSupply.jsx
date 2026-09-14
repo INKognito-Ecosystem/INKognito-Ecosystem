@@ -98,10 +98,6 @@ export default function NavbarSupply() {
                   className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
                   Proveedores
                 </Link>
-                <button onClick={() => { scrollTo('contacto'); setMenuOpen(false) }}
-                  className="block w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
-                  Contacto
-                </button>
                 <InkognitoModuleMenu
                   current="supply"
                   textClassName="text-zinc-400 hover:text-white hover:bg-zinc-900"

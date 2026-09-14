@@ -14,7 +14,9 @@ INKognito atiende Chigorodó, Apartadó, Turbo, Carepa y toda la región de Urab
 - [Tintas](https://inkognito-ecosystem.com/supply/ink) — Vice Colors, Dynamic, Eternal, Intenze, Fusion, World Famous, Solid Ink.
 - [Cartuchos](https://inkognito-ecosystem.com/supply/cartridges) — EZ Tattoo, WJX, Kwadron.
 - [Marcas](https://inkognito-ecosystem.com/supply/brands/tattoo-vision): Tattoo Vision, Heaven Pro, Royal Three.
-- [Aprende — cursos para tatuadores](https://inkognito-ecosystem.com/supply/aprende)
+- [Cursos para tatuadores](https://inkognito-ecosystem.com/supply/aprende/cursos)
+- [Kit recomendado para tatuadores](https://inkognito-ecosystem.com/supply/aprende/kit)
+- [Recursos gratuitos para tatuadores](https://inkognito-ecosystem.com/supply/aprende/recursos)
 
 ## INKognito Store — ropa y calzado deportivo
 - [Catálogo Store](https://inkognito-ecosystem.com/store): ropa dama y caballero, zapatos deportivos y casuales, guayos, tenis.
