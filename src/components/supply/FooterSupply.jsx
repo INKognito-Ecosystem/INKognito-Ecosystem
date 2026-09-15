@@ -10,6 +10,15 @@ const DOT_PATTERN = {
 // FooterSupply es compartido por TODAS las páginas de Supply, default false
 // para no tocar las demás. Solo SupplyCategoryPage.jsx pasa light={light}
 // (true únicamente en Cartuchos por ahora).
+// pb-4 en vez de py-6/py-8 simétrico en el bloque de abajo (2026-09-15,
+// Jose: "el copyright... queda lejos del navbar de abajo, hazlo más
+// compacto") — este footer es compartido por TODAS las páginas de Supply
+// (piloto light y las demás en oscuro), así que el recorte de padding
+// inferior aplica ecosystem-wide sin tocar nada más. El resto del hueco
+// (medido, no adivinado) venía del reservado fijo de 80px que cada página
+// deja para que el tab bar fijo de abajo no tape el footer — ver el mismo
+// ajuste 80px→64px en EstudioSupplyPage.jsx/SupplyPage.jsx/
+// SupplyCategoryPage.jsx (el tab bar real mide ~58px, no 80).
 export default function FooterSupply({ light = false }) {
   const t = light ? {
     barBg: 'bg-white', pageBg: 'bg-white', border: 'border-zinc-200',
@@ -38,7 +47,7 @@ export default function FooterSupply({ light = false }) {
         </h2>
       </div>
 
-      <div className={`relative ${t.pageBg} px-6 py-6 md:py-8`}>
+      <div className={`relative ${t.pageBg} px-6 pt-6 pb-4 md:py-8`}>
       <div className={`absolute inset-0 ${t.dotOpacity}`} style={DOT_PATTERN} />
 
       <div className="relative z-10 max-w-7xl mx-auto">

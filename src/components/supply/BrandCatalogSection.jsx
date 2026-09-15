@@ -32,14 +32,18 @@ const WA = '573207911013'
 // silencioso. Opcionales: las páginas que todavía no los pasan (ninguna
 // marca hoy tiene más de 100) siguen mostrando el catálogo tal cual, sin
 // botón de más.
-export default function BrandCatalogSection({ brandName, products = [], supplierBadge = null, whatsapp = WA, showEstudioBadge = true, hasMore = false, onLoadMore = null, loadingMore = false }) {
+// light (2026-09-15, Jose: "el perfil de una tienda de proveedor... tema
+// blanco también... actualiza cómo se ven y se interactúan las card") —
+// default false para no tocar los 17 consumidores existentes (páginas de
+// marca, categorías EZ/WJX, colores de tinta...), que siguen oscuros.
+export default function BrandCatalogSection({ brandName, products = [], supplierBadge = null, whatsapp = WA, showEstudioBadge = true, hasMore = false, onLoadMore = null, loadingMore = false, light = false }) {
   if (products.length === 0) {
     return (
-      <div className="border border-zinc-800 bg-zinc-950 rounded-2xl p-10 md:p-16 text-center">
-        <p className="text-zinc-500 uppercase tracking-[0.25em] text-xs md:text-sm mb-4">
+      <div className={`border rounded-2xl p-10 md:p-16 text-center ${light ? 'border-zinc-200 bg-zinc-50' : 'border-zinc-800 bg-zinc-950'}`}>
+        <p className={`uppercase tracking-[0.25em] text-xs md:text-sm mb-4 ${light ? 'text-zinc-500' : 'text-zinc-500'}`}>
           Marca de referencia
         </p>
-        <p className="text-zinc-400 text-sm md:text-base max-w-lg mx-auto mb-8 leading-relaxed">
+        <p className={`text-sm md:text-base max-w-lg mx-auto mb-8 leading-relaxed ${light ? 'text-zinc-600' : 'text-zinc-400'}`}>
           Aún no tenemos catálogo activo de {brandName}. Si buscas algo puntual
           de esta marca, escríbenos y te orientamos.
         </p>
@@ -59,15 +63,26 @@ export default function BrandCatalogSection({ brandName, products = [], supplier
   return (
     <>
       {supplierBadge && (
-        <div className="flex items-center gap-2 text-xs text-zinc-400 bg-zinc-900/60 border border-zinc-800 rounded-lg px-3 py-2 w-fit mb-4">
+        <div className={`flex items-center gap-2 text-xs rounded-lg px-3 py-2 w-fit mb-4 border ${
+          light ? 'text-zinc-600 bg-zinc-50 border-zinc-200' : 'text-zinc-400 bg-zinc-900/60 border-zinc-800'
+        }`}>
           <ShieldCheck size={14} className="shrink-0 text-blue-400" />
           <span>{supplierBadge}</span>
         </div>
       )}
-      <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide">
+      {/* light: grilla fija 2x2 en móvil, sin scroll horizontal
+          (2026-09-15, Jose: "las card se muestran en filas y columnas
+          2x2 y no scroll horizontal") — mismo patrón que
+          SupplyCategoriasPage.jsx/SupplyProductDetailPage.jsx. Los demás
+          17 consumidores (páginas de marca oscuras) se quedan con el
+          carrusel de swipe de siempre. */}
+      <div className={light
+        ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4'
+        : 'flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide'
+      }>
         {products.map(item => (
-          <div key={`${item.name}-${item.estudio_id ?? 'x'}`} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">
-            <SupplyProductCard item={item} categoria={item.categoria} showEstudioBadge={showEstudioBadge} />
+          <div key={`${item.name}-${item.estudio_id ?? 'x'}`} className={light ? '' : 'snap-start flex-shrink-0 w-[44vw] md:w-auto'}>
+            <SupplyProductCard item={item} categoria={item.categoria} showEstudioBadge={showEstudioBadge} light={light} />
           </div>
         ))}
       </div>

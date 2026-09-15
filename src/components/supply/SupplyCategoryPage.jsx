@@ -434,7 +434,11 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
         </Link>
       )}
 
-      <div className={`${t.pageBg} pt-0 pb-20 md:pt-24 md:pb-0`}>
+      {/* pb-16 (64px), no pb-20 (80px) — 2026-09-15, Jose: "el copyright...
+          queda lejos del navbar de abajo, hazlo más compacto". Medido con
+          Playwright: el tab bar fijo de SupplyMobileNav mide ~58px, no
+          80 — mismo ajuste en EstudioSupplyPage.jsx/SupplyPage.jsx. */}
+      <div className={`${t.pageBg} pt-0 pb-16 md:pt-24 md:pb-0`}>
 
         {/* HERO — H1 + ícono de categoría en móvil */}
         <div className="relative overflow-hidden px-6 max-w-7xl mx-auto pb-5 md:pb-10">
@@ -464,32 +468,74 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
 
           {/* Móvil — tira de categorías en vez de flechas (2026-09-15, mismo
               patrón que MobileHomeSupply.jsx), con el disparador de
-              descripción integrado al final, chico y sin texto. */}
-          <div className="md:hidden relative z-10 flex items-center gap-2 mb-3 -mx-6 px-6">
-            <div className="flex-1 flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {categories.map(cat => (
-                <Link
-                  key={cat.name}
-                  to={cat.path}
-                  className={`flex-shrink-0 text-[12px] font-extrabold pb-1 border-b-2 whitespace-nowrap ${
-                    cat.cat === categoria ? `${t.text} border-blue-500` : `${t.textMuted} border-transparent`
-                  }`}
-                >
-                  {cat.name}
-                </Link>
-              ))}
+              descripción integrado al final, chico y sin texto.
+              En el piloto claro (Cartuchos, light) va dentro de una franja
+              azul sólida que también envuelve la insignia de stock (Jose,
+              2026-09-15: "que ese listón sea de color azul... el límite en
+              la zona inferior sea la zona superior de la card translúcida
+              de variedad de calibres") — fuera del piloto sigue igual que
+              siempre, sin franja. */}
+          {light ? (
+            <div className="md:hidden relative z-10 -mx-6 px-6 pt-4 pb-4 bg-blue-500">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex-1 flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {categories.map(cat => (
+                    <Link
+                      key={cat.name}
+                      to={cat.path}
+                      className={`flex-shrink-0 text-[12px] font-extrabold pb-1 border-b-2 whitespace-nowrap ${
+                        cat.cat === categoria ? 'text-white border-white' : 'text-blue-100 border-transparent'
+                      }`}
+                    >
+                      {cat.name}
+                    </Link>
+                  ))}
+                </div>
+                {intro && (
+                  <button
+                    type="button"
+                    onClick={() => setIntroAbierto(true)}
+                    aria-label={`Sobre ${title.toLowerCase()}`}
+                    className="flex-shrink-0 w-7 h-7 rounded-full border border-white/50 flex items-center justify-center text-white"
+                  >
+                    <BookOpen size={14} />
+                  </button>
+                )}
+              </div>
+              {hayStockInicial && (categoria in CATEGORY_BADGE ? CATEGORY_BADGE[categoria] : DEFAULT_BADGE) && (
+                <div className="flex items-center gap-2 text-xs text-zinc-600 bg-white border border-white/70 rounded-lg px-3 py-2 w-fit">
+                  <ShieldCheck size={14} className="shrink-0 text-blue-500" />
+                  <span>{categoria in CATEGORY_BADGE ? CATEGORY_BADGE[categoria] : DEFAULT_BADGE}</span>
+                </div>
+              )}
             </div>
-            {intro && (
-              <button
-                type="button"
-                onClick={() => setIntroAbierto(true)}
-                aria-label={`Sobre ${title.toLowerCase()}`}
-                className={`flex-shrink-0 w-7 h-7 rounded-full border flex items-center justify-center ${t.textMuted} ${t.border}`}
-              >
-                <BookOpen size={14} />
-              </button>
-            )}
-          </div>
+          ) : (
+            <div className="md:hidden relative z-10 flex items-center gap-2 mb-3 -mx-6 px-6">
+              <div className="flex-1 flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {categories.map(cat => (
+                  <Link
+                    key={cat.name}
+                    to={cat.path}
+                    className={`flex-shrink-0 text-[12px] font-extrabold pb-1 border-b-2 whitespace-nowrap ${
+                      cat.cat === categoria ? `${t.text} border-blue-500` : `${t.textMuted} border-transparent`
+                    }`}
+                  >
+                    {cat.name}
+                  </Link>
+                ))}
+              </div>
+              {intro && (
+                <button
+                  type="button"
+                  onClick={() => setIntroAbierto(true)}
+                  aria-label={`Sobre ${title.toLowerCase()}`}
+                  className={`flex-shrink-0 w-7 h-7 rounded-full border flex items-center justify-center ${t.textMuted} ${t.border}`}
+                >
+                  <BookOpen size={14} />
+                </button>
+              )}
+            </div>
+          )}
 
           <div className="hidden md:flex relative z-10 items-center justify-center gap-3 mb-4">
             <h1 className={`text-4xl font-black uppercase tracking-tight leading-none ${t.text} text-center whitespace-nowrap`}>{title}</h1>
@@ -498,13 +544,16 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
             <p className={`hidden md:block relative z-10 ${t.textMuted2} text-base md:text-lg leading-relaxed max-w-3xl text-justify [hyphens:auto]`}>{intro}</p>
           )}
           {hayStockInicial && (categoria in CATEGORY_BADGE ? CATEGORY_BADGE[categoria] : DEFAULT_BADGE) && (
-            <div className={`relative z-10 flex items-center gap-2 text-xs ${t.textMuted2} ${t.panelAlt} border ${t.border} rounded-lg px-3 py-2 w-fit mt-4`}>
+            <div className={`${light ? 'hidden md:flex' : 'flex'} relative z-10 items-center gap-2 text-xs ${t.textMuted2} ${t.panelAlt} border ${t.border} rounded-lg px-3 py-2 w-fit mt-4`}>
               <ShieldCheck size={14} className="shrink-0 text-blue-400" />
               <span>{categoria in CATEGORY_BADGE ? CATEGORY_BADGE[categoria] : DEFAULT_BADGE}</span>
             </div>
           )}
           {extraCTA && (
-            <div className="relative z-10 mt-4">{extraCTA}</div>
+            // Sin espacio arriba en móvil claro (Jose: el límite inferior de
+            // la franja azul debe SER el límite superior de esta card, sin
+            // separación) — en escritorio y fuera del piloto, mt-4 normal.
+            <div className={`relative z-10 ${light ? 'mt-0 md:mt-4' : 'mt-4'}`}>{extraCTA}</div>
           )}
         </div>
 

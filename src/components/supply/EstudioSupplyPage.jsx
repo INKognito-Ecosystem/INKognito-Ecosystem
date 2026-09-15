@@ -187,8 +187,8 @@ export default function EstudioSupplyPage() {
 
   if (!estudio) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
-        <p className="text-zinc-400 text-sm">No encontramos este estudio.</p>
+      <div className="min-h-screen bg-white text-zinc-900 flex items-center justify-center px-4">
+        <p className="text-zinc-500 text-sm">No encontramos este estudio.</p>
       </div>
     )
   }
@@ -213,14 +213,46 @@ export default function EstudioSupplyPage() {
   const [categoriaActiva, setCategoriaActiva] = useState('todos')
   const productosFiltrados = categoriaActiva === 'todos' ? products : products.filter((p) => p.categoria === categoriaActiva)
 
-  return (
-    <div className="min-h-screen bg-black text-white">
-      <NavbarCategory pageName={nombreSupply} hideMenu={esDueno} hideMobileActions />
+  // Buscador propio por tienda (2026-09-15, Jose: "cada tienda que se
+  // cree... debería tener su propio buscador") — cliente-side sobre
+  // `products` (ya acotado a este estudio por el loader, no "todo el
+  // módulo"), mismo criterio que ya usan los tabs de categoría en este
+  // mismo archivo. Busca en TODA la tienda sin importar la categoría
+  // activa (mismo principio que el buscador de MobileHomeSupply.jsx: la
+  // búsqueda reemplaza el filtro de categoría mientras está activa, no lo
+  // combina, para no dejar a alguien buscando "vaselina" con cero
+  // resultados solo porque estaba parado en la pestaña Cartuchos).
+  const normaliza = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  const [query, setQuery] = useState('')
+  const queryNorm = normaliza(query.trim())
+  const buscando = queryNorm.length >= 2
+  const resultadosBusqueda = buscando ? products.filter((p) => normaliza(p.name).includes(queryNorm)) : null
 
-      {/* HERO blanco (2026-08-09, Jose: "el fondo del hero debera ser
-          blanco") — mismo look que el perfil del estudio/artista en el
-          buscador (EstudioLandingPage.jsx/ArtistaLandingPage.jsx), en vez
-          del negro que usa el resto de esta página de catálogo. Todo el
+  // Mismo link que ya arma EstudioSupplyOwnerPanel.jsx para el dueño
+  // (2026-09-15, Jose: "el link debe coincidir con el que se genera
+  // cuando se crea") — una sola fórmula, no dos que puedan desviarse.
+  const linkTienda = `${import.meta.env.VITE_SITE_URL}/supply/${estudio.slug || `estudio/${estudio.id}`}`
+
+  return (
+    <div className="min-h-screen bg-white text-zinc-900">
+      <NavbarCategory
+        pageName={nombreSupply}
+        hideMenu={esDueno}
+        hideMobileActions
+        light
+        hideWordmark
+        shareUrl={linkTienda}
+        searchValue={query}
+        onSearchChange={setQuery}
+        searchPlaceholder={`Buscar en ${nombreSupply}`}
+      />
+
+      {/* HERO gris muy claro (2026-08-09, Jose: "el fondo del hero debera
+          ser blanco"; corregido 2026-09-15: "un tono un poco más gris y
+          no blanco, para que se diferencie" del bloque de productos, que
+          ahora también es blanco) — mismo look que el perfil del
+          estudio/artista en el buscador (EstudioLandingPage.jsx/
+          ArtistaLandingPage.jsx). Todo el
           texto (antes plano, debajo/al lado del logo) ahora vive DENTRO de
           una burbuja de chat — mismo recurso que la burbuja "Sobre mí" de
           ArtistaLandingPage.jsx (rounded-2xl rounded-tl-sm, esquina
@@ -228,7 +260,13 @@ export default function EstudioSupplyPage() {
           burbuja, montada mitad adentro/mitad afuera de su borde inferior
           — mismo mecanismo que la insignia de Mercado Pago en la card de
           agenda (absolute, mitad de su propio alto hacia afuera). */}
-      <div className="bg-white text-gray-900 pt-20 md:pt-24 pb-9 px-4 md:px-6">
+      {/* Línea divisoria al pie del hero (2026-09-15, Jose: "marcar de
+          manera clara la división del hero... y sus productos") — con
+          toda la página ahora en blanco, el hero ya no se distinguía del
+          bloque de productos de abajo (antes el contraste blanco/negro
+          hacía esa división sola). Mismo criterio que en la ficha de
+          producto: una línea, no un difuminado. */}
+      <div className="bg-gray-50 text-gray-900 pt-20 md:pt-24 pb-5 px-4 md:px-6 border-b border-zinc-200">
         {/* Logo y burbuja SIEMPRE en una sola fila, incluso en celular
             (2026-08-09, Jose: "que logo y texto ocupen una línea, y no
             texto debajo del logo" — v1 apilaba en mobile con flex-col). */}
@@ -244,7 +282,6 @@ export default function EstudioSupplyPage() {
           <div className="relative max-w-md pb-4 min-w-0 flex-1">
             <div className="bg-gray-100 border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3.5 flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="uppercase tracking-[0.25em] text-gray-400 text-[10px] font-black mb-1">Catálogo de</p>
                 <h1 className="text-lg sm:text-2xl font-black uppercase leading-tight">{nombreSupply}</h1>
                 {/* Insignia "Distribuidor Oficial" (fase 6, 2026-08-07) —
                     tarifa fija de patrocinio, no comisión (la venta acá no
@@ -331,8 +368,8 @@ export default function EstudioSupplyPage() {
         )}
       </div>
 
-      <div className="pt-8 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
-        {categoriasEnCatalogo.length > 1 && (
+      <div className="pt-4 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
+        {!buscando && categoriasEnCatalogo.length > 1 && (
           <div className="flex items-center gap-2 overflow-x-auto pb-1 mb-6 scrollbar-hide">
             {['todos', ...categoriasEnCatalogo].map((c) => (
               <button
@@ -340,7 +377,7 @@ export default function EstudioSupplyPage() {
                 type="button"
                 onClick={() => setCategoriaActiva(c)}
                 className={`flex-shrink-0 px-4 py-1.5 rounded-full border text-[11px] font-bold uppercase tracking-wide transition-colors ${
-                  categoriaActiva === c ? 'border-blue-500 bg-blue-500 text-white' : 'border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-zinc-200'
+                  categoriaActiva === c ? 'border-blue-500 bg-blue-500 text-white' : 'border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:text-zinc-900'
                 }`}
               >
                 {c === 'todos' ? 'Todos' : c}
@@ -349,40 +386,68 @@ export default function EstudioSupplyPage() {
           </div>
         )}
 
+        {buscando && (
+          <p className="text-xs text-zinc-500 mb-4">
+            {resultadosBusqueda.length > 0
+              ? `${resultadosBusqueda.length} resultado${resultadosBusqueda.length === 1 ? '' : 's'} para "${query.trim()}"`
+              : `Sin resultados para "${query.trim()}" en ${nombreSupply}.`}
+          </p>
+        )}
+
         {/* Sin insignia de proveedor por card ni banner "Suministrado
             por..." acá — sería redundante, el título de esta misma
             página ya deja claro de quién es el catálogo (Jose,
             2026-08-09). Esa insignia sí importa en el catálogo general
-            de Supply, donde los productos vienen mezclados. */}
-        <BrandCatalogSection
-          brandName={nombreSupply}
-          products={productosFiltrados}
-          supplierBadge={null}
-          showEstudioBadge={false}
-          whatsapp={estudio.whatsapp || undefined}
-        />
+            de Supply, donde los productos vienen mezclados.
+            (!buscando || resultadosBusqueda.length > 0): el mensaje "Sin
+            resultados para..." de arriba ya cubre el caso de búsqueda sin
+            match — el estado vacío de BrandCatalogSection está pensado
+            para "esta marca no tiene catálogo cargado", copy que no
+            aplica acá (la tienda sí tiene productos, solo no coincidió
+            la búsqueda). */}
+        {(!buscando || resultadosBusqueda.length > 0) && (
+          <BrandCatalogSection
+            brandName={nombreSupply}
+            products={buscando ? resultadosBusqueda : productosFiltrados}
+            supplierBadge={null}
+            showEstudioBadge={false}
+            whatsapp={estudio.whatsapp || undefined}
+            light
+          />
+        )}
 
         {/* Cajas surtidas de cartuchos (2026-08-09) — solo si Jose activó
             el toggle para este proveedor Y ya tiene productos reales en
             Cartuchos (de ahí salen las marcas/precio de referencia, sin
             que el proveedor tenga que cargar nada aparte). Vive en la
             tienda de CADA proveedor, no en una página central, para que
-            nunca haya ambigüedad de a quién se le compra. */}
-        {estudio.vende_cajas_surtidas && (() => {
+            nunca haya ambigüedad de a quién se le compra.
+            Acotado a la pestaña Cartuchos (2026-09-15, Jose: "debera
+            aparecer solo cuando me pare en el boton cartuchos") — antes
+            se mostraba sin importar la categoría activa, compitiendo por
+            atención con productos de otras categorías que nada tienen
+            que ver con cartuchos. Tampoco aparece mientras se busca —
+            la búsqueda es sobre toda la tienda, no sobre "estoy viendo
+            cartuchos". */}
+        {estudio.vende_cajas_surtidas && !buscando && categoriaActiva === 'Cartuchos' && (() => {
           const cartuchos = products.filter((p) => p.categoria === 'Cartuchos')
           return cartuchos.length > 0 ? (
-            <CajaSurtidaWidget products={cartuchos} estudioId={estudio.id} estudioNombre={nombreSupply} mpConectado={estudio.mp_conectado} recargoPct={estudio.recargo_caja_surtida_pct || 0} />
+            <CajaSurtidaWidget products={cartuchos} estudioId={estudio.id} estudioNombre={nombreSupply} mpConectado={estudio.mp_conectado} recargoPct={estudio.recargo_caja_surtida_pct || 0} light />
           ) : null
         })()}
       </div>
 
-      <FooterSupply />
+      <FooterSupply light />
       {/* Espacio para que el tab bar fijo de abajo no tape el footer
           (2026-09-15, mismo patrón que MobileHomeSupply.jsx) — carrito y
           menú migran acá, NavbarCategory de arriba ya no los muestra en
-          móvil (ver hideMobileActions). */}
-      <div className="h-20 md:hidden" />
-      <SupplyMobileNav active={null} />
+          móvil (ver hideMobileActions). h-16 (64px), no h-20 (80px):
+          medido con Playwright, el tab bar real mide ~58px — el
+          reservado de 80px dejaba el copyright "lejos" del navbar
+          (Jose, 2026-09-15), 64px es el paso de Tailwind más cercano al
+          alto real sin volver a quedar corto. */}
+      <div className="h-16 md:hidden" />
+      <SupplyMobileNav active={null} light />
 
       {panelAbierto && (
         <EstudioSupplyOwnerPanel

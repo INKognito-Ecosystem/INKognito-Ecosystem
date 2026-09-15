@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useLoaderData, Link } from 'react-router'
-import { Search, MapPin, SlidersHorizontal } from 'lucide-react'
+import { Search, MapPin, SlidersHorizontal, Share2 } from 'lucide-react'
 import { categories, catKey } from './CategoriesSupply'
 import SupplyMobileNav from './SupplyMobileNav'
 import SupplyProductCard from './SupplyProductCard'
@@ -60,9 +60,28 @@ export default function SupplyCategoriasPage() {
 
   const [ordenAbierto, setOrdenAbierto] = useState(false)
   const [provAbierto, setProvAbierto] = useState(false)
+  const [shareMsg, setShareMsg] = useState(null)
   const ordenRef = useRef(null)
   const provRef = useRef(null)
   const yaHizoScroll = useRef(false)
+
+  // Compartir esta página (2026-09-15, Jose) — mismo patrón (Web Share API
+  // con fallback a portapapeles) ya usado en NavbarCategory.jsx/
+  // SupplyProductDetailPage.jsx. Acá no hay NavbarCategory que reusar (ver
+  // comentario del navbar propio más abajo), así que se repite el mismo
+  // handler corto en vez de forzar una dependencia cruzada.
+  const shareUrl = `${import.meta.env.VITE_SITE_URL}/supply/categorias`
+  const handleShare = async () => {
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Categorías | INKognito Supply', url: shareUrl }) } catch {}
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setShareMsg('Link copiado')
+      setTimeout(() => setShareMsg(null), 2000)
+    } catch {}
+  }
   useEffect(() => {
     function onClickFuera(e) {
       if (ordenRef.current && !ordenRef.current.contains(e.target)) setOrdenAbierto(false)
@@ -74,7 +93,7 @@ export default function SupplyCategoriasPage() {
 
   // Sin tildes/mayúsculas — mismo criterio que SupplyCategoryPage.jsx
   // (normaliza) para que "cartucho" encuentre "Cartuchos".
-  const normaliza = (s) => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+  const normaliza = (s) => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 
   // También filtra por CATEGORÍA (2026-09-15, Jose: "también se debe
   // filtrar por categoría, no es necesario especificar el nombre del
@@ -172,6 +191,15 @@ export default function SupplyCategoriasPage() {
             />
           </div>
 
+          <button
+            type="button"
+            onClick={handleShare}
+            aria-label="Compartir"
+            className="flex-shrink-0 flex items-center justify-center w-9 h-9 text-zinc-500 hover:text-zinc-900 transition-colors"
+          >
+            <Share2 size={18} />
+          </button>
+
           {hayFiltros && (
               <>
                 <div className="relative flex-shrink-0" ref={provRef}>
@@ -263,6 +291,12 @@ export default function SupplyCategoriasPage() {
               </>
             )}
           </div>
+
+          {shareMsg && (
+            <div className="absolute left-0 right-0 top-full mt-2 flex justify-center pointer-events-none">
+              <p className="bg-zinc-900 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg">{shareMsg}</p>
+            </div>
+          )}
         </div>
 
         <div id="categorias-resultados" className="pt-20 md:pt-24 pb-28 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto">

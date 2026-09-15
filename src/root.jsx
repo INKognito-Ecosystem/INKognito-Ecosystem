@@ -96,6 +96,16 @@ export function Layout({ children }) {
         <link rel="manifest" href="/manifest.json" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="google-site-verification" content="Hs3ziNnEk3QirSduF0Re7dFBF2se5XiT3bxeH_e0A50" />
+        {/* Evita que Chrome/Edge ofrezcan traducir la página (2026-09-15,
+            Jose: nombres de tienda como "INKognito Supply" o botones como
+            "Registrar mi Supply" salían traducidos a "Suministro de
+            INKognito" / "Registrador mi Suministro" — el navegador detecta
+            la palabra en inglés "Supply" repetida en medio de texto en
+            español y ofrece/activa su traductor automático, que mezcla mal
+            nombres propios con verbos en imperativo). lang="es" arriba no
+            alcanza a evitarlo por sí solo — esta meta apaga la sugerencia
+            de traducción por completo. */}
+        <meta name="google" content="notranslate" />
         {/* JSON-LD estático: los crawlers lo leen sin ejecutar JS */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_JSONLD) }} />
         <Meta />

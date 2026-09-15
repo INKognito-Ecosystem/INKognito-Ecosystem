@@ -369,8 +369,12 @@ export default function SupplyPage() {
     <FooterSupply />
 
     {/* Espacio para que la tab bar fija de MobileHomeSupply no tape el
-        footer (Términos/Privacidad) — 2026-09-15, reportado por Jose. */}
-    <div className="h-20 md:hidden" />
+        footer (Términos/Privacidad) — 2026-09-15, reportado por Jose.
+        h-16 (64px), no h-20 (80px): medido con Playwright, el tab bar
+        real mide ~58px — 80px dejaba el copyright "lejos" del navbar
+        (Jose, 2026-09-15, mismo ajuste en EstudioSupplyPage.jsx/
+        SupplyCategoryPage.jsx). */}
+    <div className="h-16 md:hidden" />
 
     </main>
 

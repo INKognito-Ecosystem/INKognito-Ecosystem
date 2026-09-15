@@ -173,7 +173,15 @@ export default function PedidoOnlinePage() {
     )
   }
 
-  const { items, total, clearCart } = cart
+  // items/total: si el carrito trae selección estilo Mercado Libre
+  // (solo Supply por ahora, ver CartDrawerSupply.jsx/SupplyCartContext.jsx,
+  // 2026-09-15) usa SOLO lo marcado — el resto queda guardado en el
+  // carrito para después, no se pide ni se borra. Store/Gym/Suplementos no
+  // tienen ese campo todavía, así que caen al comportamiento de siempre
+  // (?? cart.items/cart.total) sin ningún cambio para ellos.
+  const { clearCart, removeItems } = cart
+  const items = cart.selectedItems ?? cart.items
+  const total = cart.selectedTotal ?? cart.total
   const update = (campo, valor) => setForm(f => ({ ...f, [campo]: valor }))
 
   const municipioSeleccionado = Boolean(form.municipioSel && form.municipioSel !== 'otra')
@@ -265,7 +273,10 @@ export default function PedidoOnlinePage() {
         return
       }
       submitted.current = true
-      clearCart()
+      // Si hubo selección parcial (Supply), solo se borra lo que de
+      // verdad se pidió — lo que quedó desmarcado sigue en el carrito.
+      if (removeItems) removeItems(items.map(i => i.key))
+      else clearCart()
       setEstado('ok')
     } catch {
       setErrorMsg('No pudimos enviar tu pedido. Intenta de nuevo o escríbenos por WhatsApp.')

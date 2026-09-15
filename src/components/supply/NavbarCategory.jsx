@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import { ShoppingCart, Menu, X } from 'lucide-react'
+import { ShoppingCart, Menu, X, Share2, Search } from 'lucide-react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import logoSupply from '../../assets/milogo/supply.webp'
@@ -25,10 +25,42 @@ import InkognitoModuleMenu from '../InkognitoModuleMenu'
 // light (2026-09-15, Jose: "el navbar debe ser blanco" — página de
 // categorías) — default false para no tocar Cartuchos/ficha de
 // producto/EstudioSupplyPage, que siguen con el navbar oscuro de siempre.
-export default function NavbarCategory({ pageName, hideMenu = false, hideMobileActions = false, light = false }) {
+// hideWordmark + shareUrl (2026-09-15, Jose: "en las tiendas... quita la
+// palabra supply tienda online... debería estar un botón de compartir,
+// así un proveedor puede compartir su tienda con facilidad") — shareUrl
+// es opcional a propósito: solo EstudioSupplyPage.jsx lo pasa (con el
+// MISMO link que ya arma EstudioSupplyOwnerPanel.jsx para el dueño —
+// `${SITE_URL}/supply/${slug || estudio/${id}}` — Jose: "el link debe
+// coincidir con el que se genera cuando se crea"). El botón de compartir
+// NO se oculta con hideMobileActions: no tiene equivalente en
+// SupplyMobileNav, así que se queda visible en cualquier tamaño.
+// searchValue/onSearchChange/searchPlaceholder (2026-09-15, Jose: "cada
+// tienda... debería tener su propio buscador... ese buscador debe estar
+// en el navbar") — primero se armó como fila aparte debajo del hero,
+// Jose corrigió: debe vivir en ESTE navbar. onSearchChange presente es
+// lo que activa el modo buscador (reemplaza el nombre de página, que
+// deja de hacer falta — el placeholder ya dice "Buscar en X"); opcional
+// a propósito, mismo criterio que shareUrl — solo EstudioSupplyPage.jsx
+// lo pasa hoy, Cartuchos/ficha de producto siguen mostrando pageName.
+// Sin "hidden md:block": a diferencia de pageName, el buscador importa
+// tanto en móvil como en PC.
+export default function NavbarCategory({ pageName, hideMenu = false, hideMobileActions = false, light = false, hideWordmark = false, shareUrl = null, searchValue = null, onSearchChange = null, searchPlaceholder = 'Buscar' }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [shareMsg, setShareMsg] = useState(null)
   const { count } = useSupplyCart()
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try { await navigator.share({ title: pageName, url: shareUrl }) } catch {}
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setShareMsg('Link copiado')
+      setTimeout(() => setShareMsg(null), 2000)
+    } catch {}
+  }
   const t = light ? {
     navBg: 'bg-white/95', navBorder: 'border-zinc-200', shadow: '',
     pageName: 'text-zinc-500', icon: 'text-zinc-500 hover:text-zinc-900',
@@ -53,25 +85,50 @@ export default function NavbarCategory({ pageName, hideMenu = false, hideMobileA
             {/* LOGO */}
             <Link to="/supply" className="flex items-center gap-2">
               <img src={logoSupply} alt="INKognito Supply" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
-              <span>
-                <AnimatedWordmark
-                  moduleWord="SUPPLY"
-                  accentClassName="text-blue-500"
-                  className="text-xl md:text-2xl font-black uppercase tracking-wide md:tracking-[0.2em] leading-tight"
-                />
-                <span className="block text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-500 whitespace-nowrap">
-                  Tienda Online
+              {!hideWordmark && (
+                <span>
+                  <AnimatedWordmark
+                    moduleWord="SUPPLY"
+                    accentClassName="text-blue-500"
+                    className="text-xl md:text-2xl font-black uppercase tracking-wide md:tracking-[0.2em] leading-tight"
+                  />
+                  <span className="block text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-500 whitespace-nowrap">
+                    Tienda Online
+                  </span>
                 </span>
-              </span>
+              )}
             </Link>
 
-            {/* NOMBRE PÁGINA */}
-            <span className={`hidden md:block uppercase text-sm tracking-[0.2em] ${t.pageName}`}>
-              {pageName}
-            </span>
+            {/* NOMBRE PÁGINA / BUSCADOR — ver comentario de props arriba */}
+            {onSearchChange ? (
+              <div className="relative flex-1 max-w-md mx-3 md:mx-6">
+                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchValue || ''}
+                  onChange={(e) => onSearchChange(e.target.value)}
+                  placeholder={searchPlaceholder}
+                  className="w-full pl-9 pr-3 py-2 rounded-full border border-zinc-200 bg-zinc-50 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-blue-400 focus:bg-white transition-colors"
+                />
+              </div>
+            ) : (
+              <span className={`hidden md:block uppercase text-sm tracking-[0.2em] ${t.pageName}`}>
+                {pageName}
+              </span>
+            )}
 
-            {/* CARRITO + HAMBURGUESA */}
-            <div className={`${hideMobileActions ? 'hidden md:flex' : 'flex'} items-center gap-4`}>
+            {/* COMPARTIR + CARRITO + HAMBURGUESA */}
+            <div className="flex items-center gap-4">
+              {shareUrl && (
+                <button
+                  onClick={handleShare}
+                  aria-label="Compartir"
+                  className={`transition-all duration-300 ${t.icon}`}
+                >
+                  <Share2 size={20} />
+                </button>
+              )}
+              <div className={`${hideMobileActions ? 'hidden md:flex' : 'flex'} items-center gap-4`}>
 
               {/* CARRITO CON BADGE */}
               <button
@@ -94,10 +151,17 @@ export default function NavbarCategory({ pageName, hideMenu = false, hideMobileA
                   {menuOpen ? <X size={20} /> : <Menu size={20} />}
                 </button>
               )}
+              </div>
             </div>
 
           </div>
         </div>
+
+        {shareMsg && (
+          <div className="absolute left-0 right-0 top-full mt-2 flex justify-center pointer-events-none">
+            <p className="bg-zinc-900 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg">{shareMsg}</p>
+          </div>
+        )}
 
         {/* MENÚ DESPLEGABLE */}
         {!hideMenu && menuOpen && (
