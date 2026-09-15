@@ -209,9 +209,18 @@ export default function BrandsMarquee({ imgs = {}, light = false }) {
           WebkitMaskImage: 'linear-gradient(90deg, transparent, black 8%, black 92%, transparent)',
         }}
       >
+        {/* Sin gap acá (2026-09-15, bug real: "la separación entre Royal
+            Three y Heaven Pro está un poco más separada") — cada copia de
+            abajo ya trae su propio gap + pr al final (mismo mecanismo que
+            el marquee animado de escritorio); un gap ACÁ TAMBIÉN se
+            sumaba al pr de la copia, duplicando el espacio justo en la
+            costura entre el último logo de una copia (Royal Three) y el
+            primero de la siguiente (Heaven Pro) — invisible en el
+            marquee animado de siempre porque nadie podía pararse justo
+            ahí, pero sí en este que se puede arrastrar a mano. */}
         <div
           ref={trackRef}
-          className="flex items-center gap-8 md:gap-12 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex items-center overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           onPointerDown={pause}
           onPointerUp={scheduleResume}
           onPointerCancel={scheduleResume}
