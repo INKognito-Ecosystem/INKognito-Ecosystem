@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { brands, brandKey } from './BrandsSupply'
 
@@ -121,6 +122,73 @@ function BrandLogo({ brand, img, light = false }) {
   )
 }
 
+// Auto-avance con control real del usuario (2026-09-15, Jose primero:
+// "el usuario debería poder tener control de ese carrusel... mover atrás
+// o adelante para elegir y darle clic a la marca que quiera" — y luego,
+// corrigiendo: "no quites el carrusel... yo podré moverlo, pero al
+// soltarlo, el carrusel deberá seguir"). Antes era una animación CSS
+// pura (transform) sobre un contenedor sin scroll real — tocarla solo la
+// pausaba (:hover se dispara con el primer toque en móvil) y quedaba
+// congelada, sin forma de moverla a mano. Ahora es scroll nativo de
+// verdad (el usuario arrastra con el dedo, como cualquier lista) y el
+// auto-avance mueve `scrollLeft` directamente por rAF — misma propiedad
+// que toca un arrastre real, así que no compiten entre sí. pointerdown
+// pausa, pointerup/cancel programa la reanudación ~1.5s después (tiempo
+// para que se note que "uno soltó" antes de que retome solo).
+function useAutoScrollCarousel(active, speedPxPerSec = 26) {
+  const trackRef = useRef(null)
+  const pausedRef = useRef(false)
+  const resumeTimeoutRef = useRef(null)
+  // Posición propia, NO releída de el.scrollLeft cada frame (2026-09-15,
+  // bug real encontrado con Playwright: el.scrollLeft entero descarta el
+  // sub-píxel de cada frame — a 26px/s y 60fps el avance por frame es
+  // ~0.43px, que el navegador redondea a 0 al escribir; leer-sumar-
+  // escribir sobre la propiedad del DOM nunca acumula, queda congelado
+  // para siempre). Mientras está en pausa (arrastre manual del usuario),
+  // esta posición se resincroniza con el scrollLeft real en cada frame,
+  // para que al reanudar retome exactamente donde el usuario la soltó.
+  const posRef = useRef(null)
+
+  useEffect(() => {
+    if (!active) return
+    const el = trackRef.current
+    if (!el) return
+    if (posRef.current == null) posRef.current = el.scrollLeft
+    let rafId
+    let lastTs = null
+    const step = (ts) => {
+      if (lastTs == null) lastTs = ts
+      const dt = (ts - lastTs) / 1000
+      lastTs = ts
+      if (!pausedRef.current) {
+        const half = el.scrollWidth / 2
+        posRef.current += speedPxPerSec * dt
+        if (half > 0 && posRef.current >= half) posRef.current -= half
+        el.scrollLeft = posRef.current
+      } else {
+        posRef.current = el.scrollLeft
+      }
+      rafId = requestAnimationFrame(step)
+    }
+    rafId = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(rafId)
+  }, [active, speedPxPerSec])
+
+  useEffect(() => () => { if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current) }, [])
+
+  const pause = useCallback(() => {
+    pausedRef.current = true
+    if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current)
+  }, [])
+
+  const scheduleResume = useCallback(() => {
+    if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current)
+    resumeTimeoutRef.current = setTimeout(() => { pausedRef.current = false }, 1500)
+  }, [])
+
+  return { trackRef, pause, scheduleResume }
+}
+
 // imgs viene del loader de SupplyPage.jsx vía HeroSupply.jsx (2026-09-13,
 // Jose: "al volver atrás... espabila primero sin imagen luego aparece")
 // — antes este componente pedía `/api/visual/supply` por su cuenta (un
@@ -128,6 +196,39 @@ function BrandLogo({ brand, img, light = false }) {
 // la misma página); ahora las 3 comparten el mismo dato ya resuelto,
 // sin parpadeo ni fetches duplicados.
 export default function BrandsMarquee({ imgs = {}, light = false }) {
+  const { trackRef, pause, scheduleResume } = useAutoScrollCarousel(light)
+
+  // Solo light — HeroSupply.jsx/BrandsSupply.jsx (escritorio) siguen con
+  // el marquee animado por CSS de siempre, sin cambios (ver abajo).
+  if (light) {
+    return (
+      <div
+        className="relative mt-6 md:mt-10"
+        style={{
+          maskImage: 'linear-gradient(90deg, transparent, black 8%, black 92%, transparent)',
+          WebkitMaskImage: 'linear-gradient(90deg, transparent, black 8%, black 92%, transparent)',
+        }}
+      >
+        <div
+          ref={trackRef}
+          className="flex items-center gap-8 md:gap-12 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          onPointerDown={pause}
+          onPointerUp={scheduleResume}
+          onPointerCancel={scheduleResume}
+          onWheel={() => { pause(); scheduleResume() }}
+        >
+          {[0, 1].map((copy) => (
+            <div key={copy} className="flex items-center gap-8 md:gap-12 pr-8 md:pr-12 flex-shrink-0">
+              {brands.map((brand) => (
+                <BrandLogo key={brand.name} brand={brand} img={imgs[brand.imgKey || brandKey(brand.name)]} light />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div
       className="relative mt-6 md:mt-10 overflow-hidden"
