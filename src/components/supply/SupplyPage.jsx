@@ -395,8 +395,11 @@ export default function SupplyPage() {
         h-16 (64px), no h-20 (80px): medido con Playwright, el tab bar
         real mide ~58px — 80px dejaba el copyright "lejos" del navbar
         (Jose, 2026-09-15, mismo ajuste en EstudioSupplyPage.jsx/
-        SupplyCategoryPage.jsx). */}
-    <div className="h-16 md:hidden" />
+        SupplyCategoryPage.jsx). bg-white (2026-09-15) — sin fondo propio
+        este div hereda el bg-gray-950 oscuro de <main>; se notaba como un
+        "listón negro" justo debajo del copyright, que ya es blanco
+        (Jose: "hay un listón negro no sé por qué"). */}
+    <div className="h-16 md:hidden bg-white" />
 
     </main>
 

@@ -28,15 +28,21 @@ const REVEAL = {
 // Solid Ink) siguen existiendo como páginas reales, ya conectadas a
 // inventario real y sin productos/precios inventados, solo que no se listan
 // acá. Si se necesitan de nuevo, sus rutas ya funcionan.
+// Orden (2026-09-15, Jose: "pon heaven pro al lado izquierdo de tattoo
+// vision, y a wjx al lado derecho de tattoo vision") — Heaven Pro se
+// movió de su lugar viejo (después de Dynamic) a primero; el resto
+// conserva su orden relativo de siempre.
 export const brands = [
+  { name: 'HEAVEN PRO', to: '/supply/brands/heaven-pro' },
   { name: 'TATTOO VISION', to: '/supply/brands/tattoo-vision' },
+  { name: 'WJX', to: '/supply/cartridges/wjx' },
   // Antes era Kwadron (cartuchos) — reemplazada por Industrias Warlock
-  // (mobiliario), decisión de Jose (2026-08-01). Ubicada de segunda a
-  // pedido suyo. imgKey se fija a mano porque el logo ya se subió en el
-  // panel bajo la clave vieja (supply_brand_kwadron) — si dejáramos que
-  // brandKey() la recalculara del nombre nuevo, apuntaría a una clave
-  // distinta y el logo desaparecería. Ruta movida a /supply/mobiliario/warlock
-  // (antes /supply/cartridges/kwadron — no tenía sentido para una marca de
+  // (mobiliario), decisión de Jose (2026-08-01). imgKey se fija a mano
+  // porque el logo ya se subió en el panel bajo la clave vieja
+  // (supply_brand_kwadron) — si dejáramos que brandKey() la recalculara
+  // del nombre nuevo, apuntaría a una clave distinta y el logo
+  // desaparecería. Ruta movida a /supply/mobiliario/warlock (antes
+  // /supply/cartridges/kwadron — no tenía sentido para una marca de
   // mobiliario, ver KwadronCartridgesPage.jsx movido a marcasProfesionales/).
   // imgFit:'cover' porque el archivo subido tiene fondo negro sólido (no
   // transparente) alrededor del logo — con object-contain (el patrón de
@@ -44,10 +50,8 @@ export const brands = [
   // recorta un poco el piñón del diseño pero llena el espacio parejo con
   // las demás marcas — decisión de Jose, prefiere esto a que se vea chico.
   { name: 'INDUSTRIAS WARLOCK', to: '/supply/mobiliario/warlock', imgKey: 'supply_brand_kwadron', imgFit: 'cover' },
-  { name: 'WJX', to: '/supply/cartridges/wjx' },
   { name: 'VICE COLORS', to: '/supply/ink/vice-colors' },
   { name: 'DYNAMIC', to: '/supply/ink/dynamic' },
-  { name: 'HEAVEN PRO', to: '/supply/brands/heaven-pro' },
   { name: 'ROYAL THREE', to: '/supply/brands/royal-three' },
 ]
 
