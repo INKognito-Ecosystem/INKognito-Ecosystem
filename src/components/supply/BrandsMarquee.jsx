@@ -83,11 +83,19 @@ const RECOLOR_LIGHT = {
 // truco y los logos se ven mejor con su color real siempre.
 function BrandLogo({ brand, img, light = false }) {
   const local = RECORTE_LOCAL[brand.name]
-  const src = local || img
+  // brand.img (2026-09-15) — archivo local propio de una marca sin logo
+  // todavía en Cloudinary/settings (Don Melo, Difuso Galeria, ver
+  // BrandsSupply.jsx); cae hasta el final, después de un posible recorte
+  // manual (local) y del logo real ya subido (img).
+  const src = local || img || brand.img
   const alto = ALTO_EXTRA[brand.name] || 'h-10 md:h-12'
   const recolor = light ? RECOLOR_LIGHT[brand.name] : null
+  // Sin página propia todavía (brand.to null, 2026-09-15) — se exhibe sin
+  // ser clicable, en vez de un <Link to={null}> roto.
+  const Wrapper = brand.to ? Link : 'div'
+  const wrapperProps = brand.to ? { to: brand.to } : {}
   return (
-    <Link to={brand.to} className={`group flex items-center justify-center flex-shrink-0 ${alto}`}>
+    <Wrapper {...wrapperProps} className={`group flex items-center justify-center flex-shrink-0 ${alto}`}>
       {src ? recolor ? (
         // Recorte a color sólido vía CSS mask (2026-09-15, ver
         // RECOLOR_LIGHT arriba) — el <img> real queda invisible pero
@@ -118,7 +126,7 @@ function BrandLogo({ brand, img, light = false }) {
           {brand.name}
         </span>
       )}
-    </Link>
+    </Wrapper>
   )
 }
 

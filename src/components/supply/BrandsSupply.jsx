@@ -53,6 +53,18 @@ export const brands = [
   { name: 'VICE COLORS', to: '/supply/ink/vice-colors' },
   { name: 'DYNAMIC', to: '/supply/ink/dynamic' },
   { name: 'ROYAL THREE', to: '/supply/brands/royal-three' },
+  // Don Melo y Difuso Galeria (2026-09-15, Jose) — todavía sin página
+  // propia ni logo cargado en el panel (sin fila en `settings`, así que
+  // `imgs[key]` nunca las va a encontrar) — `to: null` hasta que se les
+  // construya su página como al resto; mientras tanto solo se exhiben, sin
+  // ser clicables (ver `brand.to` en el render de abajo y en
+  // BrandsMarquee.jsx). `img` es un archivo local propio (no viene de
+  // Cloudinary/settings todavía) — mismo public/marcas-marquee/ que ya usa
+  // el recorte a mano de otras marcas en BrandsMarquee.jsx, reusado acá
+  // también para que la sección "Marcas" de escritorio (que solo lee
+  // `imgs[key]`) las muestre igual.
+  { name: 'DON MELO', to: null, img: '/marcas-marquee/don-melo.png' },
+  { name: 'DIFUSO GALERIA', to: null, img: '/marcas-marquee/difuso-galeria.png' },
 ]
 
 // imgs viene del loader de SupplyPage.jsx (2026-09-13, Jose: "al volver
@@ -86,14 +98,23 @@ export default function BrandsSupply({ imgs = {} }) {
         <CoverflowRow desktopClassName="md:grid md:grid-cols-4 lg:grid-cols-7 gap-4" autoplay={false}>
           {brands.map((brand, i) => {
             const key = brand.imgKey || brandKey(brand.name)
+            // Cloudinary/settings (imgs[key]) manda si existe; si no, cae al
+            // archivo local propio de la marca (brand.img, ver arriba) —
+            // así Don Melo/Difuso Galeria se ven sin depender de que ya se
+            // hayan subido al panel.
+            const src = imgs[key] || brand.img
+            const Wrapper = brand.to ? Link : 'div'
+            const wrapperProps = brand.to
+              ? { to: brand.to }
+              : { 'aria-label': `${brand.name} — próximamente` }
             return (
             <div key={brand.name} className="w-full">
-            <Link
-              to={brand.to}
+            <Wrapper
+              {...wrapperProps}
               className="relative h-36 w-full border border-blue-500 md:border-blue-500/30 bg-black flex items-center justify-center overflow-hidden transition-all duration-300 md:hover:border-blue-500 md:hover:shadow-[0_0_25px_rgba(59,130,246,0.15)]"
             >
-              {imgs[key]
-                ? <img src={imgs[key]} alt={brand.name}
+              {src
+                ? <img src={src} alt={brand.name}
                     className={brand.imgFit === 'cover'
                       ? 'w-full h-full object-cover'
                       : 'max-h-full max-w-full object-contain p-3'} />
@@ -101,7 +122,7 @@ export default function BrandsSupply({ imgs = {} }) {
                     {brand.name}
                   </p>
               }
-            </Link>
+            </Wrapper>
             {i === 0 && (
               <div className="md:hidden mt-1.5 flex items-center justify-end gap-1 text-zinc-500 text-[9px] font-bold uppercase tracking-widest">
                 <span>Desliza</span>
