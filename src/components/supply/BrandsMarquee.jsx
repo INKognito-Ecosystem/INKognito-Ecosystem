@@ -40,7 +40,15 @@ const ALTO_EXTRA = {
   'ROYAL THREE': 'h-12 md:h-14',
 }
 
-function BrandLogo({ brand, img }) {
+// light (2026-09-15, piloto en MobileHomeSupply: "convierte la page
+// principal, en formato blanco") — default false para no tocar
+// HeroSupply.jsx/BrandsSupply.jsx (desktop, siguen oscuros). Sin esto el
+// texto de respaldo (marca sin logo) quedaba blanco-sobre-blanco al hacer
+// hover en fondo claro. A color completo desde el inicio en light (Jose:
+// "devuévele el color a las marcas") — el gris/opacidad-hasta-hover era
+// para que resaltaran sobre fondo negro; en blanco no hace falta ese
+// truco y los logos se ven mejor con su color real siempre.
+function BrandLogo({ brand, img, light = false }) {
   const local = RECORTE_LOCAL[brand.name]
   const src = local || img
   const alto = ALTO_EXTRA[brand.name] || 'h-10 md:h-12'
@@ -50,10 +58,10 @@ function BrandLogo({ brand, img }) {
         <img
           src={src}
           alt={brand.name}
-          className="h-full w-auto max-w-[9rem] md:max-w-[11rem] object-contain transition-all duration-300 opacity-50 grayscale group-hover:opacity-100 group-hover:grayscale-0"
+          className={`h-full w-auto max-w-[9rem] md:max-w-[11rem] object-contain transition-all duration-300 ${light ? '' : 'opacity-50 grayscale group-hover:opacity-100 group-hover:grayscale-0'}`}
         />
       ) : (
-        <span className="text-zinc-600 group-hover:text-white text-[9px] font-black uppercase tracking-widest text-center px-2 transition-colors duration-300">
+        <span className={`text-zinc-600 ${light ? 'group-hover:text-zinc-900' : 'group-hover:text-white'} text-[9px] font-black uppercase tracking-widest text-center px-2 transition-colors duration-300`}>
           {brand.name}
         </span>
       )}
@@ -67,7 +75,7 @@ function BrandLogo({ brand, img }) {
 // tercer fetch idéntico al de BrandsSupply.jsx y CategoriesSupply.jsx en
 // la misma página); ahora las 3 comparten el mismo dato ya resuelto,
 // sin parpadeo ni fetches duplicados.
-export default function BrandsMarquee({ imgs = {} }) {
+export default function BrandsMarquee({ imgs = {}, light = false }) {
   return (
     <div
       className="relative mt-6 md:mt-10 overflow-hidden"
@@ -80,7 +88,7 @@ export default function BrandsMarquee({ imgs = {} }) {
         {[0, 1].map((copy) => (
           <div key={copy} className="flex items-center gap-8 md:gap-12 pr-8 md:pr-12 flex-shrink-0">
             {brands.map((brand) => (
-              <BrandLogo key={brand.name} brand={brand} img={imgs[brand.imgKey || brandKey(brand.name)]} />
+              <BrandLogo key={brand.name} brand={brand} img={imgs[brand.imgKey || brandKey(brand.name)]} light={light} />
             ))}
           </div>
         ))}

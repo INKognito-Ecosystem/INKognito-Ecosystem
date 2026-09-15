@@ -98,38 +98,46 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
   }
 
   return (
-    <div className="md:hidden bg-gray-950 text-white">
+    <div className="md:hidden bg-white text-zinc-900">
 
-      {/* TOP BAR — logo + buscador + campana */}
-      <div className="sticky top-0 z-40 flex items-center gap-2 px-4 py-3 bg-black/90 backdrop-blur-md border-b border-blue-500/20">
+      {/* TOP BAR — logo + buscador + campana. Blanco (2026-09-15, Jose:
+          "convierte la page principal, en formato blanco... desde sus dos
+          navbar hasta el footer") — mismos tokens que ya usa NavbarCategory
+          en su versión light (bg-white/95, border-zinc-200, input
+          bg-zinc-50). */}
+      <div className="sticky top-0 z-40 flex items-center gap-2 px-4 py-3 bg-white/95 backdrop-blur-md border-b border-zinc-200">
         <Link to="/supply" className="flex-shrink-0">
           <img src={logoSupply} alt="INKognito Supply" className="w-12 h-12 object-contain" />
         </Link>
-        <div className="flex-1 flex items-center gap-2 bg-zinc-950 border border-zinc-800 rounded-full px-3 py-2 min-w-0">
-          <Search size={14} className="text-zinc-500 flex-shrink-0" />
+        <div className="flex-1 flex items-center gap-2 bg-zinc-50 border border-zinc-200 rounded-full px-3 py-2 min-w-0">
+          <Search size={14} className="text-zinc-400 flex-shrink-0" />
           <input
             value={busqueda}
             onChange={e => setBusqueda(e.target.value)}
             placeholder="Buscar tintas, agujas, máquinas..."
-            className="flex-1 min-w-0 bg-transparent text-xs text-white placeholder:text-zinc-500 focus:outline-none"
+            className="flex-1 min-w-0 bg-transparent text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
           />
         </div>
         {/* Campana visual por ahora — Supply no tiene notificaciones todavía */}
-        <button className="flex-shrink-0 w-9 h-9 rounded-full bg-zinc-950 border border-zinc-800 flex items-center justify-center text-zinc-400">
+        <button className="flex-shrink-0 w-9 h-9 rounded-full bg-zinc-50 border border-zinc-200 flex items-center justify-center text-zinc-500">
           <Bell size={16} />
         </button>
       </div>
 
-      {/* CATEGORÍAS — nombre en fila, sin card */}
-      <div id="categorias-mobile" className="flex gap-5 overflow-x-auto px-4 py-3 border-b border-zinc-900 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <span className={`flex-shrink-0 text-[13px] font-extrabold pb-1.5 border-b-2 whitespace-nowrap ${!resultados ? 'text-white border-blue-500' : 'text-zinc-500 border-transparent'}`}>
+      {/* CATEGORÍAS — franja azul sólida (2026-09-15, mismo tratamiento que
+          se armó para Cartuchos en SupplyCategoryPage.jsx: "el listón de
+          las categorías pasa a azul"). Ya llega borde a borde sola (esta
+          página no envuelve sus secciones en un contenedor con padding
+          propio), sin necesitar el truco -mx/px de allá. */}
+      <div id="categorias-mobile" className="flex gap-5 overflow-x-auto px-4 py-3 bg-blue-500 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <span className={`flex-shrink-0 text-[13px] font-extrabold pb-1.5 border-b-2 whitespace-nowrap ${!resultados ? 'text-white border-white' : 'text-blue-100 border-transparent'}`}>
           Todos
         </span>
         {categories.map(cat => (
           <Link
             key={cat.name}
             to={cat.path}
-            className="flex-shrink-0 text-[13px] font-extrabold text-zinc-500 pb-1.5 border-b-2 border-transparent whitespace-nowrap"
+            className="flex-shrink-0 text-[13px] font-extrabold text-blue-100 pb-1.5 border-b-2 border-transparent whitespace-nowrap"
           >
             {cat.name}
           </Link>
@@ -137,9 +145,14 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
       </div>
 
       {/* BANNER — más ancho que el resto, texto igual al de HeroSupply.jsx.
-          Compacto sin botón CTA (2026-09-14); un poco más alto (2026-09-15). */}
+          Compacto sin botón CTA (2026-09-14); un poco más alto (2026-09-15).
+          Sigue igual, con su azul traslúcido (2026-09-15, Jose, al pasar
+          el resto de la página a blanco) — text-white explícito acá
+          porque el título ("Professional"/"Equipment") no tiene color
+          propio, hereda del contenedor; sin esto quedaba negro-sobre-negro
+          en cuanto la raíz de la página pasó a texto oscuro. */}
       <div
-        className="mx-2 mt-3 rounded-2xl border border-blue-500/30 px-4 py-6 relative overflow-hidden"
+        className="mx-2 mt-3 rounded-2xl border border-blue-500/30 px-4 py-6 relative overflow-hidden text-white"
         style={{ background: 'radial-gradient(circle at 88% 28%, rgba(59,130,246,.28), transparent 55%), linear-gradient(145deg,#0e1626,#07090d)' }}
       >
         <p className="text-blue-500 text-[9px] font-bold uppercase tracking-[0.3em] mb-2">INKognito Supply — Colombia</p>
@@ -167,8 +180,8 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
         <p className="text-center text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-semibold">
           Marcas referentes en la industria
         </p>
-        <BrandsMarquee imgs={imgs} />
-        <p className="mt-4 text-center text-xs italic tracking-wide text-zinc-400">
+        <BrandsMarquee imgs={imgs} light />
+        <p className="mt-4 text-center text-xs italic tracking-wide text-zinc-500">
           &ldquo;De un tatuador, para tatuadores.&rdquo;
         </p>
       </div>
@@ -208,8 +221,11 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
       {/* espacio para que el tab bar fijo no tape el último contenido */}
       <div className="h-20" />
 
-      {/* TAB BAR INFERIOR — Inicio / Categorías / Carrito / Menú */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center bg-black/95 backdrop-blur-md border-t border-blue-500/20 py-2.5">
+      {/* TAB BAR INFERIOR — Inicio / Categorías / Carrito / Menú. Blanco
+          (2026-09-15) — mismos tokens que ya usa SupplyMobileNav.jsx en su
+          versión light (fondo blanco, borde blue-500/20 conservado tal
+          cual, íconos negros). */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center bg-white/95 backdrop-blur-md border-t border-blue-500/20 py-2.5">
         <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex flex-col items-center gap-1 text-blue-500">
           <Home size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Inicio</span>
@@ -218,11 +234,11 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
             (2026-09-15, Jose: "quiero que el botón categorías abra una
             page nueva... con card y foto, como estaban antes") — mismo
             destino que ya usa SupplyMobileNav.jsx en el resto de Supply. */}
-        <Link to="/supply/categorias" className="flex flex-col items-center gap-1 text-zinc-500">
+        <Link to="/supply/categorias" className="flex flex-col items-center gap-1 text-black">
           <LayoutGrid size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Categorías</span>
         </Link>
-        <button onClick={() => setDrawerOpen(true)} className="relative flex flex-col items-center gap-1 text-zinc-500">
+        <button onClick={() => setDrawerOpen(true)} className="relative flex flex-col items-center gap-1 text-black">
           <ShoppingCart size={19} />
           {count > 0 && (
             <span className="absolute -top-1 right-1 w-3.5 h-3.5 rounded-full bg-blue-500 text-white text-[8px] font-black flex items-center justify-center">
@@ -231,44 +247,46 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
           )}
           <span className="text-[9px] font-bold uppercase tracking-wide">Carrito</span>
         </button>
-        <button onClick={() => setMenuOpen(true)} className="flex flex-col items-center gap-1 text-zinc-500">
+        <button onClick={() => setMenuOpen(true)} className="flex flex-col items-center gap-1 text-black">
           <MenuIcon size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Menú</span>
         </button>
       </div>
 
-      <CartDrawerSupply open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <CartDrawerSupply open={drawerOpen} onClose={() => setDrawerOpen(false)} light />
 
       {/* MENÚ — pantalla completa (2026-09-15, antes era un sheet chico que
-          dejaba ver el fondo; mismo contenido que el dropdown de NavbarSupply) */}
+          dejaba ver el fondo; mismo contenido que el dropdown de NavbarSupply).
+          Blanco (2026-09-15) — mismos tokens que la versión light de
+          SupplyMobileNav.jsx. */}
       {menuOpen && (
-        <div className="fixed inset-0 z-50 bg-zinc-950 flex flex-col">
-          <div className="flex-shrink-0 flex items-center justify-between px-5 py-4 border-b border-zinc-900">
+        <div className="fixed inset-0 z-50 bg-white flex flex-col">
+          <div className="flex-shrink-0 flex items-center justify-between px-5 py-4 border-b border-zinc-200">
             <div className="flex items-center gap-2">
               <img src={logoSupply} alt="INKognito Supply" className="w-12 h-12 object-contain" />
-              <span className="text-xs font-black uppercase tracking-widest text-white">Menú</span>
+              <span className="text-xs font-black uppercase tracking-widest text-zinc-900">Menú</span>
             </div>
-            <button onClick={() => setMenuOpen(false)} className="text-zinc-400 p-1"><X size={22} /></button>
+            <button onClick={() => setMenuOpen(false)} className="text-zinc-500 p-1"><X size={22} /></button>
           </div>
           <div className="flex-1 overflow-y-auto">
-            <Link to="/supply/proveedores" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-200">
+            <Link to="/supply/proveedores" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-800">
               <Store size={18} className="flex-shrink-0" />
               Tiendas verificadas
             </Link>
-            <Link to="/supply/proveedores/unete" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-200">
+            <Link to="/supply/proveedores/unete" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-800">
               <PlusCircle size={18} className="flex-shrink-0" />
               Registrar mi Supply
             </Link>
             <button
               type="button"
               onClick={() => { setMenuOpen(false); scrollToId('educacion') }}
-              className="flex items-center gap-3 w-full text-left px-6 py-4 text-[15px] font-medium text-zinc-200"
+              className="flex items-center gap-3 w-full text-left px-6 py-4 text-[15px] font-medium text-zinc-800"
             >
               <GraduationCap size={18} className="flex-shrink-0" />
               Educación para el artista
             </button>
-            <InkognitoModuleMenu current="supply" uppercase={false} textSize="text-[15px]" textClassName="text-zinc-200 font-medium" icon={LayoutGrid} onNavigate={() => setMenuOpen(false)} />
-            <Link to="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-200">
+            <InkognitoModuleMenu current="supply" uppercase={false} textSize="text-[15px]" textClassName="text-zinc-800 font-medium" icon={LayoutGrid} onNavigate={() => setMenuOpen(false)} />
+            <Link to="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-800">
               <Globe size={18} className="flex-shrink-0" />
               Ecosistema
             </Link>

@@ -12,11 +12,14 @@ const STACK = [
   { name: 'Mercado Pago', Icon: SiMercadopago },
 ]
 
-function TechLogo({ name, Icon }) {
+// light (2026-09-15, piloto en SupplyPage.jsx móvil: "convierte la page
+// principal, en formato blanco") — default false, no toca StorePage.jsx
+// ni la versión desktop de Supply (siguen oscuras).
+function TechLogo({ name, Icon, light = false }) {
   return (
     <div className="group flex flex-col items-center gap-2 flex-shrink-0">
-      <Icon size={30} className="text-zinc-600 group-hover:text-white transition-colors duration-300" />
-      <span className="text-zinc-700 group-hover:text-zinc-400 text-[9px] uppercase tracking-widest transition-colors duration-300">
+      <Icon size={30} className={`${light ? 'text-zinc-400 group-hover:text-zinc-900' : 'text-zinc-600 group-hover:text-white'} transition-colors duration-300`} />
+      <span className={`${light ? 'text-zinc-500 group-hover:text-zinc-600' : 'text-zinc-700 group-hover:text-zinc-400'} text-[9px] uppercase tracking-widest transition-colors duration-300`}>
         {name}
       </span>
     </div>
@@ -36,16 +39,16 @@ function TechLogo({ name, Icon }) {
 // "espacio de cierre" que en el otro enfoque solo existía entre copias) —
 // así cada copia mide lo mismo empaquetada, el contenedor exterior no
 // necesita gap propio, y -50% del total cae exactamente donde debe.
-export default function TechMarquee() {
+export default function TechMarquee({ light = false }) {
   return (
     <motion.section
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="bg-black border-t border-zinc-900 py-10 md:py-12 overflow-hidden"
+      className={`${light ? 'bg-white border-zinc-200' : 'bg-black border-zinc-900'} border-t py-10 md:py-12 overflow-hidden`}
     >
-      <p className="text-center text-zinc-600 uppercase tracking-[0.25em] text-[10px] md:text-xs mb-7">
+      <p className={`text-center ${light ? 'text-zinc-500' : 'text-zinc-600'} uppercase tracking-[0.25em] text-[10px] md:text-xs mb-7`}>
         Construido con estas tecnologías y productos
       </p>
       <div
@@ -58,7 +61,7 @@ export default function TechMarquee() {
         <div className="tech-marquee-track flex items-center w-max">
           {[0, 1].map((copy) => (
             <div key={copy} className="flex items-center gap-16 md:gap-24 pr-16 md:pr-24 flex-shrink-0">
-              {STACK.map((t) => <TechLogo key={t.name} {...t} />)}
+              {STACK.map((t) => <TechLogo key={t.name} {...t} light={light} />)}
             </div>
           ))}
         </div>

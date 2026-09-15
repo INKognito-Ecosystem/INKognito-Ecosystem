@@ -139,14 +139,22 @@ export default function SupplyPage() {
         desktop (intacta, sin tocar), y una compacta para móvil que combine
         visualmente con el resto del home nuevo (MobileHomeSupply) — mismo
         criterio de "Destacados" ahí: título chico, sin el layout flotado. */}
-    <motion.section {...REVEAL} id="educacion" className="relative overflow-hidden bg-gray-950 border-t border-zinc-900 py-6 md:py-16">
-      <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+    {/* Blanco en móvil, oscuro sin tocar en escritorio (2026-09-15, Jose:
+        "convierte la page principal, en formato blanco... desde sus dos
+        navbar hasta el footer") — responsive directo (md:) en vez de una
+        prop `light`, porque esta sección vive inline en SupplyPage.jsx
+        (no es un componente compartido con otro consumidor que necesite
+        aislarse). Las cards de acento (ámbar/azul/esmeralda) conservan su
+        propio degradado oscuro tal cual — mismo criterio que el banner de
+        MobileHomeSupply.jsx, que Jose pidió dejar igual. */}
+    <motion.section {...REVEAL} id="educacion" className="relative overflow-hidden bg-white md:bg-gray-950 border-t border-zinc-200 md:border-zinc-900 py-6 md:py-16">
+      <div className="absolute inset-0 opacity-[0.05] md:opacity-[0.11]" style={DOT_PATTERN} />
       <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6">
         <div className="mb-4 md:mb-6">
           <h2 className="hidden md:block float-left mr-6 md:mr-8 mb-2 text-2xl md:text-4xl font-black uppercase leading-none">
             Educación
           </h2>
-          <h2 className="md:hidden text-lg font-black uppercase mb-3">Educación</h2>
+          <h2 className="md:hidden text-lg font-black uppercase mb-3 text-zinc-900">Educación</h2>
           <p className="hidden md:block text-zinc-500 text-sm leading-relaxed text-justify [hyphens:auto]">
             Recursos formativos, kits esenciales y herramientas gratuitas seleccionadas para
             perfeccionar tu técnica y gestionar tu trabajo. Formación práctica enfocada en el
@@ -160,15 +168,21 @@ export default function SupplyPage() {
             para ver la 3ra), ícono junto al título en vez de arriba. */}
         <div className="md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 pb-2 scrollbar-hide">
 
-          <div className="group relative overflow-hidden snap-start flex-shrink-0 w-[44vw] border border-amber-500/20 bg-gradient-to-br from-zinc-900 to-black rounded-xl p-4 flex flex-col">
+          {/* Fondo translúcido, no oscuro (2026-09-15, Jose: "las card de
+              educación deben ser transparentes, o blancas, mantén el color
+              que cada uno tiene, dorado, azul y verde") — mismo criterio ya
+              usado en la card "Arma tu caja surtida" de Cartuchos
+              (border-{color}/30 bg-{color}/5). El título ya no hereda
+              blanco del contexto oscuro, necesita color propio. */}
+          <div className="group relative overflow-hidden snap-start flex-shrink-0 w-[44vw] border border-amber-500/30 bg-amber-500/5 rounded-xl p-4 flex flex-col">
             <div className="absolute -bottom-8 -left-8 w-24 h-24 rounded-full bg-amber-600/10" />
             <div className="relative flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-full bg-zinc-900 border border-amber-500/20 flex items-center justify-center text-amber-400 flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-white border border-amber-500/30 flex items-center justify-center text-amber-600 flex-shrink-0">
                 <GraduationCap size={15} />
               </div>
-              <h3 className="text-sm font-black uppercase leading-tight">Domina tu oficio.</h3>
+              <h3 className="text-sm font-black uppercase leading-tight text-zinc-900">Domina tu oficio.</h3>
             </div>
-            <p className="relative text-zinc-400 text-[11px] leading-snug flex-1 line-clamp-2">
+            <p className="relative text-zinc-600 text-[11px] leading-snug flex-1 line-clamp-2">
               Formación en técnica, higiene y gestión de estudio. Acceso ilimitado para aprender a tu propio ritmo.
             </p>
             <button
@@ -180,21 +194,21 @@ export default function SupplyPage() {
             </button>
             <Link
               to="/supply/aprende/cursos"
-              className="relative shrink-0 border border-amber-500/40 text-amber-400 text-[10px] font-black uppercase tracking-[0.1em] py-2 px-3 rounded-lg text-center"
+              className="relative shrink-0 border border-amber-500/40 text-amber-600 text-[10px] font-black uppercase tracking-[0.1em] py-2 px-3 rounded-lg text-center"
             >
               Ver cursos →
             </Link>
           </div>
 
-          <div className="group relative overflow-hidden snap-start flex-shrink-0 w-[44vw] border border-blue-500/20 bg-gradient-to-br from-zinc-900 to-black rounded-xl p-4 flex flex-col">
+          <div className="group relative overflow-hidden snap-start flex-shrink-0 w-[44vw] border border-blue-500/30 bg-blue-500/5 rounded-xl p-4 flex flex-col">
             <div className="absolute -bottom-8 -left-8 w-24 h-24 rounded-full bg-blue-500/10" />
             <div className="relative flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-full bg-zinc-900 border border-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-white border border-blue-500/30 flex items-center justify-center text-blue-600 flex-shrink-0">
                 <Package size={15} />
               </div>
-              <h3 className="text-sm font-black uppercase leading-tight">Equípate bien</h3>
+              <h3 className="text-sm font-black uppercase leading-tight text-zinc-900">Equípate bien</h3>
             </div>
-            <p className="relative text-zinc-400 text-[11px] leading-snug flex-1 line-clamp-2">
+            <p className="relative text-zinc-600 text-[11px] leading-snug flex-1 line-clamp-2">
               Equipamiento inicial y configuraciones clave para tu mesa de trabajo, sin sobrecostos.
             </p>
             <button
@@ -206,21 +220,21 @@ export default function SupplyPage() {
             </button>
             <Link
               to="/supply/aprende/kit"
-              className="relative shrink-0 border border-blue-500/40 text-blue-400 text-[10px] font-black uppercase tracking-[0.1em] py-2 px-3 rounded-lg text-center"
+              className="relative shrink-0 border border-blue-500/40 text-blue-600 text-[10px] font-black uppercase tracking-[0.1em] py-2 px-3 rounded-lg text-center"
             >
               Ver kit →
             </Link>
           </div>
 
-          <div className="group relative overflow-hidden snap-start flex-shrink-0 w-[44vw] border border-emerald-500/20 bg-gradient-to-br from-zinc-900 to-black rounded-xl p-4 flex flex-col">
+          <div className="group relative overflow-hidden snap-start flex-shrink-0 w-[44vw] border border-emerald-500/30 bg-emerald-500/5 rounded-xl p-4 flex flex-col">
             <div className="absolute -bottom-8 -left-8 w-24 h-24 rounded-full bg-emerald-500/10" />
             <div className="relative flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-full bg-zinc-900 border border-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-white border border-emerald-500/30 flex items-center justify-center text-emerald-600 flex-shrink-0">
                 <BookOpen size={15} />
               </div>
-              <h3 className="text-sm font-black uppercase leading-tight">Conocimiento</h3>
+              <h3 className="text-sm font-black uppercase leading-tight text-zinc-900">Conocimiento</h3>
             </div>
-            <p className="relative text-zinc-400 text-[11px] leading-snug flex-1 line-clamp-2">
+            <p className="relative text-zinc-600 text-[11px] leading-snug flex-1 line-clamp-2">
               Guías, plantillas y herramientas descargables para potenciar tu técnica.
             </p>
             <button
@@ -232,7 +246,7 @@ export default function SupplyPage() {
             </button>
             <Link
               to="/supply/aprende/recursos"
-              className="relative shrink-0 border border-emerald-500/40 text-emerald-400 text-[10px] font-black uppercase tracking-[0.1em] py-2 px-3 rounded-lg text-center"
+              className="relative shrink-0 border border-emerald-500/40 text-emerald-600 text-[10px] font-black uppercase tracking-[0.1em] py-2 px-3 rounded-lg text-center"
             >
               Ver recursos →
             </Link>
@@ -329,16 +343,16 @@ export default function SupplyPage() {
         onClick={() => setDescAbierta(null)}
       >
         <div
-          className="w-full max-w-md bg-zinc-950 border-t border-zinc-800 rounded-t-2xl p-5"
+          className="w-full max-w-md bg-white border-t border-zinc-200 rounded-t-2xl p-5"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between mb-3">
-            <h4 className="text-xs font-black uppercase tracking-widest text-white">
+            <h4 className="text-xs font-black uppercase tracking-widest text-zinc-900">
               {EDUCACION_DESC[descAbierta].titulo}
             </h4>
             <button onClick={() => setDescAbierta(null)} className="text-zinc-500 text-lg leading-none px-1">✕</button>
           </div>
-          <p className="text-zinc-400 text-sm leading-relaxed">
+          <p className="text-zinc-600 text-sm leading-relaxed">
             {EDUCACION_DESC[descAbierta].texto}
           </p>
         </div>
@@ -364,9 +378,17 @@ export default function SupplyPage() {
       </div>
     </motion.section>
 
-    <TechMarquee />
+    {/* Dos instancias, no una sola con `light` condicional (2026-09-15) —
+        FooterSupply/TechMarquee no dividen sus propios tokens por
+        breakpoint, así que envolver cada una en md:hidden/hidden md:block
+        deja móvil en blanco y escritorio exactamente como estaba (sin el
+        parche que blanqueaba también el footer/marquee de escritorio
+        mientras el resto de esa columna seguía oscuro). */}
+    <div className="md:hidden"><TechMarquee light /></div>
+    <div className="hidden md:block"><TechMarquee /></div>
 
-    <FooterSupply />
+    <div className="md:hidden"><FooterSupply light /></div>
+    <div className="hidden md:block"><FooterSupply /></div>
 
     {/* Espacio para que la tab bar fija de MobileHomeSupply no tape el
         footer (Términos/Privacidad) — 2026-09-15, reportado por Jose.
