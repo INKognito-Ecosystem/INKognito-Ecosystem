@@ -2,8 +2,16 @@ import { useLoaderData } from 'react-router'
 import SupplyCategoryPage from '../SupplyCategoryPage'
 import { fetchCatalogCategoria, fetchSupplyFaq } from '../../../hooks/useCatalog'
 
-const TITLE = 'Maquinas'
-const CATEGORIA = 'Maquinas'
+// 'Máquinas' con tilde (2026-09-15) — antes decía 'Maquinas' sin tilde,
+// distinto a como aparece EN TODAS PARTES en el resto del ecosistema
+// (CategoriesSupply.jsx, CATEGORY_BADGE de SupplyCategoryPage.jsx,
+// MisProductosSupplySection.jsx, supplyCategoriesOrder.js) — la
+// comparación exacta de string `cat.cat === categoria` para resaltar la
+// pestaña activa nunca daba true acá, así que Máquinas era la única
+// categoría sin el listón blanco de "estás aquí" (Jose: "en algunas
+// categorías no les aparece ese listón blanco").
+const TITLE = 'Máquinas'
+const CATEGORIA = 'Máquinas'
 const SLUG = 'machines'
 const DESC = 'Maquinas de tatuar rotativas en Chigorodo, Uraba. Equipos para todos los estilos.'
 const INTRO = 'Máquinas rotativas para todos los estilos, del realismo al lineal. Tu máquina define tu velocidad, tu control y tu firma — equipos que ya están en manos de tatuadores que probaron y no volvieron atrás.'

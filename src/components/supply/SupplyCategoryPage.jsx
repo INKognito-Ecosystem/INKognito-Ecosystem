@@ -7,7 +7,6 @@ import FooterSupply from './FooterSupply'
 import logoSupply from '../../assets/milogo/supply.webp'
 import AccordionCard from './AccordionCard'
 import SupplyProductCard from './SupplyProductCard'
-import { useScrolled } from '../../hooks/useScrolled'
 import { fetchCatalogPage } from '../../hooks/useCatalog'
 import { FaWhatsapp } from 'react-icons/fa'
 import { ExternalLink, Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package, ArrowLeft, ArrowRight, Search, SlidersHorizontal, MapPin, BookOpen, X } from 'lucide-react'
@@ -163,7 +162,6 @@ const ORDEN_OPTIONS = [
 // demás. Si el piloto convence, se replica el prop a los demás wrappers.
 export default function SupplyCategoryPage({ title, categoria, slug, intro, guide, faqs, products = [], nextCursor = null, hasMore = false, providers = [], afiliados = [], extraCTA = null, light = false }) {
   const { prev, next } = getAdjacentCategories(slug)
-  const scrolled = useScrolled()
   const t = light ? {
     pageBg: 'bg-white', text: 'text-zinc-900', textMuted: 'text-zinc-500', textMuted2: 'text-zinc-600',
     panel: 'bg-zinc-50', panelAlt: 'bg-white', input: 'bg-zinc-100', border: 'border-zinc-200', borderStrong: 'border-zinc-300',
@@ -415,25 +413,14 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
       </div>
       <SupplyMobileNav active="categorias" light={light} />
 
-      {scrolled && prev && (
-        <Link
-          to={`/supply/${prev.slug}`} replace
-          aria-label={`Ver ${prev.name}`}
-          className="fixed top-[76px] md:top-20 left-2 md:left-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
-        >
-          <ArrowLeft size={20} />
-        </Link>
-      )}
-      {scrolled && next && (
-        <Link
-          to={`/supply/${next.slug}`} replace
-          aria-label={`Ver ${next.name}`}
-          className="fixed top-[76px] md:top-20 right-2 md:right-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
-        >
-          <ArrowRight size={20} />
-        </Link>
-      )}
-
+      {/* Ya no hay flechas prev/next flotantes al hacer scroll (2026-09-15,
+          Jose: "quítales las flechas que aparecen cuando hago scroll, ya
+          no serán necesarias") — quitado el bloque `{scrolled && ...}` que
+          las mostraba (fixed, encima del contenido) junto con useScrolled,
+          que ya no se usaba para nada más acá. Las flechas prev/next fijas
+          del hero de escritorio (más abajo, sin scroll de por medio) no se
+          tocaron — son un control de navegación aparte, no lo que Jose
+          reportó. */}
       {/* pb-16 (64px), no pb-20 (80px) — 2026-09-15, Jose: "el copyright...
           queda lejos del navbar de abajo, hazlo más compacto". Medido con
           Playwright: el tab bar fijo de SupplyMobileNav mide ~58px, no
