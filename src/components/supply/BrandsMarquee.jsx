@@ -40,6 +40,20 @@ const ALTO_EXTRA = {
   'ROYAL THREE': 'h-12 md:h-14',
 }
 
+// Recolor forzado en light (2026-09-15, Jose: "si hay logos totalmente
+// blancos, pásalos a negro como en el caso de dynamic, y wjx a color
+// azul") — Dynamic y WJX son line-art blanco sobre transparente: en el
+// marquee oscuro se veían bien (grayscale + opacity-50 los dejaba como
+// silueta gris), pero al pasar a color completo sobre fondo blanco
+// (arriba, "devuévele el color a las marcas") quedaron invisibles
+// (blanco sobre blanco). Solo estos dos — el resto de logos ya tiene
+// color propio visible (Heaven Pro cian, Royal Three rojo, Warlock
+// azul/negro, Tattoo Vision/Vice rojo).
+const RECOLOR_LIGHT = {
+  DYNAMIC: 'bg-zinc-900',
+  WJX: 'bg-blue-500',
+}
+
 // light (2026-09-15, piloto en MobileHomeSupply: "convierte la page
 // principal, en formato blanco") — default false para no tocar
 // HeroSupply.jsx/BrandsSupply.jsx (desktop, siguen oscuros). Sin esto el
@@ -52,9 +66,29 @@ function BrandLogo({ brand, img, light = false }) {
   const local = RECORTE_LOCAL[brand.name]
   const src = local || img
   const alto = ALTO_EXTRA[brand.name] || 'h-10 md:h-12'
+  const recolor = light ? RECOLOR_LIGHT[brand.name] : null
   return (
     <Link to={brand.to} className={`group flex items-center justify-center flex-shrink-0 ${alto}`}>
-      {src ? (
+      {src ? recolor ? (
+        // Recorte a color sólido vía CSS mask (2026-09-15, ver
+        // RECOLOR_LIGHT arriba) — el <img> real queda invisible pero
+        // define el tamaño real (relación de aspecto propia de cada
+        // logo, w-auto sobre h-full); el <span> de encima usa esa misma
+        // imagen como máscara de alfa y la rellena con un color sólido.
+        <span className="relative inline-flex items-center justify-center h-full">
+          <img src={src} alt={brand.name} className="h-full w-auto max-w-[9rem] md:max-w-[11rem] object-contain opacity-0" />
+          <span
+            aria-hidden="true"
+            className={`absolute inset-0 ${recolor}`}
+            style={{
+              WebkitMaskImage: `url(${src})`, maskImage: `url(${src})`,
+              WebkitMaskSize: 'contain', maskSize: 'contain',
+              WebkitMaskRepeat: 'no-repeat', maskRepeat: 'no-repeat',
+              WebkitMaskPosition: 'center', maskPosition: 'center',
+            }}
+          />
+        </span>
+      ) : (
         <img
           src={src}
           alt={brand.name}
