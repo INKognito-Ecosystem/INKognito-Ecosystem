@@ -38,6 +38,7 @@ export default function BundlesPage() {
   const { products, afiliados, nextCursor, hasMore, providers, faqs } = useLoaderData()
   return (
     <SupplyCategoryPage
+      light
       title={TITLE}
       categoria={CATEGORIA}
       slug={SLUG}
