@@ -10,8 +10,9 @@ import SupplyProductCard from './SupplyProductCard'
 import { useScrolled } from '../../hooks/useScrolled'
 import { fetchCatalogPage } from '../../hooks/useCatalog'
 import { FaWhatsapp } from 'react-icons/fa'
-import { ExternalLink, Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package, ArrowLeft, ArrowRight, Search, SlidersHorizontal, MapPin } from 'lucide-react'
+import { ExternalLink, Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, PlugZap, Toolbox, BedDouble, Package, ArrowLeft, ArrowRight, Search, SlidersHorizontal, MapPin, BookOpen, X } from 'lucide-react'
 import { getAdjacentCategories } from '../../data/supplyCategoriesOrder'
+import { categories } from './CategoriesSupply'
 
 const AFILIADO_COPY = {
   'Tintas': {
@@ -155,9 +156,23 @@ const ORDEN_OPTIONS = [
   { value: 'precio_asc', label: 'Menor precio' },
 ]
 
-export default function SupplyCategoryPage({ title, categoria, slug, intro, guide, faqs, products = [], nextCursor = null, hasMore = false, providers = [], afiliados = [], extraCTA = null }) {
+// light (2026-09-15, piloto de Jose: "cambia el fondo de la page cartuchos
+// a blanco... todo incluido el footer y politicas") — SupplyCategoryPage.jsx
+// es compartido por las 10 categorías, así que esto se pasa explícito SOLO
+// desde CartridgesPage.jsx por ahora, default false para no tocar las
+// demás. Si el piloto convence, se replica el prop a los demás wrappers.
+export default function SupplyCategoryPage({ title, categoria, slug, intro, guide, faqs, products = [], nextCursor = null, hasMore = false, providers = [], afiliados = [], extraCTA = null, light = false }) {
   const { prev, next } = getAdjacentCategories(slug)
   const scrolled = useScrolled()
+  const t = light ? {
+    pageBg: 'bg-white', text: 'text-zinc-900', textMuted: 'text-zinc-500', textMuted2: 'text-zinc-600',
+    panel: 'bg-zinc-50', panelAlt: 'bg-white', input: 'bg-zinc-100', border: 'border-zinc-200', borderStrong: 'border-zinc-300',
+    hoverBg: 'hover:bg-zinc-100', dotOpacity: 'opacity-[0.05]',
+  } : {
+    pageBg: 'bg-gray-950', text: 'text-white', textMuted: 'text-zinc-500', textMuted2: 'text-zinc-400',
+    panel: 'bg-zinc-950', panelAlt: 'bg-zinc-900', input: 'bg-zinc-900', border: 'border-zinc-800', borderStrong: 'border-zinc-700',
+    hoverBg: 'hover:bg-zinc-800', dotOpacity: 'opacity-[0.11]',
+  }
 
   // Si la categoría tiene stock alguna vez, en base a la primera página
   // servida por el loader — a diferencia de `items` (que sí cambia con
@@ -171,6 +186,13 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
   const [masDisponible, setMasDisponible] = useState(hasMore)
   const [cargandoMas, setCargandoMas] = useState(false)
   const [cargandoFiltro, setCargandoFiltro] = useState(false)
+  // Descripción de categoría en sheet, no siempre visible (2026-09-15,
+  // Jose: "que la gente sepa que encontrará una descripción allí, pero que
+  // no pelee con lo demás visualmente") — el texto sigue en el HTML inicial
+  // (SSR, mismo `intro` de siempre) solo que colapsado hasta que lo abren,
+  // así no se pierde el contenido para SEO/AEO. Solo móvil — desktop sigue
+  // mostrando el párrafo completo como siempre.
+  const [introAbierto, setIntroAbierto] = useState(false)
 
   const [provFiltro, setProvFiltro] = useState('todos')
   const [orden, setOrden] = useState('recientes')
@@ -275,19 +297,23 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
           reemplaza por esto, nav/carrito/menú bajan a la barra inferior
           (SupplyMobileNav, compartida por todas las categorías porque
           SupplyCategoryPage.jsx es el componente compartido de todas). */}
-      <div className="md:hidden sticky top-0 z-40 flex items-center gap-2 px-4 py-2 bg-black border-b border-blue-500/20">
+      {/* Barra superior — blanca con íconos azules en el piloto de Cartuchos
+          (2026-09-15, Jose: "ambos navbar blancos, íconos azul claro"). */}
+      <div className={`md:hidden sticky top-0 z-40 flex items-center gap-2 px-4 py-2 ${light ? 'bg-white' : 'bg-black'} border-b border-blue-500/20`}>
         <Link to="/supply" aria-label="Volver a Supply" className="flex-shrink-0">
           <img src={logoSupply} alt="INKognito Supply" className="w-12 h-12 object-contain" />
         </Link>
         <>
           <div className="relative flex-1 min-w-0">
-            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
+            <Search size={14} className={`absolute left-2.5 top-1/2 -translate-y-1/2 ${light ? 'text-blue-400' : 'text-zinc-600'} pointer-events-none`} />
               <input
                 type="text"
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
                 placeholder={`Buscar en categoría ${title.toLowerCase()}`}
-                className="w-full min-w-0 bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-lg pl-8 pr-2 py-2 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500"
+                className={light
+                  ? 'w-full min-w-0 bg-zinc-100 border border-zinc-200 text-zinc-900 text-xs rounded-lg pl-8 pr-2 py-2 placeholder:text-zinc-500 focus:outline-none focus:border-blue-400'
+                  : 'w-full min-w-0 bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-lg pl-8 pr-2 py-2 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500'}
               />
             </div>
             {proveedoresOrdenados.length > 0 && (
@@ -297,8 +323,8 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                   onClick={() => setProvAbiertoM(o => !o)}
                   aria-label="Filtrar por proveedor"
                   aria-expanded={provAbiertoM}
-                  className={`flex items-center justify-center w-9 h-9 bg-zinc-900 border rounded-lg transition-colors ${
-                    provAbiertoM || provFiltro !== 'todos' ? 'border-blue-500 text-blue-400' : 'border-zinc-800 text-zinc-400'
+                  className={`flex items-center justify-center w-9 h-9 border rounded-lg transition-colors ${light ? 'bg-zinc-100' : 'bg-zinc-900'} ${
+                    provAbiertoM || provFiltro !== 'todos' ? 'border-blue-500 text-blue-400' : light ? 'border-zinc-200 text-blue-400' : 'border-zinc-800 text-zinc-400'
                   }`}
                 >
                   <MapPin size={14} />
@@ -362,8 +388,8 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                 onClick={() => setOrdenAbiertoM(o => !o)}
                 aria-label="Ordenar por"
                 aria-expanded={ordenAbiertoM}
-                className={`flex items-center justify-center w-9 h-9 bg-zinc-900 border rounded-lg transition-colors ${
-                  ordenAbiertoM ? 'border-blue-500 text-blue-400' : 'border-zinc-800 text-zinc-400'
+                className={`flex items-center justify-center w-9 h-9 border rounded-lg transition-colors ${light ? 'bg-zinc-100' : 'bg-zinc-900'} ${
+                  ordenAbiertoM ? 'border-blue-500 text-blue-400' : light ? 'border-zinc-200 text-blue-400' : 'border-zinc-800 text-zinc-400'
                 }`}
               >
                 <SlidersHorizontal size={14} />
@@ -387,7 +413,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
             </div>
         </>
       </div>
-      <SupplyMobileNav active="categorias" />
+      <SupplyMobileNav active="categorias" light={light} />
 
       {scrolled && prev && (
         <Link
@@ -408,41 +434,71 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
         </Link>
       )}
 
-      <div className="bg-gray-950 pt-0 pb-20 md:pt-24 md:pb-0">
+      <div className={`${t.pageBg} pt-0 pb-20 md:pt-24 md:pb-0`}>
 
         {/* HERO — H1 + ícono de categoría en móvil */}
         <div className="relative overflow-hidden px-6 max-w-7xl mx-auto pb-5 md:pb-10">
-          <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
-          <div className="relative z-10 flex items-center gap-3 mb-2">
+          <div className={`absolute inset-0 ${t.dotOpacity}`} style={DOT_PATTERN} />
+          {/* Desktop — flechas prev/next + "Categoría", sin cambios */}
+          <div className="relative z-10 hidden md:flex items-center gap-3 mb-2">
             {prev && (
               <Link
                 to={`/supply/${prev.slug}`} replace
                 aria-label={`Ver ${prev.name}`}
-                className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors"
+                className={`flex-shrink-0 ${t.textMuted} hover:${light ? 'text-black' : 'text-white'} transition-colors`}
               >
                 <ArrowLeft size={20} />
               </Link>
             )}
-            <p className="md:hidden flex-1 text-center uppercase tracking-[0.25em] text-zinc-500 text-xs">{title}</p>
-            <p className="hidden md:block flex-1 text-center uppercase tracking-[0.25em] text-zinc-500 text-xs">Categoría</p>
+            <p className={`flex-1 text-center uppercase tracking-[0.25em] ${t.textMuted} text-xs`}>Categoría</p>
             {next && (
               <Link
                 to={`/supply/${next.slug}`} replace
                 aria-label={`Ver ${next.name}`}
-                className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors"
+                className={`flex-shrink-0 ${t.textMuted} hover:${light ? 'text-black' : 'text-white'} transition-colors`}
               >
                 <ArrowRight size={20} />
               </Link>
             )}
           </div>
+
+          {/* Móvil — tira de categorías en vez de flechas (2026-09-15, mismo
+              patrón que MobileHomeSupply.jsx), con el disparador de
+              descripción integrado al final, chico y sin texto. */}
+          <div className="md:hidden relative z-10 flex items-center gap-2 mb-3 -mx-6 px-6">
+            <div className="flex-1 flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {categories.map(cat => (
+                <Link
+                  key={cat.name}
+                  to={cat.path}
+                  className={`flex-shrink-0 text-[12px] font-extrabold pb-1 border-b-2 whitespace-nowrap ${
+                    cat.cat === categoria ? `${t.text} border-blue-500` : `${t.textMuted} border-transparent`
+                  }`}
+                >
+                  {cat.name}
+                </Link>
+              ))}
+            </div>
+            {intro && (
+              <button
+                type="button"
+                onClick={() => setIntroAbierto(true)}
+                aria-label={`Sobre ${title.toLowerCase()}`}
+                className={`flex-shrink-0 w-7 h-7 rounded-full border flex items-center justify-center ${t.textMuted} ${t.border}`}
+              >
+                <BookOpen size={14} />
+              </button>
+            )}
+          </div>
+
           <div className="hidden md:flex relative z-10 items-center justify-center gap-3 mb-4">
-            <h1 className="text-4xl font-black uppercase tracking-tight leading-none text-white text-center whitespace-nowrap">{title}</h1>
+            <h1 className={`text-4xl font-black uppercase tracking-tight leading-none ${t.text} text-center whitespace-nowrap`}>{title}</h1>
           </div>
           {intro && (
-            <p className="relative z-10 text-zinc-400 text-base md:text-lg leading-relaxed max-w-3xl text-justify [hyphens:auto]">{intro}</p>
+            <p className={`hidden md:block relative z-10 ${t.textMuted2} text-base md:text-lg leading-relaxed max-w-3xl text-justify [hyphens:auto]`}>{intro}</p>
           )}
           {hayStockInicial && (categoria in CATEGORY_BADGE ? CATEGORY_BADGE[categoria] : DEFAULT_BADGE) && (
-            <div className="relative z-10 flex items-center gap-2 text-xs text-zinc-400 bg-zinc-900/60 border border-zinc-800 rounded-lg px-3 py-2 w-fit mt-4">
+            <div className={`relative z-10 flex items-center gap-2 text-xs ${t.textMuted2} ${t.panelAlt} border ${t.border} rounded-lg px-3 py-2 w-fit mt-4`}>
               <ShieldCheck size={14} className="shrink-0 text-blue-400" />
               <span>{categoria in CATEGORY_BADGE ? CATEGORY_BADGE[categoria] : DEFAULT_BADGE}</span>
             </div>
@@ -452,17 +508,38 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
           )}
         </div>
 
+        {/* Sheet de descripción — afuera del Hero (que tiene overflow-hidden;
+            un fixed adentro queda recortado y se ve raro, ya nos pasó una
+            vez con el modal de Educación). */}
+        {introAbierto && (
+          <div
+            className="md:hidden fixed inset-0 z-50 bg-black/70 flex items-end"
+            onClick={() => setIntroAbierto(false)}
+          >
+            <div
+              className={`w-full max-w-md ${t.panel} border-t ${t.border} rounded-t-2xl p-5`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h4 className={`text-xs font-black uppercase tracking-widest ${t.text}`}>{title}</h4>
+                <button onClick={() => setIntroAbierto(false)} className={t.textMuted}><X size={20} /></button>
+              </div>
+              <p className={`${t.textMuted2} text-sm leading-relaxed`}>{intro}</p>
+            </div>
+          </div>
+        )}
+
         {/* PRODUCTOS FÍSICOS — grid en los tres anchos (2/3/4 columnas) */}
         <motion.div {...REVEAL} className="pb-10 max-w-7xl mx-auto">
           <div className="hidden md:flex flex-nowrap items-center gap-2 px-6 mb-5">
               <div className="relative flex-1 min-w-0">
-                <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
+                <Search size={14} className={`absolute left-2.5 top-1/2 -translate-y-1/2 ${t.textMuted} pointer-events-none`} />
                 <input
                   type="text"
                   value={busqueda}
                   onChange={(e) => setBusqueda(e.target.value)}
                   placeholder={`Buscar en categoría ${title.toLowerCase()}`}
-                  className="w-full min-w-0 bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-lg pl-8 pr-2 py-2 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500"
+                  className={`w-full min-w-0 ${t.input} border ${t.border} ${t.text} text-xs rounded-lg pl-8 pr-2 py-2 placeholder:${t.textMuted} focus:outline-none focus:border-blue-500`}
                 />
               </div>
               {proveedoresOrdenados.length > 0 && (
@@ -562,10 +639,10 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
               </div>
             </div>
           {!hayStockInicial ? (
-            <div className="mx-6 border border-blue-500/20 bg-zinc-950 rounded-2xl p-10 text-center">
-              <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2">Sin stock por el momento</p>
-              <p className="text-white text-lg font-black uppercase mb-2">Próximamente disponible</p>
-              <p className="text-zinc-500 text-sm mb-6 max-w-sm mx-auto">
+            <div className={`mx-6 border border-blue-500/20 ${t.panel} rounded-2xl p-10 text-center`}>
+              <p className={`${t.textMuted} text-[10px] font-bold uppercase tracking-widest mb-2`}>Sin stock por el momento</p>
+              <p className={`${t.text} text-lg font-black uppercase mb-2`}>Próximamente disponible</p>
+              <p className={`${t.textMuted} text-sm mb-6 max-w-sm mx-auto`}>
                 Déjanos tu número y te avisamos cuando tengamos {title.toLowerCase()} disponibles. Sé el primero en saber.
               </p>
               <a
@@ -578,8 +655,8 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
               </a>
             </div>
           ) : items.length === 0 && !cargandoFiltro ? (
-            <div className="mx-6 border border-zinc-800 bg-zinc-950 rounded-2xl p-8 text-center">
-              <p className="text-zinc-400 text-sm mb-4">Ningún producto coincide con tu búsqueda o filtro.</p>
+            <div className={`mx-6 border ${t.border} ${t.panel} rounded-2xl p-8 text-center`}>
+              <p className={`${t.textMuted2} text-sm mb-4`}>Ningún producto coincide con tu búsqueda o filtro.</p>
               <button
                 type="button"
                 onClick={() => { setBusqueda(''); setProvFiltro('todos') }}
@@ -592,7 +669,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
             <div className={`transition-opacity duration-200 ${cargandoFiltro ? 'opacity-50' : 'opacity-100'}`}>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-6">
                 {items.map(item => (
-                  <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={categoria} />
+                  <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={categoria} light={light} />
                 ))}
               </div>
               {masDisponible && (
@@ -617,10 +694,10 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
           <motion.div {...REVEAL} className="pb-10 max-w-7xl mx-auto px-6">
             <div className="border-t-2 border-blue-500/20 pt-8 mb-6">
               <p className="text-blue-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ {copy.badge}</p>
-              <h2 className="text-xl md:text-2xl font-black uppercase leading-none text-white">
+              <h2 className={`text-xl md:text-2xl font-black uppercase leading-none ${t.text}`}>
                 {copy.title}
               </h2>
-              <p className="text-zinc-500 text-sm mt-2 max-w-lg leading-relaxed">
+              <p className={`${t.textMuted} text-sm mt-2 max-w-lg leading-relaxed`}>
                 {copy.desc}
               </p>
             </div>
@@ -631,8 +708,8 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                 ))}
               </div>
             ) : (
-              <div className="border border-blue-500/20 bg-zinc-950 rounded-2xl p-6 text-center">
-                <p className="text-zinc-500 text-sm mb-4 max-w-sm mx-auto">
+              <div className={`border border-blue-500/20 ${t.panel} rounded-2xl p-6 text-center`}>
+                <p className={`${t.textMuted} text-sm mb-4 max-w-sm mx-auto`}>
                   Aún no tenemos activo el canal de importación para {title.toLowerCase()}. Avísanos y te contactamos en cuanto esté disponible — gestionamos el pedido desde el exterior.
                 </p>
                 <a
@@ -656,6 +733,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
 
             {guide?.length > 0 && (
               <AccordionCard
+                light={light}
                 icon="📖"
                 title={`Cómo elegir ${title.toLowerCase()}`}
                 subtitle="Tipos, usos, compatibilidad y qué factores tener en cuenta antes de comprar. Toca para desplegar la guía completa."
@@ -665,8 +743,8 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                     <div key={i} className="flex gap-4">
                       <span className="text-2xl flex-shrink-0">{item.icon}</span>
                       <div>
-                        <p className="font-black uppercase text-white text-xs tracking-[0.1em] mb-1">{item.title}</p>
-                        <p className="text-zinc-500 text-sm leading-relaxed">{item.text}</p>
+                        <p className={`font-black uppercase ${t.text} text-xs tracking-[0.1em] mb-1`}>{item.title}</p>
+                        <p className={`${t.textMuted} text-sm leading-relaxed`}>{item.text}</p>
                       </div>
                     </div>
                   ))}
@@ -676,15 +754,16 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
 
             {faqs?.length > 0 && (
               <AccordionCard
+                light={light}
                 icon="❓"
                 title="Preguntas frecuentes"
                 subtitle="Envíos, calidad, cantidades y todo lo que necesitas saber antes de hacer tu pedido. Toca para ver las respuestas."
               >
                 <div className="flex flex-col gap-5">
                   {faqs.map((faq, i) => (
-                    <div key={faq.id ?? i} className={i < faqs.length - 1 ? 'pb-5 border-b border-zinc-800' : ''}>
-                      <p className="font-bold text-white text-sm mb-2">{faq.pregunta}</p>
-                      <p className="text-zinc-500 text-sm leading-relaxed">{faq.respuesta}</p>
+                    <div key={faq.id ?? i} className={i < faqs.length - 1 ? `pb-5 border-b ${t.border}` : ''}>
+                      <p className={`font-bold ${t.text} text-sm mb-2`}>{faq.pregunta}</p>
+                      <p className={`${t.textMuted} text-sm leading-relaxed`}>{faq.respuesta}</p>
                     </div>
                   ))}
                 </div>
@@ -694,7 +773,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
           </motion.div>
         )}
 
-        <FooterSupply />
+        <FooterSupply light={light} />
       </div>
     </>
   )

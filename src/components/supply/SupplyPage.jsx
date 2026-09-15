@@ -146,13 +146,8 @@ export default function SupplyPage() {
           <h2 className="hidden md:block float-left mr-6 md:mr-8 mb-2 text-2xl md:text-4xl font-black uppercase leading-none">
             Educación
           </h2>
-          <h2 className="md:hidden text-lg font-black uppercase mb-1.5">Educación</h2>
+          <h2 className="md:hidden text-lg font-black uppercase mb-3">Educación</h2>
           <p className="hidden md:block text-zinc-500 text-sm leading-relaxed text-justify [hyphens:auto]">
-            Recursos formativos, kits esenciales y herramientas gratuitas seleccionadas para
-            perfeccionar tu técnica y gestionar tu trabajo. Formación práctica enfocada en el
-            crecimiento constante del artista.
-          </p>
-          <p className="md:hidden text-zinc-500 text-sm leading-relaxed">
             Recursos formativos, kits esenciales y herramientas gratuitas seleccionadas para
             perfeccionar tu técnica y gestionar tu trabajo. Formación práctica enfocada en el
             crecimiento constante del artista.
@@ -349,28 +344,6 @@ export default function SupplyPage() {
         </div>
       </div>
     )}
-
-    {/* ── COBERTURA + CONTACTO — solo móvil ────────────────────── */}
-    <motion.section {...REVEAL} id="contacto" className="relative overflow-hidden md:hidden border-t border-zinc-900 bg-gray-950 px-6 py-8">
-      <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
-      <div className="relative z-10">
-      <h2 className="text-base font-black uppercase leading-none mb-3 text-white whitespace-nowrap">Cobertura y red de distribución</h2>
-      <p className="text-zinc-400 text-sm leading-relaxed mb-5">
-        Infraestructura digital diseñada para el sector. Conectamos tiendas supply/proveedores
-        con artistas de todo el país. Nuestra plataforma procesa tu orden y asigna el despacho
-        directamente al supply correspondiente, garantizando disponibilidad de stock y entregas
-        eficientes en toda Colombia.
-      </p>
-      <div className="flex flex-col gap-2 mb-5">
-        {['Red de proveedores con stock verificado','Despacho directo desde el distribuidor asignado','Cobertura y logística integrada en toda Colombia'].map(g => (
-          <div key={g} className="flex items-center gap-2">
-            <span className="text-green-500 text-sm font-bold">✓</span>
-            <span className="text-zinc-400 text-xs">{g}</span>
-          </div>
-        ))}
-      </div>
-      </div>
-    </motion.section>
 
     {/* ── COBERTURA Y LOGÍSTICA — solo desktop (2026-09-13, Jose: quitó
         Garantías y Contacto, quedaban de más una vez que la plataforma

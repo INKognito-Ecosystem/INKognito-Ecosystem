@@ -37,6 +37,17 @@ export default [
   route('supply/machines', 'components/supply/categories/MachinesPage.jsx'),
   route('supply/cartridges', 'components/supply/categories/Cartridges/CartridgesPage.jsx'),
   route('supply/cartuchos-surtidos', 'components/supply/categories/Cartridges/CartuchosSurtidosPage.jsx'),
+  // Ficha de producto estilo Mercado Libre (2026-09-15, piloto en
+  // Cartuchos) — navegación interna desde SupplyProductCard.jsx cuando
+  // light=true, distinta de /p/:id (esa es la landing para tráfico
+  // externo de anuncios). Antes de supply/:slug a propósito, mismo
+  // criterio de rutas fijas antes del catch-all dinámico.
+  route('supply/producto/:id', 'components/supply/SupplyProductDetailPage.jsx'),
+  // Página propia de categorías con card+foto, blanca (2026-09-15) — a
+  // donde ahora lleva el botón "Categorías" del navbar inferior en vez de
+  // /supply#categorias-mobile. Antes de supply/:slug, mismo criterio de
+  // rutas fijas antes del catch-all dinámico.
+  route('supply/categorias', 'components/supply/SupplyCategoriasPage.jsx'),
   route('supply/cartridges/ez-tattoo', 'components/supply/categories/Cartridges/EZCartridgesPage.jsx'),
   route('supply/cartridges/wjx', 'components/supply/categories/Cartridges/WJXCartridgesPage.jsx'),
   route('supply/power-supplies', 'components/supply/categories/PowerSuppliesPage.jsx'),

@@ -88,3 +88,17 @@ html {
     animation: none;
   }
 }
+
+/* SupplyProductDetailPage.jsx — parpadeo corto del botón "Agregar al
+   carrito" al agregar (2026-09-15, Jose). Un solo ciclo (no infinite,
+   a diferencia de las animaciones de arriba) — el componente quita la
+   clase por sí solo con un setTimeout, esto solo define el efecto. */
+@keyframes cta-blink {
+  0%, 100% { opacity: 1; }
+  25% { opacity: 0.35; }
+  50% { opacity: 1; }
+  75% { opacity: 0.35; }
+}
+.cta-blink {
+  animation: cta-blink 0.5s ease-in-out;
+}

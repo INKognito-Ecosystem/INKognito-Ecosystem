@@ -4,6 +4,7 @@ import { Award, MapPin, Menu } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import FooterSupply from './FooterSupply'
 import NavbarCategory from './NavbarCategory'
+import SupplyMobileNav from './SupplyMobileNav'
 import BrandCatalogSection from './BrandCatalogSection'
 import CajaSurtidaWidget from './CajaSurtidaWidget'
 import EstudioSupplyOwnerPanel from './EstudioSupplyOwnerPanel'
@@ -214,7 +215,7 @@ export default function EstudioSupplyPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <NavbarCategory pageName={nombreSupply} hideMenu={esDueno} />
+      <NavbarCategory pageName={nombreSupply} hideMenu={esDueno} hideMobileActions />
 
       {/* HERO blanco (2026-08-09, Jose: "el fondo del hero debera ser
           blanco") — mismo look que el perfil del estudio/artista en el
@@ -376,6 +377,12 @@ export default function EstudioSupplyPage() {
       </div>
 
       <FooterSupply />
+      {/* Espacio para que el tab bar fijo de abajo no tape el footer
+          (2026-09-15, mismo patrón que MobileHomeSupply.jsx) — carrito y
+          menú migran acá, NavbarCategory de arriba ya no los muestra en
+          móvil (ver hideMobileActions). */}
+      <div className="h-20 md:hidden" />
+      <SupplyMobileNav active={null} />
 
       {panelAbierto && (
         <EstudioSupplyOwnerPanel

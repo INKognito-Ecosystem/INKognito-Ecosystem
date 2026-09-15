@@ -17,8 +17,10 @@ const REVEAL = {
   transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
 }
 
-// Convierte el campo `cat` de cada categoría a la clave de settings usada en el panel
-const catKey = (cat) => 'supply_cat_' + cat.toLowerCase()
+// Convierte el campo `cat` de cada categoría a la clave de settings usada en
+// el panel — exportado (2026-09-15) para que SupplyCategoriasPage.jsx
+// resuelva la misma clave de imagen sin duplicar la lógica.
+export const catKey = (cat) => 'supply_cat_' + cat.toLowerCase()
   .replace(/[áéíóú]/g, c => ({á:'a',é:'e',í:'i',ó:'o',ú:'u'})[c])
   .replace(/[^a-z0-9]/g, '_').replace(/_+/g,'_').replace(/^_|_$/g,'')
 

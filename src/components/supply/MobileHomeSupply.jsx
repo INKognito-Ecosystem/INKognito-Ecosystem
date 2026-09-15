@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Bell, Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X } from 'lucide-react'
+import { Search, Bell, Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, GraduationCap, Globe } from 'lucide-react'
 import { categories } from './CategoriesSupply'
 import BrandsMarquee from './BrandsMarquee'
 import SupplyProductCard from './SupplyProductCard'
@@ -27,19 +27,65 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
   const [resultados, setResultados] = useState(null) // null = sin búsqueda activa
 
   const { items, hasMore, loading, loadMore } = useLoadMore('supply', {}, initialProducts)
+  const yaHizoScroll = useRef(false)
+
+  // Sin tildes/mayúsculas — mismo criterio que SupplyCategoryPage.jsx
+  // (normaliza) para que "cartucho" encuentre "Cartuchos".
+  const normaliza = (s) => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 
   // Búsqueda global del módulo (todas las categorías a la vez) — mismo
   // debounce de 300ms que ya usa SupplyCategoryPage.jsx, mismo
   // fetchCatalogPage de siempre, sin cursor propio (primera página nada
   // más — la búsqueda por categoría con "cargar más" ya existe en cada
   // página de categoría).
+  //
+  // También filtra por CATEGORÍA (2026-09-15, Jose: "también se debe
+  // filtrar por categoría, no es necesario especificar el nombre del
+  // producto") — si lo escrito coincide con el nombre de una categoría
+  // (ej. "cartucho" → "Cartuchos"), suma también los productos de esa
+  // categoría completa, no solo los que calzan por nombre de producto.
   useEffect(() => {
     const q = busqueda.trim()
-    if (q.length < 2) { setResultados(null); return }
+    // Bug real (2026-09-15, Jose: "al borrar, destacado queda cargando y
+    // no retorna si no hasta que recargo la página") — el return
+    // temprano no reseteaba `buscando`, así que si quedaba en `true`
+    // desde la búsqueda anterior, "Buscando…" se quedaba en pantalla
+    // para siempre en vez de volver a mostrar Destacados.
+    if (q.length < 2) { setResultados(null); setBuscando(false); yaHizoScroll.current = false; return }
     setBuscando(true)
+    // Scroll a los resultados UNA sola vez por búsqueda activa (2026-09-15,
+    // Jose: "cuando empiecen a aparecer los productos, se debe hacer
+    // scroll... si no, no se entera uno que hay algo buscando o
+    // apareciendo") — no en cada tecla, para no pelear con el teclado.
+    // "Certero" (Jose, corrección): mide el alto REAL de la barra sticky
+    // en vez de confiar en el scroll-padding-top global de index.css
+    // (calibrado para el navbar de 80px de otras páginas, no para esta
+    // barra propia de MobileHomeSupply) — así la card queda exacta,
+    // justo debajo del navbar, sin hueco ni quedar tapada.
+    if (!yaHizoScroll.current) {
+      const el = document.getElementById('grid-mobile')
+      const bar = document.querySelector('.sticky.top-0')
+      if (el) {
+        const barH = bar?.getBoundingClientRect().height ?? 0
+        const y = el.getBoundingClientRect().top + window.scrollY - barH
+        window.scrollTo({ top: y, behavior: 'smooth' })
+      }
+      yaHizoScroll.current = true
+    }
     const t = setTimeout(async () => {
-      const page = await fetchCatalogPage('supply', { q, limit: 12 })
-      setResultados(page.items)
+      const qNorm = normaliza(q)
+      const categoriaCoincide = categories.find(c => normaliza(c.cat).includes(qNorm))
+      const [porNombre, porCategoria] = await Promise.all([
+        fetchCatalogPage('supply', { q, limit: 12 }),
+        categoriaCoincide
+          ? fetchCatalogPage('supply', { categoria: categoriaCoincide.cat, tipo: 'fisico', limit: 12 })
+          : Promise.resolve({ items: [] }),
+      ])
+      const mapa = new Map()
+      for (const item of [...porCategoria.items, ...porNombre.items]) {
+        mapa.set(`${item.name}-${item.estudio_id ?? 'x'}`, item)
+      }
+      setResultados([...mapa.values()])
       setBuscando(false)
     }, 300)
     return () => clearTimeout(t)
@@ -136,8 +182,13 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
           <p className="text-zinc-500 text-xs">Ningún producto coincide con tu búsqueda.</p>
         ) : (
           <div className="grid grid-cols-2 gap-3">
+            {/* light (2026-09-15, Jose: "la card del producto debe
+                mostrarse actualizada en la cantidad de información que
+                contiene") — esta grilla se había quedado con la card
+                vieja (con "Suministrado por...", nombre grande) mientras
+                el resto de Supply ya usa la versión nueva. */}
             {gridItems.map(item => (
-              <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={item.categoria} />
+              <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={item.categoria} light />
             ))}
           </div>
         )}
@@ -163,10 +214,14 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
           <Home size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Inicio</span>
         </button>
-        <button onClick={() => scrollToId('categorias-mobile')} className="flex flex-col items-center gap-1 text-zinc-500">
+        {/* Antes hacía scroll a la tira de texto de categorías del home
+            (2026-09-15, Jose: "quiero que el botón categorías abra una
+            page nueva... con card y foto, como estaban antes") — mismo
+            destino que ya usa SupplyMobileNav.jsx en el resto de Supply. */}
+        <Link to="/supply/categorias" className="flex flex-col items-center gap-1 text-zinc-500">
           <LayoutGrid size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Categorías</span>
-        </button>
+        </Link>
         <button onClick={() => setDrawerOpen(true)} className="relative flex flex-col items-center gap-1 text-zinc-500">
           <ShoppingCart size={19} />
           {count > 0 && (
@@ -196,21 +251,25 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
             <button onClick={() => setMenuOpen(false)} className="text-zinc-400 p-1"><X size={22} /></button>
           </div>
           <div className="flex-1 overflow-y-auto">
-            <Link to="/supply/proveedores" onClick={() => setMenuOpen(false)} className="block px-6 py-5 uppercase text-sm font-bold tracking-[0.2em] text-zinc-300 border-b border-zinc-900">
+            <Link to="/supply/proveedores" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-200">
+              <Store size={18} className="flex-shrink-0" />
               Tiendas verificadas
             </Link>
-            <Link to="/supply/proveedores/unete" onClick={() => setMenuOpen(false)} className="block px-6 py-5 uppercase text-sm font-bold tracking-[0.2em] text-blue-400 border-b border-zinc-900">
+            <Link to="/supply/proveedores/unete" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-200">
+              <PlusCircle size={18} className="flex-shrink-0" />
               Registrar mi Supply
             </Link>
             <button
               type="button"
               onClick={() => { setMenuOpen(false); scrollToId('educacion') }}
-              className="block w-full text-left px-6 py-5 uppercase text-sm font-bold tracking-[0.2em] text-zinc-300 border-b border-zinc-900"
+              className="flex items-center gap-3 w-full text-left px-6 py-4 text-[15px] font-medium text-zinc-200"
             >
+              <GraduationCap size={18} className="flex-shrink-0" />
               Educación para el artista
             </button>
-            <InkognitoModuleMenu current="supply" textClassName="text-zinc-300 border-b border-zinc-900" onNavigate={() => setMenuOpen(false)} />
-            <Link to="/" onClick={() => setMenuOpen(false)} className="block px-6 py-5 uppercase text-sm font-bold tracking-[0.2em] text-zinc-300 border-b border-zinc-900">
+            <InkognitoModuleMenu current="supply" uppercase={false} textSize="text-[15px]" textClassName="text-zinc-200 font-medium" icon={LayoutGrid} onNavigate={() => setMenuOpen(false)} />
+            <Link to="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-200">
+              <Globe size={18} className="flex-shrink-0" />
               Ecosistema
             </Link>
           </div>
