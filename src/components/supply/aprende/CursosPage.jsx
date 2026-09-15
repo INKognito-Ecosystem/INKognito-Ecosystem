@@ -52,8 +52,8 @@ export default function CursosPage() {
           que aplique a cada curso. */}
       {cursos.length > 0 && (
         <div className="max-w-7xl mx-auto px-6 pb-8 md:pb-12">
-          <div className="border border-zinc-800 rounded-2xl px-6 py-5 text-center">
-            <p className="text-zinc-400 text-xs md:text-sm leading-relaxed">
+          <div className="border border-zinc-200 rounded-2xl px-6 py-5 text-center">
+            <p className="text-zinc-600 text-xs md:text-sm leading-relaxed">
               Pagos 100% seguros. Accede a tu contenido desde cualquier dispositivo a través de la
               infraestructura de Hotmart.
             </p>
