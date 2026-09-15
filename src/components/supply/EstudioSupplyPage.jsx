@@ -210,8 +210,23 @@ export default function EstudioSupplyPage() {
     const resto = [...presentes].filter((c) => !ordenadas.includes(c))
     return [...ordenadas, ...resto]
   }, [products])
-  const [categoriaActiva, setCategoriaActiva] = useState('todos')
+  // Deep link "armar mi caja" (2026-09-15) — CartuchosSurtidosPage.jsx
+  // manda acá con ?caja=1 en vez de mandar directo a Cartuchos por
+  // categoría: esto abre la pestaña Cartuchos de una vez y hace scroll a
+  // CajaSurtidaWidget (id="armar-caja") sin que el visitante tenga que
+  // buscarla por su cuenta.
+  const [categoriaActiva, setCategoriaActiva] = useState(() =>
+    searchParams.get('caja') === '1' && categoriasEnCatalogo.includes('Cartuchos') ? 'Cartuchos' : 'todos'
+  )
   const productosFiltrados = categoriaActiva === 'todos' ? products : products.filter((p) => p.categoria === categoriaActiva)
+
+  useEffect(() => {
+    if (searchParams.get('caja') !== '1') return
+    const t = setTimeout(() => {
+      document.getElementById('armar-caja')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 300)
+    return () => clearTimeout(t)
+  }, [])
 
   // Buscador propio por tienda (2026-09-15, Jose: "cada tienda que se
   // cree... debería tener su propio buscador") — cliente-side sobre

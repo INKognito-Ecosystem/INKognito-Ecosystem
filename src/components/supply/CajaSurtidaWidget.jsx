@@ -104,7 +104,7 @@ export default function CajaSurtidaWidget({ products, estudioId, estudioNombre, 
   if (!referenciaGeneral) return null
 
   return (
-    <div className={`border rounded-2xl p-5 md:p-8 mt-10 ${t.cardBorder} ${t.cardBg}`}>
+    <div id="armar-caja" className={`border rounded-2xl p-5 md:p-8 mt-10 ${t.cardBorder} ${t.cardBg}`}>
       <p className="uppercase tracking-[0.2em] text-blue-500 text-xs mb-2">Cartuchos · A tu medida</p>
       <h2 className={`text-2xl md:text-3xl font-black uppercase leading-tight mb-3 ${t.text}`}>
         Arma tu <span className="text-blue-500">Caja Surtida</span>
