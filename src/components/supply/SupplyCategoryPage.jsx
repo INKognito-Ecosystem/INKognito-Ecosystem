@@ -476,8 +476,12 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
               de variedad de calibres") — fuera del piloto sigue igual que
               siempre, sin franja. */}
           {light ? (
-            <div className="md:hidden relative z-10 -mx-6 px-6 pt-4 pb-4 bg-blue-500">
-              <div className="flex items-center gap-2 mb-3">
+            // py-3, no pt-4/pb-4 (2026-09-15, Jose: "el listón está muy
+            // ancho en vertical, usa el mismo tamaño que tiene ese listón
+            // en la page principal") — mismo padding vertical que la fila
+            // de categorías de MobileHomeSupply.jsx (px-4 py-3).
+            <div className="md:hidden relative z-10 -mx-6 px-6 py-3 bg-blue-500">
+              <div className="flex items-center gap-2">
                 <div className="flex-1 flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {categories.map(cat => (
                     <Link
@@ -502,8 +506,12 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                   </button>
                 )}
               </div>
+              {/* mt-3 acá, no mb-3 en la fila de arriba (2026-09-15) — así
+                  el espacio solo existe cuando la insignia realmente se
+                  renderiza; sin ella la franja queda del mismo alto que la
+                  de MobileHomeSupply.jsx, sin espacio vacío de sobra. */}
               {hayStockInicial && (categoria in CATEGORY_BADGE ? CATEGORY_BADGE[categoria] : DEFAULT_BADGE) && (
-                <div className="flex items-center gap-2 text-xs text-zinc-600 bg-white border border-white/70 rounded-lg px-3 py-2 w-fit">
+                <div className="flex items-center gap-2 text-xs text-zinc-600 bg-white border border-white/70 rounded-lg px-3 py-2 w-fit mt-3">
                   <ShieldCheck size={14} className="shrink-0 text-blue-500" />
                   <span>{categoria in CATEGORY_BADGE ? CATEGORY_BADGE[categoria] : DEFAULT_BADGE}</span>
                 </div>
