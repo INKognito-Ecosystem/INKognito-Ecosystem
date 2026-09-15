@@ -471,10 +471,12 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
               descripción integrado al final, chico y sin texto.
               En el piloto claro (Cartuchos, light) va dentro de una franja
               azul sólida que también envuelve la insignia de stock (Jose,
-              2026-09-15: "que ese listón sea de color azul... el límite en
-              la zona inferior sea la zona superior de la card translúcida
-              de variedad de calibres") — fuera del piloto sigue igual que
-              siempre, sin franja. */}
+              2026-09-15: "que ese listón sea de color azul") — fuera del
+              piloto sigue igual que siempre, sin franja. La separación con
+              extraCTA después de la franja es mt-3, no pegada (ver ese
+              bloque más abajo — Jose pidió primero sin espacio, después
+              corrigió a la misma distancia que separa el banner en
+              MobileHomeSupply.jsx). */}
           {light ? (
             // py-3, no pt-4/pb-4 (2026-09-15, Jose: "el listón está muy
             // ancho en vertical, usa el mismo tamaño que tiene ese listón
@@ -558,10 +560,14 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
             </div>
           )}
           {extraCTA && (
-            // Sin espacio arriba en móvil claro (Jose: el límite inferior de
-            // la franja azul debe SER el límite superior de esta card, sin
-            // separación) — en escritorio y fuera del piloto, mt-4 normal.
-            <div className={`relative z-10 ${light ? 'mt-0 md:mt-4' : 'mt-4'}`}>{extraCTA}</div>
+            // mt-3 en móvil claro (2026-09-15, Jose: "separa también la
+            // card de caja surtida, a la misma distancia de separación a
+            // la que está el banner en la page principal") — mismo mt-3
+            // que separa la fila de categorías del banner promocional en
+            // MobileHomeSupply.jsx. Reemplaza el mt-0 de la vuelta
+            // anterior (pegado sin espacio). Escritorio y fuera del
+            // piloto siguen con mt-4 normal.
+            <div className={`relative z-10 ${light ? 'mt-3 md:mt-4' : 'mt-4'}`}>{extraCTA}</div>
           )}
         </div>
 
