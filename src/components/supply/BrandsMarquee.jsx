@@ -10,19 +10,38 @@ import { brands, brandKey } from './BrandsSupply'
 // exportados desde ahí) en vez de íconos de stack técnico. No reemplaza
 // la sección "Marcas" existente — vive aparte, en el hero.
 //
-// Recorte local de fondo (2026-09-13, Jose: "quitar el fondo DENTRO de
-// Heaven Pro, Royal Three y demás" — las que sí tienen un fondo sólido
-// negro incrustado, a diferencia de Tattoo Vision/Vice Colors/WJX que ya
-// eran transparentes de origen, aunque el visor las mostrara con matiz
-// blanco). Versión recortada a mano (detección de color de fondo por
-// esquina + degradado de alpha), guardada en public/marcas-marquee/ SOLO
-// para esta prueba — el archivo real en Cloudinary/settings no se toca
-// todavía, así que la sección "Marcas" (BrandsSupply.jsx) sigue igual.
+// Recorte local de fondo/padding (2026-09-13/15) — SOLO para esta prueba,
+// el archivo real en Cloudinary/settings no se toca; la sección "Marcas"
+// de escritorio (BrandsSupply.jsx) no usa este mapa y sigue igual.
+// HEAVEN PRO ya NO está acá (2026-09-15, Jose: "actualicé la foto de la
+// marca Heaven... ahora usa una donde el logo y letras son negras con
+// fondo blanco") — Jose subió un archivo nuevo directo en el panel (mismo
+// endpoint /api/visual/supply de siempre) que ya llena casi toda su caja
+// (sin padding sobrante), así que cae directo al `img` real como Tattoo
+// Vision/WJX, sin recorte.
+// DYNAMIC, INDUSTRIAS WARLOCK y ROYAL THREE sí siguen acá, pero con
+// archivos NUEVOS (2026-09-15, Jose reemplazó los tres en el panel —
+// Dynamic y Warlock ya en negro/color real, ya no hacía falta el truco de
+// recolor de antes). Los tres nuevos vienen en un lienzo cuadrado con
+// mucho margen alrededor (para verse bien como ícono de perfil), lo que
+// los dejaba chiquitos dentro de la misma caja de alto fijo que los demás
+// — recortados a mano al bounding box real del contenido (script de
+// Playwright/canvas: detecta dónde empieza/termina el logo por color
+// "casi blanco" + un margen de respiro del 6%) para que se vean al mismo
+// tamaño que antes, no más chicos (Jose: "procura que cuando actualices
+// no los dejes más pequeños").
 const RECORTE_LOCAL = {
-  'HEAVEN PRO': '/marcas-marquee/heaven-pro.png',
   'ROYAL THREE': '/marcas-marquee/royal-three.png',
   DYNAMIC: '/marcas-marquee/dynamic.png',
   'INDUSTRIAS WARLOCK': '/marcas-marquee/warlock.png',
+  // Solo "COLORS" (el texto fantasma de arriba) recoloreado a negro sólido
+  // — "VICE" abajo queda exactamente igual, con su degradado rojo propio
+  // (2026-09-15, Jose: "conviértelo a que se vea negro... pero solo el
+  // texto de arriba no el texto vice"). Recorte hecho con un canvas
+  // (Playwright headless): se ubicó la primera fila con píxel rojizo
+  // (ahí empieza VICE) y todo lo de arriba con algo de alfa (por tenue
+  // que fuera) se volvió negro opaco — VICE no se tocó en absoluto.
+  'VICE COLORS': '/marcas-marquee/vice-colors.png',
 }
 
 // Alto fijo, ancho libre (2026-09-13, Jose: "Warlock, Royal Three y Heaven
@@ -35,22 +54,21 @@ const RECORTE_LOCAL = {
 // proporción) es el patrón real de una franja de logos de marca — cada
 // uno pesa visualmente igual sin importar si es cuadrado o alargado.
 // Royal Three un poco más grande (2026-09-13, Jose) — override puntual de
-// alto sobre la base de arriba, sin tocar el resto.
+// alto sobre la base de arriba, sin tocar el resto. Warlock/Dynamic ya NO
+// necesitan un override acá (2026-09-15) — el recorte a bounding box de
+// arriba ya los deja al tamaño correcto dentro de la caja default.
 const ALTO_EXTRA = {
   'ROYAL THREE': 'h-12 md:h-14',
 }
 
-// Recolor forzado en light (2026-09-15, Jose: "si hay logos totalmente
-// blancos, pásalos a negro como en el caso de dynamic, y wjx a color
-// azul") — Dynamic y WJX son line-art blanco sobre transparente: en el
-// marquee oscuro se veían bien (grayscale + opacity-50 los dejaba como
-// silueta gris), pero al pasar a color completo sobre fondo blanco
-// (arriba, "devuévele el color a las marcas") quedaron invisibles
-// (blanco sobre blanco). Solo estos dos — el resto de logos ya tiene
-// color propio visible (Heaven Pro cian, Royal Three rojo, Warlock
-// azul/negro, Tattoo Vision/Vice rojo).
+// Recolor forzado en light (2026-09-15, Jose: "wjx a color azul") — WJX
+// sigue siendo line-art blanco sobre transparente en el archivo real (a
+// diferencia de Dynamic, que Jose ya reemplazó por uno en negro real — ver
+// RECORTE_LOCAL arriba, ya no necesita este truco). En el marquee oscuro
+// se veía bien (grayscale + opacity-50 lo dejaba como silueta gris), pero
+// en el marquee blanco a color completo queda invisible (blanco sobre
+// blanco) si no se fuerza un color.
 const RECOLOR_LIGHT = {
-  DYNAMIC: 'bg-zinc-900',
   WJX: 'bg-blue-500',
 }
 
