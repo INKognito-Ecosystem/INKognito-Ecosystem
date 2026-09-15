@@ -9,6 +9,7 @@ import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { useLoadMore, fetchCatalogPage } from '../../hooks/useCatalog'
 import logoSupply from '../../assets/milogo/supply.webp'
+import bannerBg from '../../assets/supply/banner-tattoo-swirl.jpg'
 
 // Home móvil de Supply en formato marketplace (2026-09-14, boceto + mockup
 // aprobados por Jose) — reemplaza SOLO en móvil a NavbarSupply/HeroSupply/
@@ -53,25 +54,6 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
     // para siempre en vez de volver a mostrar Destacados.
     if (q.length < 2) { setResultados(null); setBuscando(false); yaHizoScroll.current = false; return }
     setBuscando(true)
-    // Scroll a los resultados UNA sola vez por búsqueda activa (2026-09-15,
-    // Jose: "cuando empiecen a aparecer los productos, se debe hacer
-    // scroll... si no, no se entera uno que hay algo buscando o
-    // apareciendo") — no en cada tecla, para no pelear con el teclado.
-    // "Certero" (Jose, corrección): mide el alto REAL de la barra sticky
-    // en vez de confiar en el scroll-padding-top global de index.css
-    // (calibrado para el navbar de 80px de otras páginas, no para esta
-    // barra propia de MobileHomeSupply) — así la card queda exacta,
-    // justo debajo del navbar, sin hueco ni quedar tapada.
-    if (!yaHizoScroll.current) {
-      const el = document.getElementById('grid-mobile')
-      const bar = document.querySelector('.sticky.top-0')
-      if (el) {
-        const barH = bar?.getBoundingClientRect().height ?? 0
-        const y = el.getBoundingClientRect().top + window.scrollY - barH
-        window.scrollTo({ top: y, behavior: 'smooth' })
-      }
-      yaHizoScroll.current = true
-    }
     const t = setTimeout(async () => {
       const qNorm = normaliza(q)
       const categoriaCoincide = categories.find(c => normaliza(c.cat).includes(qNorm))
@@ -85,8 +67,33 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
       for (const item of [...porCategoria.items, ...porNombre.items]) {
         mapa.set(`${item.name}-${item.estudio_id ?? 'x'}`, item)
       }
-      setResultados([...mapa.values()])
+      const nuevosResultados = [...mapa.values()]
+      setResultados(nuevosResultados)
       setBuscando(false)
+      // Scroll a los resultados UNA sola vez por búsqueda activa, pero
+      // solo cuando de verdad HAY algo que mostrar (2026-09-15, corregido
+      // — Jose: "si ya apareció algo, debe hacer scroll con una sola
+      // letra o con el nombre completo de un producto"). Antes se
+      // disparaba apenas el texto llegaba a 2 caracteres, sin importar si
+      // esos 2 caracteres ya traían resultados reales — si no traían
+      // nada, el scroll se "gastaba" ahí (yaHizoScroll queda en true) y
+      // ya no volvía a dispararse aunque después, con más letras, sí
+      // aparecieran resultados de verdad. "Certero" (Jose, corrección
+      // anterior): mide el alto REAL de la barra sticky en vez de confiar
+      // en el scroll-padding-top global de index.css (calibrado para el
+      // navbar de 80px de otras páginas, no para esta barra propia de
+      // MobileHomeSupply) — así la card queda exacta, justo debajo del
+      // navbar, sin hueco ni quedar tapada.
+      if (nuevosResultados.length > 0 && !yaHizoScroll.current) {
+        const el = document.getElementById('grid-mobile')
+        const bar = document.querySelector('.sticky.top-0')
+        if (el) {
+          const barH = bar?.getBoundingClientRect().height ?? 0
+          const y = el.getBoundingClientRect().top + window.scrollY - barH
+          window.scrollTo({ top: y, behavior: 'smooth' })
+        }
+        yaHizoScroll.current = true
+      }
     }, 300)
     return () => clearTimeout(t)
   }, [busqueda])
@@ -146,23 +153,53 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
           el resto de la página a blanco) — text-white explícito acá
           porque el título ("Professional"/"Equipment") no tiene color
           propio, hereda del contenedor; sin esto quedaba negro-sobre-negro
-          en cuanto la raíz de la página pasó a texto oscuro. */}
+          en cuanto la raíz de la página pasó a texto oscuro.
+          Foto de fondo (2026-09-15, Jose subió "referencia banner" a
+          Obsidian) — imagen vertical original, rotada 90° para que su
+          lado largo quede horizontal y encaje en un banner ancho, no
+          alto. opacity-35 (subido desde 20, Jose: "pon más opacidad...
+          para que se vea más opaco") para que quede más presente sin
+          dejar de ser textura de fondo — el degradado azul y el fondo
+          oscuro de antes se quedan ENCIMA de la foto (no al revés), para
+          que el resplandor siga leyéndose igual de claro. "Tattoo" y
+          "Colombia" probaron rojo/amarillo y volvieron a su azul de
+          siempre (Jose, misma sesión: "restaura el color"). */}
       <div
         className="mx-2 mt-3 rounded-2xl border border-blue-500/30 px-4 py-6 relative overflow-hidden text-white"
-        style={{ background: 'radial-gradient(circle at 88% 28%, rgba(59,130,246,.28), transparent 55%), linear-gradient(145deg,#0e1626,#07090d)' }}
+        style={{ background: 'linear-gradient(145deg,#0e1626,#07090d)' }}
       >
-        <p className="text-blue-500 text-[9px] font-bold uppercase tracking-[0.3em] mb-2">INKognito Supply — Colombia</p>
-        <h2 className="text-lg font-black uppercase leading-[0.95]">
-          Professional <span className="text-blue-500">Tattoo</span> Equipment
-        </h2>
-        <p className="text-zinc-400 text-[10.5px] mt-2 max-w-[230px] leading-snug">
-          Ecosistema de distribución de insumos profesionales.
-        </p>
+        {/* brightness-50 (2026-09-15, Jose: "algunas letras claras no se
+            están distinguiendo bien... que el banner se vea más oscuro
+            la imagen") — el swirl es blanco brillante sobre negro; al
+            subir la opacidad esos brillos empezaron a competir con el
+            texto blanco de encima. Oscurecer la FOTO (no el texto) para
+            que siga sumando textura sin pelear con "PROFESSIONAL"/
+            "EQUIPMENT". */}
+        <img src={bannerBg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-35 brightness-50" />
+        <div
+          className="absolute inset-0"
+          style={{ background: 'radial-gradient(circle at 88% 28%, rgba(59,130,246,.28), transparent 55%)' }}
+        />
+        <div className="relative z-10">
+          <p className="text-blue-500 text-[9px] font-bold uppercase tracking-[0.3em] mb-2">
+            INKognito Supply — Colombia
+          </p>
+          <h2 className="text-lg font-black uppercase leading-[0.95]">
+            Professional <span className="text-blue-500">Tattoo</span> Equipment
+          </h2>
+          <p className="text-zinc-400 text-[10.5px] mt-2 max-w-[230px] leading-snug">
+            Ecosistema de distribución de insumos profesionales.
+          </p>
+        </div>
         {/* Checks de cobertura/confianza (2026-09-15) — texto completo, en
             una sola fila, alineados a la altura de "profesionales." (2da
             línea del subtítulo), aprovechando el espacio libre a su
-            derecha. Posición absoluta: no suma altura al banner. */}
-        <div className="absolute right-4 bottom-[26px] left-[108px] flex flex-nowrap justify-between gap-1">
+            derecha. Posición absoluta: no suma altura al banner. Hermano
+            del wrapper de texto (relative z-10), no hijo — así su
+            `bottom` sigue midiendo contra el div exterior de siempre, no
+            contra el wrapper nuevo que se agregó para la foto de fondo
+            (quedaba mal calculado adentro, se superponía con el título). */}
+        <div className="absolute right-4 bottom-[26px] left-[108px] z-10 flex flex-nowrap justify-between gap-1">
           {['Stock verificado', 'Despacho directo', 'Cobertura nacional'].map(g => (
             <span key={g} className="flex items-center gap-0.5 text-[7.5px] font-bold text-zinc-300 whitespace-nowrap">
               <span className="text-green-500">✓</span> {g}

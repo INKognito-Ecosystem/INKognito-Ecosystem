@@ -109,10 +109,6 @@ export default function SupplyCategoriasPage() {
     // apagaba al borrar el texto.
     if (q.length < 2) { setResultados(null); setBuscando(false); yaHizoScroll.current = false; return }
     setBuscando(true)
-    if (!yaHizoScroll.current) {
-      document.getElementById('categorias-resultados')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      yaHizoScroll.current = true
-    }
     const t = setTimeout(async () => {
       const qNorm = normaliza(q)
       const categoriaCoincide = categories.find(c => normaliza(c.cat).includes(qNorm))
@@ -126,8 +122,20 @@ export default function SupplyCategoriasPage() {
       for (const item of [...porCategoria.items, ...porNombre.items]) {
         mapa.set(`${item.name}-${item.estudio_id ?? 'x'}`, item)
       }
-      setResultados([...mapa.values()])
+      const nuevosResultados = [...mapa.values()]
+      setResultados(nuevosResultados)
       setBuscando(false)
+      // Scroll SOLO cuando ya hay resultados reales (2026-09-15, corregido
+      // — Jose: "si ya apareció algo, debe hacer scroll con una sola
+      // letra o con el nombre completo de un producto"). Antes se
+      // disparaba apenas el texto llegaba a 2 caracteres sin importar si
+      // había resultados, así que si esos 2 caracteres no traían nada, el
+      // scroll se "gastaba" ahí y no volvía a dispararse aunque después
+      // sí aparecieran resultados reales.
+      if (nuevosResultados.length > 0 && !yaHizoScroll.current) {
+        document.getElementById('categorias-resultados')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        yaHizoScroll.current = true
+      }
     }, 300)
     return () => clearTimeout(t)
   }, [busqueda, orden])
