@@ -24,7 +24,7 @@ export const DOT_PATTERN = {
   backgroundSize: '18px 18px',
 }
 
-export function AfiliadoCard({ item, color }) {
+export function AfiliadoCard({ item, color, onShowDesc }) {
   // Descripción recortada a 3 líneas siempre, en cualquier pantalla
   // (2026-09-13, Jose: "que se acorte siempre a 3 líneas... la card no
   // deberá crecer, se abre la descripción en la parte inferior") — mismo
@@ -33,14 +33,23 @@ export function AfiliadoCard({ item, color }) {
   // recorte aplica también en escritorio, porque estas cards viven en una
   // grilla de hasta 5 columnas donde una descripción larga rompería la
   // altura pareja de la fila.
-  const [showDesc, setShowDesc] = useState(false)
+  //
+  // La hoja YA NO vive acá (2026-09-15, bug real: "las descripciones
+  // están quedando por debajo del navbar inferior") — esta card vive
+  // dentro de <SeccionAfiliados>, que tiene overflow-hidden (para el
+  // patrón de puntos de fondo); un `fixed` adentro de un ancestro con
+  // overflow-hidden queda recortado contra ese límite en vez de
+  // comportarse como fijo de verdad — el mismo bug que ya se documentó
+  // una vez con el modal de Educación en SupplyCategoryPage.jsx. La hoja
+  // se levantó a SeccionAfiliados, que la renderiza AFUERA de esa
+  // sección — acá solo se avisa cuál item se tocó.
   const borderHover = `hover:border-${color}-500/50`
   const url = item.url_ventas || item.url_checkout
   const card = (
     // Translúcida con el acento propio de la sección, no oscura (2026-09-15,
     // mismo criterio que las cards de Educación de SupplyPage.jsx: border-
     // {color}-500/30 bg-{color}-500/5).
-    <div className={`snap-start flex-shrink-0 w-[44vw] md:w-auto border border-${color}-500/30 bg-${color}-500/5 rounded-2xl overflow-hidden flex flex-col transition-all duration-300 ${borderHover}`}>
+    <div className={`border border-${color}-500/30 bg-${color}-500/5 rounded-2xl overflow-hidden flex flex-col transition-all duration-300 ${borderHover}`}>
       {/* Foto si existe */}
       {item.image_url && (
         <div className="w-full aspect-square bg-white overflow-hidden flex-shrink-0">
@@ -83,7 +92,7 @@ export function AfiliadoCard({ item, color }) {
             <p className="text-zinc-500 text-[10px] leading-relaxed line-clamp-2">{item.descripcion}</p>
             <button
               type="button"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowDesc(true) }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onShowDesc(item) }}
               className="text-zinc-500 text-[10px] leading-relaxed underline underline-offset-2 self-start"
             >
               Ver descripción
@@ -137,28 +146,7 @@ export function AfiliadoCard({ item, color }) {
     </a>
   ) : card
 
-  return (
-    <>
-      {wrapped}
-      {showDesc && (
-        <div
-          className="fixed inset-0 z-50 bg-black/70 flex items-end justify-center"
-          onClick={() => setShowDesc(false)}
-        >
-          <div
-            className="w-full max-w-md bg-white border-t border-zinc-200 rounded-t-2xl p-5"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-black uppercase tracking-widest text-zinc-900">Descripción</h4>
-              <button onClick={() => setShowDesc(false)} className="text-zinc-500 text-lg leading-none px-1">✕</button>
-            </div>
-            <p className="text-zinc-600 text-sm leading-relaxed">{item.descripcion}</p>
-          </div>
-        </div>
-      )}
-    </>
-  )
+  return wrapped
 }
 
 // mostrarTitulo (default true) — en las páginas dedicadas (CursosPage,
@@ -166,38 +154,71 @@ export function AfiliadoCard({ item, color }) {
 // que repetirlo como h2 acá quedaba duplicado; `titulo` igual se sigue
 // pasando porque el mensaje de WhatsApp del estado vacío lo necesita.
 export function SeccionAfiliados({ id, label, titulo, subtitulo, items, color, cols, mostrarTitulo = true }) {
+  // Hoja de "Ver descripción" levantada acá (2026-09-15, bug real: "las
+  // descripciones están quedando por debajo del navbar inferior") — la
+  // section de abajo tiene overflow-hidden (para el patrón de puntos), y
+  // un `fixed` dentro de un ancestro con overflow-hidden queda recortado
+  // contra ese límite en vez de comportarse como fijo de verdad de
+  // verdad — mismo bug ya documentado una vez con el modal de Educación
+  // en SupplyCategoryPage.jsx ("un fixed adentro queda recortado"). Se
+  // renderiza como hermana de <section>, afuera del overflow-hidden.
+  const [descItem, setDescItem] = useState(null)
   return (
-    <section id={id} className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-white">
-      <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
-      <div className="relative z-10 max-w-7xl mx-auto">
-        {mostrarTitulo && (
-          <div className="mb-4 md:mb-8">
-            <p className={`uppercase tracking-[0.25em] text-${color}-500/70 text-[10px] mb-2`}>{label}</p>
-            <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-2 text-zinc-900">{titulo}</h2>
-            {subtitulo && <p className="text-zinc-500 text-sm">{subtitulo}</p>}
+    <>
+      <section id={id} className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-white">
+        <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
+        <div className="relative z-10 max-w-7xl mx-auto">
+          {mostrarTitulo && (
+            <div className="mb-4 md:mb-8">
+              <p className={`uppercase tracking-[0.25em] text-${color}-500/70 text-[10px] mb-2`}>{label}</p>
+              <h2 className="text-2xl md:text-4xl font-black uppercase leading-none mb-2 text-zinc-900">{titulo}</h2>
+              {subtitulo && <p className="text-zinc-500 text-sm">{subtitulo}</p>}
+            </div>
+          )}
+          {items.length > 0 ? (
+            // Grilla 2x2 en móvil, no scroll lateral (2026-09-15, Jose: "que
+            // también se muestren en filas y columnas de 2x2, no en scroll
+            // lateral como están ahora") — mismo patrón que la grilla de
+            // "Destacados" de MobileHomeSupply.jsx/SupplyCategoryPage.jsx.
+            <div className={`grid grid-cols-2 md:grid-cols-2 ${cols} gap-4`}>
+              {items.map((item, i) => (
+                <AfiliadoCard key={item.name + i} item={item} color={color} onShowDesc={setDescItem} />
+              ))}
+            </div>
+          ) : (
+            <div className="border border-zinc-200 bg-zinc-50 rounded-2xl p-6 text-center">
+              <p className="text-zinc-500 text-sm mb-4">Próximamente disponible en esta sección.</p>
+              <a
+                href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero que me avisen cuando haya ${titulo.toLowerCase()} disponibles en INKognito Supply.`)}`}
+                target="_blank" rel="noopener noreferrer"
+                className={`inline-flex items-center gap-2 px-5 py-2.5 bg-${color}-500 text-white font-bold uppercase tracking-[0.15em] text-xs rounded hover:opacity-90 transition`}
+              >
+                <FaWhatsapp size={16} />
+                Avisarme cuando esté disponible →
+              </a>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {descItem && (
+        <div
+          className="fixed inset-0 z-50 bg-black/70 flex items-end justify-center"
+          onClick={() => setDescItem(null)}
+        >
+          <div
+            className="w-full max-w-md bg-white border-t border-zinc-200 rounded-t-2xl p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-xs font-black uppercase tracking-widest text-zinc-900">Descripción</h4>
+              <button onClick={() => setDescItem(null)} className="text-zinc-500 text-lg leading-none px-1">✕</button>
+            </div>
+            <p className="text-zinc-600 text-sm leading-relaxed">{descItem.descripcion}</p>
           </div>
-        )}
-        {items.length > 0 ? (
-          <div className={`flex md:grid md:grid-cols-2 ${cols} gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide`}>
-            {items.map((item, i) => (
-              <AfiliadoCard key={item.name + i} item={item} color={color} />
-            ))}
-          </div>
-        ) : (
-          <div className="border border-zinc-200 bg-zinc-50 rounded-2xl p-6 text-center">
-            <p className="text-zinc-500 text-sm mb-4">Próximamente disponible en esta sección.</p>
-            <a
-              href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero que me avisen cuando haya ${titulo.toLowerCase()} disponibles en INKognito Supply.`)}`}
-              target="_blank" rel="noopener noreferrer"
-              className={`inline-flex items-center gap-2 px-5 py-2.5 bg-${color}-500 text-white font-bold uppercase tracking-[0.15em] text-xs rounded hover:opacity-90 transition`}
-            >
-              <FaWhatsapp size={16} />
-              Avisarme cuando esté disponible →
-            </a>
-          </div>
-        )}
-      </div>
-    </section>
+        </div>
+      )}
+    </>
   )
 }
 
