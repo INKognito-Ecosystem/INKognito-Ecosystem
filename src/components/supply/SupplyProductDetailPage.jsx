@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLoaderData, useParams, useNavigate, Link } from 'react-router'
-import { ArrowLeft, ShoppingCart, Share2, Store, MapPin } from 'lucide-react'
+import { ArrowLeft, ShoppingCart, Share2, Store, MapPin, ExternalLink } from 'lucide-react'
 import ProductImageGallery from '../ProductImageGallery'
 import { VariantSelectorSupply } from './SupplyProductCard'
 import NavbarCategory from './NavbarCategory'
@@ -16,6 +16,16 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL
 // mlstatic.com) — si algún día cambian la ruta, el onError lo oculta solo
 // sin romper el layout.
 const MP_LOGO_URL = 'https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.21.0/mercadopago/logo__large@2x.png'
+
+// Mismo criterio de nombre por plataforma que SupplyProductCard.jsx/
+// ProductLandingPage.jsx — solo para la insignia/CTA de un producto
+// afiliado, no repite su lógica completa.
+const PLATAFORMA_LABEL = {
+  hotmart: 'Hotmart',
+  amazon: 'Amazon',
+  aliexpress: 'AliExpress',
+  mercadolibre: 'Mercado Libre',
+}
 
 // Ficha de producto estilo Mercado Libre (2026-09-15) — piloto: solo se
 // llega acá desde SupplyProductCard.jsx cuando light=true (hoy solo
@@ -148,6 +158,23 @@ export default function SupplyProductDetailPage() {
   const images = [sel.image_url, sel.image_url_2, sel.image_url_3].filter(Boolean)
   const sinStock = (sel.stock ?? 0) <= 0
 
+  // Productos afiliados (Hotmart/Amazon/AliExpress) — cursos, kit externo,
+  // recursos, o cualquier producto futuro con tipo='afiliado' en CUALQUIER
+  // categoría (2026-09-15, Jose: "si un x producto se muestra en
+  // destacados... debería poder abrir la page de ese producto, sea físico
+  // o afiliado, inclusive si estoy en una tienda"). Antes esta ficha solo
+  // se abría para productos físicos (SupplyProductCard.jsx bloqueaba el
+  // clic con `!esAfiliado`); ahora cualquier producto abre ESTA misma
+  // ficha, sin duplicar la ficha de producto de afiliados vs. física en
+  // dos archivos distintos — sin carrito, variantes ni stock (no aplican),
+  // con un solo CTA hacia la plataforma real.
+  const esAfiliado = product.tipo === 'afiliado'
+  const afiliadoUrl = product.url_ventas || product.url_checkout
+  const plataformaLabel = PLATAFORMA_LABEL[product.plataforma] || product.plataforma || 'Afiliado'
+  // "Adquirir curso en X" (2026-09-15, Jose) — solo para Cursos; cualquier
+  // otra categoría afiliada usa un verbo genérico que no asume qué es.
+  const ctaLabel = product.categoria === 'Cursos' ? `Adquirir curso en ${plataformaLabel}` : `Ver en ${plataformaLabel}`
+
   const proveedorId = sel.estudio_id ?? product.estudio_id ?? null
   const proveedorNombre = sel.estudio_nombre_supply || sel.estudio_nombre || product.estudio_nombre_supply || product.estudio_nombre || null
   const proveedorSlug = sel.estudio_slug || product.estudio_slug || null
@@ -241,36 +268,48 @@ export default function SupplyProductDetailPage() {
           poner más datos en él") — mismo criterio que un título real de
           marketplace: deja espacio para nombres largos/con más
           información (marca, calibre, cantidad) sin dominar la pantalla. */}
+      {esAfiliado && (
+        <p className="uppercase tracking-[0.2em] text-amber-600 text-[10px] font-bold">
+          {plataformaLabel}{product.categoria ? ` · ${product.categoria}` : ''}
+        </p>
+      )}
       <h1 className="text-sm font-medium leading-snug text-zinc-900">{product.name}</h1>
-      {/* Precio con el peso estándar de marketplace, no font-black (Jose:
-          "la tipografía de los precios está algo gruesa"). */}
-      {resolvedPrice && <p className="text-zinc-900 font-bold text-2xl">{resolvedPrice}</p>}
-      {/* Medio de pago (2026-09-15, Jose: "debajo del precio, por el
-          método de pago, que es Mercado Pago") — solo si ESTE proveedor
-          está conectado (proveedorMp): si no, el cobro real no pasa por
-          Mercado Pago (cae al flujo manual de WhatsApp/Nequi), mostrar el
-          logo igual sería prometer algo que no aplica para este producto. */}
-      {proveedorMp && (
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-zinc-500">Medios de pago:</span>
-          <img
-            src={MP_LOGO_URL}
-            alt="Mercado Pago"
-            className="h-4"
-            onError={(e) => { e.currentTarget.style.display = 'none' }}
-          />
-        </div>
-      )}
-      {sinStock ? (
-        <p className="text-red-500 text-xs font-bold uppercase tracking-wide">Agotado</p>
-      ) : (sel.stock ?? 0) <= 3 && (
-        <p className="text-yellow-600 text-xs font-bold">⚠️ Últimas {sel.stock}</p>
-      )}
-      {variantes.length > 1 && (
-        <VariantSelectorSupply variantObjs={variantes} selIdx={activeVariant} onChange={setActiveVariant} light />
+      {!esAfiliado && (
+        <>
+          {/* Precio con el peso estándar de marketplace, no font-black (Jose:
+              "la tipografía de los precios está algo gruesa"). */}
+          {resolvedPrice && <p className="text-zinc-900 font-bold text-2xl">{resolvedPrice}</p>}
+          {/* Medio de pago (2026-09-15, Jose: "debajo del precio, por el
+              método de pago, que es Mercado Pago") — solo si ESTE proveedor
+              está conectado (proveedorMp): si no, el cobro real no pasa por
+              Mercado Pago (cae al flujo manual de WhatsApp/Nequi), mostrar el
+              logo igual sería prometer algo que no aplica para este producto. */}
+          {proveedorMp && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-zinc-500">Medios de pago:</span>
+              <img
+                src={MP_LOGO_URL}
+                alt="Mercado Pago"
+                className="h-4"
+                onError={(e) => { e.currentTarget.style.display = 'none' }}
+              />
+            </div>
+          )}
+          {sinStock ? (
+            <p className="text-red-500 text-xs font-bold uppercase tracking-wide">Agotado</p>
+          ) : (sel.stock ?? 0) <= 3 && (
+            <p className="text-yellow-600 text-xs font-bold">⚠️ Últimas {sel.stock}</p>
+          )}
+          {variantes.length > 1 && (
+            <VariantSelectorSupply variantObjs={variantes} selIdx={activeVariant} onChange={setActiveVariant} light />
+          )}
+        </>
       )}
       {product.descripcion && (
         <p className="text-zinc-600 text-sm leading-relaxed whitespace-pre-line">{product.descripcion}</p>
+      )}
+      {esAfiliado && product.categoria === 'Cursos' && (
+        <p className="text-zinc-500 text-[10px] uppercase tracking-widest">Acceso inmediato · Aprende a tu ritmo</p>
       )}
       {/* TODO fase 2: "productos similares" (de OTRAS tiendas, por
           categoría/afinidad) — distinto de "más de esta tienda", que ya
@@ -281,10 +320,25 @@ export default function SupplyProductDetailPage() {
     </div>
   )
 
-  // Orden tomado de la referencia real de Mercado Libre que mandó Jose:
-  // "Comprar ahora" primero (acción principal, resuelve carrito+checkout
-  // de una), "Agregar al carrito" debajo como secundaria.
-  const ctaButtons = (
+  // Afiliado (Hotmart/Amazon/AliExpress) — un solo CTA hacia la
+  // plataforma real, nunca "agregar al carrito" (no hay carrito real acá).
+  // "Adquirir curso en X" para Cursos (2026-09-15, Jose), "Ver en X" para
+  // cualquier otra categoría afiliada.
+  const ctaButtons = esAfiliado ? (
+    afiliadoUrl && (
+      <a
+        href={afiliadoUrl}
+        target="_blank"
+        rel="noopener noreferrer sponsored"
+        className="w-full inline-flex items-center justify-center gap-2 py-4 rounded-xl font-bold uppercase tracking-[0.1em] text-xs bg-amber-500 text-black hover:bg-amber-400 transition-all duration-300"
+      >
+        {ctaLabel} <ExternalLink size={14} />
+      </a>
+    )
+  ) : (
+    // Orden tomado de la referencia real de Mercado Libre que mandó Jose:
+    // "Comprar ahora" primero (acción principal, resuelve carrito+checkout
+    // de una), "Agregar al carrito" debajo como secundaria.
     <div className="flex flex-col gap-3">
       <button
         onClick={handleComprarAhora}

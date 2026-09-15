@@ -76,6 +76,10 @@ export default [
   route('supply/aprende/cursos', 'components/supply/aprende/CursosPage.jsx'),
   route('supply/aprende/kit', 'components/supply/aprende/KitPage.jsx'),
   route('supply/aprende/recursos', 'components/supply/aprende/RecursosPage.jsx'),
+  // La ficha de un curso individual vive en supply/producto/:id (ver más
+  // abajo) — MISMA ficha que abren Destacados y cualquier tienda para
+  // cualquier producto físico o afiliado (2026-09-15, Jose). No hay una
+  // ruta dedicada aparte para cursos.
   // Supply multitenant (fase 4, 2026-08-07) — catálogo dinámico de un
   // estudio-vendedor (vende_supply activo), a diferencia de las marcas de
   // arriba (archivo fijo por marca) esta ruta sirve a cualquier estudio.

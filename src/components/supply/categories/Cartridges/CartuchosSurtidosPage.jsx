@@ -129,10 +129,13 @@ export default function CartuchosSurtidosPage() {
                       {p.municipio}{p.departamento ? `, ${p.departamento}` : ''}
                     </p>
                   )}
-                  <p className="text-blue-500 text-xs font-bold uppercase tracking-wide flex items-center gap-1 mt-0.5">
-                    Armar mi caja <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
-                  </p>
                 </div>
+                {/* "Armar mi caja" a la derecha, no debajo de nombre/ubicación
+                    (2026-09-15, Jose) — mismo criterio de columna derecha que
+                    "Ver tienda" en SupplyProveedoresPage.jsx. */}
+                <p className="flex-shrink-0 text-blue-500 text-xs font-bold uppercase tracking-wide flex items-center gap-1 whitespace-nowrap pl-2">
+                  Armar mi caja <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                </p>
               </Link>
             ))}
           </div>

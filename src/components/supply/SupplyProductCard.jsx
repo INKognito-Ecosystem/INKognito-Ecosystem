@@ -186,9 +186,20 @@ export default function SupplyProductCard({ item, categoria, showEstudioBadge = 
   return (
     <div className={`border ${t.cardBorder} ${t.cardBg} rounded-2xl overflow-hidden hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-300 flex flex-col h-full`}>
 
+      {/* Clic en la foto abre la ficha propia del producto, físico O
+          afiliado (2026-09-15, Jose: "si un x producto se muestra en
+          destacados... debería poder abrir la page de ese producto, sea
+          físico o afiliado, inclusive si estoy en una tienda") — antes
+          `!esAfiliado` bloqueaba el clic para cursos/kit externo/recursos;
+          SupplyProductDetailPage.jsx ya sabe renderizar el CTA correcto
+          (Hotmart/Amazon/etc.) cuando el producto es afiliado, así que ya
+          no hace falta esa exclusión. El ícono incrustado abajo-derecha
+          (carrito o "ver en plataforma") sigue con su propio
+          stopPropagation — sigue siendo un atajo directo, sin entrar a la
+          ficha. */}
       <div
-        className={`relative aspect-square w-full ${t.photoBg} ${t.photoSeparator} overflow-hidden flex-shrink-0 ${light && sel.id && !esAfiliado ? 'cursor-pointer' : ''}`}
-        onClick={light && sel.id && !esAfiliado ? () => navigate(`/supply/producto/${sel.id}`) : undefined}
+        className={`relative aspect-square w-full ${t.photoBg} ${t.photoSeparator} overflow-hidden flex-shrink-0 ${light && sel.id ? 'cursor-pointer' : ''}`}
+        onClick={light && sel.id ? () => navigate(`/supply/producto/${sel.id}`) : undefined}
       >
         {galleryImages.length > 0 ? (
           <ProductImageGallery

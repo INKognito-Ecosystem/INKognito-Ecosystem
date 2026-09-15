@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ExternalLink, BookOpen, Package, PlayCircle } from 'lucide-react'
+import { ArrowRight, ExternalLink, BookOpen, Package, PlayCircle } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa'
 import NavbarCategory from '../NavbarCategory'
 import FooterSupply from '../FooterSupply'
@@ -45,6 +45,17 @@ export function AfiliadoCard({ item, color, onShowDesc }) {
   // sección — acá solo se avisa cuál item se tocó.
   const borderHover = `hover:border-${color}-500/50`
   const url = item.url_ventas || item.url_checkout
+  // Ficha propia solo para Cursos (2026-09-15, Jose: "que si le doy en la
+  // imagen de un curso, me abra su propia page, donde alli sí mostrará
+  // las especificaciones como la descripción, más la opción CTA para ir a
+  // comprar a Hotmart directamente") — Kit Externo y Recursos se quedan
+  // igual (siguen abriendo su link externo de una, sin ficha intermedia).
+  // El id es el de CUALQUIER fila del grupo (mismo criterio que
+  // SupplyProductCard.jsx con /p/:id): `/api/product/:id` agrupa por
+  // product+module+categoria+estudio_id, así que la primera variante del
+  // curso ya identifica al grupo completo.
+  const esCurso = item.categoria === 'Cursos'
+  const detailId = item.variantes?.[0]?.id
   const card = (
     // Translúcida con el acento propio de la sección, no oscura (2026-09-15,
     // mismo criterio que las cards de Educación de SupplyPage.jsx: border-
@@ -74,7 +85,13 @@ export function AfiliadoCard({ item, color, onShowDesc }) {
         <h3 className="font-black uppercase text-xs tracking-[0.08em] text-zinc-900 leading-snug">
           {item.name}
         </h3>
-        {item.descripcion && (
+        {/* Descripción + "Ver descripción" quitados de la card de Cursos
+            (2026-09-15, Jose: "cambiar la forma en que se muestra la info
+            de las card de los cursos, para que no se alargue tanto") — ese
+            contenido ahora vive en la ficha propia del curso (ver
+            esCurso/detailId arriba); Kit Externo y Recursos se quedan con
+            el mismo recorte a 3 líneas de siempre. */}
+        {!esCurso && item.descripcion && (
           // 2 líneas de texto + 1 línea para "Ver descripción" = 3 líneas
           // visibles siempre (2026-09-13, Jose: "sin color y seguido del
           // texto", y que sean siempre 3 líneas, no 3 en una card y 4 en
@@ -115,7 +132,7 @@ export function AfiliadoCard({ item, color, onShowDesc }) {
               </a>
             )}
           </div>
-        ) : url ? (
+        ) : (esCurso ? detailId : url) ? (
           <div className="mt-auto pt-2">
             {/* Micro-copy de apoyo (2026-09-13, propuesta de Jose) — solo
                 afirmaciones genéricas y ciertas para cualquier curso digital
@@ -124,11 +141,13 @@ export function AfiliadoCard({ item, color, onShowDesc }) {
                 afirmaciones de confianza que solo valen si son reales, y
                 hoy no hay forma de verificar que apliquen igual a cada
                 curso — mejor no mostrarlas que inventarlas. */}
-            {item.categoria === 'Cursos' && (
+            {esCurso && (
               <p className="text-zinc-600 text-[9px] uppercase tracking-widest mb-1.5">Acceso inmediato · Aprende a tu ritmo</p>
             )}
             <span className={`text-${color}-400 text-[10px] font-bold uppercase tracking-[0.15em] flex items-center gap-1`}>
-              {item.categoria === 'Cursos' ? 'Ver detalles del curso' : 'Ver'} → <ExternalLink size={10} />
+              {/* Flecha interna (no ExternalLink) para Cursos — ya no abre
+                  Hotmart de una, abre la ficha propia del curso primero. */}
+              {esCurso ? <>Ver detalles del curso <ArrowRight size={10} /></> : <>Ver <ExternalLink size={10} /></>}
             </span>
           </div>
         ) : null}
@@ -136,11 +155,25 @@ export function AfiliadoCard({ item, color, onShowDesc }) {
     </div>
   )
 
-  // Cursos y Recursos → card completa es clickeable. El botón "Ver
-  // descripción" ya hace preventDefault+stopPropagation en su onClick de
-  // arriba, así que abrir la hoja inferior no dispara además la
-  // navegación de este <a> que envuelve toda la card.
-  const wrapped = item.categoria !== 'Kit Externo' && url ? (
+  // Cursos → card completa navega a su propia ficha interna, nunca a
+  // Hotmart de una (el CTA a Hotmart vive en CursoDetailPage.jsx). Kit
+  // Externo se queda sin wrapper (cada botón interno ya tiene su propio
+  // href). Recursos → card completa sigue abriendo su link externo de una,
+  // como siempre. El botón "Ver descripción" ya hace
+  // preventDefault+stopPropagation en su onClick de arriba, así que abrir
+  // la hoja inferior no dispara además la navegación de este wrapper.
+  const wrapped = esCurso && detailId ? (
+    // Ficha ÚNICA de producto (2026-09-15, Jose: "si un x producto se
+    // muestra en destacados... debería poder abrir la page de ese
+    // producto, sea físico o afiliado, inclusive si estoy en una tienda")
+    // — antes cada curso tenía su propia ruta dedicada
+    // (/supply/aprende/cursos/:id, CursoDetailPage.jsx); ahora usa la MISMA
+    // ficha de SupplyProductDetailPage.jsx que ya abren Destacados y
+    // cualquier tienda, para no mantener dos fichas casi idénticas.
+    <Link to={`/supply/producto/${detailId}`} className="contents">
+      {card}
+    </Link>
+  ) : item.categoria !== 'Kit Externo' && url ? (
     <a href={url} target="_blank" rel="noopener noreferrer" className="contents">
       {card}
     </a>
