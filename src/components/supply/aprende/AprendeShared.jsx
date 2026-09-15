@@ -312,7 +312,7 @@ export function AprendePageShell({ eyebrow, titulo, descripcion, slug, children 
               <h3 className="text-xl md:text-3xl font-black uppercase leading-tight text-zinc-900">¿Listo para el siguiente nivel?</h3>
               <p className="text-zinc-600 mt-2 text-sm">Explora nuestro catálogo de insumos profesionales</p>
             </div>
-            <Link to="/supply"
+            <Link to="/supply/categorias"
               className="shrink-0 border border-blue-500/40 text-blue-600 text-sm font-black uppercase tracking-[0.2em] py-4 px-8 rounded-xl hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300 whitespace-nowrap">
               Ver catálogo completo →
             </Link>

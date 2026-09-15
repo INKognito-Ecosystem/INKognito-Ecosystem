@@ -93,10 +93,6 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
 
   const gridItems = resultados ?? items
 
-  const scrollToId = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
   return (
     <div className="md:hidden bg-white text-zinc-900">
 
@@ -277,14 +273,13 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
               <PlusCircle size={18} className="flex-shrink-0" />
               Registrar mi Supply
             </Link>
-            <button
-              type="button"
-              onClick={() => { setMenuOpen(false); scrollToId('educacion') }}
-              className="flex items-center gap-3 w-full text-left px-6 py-4 text-[15px] font-medium text-zinc-800"
-            >
+            {/* Va a la page de Cursos, no a la sección de la home
+                (2026-09-15, Jose) — ahí ya se ve la franja con Kit y
+                Recursos al lado, mismo patrón que Categorías. */}
+            <Link to="/supply/aprende/cursos" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-800">
               <GraduationCap size={18} className="flex-shrink-0" />
               Educación para el artista
-            </button>
+            </Link>
             <InkognitoModuleMenu current="supply" uppercase={false} textSize="text-[15px]" textClassName="text-zinc-800 font-medium" icon={LayoutGrid} onNavigate={() => setMenuOpen(false)} />
             <Link to="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-800">
               <Globe size={18} className="flex-shrink-0" />

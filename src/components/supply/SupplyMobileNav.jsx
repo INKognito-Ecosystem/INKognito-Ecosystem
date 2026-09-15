@@ -79,7 +79,10 @@ export default function SupplyMobileNav({ active = null, light = false }) {
               <PlusCircle size={18} className="flex-shrink-0" />
               Registrar mi Supply
             </Link>
-            <Link to="/supply#educacion" onClick={() => setMenuOpen(false)} className={`flex items-center gap-3 px-6 py-4 text-[15px] font-medium ${menuItemText}`}>
+            {/* Va a la page de Cursos, no a la sección de la home
+                (2026-09-15, Jose) — ahí ya se ve la franja con Kit y
+                Recursos al lado, mismo patrón que Categorías. */}
+            <Link to="/supply/aprende/cursos" onClick={() => setMenuOpen(false)} className={`flex items-center gap-3 px-6 py-4 text-[15px] font-medium ${menuItemText}`}>
               <GraduationCap size={18} className="flex-shrink-0" />
               Educación para el artista
             </Link>
