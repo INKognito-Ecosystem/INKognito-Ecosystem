@@ -192,6 +192,21 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
   // mostrando el párrafo completo como siempre.
   const [introAbierto, setIntroAbierto] = useState(false)
 
+  // Centra la categoría activa en la tira horizontal al entrar a la página
+  // (2026-09-15, Jose: "si yo hago scroll y me paro en una categoría, esta
+  // se quede allí, y no haga scroll al darle click") — cada categoría es
+  // una ruta nueva, así que la tira siempre remonta con scrollLeft=0 (el
+  // principio, "Tintas"), perdiendo la posición que el usuario tenía antes
+  // de tocar una categoría más adelante en la fila — quedaba fuera de
+  // vista, listón blanco incluido. scrollIntoView en la pestaña activa
+  // en vez de restaurar el scroll viejo: no importa desde dónde se
+  // navegó (buscador, otra categoría, el menú), la categoría en la que
+  // estás parado siempre queda visible de una vez.
+  const activeTabRef = useRef(null)
+  useEffect(() => {
+    activeTabRef.current?.scrollIntoView({ behavior: 'instant', inline: 'center', block: 'nearest' })
+  }, [categoria])
+
   const [provFiltro, setProvFiltro] = useState('todos')
   const [orden, setOrden] = useState('recientes')
   const [busqueda, setBusqueda] = useState('')
@@ -476,6 +491,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                     <Link
                       key={cat.name}
                       to={cat.path}
+                      ref={cat.cat === categoria ? activeTabRef : null}
                       className={`flex-shrink-0 text-[12px] font-extrabold pb-1 border-b-2 whitespace-nowrap ${
                         cat.cat === categoria ? 'text-white border-white' : 'text-blue-100 border-transparent'
                       }`}
@@ -513,6 +529,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                   <Link
                     key={cat.name}
                     to={cat.path}
+                    ref={cat.cat === categoria ? activeTabRef : null}
                     className={`flex-shrink-0 text-[12px] font-extrabold pb-1 border-b-2 whitespace-nowrap ${
                       cat.cat === categoria ? `${t.text} border-blue-500` : `${t.textMuted} border-transparent`
                     }`}
