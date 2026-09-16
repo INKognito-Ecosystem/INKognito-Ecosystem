@@ -51,12 +51,13 @@ export default function InkognitoHome() {
         className="hidden md:block absolute inset-0 w-full h-full object-cover opacity-80"
       />
 
-      {/* OVERLAY OSCURO — más liviano en móvil (2026-09-15), la imagen
-          nueva es predominantemente blanca ("pues quedará sobre un fondo
-          blanco", Jose) y no necesita tanto oscurecido como el hoyo negro
-          de desktop; se conserva un poco para que el texto blanco del
-          título/módulos siga siendo legible encima. */}
-      <div className="absolute inset-0 bg-black/45 md:bg-black/60"></div>
+      {/* OVERLAY OSCURO — SOLO en desktop (2026-09-15, corrección de Jose:
+          "lo que debería ser blanco de esa imagen se ve gris" — el
+          bg-black/45 que dejé en móvil la vez pasada seguía tiñendo de
+          gris el blanco real de la imagen nueva, aunque ya no tuviera su
+          propio opacity-80). En móvil, sin overlay — el blanco se ve
+          blanco de verdad, tal cual la imagen. */}
+      <div className="absolute inset-0 hidden md:block bg-black/60"></div>
 
       {/* CONTENIDO — ocupa todo el espacio disponible entre navbar y copyright.
           Todo compactado (paddings/gaps/tamaños de letra reducidos) para que
@@ -67,16 +68,24 @@ export default function InkognitoHome() {
           (reportado 2026-08-02). */}
       <div className="relative z-10 flex flex-col items-center justify-center w-full flex-1 py-2 md:py-3 min-h-0">
 
+        {/* Colores oscuros en móvil (2026-09-15, Jose: viendo el fondo claro
+            nuevo — "el título y descripción, así como seleccionar módulo,
+            no se ven, pues el fondo ahora es blanco... el INK debería ser
+            negro, y el OGNITO a un gris más oscuro, así como los demás
+            textos") — mismo criterio que mobileLight en EcosystemNavbar.jsx,
+            pero acá directo en las clases (este componente no comparte
+            estos textos con nadie más). Desktop sigue con la paleta
+            blanca de siempre, sin tocar. */}
         <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black uppercase italic tracking-[0.12em] text-center">
-          <span className="text-white">INK</span>
-          <span className="text-zinc-300">OGNITO</span>
+          <span className="text-black md:text-white">INK</span>
+          <span className="text-zinc-600 md:text-zinc-300">OGNITO</span>
         </h1>
 
-        <p className="mt-1 mb-2 sm:mb-4 text-zinc-300 uppercase tracking-[0.15em] sm:tracking-[0.5em] text-sm md:text-base font-semibold text-center whitespace-nowrap px-2">
+        <p className="mt-1 mb-2 sm:mb-4 text-zinc-600 md:text-zinc-300 uppercase tracking-[0.15em] sm:tracking-[0.5em] text-sm md:text-base font-semibold text-center whitespace-nowrap px-2">
           Disciplina • Arte • Identidad
         </p>
 
-        <p className="text-white uppercase tracking-[0.45em] text-sm text-center mb-2 sm:mb-4 font-medium">
+        <p className="text-zinc-700 md:text-white uppercase tracking-[0.45em] text-sm text-center mb-2 sm:mb-4 font-medium">
           Select Module
         </p>
 
@@ -149,15 +158,19 @@ export default function InkognitoHome() {
           tracking-widest, mucho más grande/pesado que el
           text-[9.5px] sm:text-[12px] en frase normal que ya usan
           FooterSupply.jsx y el resto). */}
+      {/* text-zinc-700 en móvil (2026-09-15, mismo criterio que el título de
+          arriba: "los demás textos" también necesitan más contraste sobre
+          el fondo ahora blanco) — desktop se queda en zinc-600, como
+          siempre. */}
       <div className="relative z-10 w-full text-center pb-2 sm:pb-3 shrink-0">
-        <p className="text-zinc-600 text-[9.5px] sm:text-[12px]">
+        <p className="text-zinc-700 md:text-zinc-600 text-[9.5px] sm:text-[12px]">
           © 2026 INKognito. Todos los derechos reservados.
         </p>
         <div className="flex justify-center items-center gap-6 mt-2 text-[12px]">
-          <Link to="/terminos" className="text-zinc-600 hover:text-white transition-colors">
+          <Link to="/terminos" className="text-zinc-700 md:text-zinc-600 hover:text-white transition-colors">
             Términos
           </Link>
-          <Link to="/privacidad" className="text-zinc-600 hover:text-white transition-colors">
+          <Link to="/privacidad" className="text-zinc-700 md:text-zinc-600 hover:text-white transition-colors">
             Privacidad
           </Link>
         </div>

@@ -106,11 +106,19 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
           </span>
         )}
 
+        {/* Caja blanca en móvil (2026-09-15, Jose: "el botón hamburguesa
+            debería estar metido en un cuadrado blanco para que se pueda
+            diferenciar del negro del fondo en esa zona") — la imagen nueva
+            tiene líneas negras cruzando justo esa esquina; sin una base
+            sólida detrás, las barras negras del ícono se pierden contra
+            ellas. Desktop se queda sin caja, transparente como siempre. */}
         <button
           onClick={() => setMenuOpen(true)}
           aria-label="Abrir menú"
           aria-expanded={menuOpen}
-          className="flex flex-col gap-[5px] p-1 bg-transparent border-none cursor-pointer"
+          className={`flex flex-col gap-[5px] cursor-pointer border-none ${
+            mobileLight ? 'p-2.5 bg-white rounded-lg shadow-sm md:p-1 md:bg-transparent md:rounded-none md:shadow-none' : 'p-1 bg-transparent'
+          }`}
         >
           <span className={`block w-6 h-[2px] rounded-sm ${mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90'}`} />
           <span className={`block w-6 h-[2px] rounded-sm ${mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90'}`} />
