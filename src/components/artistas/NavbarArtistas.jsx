@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import { Menu, X, Search, Palette, Building2, UserPlus, UserCircle, FileText, Shield, Navigation, LoaderCircle, Store, Globe } from 'lucide-react'
+import { Menu, X, Search, Palette, Building2, UserPlus, UserCircle, FileText, Shield, Navigation, LoaderCircle, Store, Globe, GraduationCap } from 'lucide-react'
 // Recorte del logo genérico (assets/ecosystem/logo.png) sin el margen
 // transparente que trae de fábrica — ese margen hacía que se viera más
 // chico que los logos por módulo (supply.webp, etc.) aunque la caja
 // midiera lo mismo (2026-08-03, reportado por Jose).
 import inkognitoLogo from '../../assets/artistas-logo-mark.png'
-import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import AnimatedCityWordmark from './AnimatedCityWordmark'
 import LogoLupaIntro from './LogoLupaIntro'
 import LegalModal from '../legal/LegalModal'
@@ -47,9 +46,13 @@ import LegalModal from '../legal/LegalModal'
 // divisores agrupando por tema) y de SupplyMobileNav.jsx (ícono antes de
 // cada nombre). Helpers locales, no compartidos — el menú de este módulo
 // es chico y ya tenía su propia paleta blanco/gris.
+// Frase, no mayúscula (2026-09-15, Jose: "el contenido del botón hamburguesa
+// de INK está en mayúscula, déjalo con la consistencia que ya traemos") —
+// mismo criterio que EcosystemNavbar.jsx: el texto real ya se escribe en
+// frase donde se usa cada componente, sin forzar uppercase por CSS.
 function MenuSectionLabel({ children }) {
   return (
-    <p className="px-6 pt-5 pb-1 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
+    <p className="px-6 pt-5 pb-1 text-[10px] font-black tracking-[0.1em] text-gray-400">
       {children}
     </p>
   )
@@ -62,7 +65,7 @@ function MenuDivider() {
 // Modo botón cuando no hay `to` (2026-09-15) — usado por Términos/Privacidad
 // para abrir el modal legal en vez de navegar (ver LegalModal.jsx).
 function MenuLink({ to, icon: Icon, onClick, children }) {
-  const className = "flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300"
+  const className = "flex items-center gap-3 px-6 py-4 text-sm font-medium tracking-normal text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300"
   const content = (
     <>
       {Icon && <Icon size={16} className="flex-shrink-0 text-gray-400" />}
@@ -323,19 +326,35 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
             Registra tu estudio
           </MenuLink>
 
+          {/* "Para artistas" dividido en piezas más chicas (2026-09-15,
+              Jose: "para artistas deberá llamarse mi cuenta/perfil, y allí
+              estará artista, y el otro es estudio... el ítem aprende
+              tendrá cursos, y el supply quedará solo, pero se llamará
+              supply y no inkognito supply") — reemplaza el InkognitoModuleMenu
+              expandible de antes (un solo botón "Para artistas" con
+              extraLinks + el módulo Supply escondido adentro) por 3 grupos
+              sueltos, mismo criterio de sección que ya usan los 4 menús de
+              Supply (Proveedores/Aprende como secciones planas, no
+              desplegables). */}
           <MenuDivider />
-          <InkognitoModuleMenu
-            current="artistas"
-            only={['supply']}
-            label="Para artistas"
-            icon={UserCircle}
-            extraLinks={[
-              { label: 'Editar mi perfil', to: '/tattoo-artist-colombia/mi-perfil' },
-              { label: 'Cursos', to: '/supply/aprende/cursos' },
-            ]}
-            textClassName="text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-            onNavigate={close}
-          />
+          <MenuSectionLabel>Mi cuenta/perfil</MenuSectionLabel>
+          <MenuLink to="/tattoo-artist-colombia/mi-perfil" icon={UserCircle} onClick={close}>
+            Artista
+          </MenuLink>
+          <MenuLink to="/tattoo-artist-colombia/estudio/mi-perfil" icon={Building2} onClick={close}>
+            Estudio
+          </MenuLink>
+
+          <MenuDivider />
+          <MenuSectionLabel>Aprende</MenuSectionLabel>
+          <MenuLink to="/supply/aprende/cursos" icon={GraduationCap} onClick={close}>
+            Cursos
+          </MenuLink>
+
+          <MenuDivider />
+          <MenuLink to="/supply" icon={Store} onClick={close}>
+            Supply
+          </MenuLink>
           {/* "Ecosistema" de vuelta (2026-09-15, Jose: "la page INK no tiene
               botón en el navbar que lleve de vuelta a los módulos, como sí
               lo tiene Supply" — se había quitado el 2026-08-06 pensando que
