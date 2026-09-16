@@ -1,11 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
-import { Search, MapPin, Palette, BadgeCheck, ChevronRight, Navigation, LoaderCircle, Share2, Sparkles, Check, Building2 } from 'lucide-react'
+import { Search, MapPin, Palette, BadgeCheck, ChevronRight, LoaderCircle, Share2, Sparkles, Check, Building2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { municipioDesdeNombreIP, getCoordsMunicipio } from '../../data/colombiaGeo'
 import { useDirectorioBusqueda } from '../../hooks/useDirectorio'
 import { artistaUrl } from './artistaSlug'
 import { cloudinaryFill } from '../../lib/cloudinary'
+// Mismo ícono (el sombrero) que ya usa NavbarArtistas.jsx — reutilizado acá
+// como logo recortado del banner del hero (2026-09-15).
+import inkognitoLogo from '../../assets/artistas-logo-mark.png'
+// Misma imagen que usa el banner de Supply (2026-09-15, Jose: "de momento
+// utiliza la misma imagen que tiene el banner de supply") — placeholder
+// hasta que exista una propia para INK.
+import bannerBg from '../../assets/supply/banner-tattoo-swirl.jpg'
+// Arte de letras tipo tattoo subido a Obsidian (2026-09-15) — procesado
+// (fondo negro removido, recortado al bounding box real) desde el
+// original en INKognito-wiki/ink.jpg, ver script de esta sesión.
+import inkognitoInkMark from '../../assets/artistas-ink-mark.png'
 
 // Psicología del color (2026-08-05, decisión final tras probar "todo
 // rojo" y "todo gris"): ninguno de los dos extremos — rojo repetido en
@@ -734,7 +745,26 @@ export default function ArtistasColombiaPage() {
     // pantalla en vez de pegado abajo — "pongamos el copyright abajo como
     // corresponde" (Jose). NavbarArtistas es fixed, no participa del flex.
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
-      <NavbarArtistas ciudadDetectada={ciudadDetectada} />
+      {/* Buscador arriba en el navbar + listón gris de categorías debajo
+          (2026-09-15, Jose: "el buscador lo vamos a situar arriba en el
+          navbar, como ya lo hace Supply... en el listón gris que tendrá
+          abajo, estarán los botones de buscador de artistas, estudios") —
+          query/categoria siguen viviendo en este componente (el navbar
+          solo los refleja), mismo criterio que el buscador de
+          MobileHomeSupply.jsx. */}
+      <NavbarArtistas
+        ciudadDetectada={ciudadDetectada}
+        searchValue={query}
+        onSearchChange={(v) => { setQuery(v); setCercaDeTiActivo(false) }}
+        searchPlaceholder="Nombre, municipio o estilo..."
+        categoria={categoria}
+        onCategoriaChange={cambiarCategoria}
+        ubicando={ubicando}
+        onUbicacion={usarMiUbicacion}
+        cercaDeTiActivo={cercaDeTiActivo}
+        tooltipUbicacion={tooltipUbicacionVisible}
+        onCerrarTooltipUbicacion={cerrarTooltipUbicacion}
+      />
 
       {/* Hero fusionado con el navbar (2026-08-05, Jose: "funde el hero...
           para que quede pegado con el navbar" — antes había un hueco
@@ -748,7 +778,11 @@ export default function ArtistasColombiaPage() {
           cerca del borde inferior de este hero) contra la card de abajo.
           El fondo de puntos (DOT_PATTERN) ya calza exacto vía inset-0, no
           dependía de este overflow para no desbordarse. */}
-      <section className="relative pt-16 md:pt-20 pb-8 md:pb-10 px-4 md:px-6 bg-gray-300 border-b border-gray-300">
+      {/* pt-[108px]/pt-[124px] (2026-09-15) = altura del navbar (64px/80px)
+          + la del listón gris de categorías nuevo (44px, h-11) que ahora
+          vive fijo debajo — sin este ajuste el título quedaba tapado por
+          el listón. */}
+      <section className="relative pt-[108px] md:pt-[124px] pb-8 md:pb-10 px-4 md:px-6 bg-gray-300 border-b border-gray-300">
         {/* pointer-events-none (2026-08-05): este fondo decorativo estaba
             tapando los clics del botón "Ver todo" de SeccionCercanos, que
             vive fuera del div `relative z-10` de más abajo — sin esto,
@@ -758,124 +792,129 @@ export default function ArtistasColombiaPage() {
         <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={DOT_PATTERN} />
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <div className="pt-5 md:pt-7">
-            <h1 className="text-lg sm:text-4xl md:text-5xl font-black uppercase leading-tight whitespace-nowrap">
-              Encuentra tu{' '}
-              <span className="inline-block px-2 sm:px-3 py-0.5 rounded-lg text-white bg-gray-600">
-                tatuador
-              </span>
-            </h1>
-            {/* div envolvente (no <p>) porque el tooltip de abajo es un
-                <div> — no puede vivir dentro de un <p> en HTML válido; ver
-                comentario completo en el tooltip mismo. */}
-            <div className="max-w-2xl mx-auto">
-              <div className="text-gray-700 text-sm md:text-lg leading-relaxed mt-1.5">
-                {/* "INK" — apodo de INKognito para el buscador (Jose,
-                    2026-08-05): se agrega como un toque de marca dentro del
-                    copy, en la misma card que ya usa "tatuador" en el
-                    título, sin reemplazar "Tattoo Artist Colombia" en
-                    navbar/meta/footer — ese texto sigue haciendo el trabajo
-                    de explicarle a quien recién llega de qué se trata esto.
-                    v3 (2026-08-11) — texto acortado: la explicación de qué
-                    es INK y a qué se dedica ahora vive en su tooltip de
-                    onboarding (ver abajo), así que acá solo queda la
-                    instrucción de uso, sin repetir lo mismo dos veces. */}
-                <span className="relative inline-block px-1.5 py-0.5 rounded-md text-white font-black bg-gray-600">
-                  INK
-                  {/* Tooltip de onboarding sobre la marca INK (2026-08-11) —
-                      primero en la secuencia, antes que el de "Cerca de ti"
-                      (ver useEffect/cerrarTooltipInk arriba). v4: vuelve a
-                      anclarse a la palabra "INK" (no al bloque de texto
-                      completo de v3) — Jose: "la flecha... debería salir de
-                      la zona izquierda, y más arriba, apuntando justamente
-                      a la palabra ink". Ancla en `left-0` (no centrada) para
-                      que la card se despliegue hacia la derecha desde ahí
-                      en vez de partirse a ambos lados — con "INK" pegado a
-                      la izquierda del bloque de texto, centrarla la hacía
-                      desbordar. `max-w-[calc(100vw-2rem)]` sigue de
-                      respaldo en pantallas muy angostas; el <div> vive
-                      dentro de este <span> (inline-block, no <p>), por eso
-                      el <p> de afuera se cambió a un <div> envolvente. */}
-                  {tooltipInkVisible && (
-                    <div className="absolute z-30 top-full mt-3 left-0 w-72 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left normal-case font-normal">
-                      <span className="absolute -top-1.5 left-4 w-3 h-3 bg-gray-900 rotate-45" />
-                      <p className="text-xs leading-relaxed text-gray-200">
-                        Es un buscador inteligente, pensado para resolver algo simple pero importante: encontrarte con el tatuador correcto. Te muestra el trabajo real de cada artista, qué tan cerca está de ti, y te conecta directo con él — sin vueltas.
-                      </p>
-                      <button
-                        onClick={cerrarTooltipInk}
-                        className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
-                      >
-                        Entendido
-                      </button>
-                    </div>
-                  )}
-                </span> Busca por nombre, municipio o estilo, o usa tu ubicación — te mostramos lo más cercano.
-              </div>
-            </div>
-
-            {/* Señales de confianza, mismo patrón que ya vimos en Tattoodo
-                ("Verified artists · Easy booking") — Jose pidió agregarlas
-                al pie de la card (2026-08-04). */}
-            <div className="flex items-center justify-center gap-4 mt-4 text-gray-600 text-xs md:text-sm font-bold uppercase tracking-wide">
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-gray-500" />
-                Artistas verificados
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-gray-500" />
-                Reserva fácil
-              </span>
-            </div>
-          </div>
-
-          {/* BARRA DE BÚSQUEDA + GEOLOCALIZACIÓN — sin listar municipios/
-              estilos como botones: si uno no tiene artista registrado
-              todavía, mostrarlo como opción no sirve de nada (Jose,
-              2026-08-03). El municipio/estilo solo aparece como RESULTADO
-              de buscar, nunca como opción previa para elegir. */}
-          <div className="flex flex-col sm:flex-row gap-2 max-w-xl mx-auto mt-6">
-            <div className="relative flex-1">
-              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                value={query}
-                onChange={e => { setQuery(e.target.value); setCercaDeTiActivo(false) }}
-                placeholder="Nombre, municipio o estilo..."
-                autoComplete="off"
-                className="w-full bg-gray-50 border border-gray-300 rounded-full pl-11 pr-9 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-500 transition-colors"
-              />
-              {query && (
-                <button
-                  onClick={() => setQuery('')}
-                  aria-label="Limpiar búsqueda"
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-            <div className="relative">
-              <button
-                onClick={usarMiUbicacion}
-                disabled={ubicando}
-                className="flex items-center justify-center gap-2 px-5 py-3 rounded-full border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60 border-gray-600 text-gray-600 w-full"
+            {/* Banner (2026-09-15, Jose: "esto literal también será un
+                baner, así que deberá ser de las proporciones del banner de
+                supply" — corrige la card asimétrica de dos paneles del
+                intento anterior, que no era lo pedido). Mismo patrón que el
+                BANNER de MobileHomeSupply.jsx: imagen de fondo oscurecida +
+                gradiente + texto encima — de momento con la MISMA imagen
+                que usa el banner de Supply (Jose: "utiliza la misma imagen
+                que tiene el banner de supply"), pendiente una propia de
+                INK. El logo (el sombrero) se recorta a la mitad contra el
+                borde izquierdo y ocupa todo el alto del banner (Jose: "se
+                ve el logo del buscador, pero solo se ve la mitad, y ocupa
+                todo el alto del banner") — `-translate-x-1/2` centra el
+                logo exactamente sobre el borde, dejando visible solo su
+                mitad derecha. Texto (titular + subtítulo) SIN CAMBIOS
+                respecto a la versión anterior (Jose: "no tenías que
+                cambiar el texto de descripción que habíamos puesto") — solo
+                cambió el contenedor visual alrededor, no el copy.
+                `overflow-hidden` vive en el banner (recorta imagen + logo
+                en las esquinas redondeadas); el tooltip de "INK" se movió
+                AFUERA de ese contenedor a un wrapper `relative` sin
+                overflow, mismo criterio que ya se corrigió antes en esta
+                misma página — si viviera adentro, el recorte del banner se
+                lo comería. */}
+            <div className="relative max-w-2xl mx-auto">
+              <div
+                className="relative overflow-hidden rounded-2xl border border-gray-700/30 px-4 py-4 sm:px-8 sm:py-6 text-left text-white"
+                style={{ background: 'linear-gradient(145deg,#1c1c1e,#050505)' }}
               >
-                {ubicando ? <LoaderCircle size={15} className="animate-spin" /> : <Navigation size={15} />}
-                {ubicando ? 'Ubicando...' : 'Cerca de ti'}
-              </button>
-              {/* Tooltip de onboarding — solo la primera vez (ver
-                  useEffect/localStorage de arriba). Centrado bajo el
-                  botón con una flechita apuntando hacia arriba, mismo
-                  truco que un cuadrado rotado 45° oculto detrás del
-                  cuerpo del tooltip. */}
-              {tooltipUbicacionVisible && (
-                <div className="absolute z-30 top-full mt-3 left-1/2 -translate-x-1/2 w-64 bg-gray-900 text-white rounded-xl p-4 shadow-xl text-left">
-                  <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-900 rotate-45" />
+                <img src={bannerBg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-35 brightness-50" />
+                <img
+                  src={inkognitoLogo}
+                  alt=""
+                  className="absolute left-0 top-0 h-full w-auto -translate-x-1/2 opacity-30 pointer-events-none"
+                  style={{ filter: 'brightness(0) invert(1)' }}
+                />
+                {/* opacity-30 (bajado de 90) — con el arte de letras nuevo
+                    encima, el sombrero pasa a ser textura de fondo, no el
+                    elemento que compite por atención; sin bajarlo, las dos
+                    siluetas blancas se veían mezcladas/confusas en la misma
+                    zona angosta. */}
+                {/* Degradado sobre el logo (2026-09-15, Jose: "para que dé
+                    la sensación que el logo está más atrás que el texto")
+                    — se pinta ENCIMA del sombrero pero DEBAJO del arte de
+                    letras nuevo (Jose, corrección: "esta nueva imagen sí
+                    debe ir por delante del degradado... debe verse
+                    totalmente blanca") — por eso este div vive ANTES del
+                    arte nuevo en el DOM (solo oscurece al sombrero), no
+                    después. Oscurece hacia la izquierda y se disuelve a
+                    transparente hacia la derecha, mismo tono que el
+                    gradiente de fondo del banner. */}
+                <div
+                  className="absolute inset-0"
+                  style={{ background: 'linear-gradient(to right, rgba(5,5,5,0.85) 0%, rgba(5,5,5,0.55) 30%, rgba(5,5,5,0) 65%)' }}
+                />
+                {/* Arte de letras tipo tattoo, encima del logo del sombrero
+                    Y del degradado (2026-09-15, Jose: "subí otra foto a
+                    Obsidian... quítale el fondo pues tiene fondo negro, y
+                    ponla encima del logo a la izquierda"; corrección: "debe
+                    ir por delante del degradado... y debe verse por
+                    completo y no la mitad como el logo") — fondo negro
+                    removido por luminancia (alpha = luminancia del píxel)
+                    vía Playwright+canvas, igual que se hizo con Difuso
+                    Galería; recortado al bounding box real del diseño. Sin
+                    `-translate-x-1/2` (a diferencia del sombrero) — se ve
+                    COMPLETA, no recortada a la mitad contra el borde.
+                    `h-full` en vez de un porcentaje con `top-1/2` (Jose:
+                    "estirastes el banner de manera vertical, revertelo, o
+                    que el banner sea justo del tamaño de la nueva imagen"
+                    — el padding vertical del banner también bajó, py-6/9 →
+                    py-4/6) — así la imagen queda a ras del alto real del
+                    banner, sin dejar aire arriba/abajo que antes empujaba
+                    todo a crecer. El texto vive cerca, no lejos (pl-20/24,
+                    bajado de pl-24/32). */}
+                <img
+                  src={inkognitoInkMark}
+                  alt=""
+                  className="absolute left-2 sm:left-3 top-0 h-full w-auto pointer-events-none"
+                />
+                <div className="relative z-10 pl-20 sm:pl-24">
+                  <h1 className="text-lg sm:text-3xl md:text-4xl font-black uppercase leading-tight">
+                    Encuentra tu{' '}
+                    <span className="inline-block px-2 sm:px-3 py-0.5 rounded-lg text-white bg-gray-600">
+                      tatuador
+                    </span>
+                  </h1>
+                  <p className="text-zinc-300 text-xs sm:text-base leading-relaxed mt-2 max-w-md">
+                    Busca por municipio, nombre o estilo. Revisa portafolios reales y agenda tu cita en línea, sin intermediarios.
+                  </p>
+                  {/* Señales de confianza, ahora DENTRO del banner
+                      (2026-09-15, Jose: "agrega el texto artistas
+                      verificados y reserva fácil en este banner, con un
+                      texto más pequeño para que el banner no sufra y
+                      crezca") — reemplaza la fila que vivía debajo del
+                      banner; texto más chico que el original (era
+                      text-xs md:text-sm) para no empujar la altura. */}
+                  <div className="flex items-center gap-3 mt-2.5 text-zinc-400 text-[9px] sm:text-[11px] font-bold uppercase tracking-wide">
+                    <span className="flex items-center gap-1">
+                      <span className="w-1 h-1 rounded-full flex-shrink-0 bg-zinc-400" />
+                      Artistas verificados
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-1 h-1 rounded-full flex-shrink-0 bg-zinc-400" />
+                      Reserva fácil
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tooltip de onboarding sobre la marca INK (2026-08-11) —
+                  primero en la secuencia, antes que el de "Cerca de ti" (ver
+                  useEffect/cerrarTooltipInk arriba). Anclado left-0 al
+                  wrapper del banner (no al logo, que vive recortado y sin
+                  espacio propio) — se expande hacia la derecha debajo del
+                  banner. `max-w-[calc(100vw-2rem)]` de respaldo en
+                  pantallas muy angostas. */}
+              {tooltipInkVisible && (
+                <div className="absolute z-30 top-full mt-3 left-0 w-72 max-w-[calc(100vw-2rem)] bg-gray-900 rounded-xl p-4 shadow-xl text-left normal-case font-normal">
+                  <span className="absolute -top-1.5 left-8 sm:left-12 w-3 h-3 bg-gray-900 rotate-45" />
                   <p className="text-xs leading-relaxed text-gray-200">
-                    Con tu permiso de ubicación te mostramos artistas y estudios reales cerca de ti, ordenados por distancia — no una lista genérica.
+                    Es un buscador inteligente, pensado para resolver algo simple pero importante: encontrarte con el tatuador correcto. Te muestra el trabajo real de cada artista, qué tan cerca está de ti, y te conecta directo con él — sin vueltas.
                   </p>
                   <button
-                    onClick={cerrarTooltipUbicacion}
+                    onClick={cerrarTooltipInk}
                     className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
                   >
                     Entendido
@@ -885,32 +924,13 @@ export default function ArtistasColombiaPage() {
             </div>
           </div>
 
-          {/* Filtro de categoría (fase 6.3, 2026-08-07, Jose: "un filtro al
-              lado del botón de búsqueda, que filtre automático, bien sea
-              por artistas, o por estudios") — 3 pills, misma paleta
-              activo/inactivo que ya usa el selector de tipo en
-              EstudioRegistroPage.jsx. No incluye "Marcas" a propósito —
-              las marcas no se navegan como categoría, solo aparecen si el
-              texto escrito coincide con una. */}
-          <div className="flex items-center justify-center gap-2 max-w-xl mx-auto mt-3">
-            {[
-              { key: 'artistas', label: 'Artistas' },
-              { key: 'estudios', label: 'Estudios' },
-            ].map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => cambiarCategoria(key)}
-                className={`px-4 py-1.5 rounded-full border text-[11px] font-bold uppercase tracking-wide transition-colors ${
-                  categoria === key ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-400 text-gray-600 hover:border-gray-600'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
+          {/* Buscador, filtro de categoría y "Cerca de ti" se movieron al
+              navbar/listón gris de arriba (2026-09-15, Jose: "agrega el
+              botón cerca de ti, al lado de los dos de arriba" — ver
+              NavbarArtistas.jsx). El estado (ubicando, tooltip, error)
+              sigue viviendo acá; solo el botón cambió de lugar. */}
           {ubicacionError && (
-            <p className="text-gray-400 text-xs mt-3 max-w-md mx-auto">{ubicacionError}</p>
+            <p className="text-gray-400 text-xs mt-4 max-w-md mx-auto">{ubicacionError}</p>
           )}
           {/* Sugerencia por geolocalización de IP (silenciosa, sin pedir
               permiso) — solo aparece antes de que la persona busque algo. */}

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Search, Palette, Building2, UserPlus, UserCircle, FileText, Shield, Navigation, LoaderCircle, Store } from 'lucide-react'
 // Recorte del logo genérico (assets/ecosystem/logo.png) sin el margen
 // transparente que trae de fábrica — ese margen hacía que se viera más
 // chico que los logos por módulo (supply.webp, etc.) aunque la caja
@@ -39,21 +39,72 @@ import LogoLupaIntro from './LogoLupaIntro'
 // pantallas de tarea puntual (ej. "Editar mi perfil") donde repetir el
 // nombre de marca no orienta tanto como decir en qué pantalla está el
 // artista. Sigue enlazando a /tattoo-artist-colombia igual que siempre.
-export default function NavbarArtistas({ ciudadDetectada = null, titulo = null }) {
+//
+// Jerarquía visual + íconos en el menú (2026-09-15, Jose: "agrégale a este
+// botón jerarquía visual y sus íconos, como ya hicimos con el home del
+// ecosystem y con Supply") — mismo patrón de EcosystemNavbar.jsx (eyebrow +
+// divisores agrupando por tema) y de SupplyMobileNav.jsx (ícono antes de
+// cada nombre). Helpers locales, no compartidos — el menú de este módulo
+// es chico y ya tenía su propia paleta blanco/gris.
+function MenuSectionLabel({ children }) {
+  return (
+    <p className="px-6 pt-5 pb-1 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
+      {children}
+    </p>
+  )
+}
+
+function MenuDivider() {
+  return <div className="border-t border-gray-100" />
+}
+
+function MenuLink({ to, icon: Icon, onClick, children }) {
+  return (
+    <Link
+      to={to}
+      onClick={onClick}
+      className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300"
+    >
+      {Icon && <Icon size={16} className="flex-shrink-0 text-gray-400" />}
+      {children}
+    </Link>
+  )
+}
+
+// searchValue/onSearchChange/searchPlaceholder (2026-09-15, Jose: "el
+// buscador lo vamos a situar arriba en el navbar, como ya lo hace Supply")
+// — mismo criterio opcional que NavbarCategory.jsx: la presencia de
+// onSearchChange activa el modo buscador (reemplaza el wordmark central),
+// default null para no afectar los demás navbars que usan este componente
+// (Editar perfil, Registro de estudio, etc. siguen mostrando su `titulo`).
+// categoria/onCategoriaChange (mismo pedido) — activan el listón gris de
+// categorías (Artistas/Estudios) pegado debajo del navbar, mismo criterio
+// opcional. Solo ArtistasColombiaPage.jsx pasa estos props hoy.
+// ubicando/onUbicacion/cercaDeTiActivo/tooltipUbicacion/onCerrarTooltipUbicacion
+// (2026-09-15, Jose: "agrega el botón cerca de ti, al lado de los dos de
+// arriba que dicen artistas, estudios") — "Cerca de ti" vivía solo en el
+// hero de ArtistasColombiaPage.jsx; ahora se suma como tercer botón del
+// listón, mismo criterio opcional que el resto (onUbicacion ausente = no
+// se renderiza). El estado (ubicando, tooltip, etc.) sigue viviendo en la
+// page — acá solo se refleja, igual que categoria/onCategoriaChange.
+export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, searchValue = null, onSearchChange = null, searchPlaceholder = 'Buscar', categoria = null, onCategoriaChange = null, ubicando = false, onUbicacion = null, cercaDeTiActivo = false, tooltipUbicacion = false, onCerrarTooltipUbicacion = null }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const close = () => setMenuOpen(false)
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-gray-600 border-b border-gray-700">
       <div className="relative max-w-6xl mx-auto px-4 md:px-6">
-        <div className="h-16 md:h-20 flex items-center justify-between">
+        <div className="h-16 md:h-20 flex items-center gap-3 justify-between">
 
           {/* Logo pegado a la izquierda, tal cual estaba — lo que se centra
               es solo el texto, no el logo (Jose, 2026-08-03: "era centrar
               el texto no mover el logo"). El texto se centra en TODO el
               navbar (absolute + left-1/2), no en el espacio libre entre
               logo y hamburguesa, para que quede alineado con el centro
-              real de la barra sin importar el ancho de cada lado. */}
+              real de la barra sin importar el ancho de cada lado. Este
+              centrado absoluto solo aplica al modo wordmark — en modo
+              buscador (ver abajo) el input vive en el flujo flex normal,
+              entre el logo y la hamburguesa. */}
           <Link to="/tattoo-artist-colombia" className="flex items-center flex-shrink-0">
             {/* Medido contra el navbar de Supply con Playwright+sharp: su
                 logo ocupa ~57% de su caja de w-12/w-14 (el archivo trae aire
@@ -69,48 +120,148 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null }
             </div>
           </Link>
 
-          <Link
-            to="/tattoo-artist-colombia"
-            className="absolute left-1/2 -translate-x-1/2 text-base md:text-xl font-black uppercase tracking-wide leading-tight whitespace-nowrap"
-          >
-            {titulo ? (
-              <span className="text-gray-100">{titulo}</span>
-            ) : (
-              <>
-                <span className="text-gray-100">Tattoo Artist</span>{' '}
-                {ciudadDetectada
-                  ? <AnimatedCityWordmark ciudad={ciudadDetectada.municipio} />
-                  : <span className="text-gray-300">Colombia</span>}
-              </>
-            )}
-          </Link>
+          {onSearchChange ? (
+            <div className="relative flex-1 max-w-md">
+              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <input
+                type="text"
+                value={searchValue || ''}
+                onChange={(e) => onSearchChange(e.target.value)}
+                placeholder={searchPlaceholder}
+                autoComplete="off"
+                className="w-full bg-gray-700 border border-gray-500/50 rounded-full pl-10 pr-9 py-2 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:border-gray-300 transition-colors"
+              />
+              {searchValue && (
+                <button
+                  onClick={() => onSearchChange('')}
+                  aria-label="Limpiar búsqueda"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+          ) : (
+            <Link
+              to="/tattoo-artist-colombia"
+              className="absolute left-1/2 -translate-x-1/2 text-base md:text-xl font-black uppercase tracking-wide leading-tight whitespace-nowrap"
+            >
+              {titulo ? (
+                <span className="text-gray-100">{titulo}</span>
+              ) : (
+                <>
+                  <span className="text-gray-100">Tattoo Artist</span>{' '}
+                  {ciudadDetectada
+                    ? <AnimatedCityWordmark ciudad={ciudadDetectada.municipio} />
+                    : <span className="text-gray-300">Colombia</span>}
+                </>
+              )}
+            </Link>
+          )}
 
-          {/* Hamburguesa tricolor — pedido de Jose (2026-08-05), colores de
-              la bandera de Colombia de arriba a abajo (amarillo/azul/rojo),
-              acorde a la expansión nacional del módulo ("Tattoo Artist
-              Colombia"). El ícono de lucide-react (Menu) es un solo trazo
-              de un color — no se puede pintar cada línea por separado, así
-              que se reemplaza por 3 barras propias solo en el estado
-              cerrado; la X de cerrar vuelve a su hover claro original
-              (gray-400 → white), correcto de nuevo ahora que el navbar
-              volvió a un fondo oscuro. */}
+          {/* Hamburguesa — vuelve al ícono normal de lucide-react
+              (2026-09-15, Jose: "que no tenga los colores amarillo azul y
+              rojo, si no que sea normal"). Antes usaba 3 barras propias
+              pintadas con los colores de la bandera de Colombia en el
+              estado cerrado; ahora el mismo gris claro que ya usaba la X
+              de cerrar, sin ningún color de acento. */}
           <button
             onClick={() => setMenuOpen(o => !o)}
             aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
             className="flex-shrink-0 flex items-center justify-center w-[22px] h-[22px]"
           >
             {menuOpen ? (
-              <X size={22} className="text-gray-400 hover:text-white transition-colors" />
+              <X size={22} className="text-gray-300 hover:text-white transition-colors" />
             ) : (
-              <span className="flex flex-col gap-[3px] w-[22px]">
-                <span className="h-[2.5px] w-full rounded-full" style={{ backgroundColor: '#FCD116' }} />
-                <span className="h-[2.5px] w-full rounded-full" style={{ backgroundColor: '#003893' }} />
-                <span className="h-[2.5px] w-full rounded-full" style={{ backgroundColor: '#CE1126' }} />
-              </span>
+              <Menu size={22} className="text-gray-300 hover:text-white transition-colors" />
             )}
           </button>
         </div>
       </div>
+
+      {/* LISTÓN GRIS DE CATEGORÍAS — pegado debajo del navbar (2026-09-15,
+          Jose: "en el listón gris que tendrá abajo, estarán lo que haría
+          de categoría, los botones de buscador de artistas, estudios").
+          Mismo principio que la franja de categorías de MobileHomeSupply.jsx
+          (ahí azul, acá gris — paleta propia del módulo), pero fija (no
+          scrollea) porque acá solo hay 2 botones, no una fila de muchas
+          categorías que necesite overflow-x. Solo se monta cuando la page
+          pasa onCategoriaChange (hoy, solo ArtistasColombiaPage.jsx) — el
+          resto de pantallas del módulo no la necesitan. */}
+      {onCategoriaChange && (
+        <div className="fixed top-16 md:top-20 left-0 w-full z-40 bg-gray-200 border-b border-gray-300">
+          {/* overflow-x-auto (2026-09-15) — con el botón nuevo de Supply se
+              suman 4 pills; en celulares angostos ya no entran todos en una
+              fila sin scroll (los 3 anteriores apenas calzaban). Mismo
+              recurso que ya usa la franja de categorías de
+              MobileHomeSupply.jsx (scrollbar oculta, flex-shrink-0 en cada
+              pill para que no se aplasten en vez de scrollear). */}
+          <div className="max-w-6xl mx-auto px-4 md:px-6 h-11 flex items-center justify-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {[
+              { key: 'artistas', label: 'Artistas', icon: Palette },
+              { key: 'estudios', label: 'Estudios', icon: Building2 },
+            ].map(({ key, label, icon: Icon }) => (
+              <button
+                key={key}
+                onClick={() => onCategoriaChange(key)}
+                className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-1.5 rounded-full border text-[11px] font-bold uppercase tracking-wide transition-colors ${
+                  categoria === key ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-400 bg-white text-gray-600 hover:border-gray-600'
+                }`}
+              >
+                <Icon size={13} />
+                {label}
+              </button>
+            ))}
+            {onUbicacion && (
+              <div className="relative flex-shrink-0">
+                <button
+                  onClick={onUbicacion}
+                  disabled={ubicando}
+                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full border text-[11px] font-bold uppercase tracking-wide transition-colors disabled:opacity-60 ${
+                    cercaDeTiActivo ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-400 bg-white text-gray-600 hover:border-gray-600'
+                  }`}
+                >
+                  {ubicando ? <LoaderCircle size={13} className="animate-spin" /> : <Navigation size={13} />}
+                  {/* "Cerca de ti" → "Cerca de mí" (2026-09-15, pedido
+                      explícito de Jose) */}
+                  {ubicando ? 'Ubicando...' : 'Cerca de mí'}
+                </button>
+                {/* Tooltip de onboarding — solo la primera vez (ver
+                    useEffect/localStorage en ArtistasColombiaPage.jsx).
+                    Anclado al borde derecho (no centrado) — este es el
+                    botón más a la derecha del listón, un tooltip centrado
+                    se saldría de la pantalla en celulares angostos. */}
+                {tooltipUbicacion && (
+                  <div className="absolute z-30 top-full mt-3 right-0 w-64 max-w-[calc(100vw-2rem)] bg-gray-900 text-white rounded-xl p-4 shadow-xl text-left">
+                    <span className="absolute -top-1.5 right-4 w-3 h-3 bg-gray-900 rotate-45" />
+                    <p className="text-xs leading-relaxed text-gray-200">
+                      Con tu permiso de ubicación te mostramos artistas y estudios reales cerca de ti, ordenados por distancia — no una lista genérica.
+                    </p>
+                    <button
+                      onClick={onCerrarTooltipUbicacion}
+                      className="mt-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:opacity-80 transition-opacity"
+                    >
+                      Entendido
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+            {/* Botón nuevo (2026-09-15, Jose: "vas a agregar allí otro
+                botón que se llamará Supply y será la url que lleva a la
+                page principal del módulo Supply") — Link directo, no un
+                toggle de categoría como los dos primeros: navega fuera de
+                esta página, no cambia ningún estado local. */}
+            <Link
+              to="/supply"
+              className="flex-shrink-0 flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-gray-400 bg-white text-gray-600 hover:border-gray-600 text-[11px] font-bold uppercase tracking-wide transition-colors"
+            >
+              <Store size={13} />
+              Supply
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Estructura del menú (2026-08-06, Jose: "analiza su botón
           hamburguesa... quiero que sea así mismo pero con nuestra
@@ -125,35 +276,42 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null }
           mismo patrón de menú full-screen que usa Tattoodo en móvil. */}
       {menuOpen && (
         <div className="fixed inset-0 top-16 md:top-20 bg-white z-50 overflow-y-auto">
+          {/* Jerarquía por secciones (2026-09-15) — antes era una lista
+              plana sin agrupar; ahora sigue el mismo criterio que
+              EcosystemNavbar.jsx: un eyebrow por tema, con íconos en cada
+              link (mismo patrón que SupplyMobileNav.jsx). */}
+          <MenuSectionLabel>Buscar</MenuSectionLabel>
           {/* Búsqueda sectorizada (fase 6.5, 2026-08-07, Jose: "por si solo
               quiero búsquedas de estudios, o tatuadores") — ambos links
               aterrizan directo en modo "cerca de mí" para su categoría
               (mismo filtro de ArtistasColombiaPage.jsx, fase 6.3), sin
               tener que tocar el pill después de cargar. */}
-          <Link to="/tattoo-artist-colombia?categoria=artistas" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">
+          <MenuLink to="/tattoo-artist-colombia?categoria=artistas" icon={Palette} onClick={close}>
             Buscar artistas
-          </Link>
-          <div className="border-t border-gray-100" />
-          <Link to="/tattoo-artist-colombia?categoria=estudios" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">
+          </MenuLink>
+          <MenuLink to="/tattoo-artist-colombia?categoria=estudios" icon={Building2} onClick={close}>
             Buscar estudios
-          </Link>
-          <div className="border-t border-gray-100" />
-          <Link to="/tattoo-artist-colombia/unete" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">
+          </MenuLink>
+
+          <MenuDivider />
+          <MenuSectionLabel>Únete</MenuSectionLabel>
+          <MenuLink to="/tattoo-artist-colombia/unete" icon={UserPlus} onClick={close}>
             Únete como artista
-          </Link>
-          <div className="border-t border-gray-100" />
+          </MenuLink>
           {/* fase 6.3 (2026-08-07, Jose) — el registro de estudio existía
               pero sin ningún link público hacia él, solo por URL directa.
               Las marcas (tipo='empresa') a propósito NO tienen link acá —
               Jose las sigue creando él directamente desde el panel. */}
-          <Link to="/tattoo-artist-colombia/estudio/unete" onClick={close} className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300">
+          <MenuLink to="/tattoo-artist-colombia/estudio/unete" icon={Building2} onClick={close}>
             Registra tu estudio
-          </Link>
-          <div className="border-t border-gray-100" />
+          </MenuLink>
+
+          <MenuDivider />
           <InkognitoModuleMenu
             current="artistas"
             only={['supply']}
             label="Para artistas"
+            icon={UserCircle}
             extraLinks={[
               { label: 'Editar mi perfil', to: '/tattoo-artist-colombia/mi-perfil' },
               { label: 'Cursos', to: '/supply/aprende/cursos' },
@@ -165,13 +323,14 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null }
               buscando tatuador ni un artista editando su perfil necesitan
               un atajo a Store/Gym; el módulo se mantiene enfocado solo en
               lo relevante para su propia audiencia. */}
-          <div className="border-t border-gray-100" />
-          <Link to="/tattoo-artist-colombia/terminos" onClick={close} className="block px-6 py-3 uppercase text-[10px] tracking-[0.2em] text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-all duration-300">
+          <MenuDivider />
+          <MenuSectionLabel>Legal</MenuSectionLabel>
+          <MenuLink to="/tattoo-artist-colombia/terminos" icon={FileText} onClick={close}>
             Términos
-          </Link>
-          <Link to="/tattoo-artist-colombia/privacidad" onClick={close} className="block px-6 py-3 uppercase text-[10px] tracking-[0.2em] text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-all duration-300">
+          </MenuLink>
+          <MenuLink to="/tattoo-artist-colombia/privacidad" icon={Shield} onClick={close}>
             Privacidad
-          </Link>
+          </MenuLink>
         </div>
       )}
     </nav>
