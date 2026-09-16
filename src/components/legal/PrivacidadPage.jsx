@@ -1,19 +1,22 @@
 import LegalPage from './LegalPage'
 
-const TITLE = 'Política de Privacidad y Cookies'
+export const PRIVACIDAD_TITLE = 'Política de Privacidad y Cookies'
+export const PRIVACIDAD_UPDATED = '25 de julio de 2026'
 const DESCRIPTION = 'Política de privacidad y cookies de INKognito: qué datos recolectamos, cómo usamos Google Analytics y Meta Pixel, y tus derechos como titular de datos personales.'
 
 export function meta() {
   return [
-    { title: `${TITLE} | INKognito` },
+    { title: `${PRIVACIDAD_TITLE} | INKognito` },
     { name: 'description', content: DESCRIPTION },
     { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/privacidad` },
   ]
 }
 
-export default function PrivacidadPage() {
+// Contenido separado del layout de ruta (2026-09-15) — ver mismo comentario
+// en TerminosPage.jsx; LegalModal.jsx reusa este contenido como overlay.
+export function PrivacidadContent() {
   return (
-    <LegalPage title={TITLE} updated="25 de julio de 2026">
+    <>
       <div>
         <h2>1. Responsable del tratamiento</h2>
         <p>
@@ -115,6 +118,14 @@ export default function PrivacidadPage() {
           aplicable. La fecha de la última actualización siempre aparece al inicio de este documento.
         </p>
       </div>
+    </>
+  )
+}
+
+export default function PrivacidadPage() {
+  return (
+    <LegalPage title={PRIVACIDAD_TITLE} updated={PRIVACIDAD_UPDATED}>
+      <PrivacidadContent />
     </LegalPage>
   )
 }

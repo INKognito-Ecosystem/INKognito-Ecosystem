@@ -6,6 +6,7 @@ import BrandsMarquee from './BrandsMarquee'
 import SupplyProductCard from './SupplyProductCard'
 import CartDrawerSupply from './CartDrawerSupply'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
+import LegalModal from '../legal/LegalModal'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { useLoadMore, fetchCatalogPage } from '../../hooks/useCatalog'
 import logoSupply from '../../assets/milogo/supply.webp'
@@ -23,6 +24,9 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
   const { count } = useSupplyCart()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  // legalOpen (2026-09-15, Jose: "el modal abre directo donde estoy...
+  // blanco... ocupa toda la pantalla" — mismo patrón que EcosystemNavbar.jsx).
+  const [legalOpen, setLegalOpen] = useState(null)
   const [busqueda, setBusqueda] = useState('')
   const [buscando, setBuscando] = useState(false)
   const [resultados, setResultados] = useState(null) // null = sin búsqueda activa
@@ -345,18 +349,21 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
               <Globe size={18} className="flex-shrink-0" />
               Ecosistema
             </Link>
-            <Link to="/terminos" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-800">
+            {/* Botones, no Links (2026-09-15) — abren el modal en vez de
+                navegar a /terminos //privacidad. */}
+            <button type="button" onClick={() => { setMenuOpen(false); setLegalOpen('terminos') }} className="flex items-center gap-3 w-full text-left px-6 py-4 text-[15px] font-medium text-zinc-800">
               <FileText size={18} className="flex-shrink-0" />
               Términos
-            </Link>
-            <Link to="/privacidad" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-800">
+            </button>
+            <button type="button" onClick={() => { setMenuOpen(false); setLegalOpen('privacidad') }} className="flex items-center gap-3 w-full text-left px-6 py-4 text-[15px] font-medium text-zinc-800">
               <Shield size={18} className="flex-shrink-0" />
               Privacidad
-            </Link>
+            </button>
           </div>
         </div>
       )}
 
+      <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
     </div>
   )
 }

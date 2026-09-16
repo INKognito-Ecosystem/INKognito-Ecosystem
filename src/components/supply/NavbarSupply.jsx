@@ -6,10 +6,14 @@ import CartDrawerSupply from './CartDrawerSupply'
 import logoSupply from '../../assets/milogo/supply.webp'
 import AnimatedWordmark from '../AnimatedWordmark'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
+import LegalModal from '../legal/LegalModal'
 
 export default function NavbarSupply() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  // legalOpen (2026-09-15, Jose: "el modal abre directo donde estoy...
+  // blanco... ocupa toda la pantalla" — mismo patrón que EcosystemNavbar.jsx).
+  const [legalOpen, setLegalOpen] = useState(null)
   const { count } = useSupplyCart()
 
   const scrollTo = (id) => {
@@ -148,14 +152,16 @@ export default function NavbarSupply() {
                   className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
                   <Globe size={16} className="flex-shrink-0" /> Ecosistema
                 </Link>
-                <Link to="/terminos" onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
+                {/* Botones, no Links (2026-09-15) — abren el modal en vez
+                    de navegar a /terminos //privacidad. */}
+                <button type="button" onClick={() => { setMenuOpen(false); setLegalOpen('terminos') }}
+                  className="flex items-center gap-3 w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
                   <FileText size={16} className="flex-shrink-0" /> Términos
-                </Link>
-                <Link to="/privacidad" onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
+                </button>
+                <button type="button" onClick={() => { setMenuOpen(false); setLegalOpen('privacidad') }}
+                  className="flex items-center gap-3 w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
                   <Shield size={16} className="flex-shrink-0" /> Privacidad
-                </Link>
+                </button>
               </div>
             )}
 
@@ -164,6 +170,7 @@ export default function NavbarSupply() {
       </nav>
 
       <CartDrawerSupply open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
     </>
   )
 }

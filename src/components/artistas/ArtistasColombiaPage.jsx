@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { Search, MapPin, Palette, BadgeCheck, ChevronRight, LoaderCircle, Share2, Sparkles, Check, Building2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
+import LegalModal from '../legal/LegalModal'
 import { municipioDesdeNombreIP, getCoordsMunicipio } from '../../data/colombiaGeo'
 import { useDirectorioBusqueda } from '../../hooks/useDirectorio'
 import { artistaUrl } from './artistaSlug'
@@ -627,6 +628,10 @@ export default function ArtistasColombiaPage() {
   // artista). ModalInfoArtista solo lee nombre/bio/estilo, así que un
   // estudio (sin estilo) encaja sin cambios en el modal.
   const [modalArtista, setModalArtista] = useState(null)
+  // legalOpen (2026-09-15, Jose: "lo mismo si le doy desde el copyright" —
+  // mismo modal blanco a pantalla completa que NavbarArtistas.jsx usa desde
+  // su propio menú, ver LegalModal.jsx).
+  const [legalOpen, setLegalOpen] = useState(null)
   // "Cerca de ti" ya resuelto (2026-08-11) — a diferencia de escribir un
   // texto, acá se muestra TODO lo cargado ordenado por distancia real, sin
   // filtrar por coincidencia de nombre de municipio (antes un artista en un
@@ -844,9 +849,13 @@ export default function ArtistasColombiaPage() {
                     después. Oscurece hacia la izquierda y se disuelve a
                     transparente hacia la derecha, mismo tono que el
                     gradiente de fondo del banner. */}
+                {/* Un poco menos oscuro (2026-09-15, Jose: "quítale un
+                    poquitico más de opacidad... para que el logo que está
+                    en medio se alcance a ver un poquitico más") — bajado de
+                    0.85/0.55 a 0.68/0.40. */}
                 <div
                   className="absolute inset-0"
-                  style={{ background: 'linear-gradient(to right, rgba(5,5,5,0.85) 0%, rgba(5,5,5,0.55) 30%, rgba(5,5,5,0) 65%)' }}
+                  style={{ background: 'linear-gradient(to right, rgba(5,5,5,0.68) 0%, rgba(5,5,5,0.40) 30%, rgba(5,5,5,0) 65%)' }}
                 />
                 {/* Arte de letras tipo tattoo, encima del logo del sombrero
                     Y del degradado (2026-09-15, Jose: "subí otra foto a
@@ -1150,14 +1159,17 @@ export default function ArtistasColombiaPage() {
         <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-400 text-[12px] gap-3">
           <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Colombia — Todos los derechos reservados.</p>
           <div className="flex items-center gap-4">
-            <Link to="/tattoo-artist-colombia/terminos" className="text-gray-400 hover:text-gray-700 transition-colors">Términos</Link>
-            <Link to="/tattoo-artist-colombia/privacidad" className="text-gray-400 hover:text-gray-700 transition-colors">Privacidad</Link>
+            {/* Botones, no Links (2026-09-15) — abren el modal en vez de
+                navegar a /tattoo-artist-colombia/terminos //privacidad. */}
+            <button type="button" onClick={() => setLegalOpen('terminos')} className="text-gray-400 hover:text-gray-700 transition-colors">Términos</button>
+            <button type="button" onClick={() => setLegalOpen('privacidad')} className="text-gray-400 hover:text-gray-700 transition-colors">Privacidad</button>
             <span className="text-gray-300">Desarrollado por INKognito</span>
           </div>
         </div>
       </footer>
 
       <ModalInfoArtista artista={modalArtista} onClose={() => setModalArtista(null)} />
+      <LegalModal type={legalOpen} variant="artistas" onClose={() => setLegalOpen(null)} />
     </div>
   )
 }

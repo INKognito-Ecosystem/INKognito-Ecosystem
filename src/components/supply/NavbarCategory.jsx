@@ -6,6 +6,7 @@ import CartDrawerSupply from './CartDrawerSupply'
 import logoSupply from '../../assets/milogo/supply.webp'
 import AnimatedWordmark from '../AnimatedWordmark'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
+import LegalModal from '../legal/LegalModal'
 
 // hideMenu (2026-09-13, Jose) — mismo criterio que NavbarCategoryStore.jsx:
 // el catálogo de un proveedor (EstudioSupplyPage.jsx) ya tiene su propio
@@ -46,6 +47,9 @@ import InkognitoModuleMenu from '../InkognitoModuleMenu'
 // tanto en móvil como en PC.
 export default function NavbarCategory({ pageName, hideMenu = false, hideMobileActions = false, light = false, hideWordmark = false, shareUrl = null, searchValue = null, onSearchChange = null, searchPlaceholder = 'Buscar' }) {
   const [menuOpen, setMenuOpen] = useState(false)
+  // legalOpen (2026-09-15, Jose: "el modal abre directo donde estoy...
+  // blanco... ocupa toda la pantalla" — mismo patrón que EcosystemNavbar.jsx).
+  const [legalOpen, setLegalOpen] = useState(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [shareMsg, setShareMsg] = useState(null)
   const { count } = useSupplyCart()
@@ -241,19 +245,22 @@ export default function NavbarCategory({ pageName, hideMenu = false, hideMobileA
               className={`flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
               <Globe size={16} className="flex-shrink-0" /> Ecosistema
             </Link>
-            <Link to="/terminos" onClick={() => setMenuOpen(false)}
-              className={`flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
+            {/* Botones, no Links (2026-09-15) — abren el modal en vez de
+                navegar a /terminos //privacidad. */}
+            <button type="button" onClick={() => { setMenuOpen(false); setLegalOpen('terminos') }}
+              className={`flex items-center gap-3 w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
               <FileText size={16} className="flex-shrink-0" /> Términos
-            </Link>
-            <Link to="/privacidad" onClick={() => setMenuOpen(false)}
-              className={`flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
+            </button>
+            <button type="button" onClick={() => { setMenuOpen(false); setLegalOpen('privacidad') }}
+              className={`flex items-center gap-3 w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
               <Shield size={16} className="flex-shrink-0" /> Privacidad
-            </Link>
+            </button>
           </div>
         )}
       </nav>
 
       <CartDrawerSupply open={drawerOpen} onClose={() => setDrawerOpen(false)} light={light} />
+      <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
     </>
   )
 }

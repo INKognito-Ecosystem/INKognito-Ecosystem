@@ -1,11 +1,12 @@
 import LegalPage from '../legal/LegalPage'
 
-const TITLE = 'Términos y Condiciones — Tattoo Artist Colombia'
+export const TERMINOS_ARTISTAS_TITLE = 'Términos y Condiciones — Tattoo Artist Colombia'
+export const TERMINOS_ARTISTAS_UPDATED = '6 de agosto de 2026'
 const DESCRIPTION = 'Términos y condiciones del directorio de artistas Tattoo Artist Colombia: propiedad de los diseños, pagos por Mercado Pago y responsabilidad del servicio.'
 
 export function meta() {
   return [
-    { title: `${TITLE} | INKognito` },
+    { title: `${TERMINOS_ARTISTAS_TITLE} | INKognito` },
     { name: 'description', content: DESCRIPTION },
     { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/tattoo-artist-colombia/terminos` },
   ]
@@ -26,9 +27,11 @@ export function meta() {
 // Split de Mercado Pago, pago directo al artista). Sí se adoptó el
 // principio de que el artista responde por su propio servicio y por lo
 // que sube, protegiendo a INKognito como intermediario tecnológico.
-export default function TerminosArtistasPage() {
+// Contenido separado del layout de ruta (2026-09-15) — ver mismo comentario
+// en TerminosPage.jsx; LegalModal.jsx reusa este contenido como overlay.
+export function TerminosArtistasContent() {
   return (
-    <LegalPage title={TITLE} updated="6 de agosto de 2026" theme="light">
+    <>
       <div>
         <h2>1. Objeto</h2>
         <p>
@@ -133,6 +136,14 @@ export default function TerminosArtistasPage() {
         <h2>11. Contacto</h2>
         <p>inkognitoecosystem@gmail.com</p>
       </div>
+    </>
+  )
+}
+
+export default function TerminosArtistasPage() {
+  return (
+    <LegalPage title={TERMINOS_ARTISTAS_TITLE} updated={TERMINOS_ARTISTAS_UPDATED} theme="light">
+      <TerminosArtistasContent />
     </LegalPage>
   )
 }

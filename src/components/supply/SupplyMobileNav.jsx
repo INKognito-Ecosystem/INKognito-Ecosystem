@@ -4,6 +4,7 @@ import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle,
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
+import LegalModal from '../legal/LegalModal'
 import logoSupply from '../../assets/milogo/supply.webp'
 
 // Tab bar + menú de pantalla completa para páginas de Supply DISTINTAS al
@@ -18,6 +19,9 @@ export default function SupplyMobileNav({ active = null, light = false }) {
   const { count } = useSupplyCart()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  // legalOpen (2026-09-15, Jose: "el modal abre directo donde estoy...
+  // blanco... ocupa toda la pantalla" — mismo patrón que EcosystemNavbar.jsx).
+  const [legalOpen, setLegalOpen] = useState(null)
 
   // Íconos negros por default (2026-09-15, Jose: "azul será cuando el
   // carrito tenga una notificación de algo agregado") — el azul queda
@@ -109,17 +113,21 @@ export default function SupplyMobileNav({ active = null, light = false }) {
               <Globe size={18} className="flex-shrink-0" />
               Ecosistema
             </Link>
-            <Link to="/terminos" onClick={() => setMenuOpen(false)} className={`flex items-center gap-3 px-6 py-4 text-[15px] font-medium ${menuItemText}`}>
+            {/* Botones, no Links (2026-09-15) — abren el modal en vez de
+                navegar a /terminos //privacidad. */}
+            <button type="button" onClick={() => { setMenuOpen(false); setLegalOpen('terminos') }} className={`flex items-center gap-3 w-full text-left px-6 py-4 text-[15px] font-medium ${menuItemText}`}>
               <FileText size={18} className="flex-shrink-0" />
               Términos
-            </Link>
-            <Link to="/privacidad" onClick={() => setMenuOpen(false)} className={`flex items-center gap-3 px-6 py-4 text-[15px] font-medium ${menuItemText}`}>
+            </button>
+            <button type="button" onClick={() => { setMenuOpen(false); setLegalOpen('privacidad') }} className={`flex items-center gap-3 w-full text-left px-6 py-4 text-[15px] font-medium ${menuItemText}`}>
               <Shield size={18} className="flex-shrink-0" />
               Privacidad
-            </Link>
+            </button>
           </div>
         </div>
       )}
+
+      <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
     </>
   )
 }

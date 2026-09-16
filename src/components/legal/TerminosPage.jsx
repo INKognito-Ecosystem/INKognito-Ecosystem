@@ -1,19 +1,26 @@
 import LegalPage from './LegalPage'
 
-const TITLE = 'Términos y Condiciones'
+export const TERMINOS_TITLE = 'Términos y Condiciones'
+export const TERMINOS_UPDATED = '25 de julio de 2026'
 const DESCRIPTION = 'Términos y condiciones de uso del sitio INKognito: catálogo de productos, precios, propiedad intelectual y responsabilidad.'
 
 export function meta() {
   return [
-    { title: `${TITLE} | INKognito` },
+    { title: `${TERMINOS_TITLE} | INKognito` },
     { name: 'description', content: DESCRIPTION },
     { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/terminos` },
   ]
 }
 
-export default function TerminosPage() {
+// Contenido separado del layout de ruta (2026-09-15, Jose: "cuando le doy a
+// políticas o privacidad... la idea es que sea como lo que ya solucionamos,
+// el modal abre directo donde estoy... blanco... ocupa toda la pantalla") —
+// LegalModal.jsx importa este mismo contenido para mostrarlo como overlay
+// en vez de navegar a esta ruta; la ruta /terminos sigue existiendo tal
+// cual para quien llega por link directo o buscador.
+export function TerminosContent() {
   return (
-    <LegalPage title={TITLE} updated="25 de julio de 2026">
+    <>
       <div>
         <h2>1. Objeto</h2>
         <p>
@@ -105,6 +112,14 @@ export default function TerminosPage() {
         <h2>10. Contacto</h2>
         <p>inkognitoecosystem@gmail.com</p>
       </div>
+    </>
+  )
+}
+
+export default function TerminosPage() {
+  return (
+    <LegalPage title={TERMINOS_TITLE} updated={TERMINOS_UPDATED}>
+      <TerminosContent />
     </LegalPage>
   )
 }

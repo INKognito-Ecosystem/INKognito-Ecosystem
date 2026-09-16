@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Info, Store, Truck, UserCircle, FileText, Shield } from 'lucide-react'
 import inkognitoLogo from '../../assets/ecosystem/logo.png'
+import LegalModal from '../legal/LegalModal'
 
 // Menú hamburguesa reestructurado (2026-09-16, Jose) — antes era una lista
 // plana (About + Tattoo Studio con sus redes anidadas). Ahora es un centro
@@ -50,25 +51,32 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
   const [menuOpen,  setMenuOpen]  = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [scrolled,  setScrolled]  = useState(false)
+  // legalOpen (2026-09-15, Jose: "cuando le doy a políticas o privacidad...
+  // la idea es que sea como lo que ya solucionamos [el modal de Sobre
+  // INKognito] — el modal abre directo donde estoy... blanco... ocupa toda
+  // la pantalla") — mismo patrón que aboutOpen: no navega, abre encima del
+  // menú sin cerrarlo. null | 'terminos' | 'privacidad'.
+  const [legalOpen, setLegalOpen] = useState(null)
 
   useEffect(() => {
-    document.body.style.overflow = (menuOpen || aboutOpen) ? 'hidden' : ''
+    document.body.style.overflow = (menuOpen || aboutOpen || legalOpen) ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
-  }, [menuOpen, aboutOpen])
+  }, [menuOpen, aboutOpen, legalOpen])
 
   // Accesibilidad por teclado (2026-09-16, Jose: "manejo de estado y
   // accesibilidad mediante teclado") — Escape cierra lo que esté abierto,
-  // el modal "Sobre INKognito" primero si ambos están abiertos a la vez.
+  // el modal "Sobre INKognito"/legal primero si ambos están abiertos a la vez.
   useEffect(() => {
-    if (!menuOpen && !aboutOpen) return
+    if (!menuOpen && !aboutOpen && !legalOpen) return
     const onKeyDown = (e) => {
       if (e.key !== 'Escape') return
-      if (aboutOpen) setAboutOpen(false)
+      if (legalOpen) setLegalOpen(null)
+      else if (aboutOpen) setAboutOpen(false)
       else setMenuOpen(false)
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [menuOpen, aboutOpen])
+  }, [menuOpen, aboutOpen, legalOpen])
 
   useEffect(() => {
     if (!showTagline) return
@@ -256,8 +264,11 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
 
           {/* Redes sociales quitado (2026-09-16, Jose) */}
           <MenuSectionLabel>Comunidad & legal</MenuSectionLabel>
-          <MenuLink icon={FileText} label="Términos y condiciones" to="/terminos" onClick={() => setMenuOpen(false)} />
-            <MenuLink icon={Shield} label="Política de privacidad" to="/privacidad" onClick={() => setMenuOpen(false)} />
+          {/* Sin `to` (2026-09-15) — abre el modal en vez de navegar a
+              /terminos //privacidad; MenuLink ya soporta modo botón cuando
+              no se le pasa `to`/`href`. */}
+          <MenuLink icon={FileText} label="Términos y condiciones" onClick={() => setLegalOpen('terminos')} />
+            <MenuLink icon={Shield} label="Política de privacidad" onClick={() => setLegalOpen('privacidad')} />
           </nav>
 
           <div className="mt-auto border-t border-zinc-200 pt-6 pb-6">
@@ -330,6 +341,8 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
           Una visión. Dejar marca.
         </p>
       </div>
+
+      <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
     </>
   )
 }

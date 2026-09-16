@@ -9,6 +9,7 @@ import inkognitoLogo from '../../assets/artistas-logo-mark.png'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import AnimatedCityWordmark from './AnimatedCityWordmark'
 import LogoLupaIntro from './LogoLupaIntro'
+import LegalModal from '../legal/LegalModal'
 
 // Navbar propio del módulo (2026-08-03) — antes usaba el EcosystemNavbar
 // genérico (pensado para landings sueltas de producto), pero al pasar a
@@ -58,15 +59,22 @@ function MenuDivider() {
   return <div className="border-t border-gray-100" />
 }
 
+// Modo botón cuando no hay `to` (2026-09-15) — usado por Términos/Privacidad
+// para abrir el modal legal en vez de navegar (ver LegalModal.jsx).
 function MenuLink({ to, icon: Icon, onClick, children }) {
-  return (
-    <Link
-      to={to}
-      onClick={onClick}
-      className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300"
-    >
+  const className = "flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300"
+  const content = (
+    <>
       {Icon && <Icon size={16} className="flex-shrink-0 text-gray-400" />}
       {children}
+    </>
+  )
+  if (!to) {
+    return <button type="button" onClick={onClick} className={`w-full text-left border-none bg-transparent cursor-pointer ${className}`}>{content}</button>
+  }
+  return (
+    <Link to={to} onClick={onClick} className={className}>
+      {content}
     </Link>
   )
 }
@@ -90,6 +98,9 @@ function MenuLink({ to, icon: Icon, onClick, children }) {
 export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, searchValue = null, onSearchChange = null, searchPlaceholder = 'Buscar', categoria = null, onCategoriaChange = null, ubicando = false, onUbicacion = null, cercaDeTiActivo = false, tooltipUbicacion = false, onCerrarTooltipUbicacion = null }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const close = () => setMenuOpen(false)
+  // legalOpen (2026-09-15, Jose: "el modal abre directo donde estoy...
+  // blanco... ocupa toda la pantalla" — mismo patrón que EcosystemNavbar.jsx).
+  const [legalOpen, setLegalOpen] = useState(null)
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-gray-600 border-b border-gray-700">
@@ -336,14 +347,19 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
           <MenuLink to="/" icon={Globe} onClick={close}>
             Ecosistema
           </MenuLink>
-          <MenuLink to="/tattoo-artist-colombia/terminos" icon={FileText} onClick={close}>
+          {/* Sin `to` (2026-09-15) — abre el modal (variant="artistas",
+              mismo contenido que /tattoo-artist-colombia/terminos y
+              /privacidad) en vez de navegar. */}
+          <MenuLink icon={FileText} onClick={() => setLegalOpen('terminos')}>
             Términos
           </MenuLink>
-          <MenuLink to="/tattoo-artist-colombia/privacidad" icon={Shield} onClick={close}>
+          <MenuLink icon={Shield} onClick={() => setLegalOpen('privacidad')}>
             Privacidad
           </MenuLink>
         </div>
       )}
+
+      <LegalModal type={legalOpen} variant="artistas" onClose={() => setLegalOpen(null)} />
     </nav>
   )
 }

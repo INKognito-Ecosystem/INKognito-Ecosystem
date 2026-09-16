@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import LegalModal from '../legal/LegalModal'
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
@@ -20,6 +22,9 @@ const DOT_PATTERN = {
 // ajuste 80px→64px en EstudioSupplyPage.jsx/SupplyPage.jsx/
 // SupplyCategoryPage.jsx (el tab bar real mide ~58px, no 80).
 export default function FooterSupply({ light = false }) {
+  // legalOpen (2026-09-15, Jose: "lo mismo si le doy desde el copyright" —
+  // mismo modal blanco a pantalla completa que los navbars de Supply).
+  const [legalOpen, setLegalOpen] = useState(null)
   const t = light ? {
     barBg: 'bg-white', pageBg: 'bg-white', border: 'border-zinc-200',
     text: 'text-zinc-900', textMuted: 'text-zinc-600', textMuted2: 'text-zinc-500',
@@ -33,7 +38,7 @@ export default function FooterSupply({ light = false }) {
   }
 
   return (
-
+    <>
     <footer id="contacto" className={`relative overflow-hidden border-t ${t.border}`}>
 
       {/* BARRA SUPERIOR — igual al navbar. Solo desktop (2026-09-15):
@@ -125,12 +130,14 @@ export default function FooterSupply({ light = false }) {
           </p>
 
           <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-[12px]">
-            <Link to="/terminos" className={`${t.textMuted2} ${t.hoverText} transition-colors`}>
+            {/* Botones, no Links (2026-09-15, Jose: "lo mismo si le doy
+                desde el copyright") — abren el modal en vez de navegar. */}
+            <button type="button" onClick={() => setLegalOpen('terminos')} className={`${t.textMuted2} ${t.hoverText} transition-colors`}>
               Términos
-            </Link>
-            <Link to="/privacidad" className={`${t.textMuted2} ${t.hoverText} transition-colors`}>
+            </button>
+            <button type="button" onClick={() => setLegalOpen('privacidad')} className={`${t.textMuted2} ${t.hoverText} transition-colors`}>
               Privacidad
-            </Link>
+            </button>
             <span className={t.textMuted2}>Desarrollado por INKognito</span>
           </div>
 
@@ -141,7 +148,8 @@ export default function FooterSupply({ light = false }) {
       </div>
 
     </footer>
-
+    <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
+    </>
   )
 
 }

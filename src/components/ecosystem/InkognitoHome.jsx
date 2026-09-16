@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import EcosystemNavbar from './EcosystemNavbar'
 import { Link } from 'react-router-dom'
+import LegalModal from '../legal/LegalModal'
 import ecosystemBg from '../../assets/ecosystem/ecosystem-bg.jpg'
 // Imagen nueva subida a Obsidian (2026-09-15, Jose: "esta imagen la usarás
 // para el fondo del home del ecosistema... solo para móvil de momento") —
@@ -24,6 +26,11 @@ export function meta() {
 }
 
 export default function InkognitoHome() {
+  // legalOpen (2026-09-15, Jose: "lo mismo si le doy desde el copyright" —
+  // mismo modal blanco a pantalla completa que EcosystemNavbar.jsx usa
+  // desde su propio menú, ver LegalModal.jsx) — estado propio, independiente
+  // del de EcosystemNavbar (el copyright vive fuera de ese componente).
+  const [legalOpen, setLegalOpen] = useState(null)
   return (
     <section className="relative h-dvh bg-black text-white flex flex-col items-center px-6 overflow-hidden">
 
@@ -160,15 +167,19 @@ export default function InkognitoHome() {
           © 2026 INKognito. Todos los derechos reservados.
         </p>
         <div className="flex justify-center items-center gap-6 mt-2 text-[12px]">
-          <Link to="/terminos" className="text-zinc-600 hover:text-white transition-colors">
+          {/* Botones, no Links (2026-09-15) — abren el modal en vez de
+              navegar a /terminos //privacidad, ver comentario de estado
+              arriba. */}
+          <button type="button" onClick={() => setLegalOpen('terminos')} className="text-zinc-600 hover:text-white transition-colors">
             Términos
-          </Link>
-          <Link to="/privacidad" className="text-zinc-600 hover:text-white transition-colors">
+          </button>
+          <button type="button" onClick={() => setLegalOpen('privacidad')} className="text-zinc-600 hover:text-white transition-colors">
             Privacidad
-          </Link>
+          </button>
         </div>
       </div>
 
+      <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
     </section>
   )
 }
