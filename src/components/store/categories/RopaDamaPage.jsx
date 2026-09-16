@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BookOpen, X } from 'lucide-react'
 import NavbarCategoryStore from '../NavbarCategoryStore'
 import FooterStore from '../FooterStore'
 import LlegamosDondeEstas from '../LlegamosDondeEstas'
@@ -8,7 +9,11 @@ import { FaWhatsapp } from 'react-icons/fa'
 import StoreProductCard from '../StoreProductCard'
 import { fetchCatalogCategoriaItems, toProdCard, useLoadMore } from '../../../hooks/useCatalog'
 import { getAdjacentCategories } from '../../../data/storeCategoriesOrder'
+import { categories } from '../../../data/storeCategories.jsx'
 import { useScrolled } from '../../../hooks/useScrolled'
+
+const TITLE = 'Ropa Deportiva Dama'
+const DESCRIPCION = 'Sets de compresión, leggings y tops para mujer activa. Diseños de marcas reconocidas, fabricados con telas técnicas que resisten el calor y el uso intenso. Despacho con Ruta del Golfo a toda la región de Urabá — pagas cuando recibes.'
 
 export async function loader() {
   return fetchCatalogCategoriaItems('store', 'Ropa Dama')
@@ -57,6 +62,7 @@ export default function RopaDamaPage() {
     useLoadMore('store', { categoria: 'Ropa Dama' }, { items: itemsIniciales, nextCursor, hasMore })
   const { prev, next } = getAdjacentCategories('ropa-dama')
   const scrolled = useScrolled()
+  const [introAbierto, setIntroAbierto] = useState(false)
 
   return (
     <>
@@ -85,7 +91,8 @@ export default function RopaDamaPage() {
       <div className="relative overflow-hidden bg-gray-50 pt-20 md:pt-24">
         <div className="absolute inset-0 opacity-[0.13]" style={STRIPE_PATTERN} />
         <div className="relative z-10 pb-4 px-6 max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
+          {/* Desktop — flechas prev/next + "Categoría", sin cambios */}
+          <div className="hidden md:flex items-center gap-3 mb-2">
             {prev && (
               <Link to={`/store/${prev.slug}`} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-gray-400 hover:text-gray-900 transition-colors">
                 <ArrowLeft size={20} />
@@ -98,15 +105,61 @@ export default function RopaDamaPage() {
               </Link>
             )}
           </div>
+
+          {/* Móvil — listón dorado de categorías + ícono de libro para la
+              descripción (2026-09-16, Jose: "la descripción encapsulada en
+              el icono del libro que ya usaste" — mismo patrón que
+              SupplyCategoryPage.jsx). */}
+          <div className="md:hidden -mx-6 px-6 py-3 mb-3" style={{ backgroundColor: '#C9A84C' }}>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {categories.map(cat => (
+                  <Link
+                    key={cat.id}
+                    to={cat.link}
+                    className={`flex-shrink-0 text-[12px] font-extrabold pb-1 border-b-2 whitespace-nowrap ${
+                      cat.link === '/store/ropa-dama' ? 'text-black border-black' : 'text-black/60 border-transparent'
+                    }`}
+                  >
+                    {cat.name}
+                  </Link>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => setIntroAbierto(true)}
+                aria-label={`Sobre ${TITLE.toLowerCase()}`}
+                className="flex-shrink-0 w-7 h-7 rounded-full border border-black/30 flex items-center justify-center text-black"
+              >
+                <BookOpen size={14} />
+              </button>
+            </div>
+          </div>
+
           <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none mb-2 text-gray-900 text-center md:text-left">
-            Ropa Deportiva Dama
+            {TITLE}
           </h1>
           <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4 text-center md:text-left">Gym • Running • Yoga • Ciclismo</p>
-          <p className="text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg text-justify [hyphens:auto]">
-            Sets de compresión, leggings y tops para mujer activa. Diseños de marcas reconocidas, fabricados con telas técnicas que resisten el calor y el uso intenso. Despacho con Ruta del Golfo a toda la región de Urabá — pagas cuando recibes.
+          {/* Desktop — descripción visible siempre; móvil va detrás del ícono de libro de arriba */}
+          <p className="hidden md:block text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg text-justify [hyphens:auto]">
+            {DESCRIPCION}
           </p>
         </div>
       </div>
+
+      {/* Sheet de descripción — afuera del Hero (que tiene overflow-hidden;
+          un fixed adentro queda recortado). */}
+      {introAbierto && (
+        <div className="md:hidden fixed inset-0 z-50 bg-black/70 flex items-end" onClick={() => setIntroAbierto(false)}>
+          <div className="w-full max-w-md bg-white border-t border-gray-200 rounded-t-2xl p-5" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-xs font-black uppercase tracking-widest text-gray-900">{TITLE}</h4>
+              <button onClick={() => setIntroAbierto(false)} className="text-gray-400"><X size={20} /></button>
+            </div>
+            <p className="text-gray-600 text-sm leading-relaxed">{DESCRIPCION}</p>
+          </div>
+        </div>
+      )}
 
       {/* PRODUCTS */}
       <div className="bg-gray-50 pt-4 pb-8 md:pb-14 px-6">

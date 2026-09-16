@@ -59,7 +59,12 @@ import { motion } from 'motion/react'
 // requieren medir el layout natural — así que ese se deja igual.
 let clientMounted = false
 
-export default function AnimatedWordmark({ moduleWord, accentClassName = 'text-white', className = '' }) {
+// inkClassName (2026-09-16, Jose: navbar de Store pasa a blanco) — "INK"
+// venía fijo en text-white, invisible sobre un navbar claro durante la
+// animación de entrada (los ~550ms antes de colapsar a solo el nombre del
+// módulo). Default text-white para no tocar los navbars oscuros que ya
+// usan este componente (Supply, Gym, etc.).
+export default function AnimatedWordmark({ moduleWord, accentClassName = 'text-white', inkClassName = 'text-white', className = '' }) {
   const storageKey = `inkognito-wordmark-seen-${moduleWord}`
 
   const alreadySeen = () => {
@@ -97,7 +102,7 @@ export default function AnimatedWordmark({ moduleWord, accentClassName = 'text-w
           transition={transition}
           style={{ display: 'inline-block', overflow: 'hidden', whiteSpace: 'nowrap' }}
         >
-          <span className="text-white">INK</span>
+          <span className={inkClassName}>INK</span>
           <span className={accentClassName}>OGNITO</span>
           {' '}
         </motion.span>

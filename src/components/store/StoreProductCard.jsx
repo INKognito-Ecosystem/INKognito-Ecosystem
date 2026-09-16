@@ -121,7 +121,12 @@ export default function StoreProductCard({ product, category, sizes, showEstudio
   const handleAdd = () => {
     const variantId = product._item?.variantes?.find(v => v.variant === selectedSize)?.id
       ?? product._item?.variantes?.[0]?.id ?? null
-    const resultado = addItem({ ...product, inventoryId: variantId }, category, selectedSize, {
+    // image (2026-09-16, Jose: "el carrito ahora trae la foto del
+    // producto, al nivel de Supply") — la foto real de la talla
+    // seleccionada, no product.image (que es solo la de la primera
+    // variante en orden alfabético y puede no ser la que el cliente
+    // eligió). Mismo criterio que SupplyProductCard.jsx.
+    const resultado = addItem({ ...product, inventoryId: variantId, image: imageSource?.image_url || product.image || '' }, category, selectedSize, {
       estudioId:     proveedorId,
       estudioNombre: proveedorNombre,
       mpConectado:   !!proveedorMp,
