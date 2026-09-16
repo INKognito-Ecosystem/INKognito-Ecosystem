@@ -11,7 +11,6 @@ import LlegamosDondeEstas from './LlegamosDondeEstas'
 import StoreProductCard from './StoreProductCard'
 import CoverflowRow from '../CoverflowRow'
 import { fetchCatalogCategoriaItems, toProdCard } from '../../hooks/useCatalog'
-import { CATEGORY_GROUPS } from '../../data/storeCategories'
 import { ZONAS_FLETE } from '../../data/colombiaGeo'
 import rutaDelGolfoLogo from '../../assets/milogo/rutadelgolfologo.png'
 const ogStore = '/og/store.webp'
@@ -19,22 +18,6 @@ const ogStore = '/og/store.webp'
 const STRIPE_PATTERN = {
   backgroundImage: 'repeating-linear-gradient(45deg,transparent,transparent 19px,rgba(201,168,76,1) 19px,rgba(201,168,76,1) 20px)',
 }
-
-// Estilo de las 2 card grandes de "Nuestras Categorías" — el "estilo Eljach"
-// que pidió Jose no es un patrón de fondo, es la card en sí (ver
-// EljachWeb/src/components/Packages.jsx): fondo claro con degradé sutil de
-// color hacia blanco, badge de ícono en cuadro con esquinas redondeadas y
-// fondo/borde tintado, borde delgado que se pinta de color al hover, y
-// glow de sombra coloreada (no negra) al levantar la card. Acá recoloreada
-// por card en vez del azul de Eljach: gris acero para Deportiva (paleta de
-// INKognito Gym, ver GymPage.jsx) y dorado (#C9A84C) para Casual
-// (2026-08-02, corrige el intento anterior con patrones geométricos de fondo).
-
-// La sección "Nuestras Categorías" del hub ya no lista las 6 categorías
-// reales una por una — ahora muestra las 2 agrupaciones (Deportiva/Casual,
-// ver storeCategories.jsx) y cada una lleva a su propia página con las
-// sub-categorías correspondientes (decisión de Jose, 2026-08-02).
-const categoryGroups = [CATEGORY_GROUPS.deportiva, CATEGORY_GROUPS.casual]
 
 const SHOE_SIZES = ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44']
 const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
@@ -205,18 +188,19 @@ export default function StorePage() {
             {/* DERECHA — solo desktop, mismo cuadro de Eljach que ya tiene
                 Supply en su hero (HeroSupply.jsx), recoloreado a dorado
                 (2026-08-02, pedido de Jose). */}
-            {/* Card temática de Ruta del Golfo — colores propios de su marca
-                oficial (2026-09-16, Jose: "la sección de ruta del golfo
-                debe adoptar los colores de su web oficial"), NO el dorado
-                de Store: azul `#0057D9`/navy `#0D1B3E` + coral `#F2854C`,
-                la misma paleta ya elegida para su logo (ver memoria
-                project_ruta_del_golfo.md). */}
+            {/* Card temática de Ruta del Golfo — fondo blanco + colores
+                propios de su marca oficial (2026-09-16, Jose: "que la
+                sección de ruta del golfo el fondo sea blanco y azules, que
+                son sus colores de empresa, y el naranja"): azul `#0057D9`
+                + naranja `#F2854C`, la misma paleta ya elegida para su
+                logo (ver memoria project_ruta_del_golfo.md) — ya NO el
+                fondo oscuro ni el dorado de Store. */}
             <div className="hidden md:flex justify-center">
-              <div className="bg-gray-950 border border-[#0057D9]/30 rounded-2xl p-8 hover:border-[#0057D9] hover:shadow-[0_0_25px_rgba(0,87,217,0.15)] transition-all duration-300 w-full max-w-md">
-                <p className="text-zinc-500 uppercase tracking-[0.3em] text-xs mb-4">
+              <div className="bg-white border border-[#0057D9]/25 rounded-2xl p-8 hover:border-[#0057D9] hover:shadow-[0_0_25px_rgba(0,87,217,0.12)] transition-all duration-300 w-full max-w-md">
+                <p className="text-[#0057D9] uppercase tracking-[0.3em] text-xs mb-4 font-semibold">
                   Logística · Cobertura
                 </p>
-                <div className="flex items-center gap-3 mb-6 bg-white rounded-xl px-4 py-3">
+                <div className="flex items-center gap-3 mb-6 bg-[#0057D9]/5 border border-[#0057D9]/15 rounded-xl px-4 py-3">
                   <img src={rutaDelGolfoLogo} alt="Ruta del Golfo" className="w-14 h-14 flex-shrink-0" />
                   <div>
                     <p className="text-gray-900 text-sm font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
@@ -225,11 +209,11 @@ export default function StorePage() {
                 </div>
                 <div className="flex flex-wrap gap-1.5 mb-6">
                   {Object.values(ZONAS_FLETE).map((z) => (
-                    <span key={z} className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#F2854C]/30 text-[#F2854C] bg-[#F2854C]/5">{z}</span>
+                    <span key={z} className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#F2854C]/40 text-[#F2854C] bg-[#F2854C]/10">{z}</span>
                   ))}
                 </div>
-                <div className="border-t border-zinc-800 pt-6">
-                  <p className="text-zinc-400 text-sm leading-relaxed">
+                <div className="border-t border-gray-200 pt-6">
+                  <p className="text-gray-600 text-sm leading-relaxed">
                     Contraentrega en toda la región de Urabá. ¿Fuera de la región? También enviamos a
                     todo Colombia — tiempo y costo se coordinan al confirmar el pedido.
                   </p>
@@ -241,69 +225,6 @@ export default function StorePage() {
         </div>
       </section>
       </div>
-
-      {/* ── CATEGORÍAS ── */}
-      <motion.section {...REVEAL} id="categorias" className="bg-gray-50 pt-3 md:pt-6 pb-8 md:pb-12 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-4 md:mb-8">
-            <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs mb-2">
-              Catálogo
-            </p>
-            <h2 className="text-2xl md:text-4xl font-black uppercase leading-none text-gray-900">
-              Nuestras Categorías
-            </h2>
-          </div>
-
-          {/* Mismo espíritu "sólido" que las card de Educación en Supply
-              (SupplyPage.jsx) pero no idéntico: fondo más claro que
-              zinc-900/black (gris acero medio para Deportiva, bronce oscuro
-              con más presencia dorada para Casual) y el círculo decorativo
-              en otra esquina/tamaño para que no se lean como copia-pega
-              (2026-08-02, ajuste sobre el primer intento). */}
-          <div className="flex md:grid md:grid-cols-2 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
-            {categoryGroups.map((group) => {
-              const isGym = group.key === 'deportiva'
-              return (
-                <Link
-                  key={group.link}
-                  to={group.link}
-                  className={`group relative overflow-hidden snap-start flex-shrink-0 w-[80vw] md:w-auto rounded-2xl border bg-gradient-to-br p-6 md:p-7 flex flex-col transition-all duration-300 hover:-translate-y-1 min-h-[240px] md:min-h-[280px] ${
-                    isGym
-                      ? 'from-zinc-600 to-zinc-900 border-zinc-400/30 hover:border-zinc-300/50 hover:shadow-[0_12px_35px_rgba(161,161,170,0.2)]'
-                      : 'from-[#4a350f] to-black border-[#C9A84C]/40 hover:border-[#C9A84C]/70 hover:shadow-[0_12px_35px_rgba(201,168,76,0.3)]'
-                  }`}
-                >
-                  <div className={isGym
-                    ? 'absolute -top-12 -right-12 w-40 h-40 rounded-full bg-white/10'
-                    : 'absolute -bottom-14 -right-14 w-44 h-44 rounded-full bg-[#C9A84C]/15'
-                  } />
-                  <div className={`relative w-12 h-12 rounded-full border flex items-center justify-center mb-4 group-hover:scale-110 transition-transform ${
-                    isGym ? 'bg-zinc-900/60 border-zinc-300/30 text-zinc-200' : 'bg-black/40 border-[#C9A84C]/50 text-[#C9A84C]'
-                  }`}>
-                    {group.icon}
-                  </div>
-                  <p className={`relative uppercase tracking-[0.25em] text-[10px] mb-2 font-semibold ${isGym ? 'text-zinc-300' : 'text-[#C9A84C]'}`}>
-                    {group.tag}
-                  </p>
-                  <h3 className="relative text-lg md:text-2xl font-black uppercase leading-tight mb-3 text-white">
-                    {group.name}
-                  </h3>
-                  <p className={`relative text-xs md:text-sm leading-relaxed mb-5 flex-1 text-justify [hyphens:auto] ${isGym ? 'text-zinc-200' : 'text-zinc-400'}`}>
-                    {group.description}
-                  </p>
-                  <span className={`relative shrink-0 border text-xs md:text-sm font-black uppercase tracking-[0.2em] py-3 px-6 rounded-xl text-center transition-all duration-300 ${
-                    isGym
-                      ? 'border-zinc-300/40 text-zinc-100 group-hover:border-zinc-100 group-hover:bg-white/10'
-                      : 'border-[#C9A84C]/50 text-[#C9A84C] group-hover:border-[#C9A84C] group-hover:bg-[#C9A84C]/15'
-                  }`}>
-                    Ver categorías →
-                  </span>
-                </Link>
-              )
-            })}
-          </div>
-        </div>
-      </motion.section>
 
       {/* ── DESTACADOS ── solo desktop (2026-09-16) — en móvil ya lo muestra
           MobileHomeStore, con la misma selección `featuredItems`, para no
@@ -344,18 +265,23 @@ export default function StorePage() {
         </div>
       </motion.section>
 
-      {/* ── LOGÍSTICA + GARANTÍAS + CONTACTO — solo desktop (dark, 3 col) ── */}
+      {/* ── LOGÍSTICA + GARANTÍAS + CONTACTO — solo desktop. Fondo blanco
+          (2026-09-16, Jose: "que la sección de ruta del golfo el fondo sea
+          blanco y azules... y el naranja, solo queda negro el listón de
+          las tecnologías usadas") — antes era una franja negra igual que
+          TechMarquee; ahora TechMarquee queda como la ÚNICA sección oscura
+          de la página. */}
       <div className="hidden md:block">
-        <motion.section {...REVEAL} className="bg-black text-white py-14 px-6">
+        <motion.section {...REVEAL} className="bg-white text-gray-900 border-t border-gray-200 py-14 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="grid lg:grid-cols-3 gap-12">
 
               {/* COL 1: LOGÍSTICA — colores propios de Ruta del Golfo, no
-                  el dorado de Store (2026-09-16, ver nota arriba en el hero). */}
+                  el dorado de Store (2026-09-16, ver nota en el hero). */}
               <div>
-                <p className="uppercase tracking-[0.25em] text-[#0057D9]/70 text-[10px] mb-4">Logística · Cobertura</p>
+                <p className="uppercase tracking-[0.25em] text-[#0057D9] text-[10px] mb-4 font-semibold">Logística · Cobertura</p>
 
-                <div className="flex items-center gap-3 mb-6 bg-white rounded-xl px-4 py-3">
+                <div className="flex items-center gap-3 mb-6 bg-[#0057D9]/5 border border-[#0057D9]/15 rounded-xl px-4 py-3">
                   <img src={rutaDelGolfoLogo} alt="Ruta del Golfo" className="w-14 h-14 flex-shrink-0" />
                   <div>
                     <p className="text-gray-900 text-sm font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
@@ -363,23 +289,23 @@ export default function StorePage() {
                   </div>
                 </div>
 
-                <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Llegamos donde estás</h2>
+                <h2 className="text-3xl font-black uppercase leading-none mb-6 text-gray-900">Llegamos donde estás</h2>
 
                 {/* Sin días por municipio a propósito — con varias
                     transportadoras pudiendo conectarse, el tiempo real varía
                     y en varios casos será más rápido que una ruta fija
                     (2026-08-30, Jose). */}
-                <p className="text-zinc-500 text-[10px] uppercase tracking-widest mb-2">Zonas de cobertura</p>
+                <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-2">Zonas de cobertura</p>
                 <div className="flex flex-wrap gap-1.5 mb-5">
                   {Object.values(ZONAS_FLETE).map((z) => (
-                    <span key={z} className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#F2854C]/30 text-[#F2854C] bg-[#F2854C]/5">{z}</span>
+                    <span key={z} className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#F2854C]/40 text-[#F2854C] bg-[#F2854C]/10">{z}</span>
                   ))}
                 </div>
 
                 {/* Resto de Colombia */}
-                <div className="border-t border-zinc-800 pt-4">
-                  <p className="text-zinc-500 text-[10px] uppercase tracking-widest mb-1.5">Resto de Colombia</p>
-                  <p className="text-zinc-600 text-xs leading-relaxed">
+                <div className="border-t border-gray-200 pt-4">
+                  <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1.5">Resto de Colombia</p>
+                  <p className="text-gray-600 text-xs leading-relaxed">
                     ¿Estás fuera de Urabá? Podemos enviarte tu pedido a cualquier parte del país.
                     Tiempo y costo de envío se coordinan al confirmar el pedido.
                   </p>
@@ -388,15 +314,15 @@ export default function StorePage() {
 
               {/* COL 2: GARANTÍAS */}
               <div>
-                <p className="uppercase tracking-[0.25em] text-[#C9A84C]/70 text-[10px] mb-4">Garantías</p>
-                <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Compra con Confianza</h2>
+                <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-[10px] mb-4 font-semibold">Garantías</p>
+                <h2 className="text-3xl font-black uppercase leading-none mb-6 text-gray-900">Compra con Confianza</h2>
                 <div className="flex flex-col gap-4">
                   {guarantees.map((g, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <span className="text-[#C9A84C] font-black text-base mt-0.5 flex-shrink-0">✓</span>
                       <div>
-                        <p className="text-white text-sm font-bold uppercase tracking-[0.06em]">{g.title}</p>
-                        <p className="text-zinc-500 text-xs mt-0.5 leading-relaxed">{g.desc}</p>
+                        <p className="text-gray-900 text-sm font-bold uppercase tracking-[0.06em]">{g.title}</p>
+                        <p className="text-gray-500 text-xs mt-0.5 leading-relaxed">{g.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -412,20 +338,20 @@ export default function StorePage() {
                   responde por su cuenta, mismo criterio que las
                   políticas de INK. */}
               <div>
-                <p className="uppercase tracking-[0.25em] text-[#C9A84C]/70 text-[10px] mb-4">Cómo Funciona</p>
-                <h2 className="text-3xl font-black uppercase leading-none mb-6 text-white">Tiendas Independientes</h2>
-                <p className="text-zinc-400 text-base leading-relaxed mb-7">
+                <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-[10px] mb-4 font-semibold">Cómo Funciona</p>
+                <h2 className="text-3xl font-black uppercase leading-none mb-6 text-gray-900">Tiendas Independientes</h2>
+                <p className="text-gray-600 text-base leading-relaxed mb-7">
                   INKognito Store reúne tiendas de ropa y calzado de Urabá — cada una gestiona sus propios pedidos.
                   Entra al perfil de la tienda que te interesa y escríbele directo por WhatsApp.
                 </p>
-                <p className="text-zinc-600 uppercase tracking-[0.2em] text-xs mb-6">
+                <p className="text-gray-500 uppercase tracking-[0.2em] text-xs mb-6">
                   {STORE_HOURS.weekdays.label} · {STORE_HOURS.weekdays.hours}
                 </p>
                 <div className="flex flex-col gap-3">
                   {['Réplicas premium de alta calidad','Cobertura en toda la región de Urabá','Contacto directo con cada tienda','Tiendas verificadas por INKognito','Pago contraentrega disponible'].map(item => (
                     <div key={item} className="flex items-center gap-3">
                       <span className="text-[#C9A84C] text-sm flex-shrink-0">✓</span>
-                      <span className="text-zinc-400 text-sm">{item}</span>
+                      <span className="text-gray-600 text-sm">{item}</span>
                     </div>
                   ))}
                 </div>

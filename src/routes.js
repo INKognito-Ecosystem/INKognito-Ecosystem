@@ -107,6 +107,10 @@ export default [
 
   // Store
   route('store', 'components/store/StorePage.jsx'),
+  // Página propia de categorías (2026-09-16, Jose: "esas cards van a pasar
+  // a estar dentro de una página, que estará enlazada a el botón
+  // categorías del navbar inferior") — mismo patrón que supply/categorias.
+  route('store/categorias', 'components/store/StoreCategoriasPage.jsx'),
   route('store/ropa-dama', 'components/store/categories/RopaDamaPage.jsx'),
   route('store/ropa-general', 'components/store/categories/RopaGeneralPage.jsx'),
   route('store/ropa-caballeros', 'components/store/categories/RopaCaballerosPage.jsx'),

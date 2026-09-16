@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import { Menu, ShoppingCart, X, LayoutGrid, Sparkles, Truck, Phone, Store, PlusCircle, Globe, FileText, Shield } from 'lucide-react'
+import { Menu, ShoppingCart, X, LayoutGrid, Sparkles, Truck, Phone, Store, PlusCircle, UserCircle, Globe, FileText, Shield } from 'lucide-react'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import CartDrawerStore from './CartDrawerStore'
 import logoStore from '../../assets/milogo/store.webp'
@@ -44,9 +44,12 @@ export default function NavbarStore() {
 
             {/* MENU DESKTOP */}
             <div className="hidden md:flex items-center gap-5">
-              <button onClick={() => scrollTo('categorias')} className="uppercase text-sm tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] transition-all duration-300">
+              {/* Link, no scrollTo (2026-09-16) — las 2 cards de categorías
+                  se movieron a su propia página (StoreCategoriasPage.jsx),
+                  ya no hay id="categorias" en esta page para hacer scroll. */}
+              <Link to="/store/categorias" className="uppercase text-sm tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] transition-all duration-300">
                 Categorías
-              </button>
+              </Link>
               <button onClick={() => scrollTo('destacados')} className="uppercase text-sm tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] transition-all duration-300">
                 Destacados
               </button>
@@ -96,10 +99,10 @@ export default function NavbarStore() {
             {menuOpen && (
               <div className="fixed left-0 right-0 top-16 md:top-20 bg-black border-t border-zinc-800 z-50 max-h-[calc(100vh-4rem)] overflow-y-auto">
                 <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-600">Explorar</p>
-                <button onClick={() => { scrollTo('categorias'); setMenuOpen(false) }}
-                  className="flex items-center gap-3 w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
+                <Link to="/store/categorias" onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
                   <LayoutGrid size={16} className="flex-shrink-0" /> Categorías
-                </button>
+                </Link>
                 <button onClick={() => { scrollTo('destacados'); setMenuOpen(false) }}
                   className="flex items-center gap-3 w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
                   <Sparkles size={16} className="flex-shrink-0" /> Destacados
@@ -122,6 +125,19 @@ export default function NavbarStore() {
                 <Link to="/tattoo-artist-colombia/tienda/unete" onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
                   <PlusCircle size={16} className="flex-shrink-0" /> Registrar mi tienda
+                </Link>
+
+                <div className="border-t border-zinc-900" />
+                {/* Mi cuenta/perfil (2026-09-16, Jose: "también en el
+                    hamburguesa debería estar el ítem cuenta/perfil, que
+                    conecta para los que tienen tienda, de allí pueda
+                    gestionar y editar su tienda") — una tienda Store ES un
+                    estudio con tipo='empresa' (ver CLAUDE.md), reusa el
+                    mismo /estudio/mi-perfil que ya usa INK para "Estudio". */}
+                <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-600">Mi cuenta/perfil</p>
+                <Link to="/tattoo-artist-colombia/estudio/mi-perfil" onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-[#C9A84C] hover:bg-zinc-900 transition-all duration-300">
+                  <UserCircle size={16} className="flex-shrink-0" /> Tienda
                 </Link>
 
                 <div className="border-t border-zinc-900" />

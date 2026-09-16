@@ -6,6 +6,10 @@ import { useStoreCart } from '../../contexts/StoreCartContext'
 
 const GOLD = '#C9A84C'
 
+// Carrito blanco (2026-09-16, Jose: "actualiza también el carrito") — todo
+// Store ya se rediseñó a blanco (navbar móvil, ribbon, cards de producto),
+// el drawer se había quedado como el único rincón oscuro (bg-zinc-950)
+// heredado del diseño original.
 export default function CartDrawerStore({ open, onClose }) {
   const { items, removeItem, changeQty, clearCart, total, count, vendorLock } = useStoreCart()
 
@@ -42,26 +46,25 @@ export default function CartDrawerStore({ open, onClose }) {
     <>
       {/* BACKDROP */}
       <div
-        className={`fixed inset-0 bg-black/70 z-[60] transition-opacity duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 bg-black/50 z-[60] transition-opacity duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         onClick={onClose}
       />
 
       {/* DRAWER */}
       <aside
-        className={`fixed top-0 right-0 h-full w-full max-w-sm bg-zinc-950 z-[70] flex flex-col transition-transform duration-300 ease-out ${open ? 'translate-x-0' : 'translate-x-full'}`}
-        style={{ borderLeft: `1px solid rgba(201,168,76,0.2)` }}
+        className={`fixed top-0 right-0 h-full w-full max-w-sm bg-white z-[70] flex flex-col transition-transform duration-300 ease-out ${open ? 'translate-x-0' : 'translate-x-full'}`}
+        style={{ borderLeft: '1px solid rgba(201,168,76,0.3)' }}
       >
 
         {/* HEADER */}
         <div
-          className="flex items-center justify-between px-6 py-5 flex-shrink-0"
-          style={{ borderBottom: '1px solid rgba(201,168,76,0.15)' }}
+          className="flex items-center justify-between px-6 py-5 flex-shrink-0 border-b border-gray-200"
         >
           <div>
             <p className="uppercase tracking-[0.25em] text-xs mb-0.5" style={{ color: GOLD }}>
               INKognito Store
             </p>
-            <h2 className="font-black uppercase tracking-[0.2em] text-lg text-white flex items-center gap-2">
+            <h2 className="font-black uppercase tracking-[0.2em] text-lg text-gray-900 flex items-center gap-2">
               Carrito
               {count > 0 && (
                 <span
@@ -75,7 +78,7 @@ export default function CartDrawerStore({ open, onClose }) {
           </div>
           <button
             onClick={onClose}
-            className="text-zinc-500 hover:text-white transition-colors duration-200 p-1"
+            className="text-gray-400 hover:text-gray-900 transition-colors duration-200 p-1"
           >
             <X size={22} />
           </button>
@@ -87,12 +90,11 @@ export default function CartDrawerStore({ open, onClose }) {
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center gap-4">
               <div
-                className="w-16 h-16 rounded-full flex items-center justify-center"
-                style={{ border: '1px solid rgba(201,168,76,0.2)' }}
+                className="w-16 h-16 rounded-full flex items-center justify-center border border-gray-200"
               >
-                <span className="text-2xl" style={{ color: 'rgba(201,168,76,0.4)' }}>∅</span>
+                <span className="text-2xl" style={{ color: 'rgba(201,168,76,0.5)' }}>∅</span>
               </div>
-              <p className="uppercase tracking-[0.2em] text-zinc-500 text-xs">
+              <p className="uppercase tracking-[0.2em] text-gray-400 text-xs">
                 Tu carrito está vacío
               </p>
             </div>
@@ -104,26 +106,25 @@ export default function CartDrawerStore({ open, onClose }) {
                 return (
                   <li
                     key={item.key}
-                    className="rounded-xl p-4 bg-zinc-900/40"
-                    style={{ border: '1px solid rgba(201,168,76,0.1)' }}
+                    className="rounded-xl p-4 bg-gray-50 border border-gray-200"
                   >
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex-1 min-w-0">
                         <p className="uppercase tracking-[0.2em] text-[10px] mb-0.5" style={{ color: GOLD }}>
                           {item.brand}{item.tag ? ` — ${item.tag}` : ''}
                         </p>
-                        <p className="font-black uppercase text-sm leading-tight text-white truncate">
+                        <p className="font-black uppercase text-sm leading-tight text-gray-900 truncate">
                           {item.name}
                         </p>
                         {item.size && (
-                          <p className="text-zinc-400 text-[10px] uppercase tracking-[0.15em] mt-0.5">
+                          <p className="text-gray-500 text-[10px] uppercase tracking-[0.15em] mt-0.5">
                             Talla: {item.size}
                           </p>
                         )}
                       </div>
                       <button
                         onClick={() => removeItem(item.key)}
-                        className="text-zinc-600 hover:text-red-500 transition-colors duration-200 flex-shrink-0 mt-0.5"
+                        className="text-gray-400 hover:text-red-500 transition-colors duration-200 flex-shrink-0 mt-0.5"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -131,19 +132,19 @@ export default function CartDrawerStore({ open, onClose }) {
 
                     <div className="flex items-center justify-between">
                       {/* CANTIDAD */}
-                      <div className="flex items-center border border-zinc-700 rounded overflow-hidden">
+                      <div className="flex items-center border border-gray-300 rounded overflow-hidden">
                         <button
                           onClick={() => changeQty(item.key, item.qty - 1)}
-                          className="px-3 py-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all duration-200"
+                          className="px-3 py-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200"
                         >
                           <Minus size={12} />
                         </button>
-                        <span className="px-3 py-1.5 text-sm font-bold text-white border-x border-zinc-700 min-w-[2rem] text-center">
+                        <span className="px-3 py-1.5 text-sm font-bold text-gray-900 border-x border-gray-300 min-w-[2rem] text-center">
                           {item.qty}
                         </span>
                         <button
                           onClick={() => changeQty(item.key, item.qty + 1)}
-                          className="px-3 py-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all duration-200"
+                          className="px-3 py-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200"
                         >
                           <Plus size={12} />
                         </button>
@@ -151,7 +152,7 @@ export default function CartDrawerStore({ open, onClose }) {
 
                       {/* SUBTOTAL */}
                       <div className="text-right">
-                        <p className="text-[10px] text-zinc-600 uppercase tracking-[0.1em]">
+                        <p className="text-[10px] text-gray-400 uppercase tracking-[0.1em]">
                           {item.price} c/u
                         </p>
                         <p className="font-black text-sm" style={{ color: GOLD }}>
@@ -170,12 +171,11 @@ export default function CartDrawerStore({ open, onClose }) {
         {/* FOOTER */}
         {items.length > 0 && (
           <div
-            className="px-6 py-5 flex-shrink-0 space-y-4"
-            style={{ borderTop: '1px solid rgba(201,168,76,0.15)' }}
+            className="px-6 py-5 flex-shrink-0 space-y-4 border-t border-gray-200"
           >
             {/* TOTAL */}
             <div className="flex items-center justify-between">
-              <p className="uppercase tracking-[0.25em] text-zinc-400 text-xs font-semibold">
+              <p className="uppercase tracking-[0.25em] text-gray-500 text-xs font-semibold">
                 Total estimado
               </p>
               <p className="font-black text-xl" style={{ color: GOLD }}>
@@ -205,13 +205,13 @@ export default function CartDrawerStore({ open, onClose }) {
                 href={buildWhatsAppMessage()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-3 w-full py-4 rounded-xl text-white uppercase tracking-[0.2em] text-xs font-bold transition-all duration-300 hover:shadow-[0_0_25px_rgba(201,168,76,0.25)]"
+                className="flex items-center justify-center gap-3 w-full py-4 rounded-xl text-gray-900 uppercase tracking-[0.2em] text-xs font-bold transition-all duration-300 hover:shadow-[0_0_25px_rgba(201,168,76,0.2)]"
                 style={{
-                  border: `1px solid rgba(201,168,76,0.4)`,
-                  backgroundColor: 'rgba(201,168,76,0.06)',
+                  border: `1px solid rgba(201,168,76,0.5)`,
+                  backgroundColor: 'rgba(201,168,76,0.08)',
                 }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = GOLD }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)' }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(201,168,76,0.5)' }}
               >
                 <FaWhatsapp size={18} />
                 Realizar Pedido por WhatsApp
@@ -221,7 +221,7 @@ export default function CartDrawerStore({ open, onClose }) {
             {/* LIMPIAR */}
             <button
               onClick={clearCart}
-              className="w-full text-center uppercase tracking-[0.2em] text-zinc-600 text-[10px] hover:text-red-500 transition-colors duration-200"
+              className="w-full text-center uppercase tracking-[0.2em] text-gray-400 text-[10px] hover:text-red-500 transition-colors duration-200"
             >
               Vaciar carrito
             </button>

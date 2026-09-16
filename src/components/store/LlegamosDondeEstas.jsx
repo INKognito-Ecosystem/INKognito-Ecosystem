@@ -14,38 +14,39 @@ const GARANTIAS = ['Pago contraentrega disponible', 'Contacto directo con cada t
 // versión vieja — con varias transportadoras pudiendo conectarse, el
 // tiempo real va a variar y en varios casos será más rápido que la ruta
 // fija de antes; prometer un rango fijo ya no es preciso (2026-08-30, Jose).
+// Fondo blanco + colores propios de Ruta del Golfo (2026-09-16, Jose: "que
+// la sección de ruta del golfo el fondo sea blanco y azules, que son sus
+// colores de empresa, y el naranja, solo queda negro el listón de las
+// tecnologías usadas") — antes era negra igual que TechMarquee; ahora
+// TechMarquee queda como la única sección oscura de Store en móvil.
 export default function LlegamosDondeEstas() {
   return (
-    <div className="md:hidden bg-black text-white border-t border-zinc-900 px-6 py-8">
-      <div className="flex items-center gap-3 mb-5 bg-white rounded-xl px-3 py-2.5">
+    <div className="md:hidden bg-white text-gray-900 border-t border-gray-200 px-6 py-8">
+      <div className="flex items-center gap-3 mb-5 bg-[#0057D9]/5 border border-[#0057D9]/15 rounded-xl px-3 py-2.5">
         <img src={rutaDelGolfoLogo} alt="Ruta del Golfo" className="w-14 h-14 flex-shrink-0" />
         <div>
           <p className="text-gray-900 text-xs font-bold uppercase tracking-wide leading-tight">Ruta del Golfo</p>
           <p className="text-gray-500 text-[10px] mt-0.5">Transportadoras verificadas</p>
         </div>
       </div>
-      <h2 className="text-2xl font-black uppercase leading-none mb-3 text-white">Llegamos donde estás</h2>
-      <p className="text-zinc-400 text-sm leading-relaxed mb-5">
+      <h2 className="text-2xl font-black uppercase leading-none mb-3 text-gray-900">Llegamos donde estás</h2>
+      <p className="text-gray-600 text-sm leading-relaxed mb-5">
         Entregas seguras con Ruta del Golfo, nuestra red de transportadoras verificadas en toda la región de Urabá.
       </p>
-      {/* Colores propios de Ruta del Golfo (2026-09-16, Jose: "la sección
-          de ruta del golfo debe adoptar los colores de su web oficial"),
-          no el dorado de Store — coral `#F2854C`, mismo acento ya elegido
-          para su logo (ver memoria project_ruta_del_golfo.md). */}
-      <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">Zonas de cobertura</p>
+      <p className="text-[#0057D9] text-[10px] uppercase tracking-widest mb-2 font-semibold">Zonas de cobertura</p>
       <div className="flex flex-wrap gap-1.5 mb-5">
         {Object.values(ZONAS_FLETE).map((z) => (
-          <span key={z} className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#F2854C]/30 text-[#F2854C] bg-[#F2854C]/5">{z}</span>
+          <span key={z} className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#F2854C]/40 text-[#F2854C] bg-[#F2854C]/10">{z}</span>
         ))}
       </div>
-      <p className="text-zinc-700 text-[9px] leading-relaxed mb-4">
+      <p className="text-gray-500 text-[9px] leading-relaxed mb-4">
         ¿Fuera de Urabá? También enviamos al resto de Colombia — tiempo y costo se coordinan al confirmar el pedido.
       </p>
       <div className="flex flex-col gap-2">
         {GARANTIAS.map((g) => (
           <div key={g} className="flex items-center gap-2">
             <span className="font-bold text-sm" style={{ color: '#F2854C' }}>✓</span>
-            <span className="text-zinc-400 text-xs">{g}</span>
+            <span className="text-gray-600 text-xs">{g}</span>
           </div>
         ))}
       </div>
