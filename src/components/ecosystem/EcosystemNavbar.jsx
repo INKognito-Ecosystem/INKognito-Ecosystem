@@ -90,10 +90,15 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
     <>
       {/* NAVBAR */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between pl-2 pr-6 py-4">
+        {/* Logo blanco siempre (2026-09-15, Jose: "que el logo sea blanco y
+            no negro") — mobileLight ya no lo toca; con la opacidad/overlay
+            de InkognitoHome.jsx restaurada, el blanco vuelve a leerse bien
+            sin necesidad de oscurecerlo. Solo la hamburguesa (abajo) sigue
+            reaccionando a mobileLight. */}
         <img
           src={inkognitoLogo}
           alt="INKognito"
-          className={`h-[52px] w-auto object-contain mr-8 ${mobileLight ? '[filter:brightness(0)] md:[filter:none]' : ''}`}
+          className="h-[52px] w-auto object-contain mr-8"
           style={logoFilter ? { filter: logoFilter } : {}}
         />
 
@@ -111,13 +116,15 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
             diferenciar del negro del fondo en esa zona") — la imagen nueva
             tiene líneas negras cruzando justo esa esquina; sin una base
             sólida detrás, las barras negras del ícono se pierden contra
-            ellas. Desktop se queda sin caja, transparente como siempre. */}
+            ellas. bg-white/85, no bg-white sólido (Jose: "déjalo con
+            opacidad como antes") — translúcida en vez de un bloque blanco
+            opaco. Desktop se queda sin caja, transparente como siempre. */}
         <button
           onClick={() => setMenuOpen(true)}
           aria-label="Abrir menú"
           aria-expanded={menuOpen}
           className={`flex flex-col gap-[5px] cursor-pointer border-none ${
-            mobileLight ? 'p-2.5 bg-white rounded-lg shadow-sm md:p-1 md:bg-transparent md:rounded-none md:shadow-none' : 'p-1 bg-transparent'
+            mobileLight ? 'p-2.5 bg-white/85 rounded-lg shadow-sm md:p-1 md:bg-transparent md:rounded-none md:shadow-none' : 'p-1 bg-transparent'
           }`}
         >
           <span className={`block w-6 h-[2px] rounded-sm ${mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90'}`} />
