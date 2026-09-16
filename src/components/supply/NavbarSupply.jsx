@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import { Menu, ShoppingCart, X } from 'lucide-react'
+import { Menu, ShoppingCart, X, Sparkles, LayoutGrid, Tag, Phone, Store, PlusCircle, GraduationCap, Globe, FileText, Shield } from 'lucide-react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import logoSupply from '../../assets/milogo/supply.webp'
@@ -79,33 +79,82 @@ export default function NavbarSupply() {
               </button>
             </div>
 
-            {/* DROPDOWN MÓVIL */}
+            {/* DROPDOWN MÓVIL — jerarquía por secciones (2026-09-15, Jose:
+                "armalo para los 4, tal como lo hicimos con el home del
+                ecosistema y con INK") — este era el más atrasado de los 4
+                menús de Supply: lista plana, sin íconos. "Registrar mi
+                Supply" y "Educación para el artista" se suman por primera
+                vez acá, mismos destinos que ya usa SupplyMobileNav.jsx en
+                móvil. Términos/Privacidad nuevos (Jose: "debería ir
+                políticas y privacidad... tal como en INK y en el home del
+                ecosistema") — Supply no tiene página legal propia, apuntan
+                a las mismas /terminos y /privacidad de siempre. */}
             {menuOpen && (
               <div className="fixed left-0 right-0 top-16 md:top-20 bg-black border-t border-zinc-800 z-50 max-h-[calc(100vh-4rem)] overflow-y-auto">
+                <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-600">Explorar</p>
                 <button onClick={() => { scrollTo('destacados'); setMenuOpen(false) }}
-                  className="block w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
-                  Destacados
+                  className="flex items-center gap-3 w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
+                  <Sparkles size={16} className="flex-shrink-0" /> Destacados
                 </button>
                 <button onClick={() => { scrollTo('categorias'); setMenuOpen(false) }}
-                  className="block w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
-                  Categorías
+                  className="flex items-center gap-3 w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
+                  <LayoutGrid size={16} className="flex-shrink-0" /> Categorías
                 </button>
                 <button onClick={() => { scrollTo('marcas'); setMenuOpen(false) }}
-                  className="block w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
-                  Marcas
+                  className="flex items-center gap-3 w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
+                  <Tag size={16} className="flex-shrink-0" /> Marcas
                 </button>
+                <button onClick={() => { scrollTo('contacto-desktop'); setMenuOpen(false) }}
+                  className="flex items-center gap-3 w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
+                  <Phone size={16} className="flex-shrink-0" /> Contacto
+                </button>
+
+                <div className="border-t border-zinc-900" />
+                <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-600">Proveedores</p>
                 <Link to="/supply/proveedores" onClick={() => setMenuOpen(false)}
-                  className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
-                  Tiendas verificadas
+                  className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
+                  <Store size={16} className="flex-shrink-0" /> Tiendas verificadas
                 </Link>
+                <Link to="/supply/proveedores/unete" onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
+                  <PlusCircle size={16} className="flex-shrink-0" /> Registrar mi Supply
+                </Link>
+
+                <div className="border-t border-zinc-900" />
+                <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-600">Aprende</p>
+                <Link to="/supply/aprende/cursos" onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
+                  <GraduationCap size={16} className="flex-shrink-0" /> Educación para el artista
+                </Link>
+
+                <div className="border-t border-zinc-900" />
+                {/* only=['store'] + extraLinks (2026-09-15, Jose: "el botón
+                    inkognito store se llamará Moda y estilo... quitaremos
+                    el de suple, lo reemplazaremos por el de INK, pero el
+                    buscador debe ir arriba y Moda y estilo abajo") —
+                    extraLinks pinta ANTES que la lista de `only`, así que
+                    INK queda primero. */}
                 <InkognitoModuleMenu
                   current="supply"
+                  only={['store']}
+                  extraLinks={[{ label: 'INK — encuentra tu tatuador', to: '/tattoo-artist-colombia' }]}
                   textClassName="text-zinc-400 hover:text-white hover:bg-zinc-900"
                   onNavigate={() => setMenuOpen(false)}
                 />
+
+                <div className="border-t border-zinc-900" />
+                <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-600">Ecosistema y legal</p>
                 <Link to="/" onClick={() => setMenuOpen(false)}
-                  className="block px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
-                  Ecosistema
+                  className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
+                  <Globe size={16} className="flex-shrink-0" /> Ecosistema
+                </Link>
+                <Link to="/terminos" onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
+                  <FileText size={16} className="flex-shrink-0" /> Términos
+                </Link>
+                <Link to="/privacidad" onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
+                  <Shield size={16} className="flex-shrink-0" /> Privacidad
                 </Link>
               </div>
             )}

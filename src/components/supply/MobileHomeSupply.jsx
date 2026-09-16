@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Bell, Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, GraduationCap, Globe } from 'lucide-react'
+import { Search, Bell, Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, GraduationCap, Globe, FileText, Shield } from 'lucide-react'
 import { categories } from './CategoriesSupply'
 import BrandsMarquee from './BrandsMarquee'
 import SupplyProductCard from './SupplyProductCard'
@@ -301,7 +301,17 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
             </div>
             <button onClick={() => setMenuOpen(false)} className="text-zinc-500 p-1"><X size={22} /></button>
           </div>
+          {/* Jerarquía por secciones (2026-09-15, Jose: "armalo para los 4
+              [navbars de Supply], tal como lo hicimos con el home del
+              ecosistema y con INK") — mismo criterio: eyebrow + divisores
+              agrupando por tema, en vez de la lista plana de siempre.
+              Términos/Privacidad se suman por primera vez acá (Jose: "debería
+              ir políticas y privacidad en esos botones tal como en INK y en
+              el home del ecosistema") — Supply no tiene su propia página
+              legal, así que apuntan a las mismas /terminos y /privacidad
+              que ya usa FooterSupply.jsx. */}
           <div className="flex-1 overflow-y-auto">
+            <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400">Proveedores</p>
             <Link to="/supply/proveedores" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-800">
               <Store size={18} className="flex-shrink-0" />
               Tiendas verificadas
@@ -310,6 +320,9 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
               <PlusCircle size={18} className="flex-shrink-0" />
               Registrar mi Supply
             </Link>
+
+            <div className="border-t border-zinc-100" />
+            <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400">Aprende</p>
             {/* Va a la page de Cursos, no a la sección de la home
                 (2026-09-15, Jose) — ahí ya se ve la franja con Kit y
                 Recursos al lado, mismo patrón que Categorías. */}
@@ -317,10 +330,28 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
               <GraduationCap size={18} className="flex-shrink-0" />
               Educación para el artista
             </Link>
-            <InkognitoModuleMenu current="supply" uppercase={false} textSize="text-[15px]" textClassName="text-zinc-800 font-medium" icon={LayoutGrid} onNavigate={() => setMenuOpen(false)} />
+
+            <div className="border-t border-zinc-100" />
+            {/* only=['store'] + extraLinks (2026-09-15, Jose: "el botón
+                inkognito store se llamará Moda y estilo... quitaremos el
+                de suple, lo reemplazaremos por el de INK, pero el buscador
+                debe ir arriba y Moda y estilo abajo") — extraLinks pinta
+                ANTES que la lista de `only`, así que INK queda primero. */}
+            <InkognitoModuleMenu current="supply" only={['store']} extraLinks={[{ label: 'INK — encuentra tu tatuador', to: '/tattoo-artist-colombia' }]} uppercase={false} textSize="text-[15px]" textClassName="text-zinc-800 font-medium" icon={LayoutGrid} onNavigate={() => setMenuOpen(false)} />
+
+            <div className="border-t border-zinc-100" />
+            <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400">Ecosistema y legal</p>
             <Link to="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-800">
               <Globe size={18} className="flex-shrink-0" />
               Ecosistema
+            </Link>
+            <Link to="/terminos" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-800">
+              <FileText size={18} className="flex-shrink-0" />
+              Términos
+            </Link>
+            <Link to="/privacidad" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-800">
+              <Shield size={18} className="flex-shrink-0" />
+              Privacidad
             </Link>
           </div>
         </div>

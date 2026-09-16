@@ -2,9 +2,13 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDown } from 'lucide-react'
 
+// "INKognito Store" → "Moda & estilo" (2026-09-15, Jose, en el contexto del
+// navbar de Supply) — mismo nombre que ya usa ese módulo en el selector del
+// home del ecosistema (InkognitoHome.jsx); se corrige acá también para no
+// tener dos nombres distintos para el mismo módulo.
 const MODULES = [
   { key: 'supply', label: 'INKognito Supply', path: '/supply' },
-  { key: 'store',  label: 'INKognito Store',  path: '/store' },
+  { key: 'store',  label: 'Moda & estilo',    path: '/store' },
   { key: 'suple',  label: 'INKognito Suple',  path: '/suplementos' },
 ]
 

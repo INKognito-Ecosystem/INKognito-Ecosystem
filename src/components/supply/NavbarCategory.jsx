@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import { ShoppingCart, Menu, X, Share2, Search } from 'lucide-react'
+import { ShoppingCart, Menu, X, Share2, Search, Home, LayoutGrid, Tag, Sparkles, Phone, Store, PlusCircle, GraduationCap, Globe, FileText, Shield } from 'lucide-react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import logoSupply from '../../assets/milogo/supply.webp'
@@ -65,10 +65,14 @@ export default function NavbarCategory({ pageName, hideMenu = false, hideMobileA
     navBg: 'bg-white/95', navBorder: 'border-zinc-200', shadow: '',
     pageName: 'text-zinc-500', icon: 'text-zinc-500 hover:text-zinc-900',
     menuBg: 'bg-white', menuBorder: 'border-zinc-200', menuText: 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100',
+    // Jerarquía por secciones (2026-09-15, Jose: "armalo para los 4, tal
+    // como lo hicimos con el home del ecosistema y con INK").
+    menuLabel: 'text-zinc-400', menuDivider: 'border-zinc-100',
   } : {
     navBg: 'bg-black/70', navBorder: 'border-blue-500/20', shadow: 'shadow-[0_6px_35px_rgba(59,130,246,0.25)]',
     pageName: 'text-zinc-400', icon: 'text-zinc-400 hover:text-white',
     menuBg: 'bg-black', menuBorder: 'border-zinc-800', menuText: 'text-zinc-400 hover:text-white hover:bg-zinc-900',
+    menuLabel: 'text-zinc-600', menuDivider: 'border-zinc-900',
   }
 
   const scrollTo = (id) => {
@@ -163,41 +167,87 @@ export default function NavbarCategory({ pageName, hideMenu = false, hideMobileA
           </div>
         )}
 
-        {/* MENÚ DESPLEGABLE */}
+        {/* MENÚ DESPLEGABLE — jerarquía por secciones (2026-09-15, Jose:
+            "armalo para los 4, tal como lo hicimos con el home del
+            ecosistema y con INK"): eyebrow + divisores agrupando por tema,
+            íconos nuevos en cada link (antes esta lista era plana y sin
+            íconos, la más atrasada de las 4). "Registrar mi Supply" y
+            "Educación para el artista" se suman acá por primera vez para
+            que el desktop tenga la misma información que ya existe en
+            SupplyMobileNav.jsx. Términos/Privacidad nuevos también (Jose:
+            "debería ir políticas y privacidad... tal como en INK y en el
+            home del ecosistema") — Supply no tiene página legal propia,
+            así que apuntan a las mismas /terminos y /privacidad de
+            siempre. */}
         {!hideMenu && menuOpen && (
           <div className={`fixed left-0 right-0 top-16 md:top-20 ${t.menuBg} border-t ${t.menuBorder} z-50 max-h-[calc(100vh-4rem)] overflow-y-auto`}>
+            <p className={`px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.2em] ${t.menuLabel}`}>Explorar</p>
             <Link to="/supply" onClick={() => setMenuOpen(false)}
-              className={`block px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
-              Inicio
-            </Link>
-            <Link to="/supply#categorias" onClick={() => setMenuOpen(false)}
-              className={`block px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
-              Categorías
-            </Link>
-            <Link to="/supply#marcas" onClick={() => setMenuOpen(false)}
-              className={`block px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
-              Marcas
-            </Link>
-            <Link to="/supply/proveedores" onClick={() => setMenuOpen(false)}
-              className={`block px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
-              Proveedores
+              className={`flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
+              <Home size={16} className="flex-shrink-0" /> Inicio
             </Link>
             <Link to="/supply#destacados" onClick={() => setMenuOpen(false)}
-              className={`block px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
-              Destacados
+              className={`flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
+              <Sparkles size={16} className="flex-shrink-0" /> Destacados
+            </Link>
+            <Link to="/supply#categorias" onClick={() => setMenuOpen(false)}
+              className={`flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
+              <LayoutGrid size={16} className="flex-shrink-0" /> Categorías
+            </Link>
+            <Link to="/supply#marcas" onClick={() => setMenuOpen(false)}
+              className={`flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
+              <Tag size={16} className="flex-shrink-0" /> Marcas
             </Link>
             <button onClick={() => { scrollTo('contacto'); setMenuOpen(false) }}
-              className={`block w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
-              Contacto
+              className={`flex items-center gap-3 w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
+              <Phone size={16} className="flex-shrink-0" /> Contacto
             </button>
+
+            <div className={`border-t ${t.menuDivider}`} />
+            <p className={`px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.2em] ${t.menuLabel}`}>Proveedores</p>
+            <Link to="/supply/proveedores" onClick={() => setMenuOpen(false)}
+              className={`flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
+              <Store size={16} className="flex-shrink-0" /> Tiendas verificadas
+            </Link>
+            <Link to="/supply/proveedores/unete" onClick={() => setMenuOpen(false)}
+              className={`flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
+              <PlusCircle size={16} className="flex-shrink-0" /> Registrar mi Supply
+            </Link>
+
+            <div className={`border-t ${t.menuDivider}`} />
+            <p className={`px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.2em] ${t.menuLabel}`}>Aprende</p>
+            <Link to="/supply/aprende/cursos" onClick={() => setMenuOpen(false)}
+              className={`flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
+              <GraduationCap size={16} className="flex-shrink-0" /> Educación para el artista
+            </Link>
+
+            <div className={`border-t ${t.menuDivider}`} />
+            {/* only=['store'] + extraLinks (2026-09-15, Jose: "el botón
+                inkognito store se llamará Moda y estilo... quitaremos el
+                de suple, lo reemplazaremos por el de INK, pero el buscador
+                debe ir arriba y Moda y estilo abajo") — extraLinks pinta
+                ANTES que la lista de `only`, así que INK queda primero. */}
             <InkognitoModuleMenu
               current="supply"
+              only={['store']}
+              extraLinks={[{ label: 'INK — encuentra tu tatuador', to: '/tattoo-artist-colombia' }]}
               textClassName={t.menuText}
               onNavigate={() => setMenuOpen(false)}
             />
+
+            <div className={`border-t ${t.menuDivider}`} />
+            <p className={`px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.2em] ${t.menuLabel}`}>Ecosistema y legal</p>
             <Link to="/" onClick={() => setMenuOpen(false)}
-              className={`block px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
-              Ecosistema
+              className={`flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
+              <Globe size={16} className="flex-shrink-0" /> Ecosistema
+            </Link>
+            <Link to="/terminos" onClick={() => setMenuOpen(false)}
+              className={`flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
+              <FileText size={16} className="flex-shrink-0" /> Términos
+            </Link>
+            <Link to="/privacidad" onClick={() => setMenuOpen(false)}
+              className={`flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] transition-all duration-300 ${t.menuText}`}>
+              <Shield size={16} className="flex-shrink-0" /> Privacidad
             </Link>
           </div>
         )}

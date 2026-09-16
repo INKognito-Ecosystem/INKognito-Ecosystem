@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import { Menu, X, Search, Palette, Building2, UserPlus, UserCircle, FileText, Shield, Navigation, LoaderCircle, Store } from 'lucide-react'
+import { Menu, X, Search, Palette, Building2, UserPlus, UserCircle, FileText, Shield, Navigation, LoaderCircle, Store, Globe } from 'lucide-react'
 // Recorte del logo genérico (assets/ecosystem/logo.png) sin el margen
 // transparente que trae de fábrica — ese margen hacía que se viera más
 // chico que los logos por módulo (supply.webp, etc.) aunque la caja
@@ -325,12 +325,17 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
             textClassName="text-gray-600 hover:text-gray-900 hover:bg-gray-50"
             onNavigate={close}
           />
-          {/* "Ecosistema" quitado (2026-08-06, Jose) — ni un cliente
-              buscando tatuador ni un artista editando su perfil necesitan
-              un atajo a Store/Gym; el módulo se mantiene enfocado solo en
-              lo relevante para su propia audiencia. */}
+          {/* "Ecosistema" de vuelta (2026-09-15, Jose: "la page INK no tiene
+              botón en el navbar que lleve de vuelta a los módulos, como sí
+              lo tiene Supply" — se había quitado el 2026-08-06 pensando que
+              ni cliente ni artista lo necesitaban; ahora se agrega para que
+              INK tenga el mismo atajo que ya tienen los 4 menús de Supply,
+              agrupado junto con legal como allá ("Ecosistema y legal"). */}
           <MenuDivider />
-          <MenuSectionLabel>Legal</MenuSectionLabel>
+          <MenuSectionLabel>Ecosistema y legal</MenuSectionLabel>
+          <MenuLink to="/" icon={Globe} onClick={close}>
+            Ecosistema
+          </MenuLink>
           <MenuLink to="/tattoo-artist-colombia/terminos" icon={FileText} onClick={close}>
             Términos
           </MenuLink>
