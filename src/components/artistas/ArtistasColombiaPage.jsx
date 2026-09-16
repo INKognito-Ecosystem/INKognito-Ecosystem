@@ -824,14 +824,16 @@ export default function ArtistasColombiaPage() {
                 <img
                   src={inkognitoLogo}
                   alt=""
-                  className="absolute left-0 top-0 h-full w-auto -translate-x-1/2 opacity-30 pointer-events-none"
+                  className="absolute left-0 top-0 h-full w-auto -translate-x-1/2 opacity-40 pointer-events-none"
                   style={{ filter: 'brightness(0) invert(1)' }}
                 />
-                {/* opacity-30 (bajado de 90) — con el arte de letras nuevo
-                    encima, el sombrero pasa a ser textura de fondo, no el
-                    elemento que compite por atención; sin bajarlo, las dos
-                    siluetas blancas se veían mezcladas/confusas en la misma
-                    zona angosta. */}
+                {/* opacity-40 (bajado de 90, subido de 30 — Jose: "quítale
+                    un poquito de opacidad para que el logo se vea un
+                    tantito más detrás de la imagen que está encima") — con
+                    el arte de letras nuevo encima, el sombrero pasa a ser
+                    textura de fondo, no el elemento que compite por
+                    atención, pero sigue debiendo notarse un poco más que
+                    antes. */}
                 {/* Degradado sobre el logo (2026-09-15, Jose: "para que dé
                     la sensación que el logo está más atrás que el texto")
                     — se pinta ENCIMA del sombrero pero DEBAJO del arte de
@@ -871,13 +873,18 @@ export default function ArtistasColombiaPage() {
                   className="absolute left-2 sm:left-3 top-0 h-full w-auto pointer-events-none"
                 />
                 <div className="relative z-10 pl-20 sm:pl-24">
-                  <h1 className="text-lg sm:text-3xl md:text-4xl font-black uppercase leading-tight">
+                  {/* Una sola línea (2026-09-15, Jose: "deja el texto
+                      encuentra tu tatuador en una sola fila") — bajé el
+                      tamaño de letra en cada breakpoint (antes envolvía a 2
+                      líneas incluso en desktop) y agregué whitespace-nowrap
+                      para forzarlo. */}
+                  <h1 className="text-sm sm:text-xl md:text-2xl font-black uppercase leading-tight whitespace-nowrap">
                     Encuentra tu{' '}
                     <span className="inline-block px-2 sm:px-3 py-0.5 rounded-lg text-white bg-gray-600">
                       tatuador
                     </span>
                   </h1>
-                  <p className="text-zinc-300 text-xs sm:text-base leading-relaxed mt-2 max-w-md">
+                  <p className="text-zinc-300 text-xs sm:text-base leading-relaxed mt-1.5 sm:mt-2 max-w-md">
                     Busca por municipio, nombre o estilo. Revisa portafolios reales y agenda tu cita en línea, sin intermediarios.
                   </p>
                   {/* Señales de confianza, ahora DENTRO del banner
@@ -886,8 +893,14 @@ export default function ArtistasColombiaPage() {
                       texto más pequeño para que el banner no sufra y
                       crezca") — reemplaza la fila que vivía debajo del
                       banner; texto más chico que el original (era
-                      text-xs md:text-sm) para no empujar la altura. */}
-                  <div className="flex items-center gap-3 mt-2.5 text-zinc-400 text-[9px] sm:text-[11px] font-bold uppercase tracking-wide">
+                      text-xs md:text-sm) para no empujar la altura.
+                      mt-3.5 (subido de mt-2.5, Jose: "reparte bien los
+                      espacios entre título, descripción y los dos puntos")
+                      — separa esta fila de cierre del párrafo de arriba más
+                      que lo que el párrafo se separa del título, para que
+                      se lea como 3 niveles distintos, no 2 bloques
+                      pegados. */}
+                  <div className="flex items-center gap-3 mt-3.5 sm:mt-4 text-zinc-400 text-[9px] sm:text-[11px] font-bold uppercase tracking-wide">
                     <span className="flex items-center gap-1">
                       <span className="w-1 h-1 rounded-full flex-shrink-0 bg-zinc-400" />
                       Artistas verificados

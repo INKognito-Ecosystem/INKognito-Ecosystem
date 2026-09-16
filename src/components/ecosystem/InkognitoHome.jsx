@@ -31,15 +31,19 @@ export default function InkognitoHome() {
           evitar que las dos mecánicas escriban <head> a la vez (rompía la
           hidratación, ver nota en HomePage.jsx). */}
 
-      {/* NAVBAR */}
-      <EcosystemNavbar />
+      {/* NAVBAR — mobileLight (2026-09-15, ver EcosystemNavbar.jsx) vuelve
+          el logo y la hamburguesa negros SOLO en móvil, donde el fondo de
+          abajo ahora es claro. */}
+      <EcosystemNavbar mobileLight />
 
       {/* FONDO — imagen distinta en móvil (2026-09-15, ver import arriba),
-          desktop se queda con el hoyo negro de siempre. */}
+          desktop se queda con el hoyo negro de siempre. Sin opacity-80 en
+          móvil (Jose: "quítale la opacidad a la imagen") — se ve a pantalla
+          completa tal cual es. */}
       <img
         src={ecosystemBgMobile}
         alt=""
-        className="md:hidden absolute inset-0 w-full h-full object-cover opacity-80"
+        className="md:hidden absolute inset-0 w-full h-full object-cover"
       />
       <img
         src={ecosystemBg}
@@ -47,8 +51,12 @@ export default function InkognitoHome() {
         className="hidden md:block absolute inset-0 w-full h-full object-cover opacity-80"
       />
 
-      {/* OVERLAY OSCURO */}
-      <div className="absolute inset-0 bg-black/60"></div>
+      {/* OVERLAY OSCURO — más liviano en móvil (2026-09-15), la imagen
+          nueva es predominantemente blanca ("pues quedará sobre un fondo
+          blanco", Jose) y no necesita tanto oscurecido como el hoyo negro
+          de desktop; se conserva un poco para que el texto blanco del
+          título/módulos siga siendo legible encima. */}
+      <div className="absolute inset-0 bg-black/45 md:bg-black/60"></div>
 
       {/* CONTENIDO — ocupa todo el espacio disponible entre navbar y copyright.
           Todo compactado (paddings/gaps/tamaños de letra reducidos) para que

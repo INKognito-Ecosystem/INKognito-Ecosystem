@@ -195,8 +195,14 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
               fila sin scroll (los 3 anteriores apenas calzaban). Mismo
               recurso que ya usa la franja de categorías de
               MobileHomeSupply.jsx (scrollbar oculta, flex-shrink-0 en cada
-              pill para que no se aplasten en vez de scrollear). */}
-          <div className="max-w-6xl mx-auto px-4 md:px-6 h-11 flex items-center justify-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              pill para que no se aplasten en vez de scrollear).
+              justify-start, NO justify-center (bug real, Jose: "el ícono
+              de artistas quedó cortado a la izquierda") — justify-center
+              en un contenedor con overflow reparte el desborde a AMBOS
+              lados y el de la izquierda queda inalcanzable (scrollLeft no
+              puede ir negativo), cortando el primer pill sin forma de
+              revelarlo con scroll. */}
+          <div className="max-w-6xl mx-auto px-4 md:px-6 h-11 flex items-center justify-start md:justify-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {[
               { key: 'artistas', label: 'Artistas', icon: Palette },
               { key: 'estudios', label: 'Estudios', icon: Building2 },

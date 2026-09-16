@@ -38,7 +38,15 @@ import inkognitoLogo from '../../assets/ecosystem/logo.png'
 // Studio") quedaron obsoletas con este cambio — el menú ahora es el mismo
 // en cualquier página que use este navbar (hoy: InkognitoHome.jsx y
 // ProductLandingPage.jsx).
-export default function EcosystemNavbar({ logoFilter = null, showTagline = false }) {
+// mobileLight (2026-09-15, Jose: "quítale la opacidad a la imagen del home
+// del ecosystem, y el logo conviértelo a negro, pues quedará sobre un
+// fondo blanco") — el fondo de InkognitoHome.jsx ahora es una imagen clara
+// en móvil (ver InkognitoHome.jsx); logo y barras de la hamburguesa son
+// blancos por default (pensados para el fondo oscuro de siempre), así que
+// necesitan volverse oscuros SOLO en móvil para seguir siendo visibles —
+// en desktop ese mismo navbar sigue sobre el fondo oscuro de siempre.
+// Default false para no afectar ProductLandingPage.jsx, que no lo pasa.
+export default function EcosystemNavbar({ logoFilter = null, showTagline = false, mobileLight = false }) {
   const [menuOpen,  setMenuOpen]  = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [scrolled,  setScrolled]  = useState(false)
@@ -85,7 +93,7 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
         <img
           src={inkognitoLogo}
           alt="INKognito"
-          className="h-[52px] w-auto object-contain mr-8"
+          className={`h-[52px] w-auto object-contain mr-8 ${mobileLight ? '[filter:brightness(0)] md:[filter:none]' : ''}`}
           style={logoFilter ? { filter: logoFilter } : {}}
         />
 
@@ -104,9 +112,9 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
           aria-expanded={menuOpen}
           className="flex flex-col gap-[5px] p-1 bg-transparent border-none cursor-pointer"
         >
-          <span className="block w-6 h-[2px] bg-white/90 rounded-sm" />
-          <span className="block w-6 h-[2px] bg-white/90 rounded-sm" />
-          <span className="block w-6 h-[2px] bg-white/90 rounded-sm" />
+          <span className={`block w-6 h-[2px] rounded-sm ${mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90'}`} />
+          <span className={`block w-6 h-[2px] rounded-sm ${mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90'}`} />
+          <span className={`block w-6 h-[2px] rounded-sm ${mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90'}`} />
         </button>
       </nav>
 
