@@ -28,10 +28,14 @@ export default function LlegamosDondeEstas() {
       <p className="text-zinc-400 text-sm leading-relaxed mb-5">
         Entregas seguras con Ruta del Golfo, nuestra red de transportadoras verificadas en toda la región de Urabá.
       </p>
+      {/* Colores propios de Ruta del Golfo (2026-09-16, Jose: "la sección
+          de ruta del golfo debe adoptar los colores de su web oficial"),
+          no el dorado de Store — coral `#F2854C`, mismo acento ya elegido
+          para su logo (ver memoria project_ruta_del_golfo.md). */}
       <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-2">Zonas de cobertura</p>
       <div className="flex flex-wrap gap-1.5 mb-5">
         {Object.values(ZONAS_FLETE).map((z) => (
-          <span key={z} className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{z}</span>
+          <span key={z} className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#F2854C]/30 text-[#F2854C] bg-[#F2854C]/5">{z}</span>
         ))}
       </div>
       <p className="text-zinc-700 text-[9px] leading-relaxed mb-4">
@@ -40,7 +44,7 @@ export default function LlegamosDondeEstas() {
       <div className="flex flex-col gap-2">
         {GARANTIAS.map((g) => (
           <div key={g} className="flex items-center gap-2">
-            <span className="font-bold text-sm" style={{ color: '#C9A84C' }}>✓</span>
+            <span className="font-bold text-sm" style={{ color: '#F2854C' }}>✓</span>
             <span className="text-zinc-400 text-xs">{g}</span>
           </div>
         ))}

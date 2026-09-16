@@ -4,6 +4,7 @@ import { STORE_HOURS } from '../../config/business'
 import { FaWhatsapp } from 'react-icons/fa'
 import { Truck, Shield, Clock, Star, Award } from 'lucide-react'
 import NavbarStore from './NavbarStore'
+import MobileHomeStore from './MobileHomeStore'
 import FooterStore from './FooterStore'
 import TechMarquee from '../TechMarquee'
 import LlegamosDondeEstas from './LlegamosDondeEstas'
@@ -124,6 +125,12 @@ export default function StorePage() {
   return (
     <main className="bg-white text-gray-900">
 
+      {/* Home móvil (MobileHomeStore, 2026-09-16, Jose: "usaremos la misma
+          lógica que aplicamos en Supply e INK") — reemplaza SOLO en móvil
+          al navbar+hero de abajo (envueltos en hidden md:block). */}
+      <MobileHomeStore initialProducts={featuredItems} />
+
+      <div className="hidden md:block">
       <NavbarStore />
 
       {/* ── HERO ── */}
@@ -198,8 +205,14 @@ export default function StorePage() {
             {/* DERECHA — solo desktop, mismo cuadro de Eljach que ya tiene
                 Supply en su hero (HeroSupply.jsx), recoloreado a dorado
                 (2026-08-02, pedido de Jose). */}
+            {/* Card temática de Ruta del Golfo — colores propios de su marca
+                oficial (2026-09-16, Jose: "la sección de ruta del golfo
+                debe adoptar los colores de su web oficial"), NO el dorado
+                de Store: azul `#0057D9`/navy `#0D1B3E` + coral `#F2854C`,
+                la misma paleta ya elegida para su logo (ver memoria
+                project_ruta_del_golfo.md). */}
             <div className="hidden md:flex justify-center">
-              <div className="bg-gray-950 border border-[#C9A84C]/30 rounded-2xl p-8 hover:border-[#C9A84C] hover:shadow-[0_0_25px_rgba(201,168,76,0.15)] transition-all duration-300 w-full max-w-md">
+              <div className="bg-gray-950 border border-[#0057D9]/30 rounded-2xl p-8 hover:border-[#0057D9] hover:shadow-[0_0_25px_rgba(0,87,217,0.15)] transition-all duration-300 w-full max-w-md">
                 <p className="text-zinc-500 uppercase tracking-[0.3em] text-xs mb-4">
                   Logística · Cobertura
                 </p>
@@ -212,7 +225,7 @@ export default function StorePage() {
                 </div>
                 <div className="flex flex-wrap gap-1.5 mb-6">
                   {Object.values(ZONAS_FLETE).map((z) => (
-                    <span key={z} className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{z}</span>
+                    <span key={z} className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#F2854C]/30 text-[#F2854C] bg-[#F2854C]/5">{z}</span>
                   ))}
                 </div>
                 <div className="border-t border-zinc-800 pt-6">
@@ -227,6 +240,7 @@ export default function StorePage() {
           </div>
         </div>
       </section>
+      </div>
 
       {/* ── CATEGORÍAS ── */}
       <motion.section {...REVEAL} id="categorias" className="bg-gray-50 pt-3 md:pt-6 pb-8 md:pb-12 px-6">
@@ -291,8 +305,10 @@ export default function StorePage() {
         </div>
       </motion.section>
 
-      {/* ── DESTACADOS ── */}
-      <motion.section {...REVEAL} id="destacados" className="bg-white pt-3 md:pt-6 pb-8 md:pb-12 px-6">
+      {/* ── DESTACADOS ── solo desktop (2026-09-16) — en móvil ya lo muestra
+          MobileHomeStore, con la misma selección `featuredItems`, para no
+          duplicar la sección. */}
+      <motion.section {...REVEAL} id="destacados" className="hidden md:block bg-white pt-3 md:pt-6 pb-8 md:pb-12 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="mb-4 md:mb-8">
             <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs mb-2">
@@ -334,9 +350,10 @@ export default function StorePage() {
           <div className="max-w-7xl mx-auto">
             <div className="grid lg:grid-cols-3 gap-12">
 
-              {/* COL 1: LOGÍSTICA */}
+              {/* COL 1: LOGÍSTICA — colores propios de Ruta del Golfo, no
+                  el dorado de Store (2026-09-16, ver nota arriba en el hero). */}
               <div>
-                <p className="uppercase tracking-[0.25em] text-[#C9A84C]/70 text-[10px] mb-4">Logística · Cobertura</p>
+                <p className="uppercase tracking-[0.25em] text-[#0057D9]/70 text-[10px] mb-4">Logística · Cobertura</p>
 
                 <div className="flex items-center gap-3 mb-6 bg-white rounded-xl px-4 py-3">
                   <img src={rutaDelGolfoLogo} alt="Ruta del Golfo" className="w-14 h-14 flex-shrink-0" />
@@ -355,7 +372,7 @@ export default function StorePage() {
                 <p className="text-zinc-500 text-[10px] uppercase tracking-widest mb-2">Zonas de cobertura</p>
                 <div className="flex flex-wrap gap-1.5 mb-5">
                   {Object.values(ZONAS_FLETE).map((z) => (
-                    <span key={z} className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#C9A84C]/30 text-[#C9A84C] bg-[#C9A84C]/5">{z}</span>
+                    <span key={z} className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#F2854C]/30 text-[#F2854C] bg-[#F2854C]/5">{z}</span>
                   ))}
                 </div>
 
@@ -444,6 +461,10 @@ export default function StorePage() {
       </motion.section>
 
       <FooterStore />
+
+      {/* Espacio para que la tab bar fija de MobileHomeStore no tape el
+          footer (2026-09-16, mismo ajuste ya hecho en SupplyPage.jsx). */}
+      <div className="h-16 md:hidden bg-white" />
 
     </main>
   )
