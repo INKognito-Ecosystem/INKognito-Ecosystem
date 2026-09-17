@@ -1064,7 +1064,15 @@ export default function ArtistasColombiaPage() {
             cerca de ti" (2026-09-17, Jose: "no resultados cerca de ti para
             los dos como está ahora") — en vez del genérico "resultados". */}
         {(hayBusqueda || cercaDeTiActivo) && (
-          <p className="text-gray-400 text-xs uppercase tracking-widest mb-4">
+          <p className={cercaDeTiActivo
+            ? 'text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4'
+            : 'text-gray-400 text-xs uppercase tracking-widest mb-4'
+          }>
+            {/* Misma tipografía que el encabezado del carrusel "Artistas
+                cerca de ti" (2026-09-17, Jose: "cambia esa tipografía, usa
+                la que tiene el carrusel") — font-black + text-[10px] en vez
+                del text-xs normal que sigue usando la variante de búsqueda
+                por texto. */}
             {cercaDeTiActivo ? (
               <>{conteoVisible}{hayMasVisible ? '+' : ''} {categoria === 'estudios' ? (conteoVisible !== 1 ? 'estudios' : 'estudio') : (conteoVisible !== 1 ? 'artistas' : 'artista')} cerca de ti</>
             ) : (
