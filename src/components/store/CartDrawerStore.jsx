@@ -34,14 +34,18 @@ export default function CartDrawerStore({ open, onClose }) {
     return () => { document.body.style.overflow = '' }
   }, [open])
 
-  // Stock real (2026-09-16, mismo patrón que CartDrawerSupply.jsx) — el
-  // carrito solo guarda precio/nombre al momento de agregar, no el stock
-  // (que puede cambiar después). Se consulta una vez por inventoryId único
-  // cada vez que el carrito se abre, reusando /api/product/:id (mismo
-  // endpoint genérico por id de inventario, sin importar el módulo).
+  // Stock real (2026-09-16, mismo patrón que CartDrawerSupply.jsx) — ya NO
+  // espera a que `open` sea true (Jose: "el quedan x producto sigue
+  // apareciendo luego" — items agregados ANTES de este fix, ya guardados en
+  // localStorage sin `.stock` propio, seguían mostrando el hueco hasta que
+  // el usuario abría el carrito y el fetch resolvía). Ahora dispara apenas
+  // el carrito (siempre montado, ver NavbarCategoryStore/StoreMobileNav)
+  // tiene items, sin importar si el drawer está visible — para cuando el
+  // usuario de verdad lo abre, la mayoría de las veces ya resolvió en
+  // segundo plano; el fallback a item.stock en el render de abajo sigue
+  // cubriendo la ventana corta mientras tanto.
   const [stockMap, setStockMap] = useState({})
   useEffect(() => {
-    if (!open) return
     const ids = [...new Set(items.map(i => i.inventoryId).filter(Boolean))]
     const faltantes = ids.filter(id => !(id in stockMap))
     if (faltantes.length === 0) return
@@ -61,7 +65,7 @@ export default function CartDrawerStore({ open, onClose }) {
       })
     })
     return () => { cancelado = true }
-  }, [open, items, stockMap])
+  }, [items, stockMap])
 
   const [shareMsg, setShareMsg] = useState(null)
   const handleShare = async () => {

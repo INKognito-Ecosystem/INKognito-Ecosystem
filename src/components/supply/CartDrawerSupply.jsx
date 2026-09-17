@@ -80,13 +80,17 @@ export default function CartDrawerSupply({ open, onClose, light = false }) {
   // Stock real (2026-09-15, Jose: "obviamente esto debe leer stock real
   // del producto, para no dejar pedir una cantidad que no hay en stock")
   // — el carrito solo guardaba el precio/nombre al momento de agregar, no
-  // el stock (que puede cambiar después). Se pide una vez por
-  // inventoryId único, cada vez que el carrito se abre — reusa
+  // el stock (que puede cambiar después). Ya NO espera a que `open` sea
+  // true (2026-09-16, Jose: "el quedan x producto sigue apareciendo
+  // luego" — items agregados antes de este ajuste, guardados en
+  // localStorage sin su propio `.stock`, seguían mostrando el hueco hasta
+  // que el usuario abría el carrito Y el fetch resolvía). Ahora dispara
+  // apenas el carrito (siempre montado, ver NavbarCategory/SupplyMobileNav)
+  // tiene items, sin importar si el drawer está visible — reusa
   // /api/product/:id, el mismo endpoint de la ficha de producto
   // (SupplyProductDetailPage.jsx), sin backend nuevo.
   const [stockMap, setStockMap] = useState({})
   useEffect(() => {
-    if (!open) return
     const ids = [...new Set(items.map(i => i.inventoryId).filter(Boolean))]
     const faltantes = ids.filter(id => !(id in stockMap))
     if (faltantes.length === 0) return
@@ -109,7 +113,7 @@ export default function CartDrawerSupply({ open, onClose, light = false }) {
       })
     })
     return () => { cancelado = true }
-  }, [open, items, stockMap])
+  }, [items, stockMap])
 
   // Compartir (2026-09-15, Jose: "en la zona derecha deberá ir el botón
   // de compartir") — mismo patrón (Web Share API con fallback a
