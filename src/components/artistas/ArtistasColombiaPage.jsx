@@ -1059,10 +1059,17 @@ export default function ArtistasColombiaPage() {
         {/* CONTADOR — con búsqueda de 2+ caracteres o "Cerca de ti" activo
             (2026-08-11, antes también con `mostrarTodos`, eliminado junto
             con la pestaña Todos). Totales acotados a lo que la categoría
-            activa realmente muestra. */}
+            activa realmente muestra. Con "Cerca de ti" el texto es
+            específico por pestaña — "artistas cerca de ti" / "estudios
+            cerca de ti" (2026-09-17, Jose: "no resultados cerca de ti para
+            los dos como está ahora") — en vez del genérico "resultados". */}
         {(hayBusqueda || cercaDeTiActivo) && (
           <p className="text-gray-400 text-xs uppercase tracking-widest mb-4">
-            {conteoVisible}{hayMasVisible ? '+' : ''} resultado{conteoVisible !== 1 ? 's' : ''}{cercaDeTiActivo ? ' cerca de ti' : <> para <span className="text-gray-600">"{query}"</span></>}
+            {cercaDeTiActivo ? (
+              <>{conteoVisible}{hayMasVisible ? '+' : ''} {categoria === 'estudios' ? (conteoVisible !== 1 ? 'estudios' : 'estudio') : (conteoVisible !== 1 ? 'artistas' : 'artista')} cerca de ti</>
+            ) : (
+              <>{conteoVisible}{hayMasVisible ? '+' : ''} resultado{conteoVisible !== 1 ? 's' : ''} para <span className="text-gray-600">"{query}"</span></>
+            )}
           </p>
         )}
 
@@ -1233,7 +1240,7 @@ export default function ArtistasColombiaPage() {
           <div className="mb-5">
             <p className="flex items-center gap-1.5 text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 px-1">
               <MapPin size={12} />
-              Cerca de ti
+              Artistas cerca de ti
             </p>
             <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {cercaSesion.items.map(a => {
