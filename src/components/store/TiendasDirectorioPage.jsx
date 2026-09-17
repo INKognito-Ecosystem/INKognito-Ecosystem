@@ -5,6 +5,7 @@ import NavbarCategoryStore from './NavbarCategoryStore'
 import StoreMobileNav from './StoreMobileNav'
 import FooterStore from './FooterStore'
 import { cloudinaryFill } from '../../lib/cloudinary'
+import logoStore from '../../assets/milogo/store.webp'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
@@ -54,9 +55,31 @@ export default function TiendasDirectorioPage() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
-      <NavbarCategoryStore pageName="Tiendas verificadas" hideMobileActions />
+      {/* Navbar fijo — solo escritorio. En móvil ya no es fixed (2026-09-16,
+          mismo criterio que las 8 páginas de categoría): lo reemplaza la
+          barra compacta de abajo, con el buscador viviendo en el navbar
+          superior en vez de flotando en el cuerpo de la página. */}
+      <div className="hidden md:block">
+        <NavbarCategoryStore pageName="Tiendas verificadas" hideMobileActions />
+      </div>
 
-      <div className="bg-gray-50 pt-20 md:pt-24 pb-4 px-4 md:px-6">
+      <div className="md:hidden sticky top-0 z-40 flex items-center gap-2 px-4 py-2 bg-white border-b border-zinc-200">
+        <Link to="/store" aria-label="Volver a Store" className="flex-shrink-0">
+          <img src={logoStore} alt="INKognito Store" className="w-12 h-12 object-contain" />
+        </Link>
+        <div className="relative flex-1 min-w-0">
+          <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
+          <input
+            type="text"
+            value={busqueda}
+            onChange={handleBusqueda}
+            placeholder="Buscar por nombre o ciudad"
+            className="w-full min-w-0 bg-zinc-100 border border-zinc-200 text-zinc-900 text-xs rounded-lg pl-8 pr-2 py-2 placeholder:text-zinc-500 focus:outline-none focus:border-[#C9A84C]"
+          />
+        </div>
+      </div>
+
+      <div className="bg-gray-50 pt-0 md:pt-24 pb-4 px-4 md:px-6">
         <div className="max-w-5xl mx-auto text-center">
           <p className="uppercase tracking-[0.25em] text-[#C9A84C] text-xs mb-2">INKognito Store</p>
           <h1 className="text-2xl md:text-4xl font-black uppercase leading-tight mb-3 text-gray-900">Tiendas verificadas</h1>
@@ -71,7 +94,9 @@ export default function TiendasDirectorioPage() {
           <p className="text-gray-400 text-sm text-center py-10">Todavía no hay tiendas registradas.</p>
         ) : (
           <>
-            <div className="relative max-w-sm mx-auto mt-4 mb-6">
+            {/* Buscador — solo escritorio (en móvil ya vive en la barra
+                superior compacta, mismo criterio que las categorías). */}
+            <div className="hidden md:block relative max-w-sm mx-auto mt-4 mb-6">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
               <input
                 type="text"
@@ -135,7 +160,7 @@ export default function TiendasDirectorioPage() {
             className="inline-block px-6 py-3 text-white font-bold uppercase tracking-[0.15em] text-xs rounded hover:brightness-90 transition"
             style={{ backgroundColor: '#C9A84C' }}
           >
-            Regístrala en INKognito Store
+            Registrar mi tienda
           </Link>
         </div>
       </div>

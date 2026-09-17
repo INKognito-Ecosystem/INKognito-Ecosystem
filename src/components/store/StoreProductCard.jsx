@@ -119,14 +119,21 @@ export default function StoreProductCard({ product, category, sizes, showEstudio
   const proveedorSlug   = selectedVariant?.estudio_slug ?? product._item?.estudio_slug ?? null
 
   const handleAdd = () => {
-    const variantId = product._item?.variantes?.find(v => v.variant === selectedSize)?.id
-      ?? product._item?.variantes?.[0]?.id ?? null
+    const varianteElegida = product._item?.variantes?.find(v => v.variant === selectedSize)
+      ?? product._item?.variantes?.[0] ?? null
+    const variantId = varianteElegida?.id ?? null
     // image (2026-09-16, Jose: "el carrito ahora trae la foto del
     // producto, al nivel de Supply") — la foto real de la talla
     // seleccionada, no product.image (que es solo la de la primera
     // variante en orden alfabético y puede no ser la que el cliente
     // eligió). Mismo criterio que SupplyProductCard.jsx.
-    const resultado = addItem({ ...product, inventoryId: variantId, image: imageSource?.image_url || product.image || '' }, category, selectedSize, {
+    // stock (2026-09-16, Jose: "en el carrito, el stock aparece un segundo
+    // después de abrir, debería cargar de una vez") — se guarda el stock ya
+    // conocido al momento de agregar, para que CartDrawerStore lo muestre
+    // de inmediato como primer valor en vez de nada; el fetch fresco al
+    // abrir el carrito lo sigue actualizando en segundo plano por si
+    // cambió desde entonces.
+    const resultado = addItem({ ...product, inventoryId: variantId, image: imageSource?.image_url || product.image || '', stock: varianteElegida?.stock ?? null }, category, selectedSize, {
       estudioId:     proveedorId,
       estudioNombre: proveedorNombre,
       mpConectado:   !!proveedorMp,

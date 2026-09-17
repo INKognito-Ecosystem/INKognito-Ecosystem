@@ -254,7 +254,13 @@ export default function CartDrawerSupply({ open, onClose, light = false }) {
                 const { base: nombreBase, variante: refVariante } = partirNombre(item.name)
                 // stockReal: undefined = todavía no se consultó, null = no
                 // se pudo verificar (producto de baja), número = stock real.
-                const stockReal = item.inventoryId ? stockMap[item.inventoryId] : undefined
+                // Mientras el fetch fresco de abajo no responde, cae al
+                // stock ya conocido desde que se agregó (item.stock) —
+                // sin esto la insignia "Quedan X" aparecía vacía y saltaba
+                // un segundo después de abrir el carrito (Jose, 2026-09-16).
+                const stockReal = item.inventoryId
+                  ? (item.inventoryId in stockMap ? stockMap[item.inventoryId] : (typeof item.stock === 'number' ? item.stock : undefined))
+                  : undefined
                 const sinStock = stockReal === 0
                 const noDisponible = stockReal === null
                 const atMax = typeof stockReal === 'number' && item.qty >= stockReal

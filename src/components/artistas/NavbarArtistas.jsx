@@ -64,12 +64,14 @@ function MenuDivider() {
 
 // Modo botón cuando no hay `to` (2026-09-15) — usado por Términos/Privacidad
 // para abrir el modal legal en vez de navegar (ver LegalModal.jsx).
-// Mayúscula + text-[15px] (2026-09-16, Jose: "los items del menú hamburguesa
-// de INK están en minúscula y son muy pequeños, ponlos en mayúscula, así
-// como están los de Supply y Store" — antes text-sm/minúscula, se quedaba
-// chico frente al resto del ecosistema).
+// text-[15px] (2026-09-16, Jose: "los items del menú hamburguesa de INK
+// están muy pequeños, ponlos como los de Supply/Store" — corregido a
+// text-sm→text-[15px], MISMA minúscula que Supply/Store usan en sus
+// propios items (SupplyMobileNav.jsx/StoreMobileNav.jsx: solo los
+// section labels van en mayúscula, no cada item — la mayúscula se había
+// aplicado por error también acá en un primer intento).
 function MenuLink({ to, icon: Icon, onClick, children }) {
-  const className = "flex items-center gap-3 px-6 py-4 text-[15px] font-bold uppercase tracking-wide text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300"
+  const className = "flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300"
   const content = (
     <>
       {Icon && <Icon size={16} className="flex-shrink-0 text-gray-400" />}

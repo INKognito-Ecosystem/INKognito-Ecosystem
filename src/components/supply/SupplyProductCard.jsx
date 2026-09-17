@@ -156,6 +156,10 @@ export default function SupplyProductCard({ item, categoria, showEstudioBadge = 
   const plataformaLabel = PLATAFORMA_LABEL[item.plataforma] || item.plataforma || 'Afiliado'
 
   const handleAdd = () => {
+    // stock (2026-09-16, Jose: "en el carrito, el stock aparece un segundo
+    // después de abrir, debería cargar de una vez") — se guarda el stock ya
+    // conocido al agregar, para que CartDrawerSupply lo muestre de inmediato
+    // en vez de esperar el fetch fresco que dispara al abrir el carrito.
     const resultado = addItem({
       id:          productId,
       inventoryId: sel.id ?? null,
@@ -163,6 +167,7 @@ export default function SupplyProductCard({ item, categoria, showEstudioBadge = 
       price:       resolvedPrice || '—',
       brand:       item.categoria || '',
       image:       activeImage || '',
+      stock:       sel.stock ?? null,
     }, categoria, {
       estudioId:      proveedorId,
       estudioNombre:  proveedorNombre,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Share2, Minus, Plus, Trash2, Check, Package, CalendarCheck } from 'lucide-react'
+import { ArrowLeft, Share2, Minus, Plus, Trash2, Check, Package } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 
@@ -18,7 +18,7 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-pro
 // solo se le da el mismo acabado visual.
 export default function CartDrawerStore({ open, onClose }) {
   const {
-    items, removeItem, changeQty, clearCart, count,
+    items, removeItem, changeQty, count,
     selectedKeys, toggleSelected, setAllSelected, allSelected, selectedCount, selectedTotal, total, vendorLock,
   } = useStoreCart()
 
@@ -183,7 +183,13 @@ export default function CartDrawerStore({ open, onClose }) {
                 const unitPrice = parseInt(String(item.price).replace(/[^0-9]/g, ''), 10) || 0
                 const subtotal = unitPrice * item.qty
                 const isSelected = selectedKeys.has(item.key)
-                const stockReal = item.inventoryId ? stockMap[item.inventoryId] : undefined
+                // Cae al stock ya conocido desde que se agregó (item.stock)
+                // mientras el fetch fresco de abajo no responde todavía —
+                // sin esto la insignia "Quedan X" aparecía vacía y luego
+                // saltaba un segundo después de abrir el carrito.
+                const stockReal = item.inventoryId
+                  ? (item.inventoryId in stockMap ? stockMap[item.inventoryId] : (typeof item.stock === 'number' ? item.stock : undefined))
+                  : undefined
                 const sinStock = stockReal === 0
                 const noDisponible = stockReal === null
                 const atMax = typeof stockReal === 'number' && item.qty >= stockReal
@@ -307,11 +313,10 @@ export default function CartDrawerStore({ open, onClose }) {
               <Link
                 to="/pedido/store"
                 onClick={onClose}
-                className="flex items-center justify-center gap-2 rounded-xl text-black font-semibold text-sm transition-colors duration-200 hover:brightness-90"
+                className="flex items-center justify-center rounded-xl text-black font-semibold text-sm transition-colors duration-200 hover:brightness-90"
                 style={{ backgroundColor: GOLD }}
               >
-                <CalendarCheck size={16} />
-                Agendar ({selectedCount > 0 ? selectedCount : count})
+                Continuar ({selectedCount > 0 ? selectedCount : count})
               </Link>
             </div>
 
@@ -331,13 +336,6 @@ export default function CartDrawerStore({ open, onClose }) {
                 Pedir por WhatsApp
               </a>
             )}
-
-            <button
-              onClick={clearCart}
-              className="w-full text-center text-zinc-400 text-[11px] hover:text-red-500 transition-colors duration-200"
-            >
-              Vaciar carrito
-            </button>
           </div>
         )}
 
