@@ -6,6 +6,25 @@ import StoreProductCard from './StoreProductCard'
 import StoreMobileNav from './StoreMobileNav'
 import { fetchCatalogPage, toProdCard } from '../../hooks/useCatalog'
 import logoStore from '../../assets/milogo/store.webp'
+import bannerRopaCalzado from '../../assets/store/banner-ropa-calzado-uraba.png'
+
+// Banners promocionales (2026-09-16) — Jose terminó pidiendo la pieza ya
+// armada completa (foto+titular+insignias+CTA, todo horneado en una sola
+// imagen) en vez de recomponerla en CSS ("esa ya está armada, solo es
+// ponerla") — mucho más simple y sin los ajustes de alineación/recorte que
+// tomaba re-armarla a mano. "El primero de varios banners que pienso
+// incluir, al igual que en supply" — por ahora es uno solo fijo (no hace
+// falta rotación/carrusel todavía); esta lista es el punto de extensión
+// para cuando llegue ese momento — agregar un banner nuevo será sumar un
+// objeto acá, no rediseñar el componente.
+const BANNERS = [
+  {
+    id: 'ropa-calzado-uraba',
+    image: bannerRopaCalzado,
+    alt: 'Ropa & Calzado para Urabá — 100% réplica premium, pago contraentrega, envío local rápido',
+    ctaTo: '/store/categorias',
+  },
+]
 
 const GOLD = '#C9A84C'
 const SHOE_SIZES = ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44']
@@ -115,40 +134,20 @@ export default function MobileHomeStore({ initialProducts = [] }) {
         ))}
       </div>
 
-      {/* BANNER — mismo copy del hero de escritorio (StorePage.jsx), formato
-          compacto sin botón CTA, mismo espíritu que el banner de
-          MobileHomeSupply.jsx pero en dorado. */}
-      <div
-        className="mx-2 mt-3 rounded-2xl border border-[#C9A84C]/30 px-4 py-6 relative overflow-hidden text-white"
-        style={{ background: 'linear-gradient(145deg,#1c1608,#050505)' }}
-      >
-        <div
-          className="absolute inset-0"
-          style={{ background: 'radial-gradient(circle at 88% 28%, rgba(201,168,76,.28), transparent 55%)' }}
-        />
-        <div className="relative z-10">
-          <p className="text-[#C9A84C] text-[9px] font-bold uppercase tracking-[0.3em] mb-2">
-            INKognito Store — Urabá, Antioquia
-          </p>
-          <h2 className="text-lg font-black uppercase leading-[0.95]">
-            Ropa & <span className="text-[#C9A84C]">Calzado</span> Para Urabá
-          </h2>
-          <p className="text-zinc-400 text-[10.5px] mt-2 max-w-[260px] leading-snug">
-            Tienda online de ropa y calzado, con proveedores verificados.
-          </p>
-          {/* Fila de checks en flujo normal, no absoluta (2026-09-16) — el
-              título de Store es más corto que el de Supply (de donde se
-              copió este banner), así que la posición fija `bottom-[26px]`
-              terminaba encima del subtítulo en vez de debajo. */}
-          <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
-            {['Réplica premium', 'Pago contraentrega', 'Entrega en Urabá'].map(g => (
-              <span key={g} className="flex items-center gap-0.5 text-[7.5px] font-bold text-zinc-300 whitespace-nowrap">
-                <span className="text-green-500">✓</span> {g}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* BANNER — Jose terminó subiendo la pieza ya armada completa (ver
+          nota junto a BANNERS más arriba), así que acá solo se coloca: sin
+          overlay de texto/insignias propio, todo eso ya viene horneado en
+          la imagen. Todo el banner es un solo link al catálogo, mismo
+          criterio que cualquier banner promocional clickeable. */}
+      {BANNERS.map(banner => (
+        <Link
+          key={banner.id}
+          to={banner.ctaTo}
+          className="block mx-2 mt-3 rounded-2xl overflow-hidden border border-[#C9A84C]/30"
+        >
+          <img src={banner.image} alt={banner.alt} className="w-full h-auto block" />
+        </Link>
+      ))}
 
       {/* GRID DE PRODUCTOS — misma selección "Destacados" que ya carga el
           loader de StorePage.jsx; se reemplaza por resultados de búsqueda
