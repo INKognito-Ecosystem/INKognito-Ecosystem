@@ -193,30 +193,32 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
         </div>
       </div>
 
-      {/* LISTÓN GRIS DE CATEGORÍAS — pegado debajo del navbar (2026-09-15,
-          Jose: "en el listón gris que tendrá abajo, estarán lo que haría
-          de categoría, los botones de buscador de artistas, estudios").
-          Mismo principio que la franja de categorías de MobileHomeSupply.jsx
-          (ahí azul, acá gris — paleta propia del módulo), pero fija (no
-          scrollea) porque acá solo hay 2 botones, no una fila de muchas
-          categorías que necesite overflow-x. Solo se monta cuando la page
-          pasa onCategoriaChange (hoy, solo ArtistasColombiaPage.jsx) — el
-          resto de pantallas del módulo no la necesitan. */}
+      {/* LISTÓN GLASSMORPHISM — pegado debajo del navbar (2026-09-16, Jose:
+          "dame las clases... para hacer que este listón sea suave y claro
+          [gris cálido o glassmorphism], manteniendo un alto nivel de
+          elegancia y contraste legible... que la transición visual entre
+          la cabecera y el cuerpo claro se sienta fluida y artística" —
+          revierte el zinc-900 casi negro de la iteración anterior). Recetas:
+          fondo `bg-stone-100/70` (gris CÁLIDO — Tailwind stone, no zinc/slate
+          que son fríos — al 70% de opacidad) + `backdrop-blur-md` (vidrio
+          esmerilado real: intensifica o suaviza lo que sea que haya scrolleado
+          detrás de este listón `fixed`) + `border-b border-stone-200/60`
+          (borde también translúcido, no una línea dura) + `shadow-[...]`
+          sutil hacia abajo en vez de un borde marcado — juntos hacen que el
+          listón se sienta como una capa de vidrio flotando entre el navbar
+          oscuro de arriba y el cuerpo claro de abajo, no un bloque de color
+          sólido cortando la transición. Texto: stone-500/800 en vez de
+          zinc-400/white — mismo criterio "cálido, no frío" que el fondo. */}
       {onCategoriaChange && (
-        <div className="fixed top-16 md:top-20 left-0 w-full z-40 bg-gray-200 border-b border-gray-300">
-          {/* overflow-x-auto (2026-09-15) — con el botón nuevo de Supply se
-              suman 4 pills; en celulares angostos ya no entran todos en una
-              fila sin scroll (los 3 anteriores apenas calzaban). Mismo
-              recurso que ya usa la franja de categorías de
-              MobileHomeSupply.jsx (scrollbar oculta, flex-shrink-0 en cada
-              pill para que no se aplasten en vez de scrollear).
-              justify-start, NO justify-center (bug real, Jose: "el ícono
-              de artistas quedó cortado a la izquierda") — justify-center
-              en un contenedor con overflow reparte el desborde a AMBOS
-              lados y el de la izquierda queda inalcanzable (scrollLeft no
-              puede ir negativo), cortando el primer pill sin forma de
-              revelarlo con scroll. */}
-          <div className="max-w-6xl mx-auto px-4 md:px-6 h-11 flex items-center justify-start md:justify-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="fixed top-16 md:top-20 left-0 w-full z-40 bg-stone-100/70 backdrop-blur-md border-b border-stone-200/60 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.15)]">
+          {/* overflow-x-auto — con el botón de Supply son 4 items; en
+              celulares angostos no entran todos en una fila sin scroll.
+              justify-start, NO justify-center (bug real ya corregido antes:
+              "el ícono de artistas quedó cortado a la izquierda") —
+              justify-center en un contenedor con overflow reparte el
+              desborde a AMBOS lados y el de la izquierda queda
+              inalcanzable. */}
+          <div className="max-w-6xl mx-auto px-4 md:px-6 h-11 flex items-center justify-start md:justify-center gap-5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {[
               { key: 'artistas', label: 'Artistas', icon: Palette },
               { key: 'estudios', label: 'Estudios', icon: Building2 },
@@ -224,8 +226,8 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
               <button
                 key={key}
                 onClick={() => onCategoriaChange(key)}
-                className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-1.5 rounded-full border text-[11px] font-bold uppercase tracking-wide transition-colors ${
-                  categoria === key ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-400 bg-white text-gray-600 hover:border-gray-600'
+                className={`flex-shrink-0 flex items-center gap-1.5 pb-1.5 border-b-2 text-[12px] font-bold uppercase tracking-wide transition-colors ${
+                  categoria === key ? 'border-stone-800 text-stone-900' : 'border-transparent text-stone-500 hover:text-stone-700'
                 }`}
               >
                 <Icon size={13} />
@@ -237,8 +239,8 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
                 <button
                   onClick={onUbicacion}
                   disabled={ubicando}
-                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full border text-[11px] font-bold uppercase tracking-wide transition-colors disabled:opacity-60 ${
-                    cercaDeTiActivo ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-400 bg-white text-gray-600 hover:border-gray-600'
+                  className={`flex items-center gap-1.5 pb-1.5 border-b-2 text-[12px] font-bold uppercase tracking-wide transition-colors disabled:opacity-60 ${
+                    cercaDeTiActivo ? 'border-stone-800 text-stone-900' : 'border-transparent text-stone-500 hover:text-stone-700'
                   }`}
                 >
                   {ubicando ? <LoaderCircle size={13} className="animate-spin" /> : <Navigation size={13} />}
@@ -274,7 +276,7 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
                 esta página, no cambia ningún estado local. */}
             <Link
               to="/supply"
-              className="flex-shrink-0 flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-gray-400 bg-white text-gray-600 hover:border-gray-600 text-[11px] font-bold uppercase tracking-wide transition-colors"
+              className="flex-shrink-0 flex items-center gap-1.5 pb-1.5 border-b-2 border-transparent text-[12px] font-bold uppercase tracking-wide text-stone-500 hover:text-stone-700 transition-colors"
             >
               <Store size={13} />
               Supply

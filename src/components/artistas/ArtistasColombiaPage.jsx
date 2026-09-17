@@ -820,9 +820,24 @@ export default function ArtistasColombiaPage() {
                 overflow, mismo criterio que ya se corrigió antes en esta
                 misma página — si viviera adentro, el recorte del banner se
                 lo comería. */}
-            <div className="relative max-w-2xl mx-auto">
+            {/* Ancho completo en móvil (2026-09-16, Jose: "estíralo hasta
+                que pegue con los bordes en móvil... hazlo ocupar el ancho
+                de la pantalla, no modifiques la altura vertical, solo
+                estíralo") — `-mx-4` cancela el px-4 de la <section> de
+                arriba, así el banner llega hasta el borde real de la
+                pantalla en vez de quedar centrado con aire a los lados.
+                Solo el ANCHO cambia — el padding vertical de adentro
+                (py-4/py-6) no se tocó. Todo lo que vive DENTRO del banner
+                (logo, degradado, arte de letras, texto) es relative/absolute
+                contra esta misma caja, así que se mueve solo junto con
+                ella — el sombrero recortado a la mitad ahora queda pegado
+                al borde real de la pantalla, no a uno artificial más
+                adentro (Jose: "que el logo parecerá que está detrás del
+                móvil"). sm: en adelante vuelve al ancho centrado de
+                siempre — sin cambios de tablet/desktop para acá. */}
+            <div className="relative -mx-4 sm:mx-auto sm:max-w-2xl">
               <div
-                className="relative overflow-hidden rounded-2xl border border-gray-700/30 px-4 py-4 sm:px-8 sm:py-6 text-left text-white"
+                className="relative overflow-hidden rounded-none sm:rounded-2xl border border-gray-700/30 px-4 py-4 sm:px-8 sm:py-6 text-left text-white"
                 style={{ background: 'linear-gradient(145deg,#1c1c1e,#050505)' }}
               >
                 <img src={bannerBg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-35 brightness-50" />
