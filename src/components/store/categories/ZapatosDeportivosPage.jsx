@@ -67,7 +67,7 @@ export default function ZapatosDeportivosPage() {
 
   return (
     <>
-      <NavbarCategoryStore pageName="Zapatos Deportivos" />
+      <NavbarCategoryStore pageName="Zapatos Deportivos" hideMobileActions />
 
       {scrolled && prev && (
         <Link

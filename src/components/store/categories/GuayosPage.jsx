@@ -67,7 +67,7 @@ export default function GuayosPage() {
 
   return (
     <>
-      <NavbarCategoryStore pageName="Guayos" />
+      <NavbarCategoryStore pageName="Guayos" hideMobileActions />
 
       {scrolled && prev && (
         <Link

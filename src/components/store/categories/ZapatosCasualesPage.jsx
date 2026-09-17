@@ -67,7 +67,7 @@ export default function ZapatosCasualesPage() {
 
   return (
     <>
-      <NavbarCategoryStore pageName="Zapatos Casuales" />
+      <NavbarCategoryStore pageName="Zapatos Casuales" hideMobileActions />
 
       {scrolled && prev && (
         <Link

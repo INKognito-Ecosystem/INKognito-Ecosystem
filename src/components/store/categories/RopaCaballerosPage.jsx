@@ -67,7 +67,7 @@ export default function RopaCaballerosPage() {
 
   return (
     <>
-      <NavbarCategoryStore pageName="Ropa Caballeros" />
+      <NavbarCategoryStore pageName="Ropa Caballeros" hideMobileActions />
 
       {scrolled && prev && (
         <Link

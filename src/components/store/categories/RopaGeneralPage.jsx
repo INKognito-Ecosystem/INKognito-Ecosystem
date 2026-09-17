@@ -67,7 +67,7 @@ export default function RopaGeneralPage() {
 
   return (
     <>
-      <NavbarCategoryStore pageName="Ropa Casual" />
+      <NavbarCategoryStore pageName="Ropa Casual" hideMobileActions />
 
       {scrolled && prev && (
         <Link

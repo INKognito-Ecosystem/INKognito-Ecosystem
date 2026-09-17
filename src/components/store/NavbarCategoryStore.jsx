@@ -24,7 +24,13 @@ import { irAMiTienda } from '../../lib/storeTienda'
 // tratamiento que ya recibió NavbarStore.jsx: este es el navbar compartido
 // por las 7 páginas de categoría, el directorio de tiendas y la ficha de
 // una tienda — un solo cambio acá cubre todas.
-export default function NavbarCategoryStore({ pageName, hideMenu = false }) {
+// hideMobileActions (2026-09-16, Jose: "el navbar superior de las
+// categorías y de la tienda siguen con el navbar viejo, recuerda que el
+// botón hamburguesa y el carrito ahora viven en el navbar inferior") —
+// mismo prop/criterio que ya resolvió esto en Supply (NavbarCategory.jsx):
+// default false para no romper ningún consumidor viejo, las páginas que
+// ya suman su propio StoreMobileNav lo pasan explícito.
+export default function NavbarCategoryStore({ pageName, hideMenu = false, hideMobileActions = false }) {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -58,8 +64,9 @@ export default function NavbarCategoryStore({ pageName, hideMenu = false }) {
               {pageName}
             </span>
 
-            {/* CARRITO + HAMBURGUESA */}
-            <div className="flex items-center gap-4">
+            {/* CARRITO + HAMBURGUESA — ocultos en móvil cuando la página ya
+                tiene su propio StoreMobileNav abajo (hideMobileActions). */}
+            <div className={`${hideMobileActions ? 'hidden md:flex' : 'flex'} items-center gap-4`}>
 
               {/* CARRITO CON BADGE DORADO */}
               <button

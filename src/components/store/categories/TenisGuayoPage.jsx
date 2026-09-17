@@ -67,7 +67,7 @@ export default function TenisGuayoPage() {
 
   return (
     <>
-      <NavbarCategoryStore pageName="Teniguayos" />
+      <NavbarCategoryStore pageName="Teniguayos" hideMobileActions />
 
       {scrolled && prev && (
         <Link

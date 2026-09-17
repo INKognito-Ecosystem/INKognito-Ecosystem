@@ -67,7 +67,7 @@ export default function RopaDamaPage() {
 
   return (
     <>
-      <NavbarCategoryStore pageName="Ropa Dama" />
+      <NavbarCategoryStore pageName="Ropa Dama" hideMobileActions />
 
       {scrolled && prev && (
         <Link

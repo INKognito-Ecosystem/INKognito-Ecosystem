@@ -4,6 +4,7 @@ import { CheckCircle2, MapPin, Menu, Bell } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import FooterStore from './FooterStore'
 import NavbarCategoryStore from './NavbarCategoryStore'
+import StoreMobileNav from './StoreMobileNav'
 import StoreProductCard from './StoreProductCard'
 import EstudioTiendaOwnerPanel from './EstudioTiendaOwnerPanel'
 import { fetchCatalogEstudio, toProdCard } from '../../hooks/useCatalog'
@@ -205,7 +206,7 @@ export default function EstudioTiendaPage() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
-      <NavbarCategoryStore pageName={nombreTienda} hideMenu={esDueno} />
+      <NavbarCategoryStore pageName={nombreTienda} hideMenu={esDueno} hideMobileActions />
 
       {/* Perfil (avatar/nombre/badge/bio/redes) en max-w-3xl, igual que
           EstudioLandingPage.jsx ("INK") — antes la bio tenía su propio
@@ -363,6 +364,14 @@ export default function EstudioTiendaPage() {
       </div>
 
       <FooterStore paginaTienda />
+
+      {/* Espacio para que el tab bar fijo de StoreMobileNav no tape el
+          footer — el navbar de arriba ya no muestra carrito/menú en móvil
+          (hideMobileActions), ahora viven acá. El botón de gestión del
+          dueño (hero, arriba) es independiente de esto. */}
+      <div className="h-16 md:hidden bg-white" />
+
+      <StoreMobileNav active={null} />
 
       {panelAbierto && esDueno && (
         <EstudioTiendaOwnerPanel

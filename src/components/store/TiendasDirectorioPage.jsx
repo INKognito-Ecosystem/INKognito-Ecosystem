@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { MapPin, ShieldCheck, Search } from 'lucide-react'
 import NavbarCategoryStore from './NavbarCategoryStore'
+import StoreMobileNav from './StoreMobileNav'
 import FooterStore from './FooterStore'
 import { cloudinaryFill } from '../../lib/cloudinary'
 
@@ -53,7 +54,7 @@ export default function TiendasDirectorioPage() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
-      <NavbarCategoryStore pageName="Tiendas verificadas" />
+      <NavbarCategoryStore pageName="Tiendas verificadas" hideMobileActions />
 
       <div className="bg-gray-50 pt-20 md:pt-24 pb-4 px-4 md:px-6">
         <div className="max-w-5xl mx-auto text-center">
@@ -140,6 +141,14 @@ export default function TiendasDirectorioPage() {
       </div>
 
       <FooterStore />
+
+      {/* Espacio para que el tab bar fijo de StoreMobileNav no tape el
+          footer (2026-09-16, mismo ajuste ya hecho en las páginas de
+          categoría) — el navbar de arriba ya no muestra carrito/menú en
+          móvil (hideMobileActions), ahora viven acá. */}
+      <div className="h-16 md:hidden bg-white" />
+
+      <StoreMobileNav active={null} />
     </div>
   )
 }

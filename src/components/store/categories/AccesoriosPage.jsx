@@ -67,7 +67,7 @@ export default function AccesoriosPage() {
 
   return (
     <>
-      <NavbarCategoryStore pageName="Accesorios" />
+      <NavbarCategoryStore pageName="Accesorios" hideMobileActions />
 
       {scrolled && prev && (
         <Link

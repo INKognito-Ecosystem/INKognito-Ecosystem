@@ -25,7 +25,7 @@ export function meta() {
 export default function StoreCategoriasPage() {
   return (
     <main className="min-h-screen bg-gray-50 text-gray-900">
-      <NavbarCategoryStore pageName="Categorías" />
+      <NavbarCategoryStore pageName="Categorías" hideMobileActions />
 
       <div className="pt-24 md:pt-28 pb-24 md:pb-16 px-6">
         <div className="max-w-7xl mx-auto">
