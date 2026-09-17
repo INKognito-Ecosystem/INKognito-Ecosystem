@@ -130,6 +130,10 @@ export default [
   // nunca deja que una tienda se registre con esos nombres, así que no
   // hay choque real posible en ningún sentido.
   route('store/estudio/:id', 'components/store/EstudioTiendaPage.jsx'),
+  // Ficha de producto estilo Mercado Libre (2026-09-17) — mismo criterio
+  // que supply/producto/:id: fija, antes del catch-all store/:slug de
+  // abajo.
+  route('store/producto/:id', 'components/store/StoreProductDetailPage.jsx'),
   route('store/compra/resultado', 'components/store/TiendaCompraResultadoPage.jsx'),
   // Directorio simple de tiendas — a propósito sin buscador/filtros, su
   // función es verificación independiente, no comparación (ver

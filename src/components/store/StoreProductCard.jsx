@@ -1,11 +1,14 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import ProductImageGallery from '../ProductImageGallery'
 
 const VAR_THRESHOLD = 3
 
-function SizeSelector({ sizes, selIdx, onChange }) {
+// Exportado (2026-09-17) — StoreProductDetailPage.jsx lo reusa para elegir
+// talla en la ficha completa, mismo criterio que SupplyProductCard.jsx
+// exporta VariantSelectorSupply para su propia ficha.
+export function SizeSelector({ sizes, selIdx, onChange }) {
   const [open, setOpen] = useState(false)
   if (!sizes || sizes.length === 0) return null
 
@@ -67,7 +70,14 @@ function SizeSelector({ sizes, selIdx, onChange }) {
   )
 }
 
-export default function StoreProductCard({ product, category, sizes, showEstudioBadge = true }) {
+// showEstudioBadge (2026-09-17, Jose: "las card ya no deberán mostrar
+// suministrado por x tienda, pues ya estará dentro de la page de ese
+// producto") — se quita la insignia "Vendido por X" de la card: ahora que
+// cualquier card abre la ficha completa (StoreProductDetailPage.jsx), que
+// SÍ muestra el módulo de la tienda, repetirlo acá era redundante. Mismo
+// criterio que ya tenía SupplyProductCard.jsx cuando light=true.
+export default function StoreProductCard({ product, category, sizes }) {
+  const navigate = useNavigate()
   const { items, addItem } = useStoreCart()
   const [selIdx, setSelIdx] = useState(0)
   const [showDesc, setShowDesc] = useState(false)
@@ -111,16 +121,15 @@ export default function StoreProductCard({ product, category, sizes, showEstudio
   const proveedorId     = selectedVariant?.estudio_id ?? product._item?.estudio_id ?? null
   const proveedorNombre = selectedVariant?.estudio_nombre_display || selectedVariant?.estudio_nombre || product._item?.estudio_nombre_display || product._item?.estudio_nombre || null
   const proveedorMp     = selectedVariant?.estudio_mp_conectado ?? product._item?.estudio_mp_conectado ?? false
-  // Link corto (2026-08-30, Jose: "asegúrate de que sea el link correcto
-  // y no el que deja ver el botón hamburguesa") — el link viejo con id
-  // YA era seguro (nunca lleva ?token=, así que el botón de gestión
-  // nunca aparece), pero no era el link canónico bonito. Con slug ya
-  // apunta directo a la URL corta, sin depender del redirect.
-  const proveedorSlug   = selectedVariant?.estudio_slug ?? product._item?.estudio_slug ?? null
+
+  // Variante activa a nivel de card (2026-09-17) — misma variante que ya
+  // resuelve handleAdd, pero elevada acá para que el clic en la foto (abre
+  // la ficha completa) y el "agregar al carrito" apunten al mismo id sin
+  // recalcularlo dos veces.
+  const varianteElegida = product._item?.variantes?.find(v => v.variant === selectedSize)
+    ?? product._item?.variantes?.[0] ?? null
 
   const handleAdd = () => {
-    const varianteElegida = product._item?.variantes?.find(v => v.variant === selectedSize)
-      ?? product._item?.variantes?.[0] ?? null
     const variantId = varianteElegida?.id ?? null
     // image (2026-09-16, Jose: "el carrito ahora trae la foto del
     // producto, al nivel de Supply") — la foto real de la talla
@@ -147,7 +156,17 @@ export default function StoreProductCard({ product, category, sizes, showEstudio
   return (
     <div className="bg-white border border-gray-200 rounded-xl md:rounded-2xl overflow-hidden hover:border-[#C9A84C] hover:shadow-md transition-all duration-300 flex flex-col h-full">
 
-      <div className="aspect-square w-full overflow-hidden bg-gray-100 relative flex-shrink-0">
+      {/* Clic en la foto abre la ficha completa del producto (2026-09-17,
+          Jose: "vamos a implementar lo que ya hicimos en supply... no
+          importa donde se muestre la card, esta deberá abrir ese
+          producto, no importa si es desde una tienda, destacados o desde
+          su categoría") — mismo criterio que SupplyProductCard.jsx, sin
+          el gate `light` que tiene Supply (Store ya es blanco en todas
+          partes, no hay una variante oscura que excluir). */}
+      <div
+        className={`aspect-square w-full overflow-hidden bg-gray-100 relative flex-shrink-0 ${varianteElegida?.id ? 'cursor-pointer' : ''}`}
+        onClick={varianteElegida?.id ? () => navigate(`/store/producto/${varianteElegida.id}`) : undefined}
+      >
         {galleryImages.length > 0 ? (
           <ProductImageGallery
             images={galleryImages}
@@ -165,22 +184,6 @@ export default function StoreProductCard({ product, category, sizes, showEstudio
       </div>
 
       <div className="p-3 flex flex-col flex-1 gap-1.5 min-h-0">
-        {/* Store multitenant (2026-08-29) — insignia por card solo para
-            productos de una tienda conectada, mismo patrón exacto que
-            SupplyProductCard.jsx. */}
-        {showEstudioBadge && proveedorNombre && (
-          proveedorId ? (
-            <Link
-              to={`/store/${proveedorSlug || `estudio/${proveedorId}`}`}
-              onClick={(e) => e.stopPropagation()}
-              className="text-[8px] font-bold uppercase tracking-wide text-[#8a7127] hover:text-[#C9A84C] underline underline-offset-2 w-fit"
-            >
-              Vendido por {proveedorNombre}
-            </Link>
-          ) : (
-            <p className="text-[8px] font-bold uppercase tracking-wide text-[#8a7127]">Vendido por {proveedorNombre}</p>
-          )
-        )}
         <h3 className="text-xs md:text-sm font-black uppercase leading-tight text-gray-900">
           {product.name}
         </h3>

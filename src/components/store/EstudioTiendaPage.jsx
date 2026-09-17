@@ -355,7 +355,6 @@ export default function EstudioTiendaPage() {
                   product={prod}
                   category={item.categoria}
                   sizes={sizes.length ? sizes : CLOTHING_SIZES}
-                  showEstudioBadge={false}
                 />
               )
             })}
