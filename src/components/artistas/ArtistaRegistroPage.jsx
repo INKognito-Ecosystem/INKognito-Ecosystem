@@ -63,6 +63,8 @@ export function meta() {
 
 const inputClass = 'w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-500 transition-colors'
 const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb-1.5 block'
+const cardClass = 'bg-white border border-gray-200 rounded-2xl shadow-sm p-5 md:p-8'
+const cardTitleClass = 'text-sm font-black uppercase tracking-widest text-gray-900 mb-4 pb-3 border-b border-gray-100'
 
 // Autoregistro público — v2 (2026-08-05, decisión de Jose: registro
 // gratis y automático, sin revisión manual — el correo verificado es el
@@ -387,100 +389,120 @@ export default function ArtistaRegistroPage() {
                 <p className="text-gray-500 text-[11px] mt-2 text-center font-medium">Sube tus fotos y completa tu información ahora — un perfil completo y presentable capta más clientes.</p>
               </div>
 
-              {/* FORMULARIO */}
-              <form id="registro-form" onSubmit={enviar} className="order-1 md:order-2 space-y-4">
-                <div>
-                  <label className={labelClass}>Nombre *</label>
-                  <input required className={inputClass} value={form.nombre} onChange={set('nombre')} placeholder="Tu nombre o el de tu estudio" />
-                </div>
+              {/* FORMULARIO — jerarquía en tarjetas (2026-09-17, Jose:
+                  "organiza todos los formularios del ecosistema, para que
+                  tengan esa estructura y sea súper claro de entender") —
+                  mismo patrón (cardClass/cardTitleClass) ya usado en
+                  EstudioProveedorSupplyRegistroPage.jsx y
+                  EstudioTiendaRegistroPage.jsx: "Datos del artista" agrupa
+                  lo propio del perfil (ubicación, estilo, bio), "Contacto y
+                  redes" agrupa WhatsApp/correo/Instagram/Facebook — antes
+                  todo vivía suelto en una sola columna sin separación
+                  visual entre temas. La vista previa en vivo de la
+                  izquierda no cambia. */}
+              <form id="registro-form" onSubmit={enviar} className="order-1 md:order-2">
+                {/* CARD 1 — Datos del artista */}
+                <div className={cardClass}>
+                  <h2 className={cardTitleClass}>Datos del artista</h2>
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-4">
+                    <div className="col-span-2">
+                      <label className={labelClass}>Nombre *</label>
+                      <input required className={inputClass} value={form.nombre} onChange={set('nombre')} placeholder="Tu nombre o el de tu estudio" />
+                    </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className={labelClass}>Departamento *</label>
-                    <ComboboxBuscable
-                      value={form.departamento}
-                      onChange={setDepartamento}
-                      options={DEPARTAMENTOS}
-                      placeholder="Escribe para buscar..."
-                      inputClassName={inputClass}
-                    />
+                    <div>
+                      <label className={labelClass}>Departamento *</label>
+                      <ComboboxBuscable
+                        value={form.departamento}
+                        onChange={setDepartamento}
+                        options={DEPARTAMENTOS}
+                        placeholder="Escribe para buscar..."
+                        inputClassName={inputClass}
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Municipio *</label>
+                      <ComboboxBuscable
+                        value={form.municipio}
+                        onChange={setMunicipio}
+                        options={municipiosDisponibles}
+                        disabled={!form.departamento}
+                        placeholder={form.departamento ? 'Escribe para buscar...' : 'Elige antes el departamento'}
+                        inputClassName={inputClass}
+                      />
+                    </div>
+
+                    {/* Ubicación exacta opcional (2026-08-05): "municipio" no
+                        alcanza para saber quién está más cerca dentro de una
+                        ciudad grande — esto le da al buscador tu punto real
+                        en vez de solo el centro de tu municipio. No es
+                        obligatorio, el registro funciona igual sin esto. */}
+                    <div className="col-span-2">
+                      <button
+                        type="button"
+                        onClick={usarMiUbicacion}
+                        disabled={ubicando}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60"
+                        style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: '#4B5563', color: '#4B5563' }}
+                      >
+                        {ubicando
+                          ? <LoaderCircle size={14} className="animate-spin" />
+                          : form.lat ? <Check size={14} /> : <Navigation size={14} />}
+                        {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación exacta agregada' : 'Agregar mi ubicación exacta (opcional)'}
+                      </button>
+                      <p className="text-gray-400 text-[10px] mt-1.5 text-center leading-relaxed">
+                        Ayuda a que clientes cerca de ti te encuentren primero, sobre todo en ciudades grandes. Es opcional — sin esto, igual apareces en tu municipio.
+                      </p>
+                      {ubicacionError && <p className="text-gray-400 text-[10px] mt-1 text-center">{ubicacionError}</p>}
+                    </div>
+
+                    <div className="col-span-2">
+                      <label className={labelClass}>Estilo</label>
+                      <input className={inputClass} value={form.estilo} onChange={set('estilo')} placeholder="Ej: Realismo, Blackwork, Fine line" />
+                    </div>
+
+                    <div className="col-span-2">
+                      <label className={labelClass}>Bio</label>
+                      <textarea rows={3} className={inputClass} value={form.bio} onChange={set('bio')} placeholder="Cuenta tus técnicas, estilos y materiales — esto es lo primero que leen quienes ya te están considerando" />
+                    </div>
+
+                    <div className="col-span-2">
+                      <label className={labelClass}>No tatúas (opcional)</label>
+                      <input className={inputClass} value={form.no_tatua} onChange={set('no_tatua')} placeholder="Ej: rostro, manos, zonas genitales" />
+                    </div>
                   </div>
-                  <div>
-                    <label className={labelClass}>Municipio *</label>
-                    <ComboboxBuscable
-                      value={form.municipio}
-                      onChange={setMunicipio}
-                      options={municipiosDisponibles}
-                      disabled={!form.departamento}
-                      placeholder={form.departamento ? 'Escribe para buscar...' : 'Elige antes el departamento'}
-                      inputClassName={inputClass}
-                    />
+                </div>
+
+                {/* CARD 2 — Contacto y redes */}
+                <div className={`${cardClass} mt-5`}>
+                  <h2 className={cardTitleClass}>Contacto y redes</h2>
+                  <div className="flex flex-col gap-4">
+                    <div>
+                      <label className={labelClass}>WhatsApp *</label>
+                      <input required className={inputClass} value={form.whatsapp} onChange={set('whatsapp')} placeholder="57300..." />
+                    </div>
+
+                    <div>
+                      {/* Correo (2026-08-05) — es el filtro anti-spam ahora
+                          que el registro ya no pasa por revisión manual: el
+                          perfil nace oculto hasta que se confirma este
+                          correo, momento en el que se activa solo. */}
+                      <label className={labelClass}>Correo *</label>
+                      <input required type="email" className={inputClass} value={form.email} onChange={set('email')} placeholder="tucorreo@ejemplo.com" />
+                      <p className="text-gray-400 text-[10px] mt-1">Te mandamos un link para confirmar tu perfil — sin esto no queda activo.</p>
+                    </div>
+
+                    <div>
+                      <label className={labelClass}>Instagram {!form.facebook.trim() && '*'}</label>
+                      <input className={inputClass} value={form.instagram} onChange={set('instagram')} placeholder="https://instagram.com/..." />
+                    </div>
+
+                    <div>
+                      <label className={labelClass}>Facebook {!form.instagram.trim() && '*'}</label>
+                      <input className={inputClass} value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." />
+                      <p className="text-gray-400 text-[10px] mt-1">Necesitamos al menos una de las dos — es donde la gente ve que de verdad tatúas.</p>
+                    </div>
                   </div>
-                </div>
-
-                {/* Ubicación exacta opcional (2026-08-05): "municipio" no
-                    alcanza para saber quién está más cerca dentro de una
-                    ciudad grande — esto le da al buscador tu punto real en
-                    vez de solo el centro de tu municipio. No es
-                    obligatorio, el registro funciona igual sin esto. */}
-                <div>
-                  <button
-                    type="button"
-                    onClick={usarMiUbicacion}
-                    disabled={ubicando}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60"
-                    style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: '#4B5563', color: '#4B5563' }}
-                  >
-                    {ubicando
-                      ? <LoaderCircle size={14} className="animate-spin" />
-                      : form.lat ? <Check size={14} /> : <Navigation size={14} />}
-                    {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación exacta agregada' : 'Agregar mi ubicación exacta (opcional)'}
-                  </button>
-                  <p className="text-gray-400 text-[10px] mt-1.5 text-center leading-relaxed">
-                    Ayuda a que clientes cerca de ti te encuentren primero, sobre todo en ciudades grandes. Es opcional — sin esto, igual apareces en tu municipio.
-                  </p>
-                  {ubicacionError && <p className="text-gray-400 text-[10px] mt-1 text-center">{ubicacionError}</p>}
-                </div>
-
-                <div>
-                  <label className={labelClass}>Estilo</label>
-                  <input className={inputClass} value={form.estilo} onChange={set('estilo')} placeholder="Ej: Realismo, Blackwork, Fine line" />
-                </div>
-
-                <div>
-                  <label className={labelClass}>Bio</label>
-                  <textarea rows={3} className={inputClass} value={form.bio} onChange={set('bio')} placeholder="Cuenta tus técnicas, estilos y materiales — esto es lo primero que leen quienes ya te están considerando" />
-                </div>
-
-                <div>
-                  <label className={labelClass}>WhatsApp *</label>
-                  <input required className={inputClass} value={form.whatsapp} onChange={set('whatsapp')} placeholder="57300..." />
-                </div>
-
-                <div>
-                  {/* Correo (2026-08-05) — es el filtro anti-spam ahora que
-                      el registro ya no pasa por revisión manual: el
-                      perfil nace oculto hasta que se confirma este
-                      correo, momento en el que se activa solo. */}
-                  <label className={labelClass}>Correo *</label>
-                  <input required type="email" className={inputClass} value={form.email} onChange={set('email')} placeholder="tucorreo@ejemplo.com" />
-                  <p className="text-gray-400 text-[10px] mt-1">Te mandamos un link para confirmar tu perfil — sin esto no queda activo.</p>
-                </div>
-
-                <div>
-                  <label className={labelClass}>Instagram {!form.facebook.trim() && '*'}</label>
-                  <input className={inputClass} value={form.instagram} onChange={set('instagram')} placeholder="https://instagram.com/..." />
-                </div>
-
-                <div>
-                  <label className={labelClass}>Facebook {!form.instagram.trim() && '*'}</label>
-                  <input className={inputClass} value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." />
-                  <p className="text-gray-400 text-[10px] mt-1">Necesitamos al menos una de las dos — es donde la gente ve que de verdad tatúas.</p>
-                </div>
-
-                <div>
-                  <label className={labelClass}>No tatúas (opcional)</label>
-                  <input className={inputClass} value={form.no_tatua} onChange={set('no_tatua')} placeholder="Ej: rostro, manos, zonas genitales" />
                 </div>
 
                 {/* Honeypot — invisible para una persona real, sin tabIndex

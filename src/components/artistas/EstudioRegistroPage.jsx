@@ -47,6 +47,8 @@ export function meta() {
 
 const inputClass = 'w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-500 transition-colors'
 const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb-1.5 block'
+const cardClass = 'bg-white border border-gray-200 rounded-2xl shadow-sm p-5 md:p-8'
+const cardTitleClass = 'text-sm font-black uppercase tracking-widest text-gray-900 mb-4 pb-3 border-b border-gray-100'
 
 export default function EstudioRegistroPage() {
   const { cloud_name, upload_preset, captchaA, captchaB } = useLoaderData()
@@ -164,7 +166,7 @@ export default function EstudioRegistroPage() {
           </div>
         </div>
       ) : (
-        <div className="flex-1 pt-20 md:pt-24 max-w-md mx-auto px-4 pb-16 w-full">
+        <div className="flex-1 pt-20 md:pt-24 max-w-2xl mx-auto px-4 pb-16 w-full">
           <h1 className="text-xl font-black uppercase mb-2 text-center">Registra tu estudio</h1>
           <p className="text-gray-500 text-sm text-center mb-5">
             Agrupa a los artistas de tu equipo bajo un mismo perfil, y ayúdalos a que se sumen al buscador.
@@ -195,65 +197,85 @@ export default function EstudioRegistroPage() {
             Logo: cuadrado, mínimo 400×400px · Portada: horizontal, ideal 1200×400px
           </p>
 
-          <form onSubmit={enviar} className="space-y-4">
-            <div>
-              <label className={labelClass}>Nombre del estudio *</label>
-              <input required className={inputClass} value={form.nombre} onChange={set('nombre')} placeholder="Ej: Estudio de tatuajes X" />
-            </div>
+          {/* Jerarquía en tarjetas (2026-09-17, Jose: "organiza todos los
+              formularios del ecosistema, para que tengan esa estructura y
+              sea súper claro de entender") — mismo patrón
+              (cardClass/cardTitleClass) ya usado en
+              EstudioProveedorSupplyRegistroPage.jsx/
+              EstudioTiendaRegistroPage.jsx/ArtistaRegistroPage.jsx: "Datos
+              del estudio" agrupa lo propio del negocio (ubicación, bio),
+              "Contacto y redes" agrupa WhatsApp/correo/Instagram/Facebook
+              — antes todo vivía suelto en una sola columna sin separación
+              visual entre temas. */}
+          <form onSubmit={enviar}>
+            {/* CARD 1 — Datos del estudio */}
+            <div className={cardClass}>
+              <h2 className={cardTitleClass}>Datos del estudio</h2>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-4">
+                <div className="col-span-2">
+                  <label className={labelClass}>Nombre del estudio *</label>
+                  <input required className={inputClass} value={form.nombre} onChange={set('nombre')} placeholder="Ej: Estudio de tatuajes X" />
+                </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className={labelClass}>Departamento *</label>
-                <ComboboxBuscable value={form.departamento} onChange={setDepartamento} options={DEPARTAMENTOS} placeholder="Escribe para buscar..." inputClassName={inputClass} />
+                <div>
+                  <label className={labelClass}>Departamento *</label>
+                  <ComboboxBuscable value={form.departamento} onChange={setDepartamento} options={DEPARTAMENTOS} placeholder="Escribe para buscar..." inputClassName={inputClass} />
+                </div>
+                <div>
+                  <label className={labelClass}>Municipio *</label>
+                  <ComboboxBuscable value={form.municipio} onChange={setMunicipio} options={municipiosDisponibles} disabled={!form.departamento} placeholder={form.departamento ? 'Escribe para buscar...' : 'Elige antes el departamento'} inputClassName={inputClass} />
+                </div>
+
+                <div className="col-span-2">
+                  <button
+                    type="button"
+                    onClick={usarMiUbicacion}
+                    disabled={ubicando}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60"
+                    style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: '#4B5563', color: '#4B5563' }}
+                  >
+                    {ubicando ? <LoaderCircle size={14} className="animate-spin" /> : form.lat ? <Check size={14} /> : <Navigation size={14} />}
+                    {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación exacta agregada' : 'Agregar ubicación exacta (opcional)'}
+                  </button>
+                  <p className="text-gray-400 text-[10px] mt-1.5 text-center leading-relaxed">
+                    Ayuda a que clientes cerca del estudio lo encuentren primero. Es opcional — sin esto, igual aparece en su municipio.
+                  </p>
+                  {ubicacionError && <p className="text-gray-400 text-[10px] mt-1 text-center">{ubicacionError}</p>}
+                </div>
+
+                <div className="col-span-2">
+                  <label className={labelClass}>Bio</label>
+                  <textarea rows={3} className={inputClass} value={form.bio} onChange={set('bio')} placeholder="Cuenta sobre el estudio — trayectoria, especialidades, ambiente" />
+                </div>
               </div>
-              <div>
-                <label className={labelClass}>Municipio *</label>
-                <ComboboxBuscable value={form.municipio} onChange={setMunicipio} options={municipiosDisponibles} disabled={!form.departamento} placeholder={form.departamento ? 'Escribe para buscar...' : 'Elige antes el departamento'} inputClassName={inputClass} />
+            </div>
+
+            {/* CARD 2 — Contacto y redes */}
+            <div className={`${cardClass} mt-5`}>
+              <h2 className={cardTitleClass}>Contacto y redes</h2>
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label className={labelClass}>WhatsApp *</label>
+                  <input required className={inputClass} value={form.whatsapp} onChange={set('whatsapp')} placeholder="57300..." />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Correo *</label>
+                  <input required type="email" className={inputClass} value={form.email} onChange={set('email')} placeholder="tucorreo@ejemplo.com" />
+                  <p className="text-gray-400 text-[10px] mt-1">Te mandamos un link para confirmar el perfil e invitar a tu equipo — sin esto no queda activo.</p>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Instagram {!form.facebook.trim() && '*'}</label>
+                  <input className={inputClass} value={form.instagram} onChange={set('instagram')} placeholder="https://instagram.com/..." />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Facebook {!form.instagram.trim() && '*'}</label>
+                  <input className={inputClass} value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." />
+                  <p className="text-gray-400 text-[10px] mt-1">Necesitamos al menos una de las dos.</p>
+                </div>
               </div>
-            </div>
-
-            <div>
-              <button
-                type="button"
-                onClick={usarMiUbicacion}
-                disabled={ubicando}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60"
-                style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: '#4B5563', color: '#4B5563' }}
-              >
-                {ubicando ? <LoaderCircle size={14} className="animate-spin" /> : form.lat ? <Check size={14} /> : <Navigation size={14} />}
-                {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación exacta agregada' : 'Agregar ubicación exacta (opcional)'}
-              </button>
-              <p className="text-gray-400 text-[10px] mt-1.5 text-center leading-relaxed">
-                Ayuda a que clientes cerca del estudio lo encuentren primero. Es opcional — sin esto, igual aparece en su municipio.
-              </p>
-              {ubicacionError && <p className="text-gray-400 text-[10px] mt-1 text-center">{ubicacionError}</p>}
-            </div>
-
-            <div>
-              <label className={labelClass}>Bio</label>
-              <textarea rows={3} className={inputClass} value={form.bio} onChange={set('bio')} placeholder="Cuenta sobre el estudio — trayectoria, especialidades, ambiente" />
-            </div>
-
-            <div>
-              <label className={labelClass}>WhatsApp *</label>
-              <input required className={inputClass} value={form.whatsapp} onChange={set('whatsapp')} placeholder="57300..." />
-            </div>
-
-            <div>
-              <label className={labelClass}>Correo *</label>
-              <input required type="email" className={inputClass} value={form.email} onChange={set('email')} placeholder="tucorreo@ejemplo.com" />
-              <p className="text-gray-400 text-[10px] mt-1">Te mandamos un link para confirmar el perfil e invitar a tu equipo — sin esto no queda activo.</p>
-            </div>
-
-            <div>
-              <label className={labelClass}>Instagram {!form.facebook.trim() && '*'}</label>
-              <input className={inputClass} value={form.instagram} onChange={set('instagram')} placeholder="https://instagram.com/..." />
-            </div>
-
-            <div>
-              <label className={labelClass}>Facebook {!form.instagram.trim() && '*'}</label>
-              <input className={inputClass} value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." />
-              <p className="text-gray-400 text-[10px] mt-1">Necesitamos al menos una de las dos.</p>
             </div>
 
             <input
@@ -266,17 +288,17 @@ export default function EstudioRegistroPage() {
               style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }}
             />
 
-            <div>
+            <div className="mt-5">
               <label className={labelClass}>Verificación — ¿cuánto es {captchaA} + {captchaB}?</label>
               <input type="number" inputMode="numeric" className={inputClass} value={captchaRespuesta} onChange={(e) => setCaptchaRespuesta(e.target.value)} placeholder="Escribe el resultado" />
             </div>
 
-            {error && <p className="text-sm text-center" style={{ color: ACCENT }}>{error}</p>}
+            {error && <p className="text-sm text-center mt-4" style={{ color: ACCENT }}>{error}</p>}
 
             <button
               type="submit"
               disabled={enviando}
-              className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
+              className="w-full py-3.5 mt-5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
               style={{ backgroundColor: ACCENT }}
             >
               {enviando ? 'Enviando...' : 'Enviar registro'}

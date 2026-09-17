@@ -137,7 +137,7 @@ export default function NavbarStore() {
                 <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400">Mi cuenta/perfil</p>
                 <button type="button" onClick={() => { setMenuOpen(false); irAMiTienda(navigate) }}
                   className="flex items-center gap-3 w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-500 hover:text-[#C9A84C] hover:bg-zinc-50 transition-all duration-300">
-                  <UserCircle size={16} className="flex-shrink-0" /> Tienda
+                  <UserCircle size={16} className="flex-shrink-0" /> Mi Tienda
                 </button>
 
                 <div className="border-t border-zinc-100" />

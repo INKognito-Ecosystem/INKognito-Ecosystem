@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, GraduationCap, Globe, FileText, Shield } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle } from 'lucide-react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import LegalModal from '../legal/LegalModal'
 import logoSupply from '../../assets/milogo/supply.webp'
+import { irAMiSupply } from '../../lib/supplyTienda'
 
 // Tab bar + menú de pantalla completa para páginas de Supply DISTINTAS al
 // home (categorías, marcas, etc.) — 2026-09-15, mismo patrón visual que ya
@@ -16,6 +17,7 @@ import logoSupply from '../../assets/milogo/supply.webp'
 // light (2026-09-15, Jose: "ambos navbar blancos, iconos azules") — default
 // false para no tocar las demás categorías.
 export default function SupplyMobileNav({ active = null, light = false }) {
+  const navigate = useNavigate()
   const { count } = useSupplyCart()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -98,6 +100,21 @@ export default function SupplyMobileNav({ active = null, light = false }) {
               <GraduationCap size={18} className="flex-shrink-0" />
               Educación para el artista
             </Link>
+
+            <div className={`border-t ${menuDividerBorder}`} />
+            {/* Mi cuenta/perfil (2026-09-17, Jose: "en el botón hamburguesa
+                de supply no veo el ítem de cuenta/perfil, y que este
+                también lleve al perfil de quien tiene una tienda
+                registrada") — mismo criterio que StoreMobileNav.jsx:
+                irAMiSupply revisa si ya hay un Supply con token guardado en
+                este navegador y lo abre directo con su botón de gestión; si
+                no, cae al flujo de siempre (correo → INK) — ver
+                supplyTienda.js. */}
+            <p className={`px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.15em] ${menuLabelText}`}>Mi cuenta/perfil</p>
+            <button type="button" onClick={() => { setMenuOpen(false); irAMiSupply(navigate) }} className={`flex items-center gap-3 w-full text-left px-6 py-4 text-[15px] font-medium ${menuItemText}`}>
+              <UserCircle size={18} className="flex-shrink-0" />
+              Mi Supply
+            </button>
 
             <div className={`border-t ${menuDividerBorder}`} />
             {/* only=['store'] + extraLinks (2026-09-15, Jose: "el botón

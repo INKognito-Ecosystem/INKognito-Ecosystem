@@ -1,7 +1,9 @@
 import { useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
-import { CheckCircle2, Camera, LoaderCircle, Navigation, Check } from 'lucide-react'
+import { CheckCircle2, UploadCloud, Image as ImageIcon, LoaderCircle, Navigation, Check } from 'lucide-react'
+import { FaWhatsapp, FaInstagram, FaFacebook } from 'react-icons/fa'
 import NavbarCategoryStore from '../store/NavbarCategoryStore'
+import StoreMobileNav from '../store/StoreMobileNav'
 import ComboboxBuscable from './ComboboxBuscable'
 import { DEPARTAMENTOS_TIENDA, MUNICIPIOS_URABA_TIENDA, municipioDesdeNombreIP } from '../../data/colombiaGeo'
 
@@ -50,6 +52,8 @@ export function meta() {
 
 const inputClass = 'w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-500 transition-colors'
 const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb-1.5 block'
+const cardClass = 'bg-white border border-gray-200 rounded-2xl shadow-sm p-5 md:p-8'
+const cardTitleClass = 'text-sm font-black uppercase tracking-widest text-gray-900 mb-4 pb-3 border-b border-gray-100'
 
 export default function EstudioTiendaRegistroPage() {
   const { cloud_name, upload_preset, captchaA, captchaB } = useLoaderData()
@@ -74,6 +78,15 @@ export default function EstudioTiendaRegistroPage() {
   // — la lista de municipios ya no depende del departamento elegido
   // (solo hay uno posible), queda fija en los 4 municipios de la zona.
   const municipiosDisponibles = MUNICIPIOS_URABA_TIENDA
+
+  // +57 fijo (2026-09-17, mismo criterio que EstudioProveedorSupplyRegistroPage.jsx,
+  // Jose: "divide la card en dos, para que en uno pongas el +57, así solo en
+  // la otra casilla deberán escribir su número") — form.whatsapp sigue
+  // guardando el número completo con indicativo (mismo formato que ya
+  // espera el backend), la casilla visible solo muestra/edita lo que va
+  // después del 57.
+  const numeroWhatsapp = form.whatsapp.replace(/^57/, '')
+  const setNumeroWhatsapp = (e) => setForm((f) => ({ ...f, whatsapp: '57' + e.target.value.replace(/\D/g, '') }))
 
   const usarMiUbicacion = () => {
     setUbicacionError(null)
@@ -148,7 +161,13 @@ export default function EstudioTiendaRegistroPage() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
-      <NavbarCategoryStore pageName="Registrar tienda" />
+      {/* hideMobileActions (2026-09-17, Jose: "tiene el carrito y botón
+          hamburguesa en el navbar superior, y no está creado el navbar
+          inferior") — esta página nunca sumó StoreMobileNav, así que el
+          navbar de arriba se quedó mostrando sus propios íconos en móvil
+          en vez de dejarle el puesto al tab bar de abajo, mismo criterio ya
+          resuelto en el resto de Store. */}
+      <NavbarCategoryStore pageName="Registrar tienda" hideMobileActions />
 
       {enviado ? (
         <div className="flex-1 pt-20 md:pt-24 max-w-md mx-auto px-4 pb-16 w-full">
@@ -167,123 +186,181 @@ export default function EstudioTiendaRegistroPage() {
           </div>
         </div>
       ) : (
-        <div className="flex-1 pt-20 md:pt-24 max-w-md mx-auto px-4 pb-16 w-full">
-          <h1 className="text-xl font-black uppercase mb-2 text-center">Registra tu tienda</h1>
-          <p className="text-gray-500 text-sm text-center mb-5">
-            Vende directo a tus clientes de Urabá con tu propio perfil en INKognito Store — cobras tú, directo a tu cuenta.
-          </p>
-
-          <input
-            type="file"
-            accept="image/*"
-            ref={(el) => { fileInputs.current.logo_url = el }}
-            style={{ display: 'none' }}
-            onChange={(e) => subirFoto(e.target.files?.[0])}
-          />
-
-          {/* Sin foto de portada (quitada 2026-08-30, Jose: el catálogo de
-              una tienda nunca la muestra en ningún lado — solo el logo). */}
-          <div className="flex flex-col items-center mb-5">
-            <button type="button" onClick={elegirFoto} className="relative w-16 h-16 rounded-full bg-gray-100 border border-gray-300 overflow-hidden flex-shrink-0">
-              {form.logo_url ? <img src={form.logo_url} alt="" className="w-full h-full object-cover" /> : <Camera size={18} className="absolute inset-0 m-auto text-gray-400" />}
-              {subiendo && <LoaderCircle size={16} className="animate-spin absolute inset-0 m-auto text-gray-600" />}
-            </button>
-            <p className="text-gray-400 text-[10px] mt-2">Logo: cuadrado, mínimo 400×400px</p>
-          </div>
-
-          <form onSubmit={enviar} className="space-y-4">
-            <div>
-              <label className={labelClass}>Nombre de la tienda *</label>
-              <input required className={inputClass} value={form.nombre} onChange={set('nombre')} placeholder="Ej: Mi Tienda de Ropa" />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className={labelClass}>Departamento *</label>
-                <ComboboxBuscable value={form.departamento} onChange={setDepartamento} options={DEPARTAMENTOS_TIENDA} placeholder="Escribe para buscar..." inputClassName={inputClass} />
-              </div>
-              <div>
-                <label className={labelClass}>Municipio *</label>
-                <ComboboxBuscable value={form.municipio} onChange={setMunicipio} options={municipiosDisponibles} disabled={!form.departamento} placeholder={form.departamento ? 'Escribe para buscar...' : 'Elige antes el departamento'} inputClassName={inputClass} />
-              </div>
-            </div>
-
-            <div>
-              <label className={labelClass}>Dirección exacta *</label>
-              <input required className={inputClass} value={form.direccion} onChange={set('direccion')} placeholder="Calle, carrera, barrio..." />
-              <p className="text-gray-400 text-[10px] mt-1">Para que Ruta del Golfo sepa dónde recoger tus pedidos — nunca se muestra públicamente.</p>
-            </div>
-
-            <div>
-              <button
-                type="button"
-                onClick={usarMiUbicacion}
-                disabled={ubicando}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60"
-                style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: '#4B5563', color: '#4B5563' }}
-              >
-                {ubicando ? <LoaderCircle size={14} className="animate-spin" /> : form.lat ? <Check size={14} /> : <Navigation size={14} />}
-                {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación exacta agregada' : 'Agregar ubicación exacta (opcional)'}
-              </button>
-              <p className="text-gray-400 text-[10px] mt-1.5 text-center leading-relaxed">
-                Opcional — sin esto, igual aparece asociada a su municipio.
+        <div className="flex-1 pt-20 md:pt-24 pb-16 px-4 w-full">
+          <div className="max-w-2xl mx-auto">
+            <div className="text-center mb-6">
+              <h1 className="text-xl md:text-2xl font-black uppercase mb-2">Registra tu tienda</h1>
+              <p className="text-gray-500 text-sm max-w-md mx-auto leading-relaxed">
+                Vende directo a tus clientes de Urabá con tu propio perfil en INKognito Store — cobras tú, directo a tu cuenta.
               </p>
-              {ubicacionError && <p className="text-gray-400 text-[10px] mt-1 text-center">{ubicacionError}</p>}
-            </div>
-
-            <div>
-              <label className={labelClass}>Bio</label>
-              <textarea rows={3} className={inputClass} value={form.bio} onChange={set('bio')} placeholder="Cuenta sobre la tienda — qué vende, trayectoria" />
-            </div>
-
-            <div>
-              <label className={labelClass}>WhatsApp *</label>
-              <input required className={inputClass} value={form.whatsapp} onChange={set('whatsapp')} placeholder="57300..." />
-            </div>
-
-            <div>
-              <label className={labelClass}>Correo *</label>
-              <input required type="email" className={inputClass} value={form.email} onChange={set('email')} placeholder="tucorreo@ejemplo.com" />
-              <p className="text-gray-400 text-[10px] mt-1">Te mandamos un link para confirmar el perfil y empezar a vender — sin esto no queda activo.</p>
-            </div>
-
-            <div>
-              <label className={labelClass}>Instagram {!form.facebook.trim() && '*'}</label>
-              <input className={inputClass} value={form.instagram} onChange={set('instagram')} placeholder="https://instagram.com/..." />
-            </div>
-
-            <div>
-              <label className={labelClass}>Facebook {!form.instagram.trim() && '*'}</label>
-              <input className={inputClass} value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." />
-              <p className="text-gray-400 text-[10px] mt-1">Necesitamos al menos una de las dos.</p>
             </div>
 
             <input
-              type="text"
-              value={form.sitio_web}
-              onChange={set('sitio_web')}
-              tabIndex={-1}
-              autoComplete="off"
-              aria-hidden="true"
-              style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }}
+              type="file"
+              accept="image/*"
+              ref={(el) => { fileInputs.current.logo_url = el }}
+              style={{ display: 'none' }}
+              onChange={(e) => subirFoto(e.target.files?.[0])}
             />
 
-            <div>
-              <label className={labelClass}>Verificación — ¿cuánto es {captchaA} + {captchaB}?</label>
-              <input type="number" inputMode="numeric" className={inputClass} value={captchaRespuesta} onChange={(e) => setCaptchaRespuesta(e.target.value)} placeholder="Escribe el resultado" />
-            </div>
+            {/* Jerarquía en tarjetas (2026-09-17, Jose: "el formulario de
+                registro no tiene ítems específico, así que actualízalo,
+                así como hicimos con supply, que le dimos jerarquía a los
+                datos, encerrándolos en burbujas para que sea más
+                intuitivo") — mismo patrón exacto que
+                EstudioProveedorSupplyRegistroPage.jsx: avatar circular
+                grande arriba, "Datos de la tienda" agrupa lo propio del
+                negocio (incluye dirección y bio, que Supply no tiene),
+                "Redes de contacto" agrupa WhatsApp/Instagram/Facebook/
+                correo — antes todo vivía suelto en una sola columna sin
+                separación visual entre temas. */}
+            <form onSubmit={enviar}>
+              <div className="flex flex-col items-center mb-6">
+                <p className="text-gray-500 text-xs mb-3"><strong className="text-gray-700">Logo:</strong> cuadrado, mínimo 400×400px</p>
+                <button
+                  type="button"
+                  onClick={elegirFoto}
+                  className="relative w-32 h-32 md:w-36 md:h-36 rounded-full border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-1 overflow-hidden hover:border-gray-400 transition-colors flex-shrink-0"
+                >
+                  {form.logo_url ? (
+                    <img src={form.logo_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                  ) : (
+                    <>
+                      <UploadCloud size={20} className="text-gray-400" />
+                      <span className="text-[11px] font-black uppercase tracking-widest text-gray-600">Subir logo</span>
+                      <ImageIcon size={14} className="text-gray-300" />
+                    </>
+                  )}
+                  {subiendo && <LoaderCircle size={18} className="animate-spin absolute inset-0 m-auto text-gray-700" />}
+                </button>
+              </div>
 
-            {error && <p className="text-sm text-center" style={{ color: ACCENT }}>{error}</p>}
+              {/* CARD 1 — Datos de la tienda */}
+              <div className={cardClass}>
+                <h2 className={cardTitleClass}>Datos de la tienda</h2>
+                <div className="grid grid-cols-2 gap-x-3 gap-y-4">
+                  <div className="col-span-2">
+                    <label className={labelClass}>Nombre de la tienda *</label>
+                    <input required className={inputClass} value={form.nombre} onChange={set('nombre')} placeholder="Ej: Mi Tienda de Ropa" />
+                  </div>
 
-            <button
-              type="submit"
-              disabled={enviando}
-              className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
-              style={{ backgroundColor: ACCENT }}
-            >
-              {enviando ? 'Enviando...' : 'Enviar registro'}
-            </button>
-          </form>
+                  <div>
+                    <label className={labelClass}>Departamento *</label>
+                    <ComboboxBuscable value={form.departamento} onChange={setDepartamento} options={DEPARTAMENTOS_TIENDA} placeholder="Escribe para buscar..." inputClassName={inputClass} />
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>Municipio *</label>
+                    <ComboboxBuscable value={form.municipio} onChange={setMunicipio} options={municipiosDisponibles} disabled={!form.departamento} placeholder={form.departamento ? 'Escribe para buscar...' : 'Elige antes el departamento'} inputClassName={inputClass} />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className={labelClass}>Dirección exacta *</label>
+                    <input required className={inputClass} value={form.direccion} onChange={set('direccion')} placeholder="Calle, carrera, barrio..." />
+                    <p className="text-gray-400 text-[10px] mt-1">Para que Ruta del Golfo sepa dónde recoger tus pedidos — nunca se muestra públicamente.</p>
+                  </div>
+
+                  <div className="col-span-2">
+                    <button
+                      type="button"
+                      onClick={usarMiUbicacion}
+                      disabled={ubicando}
+                      className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border text-[10px] font-bold uppercase tracking-wide transition-all duration-200 disabled:opacity-60"
+                      style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: '#4B5563', color: '#4B5563' }}
+                    >
+                      {ubicando ? <LoaderCircle size={12} className="animate-spin" /> : form.lat ? <Check size={12} /> : <Navigation size={12} />}
+                      {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación agregada' : 'Ubicación exacta'}
+                    </button>
+                    <p className="text-gray-400 text-[10px] mt-1.5 text-center leading-relaxed">
+                      Mejora la precisión de tu ubicación para clientes cercanos.
+                    </p>
+                    {ubicacionError && <p className="text-gray-400 text-[10px] mt-1 text-center">{ubicacionError}</p>}
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className={labelClass}>Bio</label>
+                    <textarea rows={3} className={inputClass} value={form.bio} onChange={set('bio')} placeholder="Cuenta sobre la tienda — qué vende, trayectoria" />
+                  </div>
+                </div>
+              </div>
+
+              {/* CARD 2 — Redes de contacto */}
+              <div className={`${cardClass} mt-5`}>
+                <h2 className={cardTitleClass}>Redes de contacto</h2>
+                <div className="flex flex-col gap-4">
+                  <div>
+                    <label className={labelClass}>WhatsApp *</label>
+                    <div className="flex gap-2">
+                      <div className="flex-shrink-0 w-14 flex items-center justify-center rounded-lg border border-gray-300 bg-gray-100 text-sm font-bold text-gray-600">
+                        +57
+                      </div>
+                      <div className="relative flex-1 min-w-0">
+                        <input
+                          required
+                          type="tel"
+                          inputMode="numeric"
+                          className={`${inputClass} pr-9`}
+                          value={numeroWhatsapp}
+                          onChange={setNumeroWhatsapp}
+                          placeholder="300 1234567"
+                        />
+                        <FaWhatsapp size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>Instagram {!form.facebook.trim() && '*'}</label>
+                    <div className="relative">
+                      <input className={`${inputClass} pr-9`} value={form.instagram} onChange={set('instagram')} placeholder="https://instagram.com/..." />
+                      <FaInstagram size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>Facebook {!form.instagram.trim() && '*'}</label>
+                    <div className="relative">
+                      <input className={`${inputClass} pr-9`} value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." />
+                      <FaFacebook size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    </div>
+                    <p className="text-gray-400 text-[10px] mt-1">Necesitamos al menos una de las dos.</p>
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>Correo *</label>
+                    <input required type="email" className={inputClass} value={form.email} onChange={set('email')} placeholder="tucorreo@ejemplo.com" />
+                    <p className="text-gray-400 text-[10px] mt-1">Te mandamos un link para confirmar el perfil y empezar a vender — sin esto no queda activo.</p>
+                  </div>
+                </div>
+              </div>
+
+              <input
+                type="text"
+                value={form.sitio_web}
+                onChange={set('sitio_web')}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }}
+              />
+
+              <div className="mt-5">
+                <label className={labelClass}>Verificación — ¿cuánto es {captchaA} + {captchaB}?</label>
+                <input type="number" inputMode="numeric" className={inputClass} value={captchaRespuesta} onChange={(e) => setCaptchaRespuesta(e.target.value)} placeholder="Escribe el resultado" />
+              </div>
+
+              {error && <p className="text-sm text-center mt-4" style={{ color: ACCENT }}>{error}</p>}
+
+              <button
+                type="submit"
+                disabled={enviando}
+                className="w-full py-3.5 mt-5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
+                style={{ backgroundColor: ACCENT }}
+              >
+                {enviando ? 'Enviando...' : 'Enviar registro'}
+              </button>
+            </form>
+          </div>
         </div>
       )}
 
@@ -293,6 +370,11 @@ export default function EstudioTiendaRegistroPage() {
           <span className="text-gray-300">Desarrollado por INKognito</span>
         </div>
       </footer>
+      {/* h-16 (64px) — mismo ajuste medido de 2026-09-15 usado en el resto
+          de Store (EstudioTiendaPage.jsx/StorePage.jsx/etc.) para que el
+          tab bar fijo de StoreMobileNav no tape el footer. */}
+      <div className="h-16 md:hidden" />
+      <StoreMobileNav active={null} />
     </div>
   )
 }

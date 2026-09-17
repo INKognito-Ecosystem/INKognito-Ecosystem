@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
-import { Search, Bell, Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, GraduationCap, Globe, FileText, Shield } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Search, Bell, Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle } from 'lucide-react'
 import { categories } from './CategoriesSupply'
 import BrandsMarquee from './BrandsMarquee'
 import SupplyProductCard from './SupplyProductCard'
@@ -11,6 +11,7 @@ import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { useLoadMore, fetchCatalogPage } from '../../hooks/useCatalog'
 import logoSupply from '../../assets/milogo/supply.webp'
 import bannerBg from '../../assets/supply/banner-tattoo-swirl.jpg'
+import { irAMiSupply } from '../../lib/supplyTienda'
 
 // Home móvil de Supply en formato marketplace (2026-09-14, boceto + mockup
 // aprobados por Jose) — reemplaza SOLO en móvil a NavbarSupply/HeroSupply/
@@ -21,6 +22,7 @@ import bannerBg from '../../assets/supply/banner-tattoo-swirl.jpg'
 // en HeroSupply.jsx — Jose fue explícito: no inventar copy nuevo, reusar
 // "Professional Tattoo Equipment" y "De un tatuador, para tatuadores."
 export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
+  const navigate = useNavigate()
   const { count } = useSupplyCart()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -334,6 +336,23 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
               <GraduationCap size={18} className="flex-shrink-0" />
               Educación para el artista
             </Link>
+
+            <div className="border-t border-zinc-100" />
+            {/* Mi cuenta/perfil (2026-09-17, Jose: "en el botón hamburguesa
+                de supply no veo el ítem de cuenta/perfil, y que este
+                también lleve al perfil de quien tiene una tienda
+                registrada") — irAMiSupply revisa si ya hay un Supply con
+                token guardado en este navegador y lo abre directo con su
+                botón de gestión; si no, cae al flujo de siempre (correo →
+                INK) — ver supplyTienda.js. Esta es la home de Supply
+                (MobileHomeSupply.jsx), con su propio menú aparte del de
+                SupplyMobileNav.jsx (categorías/marcas) — el mismo ítem se
+                suma en ambos. */}
+            <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400">Mi cuenta/perfil</p>
+            <button type="button" onClick={() => { setMenuOpen(false); irAMiSupply(navigate) }} className="flex items-center gap-3 w-full text-left px-6 py-4 text-[15px] font-medium text-zinc-800">
+              <UserCircle size={18} className="flex-shrink-0" />
+              Mi Supply
+            </button>
 
             <div className="border-t border-zinc-100" />
             {/* only=['store'] + extraLinks (2026-09-15, Jose: "el botón

@@ -351,17 +351,18 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
 // reducido, mismo recurso que ya usan los footers de los módulos
 // (FooterSupply.jsx etc.) para "Navegación"/"Ecosistema", así la jerarquía
 // se siente consistente con el resto del sitio, no un componente aparte.
-// Sentence case (2026-09-16, Jose: "debe ser una letra en minúscula,
-// mayúscula solo la primera letra, y debe ser en una letra limpia") — se
-// quita `uppercase` de TODO el menú (categorías, items, sub-items): el
-// texto real ya se escribió en frase (arriba, donde se usa cada
-// componente), forzarlo a mayúscula acá lo habría vuelto a tapar. Peso
-// baja de font-bold a font-medium/font-semibold y el tracking se acorta a
-// tracking-wide — mismo criterio ya aplicado a los botones de módulo de
-// InkognitoHome.jsx.
+// Vuelve a mayúscula (2026-09-17, Jose: "Ecosistema y marca, Aliados y
+// logística, y Comunidad y legal debe ir en mayúscula, misma lógica que ya
+// usamos en los demás") — el 2026-09-16 se había quitado `uppercase` de
+// TODO el menú (categorías, items, sub-items) por sentence case; ese
+// mismo día, en paralelo, Supply/Store/INK terminaron consolidando el
+// patrón contrario para sus propios menús: SOLO el section label va en
+// mayúscula, los items (MenuLink de abajo) se quedan en minúscula/frase.
+// Esto alinea el menú del ecosistema con ese patrón ya extendido a los
+// demás — MenuLink NO cambia, sigue sin `uppercase`.
 function MenuSectionLabel({ children }) {
   return (
-    <p className="px-4 pt-2 pb-1 text-zinc-400 text-[10px] font-semibold tracking-wide">
+    <p className="px-4 pt-2 pb-1 text-zinc-400 text-[10px] font-semibold uppercase tracking-wide">
       {children}
     </p>
   )

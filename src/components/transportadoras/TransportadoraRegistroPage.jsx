@@ -37,6 +37,8 @@ export function meta() {
 
 const inputClass = 'w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-500 transition-colors'
 const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb-1.5 block'
+const cardClass = 'bg-white border border-gray-200 rounded-2xl shadow-sm p-5 md:p-8'
+const cardTitleClass = 'text-sm font-black uppercase tracking-widest text-gray-900 mb-4 pb-3 border-b border-gray-100'
 
 export default function TransportadoraRegistroPage() {
   const { cloud_name, upload_preset, captchaA, captchaB } = useLoaderData()
@@ -128,7 +130,7 @@ export default function TransportadoraRegistroPage() {
           </div>
         </div>
       ) : (
-        <div className="flex-1 pt-10 max-w-md mx-auto px-4 pb-16 w-full">
+        <div className="flex-1 pt-10 max-w-2xl mx-auto px-4 pb-16 w-full">
           <h1 className="text-xl font-black uppercase mb-2 text-center">Regístrate como transportadora</h1>
           <p className="text-gray-500 text-sm text-center mb-5">
             Recibe envíos de tiendas de INKognito Store en tu zona de cobertura.
@@ -150,47 +152,65 @@ export default function TransportadoraRegistroPage() {
             <p className="text-gray-400 text-[10px] mt-2">Logo (opcional): cuadrado, mínimo 400×400px</p>
           </div>
 
-          <form onSubmit={enviar} className="space-y-4">
-            <div>
-              <label className={labelClass}>Nombre de la empresa *</label>
-              <input required className={inputClass} value={form.nombre} onChange={set('nombre')} placeholder="Ej: Envíos Rápidos Urabá" />
+          {/* Jerarquía en tarjetas (2026-09-17, Jose: "organiza todos los
+              formularios del ecosistema, para que tengan esa estructura y
+              sea súper claro de entender") — mismo patrón que los demás
+              registros: "Datos de la empresa" agrupa lo propio del
+              negocio (municipio, cobertura, bio), "Contacto" agrupa
+              WhatsApp/correo/Facebook. */}
+          <form onSubmit={enviar}>
+            {/* CARD 1 — Datos de la empresa */}
+            <div className={cardClass}>
+              <h2 className={cardTitleClass}>Datos de la empresa</h2>
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label className={labelClass}>Nombre de la empresa *</label>
+                  <input required className={inputClass} value={form.nombre} onChange={set('nombre')} placeholder="Ej: Envíos Rápidos Urabá" />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Municipio de tu empresa *</label>
+                  <select required className={inputClass} value={form.municipio} onChange={set('municipio')}>
+                    <option value="">Selecciona...</option>
+                    {Object.entries(ZONAS_FLETE).map(([key, label]) => (
+                      <option key={key} value={key}>{label}</option>
+                    ))}
+                  </select>
+                  <p className="text-gray-400 text-[10px] mt-1">Dónde tienes tu sede — puede ser distinto de las zonas que cubres abajo.</p>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Zonas que cubres *</label>
+                  <ZonasCoberturaCheckboxes value={form.zonas_cobertura} onChange={(zonas) => setForm((f) => ({ ...f, zonas_cobertura: zonas }))} />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Bio (opcional)</label>
+                  <textarea rows={3} className={inputClass} value={form.bio} onChange={set('bio')} placeholder="Cuenta sobre tu empresa — flota, trayectoria..." />
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label className={labelClass}>WhatsApp *</label>
-              <input required className={inputClass} value={form.whatsapp} onChange={set('whatsapp')} placeholder="57300..." />
-            </div>
+            {/* CARD 2 — Contacto */}
+            <div className={`${cardClass} mt-5`}>
+              <h2 className={cardTitleClass}>Contacto</h2>
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label className={labelClass}>WhatsApp *</label>
+                  <input required className={inputClass} value={form.whatsapp} onChange={set('whatsapp')} placeholder="57300..." />
+                </div>
 
-            <div>
-              <label className={labelClass}>Correo *</label>
-              <input required type="email" className={inputClass} value={form.email} onChange={set('email')} placeholder="tucorreo@ejemplo.com" />
-              <p className="text-gray-400 text-[10px] mt-1">Te mandamos un link para confirmar el registro — sin esto no queda activo.</p>
-            </div>
+                <div>
+                  <label className={labelClass}>Correo *</label>
+                  <input required type="email" className={inputClass} value={form.email} onChange={set('email')} placeholder="tucorreo@ejemplo.com" />
+                  <p className="text-gray-400 text-[10px] mt-1">Te mandamos un link para confirmar el registro — sin esto no queda activo.</p>
+                </div>
 
-            <div>
-              <label className={labelClass}>Municipio de tu empresa *</label>
-              <select required className={inputClass} value={form.municipio} onChange={set('municipio')}>
-                <option value="">Selecciona...</option>
-                {Object.entries(ZONAS_FLETE).map(([key, label]) => (
-                  <option key={key} value={key}>{label}</option>
-                ))}
-              </select>
-              <p className="text-gray-400 text-[10px] mt-1">Dónde tienes tu sede — puede ser distinto de las zonas que cubres abajo.</p>
-            </div>
-
-            <div>
-              <label className={labelClass}>Zonas que cubres *</label>
-              <ZonasCoberturaCheckboxes value={form.zonas_cobertura} onChange={(zonas) => setForm((f) => ({ ...f, zonas_cobertura: zonas }))} />
-            </div>
-
-            <div>
-              <label className={labelClass}>Facebook (opcional)</label>
-              <input className={inputClass} value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." />
-            </div>
-
-            <div>
-              <label className={labelClass}>Bio (opcional)</label>
-              <textarea rows={3} className={inputClass} value={form.bio} onChange={set('bio')} placeholder="Cuenta sobre tu empresa — flota, trayectoria..." />
+                <div>
+                  <label className={labelClass}>Facebook (opcional)</label>
+                  <input className={inputClass} value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." />
+                </div>
+              </div>
             </div>
 
             <input
@@ -203,17 +223,17 @@ export default function TransportadoraRegistroPage() {
               style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }}
             />
 
-            <div>
+            <div className="mt-5">
               <label className={labelClass}>Verificación — ¿cuánto es {captchaA} + {captchaB}?</label>
               <input type="number" inputMode="numeric" className={inputClass} value={captchaRespuesta} onChange={(e) => setCaptchaRespuesta(e.target.value)} placeholder="Escribe el resultado" />
             </div>
 
-            {error && <p className="text-sm text-center" style={{ color: '#dc2626' }}>{error}</p>}
+            {error && <p className="text-sm text-center mt-4" style={{ color: '#dc2626' }}>{error}</p>}
 
             <button
               type="submit"
               disabled={enviando}
-              className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
+              className="w-full py-3.5 mt-5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
               style={{ backgroundColor: ACCENT }}
             >
               {enviando ? 'Enviando...' : 'Enviar registro'}

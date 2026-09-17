@@ -83,7 +83,7 @@ export default function StoreMobileNav({ active = null }) {
             <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400">Mi cuenta/perfil</p>
             <button type="button" onClick={() => { setMenuOpen(false); irAMiTienda(navigate) }} className="flex items-center gap-3 w-full text-left px-6 py-4 text-[15px] font-medium text-zinc-800">
               <UserCircle size={18} className="flex-shrink-0" />
-              Tienda
+              Mi Tienda
             </button>
 
             <div className="border-t border-zinc-100" />

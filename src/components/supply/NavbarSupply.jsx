@@ -1,14 +1,16 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { Menu, ShoppingCart, X, Sparkles, LayoutGrid, Tag, Phone, Store, PlusCircle, GraduationCap, Globe, FileText, Shield } from 'lucide-react'
+import { Menu, ShoppingCart, X, Sparkles, LayoutGrid, Tag, Phone, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle } from 'lucide-react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import logoSupply from '../../assets/milogo/supply.webp'
 import AnimatedWordmark from '../AnimatedWordmark'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import LegalModal from '../legal/LegalModal'
+import { irAMiSupply } from '../../lib/supplyTienda'
 
 export default function NavbarSupply() {
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   // legalOpen (2026-09-15, Jose: "el modal abre directo donde estoy...
@@ -130,6 +132,21 @@ export default function NavbarSupply() {
                   className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
                   <GraduationCap size={16} className="flex-shrink-0" /> Educación para el artista
                 </Link>
+
+                <div className="border-t border-zinc-900" />
+                {/* Mi cuenta/perfil (2026-09-17, Jose: "en el botón
+                    hamburguesa de supply no veo el ítem de cuenta/perfil, y
+                    que este también lleve al perfil de quien tiene una
+                    tienda registrada") — mismo criterio que NavbarStore.jsx:
+                    irAMiSupply revisa si ya hay un Supply con token guardado
+                    en este navegador y lo abre directo con su botón de
+                    gestión; si no, cae al flujo de siempre (correo → INK) —
+                    ver supplyTienda.js. */}
+                <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-600">Mi cuenta/perfil</p>
+                <button type="button" onClick={() => { setMenuOpen(false); irAMiSupply(navigate) }}
+                  className="flex items-center gap-3 w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all duration-300">
+                  <UserCircle size={16} className="flex-shrink-0" /> Mi Supply
+                </button>
 
                 <div className="border-t border-zinc-900" />
                 {/* only=['store'] + extraLinks (2026-09-15, Jose: "el botón
