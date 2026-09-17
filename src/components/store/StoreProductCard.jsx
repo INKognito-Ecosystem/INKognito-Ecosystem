@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ShoppingCart, Check } from 'lucide-react'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import ProductImageGallery from '../ProductImageGallery'
 
@@ -78,7 +79,7 @@ export function SizeSelector({ sizes, selIdx, onChange }) {
 // criterio que ya tenía SupplyProductCard.jsx cuando light=true.
 export default function StoreProductCard({ product, category, sizes }) {
   const navigate = useNavigate()
-  const { items, addItem } = useStoreCart()
+  const { items, addItem, removeItem } = useStoreCart()
   const [selIdx, setSelIdx] = useState(0)
   const [showDesc, setShowDesc] = useState(false)
   const [bloqueoMsg, setBloqueoMsg] = useState(null)
@@ -153,6 +154,17 @@ export default function StoreProductCard({ product, category, sizes }) {
     }
   }
 
+  // Alterna agregar/quitar (2026-09-17, Jose: "no dice agregar al
+  // carrito, sino que aparece el ícono del carrito" — la card debía
+  // pasar al mismo ícono incrustado en la foto que ya usa Supply, en vez
+  // del botón de texto de ancho completo de antes) — mismo criterio que
+  // SupplyProductCard.jsx: volver a tocar el ícono ya en el carrito lo
+  // quita, en vez de no hacer nada.
+  const handleToggle = () => {
+    if (enCarrito) removeItem(cartKey)
+    else handleAdd()
+  }
+
   return (
     <div className="bg-white border border-gray-200 rounded-xl md:rounded-2xl overflow-hidden hover:border-[#C9A84C] hover:shadow-md transition-all duration-300 flex flex-col h-full">
 
@@ -181,6 +193,22 @@ export default function StoreProductCard({ product, category, sizes }) {
             <p className="text-gray-400 uppercase tracking-[0.3em] text-[10px]">Imagen</p>
           </div>
         )}
+        {/* Carrito como ícono incrustado en la foto (2026-09-17, mismo
+            patrón que SupplyProductCard.jsx) — reemplaza el botón de
+            texto de ancho completo de abajo. stopPropagation: el
+            contenedor de la foto también tiene su propio onClick (abre
+            la ficha completa), sin esto tocar el ícono también
+            navegaría. */}
+        <button
+          onClick={(e) => { e.stopPropagation(); handleToggle() }}
+          aria-label={enCarrito ? 'Quitar del carrito' : 'Agregar al carrito'}
+          className={`absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center shadow-md transition-all duration-300 ${
+            enCarrito ? 'text-black' : 'bg-white text-gray-500 hover:text-gray-900'
+          }`}
+          style={enCarrito ? { backgroundColor: '#C9A84C' } : {}}
+        >
+          {enCarrito ? <Check size={13} /> : <ShoppingCart size={12} />}
+        </button>
       </div>
 
       <div className="p-3 flex flex-col flex-1 gap-1.5 min-h-0">
@@ -207,20 +235,10 @@ export default function StoreProductCard({ product, category, sizes }) {
         <div className="mt-auto pt-1">
           <SizeSelector sizes={sizes} selIdx={selIdx} onChange={setSelIdx} />
         </div>
+        {bloqueoMsg && (
+          <p className="text-[9px] leading-snug text-amber-700 bg-amber-50 rounded px-2 py-1.5 mt-1">{bloqueoMsg}</p>
+        )}
       </div>
-
-      {bloqueoMsg && (
-        <p className="px-3 pb-2 text-[9px] leading-snug text-amber-700 bg-amber-50">{bloqueoMsg}</p>
-      )}
-      <button
-        onClick={handleAdd}
-        className={`w-full py-2.5 font-bold uppercase tracking-[0.1em] text-[10px] md:text-xs flex-shrink-0 transition-all duration-300 ${
-          enCarrito ? 'bg-green-500 text-white' : 'text-black hover:brightness-90'
-        }`}
-        style={enCarrito ? {} : { backgroundColor: '#C9A84C' }}
-      >
-        {enCarrito ? '✓ Agregado' : '+ Agregar al carrito'}
-      </button>
 
       {showDesc && (
         <div

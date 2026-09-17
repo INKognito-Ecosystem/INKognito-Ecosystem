@@ -144,13 +144,24 @@ export default function StoreProductDetailPage() {
   const proveedorSlug = sel.estudio_slug || product.estudio_slug || null
   const proveedorMp = sel.estudio_mp_conectado ?? product.estudio_mp_conectado ?? false
 
-  const productId = product.name + (sel.variant ? '-' + sel.variant : '')
-  const cartKey = `${product.categoria}-${productId}`
+  // Misma convención de key que StoreProductCard.jsx: `${category}-${id}-
+  // ${size}`, con `id` el nombre PELADO del producto (sin la talla ya
+  // pegada) — StoreCartContext.addItem arma esa key sola a partir de
+  // (product, category, size). Antes esta página pasaba `id: productId`
+  // (que YA traía la talla pegada, "Nombre-Talla") Y ADEMÁS `sel.variant`
+  // como el 3er argumento de talla, así que la key real que guardaba el
+  // carrito quedaba con la talla dos veces ("categoria-Nombre-Talla-
+  // Talla"), distinta de la que esta página comparaba para pintar el
+  // botón como "ya agregado" — el carrito sí guardaba bien el producto
+  // (por eso el contador del navbar se actualizaba), pero enCarrito acá
+  // nunca daba true (Jose, 2026-09-17: "el botón espabiló pero no mostró
+  // el número 1 de agregado, aunque en el navbar sí aparece").
+  const cartKey = `${product.categoria}-${product.name}-${sel.variant || ''}`
   const enCarrito = cartItems.some(i => i.key === cartKey)
 
   const handleAdd = () => {
     const resultado = addItem({
-      id: productId,
+      id: product.name,
       inventoryId: sel.id ?? null,
       name: product.name,
       price: resolvedPrice || '—',
@@ -186,7 +197,7 @@ export default function StoreProductDetailPage() {
   const handleComprarAhora = () => {
     if (sinStock) return
     const resultado = setSingleItem({
-      id: productId,
+      id: product.name,
       inventoryId: sel.id ?? null,
       name: product.name,
       price: resolvedPrice || '—',
