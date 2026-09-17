@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, BookOpen, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BookOpen, X, Search } from 'lucide-react'
 import NavbarCategoryStore from '../NavbarCategoryStore'
 import StoreMobileNav from '../StoreMobileNav'
 import FooterStore from '../FooterStore'
@@ -8,16 +8,18 @@ import LlegamosDondeEstas from '../LlegamosDondeEstas'
 import AccordionCardStore from '../AccordionCardStore'
 import { FaWhatsapp } from 'react-icons/fa'
 import StoreProductCard from '../StoreProductCard'
-import { fetchCatalogCategoriaItems, toProdCard, useLoadMore } from '../../../hooks/useCatalog'
+import { fetchCatalogCategoriaItems, fetchCatalogPage, toProdCard, useLoadMore } from '../../../hooks/useCatalog'
 import { getAdjacentCategories } from '../../../data/storeCategoriesOrder'
 import { categories } from '../../../data/storeCategories.jsx'
 import { useScrolled } from '../../../hooks/useScrolled'
+import logoStore from '../../../assets/milogo/store.webp'
 
 const TITLE = 'Teniguayos'
+const CATEGORIA_DB = 'Tenis y guayo'
 const DESCRIPCION = 'El calzado más versátil de Urabá: rinde en sintético, polvo de ladrillo y calle sin cambiar de par. La opción inteligente para quien juega donde se pueda y quiere un solo calzado para todo. Despachamos con Ruta del Golfo a toda la región — pago contraentrega.'
 
 export async function loader() {
-  return fetchCatalogCategoriaItems('store', 'Tenis y guayo')
+  return fetchCatalogCategoriaItems('store', CATEGORIA_DB)
 }
 
 export function meta() {
@@ -60,14 +62,50 @@ const faqs = [
 export default function TenisGuayoPage() {
   const { items: itemsIniciales, nextCursor, hasMore } = useLoaderData()
   const { items: catalogItems, hasMore: hayMasProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } =
-    useLoadMore('store', { categoria: 'Tenis y guayo' }, { items: itemsIniciales, nextCursor, hasMore })
+    useLoadMore('store', { categoria: CATEGORIA_DB }, { items: itemsIniciales, nextCursor, hasMore })
   const { prev, next } = getAdjacentCategories('tenis-guayo')
   const scrolled = useScrolled()
   const [introAbierto, setIntroAbierto] = useState(false)
 
+  const [busqueda, setBusqueda] = useState('')
+  const [buscando, setBuscando] = useState(false)
+  const [resultados, setResultados] = useState(null)
+
+  useEffect(() => {
+    const q = busqueda.trim()
+    if (q.length < 2) { setResultados(null); setBuscando(false); return }
+    setBuscando(true)
+    const t = setTimeout(async () => {
+      const page = await fetchCatalogPage('store', { categoria: CATEGORIA_DB, q, limit: 24 })
+      setResultados(page.items)
+      setBuscando(false)
+    }, 300)
+    return () => clearTimeout(t)
+  }, [busqueda])
+
+  const gridItems = resultados ?? catalogItems
+
   return (
     <>
-      <NavbarCategoryStore pageName="Teniguayos" hideMobileActions />
+      <div className="hidden md:block">
+        <NavbarCategoryStore pageName="Teniguayos" />
+      </div>
+
+      <div className="md:hidden sticky top-0 z-40 flex items-center gap-2 px-4 py-2 bg-white border-b border-zinc-200">
+        <Link to="/store" aria-label="Volver a Store" className="flex-shrink-0">
+          <img src={logoStore} alt="INKognito Store" className="w-12 h-12 object-contain" />
+        </Link>
+        <div className="relative flex-1 min-w-0">
+          <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
+          <input
+            type="text"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            placeholder={`Buscar en categoría ${TITLE.toLowerCase()}`}
+            className="w-full min-w-0 bg-zinc-100 border border-zinc-200 text-zinc-900 text-xs rounded-lg pl-8 pr-2 py-2 placeholder:text-zinc-500 focus:outline-none focus:border-[#C9A84C]"
+          />
+        </div>
+      </div>
 
       {scrolled && prev && (
         <Link
@@ -88,7 +126,7 @@ export default function TenisGuayoPage() {
         </Link>
       )}
 
-      <div className="relative overflow-hidden bg-gray-50 pt-20 md:pt-24">
+      <div className="relative overflow-hidden bg-gray-50 pt-0 md:pt-24">
         <div className="absolute inset-0 opacity-[0.13]" style={STRIPE_PATTERN} />
         <div className="relative z-10 pb-4 px-6 max-w-7xl mx-auto">
           {/* Desktop — flechas prev/next + "Categoría", sin cambios */}
@@ -156,7 +194,25 @@ export default function TenisGuayoPage() {
 
       <div className="bg-gray-50 pt-4 pb-8 md:pb-14 px-6">
         <div className="max-w-7xl mx-auto">
-          {catalogItems.length === 0 ? (
+          <div className="hidden md:flex items-center gap-2 mb-5">
+            <div className="relative flex-1 min-w-0">
+              <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <input
+                type="text"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                placeholder={`Buscar en categoría ${TITLE.toLowerCase()}`}
+                className="w-full min-w-0 bg-white border border-gray-200 text-gray-900 text-sm rounded-lg pl-9 pr-3 py-2.5 placeholder:text-gray-400 focus:outline-none focus:border-[#C9A84C]"
+              />
+            </div>
+          </div>
+
+          {buscando ? (
+            <p className="text-gray-400 text-sm text-center py-10">Buscando…</p>
+          ) : gridItems.length === 0 ? (
+            resultados ? (
+              <p className="text-gray-400 text-sm text-center py-10">Ningún producto coincide con tu búsqueda.</p>
+            ) : (
             <div className="border border-[#C9A84C]/30 bg-white rounded-2xl p-10 text-center">
               <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-2">Sin stock por el momento</p>
               <p className="text-gray-900 text-lg font-black uppercase mb-2">Catálogo actualizándose</p>
@@ -173,10 +229,11 @@ export default function TenisGuayoPage() {
                 Avisarme cuando haya stock →
               </a>
             </div>
+            )
           ) : (
             <>
             <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
-              {catalogItems.map(item => {
+              {gridItems.map(item => {
                 const prod = toProdCard(item)
                 const sizes = item.variantes.map(v => v.variant).filter(Boolean)
                 return (
@@ -186,7 +243,7 @@ export default function TenisGuayoPage() {
                 )
               })}
             </div>
-            {hayMasProductos && (
+            {!resultados && hayMasProductos && (
               <div className="flex justify-center mt-6">
                 <button
                   onClick={cargarMasProductos}
