@@ -1054,35 +1054,6 @@ export default function ArtistasColombiaPage() {
         </div>
       </section>
 
-      {/* Carrusel persistente "Cerca de ti" (2026-09-17) — se oculta SOLO en
-          el momento en que la pestaña Artistas ya está mostrando este mismo
-          contenido a ancho completo (justo tras tocar el botón), para no
-          duplicar la misma card dos veces seguidas en pantalla. En
-          cualquier otro estado (pestaña Estudios, una búsqueda de texto
-          nueva, o navegación normal después) se mantiene visible. */}
-      {cercaSesion && cercaSesion.items.length > 0 && !(categoria === 'artistas' && cercaDeTiActivo && !hayBusqueda) && (
-        <section className="px-4 md:px-6 pt-5 max-w-3xl mx-auto w-full">
-          <p className="flex items-center gap-1.5 text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 px-1">
-            <MapPin size={12} />
-            Cerca de ti
-          </p>
-          <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {cercaSesion.items.map(a => {
-              const distanciaTexto = a.distancia_km != null ? a.distancia_km.toFixed(1) : null
-              return (
-                <ArtistaCercanoCard
-                  key={a.id}
-                  a={a}
-                  distanciaTexto={distanciaTexto}
-                  onVerInfo={() => setModalArtista(a)}
-                  sesionNuevo={!!a._nuevo}
-                />
-              )
-            })}
-          </div>
-        </section>
-      )}
-
       <section ref={listadoRef} className="flex-1 px-4 md:px-6 pb-16 max-w-3xl mx-auto scroll-mt-20 w-full">
 
         {/* CONTADOR — con búsqueda de 2+ caracteres o "Cerca de ti" activo
@@ -1138,12 +1109,14 @@ export default function ArtistasColombiaPage() {
         {categoria !== 'artistas' && estudiosFiltrados.length > 0 && (
           <div className="mb-5">
             <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 px-1">Estudios</p>
-            {/* grid de 2 columnas desde sm: (2026-08-09, Jose) — solo
-                cuando se pintan las cards con portada (full); en "Todos"
-                sigue siendo lista vertical de ListingRow como siempre. En
-                celular queda 1 sola columna a propósito, para que la foto
-                grande "estilo redes sociales" no se achique. */}
-            <div className={categoria === 'estudios' ? 'grid grid-cols-1 sm:grid-cols-2 gap-3' : 'flex flex-col gap-3'}>
+            {/* grid de 2 columnas SIEMPRE, incluido celular (2026-09-17,
+                Jose: "card de 2x2") — antes quedaba en 1 sola columna hasta
+                el breakpoint sm: para que la foto "estilo redes sociales"
+                no se achicara; ahora se prioriza la grilla 2x2 pedida
+                explícitamente, solo cuando se pintan las cards con portada
+                (full); en "Todos" sigue siendo lista vertical de
+                ListingRow como siempre. */}
+            <div className={categoria === 'estudios' ? 'grid grid-cols-2 gap-3' : 'flex flex-col gap-3'}>
               {estudiosFiltrados.map(e => (
                 categoria === 'estudios' ? (() => {
                   // distancia_km ya viene calculada por el servidor
@@ -1194,7 +1167,7 @@ export default function ArtistasColombiaPage() {
         {categoria !== 'estudios' && (
           <div className={
             categoria === 'artistas'
-              ? `grid grid-cols-1 sm:grid-cols-2 gap-3 ${query ? '' : 'mt-1'}`
+              ? `grid grid-cols-2 gap-3 ${query ? '' : 'mt-1'}`
               : `flex flex-col gap-3 ${query ? '' : 'mt-1'}`
           }>
             {filtrados.map(a => (
@@ -1245,6 +1218,37 @@ export default function ArtistasColombiaPage() {
         {!cargando && (hayBusqueda || cercaDeTiActivo) && !hayResultadosVisible && (
           <div className="text-center py-6 text-gray-400 text-sm">
             No hay resultados por ahora.
+          </div>
+        )}
+
+        {/* Carrusel persistente "Cerca de ti" (2026-09-17, reubicado a
+            pedido de Jose: "cuando me pare en estudios, deberán aparecer
+            arriba y los cerca de ti deberán aparecer abajo") — va DEBAJO
+            del contenido principal de la pestaña activa (estudios o
+            artistas), nunca arriba. Se oculta SOLO en el momento en que la
+            pestaña Artistas ya está mostrando este mismo contenido a ancho
+            completo (justo tras tocar el botón), para no duplicar la misma
+            card dos veces seguidas en pantalla. */}
+        {cercaSesion && cercaSesion.items.length > 0 && !(categoria === 'artistas' && cercaDeTiActivo && !hayBusqueda) && (
+          <div className="mb-5">
+            <p className="flex items-center gap-1.5 text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 px-1">
+              <MapPin size={12} />
+              Cerca de ti
+            </p>
+            <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {cercaSesion.items.map(a => {
+                const distanciaTexto = a.distancia_km != null ? a.distancia_km.toFixed(1) : null
+                return (
+                  <ArtistaCercanoCard
+                    key={a.id}
+                    a={a}
+                    distanciaTexto={distanciaTexto}
+                    onVerInfo={() => setModalArtista(a)}
+                    sesionNuevo={!!a._nuevo}
+                  />
+                )
+              })}
+            </div>
           </div>
         )}
 
