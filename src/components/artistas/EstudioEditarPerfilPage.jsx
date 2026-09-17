@@ -645,13 +645,17 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
               style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: '#4B5563', color: '#4B5563' }}
             >
               {ubicando ? <LoaderCircle size={14} className="animate-spin" /> : form.lat ? <Check size={14} /> : <Navigation size={14} />}
-              {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación exacta agregada' : 'Agregar ubicación exacta (ayuda a aparecer "cerca de ti")'}
+              {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación agregada' : 'Ubicación exacta'}
             </button>
             {/* Aclaración (2026-08-07, Jose confundió esto con el link de
                 Google Maps, pensando que uno reemplaza al otro) — son
                 independientes: esto alimenta el orden por cercanía del
-                buscador, el link de Google Maps de abajo NO. */}
-            <p className="text-gray-400 text-[10px] mt-1.5 text-center">Actívalo siempre — es lo único que ordena tu perfil por cercanía real en el buscador, tengas o no link de Google Maps.</p>
+                buscador, el link de Google Maps de abajo NO. Suma
+                (2026-09-17, Jose: la descripción debe aclarar que hay que
+                estar físicamente en el punto exacto al activarla, no en
+                otro lado) — mismo criterio en todos los formularios/
+                ediciones que tienen este botón. */}
+            <p className="text-gray-400 text-[10px] mt-1.5 text-center">Actívala estando físicamente en el punto exacto que quieres mostrar. Es independiente del link de Google Maps de abajo — actívala siempre.</p>
           </div>
           <div>
             <label className={labelClass}><FaInstagram className="inline -mt-0.5 mr-1" />Instagram</label>

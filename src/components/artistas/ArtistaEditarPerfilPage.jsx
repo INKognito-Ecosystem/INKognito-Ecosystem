@@ -1697,7 +1697,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
               {ubicando ? <LoaderCircle size={14} className="animate-spin" /> : form.lat ? <Check size={14} /> : <Navigation size={14} />}
               {ubicando ? 'Ubicando...' : form.lat ? 'Actualizar ubicación' : 'Activar mi ubicación'}
             </button>
-            <p className="text-gray-400 text-[10px] mt-1.5 text-center">Utilizado para priorizar tu perfil en búsquedas locales.</p>
+            <p className="text-gray-400 text-[10px] mt-1.5 text-center">Actívala estando físicamente en el punto exacto que quieres mostrar — prioriza tu perfil en búsquedas locales.</p>
           </div>
 
           <div>

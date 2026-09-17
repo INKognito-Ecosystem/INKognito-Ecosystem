@@ -265,7 +265,7 @@ export default function EstudioProveedorSupplyRegistroPage() {
                       {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación agregada' : 'Ubicación exacta'}
                     </button>
                     <p className="text-gray-400 text-[10px] mt-1.5 text-center leading-relaxed">
-                      Mejora la precisión de tu ubicación para clientes cercanos.
+                      Actívala estando físicamente en el punto exacto que quieres mostrar.
                     </p>
                     {ubicacionError && <p className="text-gray-400 text-[10px] mt-1 text-center">{ubicacionError}</p>}
                   </div>

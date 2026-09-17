@@ -229,10 +229,10 @@ export default function EstudioMarcaRegistroPage() {
                     style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: '#4B5563', color: '#4B5563' }}
                   >
                     {ubicando ? <LoaderCircle size={14} className="animate-spin" /> : form.lat ? <Check size={14} /> : <Navigation size={14} />}
-                    {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación exacta agregada' : 'Agregar ubicación exacta (opcional)'}
+                    {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación agregada' : 'Ubicación exacta'}
                   </button>
                   <p className="text-gray-400 text-[10px] mt-1.5 text-center leading-relaxed">
-                    Opcional — sin esto, igual aparece asociada a su municipio.
+                    Actívala estando físicamente en el punto exacto que quieres mostrar.
                   </p>
                   {ubicacionError && <p className="text-gray-400 text-[10px] mt-1 text-center">{ubicacionError}</p>}
                 </div>

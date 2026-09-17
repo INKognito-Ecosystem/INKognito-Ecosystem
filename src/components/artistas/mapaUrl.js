@@ -3,7 +3,7 @@
 // estudios/supplys que se registran en google"). Tres niveles, del más
 // específico al más genérico — nunca deja el chip sin link:
 // 1. google_maps_url propio, si ya tienen ficha real de Google Maps.
-// 2. lat/lng capturados ("Agregar ubicación exacta") — pin exacto.
+// 2. lat/lng capturados ("Ubicación exacta") — pin exacto.
 // 3. Búsqueda por nombre+municipio — a veces resuelve solo a su ficha
 //    real si ya está registrado en Google, aunque no lo hayan pegado acá.
 export function urlGoogleMaps({ google_maps_url, lat, lng, nombre, municipio, departamento }) {

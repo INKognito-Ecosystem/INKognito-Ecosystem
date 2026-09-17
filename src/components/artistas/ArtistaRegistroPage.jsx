@@ -448,10 +448,10 @@ export default function ArtistaRegistroPage() {
                         {ubicando
                           ? <LoaderCircle size={14} className="animate-spin" />
                           : form.lat ? <Check size={14} /> : <Navigation size={14} />}
-                        {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación exacta agregada' : 'Agregar mi ubicación exacta (opcional)'}
+                        {ubicando ? 'Ubicando...' : form.lat ? 'Ubicación agregada' : 'Ubicación exacta'}
                       </button>
                       <p className="text-gray-400 text-[10px] mt-1.5 text-center leading-relaxed">
-                        Ayuda a que clientes cerca de ti te encuentren primero, sobre todo en ciudades grandes. Es opcional — sin esto, igual apareces en tu municipio.
+                        Actívala estando físicamente en el punto exacto que quieres mostrar.
                       </p>
                       {ubicacionError && <p className="text-gray-400 text-[10px] mt-1 text-center">{ubicacionError}</p>}
                     </div>
