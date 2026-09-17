@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, BookOpen, X, Search } from 'lucide-react'
 import NavbarCategoryStore from '../NavbarCategoryStore'
@@ -66,6 +66,13 @@ export default function GuayosPage() {
   const { prev, next } = getAdjacentCategories('guayos')
   const scrolled = useScrolled()
   const [introAbierto, setIntroAbierto] = useState(false)
+
+  // Centra la categoría activa en el listón horizontal al entrar a la
+  // página (2026-09-16, mismo bug/mismo arreglo que SupplyCategoryPage.jsx).
+  const activeTabRef = useRef(null)
+  useEffect(() => {
+    activeTabRef.current?.scrollIntoView({ behavior: 'instant', inline: 'center', block: 'nearest' })
+  }, [])
 
   const [busqueda, setBusqueda] = useState('')
   const [buscando, setBuscando] = useState(false)
@@ -152,6 +159,7 @@ export default function GuayosPage() {
                   <Link
                     key={cat.id}
                     to={cat.link}
+                    ref={cat.link === '/store/guayos' ? activeTabRef : null}
                     className={`flex-shrink-0 text-[12px] font-extrabold pb-1 border-b-2 whitespace-nowrap ${
                       cat.link === '/store/guayos' ? 'text-black border-black' : 'text-black/60 border-transparent'
                     }`}

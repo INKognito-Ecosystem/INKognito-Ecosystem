@@ -52,7 +52,7 @@ import LegalModal from '../legal/LegalModal'
 // frase donde se usa cada componente, sin forzar uppercase por CSS.
 function MenuSectionLabel({ children }) {
   return (
-    <p className="px-6 pt-5 pb-1 text-[10px] font-black tracking-[0.1em] text-gray-400">
+    <p className="px-6 pt-5 pb-1 text-[10px] font-black uppercase tracking-[0.1em] text-gray-400">
       {children}
     </p>
   )
@@ -64,8 +64,12 @@ function MenuDivider() {
 
 // Modo botón cuando no hay `to` (2026-09-15) — usado por Términos/Privacidad
 // para abrir el modal legal en vez de navegar (ver LegalModal.jsx).
+// Mayúscula + text-[15px] (2026-09-16, Jose: "los items del menú hamburguesa
+// de INK están en minúscula y son muy pequeños, ponlos en mayúscula, así
+// como están los de Supply y Store" — antes text-sm/minúscula, se quedaba
+// chico frente al resto del ecosistema).
 function MenuLink({ to, icon: Icon, onClick, children }) {
-  const className = "flex items-center gap-3 px-6 py-4 text-sm font-medium tracking-normal text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300"
+  const className = "flex items-center gap-3 px-6 py-4 text-[15px] font-bold uppercase tracking-wide text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300"
   const content = (
     <>
       {Icon && <Icon size={16} className="flex-shrink-0 text-gray-400" />}

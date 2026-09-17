@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, BookOpen, X, Search } from 'lucide-react'
 import NavbarCategoryStore from '../NavbarCategoryStore'
@@ -66,6 +66,18 @@ export default function RopaDamaPage() {
   const { prev, next } = getAdjacentCategories('ropa-dama')
   const scrolled = useScrolled()
   const [introAbierto, setIntroAbierto] = useState(false)
+
+  // Centra la categoría activa en el listón horizontal al entrar a la
+  // página (2026-09-16, mismo bug/mismo arreglo que SupplyCategoryPage.jsx:
+  // Jose "cuando hago scroll en categorías y elijo una, esta vuelve a su
+  // posición, dejando la selección escondida" — cada categoría de Store es
+  // una página/ruta distinta, así que el listón siempre remonta con
+  // scrollLeft=0, dejando la categoría activa fuera de vista si el usuario
+  // la eligió más adelante en la fila).
+  const activeTabRef = useRef(null)
+  useEffect(() => {
+    activeTabRef.current?.scrollIntoView({ behavior: 'instant', inline: 'center', block: 'nearest' })
+  }, [])
 
   // Buscador dentro de la categoría (2026-09-16, Jose: "el buscador debe
   // aparecer también en cada categoría... debe filtrar dentro de su
@@ -171,6 +183,7 @@ export default function RopaDamaPage() {
                   <Link
                     key={cat.id}
                     to={cat.link}
+                    ref={cat.link === '/store/ropa-dama' ? activeTabRef : null}
                     className={`flex-shrink-0 text-[12px] font-extrabold pb-1 border-b-2 whitespace-nowrap ${
                       cat.link === '/store/ropa-dama' ? 'text-black border-black' : 'text-black/60 border-transparent'
                     }`}
