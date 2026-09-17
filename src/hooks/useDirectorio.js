@@ -36,12 +36,15 @@ export function fetchEstudiosPage(filtros) {
   return fetchDirectorioPage('/api/estudios', filtros)
 }
 
-const PAGE_SIZE = 12
+export const PAGE_SIZE = 12
 // "Cerca de ti" — mismo radio que ya usaba filtrarCercaDeTi en el
 // frontend antes de esta migración (RADIO_CERCA_KM); el fallback a los 10
 // más cercanos del país cuando nadie cae dentro vive ahora en el backend
-// (ver GET /api/artistas, fallback de radio en server.js).
-const RADIO_CERCA_KM = 50
+// (ver GET /api/artistas, fallback de radio en server.js). Exportada
+// (2026-09-17) para que el carrusel persistente "Cerca de ti" de
+// ArtistasColombiaPage.jsx use el mismo radio en su polling de
+// actualización en vivo, sin duplicar el número mágico.
+export const RADIO_CERCA_KM = 50
 
 /**
  * Hook de alto nivel del buscador — reemplaza la carga completa +

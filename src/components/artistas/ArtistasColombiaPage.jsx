@@ -4,7 +4,7 @@ import { Search, MapPin, Palette, BadgeCheck, ChevronRight, LoaderCircle, Share2
 import NavbarArtistas from './NavbarArtistas'
 import LegalModal from '../legal/LegalModal'
 import { municipioDesdeNombreIP, getCoordsMunicipio } from '../../data/colombiaGeo'
-import { useDirectorioBusqueda } from '../../hooks/useDirectorio'
+import { useDirectorioBusqueda, fetchArtistasPage, RADIO_CERCA_KM, PAGE_SIZE } from '../../hooks/useDirectorio'
 import { artistaUrl } from './artistaSlug'
 import { cloudinaryFill } from '../../lib/cloudinary'
 // Mismo ícono (el sombrero) que ya usa NavbarArtistas.jsx — reutilizado acá
@@ -127,7 +127,7 @@ const BIO_BOTON_MIN = 45
 // completa debajo de otra) — mismo componente que ya usaba el carrusel
 // "Artistas más cercanos", solo cambia el contenedor: ancho fijo +
 // snap-scroll (carrusel horizontal) vs. ancho completo (feed vertical).
-function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo, full = false }) {
+function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo, full = false, sesionNuevo = false }) {
   const fotos = [a.foto_trabajo_1, a.foto_trabajo_2].filter(Boolean)
   const nuevo = esArtistaNuevo(a.created_at)
   const abrirInfo = (e) => { e.preventDefault(); e.stopPropagation(); onVerInfo() }
@@ -150,7 +150,16 @@ function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo, full = false }) {
             {a.nombre?.[0]?.toUpperCase() || '?'}
           </div>
         )}
-        {nuevo && (
+        {/* sesionNuevo gana sobre la insignia genérica de "registrado hace
+            poco" (2026-09-17, carrusel "Cerca de ti") — es un evento más
+            específico: apareció dentro del radio MIENTRAS este visitante
+            seguía navegando, no solo que se registró hace unos días.
+            Nunca se muestran las dos a la vez. */}
+        {sesionNuevo ? (
+          <span className="absolute top-2 left-2 flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full text-white" style={{ backgroundColor: ACCENT }}>
+            Nuevo en tu zona
+          </span>
+        ) : nuevo && (
           <span className="absolute top-2 left-2 flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full text-white bg-gray-600">
             Nuevo artista
           </span>
@@ -655,6 +664,21 @@ export default function ArtistasColombiaPage() {
   const listadoRef = useRef(null)
   const prevVacioRef = useRef(true)
 
+  // Carrusel persistente "Cerca de ti" (2026-09-17, pedido de Jose: que los
+  // artistas cercanos "se fijen" en una sesión aparte, con scroll lateral,
+  // que sobreviva a cambiar de pestaña o escribir una búsqueda nueva — hoy
+  // `cercaDeTiActivo` se apaga apenas se escribe texto y esos resultados se
+  // pierden del todo). Vive independiente de `filtrados`/`cercaDeTiActivo`:
+  // se siembra UNA vez desde el feed normal (ver efecto más abajo) y de ahí
+  // en adelante ya no depende de qué esté mostrando el resto de la página.
+  // `vistos` guarda los ids ya mostrados en ESTA sesión, para poder
+  // distinguir un artista realmente nuevo (se registró mientras el
+  // visitante seguía navegando) de uno que ya estaba en el radio desde el
+  // principio.
+  const [cercaSesion, setCercaSesion] = useState(null)
+  const cercaSesionRef = useRef(null)
+  useEffect(() => { cercaSesionRef.current = cercaSesion }, [cercaSesion])
+
   // Búsqueda/orden/paginación real por cursor (2026-09-14) — ya no hay
   // `matches()`/Levenshtein/Haversine en JS: el servidor filtra, ordena
   // (por relevancia de texto o por distancia real) y pagina. El hook trae
@@ -666,6 +690,53 @@ export default function ArtistasColombiaPage() {
     cargando,
   } = useDirectorioBusqueda({ query, misCoords, cercaDeTiActivo })
   const hayBusqueda = query.trim().length >= 2
+
+  // Siembra del carrusel "Cerca de ti" — se toma directo de `filtrados`
+  // (el hook ya trae artistas por distancia mientras `cercaDeTiActivo` esté
+  // activo y no haya texto de búsqueda), sin disparar un fetch aparte. Si
+  // las coords cambian (la persona vuelve a tocar "Cerca de ti" desde otro
+  // punto) se trata como sesión nueva: se descarta la anterior y se resiembra
+  // desde cero, sin arrastrar ids "vistos" de un radio que ya no aplica.
+  useEffect(() => {
+    if (!cercaDeTiActivo || hayBusqueda || !misCoords || filtrados.length === 0) return
+    setCercaSesion(prev => {
+      if (prev && prev.coords.lat === misCoords.lat && prev.coords.lng === misCoords.lng) return prev
+      return { coords: misCoords, items: filtrados, vistos: new Set(filtrados.map(a => a.id)) }
+    })
+  }, [cercaDeTiActivo, hayBusqueda, misCoords, filtrados])
+
+  // Actualización en vivo del carrusel — mientras exista una sesión activa,
+  // reconsulta el mismo radio cada 2 minutos directo con `fetchArtistasPage`
+  // (sin pasar por el hook de búsqueda, para no interferir con lo que el
+  // visitante esté haciendo en ese momento) y compara ids contra `vistos`.
+  // Los nuevos se agregan al inicio con `_nuevo: true` (ver insignia "Nuevo
+  // en tu zona" en ArtistaCercanoCard). Usa `cercaSesionRef` para leer el
+  // estado más reciente dentro del intervalo sin reiniciarlo en cada
+  // actualización — el efecto solo se reinicia si cambian las coords (nueva
+  // sesión), no en cada resultado nuevo. Se salta la consulta si la pestaña
+  // no está visible, para no gastar llamadas de balde.
+  useEffect(() => {
+    if (!cercaSesion) return
+    let detenido = false
+    const consultar = async () => {
+      if (document.hidden) return
+      const actual = cercaSesionRef.current
+      if (!actual) return
+      const pagina = await fetchArtistasPage({ lat: actual.coords.lat, lng: actual.coords.lng, radioKm: RADIO_CERCA_KM, orden: 'distancia', limit: PAGE_SIZE })
+      if (detenido) return
+      const nuevos = pagina.items.filter(a => !actual.vistos.has(a.id))
+      if (nuevos.length === 0) return
+      setCercaSesion(prev => {
+        if (!prev) return prev
+        const vistos = new Set(prev.vistos)
+        nuevos.forEach(a => vistos.add(a.id))
+        return { ...prev, items: [...nuevos.map(a => ({ ...a, _nuevo: true })), ...prev.items], vistos }
+      })
+    }
+    const intervalo = setInterval(consultar, 120000)
+    return () => { detenido = true; clearInterval(intervalo) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cercaSesion?.coords?.lat, cercaSesion?.coords?.lng])
 
   // Estudios reales vs. empresas proveedoras patrocinadas (fase 6,
   // 2026-08-07) — ya viene resuelto por el servidor (GET /api/estudios
@@ -982,6 +1053,35 @@ export default function ArtistasColombiaPage() {
           )}
         </div>
       </section>
+
+      {/* Carrusel persistente "Cerca de ti" (2026-09-17) — se oculta SOLO en
+          el momento en que la pestaña Artistas ya está mostrando este mismo
+          contenido a ancho completo (justo tras tocar el botón), para no
+          duplicar la misma card dos veces seguidas en pantalla. En
+          cualquier otro estado (pestaña Estudios, una búsqueda de texto
+          nueva, o navegación normal después) se mantiene visible. */}
+      {cercaSesion && cercaSesion.items.length > 0 && !(categoria === 'artistas' && cercaDeTiActivo && !hayBusqueda) && (
+        <section className="px-4 md:px-6 pt-5 max-w-3xl mx-auto w-full">
+          <p className="flex items-center gap-1.5 text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 px-1">
+            <MapPin size={12} />
+            Cerca de ti
+          </p>
+          <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {cercaSesion.items.map(a => {
+              const distanciaTexto = a.distancia_km != null ? a.distancia_km.toFixed(1) : null
+              return (
+                <ArtistaCercanoCard
+                  key={a.id}
+                  a={a}
+                  distanciaTexto={distanciaTexto}
+                  onVerInfo={() => setModalArtista(a)}
+                  sesionNuevo={!!a._nuevo}
+                />
+              )
+            })}
+          </div>
+        </section>
+      )}
 
       <section ref={listadoRef} className="flex-1 px-4 md:px-6 pb-16 max-w-3xl mx-auto scroll-mt-20 w-full">
 
