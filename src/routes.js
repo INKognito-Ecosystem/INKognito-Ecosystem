@@ -118,6 +118,7 @@ export default [
   route('store/zapatos-casuales', 'components/store/categories/ZapatosCasualesPage.jsx'),
   route('store/guayos', 'components/store/categories/GuayosPage.jsx'),
   route('store/tenis-guayo', 'components/store/categories/TenisGuayoPage.jsx'),
+  route('store/accesorios', 'components/store/categories/AccesoriosPage.jsx'),
   // Store multitenant (2026-08-29) — catálogo de una tienda conectada,
   // mismo patrón que supply/estudio/:id de arriba. store/estudio/:id se
   // queda vivo como link viejo — el loader redirige a /store/:slug en

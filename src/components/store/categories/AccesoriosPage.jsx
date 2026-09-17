@@ -13,26 +13,30 @@ import { getAdjacentCategories } from '../../../data/storeCategoriesOrder'
 import { categories } from '../../../data/storeCategories.jsx'
 import { useScrolled } from '../../../hooks/useScrolled'
 
-const TITLE = 'Ropa Deportiva Caballeros'
-const DESCRIPCION = 'Camisetas dry-fit, shorts y joggers para el hombre activo. Diseños de marcas reconocidas con telas que resisten el sudor y el calor de Urabá. Despacho con Ruta del Golfo a toda la región — pago contraentrega, sin adelantos.'
+const TITLE = 'Accesorios'
+const DESCRIPCION = 'Gorras y accesorios para completar tu look, de tiendas verificadas de Urabá. Despacho con Ruta del Golfo a toda la región — pago contraentrega.'
 
+// Categoría nueva (2026-09-16, Jose: "no veo habilitada la categoría
+// accesorios en el listón") — ya existía en el dropdown del panel para
+// tiendas desde 2026-08-31 (gorras), pero nunca tuvo página propia — ver
+// MisProductosTiendaSection.jsx y storeCategories.jsx.
 export async function loader() {
-  return fetchCatalogCategoriaItems('store', 'Ropa Caballeros')
+  return fetchCatalogCategoriaItems('store', 'Accesorios')
 }
 
 export function meta() {
-  const title = 'Ropa para caballero | INKognito Store — Urabá'
-  const description = 'Shorts, camisetas dry-fit, joggers y conjuntos deportivos para hombre en Urabá. Calidad premium para gym, running y ciclismo en el clima cálido de la región.'
+  const title = 'Accesorios y gorras en Urabá | INKognito Store — Chigorodó'
+  const description = 'Gorras y accesorios de tiendas verificadas en Chigorodó y el Urabá antioqueño. Pide por WhatsApp o en línea con entrega a domicilio.'
   return [
     { title },
     { name: 'description', content: description },
     { property: 'og:title', content: title },
     { property: 'og:description', content: description },
-    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/store/ropa-caballeros` },
+    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/store/accesorios` },
   ]
 }
 
-const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+const TALLA_UNICA = ['Única']
 
 const STRIPE_PATTERN = {
   backgroundImage: 'repeating-linear-gradient(45deg,transparent,transparent 19px,rgba(201,168,76,1) 19px,rgba(201,168,76,1) 20px)',
@@ -45,29 +49,25 @@ const faqs = [
   },
   {
     q: '¿Cómo llega mi pedido y en cuánto tiempo?',
-    a: 'Despachamos con Ruta del Golfo, nuestra red de transportadoras verificadas en toda la región de Urabá — el tiempo exacto depende de la transportadora y la zona. Pago contraentrega: pagas cuando recibes el paquete, sin adelantos.',
+    a: 'Despachamos con Ruta del Golfo, nuestra red de transportadoras verificadas en toda la región de Urabá — el tiempo exacto depende de la transportadora y la zona. Pago contraentrega: pagas cuando recibes el paquete en tu puerta, sin adelantos.',
   },
   {
-    q: '¿Qué pasa si la talla que recibo no me queda?',
-    a: 'Las tallas disponibles las ves directamente en cada producto del catálogo. Si tienes duda entre dos tallas, escríbenos por WhatsApp con tu medida de pecho y cintura en centímetros y te orientamos antes de confirmar. Si la talla llegó y no queda bien, coordina el cambio dentro de los 3 días hábiles de recibido.',
-  },
-  {
-    q: '¿Las telas aguantan el entrenamiento y el calor de Urabá?',
-    a: 'Sí. Dry-fit con ventilación activa y costuras reforzadas para uso intenso en el clima cálido de la región. Shorts, joggers y camisetas fabricados con los mismos estándares de las marcas de referencia — a un precio accesible.',
+    q: '¿Qué pasa si el producto no es lo que esperaba?',
+    a: 'Si el accesorio que recibiste tiene algún defecto o no corresponde a lo pedido, escríbenos por WhatsApp dentro de los 3 días hábiles de recibido y coordinamos el cambio sin complicaciones.',
   },
 ]
 
-export default function RopaCaballerosPage() {
+export default function AccesoriosPage() {
   const { items: itemsIniciales, nextCursor, hasMore } = useLoaderData()
   const { items: catalogItems, hasMore: hayMasProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } =
-    useLoadMore('store', { categoria: 'Ropa Caballeros' }, { items: itemsIniciales, nextCursor, hasMore })
-  const { prev, next } = getAdjacentCategories('ropa-caballeros')
+    useLoadMore('store', { categoria: 'Accesorios' }, { items: itemsIniciales, nextCursor, hasMore })
+  const { prev, next } = getAdjacentCategories('accesorios')
   const scrolled = useScrolled()
   const [introAbierto, setIntroAbierto] = useState(false)
 
   return (
     <>
-      <NavbarCategoryStore pageName="Ropa Caballeros" />
+      <NavbarCategoryStore pageName="Accesorios" />
 
       {scrolled && prev && (
         <Link
@@ -116,7 +116,7 @@ export default function RopaCaballerosPage() {
                     key={cat.id}
                     to={cat.link}
                     className={`flex-shrink-0 text-[12px] font-extrabold pb-1 border-b-2 whitespace-nowrap ${
-                      cat.link === '/store/ropa-caballeros' ? 'text-black border-black' : 'text-black/60 border-transparent'
+                      cat.link === '/store/accesorios' ? 'text-black border-black' : 'text-black/60 border-transparent'
                     }`}
                   >
                     {cat.name}
@@ -138,9 +138,7 @@ export default function RopaCaballerosPage() {
           <h1 className="hidden md:block text-7xl font-black uppercase leading-none mb-2 text-gray-900 text-left">
             {TITLE}
           </h1>
-          <p className="hidden md:block uppercase tracking-[0.2em] text-gray-500 text-xs mb-4 text-left">
-            Gym • Running • Ciclismo • Urbano
-          </p>
+          <p className="hidden md:block uppercase tracking-[0.2em] text-gray-500 text-xs mb-4 text-left">Gorras • Estilo • Urabá</p>
           <p className="hidden md:block text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg text-justify [hyphens:auto]">
             {DESCRIPCION}
           </p>
@@ -167,10 +165,10 @@ export default function RopaCaballerosPage() {
               <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-2">Sin stock por el momento</p>
               <p className="text-gray-900 text-lg font-black uppercase mb-2">Catálogo actualizándose</p>
               <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
-                Déjanos tu número y te avisamos cuando tengamos Ropa Caballeros disponible. Sé el primero en saber.
+                Déjanos tu número y te avisamos cuando tengamos Accesorios disponibles. Sé el primero en saber.
               </p>
               <a
-                href={`https://wa.me/573207911013?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya Ropa Caballeros disponible en INKognito Store.')}`}
+                href={`https://wa.me/573207911013?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya Accesorios disponibles en INKognito Store.')}`}
                 target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 text-white font-bold uppercase tracking-[0.15em] text-sm rounded hover:brightness-90 transition"
                 style={{ backgroundColor: '#C9A84C' }}
@@ -189,8 +187,8 @@ export default function RopaCaballerosPage() {
                   <div key={item.name} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">
                     <StoreProductCard
                       product={prod}
-                      category="ropa-caballeros"
-                      sizes={sizes.length ? sizes : CLOTHING_SIZES}
+                      category="accesorios"
+                      sizes={sizes.length ? sizes : TALLA_UNICA}
                     />
                   </div>
                 )
@@ -215,10 +213,9 @@ export default function RopaCaballerosPage() {
       {/* CTA DARK — solo desktop */}
       <div className="hidden md:block bg-black py-16 px-6 text-center">
         <a
-          href="https://wa.me/573207911013?text=Hola,%20quiero%20ver%20el%20catálogo%20completo%20de%20ropa%20deportiva%20caballeros"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-3 px-10 py-5 rounded-xl border text-white uppercase tracking-[0.2em] font-semibold transition-all duration-300 hover:shadow-[0_0_30px_rgba(201,168,76,0.2)] hover:border-[#C9A84C]"
+          href="https://wa.me/573207911013?text=Hola,%20quiero%20ver%20el%20cat%C3%A1logo%20de%20accesorios"
+          target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-3 px-10 py-5 rounded-xl border text-white uppercase tracking-[0.2em] font-semibold transition-all duration-300 hover:border-[#C9A84C]"
           style={{ borderColor: 'rgba(201,168,76,0.3)', backgroundColor: 'rgba(201,168,76,0.04)' }}
         >
           <FaWhatsapp size={22} />
@@ -232,7 +229,7 @@ export default function RopaCaballerosPage() {
           <AccordionCardStore
             icon="❓"
             title="Preguntas frecuentes"
-            subtitle="Envíos, tallas y todo lo que necesitas saber antes de tu pedido. Toca para ver las respuestas."
+            subtitle="Envíos y todo lo que necesitas saber antes de tu pedido. Toca para ver las respuestas."
           >
             <div className="flex flex-col gap-5">
               {faqs.map((faq, i) => (

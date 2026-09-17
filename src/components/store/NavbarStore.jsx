@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { Menu, ShoppingCart, X, LayoutGrid, Sparkles, Truck, Phone, Store, PlusCircle, UserCircle, Globe, FileText, Shield } from 'lucide-react'
 import { useStoreCart } from '../../contexts/StoreCartContext'
@@ -7,6 +7,7 @@ import logoStore from '../../assets/milogo/store.webp'
 import AnimatedWordmark from '../AnimatedWordmark'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import LegalModal from '../legal/LegalModal'
+import { irAMiTienda } from '../../lib/storeTienda'
 
 // Blanco (2026-09-16, Jose: "como la estructura de store está fácil pues
 // en su mayoría es blanco, procede con actualizar todos los navbar de las
@@ -14,6 +15,7 @@ import LegalModal from '../legal/LegalModal'
 // oscuro heredado del diseño original; mismos tokens que ya usa la topbar
 // de MobileHomeStore.jsx (bg-white/95 backdrop-blur, border-zinc-200).
 export default function NavbarStore() {
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   // legalOpen (2026-09-16, mismo patrón que NavbarSupply.jsx) — el modal
@@ -133,10 +135,10 @@ export default function NavbarStore() {
                     tipo='empresa' (ver CLAUDE.md), reusa el mismo
                     /estudio/mi-perfil que ya usa INK para "Estudio". */}
                 <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400">Mi cuenta/perfil</p>
-                <Link to="/tattoo-artist-colombia/estudio/mi-perfil" onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-500 hover:text-[#C9A84C] hover:bg-zinc-50 transition-all duration-300">
+                <button type="button" onClick={() => { setMenuOpen(false); irAMiTienda(navigate) }}
+                  className="flex items-center gap-3 w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-500 hover:text-[#C9A84C] hover:bg-zinc-50 transition-all duration-300">
                   <UserCircle size={16} className="flex-shrink-0" /> Tienda
-                </Link>
+                </button>
 
                 <div className="border-t border-zinc-100" />
                 {/* only=['supply'] + extraLinks — mismo criterio recíproco

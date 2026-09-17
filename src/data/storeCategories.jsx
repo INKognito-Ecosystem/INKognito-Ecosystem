@@ -1,4 +1,4 @@
-import { Shirt, Footprints, Sun, Trophy, Zap } from 'lucide-react'
+import { Shirt, Footprints, Sun, Trophy, Zap, Watch } from 'lucide-react'
 
 // Fuente única de las 6 categorías reales de Store — antes vivía inline en
 // StorePage.jsx, ahora también la usan las páginas de grupo (deportiva/
@@ -68,6 +68,22 @@ export const categories = [
     description: 'Pantalones, camisetas, camisas y prendas de estilo urbano para el día a día — cómodas, versátiles y con buena mano de obra. Despacho con Eljach, pago contraentrega.',
     link: '/store/ropa-general',
     icon: <Shirt size={28} />,
+    group: 'casual',
+  },
+  // Accesorios (2026-09-16, Jose: "no veo habilitada la categoría
+  // accesorios en el listón") — ya existía en el dropdown de categoría
+  // del panel para tiendas desde 2026-08-31 (Jose: "tiendas subirán
+  // gorras"), pero nunca tuvo página propia ni entrada acá — los
+  // productos subidos con esa categoría aparecían en el catálogo de su
+  // tienda, solo no navegaban desde una card/listón. Ver
+  // MisProductosTiendaSection.jsx.
+  {
+    id: 8,
+    name: 'Accesorios',
+    tag: 'Gorras & Más',
+    description: 'Gorras y accesorios para completar tu look, de tiendas verificadas de Urabá. Despacho con Ruta del Golfo — pago contraentrega.',
+    link: '/store/accesorios',
+    icon: <Watch size={28} />,
     group: 'casual',
   },
 ]

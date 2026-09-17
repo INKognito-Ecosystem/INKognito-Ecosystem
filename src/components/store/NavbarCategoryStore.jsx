@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { ShoppingCart, Menu, X, LayoutGrid, Store, PlusCircle, UserCircle, Globe, FileText, Shield } from 'lucide-react'
 import { useStoreCart } from '../../contexts/StoreCartContext'
@@ -7,6 +7,7 @@ import logoStore from '../../assets/milogo/store.webp'
 import AnimatedWordmark from '../AnimatedWordmark'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import LegalModal from '../legal/LegalModal'
+import { irAMiTienda } from '../../lib/storeTienda'
 
 // hideMenu (2026-08-30, Jose; corregido 2026-09-13) — el catálogo de una
 // tienda (EstudioTiendaPage.jsx) ya tiene su propio botón de gestión en el
@@ -24,6 +25,7 @@ import LegalModal from '../legal/LegalModal'
 // por las 7 páginas de categoría, el directorio de tiendas y la ficha de
 // una tienda — un solo cambio acá cubre todas.
 export default function NavbarCategoryStore({ pageName, hideMenu = false }) {
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [legalOpen, setLegalOpen] = useState(null)
@@ -111,9 +113,9 @@ export default function NavbarCategoryStore({ pageName, hideMenu = false }) {
 
             <div className="border-t border-zinc-100" />
             <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400">Mi cuenta/perfil</p>
-            <Link to="/tattoo-artist-colombia/estudio/mi-perfil" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-500 hover:text-[#C9A84C] hover:bg-zinc-50 transition-all duration-300">
+            <button type="button" onClick={() => { setMenuOpen(false); irAMiTienda(navigate) }} className="flex items-center gap-3 w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-zinc-500 hover:text-[#C9A84C] hover:bg-zinc-50 transition-all duration-300">
               <UserCircle size={16} className="flex-shrink-0" /> Tienda
-            </Link>
+            </button>
 
             <div className="border-t border-zinc-100" />
             <InkognitoModuleMenu

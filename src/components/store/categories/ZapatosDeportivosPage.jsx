@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, BookOpen, X } from 'lucide-react'
 import NavbarCategoryStore from '../NavbarCategoryStore'
+import StoreMobileNav from '../StoreMobileNav'
 import FooterStore from '../FooterStore'
 import LlegamosDondeEstas from '../LlegamosDondeEstas'
 import AccordionCardStore from '../AccordionCardStore'
@@ -133,10 +134,11 @@ export default function ZapatosDeportivosPage() {
             </div>
           </div>
 
-          <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none mb-2 text-gray-900 text-center md:text-left">
+          {/* Título — solo desktop, el listón ya identifica la categoría en móvil */}
+          <h1 className="hidden md:block text-7xl font-black uppercase leading-none mb-2 text-gray-900 text-left">
             {TITLE}
           </h1>
-          <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4 text-center md:text-left">
+          <p className="hidden md:block uppercase tracking-[0.2em] text-gray-500 text-xs mb-4 text-left">
             Running • Entrenamiento • Gym
           </p>
           <p className="hidden md:block text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg text-justify [hyphens:auto]">
@@ -243,6 +245,10 @@ export default function ZapatosDeportivosPage() {
       <LlegamosDondeEstas />
 
       <FooterStore />
+
+      <div className="h-16 md:hidden bg-white" />
+
+      <StoreMobileNav active="categorias" />
     </>
   )
 }

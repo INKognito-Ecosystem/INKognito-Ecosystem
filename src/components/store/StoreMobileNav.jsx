@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, UserCircle, Globe, FileText, Shield } from 'lucide-react'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import CartDrawerStore from './CartDrawerStore'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import LegalModal from '../legal/LegalModal'
 import logoStore from '../../assets/milogo/store.webp'
+import { irAMiTienda } from '../../lib/storeTienda'
 
 const GOLD = '#C9A84C'
 
@@ -16,6 +17,7 @@ const GOLD = '#C9A84C'
 // esto en Supply (SupplyMobileNav.jsx, separado de MobileHomeSupply.jsx).
 // active: 'inicio' | 'categorias' — qué pestaña queda resaltada.
 export default function StoreMobileNav({ active = null }) {
+  const navigate = useNavigate()
   const { count } = useStoreCart()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -75,14 +77,14 @@ export default function StoreMobileNav({ active = null }) {
             {/* Mi cuenta/perfil (2026-09-16, Jose: "también en el hamburguesa
                 debería estar el ítem cuenta/perfil, que conecta para los que
                 tienen tienda, de allí pueda gestionar y editar su tienda") —
-                una tienda Store ES un estudio con tipo='empresa' (ver
-                CLAUDE.md), así que reusa el mismo /estudio/mi-perfil que ya
-                usa INK para "Estudio", en vez de una ruta nueva. */}
+                irAMiTienda revisa si ya hay una tienda con token guardado en
+                este navegador y la abre directo con su botón de gestión; si
+                no, cae al flujo de siempre (correo → INK) — ver storeTienda.js. */}
             <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400">Mi cuenta/perfil</p>
-            <Link to="/tattoo-artist-colombia/estudio/mi-perfil" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-800">
+            <button type="button" onClick={() => { setMenuOpen(false); irAMiTienda(navigate) }} className="flex items-center gap-3 w-full text-left px-6 py-4 text-[15px] font-medium text-zinc-800">
               <UserCircle size={18} className="flex-shrink-0" />
               Tienda
-            </Link>
+            </button>
 
             <div className="border-t border-zinc-100" />
             <InkognitoModuleMenu current="store" only={['supply']} extraLinks={[{ label: 'INK — encuentra tu tatuador', to: '/tattoo-artist-colombia' }]} uppercase={false} textSize="text-[15px]" textClassName="text-zinc-800 font-medium" icon={LayoutGrid} onNavigate={() => setMenuOpen(false)} />

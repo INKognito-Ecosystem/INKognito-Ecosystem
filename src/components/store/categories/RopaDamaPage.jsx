@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, BookOpen, X } from 'lucide-react'
 import NavbarCategoryStore from '../NavbarCategoryStore'
+import StoreMobileNav from '../StoreMobileNav'
 import FooterStore from '../FooterStore'
 import LlegamosDondeEstas from '../LlegamosDondeEstas'
 import AccordionCardStore from '../AccordionCardStore'
@@ -136,10 +137,14 @@ export default function RopaDamaPage() {
             </div>
           </div>
 
-          <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none mb-2 text-gray-900 text-center md:text-left">
+          {/* Título — solo desktop (2026-09-16, Jose: "aún está quedando
+              títulos cuando se entra a cada categoría, ya no se
+              necesitan" — el listón de arriba ya identifica la categoría
+              en móvil, mismo criterio que SupplyCategoryPage.jsx). */}
+          <h1 className="hidden md:block text-7xl font-black uppercase leading-none mb-2 text-gray-900 text-left">
             {TITLE}
           </h1>
-          <p className="uppercase tracking-[0.2em] text-gray-500 text-xs mb-4 text-center md:text-left">Gym • Running • Yoga • Ciclismo</p>
+          <p className="hidden md:block uppercase tracking-[0.2em] text-gray-500 text-xs mb-4 text-left">Gym • Running • Yoga • Ciclismo</p>
           {/* Desktop — descripción visible siempre; móvil va detrás del ícono de libro de arriba */}
           <p className="hidden md:block text-gray-700 leading-relaxed max-w-2xl text-sm md:text-lg text-justify [hyphens:auto]">
             {DESCRIPCION}
@@ -250,6 +255,12 @@ export default function RopaDamaPage() {
       <LlegamosDondeEstas />
 
       <FooterStore />
+
+      {/* Espacio para que el tab bar fijo de StoreMobileNav no tape el
+          footer (2026-09-16, mismo ajuste ya hecho en StorePage.jsx). */}
+      <div className="h-16 md:hidden bg-white" />
+
+      <StoreMobileNav active="categorias" />
     </>
   )
 }
