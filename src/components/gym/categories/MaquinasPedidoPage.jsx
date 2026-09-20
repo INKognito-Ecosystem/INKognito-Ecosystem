@@ -1,37 +1,20 @@
 import { useState } from 'react'
-import { Link, useLoaderData } from 'react-router-dom'
+import { Link, useNavigate, useLoaderData } from 'react-router-dom'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import GymMobileNav from '../GymMobileNav'
 import { fetchCatalogPage } from '../../../hooks/useCatalog'
 import { useGymCart } from '../../../contexts/GymCartContext'
-import { Wrench, ExternalLink, ArrowLeft, ArrowRight } from 'lucide-react'
+import { GYM_CART_CATEGORY, gymCartKey, gymCartItem, gymFormatPrice } from '../../../lib/gymCart'
+import { Wrench, ExternalLink, ArrowLeft, ArrowRight, ShoppingCart, Check } from 'lucide-react'
 import { getAdjacentCategories } from '../../../data/gymCategoriesOrder'
 import { useScrolled } from '../../../hooks/useScrolled'
-import imgBancoMultiangulo from '../../../assets/imagenesgym/bancomultiangulo.jpg'
-import imgRemoAcostado     from '../../../assets/imagenesgym/remoacostado.jpg'
-import imgHipThrust        from '../../../assets/imagenesgym/hipthrust.jpg'
-import imgExtencionFemoral  from '../../../assets/imagenesgym/extencionyfemoral.jpg'
-import imgFondosDominadas  from '../../../assets/imagenesgym/fondosydominadas.jpg'
 
 const WA = '573207911013'
 
 const GRID_PATTERN = {
   backgroundImage:
     'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
-}
-
-const fmtPrecio = (p) => p != null ? `$${Number(p).toLocaleString('es-CO')} COP` : 'Desde $XX.000'
-
-const LOCAL_IMAGES = {
-  'banco multiángulo': imgBancoMultiangulo,
-  'banco multiangulo': imgBancoMultiangulo,
-  'remo acostado':     imgRemoAcostado,
-  'hip thrust':        imgHipThrust,
-  'extensión y femorales': imgExtencionFemoral,
-  'extension y femorales': imgExtencionFemoral,
-  'estructura para dominadas y fondos': imgFondosDominadas,
-  'dominadas y fondos': imgFondosDominadas,
 }
 
 // Paginación real (2026-09-14) — antes traía TODO gym (fetchCatalogFull)
@@ -59,43 +42,52 @@ export function meta() {
 }
 
 export default function MaquinasPedidoPage() {
-  const [lightbox, setLightbox] = useState(null)
+  const navigate = useNavigate()
   // Qué máquina tiene su modal de descripción abierto en móvil — mismo
   // patrón que StoreProductCard/SupplyProductCard/SuplCard, pero como estas
   // cards se renderizan inline (no en un sub-componente propio) alcanza con
   // guardar el id en vez de un estado local por card (2026-08-02).
   const [showDescId, setShowDescId] = useState(null)
   const { maquinas: apiMaquinas, afiliadosMateriales: gymAfiliados } = useLoaderData()
-  const { addItem, items: cartItems } = useGymCart()
+  const { addItem, removeItem, items: cartItems } = useGymCart()
   const { prev, next } = getAdjacentCategories('maquinas-pedido')
   const scrolled = useScrolled()
 
-  const productosFinales = apiMaquinas.map((item, i) => {
-    const key = item.name.toLowerCase()
-    return {
-      id:          i + 1,
-      // id real de inventory (no el índice de arriba) — sin esto el pedido
-      // nunca queda ligado a la fila real, y la validación server-side de
-      // "Eljach no transporta máquinas" no tiene cómo verificar la
-      // categoría real del producto (2026-08-02).
-      inventoryId: item.variantes?.[0]?.id ?? null,
-      nombre:      item.name,
-      descripcion: item.descripcion || '',
-      precio:      item.variantes?.[0]?.price || null,
-      image1:      item.image_url || LOCAL_IMAGES[key] || null,
-      image2:      null,
-    }
-  })
+  // id = nombre de la máquina, no el índice del array (2026-09-20, dinámica
+  // de card al nivel de los demás módulos — mismo motivo que gymCart.js) —
+  // inventoryId real de inventory, sin esto el pedido no queda ligado a la
+  // fila real (2026-08-02) y tampoco la ficha (GymProductDetailPage.jsx)
+  // sabría qué producto abrir.
+  const productosFinales = apiMaquinas.map((item) => ({
+    id:          item.name,
+    inventoryId: item.variantes?.[0]?.id ?? null,
+    nombre:      item.name,
+    descripcion: item.descripcion || '',
+    precio:      item.variantes?.[0]?.price || null,
+    stock:       item.variantes?.[0]?.stock ?? null,
+    // Sin foto de referencia si no hay image_url real (2026-09-20, Jose:
+    // "si no tiene imagen, simplemente no se muestra imagen") — antes caía
+    // a una foto fija de otra máquina para que la card no se viera vacía;
+    // ahora, sin foto real, la card muestra "Imagen próximamente" (ver
+    // más abajo) tal como ya lo hacen Supply/Store/Suple.
+    image1:      item.image_url || null,
+  }))
 
-  const handleAddToCart = (p) => {
-    addItem({
-      id:          p.id,
+  // Toggle agregar/quitar (2026-09-20) — antes solo agregaba (sin forma de
+  // quitar desde la card); mismo patrón que SuplCard.jsx/StoreProductCard.jsx.
+  const handleToggleCart = (p) => {
+    const key = gymCartKey(p.nombre)
+    if (cartItems.some(i => i.key === key)) {
+      removeItem(key)
+      return
+    }
+    addItem(gymCartItem({
+      nombre:      p.nombre,
+      price:       gymFormatPrice(p.precio),
       inventoryId: p.inventoryId,
-      name:        p.nombre,
-      price:       fmtPrecio(p.precio),
-      brand:       'Bajo pedido',
       image:       p.image1 || '',
-    }, 'maquinas')
+      stock:       p.stock,
+    }), GYM_CART_CATEGORY)
   }
 
   return (
@@ -168,27 +160,36 @@ export default function MaquinasPedidoPage() {
         )}
         <div className={`flex md:grid md:grid-cols-3 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide ${productosFinales.length === 0 ? 'hidden' : ''}`}>
           {productosFinales.map((p) => {
-            const hasImages = p.image1 || p.image2
-            const enCarrito = cartItems.some(i => i.key === `maquinas-${p.id}`)
+            const enCarrito = cartItems.some(i => i.key === gymCartKey(p.nombre))
             return (
               <div
                 key={p.id}
                 className="snap-start flex-shrink-0 w-[46vw] md:w-auto border border-gray-800 bg-gray-800/40 rounded-2xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
               >
-                {/* IMAGEN */}
-                <div className="relative w-full aspect-video bg-gray-800 flex items-center justify-center flex-shrink-0">
+                {/* IMAGEN — clic abre la ficha completa, mismo patrón que
+                    SuplCard.jsx/StoreProductCard.jsx (2026-09-20). El ícono
+                    de carrito pasa de botón ancho abajo a círculo incrustado
+                    en la foto (ShoppingCart ↔ Check, toggle). */}
+                <div
+                  className={`relative w-full aspect-video bg-gray-800 flex items-center justify-center flex-shrink-0 ${p.inventoryId ? 'cursor-pointer' : ''}`}
+                  onClick={p.inventoryId ? () => navigate(`/gym/producto/${p.inventoryId}`) : undefined}
+                >
                   {p.image1
                     ? <img src={p.image1} alt={p.nombre} className="w-full h-full object-cover" />
                     : <span className="text-gray-700 text-xs uppercase tracking-widest text-center px-4">Imagen próximamente</span>
                   }
-                  {hasImages && (
-                    <button
-                      onClick={() => setLightbox(p)}
-                      className="absolute bottom-2 right-2 bg-black/60 border border-gray-600 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-lg hover:bg-black/90 transition-all"
-                    >
-                      Ver
-                    </button>
-                  )}
+                  {/* stopPropagation: el contenedor también navega a la
+                      ficha — sin esto, tocar el ícono también navegaría. */}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleToggleCart(p) }}
+                    aria-label={enCarrito ? 'Quitar del carrito' : 'Agregar al carrito'}
+                    className={`absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center shadow-md transition-all duration-300 ${
+                      enCarrito ? 'bg-white text-gray-950' : 'bg-black/60 text-white hover:bg-black/90'
+                    }`}
+                  >
+                    {enCarrito ? <Check size={13} /> : <ShoppingCart size={12} />}
+                  </button>
                 </div>
 
                 {/* INFO */}
@@ -198,7 +199,7 @@ export default function MaquinasPedidoPage() {
                     <span className="text-[9px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-2 py-0.5">Envío nacional</span>
                   </div>
                   <h3 className="font-black uppercase text-xs leading-tight mb-1">{p.nombre}</h3>
-                  <p className="text-white text-xs font-black">{fmtPrecio(p.precio)}</p>
+                  <p className="text-white text-xs font-black">{gymFormatPrice(p.precio) || 'Desde $XX.000'}</p>
                   {p.descripcion && (
                     <>
                       {/* Escritorio — texto completo, mismo patrón que
@@ -216,16 +217,6 @@ export default function MaquinasPedidoPage() {
                   )}
                   <div className="mt-auto" />
                 </div>
-
-                {/* BOTÓN — flush al borde inferior */}
-                <button
-                  onClick={() => handleAddToCart(p)}
-                  className={`w-full text-[10px] font-bold uppercase tracking-[0.12em] py-2.5 transition-all duration-300 flex-shrink-0 ${
-                    enCarrito ? 'bg-green-500 text-white' : 'bg-white text-gray-950 hover:bg-gray-200'
-                  }`}
-                >
-                  {enCarrito ? '✓ Agregado' : '+ Agregar al carrito'}
-                </button>
 
                 {showDescId === p.id && (
                   <div
@@ -311,25 +302,6 @@ export default function MaquinasPedidoPage() {
       <FooterGym />
       <div className="h-16 md:hidden" />
       <GymMobileNav />
-
-      {/* LIGHTBOX */}
-      {lightbox && (
-        <div
-          className="fixed inset-0 bg-black/90 z-[80] flex items-center justify-center p-4 overflow-y-auto"
-          onClick={() => setLightbox(null)}
-        >
-          <button
-            className="absolute top-5 right-6 text-white/60 hover:text-white text-3xl leading-none bg-transparent border-none cursor-pointer z-10"
-            onClick={() => setLightbox(null)}
-            aria-label="Cerrar"
-          >✕</button>
-          <div className="flex flex-col md:flex-row gap-4 max-w-4xl w-full" onClick={e => e.stopPropagation()}>
-            {[lightbox.image1, lightbox.image2].filter(Boolean).map((src, i) => (
-              <img key={i} src={src} alt={`${lightbox.nombre} — imagen ${i + 1}`} className="rounded-xl object-contain max-h-[75vh] flex-1" />
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }

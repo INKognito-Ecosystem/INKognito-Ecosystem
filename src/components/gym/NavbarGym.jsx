@@ -4,7 +4,6 @@ import { Menu, X, Dumbbell, ShoppingCart, Share2 } from 'lucide-react'
 import logoGym from '../../assets/milogo/gym.webp'
 import { useGymCart } from '../../contexts/GymCartContext'
 import CartDrawerGym from './CartDrawerGym'
-import AnimatedWordmark from '../AnimatedWordmark'
 
 const LINK = 'uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300'
 const MOBILE_LINK = 'block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300'
@@ -57,14 +56,18 @@ export default function NavbarGym() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="h-16 md:h-20 flex items-center justify-between">
 
-            {/* LOGO */}
+            {/* LOGO — sin AnimatedWordmark (2026-09-20, Jose: "quita la
+                animación... heredó la animación que tenía INKOGNITO GYM").
+                El wordmark animado guarda si ya se vio por sessionStorage
+                usando moduleWord como key; al renombrar "GYM" → "GYM SYSTEM"
+                la key cambió, así que la animación volvía a reproducirse de
+                cero para quien ya la había visto — texto estático, como
+                queda siempre el wordmark al terminar de animar. */}
             <Link to="/gym" className="flex items-center gap-2">
               <img src={logoGym} alt="INKognito Gym" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
-              <AnimatedWordmark
-                moduleWord="GYM SYSTEM"
-                accentClassName="text-gray-400"
-                className="font-black uppercase tracking-wide md:tracking-[0.2em] text-xl md:text-2xl"
-              />
+              <span className="font-black uppercase tracking-wide md:tracking-[0.2em] text-xl md:text-2xl text-gray-400 whitespace-nowrap">
+                GYM SYSTEM
+              </span>
               <Dumbbell size={18} className="text-gray-500" />
             </Link>
 

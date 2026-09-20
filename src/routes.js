@@ -149,6 +149,11 @@ export default [
   // Página de categorías (2026-09-20) — destino de la pestaña "Categorías"
   // del tab bar inferior de Gym System.
   route('gym/categorias', 'components/gym/GymCategoriasPage.jsx'),
+  // Ficha de producto (2026-09-20, Jose: "aplica a la card... la dinámica
+  // de los demás módulos, que abra una landing cuando le dé clic") — mismo
+  // patrón que supply/producto/:id, store/producto/:id, suplementos/
+  // producto/:id. Antes de la categoría fija, por claridad.
+  route('gym/producto/:id', 'components/gym/GymProductDetailPage.jsx'),
   route('gym/maquinas-pedido', 'components/gym/categories/MaquinasPedidoPage.jsx'),
   route('gym/tutoriales', 'components/gym/categories/VideosTutorialesPage.jsx'),
   route('gym/cursos', 'components/gym/categories/CursosPage.jsx'),
