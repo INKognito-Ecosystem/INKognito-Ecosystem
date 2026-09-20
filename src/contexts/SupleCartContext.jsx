@@ -46,24 +46,39 @@ export function SupleCartProvider({ children }) {
   // La key es `${category}-${product.id}` — el llamador arma `product.id`
   // con el nombre del producto + la variante (mismo patrón que Supply), así
   // cada presentación es su propia fila y la card y la ficha coinciden.
-  const addItem = useCallback((product, category) => {
+  // vendorLock (2026-09-20, Suple multitenant) — mismo criterio exacto que
+  // SupplyCartContext.jsx/StoreCartContext.jsx: un carrito solo puede tener
+  // productos de UN vendedor (conectado a MP o no) a la vez, o todos
+  // directos de INKognito (sin estudio_id), nunca mezclados —
+  // si se mezcla, el checkout genérico de Nequi/contraentrega le pagaría A
+  // INKOGNITO por un producto que no es suyo (ver PedidoOnlinePage.jsx).
+  const addItem = useCallback((product, category, opts = {}) => {
+    const { estudioId = null, estudioNombre = null, mpConectado = false } = opts
+    const primero = items[0]
+    if (primero && (primero.estudioId || null) !== estudioId) {
+      return { ok: false, motivo: 'otro_proveedor', nombreActual: primero.estudioNombre || 'el vendedor general' }
+    }
     const key = `${category}-${product.id}`
     setItems(prev => {
       const existing = prev.find(i => i.key === key)
       if (existing) {
         return prev.map(i => i.key === key ? { ...i, qty: i.qty + 1 } : i)
       }
-      return [...prev, { key, ...product, category, qty: 1 }]
+      return [...prev, { key, ...product, category, qty: 1, estudioId, estudioNombre, mpConectado }]
     })
-  }, [])
+    return { ok: true }
+  }, [items])
 
   // Reemplaza TODO el carrito por un único producto (2026-09-11) — ver
   // comentario en StoreCartContext.jsx (mismo motivo).
-  const setSingleItem = useCallback((product, category) => {
+  const setSingleItem = useCallback((product, category, opts = {}) => {
+    const { estudioId = null, estudioNombre = null, mpConectado = false } = opts
     const key = `${category}-${product.id}`
-    setItems([{ key, ...product, category, qty: 1 }])
+    setItems([{ key, ...product, category, qty: 1, estudioId, estudioNombre, mpConectado }])
     return { ok: true }
   }, [])
+
+  const vendorLock = items.find(i => i.estudioId) || null
 
   const removeItem = useCallback((key) => {
     setItems(prev => prev.filter(i => i.key !== key))
@@ -114,7 +129,7 @@ export function SupleCartProvider({ children }) {
 
   return (
     <SupleCartContext.Provider value={{
-      items, addItem, setSingleItem, removeItem, removeItems, changeQty, clearCart, count, total,
+      items, addItem, setSingleItem, removeItem, removeItems, changeQty, clearCart, count, total, vendorLock,
       selectedKeys, toggleSelected, setAllSelected, allSelected, selectedItems, selectedCount, selectedTotal,
     }}>
       {children}

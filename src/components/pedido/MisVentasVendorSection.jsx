@@ -2,23 +2,27 @@ import { useEffect, useState } from 'react'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
-// "Mis ventas" (Store multitenant) — relocada 2026-08-30 al fusionar
-// perfil+catálogo, mismo motivo/patrón que MisProductosTiendaSection.jsx.
-// Sin acordeón propio (mismo criterio: ahora vive en su propia pantalla
-// dentro de EstudioTiendaOwnerPanel.jsx, la navegación del panel ya
-// decide cuándo se muestra). Antes, sin ventas, no mostraba nada (return
-// null) — tenía sentido cuando compartía scroll con otras secciones,
-// pero acá sería una pantalla completamente vacía; ahora muestra un
-// mensaje.
-export default function MisVentasTiendaSection({ token }) {
+// "Mis ventas" — generalizado (2026-09-20, Suple multitenant) de
+// MisVentasTiendaSection.jsx (Store) para servir también a Suple: el
+// backend sigue siendo familia propia por módulo (estudios_compras_tienda
+// vs estudios_compras_suple, cada uno con su propio endpoint), pero esta
+// pantalla es visualmente idéntica sin ninguna rama de negocio distinta —
+// mismo criterio que COMPRAR_ENDPOINT en PedidoSupplyVendorCheckout.jsx.
+const VENTAS_ENDPOINT = {
+  store: 'estudios-ventas-tienda-por-token',
+  suplementos: 'estudios-ventas-suple-por-token',
+}
+
+export default function MisVentasVendorSection({ token, module = 'store' }) {
   const [ventas, setVentas] = useState(null)
 
   useEffect(() => {
-    fetch(`${PANEL_URL}/api/estudios-ventas-tienda-por-token?token=${encodeURIComponent(token)}`)
+    const endpoint = VENTAS_ENDPOINT[module] || VENTAS_ENDPOINT.store
+    fetch(`${PANEL_URL}/api/${endpoint}?token=${encodeURIComponent(token)}`)
       .then((r) => r.ok ? r.json() : [])
       .then(setVentas)
       .catch(() => setVentas([]))
-  }, [token])
+  }, [token, module])
 
   if (ventas === null) {
     return <p className="text-gray-400 text-xs text-center py-6">Cargando...</p>

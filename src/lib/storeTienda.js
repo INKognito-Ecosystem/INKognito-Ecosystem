@@ -11,7 +11,9 @@
 // dueño visitó bajo la key `store_edit_token_<id>` (EDIT_TOKEN_KEY_PREFIX
 // ahí mismo) apenas confirma que es el dueño — mismo prefijo acá, léelo
 // directo si existe. Si no hay ninguna tienda con token guardado (cuenta
-// no verificada en este navegador todavía), cae al flujo de siempre.
+// no verificada en este navegador todavía), abre el formulario de correo
+// propio de Store (StoreMiTiendaPage.jsx) — nunca la página de INK, que
+// carga sola el último token de cualquier módulo y redirige al que sea.
 const EDIT_TOKEN_KEY_PREFIX = 'store_edit_token_'
 
 export function irAMiTienda(navigate) {
@@ -27,5 +29,5 @@ export function irAMiTienda(navigate) {
       }
     }
   } catch {}
-  navigate('/tattoo-artist-colombia/estudio/mi-perfil')
+  navigate('/store/mi-tienda')
 }

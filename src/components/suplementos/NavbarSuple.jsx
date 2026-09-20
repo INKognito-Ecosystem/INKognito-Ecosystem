@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { Menu, X, ShoppingCart, Search, Share2, Home, LayoutGrid, Globe, FileText, Shield } from 'lucide-react'
+import { Menu, X, ShoppingCart, Search, Share2, Home, LayoutGrid, Globe, FileText, Shield, Store, PlusCircle, UserCircle } from 'lucide-react'
 // Mismo logo que ya usaba Gym (gris, coherente con el color de marca de
 // Suple) — no existe todavía un logo propio subido para el módulo, así
 // que se reusa el de Gym mientras tanto (2026-08-02, pedido de Jose:
@@ -11,6 +11,7 @@ import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import LegalModal from '../legal/LegalModal'
 import { useSupleCart } from '../../contexts/SupleCartContext'
 import { SUPLE_CATEGORIES_ORDER } from '../../data/supleCategoriesOrder'
+import { irAMiSuple } from '../../lib/supleTienda'
 import CartDrawerSuple from './CartDrawerSuple'
 
 // Navbar superior ÚNICO de Suple, blanco (2026-09-19, migración de Suple a
@@ -35,6 +36,7 @@ export default function NavbarSuple({
   searchPlaceholder = 'Buscar suplementos…',
   shareUrl = '',
 }) {
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [legalOpen, setLegalOpen] = useState(null)
@@ -155,9 +157,9 @@ export default function NavbarSuple({
         </div>
 
         {/* DROPDOWN — jerarquía por secciones, mismo criterio que
-            NavbarCategoryStore.jsx: navegación / categorías / módulos /
-            Ecosistema y legal. Sin "Mi cuenta/perfil" ni tiendas: Suple aún
-            no tiene registro de tiendas (se suma cuando llegue). */}
+            NavbarStore.jsx: navegación / categorías / vendedores / Mi
+            cuenta/perfil / módulos / Ecosistema y legal. "Vendedores" y "Mi
+            cuenta/perfil" se suman acá (Suple multitenant, 2026-09-20). */}
         {!hideMenu && menuOpen && (
           <div className="fixed left-0 right-0 top-16 md:top-20 bg-white border-t border-zinc-200 z-50 max-h-[calc(100vh-4rem)] overflow-y-auto">
             <Link to="/suplementos" onClick={close} className={itemClass}>
@@ -174,6 +176,21 @@ export default function NavbarSuple({
                 {c.name}
               </Link>
             ))}
+
+            <div className="border-t border-zinc-100" />
+            <p className={labelClass}>Vendedores</p>
+            <Link to="/suplementos/tiendas" onClick={close} className={itemClass}>
+              <Store size={16} className="flex-shrink-0" /> Vendedores verificados
+            </Link>
+            <Link to="/suplementos/proveedores/unete" onClick={close} className={itemClass}>
+              <PlusCircle size={16} className="flex-shrink-0" /> Registrar mi catálogo
+            </Link>
+
+            <div className="border-t border-zinc-100" />
+            <p className={labelClass}>Mi cuenta/perfil</p>
+            <button type="button" onClick={() => { close(); irAMiSuple(navigate) }} className={itemClass}>
+              <UserCircle size={16} className="flex-shrink-0" /> Mi Suple
+            </button>
 
             <div className="border-t border-zinc-100" />
             <InkognitoModuleMenu

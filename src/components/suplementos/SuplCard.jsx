@@ -91,6 +91,7 @@ export function SuplCard({ item }) {
   const { items: cartItems, addItem, removeItem } = useSupleCart()
   const [selIdx, setSelIdx] = useState(0)
   const [showDesc, setShowDesc] = useState(false)
+  const [bloqueoMsg, setBloqueoMsg] = useState(null)
 
   const nombre = item.name
   const variantes = item.variantes || []
@@ -112,12 +113,20 @@ export function SuplCard({ item }) {
   const cartKey = supleCartKey(nombre, sel.variant)
   const enCarrito = cartItems.some(i => i.key === cartKey)
 
+  // Dueño real de la variante seleccionada (2026-09-20, Suple multitenant)
+  // — mismo criterio que SupplyProductCard.jsx: `estudio_nombre_display` ya
+  // resuelve nombre_suple vs nombre a nivel de backend (server.js), no hace
+  // falta elegir entre varios campos acá.
+  const proveedorId = sel.estudio_id ?? item.estudio_id ?? null
+  const proveedorNombre = sel.estudio_nombre_display || item.estudio_nombre_display || null
+  const proveedorMp = sel.estudio_mp_conectado ?? item.estudio_mp_conectado ?? false
+
   const handleToggle = () => {
     if (enCarrito) {
       removeItem(cartKey)
       return
     }
-    addItem(supleCartItem({
+    const resultado = addItem(supleCartItem({
       nombre,
       variant: sel.variant,
       price: precio,
@@ -125,7 +134,15 @@ export function SuplCard({ item }) {
       categoria: item.categoria,
       image: fuenteImagen?.image_url || item.image_url,
       stock: sel.stock,
-    }), SUPLE_CART_CATEGORY)
+    }), SUPLE_CART_CATEGORY, {
+      estudioId: proveedorId,
+      estudioNombre: proveedorNombre,
+      mpConectado: !!proveedorMp,
+    })
+    if (!resultado.ok) {
+      setBloqueoMsg(`Ya tienes productos de ${resultado.nombreActual} en tu carrito — termina esa compra antes de agregar de otro vendedor.`)
+      setTimeout(() => setBloqueoMsg(null), 5000)
+    }
   }
 
   const ultimas = typeof sel.stock === 'number' && sel.stock > 0 && sel.stock <= 3
@@ -165,6 +182,10 @@ export function SuplCard({ item }) {
           {enCarrito ? <Check size={13} /> : <ShoppingCart size={12} />}
         </button>
       </div>
+
+      {bloqueoMsg && (
+        <p className="px-3 pt-2 text-[9px] leading-snug text-amber-700 bg-amber-50">{bloqueoMsg}</p>
+      )}
 
       <div className="p-3 flex flex-col flex-1 gap-1.5 min-h-0">
         <h3 className="text-xs md:text-sm font-black uppercase leading-tight text-zinc-900">{nombre}</h3>

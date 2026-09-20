@@ -45,6 +45,10 @@ export async function loader({ request }) {
   // verificación, reenvío de link, bookmarks viejos, y el propio
   // localStorage de este componente (más abajo).
   if (estudio.tipo === 'tienda') throw redirect(`/store/estudio/${estudio.id}?token=${token}`)
+  // Suple multitenant (2026-09-20) — mismo criterio exacto que tienda: un
+  // vendedor de Suple tampoco tiene dashboard aparte, su perfil y su
+  // catálogo son la misma página (EstudioSuplePage.jsx).
+  if (estudio.tipo === 'suple') throw redirect(`/suplementos/estudio/${estudio.id}?token=${token}`)
   return { token, estudio, invitaciones, ...config }
 }
 

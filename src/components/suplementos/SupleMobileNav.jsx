@@ -1,22 +1,24 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Globe, FileText, Shield } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Globe, FileText, Shield, Store, PlusCircle, UserCircle } from 'lucide-react'
 import { useSupleCart } from '../../contexts/SupleCartContext'
 import CartDrawerSuple from './CartDrawerSuple'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import LegalModal from '../legal/LegalModal'
 import { SUPLE_CATEGORIES_ORDER } from '../../data/supleCategoriesOrder'
 import { CAT_ICONS } from './CategoriesSuple'
+import { irAMiSuple } from '../../lib/supleTienda'
 import logoSuple from '../../assets/milogo/gym.webp'
 
 // Tab bar + menú de pantalla completa compartidos por TODAS las páginas de
 // Suple (2026-09-19, migración de Suple a fondo blanco) — mismo criterio que
 // StoreMobileNav.jsx / SupplyMobileNav.jsx: Inicio · Categorías · Carrito ·
-// Menú. Sin "Mi cuenta/perfil" ni "Tiendas": Suple aún no tiene registro de
-// tiendas (etapa futura, va en su propio plan).
+// Menú. "Vendedores" y "Mi cuenta/perfil" se suman acá (Suple multitenant,
+// 2026-09-20).
 // active: 'inicio' | 'categorias' — qué pestaña queda marcada (barrita
 // grafito arriba del ícono; todas las pestañas son negras como en Supply).
 export default function SupleMobileNav({ active = null }) {
+  const navigate = useNavigate()
   const { count } = useSupleCart()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -79,6 +81,24 @@ export default function SupleMobileNav({ active = null }) {
                 </Link>
               )
             })}
+
+            <div className="border-t border-zinc-100" />
+            <p className={etiqueta}>Vendedores</p>
+            <Link to="/suplementos/tiendas" onClick={() => setMenuOpen(false)} className={itemMenu}>
+              <Store size={18} className="flex-shrink-0" />
+              Vendedores verificados
+            </Link>
+            <Link to="/suplementos/proveedores/unete" onClick={() => setMenuOpen(false)} className={itemMenu}>
+              <PlusCircle size={18} className="flex-shrink-0" />
+              Registrar mi catálogo
+            </Link>
+
+            <div className="border-t border-zinc-100" />
+            <p className={etiqueta}>Mi cuenta/perfil</p>
+            <button type="button" onClick={() => { setMenuOpen(false); irAMiSuple(navigate) }} className={`${itemMenu} w-full text-left`}>
+              <UserCircle size={18} className="flex-shrink-0" />
+              Mi Suple
+            </button>
 
             <div className="border-t border-zinc-100" />
             <InkognitoModuleMenu current="suple" extraLinks={[{ label: 'INK — encuentra tu tatuador', to: '/tattoo-artist-colombia' }]} uppercase={false} textSize="text-[15px]" textClassName="text-zinc-800 font-medium" icon={LayoutGrid} onNavigate={() => setMenuOpen(false)} />

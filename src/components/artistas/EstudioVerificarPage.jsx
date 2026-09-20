@@ -33,6 +33,10 @@ export async function loader({ request }) {
         ? `/store/${data.slug || `estudio/${data.id}`}?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`
         : data.tipo === 'proveedor'
         ? `/supply/${data.slug || `estudio/${data.id}`}?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`
+        // 'suple' (Suple multitenant, 2026-09-20) — mismo criterio que
+        // tienda/proveedor: su única página es su catálogo de Suple.
+        : data.tipo === 'suple'
+        ? `/suplementos/${data.slug || `estudio/${data.id}`}?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`
         : `/tattoo-artist-colombia/estudio/mi-perfil?token=${encodeURIComponent(data.tokenEdicion)}&bienvenida=1`
       return redirect(destino)
     }

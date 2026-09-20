@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { X, ExternalLink, ChevronLeft, Pencil, ShoppingBag, Wallet, ChevronRight, Copy, Check, Truck } from 'lucide-react'
-import EditarPerfilTiendaSection from './EditarPerfilTiendaSection'
+import EditarPerfilSupleSection from './EditarPerfilSupleSection'
 import MisVentasVendorSection from '../pedido/MisVentasVendorSection'
-import MisProductosTiendaSection from './MisProductosTiendaSection'
+import MisProductosSupleSection from './MisProductosSupleSection'
 import MisEnviosVendorSection from '../pedido/MisEnviosVendorSection'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
@@ -13,32 +13,17 @@ const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb
 
 const OPCIONES = [
   { key: 'perfil', label: 'Editar mi perfil', icon: Pencil },
-  { key: 'productos', label: 'Mis productos en Store', icon: ShoppingBag },
+  { key: 'productos', label: 'Mis productos en Suple', icon: ShoppingBag },
   { key: 'ventas', label: 'Mis ventas', icon: Wallet },
-  // "Ruta del Golfo" (2026-08-30) — elegir transportadora por compra.
   { key: 'envios', label: 'Mis envíos', icon: Truck },
 ]
 
-const TITULOS = { perfil: 'Editar mi perfil', productos: 'Mis productos en Store', ventas: 'Mis ventas', envios: 'Mis envíos' }
+const TITULOS = { perfil: 'Editar mi perfil', productos: 'Mis productos en Suple', ventas: 'Mis ventas', envios: 'Mis envíos' }
 
-// Panel de gestión de la tienda (Store multitenant, 2026-08-30) — lo que
-// abre el botón hamburguesa que solo ve el dueño en EstudioTiendaPage.jsx.
-// Reemplaza el dashboard viejo (EstudioEditarPerfilPage.jsx) SOLO para
-// tiendas. v2 (2026-08-30, Jose: "el botón no debería abrir de una vez
-// la edición, mis productos en Store debería verse aparte") — antes
-// abría directo el formulario de perfil con todo lo demás apilado
-// debajo; ahora abre primero un menú (mismo espíritu que el overlay de
-// NavbarArtistas.jsx), cada opción es su propia pantalla con botón
-// "← Volver". Mercado Pago se queda en el menú mismo (es solo un
-// estado + un botón, no amerita su propia pantalla).
-export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, upload_preset, mpStatus, notif, onNotifVista, onClose, onEstudioUpdate }) {
-  // Campana de notificaciones (2026-09-11, Jose) — si al abrir el panel
-  // hay avisos de UN SOLO tipo pendiente, aterriza directo en esa
-  // pantalla en vez del menú (con las dos a la vez, no hay una respuesta
-  // obvia de a cuál ir primero, así que se queda en el menú con ambas
-  // marcadas). El useEffect de abajo limpia el contador apenas se
-  // aterriza o se navega a esa sección, sea por el salto automático o
-  // por un clic normal en el menú.
+// Panel de gestión del vendedor (Suple multitenant, 2026-09-20) — calco
+// exacto de EstudioTiendaOwnerPanel.jsx (Store): lo que abre el botón
+// hamburguesa/campana que solo ve el dueño en EstudioSuplePage.jsx.
+export default function EstudioSupleOwnerPanel({ estudio, token, cloud_name, upload_preset, mpStatus, notif, onNotifVista, onClose, onEstudioUpdate }) {
   const [vista, setVista] = useState(() => {
     const hayVentas = (notif?.ventas_nuevas || 0) > 0
     const hayEnvios = (notif?.envios_actualizados || 0) > 0
@@ -52,13 +37,7 @@ export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, up
     if (vista === 'ventas' || vista === 'envios') onNotifVista?.(vista)
   }, [vista])
 
-  // Link para clientes (2026-08-30, Jose: "no tiene forma de ver el link
-  // que deberá compartir para que las personas no vean ese botón") — la
-  // única URL a la que el dueño tiene acceso naturalmente es la SUYA
-  // (con su ?token= en la barra del navegador); si la copia y comparte
-  // tal cual, un cliente que la abra vería este mismo panel de gestión.
-  // Este botón arma la versión limpia, sin token, para compartir.
-  const linkPublico = `${SITE_URL}/store/${estudio.slug || `estudio/${estudio.id}`}`
+  const linkPublico = `${SITE_URL}/suplementos/${estudio.slug || `estudio/${estudio.id}`}`
   const copiarLinkPublico = async () => {
     try {
       await navigator.clipboard.writeText(linkPublico)
@@ -67,11 +46,6 @@ export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, up
     } catch {}
   }
 
-  // "Mis productos en Store" (2026-08-30, Jose) — es una tabla, se ve
-  // apretada en el ancho angosto del drawer normal; en PC ocupa toda la
-  // pantalla en vez del bloque a la derecha. El resto (menú/perfil/
-  // ventas, todo listas simples) se queda con el drawer angosto de
-  // siempre.
   const anchoCompleto = vista === 'productos'
 
   return (
@@ -89,7 +63,7 @@ export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, up
             <span className="w-5 flex-shrink-0" />
           )}
           <p className="flex-1 text-sm font-black uppercase tracking-widest text-gray-900">
-            {vista === 'menu' ? 'Panel de tu tienda' : TITULOS[vista]}
+            {vista === 'menu' ? 'Panel de tu catálogo' : TITULOS[vista]}
           </p>
           <button type="button" onClick={onClose} aria-label="Cerrar" className="text-gray-400 hover:text-gray-700 flex-shrink-0"><X size={20} /></button>
         </div>
@@ -136,7 +110,7 @@ export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, up
                 </a>
               )}
               {!estudio.mp_conectado && (
-                <p className="text-gray-400 text-[10px] mt-1.5">Sin esto conectado, nadie puede pagarte por tus productos de Store — la plata te llega directo a tu cuenta, sin pasar por INKognito.</p>
+                <p className="text-gray-400 text-[10px] mt-1.5">Sin esto conectado, nadie puede pagarte por tus productos de Suple — la plata te llega directo a tu cuenta, sin pasar por INKognito.</p>
               )}
               {mpStatus === 'ok' && <p className="text-green-600 text-[11px] font-bold mt-1.5">¡Mercado Pago conectado!</p>}
               {mpStatus === 'error' && <p className="text-red-600 text-[11px] font-bold mt-1.5">No pudimos conectar tu cuenta — intenta de nuevo.</p>}
@@ -158,7 +132,7 @@ export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, up
         )}
 
         {vista === 'perfil' && (
-          <EditarPerfilTiendaSection
+          <EditarPerfilSupleSection
             token={token}
             estudio={estudio}
             cloud_name={cloud_name}
@@ -168,15 +142,15 @@ export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, up
         )}
 
         {vista === 'productos' && (
-          <MisProductosTiendaSection token={token} cloud_name={cloud_name} upload_preset={upload_preset} estudioId={estudio.id} estudioSlug={estudio.slug} />
+          <MisProductosSupleSection token={token} cloud_name={cloud_name} upload_preset={upload_preset} estudioId={estudio.id} estudioSlug={estudio.slug} />
         )}
 
         {vista === 'ventas' && (
-          <MisVentasVendorSection token={token} module="store" />
+          <MisVentasVendorSection token={token} module="suplementos" />
         )}
 
         {vista === 'envios' && (
-          <MisEnviosVendorSection token={token} module="store" />
+          <MisEnviosVendorSection token={token} module="suplementos" />
         )}
       </div>
     </div>

@@ -3,20 +3,27 @@ import { Truck } from 'lucide-react'
 import { ZONAS_FLETE } from '../../data/colombiaGeo'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
-const BTN = '#374151'
 const ESTADO_LABEL = { asignado: 'Asignado', recogido: 'Recogido', entregado: 'Entregado' }
 const ESTADO_CLASE = { asignado: 'bg-amber-100 text-amber-700', recogido: 'bg-blue-100 text-blue-700', entregado: 'bg-green-100 text-green-700' }
 
-// "Mis envíos" — "Ruta del Golfo" (2026-08-30). 4ta opción del panel de
-// la dueña, junto a perfil/productos/ventas. Dos secciones:
-// - Pendientes: compras aprobadas sin transportadora — elegir una asigna
-//   directo (chip con logo, 2026-08-30, Jose: "cuando el dueño de la
-//   tienda busque, deberían mostrarse la transportadora, con su logo").
-// - En camino: seguimiento de lo ya asignado (2026-08-30, Jose: "no
-//   desaparezca la card hasta que la transportadora marque el estado
-//   como entregado") — de solo lectura, la transportadora es quien avanza
-//   el estado desde su propio panel.
-export default function MisEnviosTiendaSection({ token }) {
+// "Mis envíos" — generalizado (2026-09-20, Suple multitenant) de
+// MisEnviosTiendaSection.jsx (Store) para servir también a Suple: mismo
+// criterio que MisVentasVendorSection.jsx — el backend sigue siendo
+// familia propia por módulo, esta pantalla no tiene ninguna rama de
+// negocio distinta entre los dos. Un vendedor de Suple no está
+// necesariamente en la zona de Ruta del Golfo — si su municipio no tiene
+// transportadoras activas, el mensaje de "coordina directo" ya lo cubre
+// sin necesitar ningún caso especial acá.
+const ENVIOS_PENDIENTES_ENDPOINT = {
+  store: 'estudios-envios-pendientes-por-token',
+  suplementos: 'estudios-envios-pendientes-suple-por-token',
+}
+const ENVIOS_ASIGNAR_ENDPOINT = {
+  store: 'estudios-envios-asignar-por-token',
+  suplementos: 'estudios-envios-asignar-suple-por-token',
+}
+
+export default function MisEnviosVendorSection({ token, module = 'store' }) {
   const [pendientes, setPendientes] = useState(null)
   const [enCamino, setEnCamino] = useState([])
   const [municipioTienda, setMunicipioTienda] = useState(null)
@@ -25,8 +32,11 @@ export default function MisEnviosTiendaSection({ token }) {
   const [asignando, setAsignando] = useState(null)
   const [error, setError] = useState(null)
 
+  const endpointPendientes = ENVIOS_PENDIENTES_ENDPOINT[module] || ENVIOS_PENDIENTES_ENDPOINT.store
+  const endpointAsignar = ENVIOS_ASIGNAR_ENDPOINT[module] || ENVIOS_ASIGNAR_ENDPOINT.store
+
   const cargar = () => {
-    fetch(`${PANEL_URL}/api/estudios-envios-pendientes-por-token?token=${encodeURIComponent(token)}`)
+    fetch(`${PANEL_URL}/api/${endpointPendientes}?token=${encodeURIComponent(token)}`)
       .then((r) => r.ok ? r.json() : { pendientes: [], enCamino: [], municipioTienda: null })
       .then((data) => {
         setPendientes(data.pendientes || [])
@@ -36,15 +46,9 @@ export default function MisEnviosTiendaSection({ token }) {
       .catch(() => setPendientes([]))
   }
 
-  useEffect(cargar, [token])
+  useEffect(cargar, [token, module])
 
   useEffect(() => {
-    // Precarga el filtro con el municipio propio de la tienda (normalizado a
-    // las claves de flete_tabla) — pero solo como punto de partida: el select
-    // de abajo lo deja cambiar (2026-08-30, Jose: "debería poder filtrar por
-    // municipio para ver el servicio de transporte más cercano"). Por eso el
-    // guard es "aún no hay filtro elegido", no "cambió el municipio" — así
-    // este efecto no pisa una elección manual en un re-render.
     if (!municipioTienda || zonaFiltro) return
     const zona = municipioTienda.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z]/g, '')
     if (ZONAS_FLETE[zona]) setZonaFiltro(zona)
@@ -62,7 +66,7 @@ export default function MisEnviosTiendaSection({ token }) {
     setError(null)
     setAsignando(compraId)
     try {
-      const res = await fetch(`${PANEL_URL}/api/estudios-envios-asignar-por-token`, {
+      const res = await fetch(`${PANEL_URL}/api/${endpointAsignar}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, compra_id: compraId, transportadora_id: transportadoraId }),

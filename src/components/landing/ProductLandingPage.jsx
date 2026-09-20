@@ -8,7 +8,6 @@ import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import { useGymCart } from '../../contexts/GymCartContext'
 import { useSupleCart } from '../../contexts/SupleCartContext'
-import logoNutriHouse from '../../assets/milogo/nutrihouse.webp'
 
 const PANEL_URL  = import.meta.env.VITE_PANEL_URL
 const WA_NUMBER  = import.meta.env.VITE_WHATSAPP_NUMBER || '573207911013'
@@ -119,7 +118,7 @@ export function meta({ data }) {
 // Módulo de inventario → contexto de carrito real. "suplementos" tiene su
 // propio carrito desde que Suple se independizó de Gym como módulo propio
 // (2026-08-02, ver SupleCartContext.jsx) — antes mandaba todo al carrito de
-// Gym, bug detectado al agregar la insignia de Nutri House acá (2026-08-03).
+// Gym.
 const CART_MODULE = { supply: 'supply', store: 'store', gym: 'gym', suplementos: 'suplementos' }
 
 export default function ProductLandingPage() {
@@ -183,10 +182,10 @@ export default function ProductLandingPage() {
   // real detrás (la query hace LEFT JOIN, sin fila no hay nombre).
   const nombreProveedorStore = variant?.estudio_nombre_display || product.estudio_nombre_display || null
   const esStoreConProveedor  = product.module === 'store' && !!nombreProveedorStore
-  // Nutri House suministra las 5 categorías de Suple (2026-08-03, confirmado
-  // por Jose, incluida Accesorios) — a diferencia de Warlock/Tommy no hay
-  // exclusiones por categoría/marca.
-  const esNutriHouse     = product.module === 'suplementos'
+  // Suple multitenant (2026-09-20) — mismo criterio que Store: solo hay
+  // vendedor que mostrar si el producto tiene un estudio_id real detrás.
+  const nombreProveedorSuple = variant?.estudio_nombre_display || product.estudio_nombre_display || null
+  const esSupleConProveedor  = product.module === 'suplementos' && !!nombreProveedorSuple
   const accent          = MODULE_ACCENT[product.module] || '#A1A1AA'
   const imageUrl        = variant?.image_url || product.variantes[0]?.image_url
   const images           = variant?.image_url
@@ -220,7 +219,7 @@ export default function ProductLandingPage() {
   // aterrizó en esta página — el catálogo maestro permite que variantes
   // del mismo producto pertenezcan a proveedores distintos (reportado
   // 2026-08-09). Fallback a nivel de producto por compatibilidad.
-  const tieneVendorLock = ['supply', 'store'].includes(product.module)
+  const tieneVendorLock = ['supply', 'store', 'suplementos'].includes(product.module)
   const vendorOpts = tieneVendorLock ? {
     estudioId:     variant?.estudio_id ?? product.estudio_id ?? null,
     estudioNombre: variant?.estudio_nombre_display || variant?.estudio_nombre || product.estudio_nombre_display || product.estudio_nombre || null,
@@ -357,18 +356,6 @@ export default function ProductLandingPage() {
                         <img src={warlockLogo} alt="Industrias Warlock" className="w-full h-full object-cover" />
                       </div>
                     )}
-                    {/* Nutri House (Suple) — el logo es un webp con fondo
-                        transparente, se deja libre sin círculo/plate (Jose,
-                        2026-08-03), con drop-shadow para que no se pierda
-                        sobre fotos claras. */}
-                    {esNutriHouse && (
-                      <img
-                        src={logoNutriHouse}
-                        alt="Nutri House"
-                        title="Suministrado por Nutri House"
-                        className="absolute bottom-3 right-3 h-14 md:h-16 w-auto drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
-                      />
-                    )}
                   </div>
                   {images.length > 1 && (
                     <div className="hidden md:flex gap-2">
@@ -398,14 +385,6 @@ export default function ProductLandingPage() {
                     >
                       <img src={warlockLogo} alt="Industrias Warlock" className="w-full h-full object-cover" />
                     </div>
-                  )}
-                  {esNutriHouse && (
-                    <img
-                      src={logoNutriHouse}
-                      alt="Nutri House"
-                      title="Suministrado por Nutri House"
-                      className="absolute bottom-3 right-3 h-14 md:h-16 w-auto drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
-                    />
                   )}
                 </div>
               )
@@ -587,10 +566,10 @@ export default function ProductLandingPage() {
                         <span>Vendido por {nombreProveedorStore}</span>
                       </div>
                     )}
-                    {esNutriHouse && (
+                    {esSupleConProveedor && (
                       <div className="flex items-center gap-3 text-zinc-400 text-xs">
                         <ShieldCheck size={13} className="shrink-0" style={{ color: accent }} />
-                        <span>Suministrado por Nutri House — punto físico en Chigorodó</span>
+                        <span>Vendido por {nombreProveedorSuple}</span>
                       </div>
                     )}
                     {/* Supply es multi-tenant (fase 4/5): cada producto puede
@@ -599,13 +578,14 @@ export default function ProductLandingPage() {
                         cuando Supply era solo el inventario de Jose (Jose,
                         2026-08-27: "ya no se maneja como antes, ni lo
                         transporta Eljach... debe ser universal"). Store y
-                        Suplementos siguen siendo de un solo proveedor, ahí
-                        el texto específico de Eljach/Urabá sigue siendo
-                        cierto. */}
-                    {isSupply || esStoreConProveedor ? (
+                        Suple con vendedor real detrás (estudio_id) siguen
+                        el mismo criterio; sin vendedor es el inventario
+                        propio de INKognito, ahí el texto específico de
+                        Eljach/Urabá sigue siendo cierto. */}
+                    {isSupply || esStoreConProveedor || esSupleConProveedor ? (
                       <div className="flex items-center gap-3 text-zinc-400 text-xs">
                         <Truck size={13} className="shrink-0" style={{ color: accent }} />
-                        <span>Envío y forma de pago los coordina {variant?.estudio_nombre_supply || product.estudio_nombre_supply || nombreProveedorStore || 'el vendedor'} directamente contigo al confirmar tu pedido</span>
+                        <span>Envío y forma de pago los coordina {variant?.estudio_nombre_supply || product.estudio_nombre_supply || nombreProveedorStore || nombreProveedorSuple || 'el vendedor'} directamente contigo al confirmar tu pedido</span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-3 text-zinc-400 text-xs">
@@ -627,7 +607,7 @@ export default function ProductLandingPage() {
                     detrás (2026-08-29) — sin proveedor real, sigue siendo
                     el inventario propio de INKognito, ahí el texto de
                     Eljach/Urabá sigue siendo cierto. */}
-                {!esMobiliario && !isSupply && !esStoreConProveedor && (
+                {!esMobiliario && !isSupply && !esStoreConProveedor && !esSupleConProveedor && (
                   <div className="flex items-center gap-3 text-zinc-400 text-xs">
                     <Globe size={13} className="shrink-0" style={{ color: accent }} />
                     <span>¿Fuera de Urabá? También enviamos a toda Colombia — tiempo y costo se coordinan al confirmar (sin contraentrega fuera de la zona)</span>

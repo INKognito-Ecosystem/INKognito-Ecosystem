@@ -139,6 +139,9 @@ export default [
   // función es verificación independiente, no comparación (ver
   // TiendasDirectorioPage.jsx).
   route('store/tiendas', 'components/store/TiendasDirectorioPage.jsx'),
+  // A donde lleva "Mi Tienda" si este navegador no tiene ninguna tienda
+  // guardada — formulario de correo propio de Store, ver StoreMiTiendaPage.jsx.
+  route('store/mi-tienda', 'components/store/StoreMiTiendaPage.jsx'),
   // id explícito — dos route() no pueden compartir el mismo archivo sin
   // un id propio (React Router lo deriva del path del archivo por
   // defecto, y ya está tomado por store/estudio/:id de arriba).
@@ -166,16 +169,27 @@ export default [
   route('suplementos', 'components/suplementos/SuplePage.jsx'),
   // Página de categorías y ficha de producto (2026-09-19, migración de Suple
   // a fondo blanco) — mismo patrón que supply/categorias + supply/producto/:id
-  // y store/categorias + store/producto/:id. Suple no tiene catch-all
-  // (`suplementos/:slug`), pero se declaran antes de las categorías fijas
-  // por claridad y para que un futuro catch-all de tiendas no las tape.
+  // y store/categorias + store/producto/:id.
   route('suplementos/categorias', 'components/suplementos/SupleCategoriasPage.jsx'),
   route('suplementos/producto/:id', 'components/suplementos/SupleProductDetailPage.jsx'),
+  // Suple multitenant (2026-09-20) — mismo patrón que supply/proveedores/
+  // unete: registro público, antes de las categorías fijas. estudio/:id y
+  // :slug (catch-all) se declaran DESPUÉS de las categorías fijas — mismo
+  // criterio que Store/Supply, SUPLE_SLUGS_RESERVADOS en server.js nunca
+  // deja que un vendedor se registre con esos nombres.
+  route('suplementos/proveedores/unete', 'components/suplementos/EstudioSupleRegistroPage.jsx'),
+  // A donde lleva "Mi Suple" si este navegador no tiene ningún catálogo
+  // guardado — formulario de correo propio de Suple, ver SupleMiCatalogoPage.jsx.
+  route('suplementos/mi-catalogo', 'components/suplementos/SupleMiCatalogoPage.jsx'),
+  route('suplementos/compra/resultado', 'components/suplementos/SupleCompraResultadoPage.jsx'),
   route('suplementos/proteinas', 'components/suplementos/categories/ProteinasPage.jsx'),
   route('suplementos/creatina', 'components/suplementos/categories/CreatinaPage.jsx'),
   route('suplementos/pre-entreno', 'components/suplementos/categories/PreEntrenoPage.jsx'),
   route('suplementos/vitaminas', 'components/suplementos/categories/VitaminasPage.jsx'),
   route('suplementos/accesorios', 'components/suplementos/categories/AccesoriosPage.jsx'),
+  route('suplementos/tiendas', 'components/suplementos/SupleTiendasDirectorioPage.jsx'),
+  route('suplementos/estudio/:id', 'components/suplementos/EstudioSuplePage.jsx'),
+  route('suplementos/:slug', 'components/suplementos/EstudioSuplePage.jsx', { id: 'suple-estudio-slug' }),
 
   // Tattoo Artist Colombia — directorio de artistas (2026-08-03, renombrado
   // de "Urabá" a "Colombia" el 2026-08-06 tras la expansión nacional del

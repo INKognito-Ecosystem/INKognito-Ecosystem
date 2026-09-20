@@ -177,6 +177,14 @@ export default function EstudioTiendaPage() {
       try { localStorage.setItem(key, token) } catch {}
       return
     }
+    // Token guardado que ya no sirve (vencido) — se borra para que "Mi
+    // Tienda" vuelva a pedir el correo en vez de dejar al dueño en el
+    // catálogo público sin botón de gestión y sin forma de entrar.
+    const tokenUrl = searchParams.get('token')
+    if (tokenUrl) {
+      try { if (localStorage.getItem(key) === tokenUrl) localStorage.removeItem(key) } catch {}
+      return
+    }
     if (!searchParams.get('token')) {
       try {
         const guardado = localStorage.getItem(key)

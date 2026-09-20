@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLoaderData, useParams, useNavigate, Link } from 'react-router'
-import { ArrowLeft, ShoppingCart, Share2, ShieldCheck, ExternalLink } from 'lucide-react'
+import { ArrowLeft, ShoppingCart, Share2, Store, MapPin, ExternalLink } from 'lucide-react'
 import ProductImageGallery from '../ProductImageGallery'
 import { VariantSelectorSupl } from './SuplCard'
 import NavbarSuple from './NavbarSuple'
@@ -9,24 +9,29 @@ import { useSupleCart } from '../../contexts/SupleCartContext'
 import { fetchCatalogPage } from '../../hooks/useCatalog'
 import { getSupleCategoryByCategoria } from '../../data/supleCategoriesOrder'
 import { SUPLE_CART_CATEGORY, supleCartKey, supleCartItem, supleFormatPrice } from '../../lib/supleCart'
-import logoNutriHouse from '../../assets/milogo/nutrihouse.webp'
+import { cloudinaryFill } from '../../lib/cloudinary'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+const MP_LOGO_URL = 'https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.21.0/mercadopago/logo__large@2x.png'
 
-// Ficha de producto estilo Mercado Libre para Suple (2026-09-19, migración
-// de Suple a fondo blanco) — calco de StoreProductDetailPage.jsx /
-// SupplyProductDetailPage.jsx SIN la parte multitenant: Suple aún no tiene
-// tiendas, así que no hay insignia de Mercado Pago, bloque de vendedor, ni
-// bloqueo por proveedor. En su lugar hay un bloque de origen ESTÁTICO
-// ("Suministrado por Nutri House", el proveedor único de las 5 categorías)
-// que se reemplazará por el de vendedor cuando llegue el registro de
-// tiendas. El :id es un inventory.id de CUALQUIER variante del producto,
-// mismo contrato que ya usa /api/product/:id sin cambios de backend.
+// Ficha de producto estilo Mercado Libre para Suple (2026-09-19, migración a
+// fondo blanco; 2026-09-20, Suple multitenant) — calco de
+// StoreProductDetailPage.jsx/SupplyProductDetailPage.jsx: bloqueo de
+// carrito por vendedor (vendorLock), insignia de Mercado Pago cuando ESE
+// vendedor está conectado, y bloque de vendedor real (logo/nombre/
+// municipio/"Ir a la página del vendedor") en vez del texto fijo de Nutri
+// House de antes. Mientras un producto no tenga estudio_id (catálogo viejo
+// sin migrar, ver Fase 11 del plan de multitenant), el bloque de vendedor
+// simplemente no aparece — nunca se inventa una identidad — pero "Más de
+// {categoría}" se mantiene siempre, sin importar si el producto tiene
+// vendedor o no. El :id es un inventory.id de CUALQUIER variante del
+// producto, mismo contrato que ya usa /api/product/:id sin cambios de
+// backend.
 export async function loader({ params }) {
   try {
     const res = await fetch(`${PANEL_URL}/api/product/${params.id}`)
     const data = await res.json()
-    if (data.error) return { product: null, otrosProductos: [] }
+    if (data.error) return { product: null, otrosProductos: [], tienda: null }
 
     // "Más de {categoría}" — 2 productos de la misma categoría, con su
     // propia foto (fetchCatalogPage, paginado, nunca el catálogo completo).
@@ -50,9 +55,22 @@ export async function loader({ params }) {
       }
     }
 
-    return { product: data, otrosProductos }
+    // Vendedor real (Suple multitenant, 2026-09-20) — mismos datos que ya
+    // muestran SupleTiendasDirectorioPage.jsx/EstudioSuplePage.jsx: logo,
+    // municipio/departamento vía GET /api/estudios/:id, público y sin auth.
+    let tienda = null
+    if (data.estudio_id) {
+      try {
+        const estudioRes = await fetch(`${PANEL_URL}/api/estudios/${data.estudio_id}`)
+        tienda = estudioRes.ok ? await estudioRes.json() : null
+      } catch {
+        tienda = null
+      }
+    }
+
+    return { product: data, otrosProductos, tienda }
   } catch {
-    return { product: null, otrosProductos: [] }
+    return { product: null, otrosProductos: [], tienda: null }
   }
 }
 
@@ -77,7 +95,7 @@ export function meta({ data, params }) {
 }
 
 export default function SupleProductDetailPage() {
-  const { product, otrosProductos } = useLoaderData()
+  const { product, otrosProductos, tienda } = useLoaderData()
   const { id } = useParams()
   const navigate = useNavigate()
   const { items: cartItems, addItem, removeItem, setSingleItem } = useSupleCart()
@@ -88,6 +106,7 @@ export default function SupleProductDetailPage() {
   const [scrolled, setScrolled] = useState(false)
   const [justAdded, setJustAdded] = useState(false)
   const [shareMsg, setShareMsg] = useState(null)
+  const [bloqueoMsg, setBloqueoMsg] = useState(null)
 
   const variantes = product?.variantes ?? []
 
@@ -133,6 +152,14 @@ export default function SupleProductDetailPage() {
   const images = [sel.image_url, sel.image_url_2, sel.image_url_3].filter(Boolean)
   const sinStock = (sel.stock ?? 0) <= 0
 
+  // Dueño real de la variante seleccionada (Suple multitenant, 2026-09-20)
+  // — mismo criterio que Store/Supply: `estudio_nombre_display` ya resuelve
+  // nombre_suple vs nombre a nivel de backend (server.js).
+  const proveedorId = sel.estudio_id ?? product.estudio_id ?? null
+  const proveedorNombre = sel.estudio_nombre_display || product.estudio_nombre_display || null
+  const proveedorSlug = sel.estudio_slug || product.estudio_slug || null
+  const proveedorMp = sel.estudio_mp_conectado ?? product.estudio_mp_conectado ?? false
+
   // Misma key que SuplCard.jsx (ver src/lib/supleCart.js) — el estado "en
   // carrito" y el "1" del botón coinciden con la card sin importar desde
   // dónde se agregó.
@@ -148,6 +175,7 @@ export default function SupleProductDetailPage() {
     image: images[0],
     stock: sel.stock,
   })
+  const opts = { estudioId: proveedorId, estudioNombre: proveedorNombre, mpConectado: !!proveedorMp }
 
   // Parpadeo del botón al agregar (mismo criterio que
   // SupplyProductDetailPage.jsx) — feedback visual corto, no cambia el
@@ -157,7 +185,12 @@ export default function SupleProductDetailPage() {
       removeItem(cartKey)
       return
     }
-    addItem(armarItem(), SUPLE_CART_CATEGORY)
+    const resultado = addItem(armarItem(), SUPLE_CART_CATEGORY, opts)
+    if (resultado && !resultado.ok) {
+      setBloqueoMsg(`Ya tienes productos de ${resultado.nombreActual} en tu carrito — termina esa compra antes de agregar de otro vendedor.`)
+      setTimeout(() => setBloqueoMsg(null), 5000)
+      return
+    }
     setJustAdded(true)
     setTimeout(() => setJustAdded(false), 500)
   }
@@ -167,7 +200,7 @@ export default function SupleProductDetailPage() {
   // pedido en línea.
   const handleComprarAhora = () => {
     if (sinStock) return
-    setSingleItem(armarItem(), SUPLE_CART_CATEGORY)
+    setSingleItem(armarItem(), SUPLE_CART_CATEGORY, opts)
     navigate('/pedido/suplementos')
   }
 
@@ -188,6 +221,20 @@ export default function SupleProductDetailPage() {
     <div className="flex flex-col gap-3">
       <h1 className="text-sm font-medium leading-snug text-zinc-900">{product.name}</h1>
       {resolvedPrice && <p className="text-zinc-900 font-bold text-2xl">{resolvedPrice}</p>}
+      {/* Medio de pago — solo si ESTE vendedor está conectado (proveedorMp):
+          si no, el cobro real no pasa por Mercado Pago, mostrar el logo
+          igual sería prometer algo que no aplica para este producto. */}
+      {proveedorMp && (
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-zinc-500">Medios de pago:</span>
+          <img
+            src={MP_LOGO_URL}
+            alt="Mercado Pago"
+            className="h-4"
+            onError={(e) => { e.currentTarget.style.display = 'none' }}
+          />
+        </div>
+      )}
       {!esAfiliado && (
         sinStock ? (
           <p className="text-red-500 text-xs font-bold uppercase tracking-wide">Agotado</p>
@@ -200,6 +247,9 @@ export default function SupleProductDetailPage() {
       )}
       {product.descripcion && (
         <p className="text-zinc-600 text-sm leading-relaxed whitespace-pre-line">{product.descripcion}</p>
+      )}
+      {bloqueoMsg && (
+        <p className="text-[11px] leading-snug text-amber-700 bg-amber-100 border border-amber-200 rounded-lg px-3 py-2">{bloqueoMsg}</p>
       )}
     </div>
   )
@@ -254,23 +304,35 @@ export default function SupleProductDetailPage() {
     </div>
   )
 
-  // Bloque de origen ESTÁTICO (reemplaza al bloque de vendedor multitenant
-  // de Store/Supply): Nutri House suministra las 5 categorías. Debajo, "Más
-  // de {categoría}" y el link a toda la categoría.
-  const origenBlock = !esAfiliado && (
+  // Bloque de vendedor (Suple multitenant, 2026-09-20) — mismos campos reales que ya muestran
+  // SupleTiendasDirectorioPage.jsx/EstudioSuplePage.jsx (logo_url,
+  // municipio, departamento). Solo aparece si el producto de verdad tiene
+  // estudio_id (`tienda` viene del loader) — un producto todavía sin
+  // migrar (ver Fase 11 del plan) no tiene ninguna identidad de vendedor
+  // que mostrar, así que el header de arriba simplemente no aparece; "Más
+  // de {categoría}" se mantiene siempre, con o sin vendedor real.
+  const proveedorBlock = !esAfiliado && (
     <div className="border border-zinc-200 rounded-xl overflow-hidden">
-      <div className="flex items-center gap-3 px-4 py-3">
-        <div className="w-11 h-11 rounded-full bg-zinc-50 border border-zinc-100 overflow-hidden flex items-center justify-center flex-shrink-0">
-          <img src={logoNutriHouse} alt="Nutri House" className="w-full h-full object-contain" />
-        </div>
-        <div className="min-w-0">
-          <p className="font-black uppercase text-sm text-zinc-900 truncate">Nutri House</p>
-          <p className="flex items-center gap-1 text-[11px] text-zinc-500 truncate">
-            <ShieldCheck size={11} className="flex-shrink-0" />
-            Suministrado por Nutri House — punto físico en Chigorodó
-          </p>
-        </div>
-      </div>
+      {proveedorNombre && (
+        <Link to={`/suplementos/${proveedorSlug || `estudio/${proveedorId}`}`} className="flex items-center gap-3 px-4 py-3">
+          <div className="w-11 h-11 rounded-full bg-zinc-100 overflow-hidden flex items-center justify-center flex-shrink-0">
+            {tienda?.logo_url ? (
+              <img src={cloudinaryFill(tienda.logo_url, 100, 100)} alt={proveedorNombre} className="w-full h-full object-cover" />
+            ) : (
+              <Store size={18} className="text-zinc-400" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="font-black uppercase text-sm text-zinc-900 truncate">{proveedorNombre}</p>
+            {tienda?.municipio && (
+              <p className="flex items-center gap-1 text-[11px] text-zinc-500 truncate">
+                <MapPin size={11} className="flex-shrink-0" />
+                {tienda.municipio}{tienda.departamento ? `, ${tienda.departamento}` : ''}
+              </p>
+            )}
+          </div>
+        </Link>
+      )}
       {otrosProductos.length > 0 && (
         <div className="border-t border-zinc-100">
           <p className="px-4 pt-3 text-[10px] font-black uppercase tracking-widest text-zinc-400">
@@ -295,7 +357,15 @@ export default function SupleProductDetailPage() {
           ))}
         </div>
       )}
-      {categoriaInfo && (
+      {proveedorId ? (
+        <Link
+          to={`/suplementos/${proveedorSlug || `estudio/${proveedorId}`}`}
+          className="flex items-center justify-between px-4 py-3 border-t border-zinc-100 text-sm font-bold text-zinc-700"
+        >
+          Ir a la página del vendedor
+          <span aria-hidden="true">→</span>
+        </Link>
+      ) : categoriaInfo && (
         <Link
           to={categoriaInfo.link}
           className="flex items-center justify-between px-4 py-3 border-t border-zinc-100 text-sm font-bold text-zinc-700"
@@ -359,7 +429,7 @@ export default function SupleProductDetailPage() {
         <div className="px-5 py-6 pb-28 flex flex-col gap-6">
           {infoBlock}
           {ctaButtons}
-          {origenBlock}
+          {proveedorBlock}
         </div>
 
         <SupleMobileNav active={null} />
@@ -390,7 +460,7 @@ export default function SupleProductDetailPage() {
             <div className="flex flex-col gap-6">
               {infoBlock}
               {ctaButtons}
-              {origenBlock}
+              {proveedorBlock}
             </div>
           </div>
         </div>

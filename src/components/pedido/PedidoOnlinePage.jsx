@@ -133,8 +133,9 @@ export default function PedidoOnlinePage() {
   const [vendorChecking, setVendorChecking] = useState(false)
   // Store multitenant (2026-08-29) — mismo mecanismo de revalidación en
   // vivo que ya tenía Supply, extendido a Store: ambos módulos permiten
-  // un carrito bloqueado a un proveedor con Mercado Pago propio.
-  const VENDOR_LOCK_MODULES = ['supply', 'store']
+  // un carrito bloqueado a un proveedor con Mercado Pago propio. Suple
+  // multitenant (2026-09-20) se suma con el mismo criterio exacto.
+  const VENDOR_LOCK_MODULES = ['supply', 'store', 'suplementos']
   const estudioIdsEnCarrito = VENDOR_LOCK_MODULES.includes(module)
     ? [...new Set(cart?.items.map(i => i.estudioId).filter(Boolean))]
     : []
@@ -150,7 +151,7 @@ export default function PedidoOnlinePage() {
     return () => { active = false }
   }, [estudioIdsEnCarrito.join(',')])
 
-  const vendorNombreVivo = vendorInfo ? ((module === 'store' ? vendorInfo.nombre_tienda : vendorInfo.nombre_supply) || vendorInfo.nombre) : null
+  const vendorNombreVivo = vendorInfo ? ((module === 'store' ? vendorInfo.nombre_tienda : module === 'suplementos' ? vendorInfo.nombre_suple : vendorInfo.nombre_supply) || vendorInfo.nombre) : null
   const vendorLive = vendorInfo?.mp_conectado ? { estudioId: vendorInfo.id, estudioNombre: vendorNombreVivo } : null
 
   useEffect(() => {
@@ -338,10 +339,10 @@ export default function PedidoOnlinePage() {
   if (VENDOR_LOCK_MODULES.includes(module) && estudioIdsEnCarrito.length === 1 && vendorChecking && !vendorInfo) {
     return (
       <>
-        <section className="min-h-[60vh] flex items-center justify-center py-16 px-4 bg-black">
-          <p className="text-gray-500 text-sm">Cargando...</p>
+        <section className={`min-h-[60vh] flex items-center justify-center py-16 px-4 ${c('bg-black', 'bg-white')}`}>
+          <p className={c('text-gray-500', 'text-zinc-500')}>Cargando...</p>
         </section>
-        <MiniFooter moduleLabel={MODULE_LABELS[module]} />
+        <MiniFooter moduleLabel={MODULE_LABELS[module]} light={light} />
       </>
     )
   }
@@ -350,7 +351,7 @@ export default function PedidoOnlinePage() {
     return (
       <>
         <PedidoSupplyVendorCheckout cart={{ ...cart, vendorLock: vendorLive }} module={module} />
-        <MiniFooter moduleLabel={MODULE_LABELS[module]} />
+        <MiniFooter moduleLabel={MODULE_LABELS[module]} light={light} />
       </>
     )
   }
@@ -363,18 +364,23 @@ export default function PedidoOnlinePage() {
   // acá no puede correr sin una cuenta conectada). Se ofrece contactar a
   // la tienda directo por SU propio WhatsApp — nunca el de INKognito.
   if (VENDOR_LOCK_MODULES.includes(module) && estudioIdsEnCarrito.length === 1 && vendorInfo && !vendorInfo.mp_conectado) {
+    const vendorHref = module === 'store'
+      ? `/store/${vendorInfo.slug || `estudio/${vendorInfo.id}`}`
+      : module === 'suplementos'
+      ? `/suplementos/${vendorInfo.slug || `estudio/${vendorInfo.id}`}`
+      : `/supply/${vendorInfo.slug || `estudio/${vendorInfo.id}`}`
     return (
       <>
-        <section className="min-h-[60vh] flex items-center justify-center py-16 px-4 bg-black">
+        <section className={`min-h-[60vh] flex items-center justify-center py-16 px-4 ${c('bg-black', 'bg-white')}`}>
           <div className="max-w-md mx-auto text-center">
-            <Landmark size={40} className="text-amber-500 mx-auto mb-4" />
-            <h3 className="text-xl font-black uppercase italic mb-3 text-white">Pago en línea no disponible todavía</h3>
-            <p className="text-gray-400 leading-relaxed mb-6">
-              {vendorNombreVivo || 'Esta tienda'} todavía no conecta su cuenta de pago, así que no podemos procesar este pedido en línea por ahora.
+            <Landmark size={40} className={`mx-auto mb-4 ${c('text-amber-500', 'text-amber-600')}`} />
+            <h3 className={`text-xl font-black uppercase italic mb-3 ${c('text-white', 'text-zinc-900')}`}>Pago en línea no disponible todavía</h3>
+            <p className={`leading-relaxed mb-6 ${c('text-gray-400', 'text-zinc-600')}`}>
+              {vendorNombreVivo || 'Este vendedor'} todavía no conecta su cuenta de pago, así que no podemos procesar este pedido en línea por ahora.
             </p>
             {vendorInfo.whatsapp ? (
               <a
-                href={`https://wa.me/${vendorInfo.whatsapp}?text=${encodeURIComponent(`Hola, quiero comprar un producto de tu catálogo en INKognito ${module === 'store' ? 'Store' : 'Supply'}`)}`}
+                href={`https://wa.me/${vendorInfo.whatsapp}?text=${encodeURIComponent(`Hola, quiero comprar un producto de tu catálogo en ${MODULE_LABELS[module]}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-green-600 text-white font-black py-3.5 px-8 rounded uppercase tracking-widest text-sm hover:bg-green-500 transition-all"
@@ -383,7 +389,7 @@ export default function PedidoOnlinePage() {
                 Escribirle directo por WhatsApp
               </a>
             ) : (
-              <p className="text-gray-500 text-sm">Intenta más tarde, o quita este producto del carrito.</p>
+              <p className={c('text-gray-500', 'text-zinc-500') + ' text-sm'}>Intenta más tarde, o quita este producto del carrito.</p>
             )}
             <div className="mt-6">
               {/* 2026-08-30 (Jose: "me mandó al ecosistema, y no a la
@@ -391,15 +397,15 @@ export default function PedidoOnlinePage() {
                   al módulo genérico (/store, /supply); ahora vuelve al
                   perfil del proveedor específico del que venía el carrito. */}
               <Link
-                to={module === 'store' ? `/store/${vendorInfo.slug || `estudio/${vendorInfo.id}`}` : `/supply/${vendorInfo.slug || `estudio/${vendorInfo.id}`}`}
-                className="text-gray-500 hover:text-gray-300 text-xs"
+                to={vendorHref}
+                className={c('text-gray-500 hover:text-gray-300', 'text-zinc-500 hover:text-zinc-800') + ' text-xs'}
               >
                 ← Volver a {vendorNombreVivo || MODULE_LABELS[module]}
               </Link>
             </div>
           </div>
         </section>
-        <MiniFooter moduleLabel={MODULE_LABELS[module]} />
+        <MiniFooter moduleLabel={MODULE_LABELS[module]} light={light} />
       </>
     )
   }

@@ -6,19 +6,11 @@ import SupleMobileNav from './SupleMobileNav'
 import SupleCategoryRibbon from './SupleCategoryRibbon'
 import { SuplCard } from './SuplCard'
 import { FaWhatsapp } from 'react-icons/fa'
-import { ArrowLeft, ArrowRight, ShieldCheck, LoaderCircle, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, LoaderCircle, X } from 'lucide-react'
 import { getAdjacentSupleCategories } from '../../data/supleCategoriesOrder'
 import { useLoadMore, fetchCatalogPage } from '../../hooks/useCatalog'
-import logoNutriHouse from '../../assets/milogo/nutrihouse.webp'
 
 const WA = '573207911013'
-
-// Insignia de proveedor — Nutri House (punto físico en Chigorodó, mismo
-// patrón que Tommy Tattoo Supply en Supply) suministra las 5 categorías,
-// incluida Accesorios (2026-08-03, confirmado por Jose) — un solo
-// DEFAULT_BADGE alcanza, sin overrides por categoría.
-const DEFAULT_BADGE = 'Suministrado por Nutri House — punto físico en Chigorodó'
-const CATEGORY_BADGE = {}
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(24,24,27,1) 1px, transparent 1px)',
@@ -76,7 +68,6 @@ export default function SupleCategoryPage({ title, categoria, slug, intro, produ
   const cargandoMas = buscando ? cargandoMasBusqueda : cargandoMasProductos
   const cargarMas = buscando ? cargarMasBusqueda : cargarMasProductos
 
-  const badge = categoria in CATEGORY_BADGE ? CATEGORY_BADGE[categoria] : DEFAULT_BADGE
   // Hoja con la descripción de la categoría (móvil) — se abre desde el
   // ícono de libro del listón.
   const [verDescripcion, setVerDescripcion] = useState(false)
@@ -147,20 +138,6 @@ export default function SupleCategoryPage({ title, categoria, slug, intro, produ
               SupleCategoryRibbon.jsx y la hoja de abajo). */}
           {intro && (
             <p className="relative z-10 hidden md:block text-zinc-600 text-lg leading-relaxed max-w-3xl text-justify [hyphens:auto]">{intro}</p>
-          )}
-          {badge && (
-            <div className="relative z-10 flex items-center gap-2 text-xs text-zinc-600 bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 w-fit mt-4">
-              <ShieldCheck size={14} className="shrink-0 text-zinc-500" />
-              <span>{badge}</span>
-              {/* Logo de Nutri House al final de la insignia — versión PNG
-                  con fondo transparente (2026-08-03), sin círculo/recorte:
-                  se deja libre, solo con una altura fija. */}
-              <img
-                src={logoNutriHouse}
-                alt="Nutri House"
-                className="shrink-0 h-14 w-auto ml-1 -my-4"
-              />
-            </div>
           )}
         </div>
 
