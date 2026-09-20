@@ -87,6 +87,8 @@ export function meta() {
   ]
 }
 
+const CERCA_COORDS_KEY = 'kg_cerca_de_mi_coords'
+
 const DIAS_ARTISTA_NUEVO = 14
 
 function esArtistaNuevo(createdAt) {
@@ -664,6 +666,25 @@ export default function ArtistasColombiaPage() {
   const listadoRef = useRef(null)
   const prevVacioRef = useRef(true)
 
+  // "Cerca de mí" recuerda la ubicación (2026-09-19, Jose: "si navego a otra
+  // page del ecosistema y vuelvo, o recargo la página, está deshabilitada
+  // nuevamente... no guarda la ubicación"). Al tocar el botón se guardan las
+  // coords en localStorage; acá se restauran al montar y se reactiva el modo.
+  // Va en un useEffect (no en el useState inicial) por la misma razón que los
+  // tooltips de arriba: el servidor no tiene localStorage y el HTML inicial
+  // debe coincidir para no romper la hidratación.
+  useEffect(() => {
+    try {
+      const guardado = JSON.parse(localStorage.getItem(CERCA_COORDS_KEY) || 'null')
+      if (guardado && Number.isFinite(guardado.lat) && Number.isFinite(guardado.lng)) {
+        setMisCoords({ lat: guardado.lat, lng: guardado.lng })
+        setCercaDeTiActivo(true)
+      }
+    } catch {
+      // localStorage bloqueado o valor corrupto — se queda sin restaurar
+    }
+  }, [])
+
   // Carrusel persistente "Cerca de ti" (2026-09-17, pedido de Jose: que los
   // artistas cercanos "se fijen" en una sesión aparte, con scroll lateral,
   // que sobreviva a cambiar de pestaña o escribir una búsqueda nueva — hoy
@@ -782,10 +803,12 @@ export default function ArtistasColombiaPage() {
     setUbicando(true)
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setMisCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+        setMisCoords(coords)
         setQuery('')
         setCercaDeTiActivo(true)
         setUbicando(false)
+        try { localStorage.setItem(CERCA_COORDS_KEY, JSON.stringify(coords)) } catch {}
       },
       () => {
         setUbicacionError('No pudimos acceder a tu ubicación — actívala en el navegador o escribe tu municipio.')
@@ -1065,7 +1088,7 @@ export default function ArtistasColombiaPage() {
             los dos como está ahora") — en vez del genérico "resultados". */}
         {(hayBusqueda || cercaDeTiActivo) && (
           <p className={cercaDeTiActivo
-            ? 'text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4'
+            ? 'flex items-center gap-1.5 text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4'
             : 'text-gray-400 text-xs uppercase tracking-widest mb-4'
           }>
             {/* Misma tipografía que el encabezado del carrusel "Artistas
@@ -1074,7 +1097,7 @@ export default function ArtistasColombiaPage() {
                 del text-xs normal que sigue usando la variante de búsqueda
                 por texto. */}
             {cercaDeTiActivo ? (
-              <>{conteoVisible}{hayMasVisible ? '+' : ''} {categoria === 'estudios' ? (conteoVisible !== 1 ? 'estudios' : 'estudio') : (conteoVisible !== 1 ? 'artistas' : 'artista')} cerca de ti</>
+              <><MapPin size={12} className="flex-shrink-0" />{conteoVisible}{hayMasVisible ? '+' : ''} {categoria === 'estudios' ? (conteoVisible !== 1 ? 'estudios' : 'estudio') : (conteoVisible !== 1 ? 'artistas' : 'artista')} cerca de ti</>
             ) : (
               <>{conteoVisible}{hayMasVisible ? '+' : ''} resultado{conteoVisible !== 1 ? 's' : ''} para <span className="text-gray-600">"{query}"</span></>
             )}
