@@ -111,7 +111,7 @@ export function CoberturaMovilSuple() {
           ¿Fuera de Urabá? También enviamos al resto de Colombia — tiempo y costo se coordinan al confirmar.
         </p>
         <div className="flex flex-col gap-2">
-          {['Pago contraentrega disponible','Atención personalizada por WhatsApp','Cobertura en toda la región de Urabá'].map(g => (
+          {['Pago contraentrega disponible','Cobertura en toda la región de Urabá'].map(g => (
             <div key={g} className="flex items-center gap-2">
               <span className="text-green-600 text-sm font-bold">✓</span>
               <span className="text-zinc-600 text-xs">{g}</span>

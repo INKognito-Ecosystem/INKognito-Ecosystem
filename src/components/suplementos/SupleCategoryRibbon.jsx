@@ -57,6 +57,11 @@ export default function SupleCategoryRibbon({ activeSlug = null, todosActivo = f
             {cat.name}
           </Link>
         ))}
+        {/* Enlace al módulo Gym System (2026-09-20, Jose: "en el listón de
+            categorías de suple, agrega la ruta a gym system") — al final,
+            después de las 5 categorías; no es una categoría, lleva a otro
+            módulo (como "Suplementos" en el listón de Gym). */}
+        <Link to="/gym" className={`${base} ${off}`}>Gym System</Link>
       </div>
       {onInfo && (
         <button
