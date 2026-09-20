@@ -76,6 +76,11 @@ export function meta() {
 
 const inputClass = 'w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-500 transition-colors'
 const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb-1.5 block'
+// Jerarquía en tarjetas (2026-09-19, Jose: el editar perfil no tiene el
+// orden jerárquico del registro) — mismo estilo de burbuja que
+// ArtistaRegistroPage.jsx, reemplaza los bloques grises con emoji.
+const cardClass = 'bg-white border border-gray-200 rounded-2xl shadow-sm p-5 md:p-8'
+const cardTitleClass = 'text-sm font-black uppercase tracking-widest text-gray-900 mb-4 pb-3 border-b border-gray-100'
 
 // Pantalla 1 — sin token: solo pide el correo y dispara el envío del link.
 function PedirLinkForm() {
@@ -1669,8 +1674,8 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
             colapsar adentro sumaría una capa de interacción sin necesidad
             — el mismo objetivo (que no se lea como un formulario largo
             sin cortes) ya queda resuelto con encabezado + tarjeta. */}
-        <div className="-mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5 space-y-3">
-          <p className={labelClass}>📍 Ubicación y Negocio</p>
+        <div className={`${cardClass} space-y-4`}>
+          <h2 className={cardTitleClass}>Ubicación y negocio</h2>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>Departamento *</label>
@@ -1707,8 +1712,8 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           </div>
         </div>
 
-        <div className="-mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5 space-y-3">
-          <p className={labelClass}>⚙️ Parámetros de Servicio</p>
+        <div className={`${cardClass} space-y-4`}>
+          <h2 className={cardTitleClass}>Parámetros de servicio</h2>
           <div>
             <label className={labelClass}>Restricciones de servicio</label>
             <input className={inputClass} value={form.no_tatua} onChange={set('no_tatua')} placeholder="Zonas o tipos de trabajo no realizados." />

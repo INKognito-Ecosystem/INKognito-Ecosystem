@@ -148,7 +148,16 @@ export default function EstudioSupplyPage() {
     if (!searchParams.get('token')) {
       try {
         const guardado = localStorage.getItem(key)
-        if (guardado) navigate(`?token=${encodeURIComponent(guardado)}`, { replace: true })
+        if (guardado) {
+          // Conserva los demás parámetros (bug real, 2026-09-19: con solo
+          // `?token=` se perdía ?caja=1 del deep link "Armar mi caja") y
+          // pide no resetear el scroll (ver `sinScroll` en root.jsx) — sin
+          // eso, esta reescritura mandaba la página al hero justo después
+          // de que el deep link había hecho scroll a la caja.
+          const params = new URLSearchParams(searchParams)
+          params.set('token', guardado)
+          navigate(`?${params}`, { replace: true, state: { sinScroll: true } })
+        }
       } catch {}
     }
   }, [estudio, esDueno, token])

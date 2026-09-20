@@ -8,6 +8,10 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-pro
 const BTN = '#374151'
 const inputClass = 'w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-500 transition-colors'
 const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb-1.5 block'
+// Jerarquía en tarjetas (2026-09-19) — mismos títulos y orden que
+// EstudioProveedorSupplyRegistroPage.jsx.
+const cardClass = 'bg-white border border-gray-200 rounded-2xl shadow-sm p-5 md:p-8'
+const cardTitleClass = 'text-sm font-black uppercase tracking-widest text-gray-900 mb-4 pb-3 border-b border-gray-100'
 
 // Formulario de perfil, autocontenido (2026-09-12) — mismo criterio que
 // EditarPerfilTiendaSection.jsx en Store: se monta dentro del panel del
@@ -93,7 +97,7 @@ export default function EditarPerfilSupplySection({ token, estudio, cloud_name, 
   }
 
   return (
-    <div className="space-y-4">
+    <div>
       <input
         type="file"
         accept="image/*"
@@ -102,7 +106,7 @@ export default function EditarPerfilSupplySection({ token, estudio, cloud_name, 
         onChange={(e) => subirFoto(e.target.files?.[0])}
       />
 
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center mb-6">
         <div className="relative w-20 h-20">
           <div className="w-20 h-20 rounded-full border-4 border-white bg-gray-100 shadow-md overflow-hidden">
             {form.logo_url ? (
@@ -123,7 +127,11 @@ export default function EditarPerfilSupplySection({ token, estudio, cloud_name, 
         <p className="text-gray-400 text-[10px] mt-2">Cuadrado, mínimo 400×400px</p>
       </div>
 
-      <div>
+      {/* CARD 1 — Datos de la tienda */}
+      <div className={cardClass}>
+        <h2 className={cardTitleClass}>Datos de la tienda</h2>
+        <div className="grid grid-cols-2 gap-x-3 gap-y-4">
+      <div className="col-span-2">
         <label className={labelClass}>Nombre del negocio</label>
         <input value={form.nombre} onChange={set('nombre')} className={inputClass} />
       </div>
@@ -137,25 +145,23 @@ export default function EditarPerfilSupplySection({ token, estudio, cloud_name, 
           segunda identidad que distinguir — pedirle este campo aparte es
           redundante, ya escribió su nombre arriba. */}
       {estudio.tipo === 'estudio' && (
-        <div>
+        <div className="col-span-2">
           <label className={labelClass}>Nombre para mostrar en Supply (opcional)</label>
           <input value={form.nombre_supply} onChange={set('nombre_supply')} placeholder={form.nombre || 'Nombre del negocio'} className={inputClass} />
           <p className="text-gray-400 text-[10px] mt-1">Si lo dejas vacío, se muestra el mismo nombre de arriba.</p>
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className={labelClass}>Departamento *</label>
-          <ComboboxBuscable value={form.departamento} onChange={setDepartamento} options={DEPARTAMENTOS} placeholder="Escribe para buscar..." inputClassName={inputClass} />
-        </div>
-        <div>
-          <label className={labelClass}>Municipio *</label>
-          <ComboboxBuscable value={form.municipio} onChange={setMunicipio} options={municipiosDisponibles} disabled={!form.departamento} placeholder="Escribe para buscar..." inputClassName={inputClass} />
-        </div>
+      <div>
+        <label className={labelClass}>Departamento *</label>
+        <ComboboxBuscable value={form.departamento} onChange={setDepartamento} options={DEPARTAMENTOS} placeholder="Escribe para buscar..." inputClassName={inputClass} />
+      </div>
+      <div>
+        <label className={labelClass}>Municipio *</label>
+        <ComboboxBuscable value={form.municipio} onChange={setMunicipio} options={municipiosDisponibles} disabled={!form.departamento} placeholder="Escribe para buscar..." inputClassName={inputClass} />
       </div>
 
-      <div>
+      <div className="col-span-2">
         <button
           type="button"
           onClick={usarMiUbicacion}
@@ -170,30 +176,38 @@ export default function EditarPerfilSupplySection({ token, estudio, cloud_name, 
           Actívala estando físicamente en el punto exacto que quieres mostrar.
         </p>
       </div>
-
-      <div>
-        <label className={labelClass}><FaInstagram className="inline -mt-0.5 mr-1" />Instagram</label>
-        <input value={form.instagram} onChange={set('instagram')} placeholder="https://instagram.com/..." className={inputClass} />
-      </div>
-      <div>
-        <label className={labelClass}><FaFacebook className="inline -mt-0.5 mr-1" />Facebook</label>
-        <input value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." className={inputClass} />
-      </div>
-      <div>
-        <label className={labelClass}><FaWhatsapp className="inline -mt-0.5 mr-1" />WhatsApp</label>
-        <input value={form.whatsapp} onChange={set('whatsapp')} placeholder="57300..." className={inputClass} />
-      </div>
-      <div>
-        <label className={labelClass}><MapPin size={12} className="inline -mt-0.5 mr-1" />Link de Google Maps (opcional)</label>
-        <input value={form.google_maps_url} onChange={set('google_maps_url')} placeholder="https://maps.app.goo.gl/..." className={inputClass} />
+        </div>
       </div>
 
-      {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+      {/* CARD 2 — Redes de contacto */}
+      <div className={`${cardClass} mt-5`}>
+        <h2 className={cardTitleClass}>Redes de contacto</h2>
+        <div className="flex flex-col gap-4">
+          <div>
+            <label className={labelClass}><FaWhatsapp className="inline -mt-0.5 mr-1" />WhatsApp</label>
+            <input value={form.whatsapp} onChange={set('whatsapp')} placeholder="57300..." className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}><FaInstagram className="inline -mt-0.5 mr-1" />Instagram</label>
+            <input value={form.instagram} onChange={set('instagram')} placeholder="https://instagram.com/..." className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}><FaFacebook className="inline -mt-0.5 mr-1" />Facebook</label>
+            <input value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}><MapPin size={12} className="inline -mt-0.5 mr-1" />Link de Google Maps (opcional)</label>
+            <input value={form.google_maps_url} onChange={set('google_maps_url')} placeholder="https://maps.app.goo.gl/..." className={inputClass} />
+          </div>
+        </div>
+      </div>
+
+      {error && <p className="text-red-600 text-sm text-center mt-5">{error}</p>}
       <button
         type="button"
         onClick={guardar}
         disabled={guardando}
-        className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
+        className="w-full mt-5 py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
         style={{ backgroundColor: BTN }}
       >
         {guardando ? 'Guardando...' : guardado ? '✓ Guardado' : 'Guardar cambios'}

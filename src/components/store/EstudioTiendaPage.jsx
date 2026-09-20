@@ -180,7 +180,14 @@ export default function EstudioTiendaPage() {
     if (!searchParams.get('token')) {
       try {
         const guardado = localStorage.getItem(key)
-        if (guardado) navigate(`?token=${encodeURIComponent(guardado)}`, { replace: true })
+        if (guardado) {
+          // Mismo arreglo que EstudioSupplyPage.jsx (2026-09-19): conserva
+          // los demás parámetros y no resetea el scroll (ver `sinScroll`
+          // en root.jsx).
+          const params = new URLSearchParams(searchParams)
+          params.set('token', guardado)
+          navigate(`?${params}`, { replace: true, state: { sinScroll: true } })
+        }
       } catch {}
     }
   }, [estudio, esDueno, token])

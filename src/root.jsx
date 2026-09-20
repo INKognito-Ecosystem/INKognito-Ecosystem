@@ -143,7 +143,7 @@ const scrollPositions = new Map()
 // del árbol de rutas (necesita useLocation, que exige contexto de router), así
 // que se mueve acá como hermano de <Outlet/> en vez de wrapper desde afuera.
 function ScrollToHash() {
-  const { pathname, hash, key } = useLocation()
+  const { pathname, hash, key, state } = useLocation()
   const navigationType = useNavigationType() // 'PUSH' | 'POP' | 'REPLACE'
 
   // Guarda continuamente el scroll de la página actual bajo su propia key,
@@ -163,6 +163,15 @@ function ScrollToHash() {
   // Supply, pero el bug es de todo el sitio). Ahora "atrás/adelante" (POP)
   // restaura la posición guardada arriba en vez de forzar nada.
   useLayoutEffect(() => {
+    // `state.sinScroll` (2026-09-19) — señal opcional para reescrituras de
+    // URL que NO son un cambio de página (ej. restaurar el ?token= del
+    // dueño en Supply/Store): sin esto, ese `navigate(..., {replace:true})`
+    // mandaba el scroll al tope y deshacía el deep link "Armar mi caja"
+    // (?caja=1) apenas terminaba de recargar. Opt-in a propósito: otros
+    // REPLACE (ej. cambiar de pestaña en el editar perfil del artista)
+    // SÍ dependen de este scroll-to-top. Solo REPLACE — si el usuario
+    // vuelve a esa entrada con "atrás" (POP) se restaura el scroll normal.
+    if (navigationType === 'REPLACE' && state?.sinScroll) return
     if (navigationType === 'POP') {
       const saved = scrollPositions.get(key)
       if (saved != null) {

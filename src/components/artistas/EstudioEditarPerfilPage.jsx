@@ -54,6 +54,9 @@ export function meta() {
 
 const inputClass = 'w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-500 transition-colors'
 const labelClass = 'text-xs font-bold uppercase tracking-widest text-gray-500 mb-1.5 block'
+// Jerarquía en tarjetas (2026-09-19) — mismos títulos que EstudioRegistroPage.jsx.
+const cardClass = 'bg-white border border-gray-200 rounded-2xl shadow-sm p-5 md:p-8'
+const cardTitleClass = 'text-sm font-black uppercase tracking-widest text-gray-900 mb-4 pb-3 border-b border-gray-100'
 const VISTA_TITULOS = { perfil: 'Editar mi perfil', supply: 'Tienda en Supply' }
 
 // Pantalla 1 — sin token: solo pide el correo y dispara el envío del link.
@@ -625,7 +628,10 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
           alternan entre texto plano e input/textarea); estos campos son
           inputs de toda la vida, no tiene sentido esconderlos detrás de
           ese mismo botón. */}
-      <div className="mt-6 space-y-4 max-w-xl">
+      <div className="mt-8">
+        <div className={cardClass}>
+          <h2 className={cardTitleClass}>Datos del estudio</h2>
+          <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>Departamento *</label>
@@ -657,6 +663,28 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
                 ediciones que tienen este botón. */}
             <p className="text-gray-400 text-[10px] mt-1.5 text-center">Actívala estando físicamente en el punto exacto que quieres mostrar. Es independiente del link de Google Maps de abajo — actívala siempre.</p>
           </div>
+          {/* fase 6.2 (2026-08-07) — link a su propio catálogo (interno o
+              externo), solo para marcas/empresas. Reusa el mismo mecanismo
+              que ya redirige /supply/estudio/:id cuando este campo está
+              seteado (fase 6.1). Movido a la tarjeta de datos (2026-09-19)
+              — es un dato del negocio, no una red de contacto. */}
+          {estudio.tipo === 'empresa' && (
+            <div>
+              <label className={labelClass}>Link de tu catálogo (opcional)</label>
+              <input value={form.catalogo_url} onChange={set('catalogo_url')} placeholder="https://tu-sitio.com o /supply/brands/tu-marca" className={inputClass} />
+              <p className="text-gray-400 text-[10px] mt-1">Puede ser tu propia web, o si ya tienes una página armada con nosotros, pégala acá. Quien vea tu perfil en el buscador va a llegar directo ahí en vez de a una página genérica.</p>
+            </div>
+          )}
+          </div>
+        </div>
+
+        <div className={`${cardClass} mt-5`}>
+          <h2 className={cardTitleClass}>Contacto y redes</h2>
+          <div className="flex flex-col gap-4">
+          <div>
+            <label className={labelClass}><FaWhatsapp className="inline -mt-0.5 mr-1" />WhatsApp</label>
+            <input value={form.whatsapp} onChange={set('whatsapp')} placeholder="57300..." className={inputClass} />
+          </div>
           <div>
             <label className={labelClass}><FaInstagram className="inline -mt-0.5 mr-1" />Instagram</label>
             <input value={form.instagram} onChange={set('instagram')} placeholder="https://instagram.com/..." className={inputClass} />
@@ -664,10 +692,6 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
           <div>
             <label className={labelClass}><FaFacebook className="inline -mt-0.5 mr-1" />Facebook</label>
             <input value={form.facebook} onChange={set('facebook')} placeholder="https://facebook.com/..." className={inputClass} />
-          </div>
-          <div>
-            <label className={labelClass}><FaWhatsapp className="inline -mt-0.5 mr-1" />WhatsApp</label>
-            <input value={form.whatsapp} onChange={set('whatsapp')} placeholder="57300..." className={inputClass} />
           </div>
           <div>
             {/* Link de Google Maps (2026-08-07, Jose: "conectar el botón
@@ -683,19 +707,9 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
             <input value={form.google_maps_url} onChange={set('google_maps_url')} placeholder="https://maps.app.goo.gl/..." className={inputClass} />
             <p className="text-gray-400 text-[10px] mt-1">Si ya tienes ficha de tu negocio en Google Maps, pégala acá — el botón de ubicación de tu perfil abrirá esa ficha real en vez de un pin genérico. No reemplaza la ubicación exacta de arriba, es un extra: no afecta el orden del buscador.</p>
           </div>
-      </div>
-
-      {/* fase 6.2 (2026-08-07) — link a su propio catálogo (interno o
-          externo), solo para marcas/empresas. Reusa el mismo mecanismo
-          que ya redirige /supply/estudio/:id cuando este campo está
-          seteado (fase 6.1). */}
-      {estudio.tipo === 'empresa' && (
-        <div className="mt-8">
-          <label className={labelClass}>Link de tu catálogo (opcional)</label>
-          <input value={form.catalogo_url} onChange={set('catalogo_url')} placeholder="https://tu-sitio.com o /supply/brands/tu-marca" className={inputClass} />
-          <p className="text-gray-400 text-[10px] mt-1">Puede ser tu propia web, o si ya tienes una página armada con nosotros, pégala acá. Quien vea tu perfil en el buscador va a llegar directo ahí en vez de a una página genérica.</p>
+          </div>
         </div>
-      )}
+      </div>
 
       {error && <p className="text-red-600 text-sm text-center mt-8">{error}</p>}
       <button
