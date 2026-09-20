@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { GraduationCap, PlayCircle, FileText, FlaskConical, Wrench, BookOpen } from 'lucide-react'
+import { FileText, Wrench, Dumbbell } from 'lucide-react'
 import NavbarGym from './NavbarGym'
+import GymMobileNav from './GymMobileNav'
 import FooterGym from './FooterGym'
 import CoverflowRow from '../CoverflowRow'
+import { GYM_SECCIONES } from '../../data/gymSecciones'
 
 const ogGym = '/og/gym.webp'
 const WA = '573207911013'
@@ -39,47 +41,7 @@ const gymJsonLd = {
   }
 }
 
-const servicios = [
-  {
-    icon: Wrench,
-    titulo: 'Máquinas',
-    texto: 'Fabricadas con acero calibre grueso y soldadura profesional, a tu medida. Hechas en Chigorodó, Urabá, con acabados listos para uso intenso diario.',
-    link: '/gym/maquinas-pedido',
-  },
-  {
-    icon: FileText,
-    titulo: 'Planos PDF',
-    texto: 'Planos técnicos con medidas exactas y lista de materiales. Descárgalos y fabrica tú mismo tus máquinas, sin depender de nadie más.',
-    scrollTo: 'planos',
-  },
-  {
-    icon: FlaskConical,
-    titulo: 'Suplementos',
-    texto: 'Proteína, creatina y pre-entreno de marcas confiables, con stock real y despacho rápido para complementar tu entrenamiento.',
-    // Suplementos ahora es su propio módulo (INKognito Suple) — esta card
-    // sigue viviendo en Gym como estaba, solo cambia a dónde lleva
-    // (2026-08-02).
-    link: '/suplementos',
-  },
-  {
-    icon: PlayCircle,
-    titulo: 'Tutoriales',
-    texto: 'Videos paso a paso para construir tus propias máquinas caseras, con las mismas técnicas que uso yo. Ideal si prefieres aprender haciendo.',
-    link: '/gym/tutoriales',
-  },
-  {
-    icon: GraduationCap,
-    titulo: 'Cursos',
-    texto: 'Entrenamiento y nutrición en español, grabados por quienes ya viven de esto. Aprende a tu ritmo, sin salir de casa.',
-    link: '/gym/cursos',
-  },
-  {
-    icon: BookOpen,
-    titulo: 'Recursos',
-    texto: 'Ebooks y guías gratuitas para empezar a entrenar sin gastar en gimnasio ni equipo. Contenido real para quien arranca desde cero.',
-    link: '/gym/recursos',
-  },
-]
+const RIBBON_ITEM = 'flex-shrink-0 text-[13px] font-extrabold text-white/70 pb-1.5 border-b-2 border-transparent whitespace-nowrap'
 
 const CARD_CLASS = 'border border-gray-800 bg-gray-900/60 rounded-xl p-4 md:p-5 flex flex-col gap-3 min-h-[190px] md:min-h-[210px] hover:border-gray-600 hover:bg-gray-900/80 transition-all duration-300 group'
 
@@ -139,8 +101,83 @@ export default function GymPage() {
     <div className="min-h-screen bg-gray-950 text-white">
       <NavbarGym />
 
-      {/* HERO */}
-      <section className="relative pt-24 md:pt-32 pb-8 md:pb-14 px-4 md:px-6 overflow-hidden">
+      {/* CATEGORÍAS — listón (2026-09-20, Jose: "que se muestren en un listón
+          tal como los demás módulos"). Solo móvil, justo debajo del navbar
+          fijo, igual que en MobileHomeSupply/Store/Suple; reemplaza al
+          carrusel de tarjetas de "Lo que puedes conseguir aquí", que en móvil
+          queda oculto (escritorio conserva la grilla de tarjetas). Gym no
+          tiene color de acento (blanco/gris), así que el listón va en gris
+          acero — el mismo zinc-700 de Suple y del degradé de las tarjetas de
+          Planos/Máquinas. "Todos" es solo indicador visual (no navega), igual
+          que en los demás módulos. */}
+      <div className="md:hidden pt-16">
+        <div className="flex gap-5 overflow-x-auto px-4 py-3 bg-zinc-700 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <span className="flex-shrink-0 text-[13px] font-extrabold pb-1.5 border-b-2 whitespace-nowrap text-white border-white">
+            Todos
+          </span>
+          {GYM_SECCIONES.map(s => (
+            s.scrollTo ? (
+              <button
+                key={s.titulo}
+                type="button"
+                onClick={() => scrollToSection(s.scrollTo)}
+                className={RIBBON_ITEM}
+              >
+                {s.titulo}
+              </button>
+            ) : (
+              <Link key={s.titulo} to={s.link} className={RIBBON_ITEM}>
+                {s.titulo}
+              </Link>
+            )
+          ))}
+        </div>
+      </div>
+
+      {/* BANNER — hero móvil (2026-09-20, Jose: "que sea algo más comercial,
+          tipo banner como ya venimos haciendo"). Mismo formato del banner
+          armado en CSS de MobileHomeSuple.jsx (tarjeta con degradé, titular
+          con palabra resaltada, botones, marca de agua), en la paleta de Gym
+          (gris acero + blanco). Conserva "Nuestra historia" y la frase del
+          hero de siempre (Jose: "la frase sí la conservamos"). Escritorio
+          sigue con el hero de abajo. El <h1> vive acá en móvil y en el hero
+          en escritorio — nunca se ven los dos a la vez. */}
+      <div className="md:hidden relative overflow-hidden mx-4 mt-4 mb-8 rounded-2xl border border-zinc-400/20 bg-gradient-to-br from-zinc-700 to-zinc-900 px-5 py-6">
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={GRID_PATTERN} />
+        <Dumbbell
+          className="absolute -right-6 top-1/2 text-white/[0.07] pointer-events-none"
+          style={{ transform: 'translateY(-50%) rotate(-20deg)' }}
+          size={190}
+          strokeWidth={1}
+        />
+        <div className="relative z-10">
+          <p className="uppercase tracking-[0.25em] text-zinc-300 text-[10px] font-semibold mb-2">INKognito Gym — Urabá</p>
+          <h1 className="text-2xl font-black uppercase leading-[1.1] mb-2">
+            Tu gym en casa, <span className="inline-block bg-white text-gray-950 px-1.5 -mx-0.5">a tu medida</span>
+          </h1>
+          <p className="text-zinc-300 text-xs leading-relaxed mb-5 max-w-[18rem]">
+            Máquinas con soldadura profesional, planos técnicos y todo para entrenar sin gimnasio comercial. Envíos a toda Colombia.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Link to="/gym/maquinas-pedido" className="px-4 py-2.5 rounded-lg bg-white text-gray-950 text-[11px] font-black uppercase tracking-[0.1em] whitespace-nowrap">
+              Ver máquinas
+            </Link>
+            <button
+              type="button"
+              onClick={() => setHistoriaModalOpen(true)}
+              className="px-4 py-2.5 rounded-lg border border-white/40 text-white text-[11px] font-bold uppercase tracking-[0.1em] whitespace-nowrap"
+            >
+              Nuestra historia
+            </button>
+          </div>
+          <p className="mt-5 pt-4 border-t border-white/15 text-zinc-300 text-[11px] italic tracking-wide">
+            “Hago arte para no morir, desafío cuerpo y mente.”
+          </p>
+        </div>
+      </div>
+
+      {/* HERO — solo escritorio; en móvil lo reemplaza el banner de arriba. */}
+      <section className="hidden md:block relative pt-24 md:pt-32 pb-8 md:pb-14 px-4 md:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         {/* Resplandor debajo del navbar — mismo recurso que ya usan Store/
@@ -165,8 +202,12 @@ export default function GymPage() {
         </div>
       </section>
 
-      {/* LO QUE PUEDES CONSEGUIR AQUÍ */}
-      <section className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
+      {/* LO QUE PUEDES CONSEGUIR AQUÍ — solo escritorio (2026-09-20, Jose:
+          "sobra en ese lugar pues categorías ya no le acompaña"): en móvil
+          las categorías pasaron al listón de arriba, así que el título y la
+          descripción quedaban sueltos. En escritorio siguen con su grilla de
+          tarjetas. */}
+      <section className="hidden md:block pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
         <div className="border-t border-gray-800 pt-3 md:pt-8">
           <div className="mb-4 md:mb-8">
             <h2 className="float-left mr-6 md:mr-8 mb-2 text-base md:text-3xl font-black uppercase leading-none whitespace-nowrap">
@@ -185,9 +226,11 @@ export default function GymPage() {
               estático — sin autoplay, el usuario mueve con el dedo desde el
               inicio, con la flechita "Desliza" siempre visible (pedido
               explícito: estas card de Gym no hacen la vuelta automática al
-              entrar, 2026-08-02). */}
+              entrar, 2026-08-02). Desde 2026-09-20 la sección entera es solo
+              escritorio: en móvil las categorías van en el listón de arriba
+              (ver bajo NavbarGym). */}
           <CoverflowRow desktopClassName="md:grid md:grid-cols-3 lg:grid-cols-6 gap-3" autoplay={false}>
-            {servicios.map((s, i) => {
+            {GYM_SECCIONES.map((s, i) => {
               const Icon = s.icon
               const inner = (
                 <>
@@ -404,6 +447,8 @@ export default function GymPage() {
       </section>
 
       <FooterGym />
+      <div className="h-16 md:hidden" />
+      <GymMobileNav active="inicio" />
 
       {/* MODAL NUESTRA HISTORIA */}
       {historiaModalOpen && (

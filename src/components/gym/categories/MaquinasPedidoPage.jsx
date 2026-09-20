@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
+import GymMobileNav from '../GymMobileNav'
 import { fetchCatalogPage } from '../../../hooks/useCatalog'
 import { useGymCart } from '../../../contexts/GymCartContext'
 import { Wrench, ExternalLink, ArrowLeft, ArrowRight } from 'lucide-react'
@@ -308,6 +309,8 @@ export default function MaquinasPedidoPage() {
       </section>
 
       <FooterGym />
+      <div className="h-16 md:hidden" />
+      <GymMobileNav />
 
       {/* LIGHTBOX */}
       {lightbox && (

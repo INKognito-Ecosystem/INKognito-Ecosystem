@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
+import GymMobileNav from '../GymMobileNav'
 import { PlayCircle, ArrowLeft, ArrowRight } from 'lucide-react'
 import { getAdjacentCategories } from '../../../data/gymCategoriesOrder'
 import { useScrolled } from '../../../hooks/useScrolled'
@@ -145,6 +146,8 @@ export default function VideosTutorialesPage() {
       </div>
 
       <FooterGym />
+      <div className="h-16 md:hidden" />
+      <GymMobileNav />
     </div>
   )
 }

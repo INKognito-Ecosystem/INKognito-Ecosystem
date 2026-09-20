@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
-import { Menu, X, Dumbbell, ShoppingCart } from 'lucide-react'
+import { Menu, X, Dumbbell, ShoppingCart, Share2 } from 'lucide-react'
 import logoGym from '../../assets/milogo/gym.webp'
 import { useGymCart } from '../../contexts/GymCartContext'
 import CartDrawerGym from './CartDrawerGym'
@@ -10,12 +10,34 @@ const LINK = 'uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white 
 const MOBILE_LINK = 'block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300'
 const MOBILE_BTN  = 'block w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300 bg-transparent border-none cursor-pointer'
 
+// Navbar de Gym System (2026-09-20, Jose: "en el navbar de arriba, agregarás
+// el botón compartir al costado derecho, y ahora se llamará en el navbar gym
+// system, y no solo gym"). En móvil el carrito y el menú ya no viven acá:
+// pasaron al tab bar inferior (GymMobileNav.jsx, mismo esquema de los demás
+// módulos); en escritorio se mantienen con sus links de siempre.
 export default function NavbarGym() {
   const [menuOpen, setMenuOpen]   = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [shareMsg, setShareMsg] = useState(null)
   const navigate   = useNavigate()
   const { pathname } = useLocation()
   const { count }  = useGymCart()
+
+  // Comparte la página actual con su URL pública (Web Share API; sin ella,
+  // copia el link) — mismo comportamiento que NavbarSuple.jsx.
+  const compartir = async () => {
+    const base = import.meta.env.VITE_SITE_URL || (typeof window !== 'undefined' ? window.location.origin : '')
+    const url = `${base}${pathname}`
+    if (navigator.share) {
+      try { await navigator.share({ title: 'INKognito Gym System', url }) } catch {}
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(url)
+      setShareMsg('Link copiado')
+      setTimeout(() => setShareMsg(null), 2000)
+    } catch {}
+  }
 
   const goToPlanos = () => {
     setMenuOpen(false)
@@ -39,7 +61,7 @@ export default function NavbarGym() {
             <Link to="/gym" className="flex items-center gap-2">
               <img src={logoGym} alt="INKognito Gym" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
               <AnimatedWordmark
-                moduleWord="GYM"
+                moduleWord="GYM SYSTEM"
                 accentClassName="text-gray-400"
                 className="font-black uppercase tracking-wide md:tracking-[0.2em] text-xl md:text-2xl"
               />
@@ -56,26 +78,44 @@ export default function NavbarGym() {
               <Link to="/suplementos" className={LINK}>Suplementos</Link>
             </div>
 
-            {/* CARRITO + HAMBURGUESA */}
+            {/* COMPARTIR + CARRITO + HAMBURGUESA (carrito y menú solo en
+                escritorio — en móvil viven en el tab bar de abajo) */}
             <div className="flex items-center gap-4">
-              <button
-                onClick={() => setDrawerOpen(true)}
-                className="relative text-gray-400 hover:text-white transition-all duration-300"
-                aria-label="Abrir carrito"
-              >
-                <ShoppingCart size={20} />
-                {count > 0 && (
-                  <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] rounded-full bg-white text-gray-950 text-[9px] font-black flex items-center justify-center px-0.5">
-                    {count > 99 ? '99+' : count}
-                  </span>
+              <div className="relative">
+                <button
+                  onClick={compartir}
+                  aria-label="Compartir"
+                  className="text-gray-400 hover:text-white transition-all duration-300"
+                >
+                  <Share2 size={20} />
+                </button>
+                {shareMsg && (
+                  <p className="absolute right-0 top-full mt-2 bg-white text-gray-950 text-xs font-medium px-3 py-1.5 rounded-full shadow-lg whitespace-nowrap">
+                    {shareMsg}
+                  </p>
                 )}
-              </button>
-              <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="text-gray-400 hover:text-white transition-all duration-300"
-              >
-                {menuOpen ? <X size={22} /> : <Menu size={22} />}
-              </button>
+              </div>
+              <div className="hidden md:flex items-center gap-4">
+                <button
+                  onClick={() => setDrawerOpen(true)}
+                  className="relative text-gray-400 hover:text-white transition-all duration-300"
+                  aria-label="Abrir carrito"
+                >
+                  <ShoppingCart size={20} />
+                  {count > 0 && (
+                    <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] rounded-full bg-white text-gray-950 text-[9px] font-black flex items-center justify-center px-0.5">
+                      {count > 99 ? '99+' : count}
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  aria-label="Abrir menú"
+                  className="text-gray-400 hover:text-white transition-all duration-300"
+                >
+                  {menuOpen ? <X size={22} /> : <Menu size={22} />}
+                </button>
+              </div>
             </div>
           </div>
         </div>

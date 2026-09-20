@@ -146,6 +146,9 @@ export default [
 
   // Gym
   route('gym', 'components/gym/GymPage.jsx'),
+  // Página de categorías (2026-09-20) — destino de la pestaña "Categorías"
+  // del tab bar inferior de Gym System.
+  route('gym/categorias', 'components/gym/GymCategoriasPage.jsx'),
   route('gym/maquinas-pedido', 'components/gym/categories/MaquinasPedidoPage.jsx'),
   route('gym/tutoriales', 'components/gym/categories/VideosTutorialesPage.jsx'),
   route('gym/cursos', 'components/gym/categories/CursosPage.jsx'),

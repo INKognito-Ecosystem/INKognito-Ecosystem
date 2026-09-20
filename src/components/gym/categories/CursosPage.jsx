@@ -1,6 +1,7 @@
 import { Link, useLoaderData } from 'react-router-dom'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
+import GymMobileNav from '../GymMobileNav'
 import { GraduationCap, ArrowLeft, ArrowRight } from 'lucide-react'
 import { fetchCatalogCategoriaItems } from '../../../hooks/useCatalog'
 import { getAdjacentCategories } from '../../../data/gymCategoriesOrder'
@@ -147,6 +148,8 @@ export default function CursosPage() {
       </div>
 
       <FooterGym />
+      <div className="h-16 md:hidden" />
+      <GymMobileNav />
     </div>
   )
 }

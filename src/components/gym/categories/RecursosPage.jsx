@@ -1,6 +1,7 @@
 import { Link, useLoaderData } from 'react-router-dom'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
+import GymMobileNav from '../GymMobileNav'
 import { FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa'
 import { BookOpen, ArrowLeft, ArrowRight } from 'lucide-react'
 import { fetchCatalogCategoriaItems } from '../../../hooks/useCatalog'
@@ -180,6 +181,8 @@ export default function RecursosPage() {
       </div>
 
       <FooterGym />
+      <div className="h-16 md:hidden" />
+      <GymMobileNav />
     </div>
   )
 }
