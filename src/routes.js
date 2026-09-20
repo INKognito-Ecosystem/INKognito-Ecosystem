@@ -156,6 +156,13 @@ export default [
 
   // Suple (INKognito Suple — suplementos deportivos, módulo propio)
   route('suplementos', 'components/suplementos/SuplePage.jsx'),
+  // Página de categorías y ficha de producto (2026-09-19, migración de Suple
+  // a fondo blanco) — mismo patrón que supply/categorias + supply/producto/:id
+  // y store/categorias + store/producto/:id. Suple no tiene catch-all
+  // (`suplementos/:slug`), pero se declaran antes de las categorías fijas
+  // por claridad y para que un futuro catch-all de tiendas no las tape.
+  route('suplementos/categorias', 'components/suplementos/SupleCategoriasPage.jsx'),
+  route('suplementos/producto/:id', 'components/suplementos/SupleProductDetailPage.jsx'),
   route('suplementos/proteinas', 'components/suplementos/categories/ProteinasPage.jsx'),
   route('suplementos/creatina', 'components/suplementos/categories/CreatinaPage.jsx'),
   route('suplementos/pre-entreno', 'components/suplementos/categories/PreEntrenoPage.jsx'),

@@ -1,13 +1,14 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import NavbarSuple from './NavbarSuple'
 import FooterSuple from './FooterSuple'
+import SupleMobileNav from './SupleMobileNav'
+import SupleCategoryRibbon from './SupleCategoryRibbon'
 import { SuplCard } from './SuplCard'
-import { useScrolled } from '../../hooks/useScrolled'
-import { useSupleCart } from '../../contexts/SupleCartContext'
 import { FaWhatsapp } from 'react-icons/fa'
-import { ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ShieldCheck, LoaderCircle, X } from 'lucide-react'
 import { getAdjacentSupleCategories } from '../../data/supleCategoriesOrder'
-import { useLoadMore } from '../../hooks/useCatalog'
+import { useLoadMore, fetchCatalogPage } from '../../hooks/useCatalog'
 import logoNutriHouse from '../../assets/milogo/nutrihouse.webp'
 
 const WA = '573207911013'
@@ -20,108 +21,136 @@ const DEFAULT_BADGE = 'Suministrado por Nutri House — punto físico en Chigoro
 const CATEGORY_BADGE = {}
 
 const DOT_PATTERN = {
-  backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
+  backgroundImage: 'radial-gradient(rgba(24,24,27,1) 1px, transparent 1px)',
   backgroundSize: '18px 18px',
 }
 
+const PAGE_SIZE = 24
+
+// Blanco (2026-09-19, migración de Suple a fondo blanco) — mismo esqueleto
+// que las categorías de Store/Supply: navbar superior con buscador, hero,
+// grid de cards, footer, espaciador y tab bar inferior. La card ahora maneja
+// su propio carrito (ver SuplCard.jsx), así que esta página ya no arma ítems
+// ni calcula keys.
+//
 // nextCursor/hasMore (2026-09-14, paginación real, fase 2) — `products` ya
 // no es la categoría completa, es solo la primera página; useLoadMore trae
 // el resto bajo pedido en vez de un techo silencioso en el primer límite.
 export default function SupleCategoryPage({ title, categoria, slug, intro, products: productosIniciales = [], nextCursor = null, hasMore = false }) {
   const { prev, next } = getAdjacentSupleCategories(slug)
-  const scrolled = useScrolled()
-  const { addItem, items: cartItems } = useSupleCart()
   const { items: products, hasMore: hayMasProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } =
     useLoadMore('suplementos', { categoria }, { items: productosIniciales, nextCursor, hasMore })
 
-  const handleAddToCart = (p, sel = {}) => {
-    const precio = sel.price
-      ? '$' + Math.round(sel.price).toLocaleString('es-CO')
-      : p.precioLabel
-    const nombre = sel.variant ? `${p.nombre} — ${sel.variant}` : p.nombre
-    addItem({
-      id:          p.id,
-      inventoryId: sel.id ?? null,
-      name:        nombre,
-      price:       precio,
-      brand:       p.categoria,
-      image:       sel.image_url || p.image || '',
-    }, 'suplementos')
+  // Buscador (server-side, dentro de esta categoría) — mismo patrón que
+  // SupplyCategoryPage.jsx: la búsqueda reemplaza la lista mientras está
+  // activa, con debounce de 300 ms y su propia paginación por cursor.
+  const [query, setQuery] = useState('')
+  const buscando = query.trim().length >= 2
+  const [resultados, setResultados] = useState({ items: [], nextCursor: null, hasMore: false })
+  const [cargandoBusqueda, setCargandoBusqueda] = useState(false)
+  const [cargandoMasBusqueda, setCargandoMasBusqueda] = useState(false)
+
+  useEffect(() => {
+    if (!buscando) return
+    let vigente = true
+    setCargandoBusqueda(true)
+    const timer = setTimeout(async () => {
+      const r = await fetchCatalogPage('suplementos', { categoria, tipo: 'fisico', q: query.trim(), limit: PAGE_SIZE })
+      if (!vigente) return
+      setResultados({ items: r.items, nextCursor: r.nextCursor, hasMore: r.hasMore })
+      setCargandoBusqueda(false)
+    }, 300)
+    return () => { vigente = false; clearTimeout(timer) }
+  }, [query, categoria, buscando])
+
+  const cargarMasBusqueda = async () => {
+    if (!resultados.hasMore || cargandoMasBusqueda) return
+    setCargandoMasBusqueda(true)
+    const r = await fetchCatalogPage('suplementos', { categoria, tipo: 'fisico', q: query.trim(), limit: PAGE_SIZE, cursor: resultados.nextCursor })
+    setResultados(prevR => ({ items: [...prevR.items, ...r.items], nextCursor: r.nextCursor, hasMore: r.hasMore }))
+    setCargandoMasBusqueda(false)
   }
 
-  const productosCard = products.map((item, i) => ({
-    id:          i + 1,
-    categoria:   item.categoria || categoria,
-    descripcion: item.descripcion || null,
-    nombre:      item.name,
-    image:       item.image_url || item.variantes?.[0]?.image_url || null,
-    images:      [item.image_url, item.image_url_2, item.image_url_3].filter(Boolean).length
-      ? [item.image_url, item.image_url_2, item.image_url_3].filter(Boolean)
-      : [item.variantes?.[0]?.image_url, item.variantes?.[0]?.image_url_2, item.variantes?.[0]?.image_url_3].filter(Boolean),
-    variantes:   item.variantes || [],
-    precioLabel: item.variantes?.[0]?.price
-      ? '$' + Math.round(item.variantes[0].price).toLocaleString('es-CO')
-      : 'Consultar precio',
-  }))
+  const lista = buscando ? resultados.items : products
+  const hayMas = buscando ? resultados.hasMore : hayMasProductos
+  const cargandoMas = buscando ? cargandoMasBusqueda : cargandoMasProductos
+  const cargarMas = buscando ? cargarMasBusqueda : cargarMasProductos
 
   const badge = categoria in CATEGORY_BADGE ? CATEGORY_BADGE[categoria] : DEFAULT_BADGE
+  // Hoja con la descripción de la categoría (móvil) — se abre desde el
+  // ícono de libro del listón.
+  const [verDescripcion, setVerDescripcion] = useState(false)
 
   return (
-    <>
-      <NavbarSuple />
+    <div className="min-h-screen bg-white text-zinc-900">
+      <NavbarSuple
+        pageName={title}
+        hideMobileActions
+        hideWordmark
+        searchValue={query}
+        onSearchChange={setQuery}
+        searchPlaceholder={`Buscar en ${title}`}
+        shareUrl={`${import.meta.env.VITE_SITE_URL}/suplementos/${slug}`}
+      />
 
-      {scrolled && prev && (
-        <Link
-          to={`/suplementos/${prev.slug}`} replace
-          aria-label={`Ver ${prev.name}`}
-          className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
-        >
-          <ArrowLeft size={20} />
-        </Link>
-      )}
-      {scrolled && next && (
-        <Link
-          to={`/suplementos/${next.slug}`} replace
-          aria-label={`Ver ${next.name}`}
-          className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
-        >
-          <ArrowRight size={20} />
-        </Link>
-      )}
+      {/* Sin flechas prev/next flotantes al hacer scroll (2026-09-19, Jose:
+          "no has quitado las flechas que aparecen al hacer scroll en las
+          categorías") — mismo criterio que SupplyCategoryPage.jsx desde
+          2026-09-15. Quedan las flechas fijas del hero de escritorio, que
+          son un control de navegación aparte. */}
 
-      <div className="min-h-screen bg-gray-950 text-white pt-16 md:pt-24">
+      <div className="pt-16 md:pt-24">
+
+        {/* Listón de categorías debajo del navbar, como en el home móvil
+            (2026-09-19, Jose) — solo móvil: en escritorio la navegación
+            entre categorías ya está en el menú del navbar y en las flechas
+            del hero. La categoría actual queda marcada. */}
+        <div className="md:hidden">
+          <SupleCategoryRibbon activeSlug={slug} todosComoLink onInfo={intro ? () => setVerDescripcion(true) : null} />
+        </div>
 
         {/* HERO */}
-        <div className="relative overflow-hidden px-6 max-w-7xl mx-auto pb-5 md:pb-10">
-          <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
-          <div className="relative z-10 flex items-center gap-3 mb-2">
+        <div className="relative overflow-hidden px-6 max-w-7xl mx-auto pt-4 pb-5 md:pb-10">
+          <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={DOT_PATTERN} />
+          {/* Fila "Categoría" con flechas prev/next — solo escritorio: en
+              móvil el listón de arriba ya muestra todas las categorías y
+              marca la actual, así que repetirlo acá sobraba (2026-09-19,
+              Jose: "no hacer redundante el nombre de la categoría"). */}
+          <div className="relative z-10 hidden md:flex items-center gap-3 mb-2">
             {prev && (
               <Link
                 to={`/suplementos/${prev.slug}`} replace
                 aria-label={`Ver ${prev.name}`}
-                className="flex-shrink-0 text-gray-500 hover:text-white transition-colors"
+                className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors"
               >
                 <ArrowLeft size={20} />
               </Link>
             )}
-            <p className="flex-1 text-center uppercase tracking-[0.25em] text-gray-500 text-xs">Categoría</p>
+            <p className="flex-1 text-center uppercase tracking-[0.25em] text-zinc-500 text-xs">Categoría</p>
             {next && (
               <Link
                 to={`/suplementos/${next.slug}`} replace
                 aria-label={`Ver ${next.name}`}
-                className="flex-shrink-0 text-gray-500 hover:text-white transition-colors"
+                className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors"
               >
                 <ArrowRight size={20} />
               </Link>
             )}
           </div>
-          <h1 className="relative z-10 text-xl md:text-4xl font-black uppercase tracking-tight leading-none text-white text-center mb-4">{title}</h1>
+          {/* El título se oculta visualmente en móvil (el listón ya dice qué
+              categoría es) pero se conserva en el HTML como <h1>: la página
+              necesita su encabezado principal para SEO y lectores de
+              pantalla. */}
+          <h1 className="relative z-10 sr-only md:not-sr-only md:text-4xl font-black uppercase tracking-tight leading-none text-zinc-900 text-center mb-4">{title}</h1>
+          {/* Descripción — en escritorio queda como el párrafo de siempre; en
+              móvil vive detrás del ícono de libro del listón (ver
+              SupleCategoryRibbon.jsx y la hoja de abajo). */}
           {intro && (
-            <p className="relative z-10 text-gray-400 text-base md:text-lg leading-relaxed max-w-3xl text-justify [hyphens:auto]">{intro}</p>
+            <p className="relative z-10 hidden md:block text-zinc-600 text-lg leading-relaxed max-w-3xl text-justify [hyphens:auto]">{intro}</p>
           )}
           {badge && (
-            <div className="relative z-10 flex items-center gap-2 text-xs text-gray-400 bg-gray-900/60 border border-gray-800 rounded-lg px-3 py-2 w-fit mt-4">
-              <ShieldCheck size={14} className="shrink-0 text-[#9E9E9E]" />
+            <div className="relative z-10 flex items-center gap-2 text-xs text-zinc-600 bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 w-fit mt-4">
+              <ShieldCheck size={14} className="shrink-0 text-zinc-500" />
               <span>{badge}</span>
               {/* Logo de Nutri House al final de la insignia — versión PNG
                   con fondo transparente (2026-08-03), sin círculo/recorte:
@@ -137,38 +166,51 @@ export default function SupleCategoryPage({ title, categoria, slug, intro, produ
 
         {/* PRODUCTOS */}
         <div className="pb-16 max-w-7xl mx-auto">
-          {productosCard.length === 0 ? (
-            <div className="mx-6 border border-gray-800 bg-gray-900/30 rounded-2xl p-10 text-center">
-              <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-2">Sin stock por el momento</p>
-              <p className="text-white text-lg font-black uppercase mb-2">Próximamente disponible</p>
-              <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
-                Déjanos tu número y te avisamos cuando tengamos {title.toLowerCase()} disponibles. Sé el primero en saber.
-              </p>
-              <a
-                href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero que me avisen cuando haya ${title} disponibles en INKognito Suple.`)}`}
-                target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 text-gray-950 font-bold uppercase tracking-[0.15em] text-sm rounded hover:brightness-90 transition"
-                style={{ backgroundColor: '#9E9E9E' }}
-              >
-                <FaWhatsapp size={18} />
-                Avisarme cuando haya stock →
-              </a>
+          {buscando && (
+            <p className="px-4 md:px-6 mb-3 text-zinc-400 text-xs uppercase tracking-widest">
+              {cargandoBusqueda ? 'Buscando…' : `${lista.length}${hayMas ? '+' : ''} resultado${lista.length !== 1 ? 's' : ''} para "${query.trim()}"`}
+            </p>
+          )}
+
+          {buscando && cargandoBusqueda && lista.length === 0 ? (
+            <div className="flex items-center justify-center gap-2 py-10 text-zinc-400 text-sm">
+              <LoaderCircle size={14} className="animate-spin" /> Buscando…
             </div>
+          ) : lista.length === 0 ? (
+            buscando ? (
+              <p className="px-6 py-10 text-center text-zinc-500 text-sm">Ningún producto de {title.toLowerCase()} coincide con "{query.trim()}".</p>
+            ) : (
+              <div className="mx-6 border border-zinc-200 bg-zinc-50 rounded-2xl p-10 text-center">
+                <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2">Sin stock por el momento</p>
+                <p className="text-zinc-900 text-lg font-black uppercase mb-2">Próximamente disponible</p>
+                <p className="text-zinc-500 text-sm mb-6 max-w-sm mx-auto">
+                  Déjanos tu número y te avisamos cuando tengamos {title.toLowerCase()} disponibles. Sé el primero en saber.
+                </p>
+                <a
+                  href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero que me avisen cuando haya ${title} disponibles en INKognito Suple.`)}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-zinc-700 text-white font-bold uppercase tracking-[0.15em] text-sm rounded hover:bg-zinc-800 transition"
+                >
+                  <FaWhatsapp size={18} />
+                  Avisarme cuando haya stock →
+                </a>
+              </div>
+            )
           ) : (
             <>
-              <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-6 md:mx-0 md:px-6 pb-2 md:pb-0 scrollbar-hide">
-                {productosCard.map((p) => (
-                  <SuplCard key={p.id} p={p} onAddToCart={handleAddToCart} enCarrito={cartItems.some(i => i.key === `suplementos-${p.id}`)} />
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-4 md:px-6">
+                {lista.map((item) => (
+                  <SuplCard key={item.variantes?.[0]?.id ?? item.name} item={item} />
                 ))}
               </div>
-              {hayMasProductos && (
+              {hayMas && (
                 <div className="flex justify-center mt-6 px-6">
                   <button
-                    onClick={cargarMasProductos}
-                    disabled={cargandoMasProductos}
-                    className="px-6 py-2.5 border border-[#9E9E9E]/40 text-[#9E9E9E] text-xs font-bold uppercase tracking-[0.15em] rounded hover:border-[#9E9E9E] hover:bg-[#9E9E9E]/10 transition-all duration-300 disabled:opacity-50"
+                    onClick={cargarMas}
+                    disabled={cargandoMas}
+                    className="px-6 py-2.5 border border-zinc-300 text-zinc-700 text-xs font-bold uppercase tracking-[0.15em] rounded hover:border-zinc-700 hover:text-zinc-900 transition-all duration-300 disabled:opacity-50"
                   >
-                    {cargandoMasProductos ? 'Cargando…' : 'Cargar más'}
+                    {cargandoMas ? 'Cargando…' : 'Cargar más'}
                   </button>
                 </div>
               )}
@@ -178,6 +220,30 @@ export default function SupleCategoryPage({ title, categoria, slug, intro, produ
 
         <FooterSuple />
       </div>
-    </>
+
+      <div className="h-16 md:hidden" />
+      <SupleMobileNav active={null} />
+
+      {/* Hoja inferior con la descripción — misma que la de Supply y Store
+          (SupplyCategoryPage.jsx / categorías de Store): overlay oscuro, panel
+          que sube desde abajo, título = nombre de la categoría y ✕. */}
+      {verDescripcion && intro && (
+        <div
+          className="md:hidden fixed inset-0 z-[60] bg-black/70 flex items-end"
+          onClick={() => setVerDescripcion(false)}
+        >
+          <div
+            className="w-full max-w-md bg-white border-t border-zinc-200 rounded-t-2xl p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-xs font-black uppercase tracking-widest text-zinc-900">{title}</h4>
+              <button onClick={() => setVerDescripcion(false)} aria-label="Cerrar" className="text-zinc-400"><X size={20} /></button>
+            </div>
+            <p className="text-zinc-600 text-sm leading-relaxed">{intro}</p>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }

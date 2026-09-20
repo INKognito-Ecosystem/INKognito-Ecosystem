@@ -8,6 +8,12 @@ const STORAGE_KEY = 'inkognito-cart-suplementos'
 // Store/Gym, separado porque Suple ahora es su propio módulo (2026-08-02).
 export function SupleCartProvider({ children }) {
   const [items, setItems] = useState([])
+  // Selección estilo Mercado Libre (2026-09-19, migración de Suple a fondo
+  // blanco) — mismo patrón que StoreCartContext.jsx/SupplyCartContext.jsx:
+  // vive acá para que PedidoOnlinePage.jsx también la respete al armar el
+  // pedido (ya lee `cart.selectedItems ?? cart.items`). No se persiste a
+  // propósito: cada sesión nueva arranca con todo seleccionado.
+  const [selectedKeys, setSelectedKeys] = useState(() => new Set())
   const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
@@ -23,6 +29,23 @@ export function SupleCartProvider({ children }) {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)) } catch {}
   }, [items, hydrated])
 
+  // Mantiene selectedKeys sincronizado con items: un producto nuevo entra
+  // seleccionado, una key eliminada del carrito se limpia sola.
+  useEffect(() => {
+    setSelectedKeys(prev => {
+      const keys = new Set(items.map(i => i.key))
+      let changed = false
+      const next = new Set()
+      for (const k of prev) { if (keys.has(k)) next.add(k) }
+      if (next.size !== prev.size) changed = true
+      for (const k of keys) { if (!next.has(k)) { next.add(k); changed = true } }
+      return changed ? next : prev
+    })
+  }, [items])
+
+  // La key es `${category}-${product.id}` — el llamador arma `product.id`
+  // con el nombre del producto + la variante (mismo patrón que Supply), así
+  // cada presentación es su propia fila y la card y la ficha coinciden.
   const addItem = useCallback((product, category) => {
     const key = `${category}-${product.id}`
     setItems(prev => {
@@ -56,6 +79,32 @@ export function SupleCartProvider({ children }) {
 
   const clearCart = useCallback(() => setItems([]), [])
 
+  // Elimina varias a la vez — usado tras un pedido exitoso para borrar solo
+  // los productos que de verdad se pidieron (ver PedidoOnlinePage.jsx).
+  const removeItems = useCallback((keys) => {
+    const set = new Set(keys)
+    setItems(prev => prev.filter(i => !set.has(i.key)))
+  }, [])
+
+  const toggleSelected = useCallback((key) => {
+    setSelectedKeys(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }, [])
+  const setAllSelected = useCallback((valor) => {
+    setSelectedKeys(valor ? new Set(items.map(i => i.key)) : new Set())
+  }, [items])
+  const allSelected = items.length > 0 && items.every(i => selectedKeys.has(i.key))
+  const selectedItems = items.filter(i => selectedKeys.has(i.key))
+  const selectedCount = selectedItems.reduce((sum, i) => sum + i.qty, 0)
+  const selectedTotal = selectedItems.reduce((sum, i) => {
+    const num = parseInt(String(i.price).replace(/[^0-9]/g, ''), 10) || 0
+    return sum + num * i.qty
+  }, 0)
+
   const count = items.reduce((sum, i) => sum + i.qty, 0)
 
   const total = items.reduce((sum, i) => {
@@ -64,7 +113,10 @@ export function SupleCartProvider({ children }) {
   }, 0)
 
   return (
-    <SupleCartContext.Provider value={{ items, addItem, setSingleItem, removeItem, changeQty, clearCart, count, total }}>
+    <SupleCartContext.Provider value={{
+      items, addItem, setSingleItem, removeItem, removeItems, changeQty, clearCart, count, total,
+      selectedKeys, toggleSelected, setAllSelected, allSelected, selectedItems, selectedCount, selectedTotal,
+    }}>
       {children}
     </SupleCartContext.Provider>
   )
