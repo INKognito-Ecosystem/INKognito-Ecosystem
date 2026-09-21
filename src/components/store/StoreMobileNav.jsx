@@ -28,11 +28,11 @@ export default function StoreMobileNav({ active = null }) {
   return (
     <>
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center bg-white/95 backdrop-blur-md border-t border-[#C9A84C]/20 py-2.5">
-        <Link to="/store" className="flex flex-col items-center gap-1" style={{ color: tabColor('inicio') }}>
+        <Link to="/store" prefetch="viewport" className="flex flex-col items-center gap-1" style={{ color: tabColor('inicio') }}>
           <Home size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Inicio</span>
         </Link>
-        <Link to="/store/categorias" className="flex flex-col items-center gap-1" style={{ color: tabColor('categorias') }}>
+        <Link to="/store/categorias" prefetch="viewport" className="flex flex-col items-center gap-1" style={{ color: tabColor('categorias') }}>
           <LayoutGrid size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Categorías</span>
         </Link>

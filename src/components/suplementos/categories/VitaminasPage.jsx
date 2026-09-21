@@ -9,7 +9,7 @@ const DESC = 'Vitaminas y omega para complementar tu entrenamiento en Chigorodó
 const INTRO = 'Vitaminas y omega para complementar tu recuperación y salud general — con stock real y despacho rápido en toda la región de Urabá.'
 
 export async function loader() {
-  return fetchCatalogCategoria('suplementos', CATEGORIA)
+  return fetchCatalogCategoria('suplementos', CATEGORIA, { soloFisicos: true })
 }
 
 export function meta() {

@@ -65,12 +65,16 @@ export async function fetchCatalogProviders(module, categoria) {
  * proveedores para el filtro. Reemplaza al viejo fetchCatalogCategoria que
  * traía el módulo entero y filtraba en JS.
  */
-export async function fetchCatalogCategoria(module, categoria, { limit = 12, orden, q } = {}) {
+export async function fetchCatalogCategoria(module, categoria, { limit = 12, orden, q, soloFisicos = false } = {}) {
   try {
+    // `soloFisicos` (2026-09-21) — las páginas que no muestran la sección de
+    // afiliados ni el filtro de proveedor (las 5 categorías de Suple) se
+    // ahorran esas 2 llamadas al panel en cada navegación; con la base a
+    // ~150 ms por consulta, cada llamada de más pesaba de verdad.
     const [fisicos, afiliadosPage, providers] = await Promise.all([
       fetchCatalogPage(module, { categoria, tipo: 'fisico', limit, orden, q }),
-      fetchCatalogPage(module, { categoria, tipo: 'afiliado', limit: 100 }),
-      fetchCatalogProviders(module, categoria),
+      soloFisicos ? { items: [] } : fetchCatalogPage(module, { categoria, tipo: 'afiliado', limit: 100 }),
+      soloFisicos ? [] : fetchCatalogProviders(module, categoria),
     ])
     return {
       products: fisicos.items,

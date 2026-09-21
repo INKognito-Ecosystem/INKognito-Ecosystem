@@ -9,7 +9,7 @@ const DESC = 'Accesorios para entrenar en Chigorodó, Urabá. Guantes, correas, 
 const INTRO = 'Guantes, correas, straps y demás accesorios para complementar tu entrenamiento — próximamente disponibles con despacho a toda la región de Urabá.'
 
 export async function loader() {
-  return fetchCatalogCategoria('suplementos', CATEGORIA)
+  return fetchCatalogCategoria('suplementos', CATEGORIA, { soloFisicos: true })
 }
 
 export function meta() {

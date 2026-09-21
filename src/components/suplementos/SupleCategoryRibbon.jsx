@@ -43,7 +43,7 @@ export default function SupleCategoryRibbon({ activeSlug = null, todosActivo = f
         className="flex flex-1 min-w-0 gap-5 overflow-x-auto px-4 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {todosComoLink ? (
-          <Link to="/suplementos" className={`${base} ${off}`}>Todos</Link>
+          <Link to="/suplementos" prefetch="viewport" className={`${base} ${off}`}>Todos</Link>
         ) : (
           <span className={`${base} ${todosActivo ? on : 'text-white/60 border-transparent'}`}>Todos</span>
         )}
@@ -51,6 +51,7 @@ export default function SupleCategoryRibbon({ activeSlug = null, todosActivo = f
           <Link
             key={cat.slug}
             to={cat.link}
+            prefetch="viewport"
             aria-current={activeSlug === cat.slug ? 'page' : undefined}
             className={`${base} ${activeSlug === cat.slug ? on : off}`}
           >
@@ -61,7 +62,7 @@ export default function SupleCategoryRibbon({ activeSlug = null, todosActivo = f
             categorías de suple, agrega la ruta a gym system") — al final,
             después de las 5 categorías; no es una categoría, lleva a otro
             módulo (como "Suplementos" en el listón de Gym). */}
-        <Link to="/gym" className={`${base} ${off}`}>Gym System</Link>
+        <Link to="/gym" prefetch="viewport" className={`${base} ${off}`}>Gym System</Link>
       </div>
       {onInfo && (
         <button

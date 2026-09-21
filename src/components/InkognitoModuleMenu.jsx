@@ -73,6 +73,7 @@ export default function InkognitoModuleMenu({ current, textClassName, onNavigate
         <Link
           key={m.key}
           to={m.path}
+          prefetch="intent"
           onClick={onNavigate}
           className={`block pl-10 pr-6 py-3 ${caseClass} ${subSize} transition-all duration-300 ${textClassName}`}
         >

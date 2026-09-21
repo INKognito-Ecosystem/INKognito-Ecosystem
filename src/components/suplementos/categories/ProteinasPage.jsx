@@ -9,7 +9,7 @@ const DESC = 'Proteína en polvo para tu entrenamiento en Chigorodó, Urabá. St
 const INTRO = 'Whey, caseína y proteína vegetal para complementar tu entrenamiento — con stock real y despacho rápido en toda la región de Urabá.'
 
 export async function loader() {
-  return fetchCatalogCategoria('suplementos', CATEGORIA)
+  return fetchCatalogCategoria('suplementos', CATEGORIA, { soloFisicos: true })
 }
 
 export function meta() {

@@ -34,12 +34,12 @@ export default function SupleMobileNav({ active = null }) {
   return (
     <>
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center bg-white/95 backdrop-blur-md border-t border-zinc-200 py-2.5">
-        <Link to="/suplementos" className="relative flex flex-col items-center gap-1 text-black">
+        <Link to="/suplementos" prefetch="viewport" className="relative flex flex-col items-center gap-1 text-black">
           {marca('inicio')}
           <Home size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Inicio</span>
         </Link>
-        <Link to="/suplementos/categorias" className="relative flex flex-col items-center gap-1 text-black">
+        <Link to="/suplementos/categorias" prefetch="viewport" className="relative flex flex-col items-center gap-1 text-black">
           {marca('categorias')}
           <LayoutGrid size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Categorías</span>

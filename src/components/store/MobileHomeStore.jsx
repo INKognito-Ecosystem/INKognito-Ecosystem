@@ -127,6 +127,7 @@ export default function MobileHomeStore({ initialProducts = [] }) {
           <Link
             key={cat.id}
             to={cat.link}
+            prefetch="viewport"
             className="flex-shrink-0 text-[13px] font-extrabold text-black/60 pb-1.5 border-b-2 border-transparent whitespace-nowrap"
           >
             {cat.name}

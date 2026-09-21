@@ -9,7 +9,7 @@ const DESC = 'Creatina para tu entrenamiento en Chigorodó, Urabá. Stock real, 
 const INTRO = 'Creatina monohidratada para fuerza y rendimiento — con stock real y despacho rápido en toda la región de Urabá.'
 
 export async function loader() {
-  return fetchCatalogCategoria('suplementos', CATEGORIA)
+  return fetchCatalogCategoria('suplementos', CATEGORIA, { soloFisicos: true })
 }
 
 export function meta() {

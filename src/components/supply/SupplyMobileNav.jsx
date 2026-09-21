@@ -46,11 +46,11 @@ export default function SupplyMobileNav({ active = null, light = false }) {
   return (
     <>
       <div className={`md:hidden fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center ${barBg} backdrop-blur-md border-t ${barBorder} py-2.5`}>
-        <Link to="/supply" className={`flex flex-col items-center gap-1 ${tab('inicio')}`}>
+        <Link to="/supply" prefetch="viewport" className={`flex flex-col items-center gap-1 ${tab('inicio')}`}>
           <Home size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Inicio</span>
         </Link>
-        <Link to="/supply/categorias" className={`flex flex-col items-center gap-1 ${tab('categorias')}`}>
+        <Link to="/supply/categorias" prefetch="viewport" className={`flex flex-col items-center gap-1 ${tab('categorias')}`}>
           <LayoutGrid size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Categorías</span>
         </Link>

@@ -9,7 +9,7 @@ const DESC = 'Pre-entreno para tus rutinas en Chigorodó, Urabá. Stock real, de
 const INTRO = 'Energía y enfoque antes de entrenar — pre-entrenos con stock real y despacho rápido en toda la región de Urabá.'
 
 export async function loader() {
-  return fetchCatalogCategoria('suplementos', CATEGORIA)
+  return fetchCatalogCategoria('suplementos', CATEGORIA, { soloFisicos: true })
 }
 
 export function meta() {
