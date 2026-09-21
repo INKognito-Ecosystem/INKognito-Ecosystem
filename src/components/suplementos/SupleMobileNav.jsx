@@ -13,7 +13,7 @@ import logoSuple from '../../assets/milogo/gym.webp'
 // Tab bar + menú de pantalla completa compartidos por TODAS las páginas de
 // Suple (2026-09-19, migración de Suple a fondo blanco) — mismo criterio que
 // StoreMobileNav.jsx / SupplyMobileNav.jsx: Inicio · Categorías · Carrito ·
-// Menú. "Vendedores" y "Mi cuenta/perfil" se suman acá (Suple multitenant,
+// Menú. "Proveedores" y "Mi cuenta/perfil" se suman acá (Suple multitenant,
 // 2026-09-20).
 // active: 'inicio' | 'categorias' — qué pestaña queda marcada (barrita
 // grafito arriba del ícono; todas las pestañas son negras como en Supply).
@@ -83,10 +83,10 @@ export default function SupleMobileNav({ active = null }) {
             })}
 
             <div className="border-t border-zinc-100" />
-            <p className={etiqueta}>Vendedores</p>
+            <p className={etiqueta}>Proveedores</p>
             <Link to="/suplementos/tiendas" onClick={() => setMenuOpen(false)} className={itemMenu}>
               <Store size={18} className="flex-shrink-0" />
-              Vendedores verificados
+              Tiendas verificadas
             </Link>
             <Link to="/suplementos/proveedores/unete" onClick={() => setMenuOpen(false)} className={itemMenu}>
               <PlusCircle size={18} className="flex-shrink-0" />

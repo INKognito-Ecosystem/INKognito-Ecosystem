@@ -23,7 +23,7 @@ export async function loader() {
 }
 
 export function meta() {
-  const title = 'Vendedores verificados | INKognito Suple'
+  const title = 'Tiendas verificadas | INKognito Suple'
   const description = 'Directorio de vendedores de suplementos deportivos registrados en INKognito Suple, en toda Colombia.'
   return [
     { title },
@@ -51,7 +51,7 @@ export default function SupleTiendasDirectorioPage() {
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <div className="hidden md:block">
-        <NavbarSuple pageName="Vendedores verificados" hideMobileActions />
+        <NavbarSuple pageName="Tiendas verificadas" hideMobileActions />
       </div>
 
       <div className="md:hidden sticky top-0 z-40 flex items-center gap-2 px-4 py-2 bg-white border-b border-zinc-200">
@@ -73,7 +73,7 @@ export default function SupleTiendasDirectorioPage() {
       <div className="bg-gray-50 pt-0 md:pt-24 pb-4 px-4 md:px-6">
         <div className="max-w-5xl mx-auto text-center">
           <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-2">INKognito Suple</p>
-          <h1 className="text-2xl md:text-4xl font-black uppercase leading-tight mb-3 text-gray-900">Vendedores verificados</h1>
+          <h1 className="text-2xl md:text-4xl font-black uppercase leading-tight mb-3 text-gray-900">Tiendas verificadas</h1>
           <p className="text-gray-500 text-sm max-w-md mx-auto leading-relaxed">
             Suplementos deportivos de vendedores reales, registrados en INKognito Suple.
           </p>
@@ -82,7 +82,7 @@ export default function SupleTiendasDirectorioPage() {
 
       <div className="max-w-5xl mx-auto px-4 md:px-6 pb-10 md:pb-14">
         {vendedores.length === 0 ? (
-          <p className="text-gray-400 text-sm text-center py-10">Todavía no hay vendedores registrados.</p>
+          <p className="text-gray-400 text-sm text-center py-10">Todavía no hay tiendas registradas.</p>
         ) : (
           <>
             <div className="hidden md:block relative max-w-sm mx-auto mt-4 mb-6">
@@ -96,7 +96,7 @@ export default function SupleTiendasDirectorioPage() {
               />
             </div>
             {vendedoresFiltrados.length === 0 ? (
-              <p className="text-gray-400 text-sm text-center py-10">Ningún vendedor coincide con "{busqueda}".</p>
+              <p className="text-gray-400 text-sm text-center py-10">Ninguna tienda coincide con "{busqueda}".</p>
             ) : (
               <>
                 <div className="max-w-xl mx-auto flex flex-col divide-y divide-gray-100 border-t border-b border-gray-100">

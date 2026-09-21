@@ -158,7 +158,7 @@ export default function NavbarSuple({
 
         {/* DROPDOWN — jerarquía por secciones, mismo criterio que
             NavbarStore.jsx: navegación / categorías / vendedores / Mi
-            cuenta/perfil / módulos / Ecosistema y legal. "Vendedores" y "Mi
+            cuenta/perfil / módulos / Ecosistema y legal. "Proveedores" y "Mi
             cuenta/perfil" se suman acá (Suple multitenant, 2026-09-20). */}
         {!hideMenu && menuOpen && (
           <div className="fixed left-0 right-0 top-16 md:top-20 bg-white border-t border-zinc-200 z-50 max-h-[calc(100vh-4rem)] overflow-y-auto">
@@ -178,9 +178,9 @@ export default function NavbarSuple({
             ))}
 
             <div className="border-t border-zinc-100" />
-            <p className={labelClass}>Vendedores</p>
+            <p className={labelClass}>Proveedores</p>
             <Link to="/suplementos/tiendas" onClick={close} className={itemClass}>
-              <Store size={16} className="flex-shrink-0" /> Vendedores verificados
+              <Store size={16} className="flex-shrink-0" /> Tiendas verificadas
             </Link>
             <Link to="/suplementos/proveedores/unete" onClick={close} className={itemClass}>
               <PlusCircle size={16} className="flex-shrink-0" /> Registrar mi catálogo

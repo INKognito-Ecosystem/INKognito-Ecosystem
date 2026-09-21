@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Flame, Share2 } from 'lucide-react'
+import { Search, Zap, Share2 } from 'lucide-react'
 import FooterSuple from './FooterSuple'
 import SupleMobileNav from './SupleMobileNav'
 import { SuplCard } from './SuplCard'
@@ -125,7 +125,7 @@ export default function MobileHomeSuple({ afiliados = [], products = [], nextCur
 
       {/* BANNER — armado en CSS con el copy del hero de escritorio. */}
       <div className="relative overflow-hidden mx-2 mt-3 rounded-2xl bg-gradient-to-br from-zinc-700 to-zinc-900 text-white px-5 py-6">
-        <Flame
+        <Zap
           className="absolute -right-4 top-1/2 text-white/[0.09] pointer-events-none"
           style={{ transform: 'translateY(-50%) rotate(8deg)' }}
           size={200}
