@@ -28,6 +28,11 @@ export default function MisProductosSupleSection({ token, cloud_name, upload_pre
   const [varianteDe, setVarianteDe] = useState(null)
   const fileInput = useRef(null)
   const masterSearchTimer = useRef(null)
+  // Autollenado de la descripción (ver prefillDescripcion más abajo):
+  // prefillSeq numera cada pedido para que solo cuente el último;
+  // marcaTimer da un respiro mientras se escribe la marca.
+  const prefillSeq = useRef(0)
+  const marcaTimer = useRef(null)
   const [formAbierto, setFormAbierto] = useState(false)
   const [verGrupo, setVerGrupo] = useState(null)
   const [grupoExpandido, setGrupoExpandido] = useState(null)
@@ -73,6 +78,7 @@ export default function MisProductosSupleSection({ token, cloud_name, upload_pre
   }
 
   const iniciarEdicion = (p) => {
+    prefillSeq.current++
     setError(null)
     setEditando(p.id)
     setVarianteDe(null)
@@ -80,7 +86,7 @@ export default function MisProductosSupleSection({ token, cloud_name, upload_pre
     setNuevo({ product: p.product, variant: p.variant || '', price: p.price, stock: p.stock, categoria: p.categoria, marca: p.marca || '', image_url: p.image_url || '', descripcion: p.descripcion || '', descripcionAuto: false, master_product_id: null })
     setFormAbierto(true)
   }
-  const cancelarEdicion = () => { setEditando(null); setVarianteDe(null); setNuevo(PRODUCTO_VACIO_SUPLE); setMasterResults([]); setError(null); setFormAbierto(false) }
+  const cancelarEdicion = () => { prefillSeq.current++; setEditando(null); setVarianteDe(null); setNuevo(PRODUCTO_VACIO_SUPLE); setMasterResults([]); setError(null); setFormAbierto(false) }
   const abrirNuevoProducto = () => {
     setError(null)
     setEditando(null)
@@ -88,9 +94,13 @@ export default function MisProductosSupleSection({ token, cloud_name, upload_pre
     setMasterResults([])
     setNuevo(PRODUCTO_VACIO_SUPLE)
     setFormAbierto(true)
+    // La categoría ya viene elegida (la primera de la lista): la descripción
+    // se llena desde el primer momento, no solo después de cambiarla.
+    prefillDescripcion(PRODUCTO_VACIO_SUPLE.categoria, '')
   }
 
   const agregarVariante = (p) => {
+    prefillSeq.current++
     setError(null)
     setEditando(null)
     setVarianteDe(p.product)
@@ -112,13 +122,31 @@ export default function MisProductosSupleSection({ token, cloud_name, upload_pre
     }, 300)
   }
 
+  // Autollenado de la descripción (2026-09-21, Jose: "le quitamos peso a los
+  // vendedores a la hora de subir un producto") — al abrir el formulario y
+  // cada vez que cambia la categoría se pide el texto por defecto de esa
+  // categoría (tabla catalogo_defaults del panel, editable por Jose). Mismas
+  // reglas que ya se pulieron en Supply, más tres que allá faltaban:
+  //  - Solo pisa lo que llegó solo: si el vendedor la escribió a mano, o
+  //    vino de un producto real (editar, catálogo maestro), no se toca; si
+  //    la borra, vuelve a poder llenarse.
+  //  - Si dos cambios seguidos hacen que las respuestas lleguen desordenadas
+  //    (o el formulario ya cambió de categoría), solo cuenta la última.
+  //  - Si la categoría nueva no tiene texto por defecto, el texto automático
+  //    de la anterior se quita: nunca queda una descripción de "Proteínas"
+  //    dentro de un producto de "Accesorios".
   const prefillDescripcion = async (categoria, marca) => {
+    const mio = ++prefillSeq.current
     try {
       const res = await fetch(`${PANEL_URL}/api/catalogo-defaults-lookup?module=suplementos&categoria=${encodeURIComponent(categoria || '')}&marca=${encodeURIComponent(marca || '')}`)
-      const data = await res.json()
-      if (data.descripcion) {
-        setNuevo((n) => (n.descripcion && !n.descripcionAuto ? n : { ...n, descripcion: data.descripcion, descripcionAuto: true }))
-      }
+      const data = res.ok ? await res.json() : {}
+      if (mio !== prefillSeq.current) return
+      setNuevo((n) => {
+        if ((n.categoria || '') !== (categoria || '')) return n
+        if (n.descripcion && !n.descripcionAuto) return n
+        if (data.descripcion) return { ...n, descripcion: data.descripcion, descripcionAuto: true }
+        return n.descripcionAuto ? { ...n, descripcion: '', descripcionAuto: false } : n
+      })
     } catch { /* silencioso — el vendedor siempre puede escribirla a mano */ }
   }
 
@@ -129,11 +157,13 @@ export default function MisProductosSupleSection({ token, cloud_name, upload_pre
       categoria: item.categoria || n.categoria,
       marca: item.marca || n.marca,
       descripcion: item.descripcion || n.descripcion,
-      descripcionAuto: false,
+      descripcionAuto: item.descripcion ? false : n.descripcionAuto,
       image_url: n.image_url || item.image_url || '',
       master_product_id: item.id,
     }))
     setMasterResults([])
+    // Sin descripción propia, la de la categoría (posiblemente otra) se recalcula.
+    if (!item.descripcion) prefillDescripcion(item.categoria || nuevo.categoria, item.marca || nuevo.marca)
   }
 
   const guardar = async () => {
@@ -394,7 +424,12 @@ export default function MisProductosSupleSection({ token, cloud_name, upload_pre
                     placeholder="Marca (opcional)"
                     readOnly={categoriaMarcaBloqueada}
                     value={nuevo.marca}
-                    onChange={(e) => { setNuevo((n) => ({ ...n, marca: e.target.value })); prefillDescripcion(nuevo.categoria, e.target.value) }}
+                    onChange={(e) => {
+                      const marca = e.target.value
+                      setNuevo((n) => ({ ...n, marca }))
+                      clearTimeout(marcaTimer.current)
+                      marcaTimer.current = setTimeout(() => prefillDescripcion(nuevo.categoria, marca), 350)
+                    }}
                   />
                   {nuevo.master_product_id && !varianteDe && (
                     <div className="flex items-center justify-between bg-green-50 rounded-md px-2.5 py-1.5 -mt-1">
