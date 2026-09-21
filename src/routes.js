@@ -91,6 +91,9 @@ export default [
   // Registro de proveedor nativo de Supply (2026-09-12) — mismo criterio
   // público que marca/tienda de arriba, ver EstudioProveedorSupplyRegistroPage.jsx.
   route('supply/proveedores/unete', 'components/artistas/EstudioProveedorSupplyRegistroPage.jsx'),
+  // A donde lleva "Mi Supply" si este navegador no tiene ningún catálogo
+  // guardado — formulario de correo propio de Supply, ver SupplyMiSupplyPage.jsx.
+  route('supply/mi-supply', 'components/supply/SupplyMiSupplyPage.jsx'),
   // Proveedores de Supply con pago directo (fase 5, 2026-08-07) — a donde
   // vuelve el comprador tras pagar en Mercado Pago (back_urls de
   // POST /api/estudios-supply-comprar, panel).

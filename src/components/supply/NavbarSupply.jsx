@@ -140,7 +140,7 @@ export default function NavbarSupply() {
                     tienda registrada") — mismo criterio que NavbarStore.jsx:
                     irAMiSupply revisa si ya hay un Supply con token guardado
                     en este navegador y lo abre directo con su botón de
-                    gestión; si no, cae al flujo de siempre (correo → INK) —
+                    gestión; si no, abre su formulario de correo propio —
                     ver supplyTienda.js. */}
                 <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-600">Mi cuenta/perfil</p>
                 <button type="button" onClick={() => { setMenuOpen(false); irAMiSupply(navigate) }}

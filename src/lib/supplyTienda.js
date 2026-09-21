@@ -6,7 +6,9 @@
 // key `supply_edit_token_<id>` (EDIT_TOKEN_KEY_PREFIX ahí mismo); léelo
 // directo y abre esa tienda ya con la gestión activa, en vez de mandarlo
 // primero al editor genérico. Sin token guardado (cuenta no verificada en
-// este navegador todavía), cae al flujo de siempre.
+// este navegador todavía), abre el formulario de correo propio de Supply
+// (SupplyMiSupplyPage.jsx) — nunca la página de INK, que carga sola el
+// último token de cualquier módulo y redirige al que sea.
 const EDIT_TOKEN_KEY_PREFIX = 'supply_edit_token_'
 
 export function irAMiSupply(navigate) {
@@ -22,5 +24,5 @@ export function irAMiSupply(navigate) {
       }
     }
   } catch {}
-  navigate('/tattoo-artist-colombia/estudio/mi-perfil')
+  navigate('/supply/mi-supply')
 }
