@@ -13,6 +13,7 @@ import { ExternalLink, Droplet, PenTool, Crosshair, Drill, Hand, ShieldCheck, Pl
 import { getAdjacentCategories } from '../../data/supplyCategoriesOrder'
 import { categories } from './CategoriesSupply'
 
+import CategoriaVaciaCard from '../CategoriaVaciaCard'
 const AFILIADO_COPY = {
   'Tintas': {
     badge: 'Importación internacional · bajo pedido',
@@ -706,21 +707,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
               </div>
             </div>
           {!hayStockInicial ? (
-            <div className={`mx-6 border border-blue-500/20 ${t.panel} rounded-2xl p-10 text-center`}>
-              <p className={`${t.textMuted} text-[10px] font-bold uppercase tracking-widest mb-2`}>Sin stock por el momento</p>
-              <p className={`${t.text} text-lg font-black uppercase mb-2`}>Próximamente disponible</p>
-              <p className={`${t.textMuted} text-sm mb-6 max-w-sm mx-auto`}>
-                Déjanos tu número y te avisamos cuando tengamos {title.toLowerCase()} disponibles. Sé el primero en saber.
-              </p>
-              <a
-                href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero que me avisen cuando haya ${title} disponibles en INKognito Supply.`)}`}
-                target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white font-bold uppercase tracking-[0.15em] text-sm rounded hover:bg-blue-600 transition"
-              >
-                <FaWhatsapp size={18} />
-                Avisarme cuando haya stock →
-              </a>
-            </div>
+            <CategoriaVaciaCard className={`mx-6 border border-blue-500/20 ${t.panel}`} labelClassName={t.textMuted} titleClassName={t.text} />
           ) : items.length === 0 && !cargandoFiltro ? (
             <div className={`mx-6 border ${t.border} ${t.panel} rounded-2xl p-8 text-center`}>
               <p className={`${t.textMuted2} text-sm mb-4`}>Ningún producto coincide con tu búsqueda o filtro.</p>

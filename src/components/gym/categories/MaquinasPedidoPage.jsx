@@ -10,6 +10,7 @@ import { Wrench, ExternalLink, ArrowLeft, ArrowRight, ShoppingCart, Check } from
 import { getAdjacentCategories } from '../../../data/gymCategoriesOrder'
 import { useScrolled } from '../../../hooks/useScrolled'
 
+import CategoriaVaciaCard from '../../CategoriaVaciaCard'
 const WA = '573207911013'
 
 const GRID_PATTERN = {
@@ -283,18 +284,7 @@ export default function MaquinasPedidoPage() {
               })}
             </div>
           ) : (
-            <div className="border border-yellow-500/15 bg-gray-950 rounded-2xl p-6 text-center">
-              <p className="text-gray-500 text-sm mb-4 max-w-sm mx-auto">
-                Aún no tenemos materiales cargados. Avísanos y te contactamos apenas tengamos opciones disponibles.
-              </p>
-              <a
-                href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya materiales disponibles en INKognito Gym.')}`}
-                target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-yellow-500 text-gray-950 font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-yellow-400 transition"
-              >
-                Avisarme cuando haya stock →
-              </a>
-            </div>
+            <CategoriaVaciaCard className="border border-yellow-500/15 bg-gray-950" labelClassName="text-gray-500" titleClassName="text-white" />
           )}
         </div>
       </section>

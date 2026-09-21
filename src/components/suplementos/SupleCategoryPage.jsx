@@ -5,12 +5,11 @@ import FooterSuple from './FooterSuple'
 import SupleMobileNav from './SupleMobileNav'
 import SupleCategoryRibbon from './SupleCategoryRibbon'
 import { SuplCard } from './SuplCard'
-import { FaWhatsapp } from 'react-icons/fa'
 import { ArrowLeft, ArrowRight, LoaderCircle, X } from 'lucide-react'
 import { getAdjacentSupleCategories } from '../../data/supleCategoriesOrder'
 import { useLoadMore, fetchCatalogPage } from '../../hooks/useCatalog'
 
-const WA = '573207911013'
+import CategoriaVaciaCard from '../CategoriaVaciaCard'
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(rgba(24,24,27,1) 1px, transparent 1px)',
@@ -157,21 +156,7 @@ export default function SupleCategoryPage({ title, categoria, slug, intro, produ
             buscando ? (
               <p className="px-6 py-10 text-center text-zinc-500 text-sm">Ningún producto de {title.toLowerCase()} coincide con "{query.trim()}".</p>
             ) : (
-              <div className="mx-6 border border-zinc-200 bg-zinc-50 rounded-2xl p-10 text-center">
-                <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2">Sin stock por el momento</p>
-                <p className="text-zinc-900 text-lg font-black uppercase mb-2">Próximamente disponible</p>
-                <p className="text-zinc-500 text-sm mb-6 max-w-sm mx-auto">
-                  Déjanos tu número y te avisamos cuando tengamos {title.toLowerCase()} disponibles. Sé el primero en saber.
-                </p>
-                <a
-                  href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero que me avisen cuando haya ${title} disponibles en INKognito Suple.`)}`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-zinc-700 text-white font-bold uppercase tracking-[0.15em] text-sm rounded hover:bg-zinc-800 transition"
-                >
-                  <FaWhatsapp size={18} />
-                  Avisarme cuando haya stock →
-                </a>
-              </div>
+              <CategoriaVaciaCard className="mx-6 border border-zinc-200 bg-zinc-50" labelClassName="text-zinc-500" titleClassName="text-zinc-900" />
             )
           ) : (
             <>

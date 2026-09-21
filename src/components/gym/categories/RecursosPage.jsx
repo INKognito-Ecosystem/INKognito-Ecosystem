@@ -8,12 +8,12 @@ import { fetchCatalogCategoriaItems } from '../../../hooks/useCatalog'
 import { getAdjacentCategories } from '../../../data/gymCategoriesOrder'
 import { useScrolled } from '../../../hooks/useScrolled'
 
+import CategoriaVaciaCard from '../../CategoriaVaciaCard'
 const GRID_PATTERN = {
   backgroundImage:
     'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
 }
 
-const WA = '573207911013'
 
 // limit:100 (2026-09-14, paginación real) — recursos gratuitos curados a
 // mano, no inventario masivo; mismo criterio que los afiliados de Supply:
@@ -144,18 +144,7 @@ export default function RecursosPage() {
             })}
           </div>
         ) : (
-          <div className="border border-gray-800 bg-gray-800/40 rounded-2xl p-6 text-center">
-            <p className="text-gray-400 text-sm mb-4 max-w-sm mx-auto">
-              Aún no tenemos recursos gratuitos cargados. Avísanos y te contactamos apenas tengamos algo disponible.
-            </p>
-            <a
-              href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya recursos gratuitos disponibles en INKognito Gym.')}`}
-              target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-gray-950 font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-orange-400 transition"
-            >
-              Avisarme cuando haya recursos →
-            </a>
-          </div>
+          <CategoriaVaciaCard className="border border-gray-800 bg-gray-800/40" labelClassName="text-gray-400" titleClassName="text-white" />
         )}
 
         {/* SECCIÓN REDES */}

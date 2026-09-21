@@ -14,6 +14,7 @@ import { categories } from '../../../data/storeCategories.jsx'
 import { useScrolled } from '../../../hooks/useScrolled'
 import logoStore from '../../../assets/milogo/store.webp'
 
+import CategoriaVaciaCard from '../../CategoriaVaciaCard'
 const TITLE = 'Ropa Casual Día a Día'
 const CATEGORIA_DB = 'Ropa General'
 const DESCRIPCION = 'Prendas cómodas y versátiles para el día a día — pantalones, camisetas, camisas y ropa de estilo urbano, con la misma calidad que ya conoces en INKognito Store. Despacho con Ruta del Golfo a toda la región de Urabá — pagas cuando recibes.'
@@ -225,22 +226,7 @@ export default function RopaGeneralPage() {
             resultados ? (
               <p className="text-gray-400 text-sm text-center py-10">Ningún producto coincide con tu búsqueda.</p>
             ) : (
-            <div className="border border-[#C9A84C]/30 bg-white rounded-2xl p-10 text-center">
-              <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-2">Sin stock por el momento</p>
-              <p className="text-gray-900 text-lg font-black uppercase mb-2">Catálogo actualizándose</p>
-              <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
-                Déjanos tu número y te avisamos cuando tengamos Ropa Casual disponible. Sé el primero en saber.
-              </p>
-              <a
-                href={`https://wa.me/573207911013?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya Ropa Casual disponible en INKognito Store.')}`}
-                target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 text-white font-bold uppercase tracking-[0.15em] text-sm rounded hover:brightness-90 transition"
-                style={{ backgroundColor: '#C9A84C' }}
-              >
-                <FaWhatsapp size={18} />
-                Avisarme cuando haya stock →
-              </a>
-            </div>
+            <CategoriaVaciaCard className="border border-[#C9A84C]/30 bg-white" labelClassName="text-gray-400" titleClassName="text-gray-900" />
             )
           ) : (
             <>

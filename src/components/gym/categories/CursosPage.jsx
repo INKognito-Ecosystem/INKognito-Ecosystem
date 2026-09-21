@@ -7,7 +7,7 @@ import { fetchCatalogCategoriaItems } from '../../../hooks/useCatalog'
 import { getAdjacentCategories } from '../../../data/gymCategoriesOrder'
 import { useScrolled } from '../../../hooks/useScrolled'
 
-const WA = '573207911013'
+import CategoriaVaciaCard from '../../CategoriaVaciaCard'
 
 // limit:100 (2026-09-14, paginación real) — contenido curado a mano
 // (cursos de Hotmart), no inventario masivo; mismo criterio que los
@@ -132,18 +132,7 @@ export default function CursosPage() {
             })}
           </div>
         ) : (
-          <div className="border border-gray-800 bg-gray-800/40 rounded-2xl p-6 text-center">
-            <p className="text-gray-400 text-sm mb-4 max-w-sm mx-auto">
-              Aún no tenemos cursos cargados. Avísanos y te contactamos apenas tengamos opciones disponibles.
-            </p>
-            <a
-              href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero que me avisen cuando haya cursos disponibles en INKognito Gym.')}`}
-              target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-gray-950 font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-orange-400 transition"
-            >
-              Avisarme cuando haya stock →
-            </a>
-          </div>
+          <CategoriaVaciaCard className="border border-gray-800 bg-gray-800/40" labelClassName="text-gray-400" titleClassName="text-white" />
         )}
       </div>
 

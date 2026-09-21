@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, ExternalLink, BookOpen, Package, PlayCircle } from 'lucide-react'
-import { FaWhatsapp } from 'react-icons/fa'
 import NavbarCategory from '../NavbarCategory'
 import FooterSupply from '../FooterSupply'
 import SupplyMobileNav from '../SupplyMobileNav'
 import { APRENDE_ORDER } from '../../../data/aprendeOrder'
 
+import CategoriaVaciaCard from '../../CategoriaVaciaCard'
 // Piezas compartidas por las 3 páginas de /supply/aprende/* (cursos, kit,
 // recursos) — 2026-09-13, Jose: "separemos las card de educación... cada
 // uno deberá abrir su propio espacio". Antes las 3 vivían juntas en una
@@ -219,17 +219,7 @@ export function SeccionAfiliados({ id, label, titulo, subtitulo, items, color, c
               ))}
             </div>
           ) : (
-            <div className="border border-zinc-200 bg-zinc-50 rounded-2xl p-6 text-center">
-              <p className="text-zinc-500 text-sm mb-4">Próximamente disponible en esta sección.</p>
-              <a
-                href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola, quiero que me avisen cuando haya ${titulo.toLowerCase()} disponibles en INKognito Supply.`)}`}
-                target="_blank" rel="noopener noreferrer"
-                className={`inline-flex items-center gap-2 px-5 py-2.5 bg-${color}-500 text-white font-bold uppercase tracking-[0.15em] text-xs rounded hover:opacity-90 transition`}
-              >
-                <FaWhatsapp size={16} />
-                Avisarme cuando esté disponible →
-              </a>
-            </div>
+            <CategoriaVaciaCard className="border border-zinc-200 bg-zinc-50" labelClassName="text-zinc-500" titleClassName="text-zinc-900" />
           )}
         </div>
       </section>
