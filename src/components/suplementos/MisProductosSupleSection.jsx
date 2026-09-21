@@ -33,6 +33,7 @@ export default function MisProductosSupleSection({ token, cloud_name, upload_pre
   // marcaTimer da un respiro mientras se escribe la marca.
   const prefillSeq = useRef(0)
   const marcaTimer = useRef(null)
+  const nameTimer = useRef(null)
   const [formAbierto, setFormAbierto] = useState(false)
   const [verGrupo, setVerGrupo] = useState(null)
   const [grupoExpandido, setGrupoExpandido] = useState(null)
@@ -112,6 +113,10 @@ export default function MisProductosSupleSection({ token, cloud_name, upload_pre
 
   const onProductInput = (value) => {
     setNuevo((n) => ({ ...n, product: value, master_product_id: null }))
+    clearTimeout(nameTimer.current)
+    if (nuevo.categoria === 'Accesorios') {
+      nameTimer.current = setTimeout(() => prefillDescripcion('Accesorios', nuevo.marca, value.trim()), 350)
+    }
     clearTimeout(masterSearchTimer.current)
     if (value.trim().length < 2) { setMasterResults([]); return }
     masterSearchTimer.current = setTimeout(async () => {
@@ -136,10 +141,15 @@ export default function MisProductosSupleSection({ token, cloud_name, upload_pre
   //  - Si la categoría nueva no tiene texto por defecto, el texto automático
   //    de la anterior se quita: nunca queda una descripción de "Proteínas"
   //    dentro de un producto de "Accesorios".
-  const prefillDescripcion = async (categoria, marca) => {
+  //  - Accesorios (2026-09-21, Jose: "va desde guantes hasta termos"): es la
+  //    única categoría donde el texto depende de QUÉ es el producto, así que
+  //    ahí también viaja el nombre — "Termo 1L" trae la descripción de un
+  //    termo, "Guantes" la de unos guantes, y un nombre que no se reconoce
+  //    cae al texto general de accesorios.
+  const prefillDescripcion = async (categoria, marca, producto = '') => {
     const mio = ++prefillSeq.current
     try {
-      const res = await fetch(`${PANEL_URL}/api/catalogo-defaults-lookup?module=suplementos&categoria=${encodeURIComponent(categoria || '')}&marca=${encodeURIComponent(marca || '')}`)
+      const res = await fetch(`${PANEL_URL}/api/catalogo-defaults-lookup?module=suplementos&categoria=${encodeURIComponent(categoria || '')}&marca=${encodeURIComponent(marca || '')}&producto=${encodeURIComponent(producto || '')}`)
       const data = res.ok ? await res.json() : {}
       if (mio !== prefillSeq.current) return
       setNuevo((n) => {
@@ -164,7 +174,7 @@ export default function MisProductosSupleSection({ token, cloud_name, upload_pre
     }))
     setMasterResults([])
     // Sin descripción propia, la de la categoría (posiblemente otra) se recalcula.
-    if (!item.descripcion) prefillDescripcion(item.categoria || nuevo.categoria, item.marca || nuevo.marca)
+    if (!item.descripcion) prefillDescripcion(item.categoria || nuevo.categoria, item.marca || nuevo.marca, item.product)
   }
 
   const guardar = async () => {
@@ -417,7 +427,7 @@ export default function MisProductosSupleSection({ token, cloud_name, upload_pre
                     disabled={categoriaMarcaBloqueada}
                     onChange={(categoria) => {
                       setNuevo((n) => ({ ...n, categoria }))
-                      prefillDescripcion(categoria, nuevo.marca)
+                      prefillDescripcion(categoria, nuevo.marca, nuevo.product.trim())
                     }}
                   />
                   <input
@@ -429,7 +439,7 @@ export default function MisProductosSupleSection({ token, cloud_name, upload_pre
                       const marca = e.target.value
                       setNuevo((n) => ({ ...n, marca }))
                       clearTimeout(marcaTimer.current)
-                      marcaTimer.current = setTimeout(() => prefillDescripcion(nuevo.categoria, marca), 350)
+                      marcaTimer.current = setTimeout(() => prefillDescripcion(nuevo.categoria, marca, nuevo.product.trim()), 350)
                     }}
                   />
                   {nuevo.master_product_id && !varianteDe && (

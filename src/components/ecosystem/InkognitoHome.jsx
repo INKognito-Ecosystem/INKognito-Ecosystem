@@ -162,18 +162,25 @@ export default function InkognitoHome() {
           tracking-widest, mucho más grande/pesado que el
           text-[9.5px] sm:text-[12px] en frase normal que ya usan
           FooterSupply.jsx y el resto). */}
-      <div className="relative z-10 w-full text-center pb-2 sm:pb-3 shrink-0">
-        <p className="text-zinc-600 text-[9.5px] sm:text-[12px]">
+      {/* Texto blanco (2026-09-21, Jose: "el copyright en la home del
+          ecosistema debería ser más claro, o blanco, para que se pueda
+          entender") — era text-zinc-600, casi invisible sobre la imagen
+          oscura del fondo. Con una sombra suave para que también se lea
+          donde la imagen tiene zonas claras (el fondo de móvil). Los links
+          de Términos/Privacidad ya no pueden usar "hover:text-white" como
+          señal (ahora son blancos de base): subrayan al pasar el mouse. */}
+      <div className="relative z-10 w-full text-center pb-2 sm:pb-3 shrink-0" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.75)' }}>
+        <p className="text-white text-[9.5px] sm:text-[12px]">
           © 2026 INKognito. Todos los derechos reservados.
         </p>
         <div className="flex justify-center items-center gap-6 mt-2 text-[12px]">
           {/* Botones, no Links (2026-09-15) — abren el modal en vez de
               navegar a /terminos //privacidad, ver comentario de estado
               arriba. */}
-          <button type="button" onClick={() => setLegalOpen('terminos')} className="text-zinc-600 hover:text-white transition-colors">
+          <button type="button" onClick={() => setLegalOpen('terminos')} className="text-white hover:underline underline-offset-2 transition-colors">
             Términos
           </button>
-          <button type="button" onClick={() => setLegalOpen('privacidad')} className="text-zinc-600 hover:text-white transition-colors">
+          <button type="button" onClick={() => setLegalOpen('privacidad')} className="text-white hover:underline underline-offset-2 transition-colors">
             Privacidad
           </button>
         </div>

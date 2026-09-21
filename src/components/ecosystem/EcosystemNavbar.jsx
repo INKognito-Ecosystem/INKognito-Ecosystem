@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Info, Store, Truck, UserCircle, FileText, Shield } from 'lucide-react'
 import inkognitoLogo from '../../assets/ecosystem/logo.png'
 import LegalModal from '../legal/LegalModal'
+import { irAMiSuple } from '../../lib/supleTienda'
 
 // Menú hamburguesa reestructurado (2026-09-16, Jose) — antes era una lista
 // plana (About + Tattoo Studio con sus redes anidadas). Ahora es un centro
@@ -48,6 +49,7 @@ import LegalModal from '../legal/LegalModal'
 // en desktop ese mismo navbar sigue sobre el fondo oscuro de siempre.
 // Default false para no afectar ProductLandingPage.jsx, que no lo pasa.
 export default function EcosystemNavbar({ logoFilter = null, showTagline = false, mobileLight = false }) {
+  const navigate = useNavigate()
   const [menuOpen,  setMenuOpen]  = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [scrolled,  setScrolled]  = useState(false)
@@ -219,6 +221,9 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
               { label: 'Estudio de tatuaje', to: '/tattoo-artist-colombia/estudio/unete' },
               { label: 'Supply — insumos para tatuaje', to: '/supply/proveedores/unete' },
               { label: 'Store — ropa y calzado', to: '/tattoo-artist-colombia/tienda/unete' },
+              // Suple (2026-09-21, Jose: "agregar suplementación en aliados
+              // y logística") — registro real de vendedores de Suple.
+              { label: 'Suple — suplementación', to: '/suplementos/proveedores/unete' },
             ]}
             onNavigate={() => setMenuOpen(false)}
           />
@@ -255,6 +260,11 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
               { label: 'Estudio', to: '/tattoo-artist-colombia/estudio/mi-perfil' },
               { label: 'Supply', to: '/supply/proveedores' },
               { label: 'Store', to: '/store/tiendas' },
+              // Suple (2026-09-21, Jose: "y suple, en mi cuenta / perfil") —
+              // mismo destino que "Mi Suple" dentro del propio módulo: abre
+              // directo su tienda si este navegador ya guarda su token, y si
+              // no, el formulario de correo de Suple (irAMiSuple).
+              { label: 'Suple', action: () => irAMiSuple(navigate) },
               { label: 'Transportadora', to: '/transportadoras/mi-panel' },
             ]}
             onNavigate={() => setMenuOpen(false)}
@@ -442,10 +452,19 @@ function ExpandableSection({ icon: Icon, label, items, onNavigate }) {
   )
 }
 
-function SubLink({ label, to, href, onClick }) {
+function SubLink({ label, to, href, action, onClick }) {
   const className = "block px-8 py-[10px] text-zinc-500 hover:text-black tracking-wide text-[13px] font-medium hover:bg-zinc-100 transition-all duration-200 rounded"
   if (to) {
     return <Link to={to} onClick={onClick} className={className}>{label}</Link>
+  }
+  // `action` — para destinos que se resuelven al hacer clic (p. ej. irAMiSuple
+  // mira el token guardado en este navegador), no una URL fija.
+  if (action) {
+    return (
+      <button type="button" onClick={() => { onClick?.(); action() }} className={`${className} w-full text-left bg-transparent border-none cursor-pointer`}>
+        {label}
+      </button>
+    )
   }
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
