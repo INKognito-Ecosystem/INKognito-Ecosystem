@@ -198,7 +198,7 @@ export function toProdCard(item) {
     id:     item.name,
     name:   item.name,
     image:  item.image_url || '',
-    images: [item.image_url, item.image_url_2, item.image_url_3].filter(Boolean),
+    images: [item.image_url].filter(Boolean), // solo la portada: las otras fotos son de la ficha
     price:  firstPrice ? '$' + Math.round(firstPrice).toLocaleString('es-CO') : '—',
     tag:    item.descripcion || '',
     _item:  item,

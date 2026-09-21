@@ -104,8 +104,11 @@ export function SuplCard({ item }) {
   // dejar la card sin imagen (mismo criterio que StoreProductCard.jsx).
   const conFoto = variantes.find(v => v.image_url)
   const fuenteImagen = sel.image_url ? sel : conFoto
+  // Cards de catálogo: SOLO la portada (2026-09-21, Jose: "estas fotos solo
+  // se mostrarán dentro de la landing de un producto específico"). Las fotos
+  // 2 y 3 viven en la ficha del producto, con sus miniaturas.
   const galleryImages = fuenteImagen?.image_url
-    ? [fuenteImagen.image_url, fuenteImagen.image_url_2, fuenteImagen.image_url_3].filter(Boolean)
+    ? [fuenteImagen.image_url]
     : [item.image_url].filter(Boolean)
 
   const description = sel.descripcion || item.descripcion

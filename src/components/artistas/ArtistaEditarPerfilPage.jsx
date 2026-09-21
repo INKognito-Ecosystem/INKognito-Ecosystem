@@ -219,7 +219,8 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
       fd.append('folder', 'inkognito-disenos')
       const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, { method: 'POST', body: fd })
       const data = await res.json()
-      if (data.secure_url) setNuevo((n) => ({ ...n, [slot]: data.secure_url }))
+      if (!data.secure_url) throw new Error(data.error?.message || 'No se pudo subir la imagen')
+      setNuevo((n) => ({ ...n, [slot]: data.secure_url }))
     } catch {
       setError('No pudimos subir esa imagen — intenta de nuevo.')
     } finally {
@@ -1228,7 +1229,8 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
       fd.append('folder', 'inkognito-artistas')
       const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, { method: 'POST', body: fd })
       const data = await res.json()
-      if (data.secure_url) setForm((f) => ({ ...f, [slot]: data.secure_url }))
+      if (!data.secure_url) throw new Error(data.error?.message || 'No se pudo subir la imagen')
+      setForm((f) => ({ ...f, [slot]: data.secure_url }))
     } catch {
       setError('No pudimos subir esa foto — intenta de nuevo.')
     } finally {

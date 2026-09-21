@@ -117,12 +117,10 @@ export default function SupplyProductCard({ item, categoria, showEstudioBadge = 
   // StoreProductCard.jsx, reportado 2026-08-02).
   const fallbackVariant = allVariants.find(v => v.image_url)
   const activeImage = sel.image_url || fallbackVariant?.image_url || item.image_url || null
-  const images = sel.image_url
-    ? [sel.image_url, sel.image_url_2, sel.image_url_3].filter(Boolean)
-    : fallbackVariant
-      ? [fallbackVariant.image_url, fallbackVariant.image_url_2, fallbackVariant.image_url_3].filter(Boolean)
-      : [item.image_url, item.image_url_2, item.image_url_3].filter(Boolean)
-  const galleryImages = images.filter(Boolean)
+  // Cards de catálogo: SOLO la portada (2026-09-21, Jose: "estas fotos solo
+  // se mostrarán dentro de la landing de un producto específico"). Las fotos
+  // 2 y 3 viven en la ficha del producto, con sus miniaturas.
+  const galleryImages = [activeImage].filter(Boolean)
 
   // Descripción de la variante seleccionada si tiene la suya propia; si no,
   // la del producto — mismo criterio que StoreProductCard.jsx. Antes

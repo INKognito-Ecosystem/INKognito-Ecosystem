@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useLoaderData, useParams, useNavigate, Link } from 'react-router'
 import { ArrowLeft, ShoppingCart, Share2, Wrench, MapPin } from 'lucide-react'
 import ProductImageGallery from '../ProductImageGallery'
+import ProductImageThumbs from '../ProductImageThumbs'
 import NavbarGym from './NavbarGym'
 import GymMobileNav from './GymMobileNav'
 import { useGymCart } from '../../contexts/GymCartContext'
@@ -316,7 +317,7 @@ export default function GymProductDetailPage() {
       <div className="md:hidden">
         <div ref={heroRef} className="relative w-full aspect-square bg-zinc-50 border-b border-zinc-200">
           {images.length > 0 ? (
-            <ProductImageGallery
+            <ProductImageGallery hoverScrub={false}
               images={images}
               alt={product.name}
               containerClassName="w-full h-full"
@@ -359,6 +360,7 @@ export default function GymProductDetailPage() {
         )}
 
         <div className="px-5 py-6 pb-28 flex flex-col gap-6">
+          <ProductImageThumbs images={images} activeIndex={imgIdx} onSelect={setImgIdx} />
           {infoBlock}
           {ctaButtons}
           {origenBlock}
@@ -372,9 +374,10 @@ export default function GymProductDetailPage() {
         <NavbarGym />
         <div className="pt-24 pb-16 max-w-5xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-start">
+            <div className="flex flex-col gap-3">
             <div className="aspect-square w-full bg-zinc-50 rounded-2xl overflow-hidden border border-zinc-200">
               {images.length > 0 ? (
-                <ProductImageGallery
+                <ProductImageGallery hoverScrub={false}
                   images={images}
                   alt={product.name}
                   containerClassName="w-full h-full"
@@ -388,6 +391,8 @@ export default function GymProductDetailPage() {
                   <Wrench size={64} className="text-zinc-300" strokeWidth={1} />
                 </div>
               )}
+            </div>
+              <ProductImageThumbs images={images} activeIndex={imgIdx} onSelect={setImgIdx} />
             </div>
             <div className="flex flex-col gap-6">
               {infoBlock}

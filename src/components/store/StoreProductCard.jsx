@@ -104,9 +104,12 @@ export default function StoreProductCard({ product, category, sizes }) {
   const fallbackVariant = product._item?.variantes?.find(v => v.image_url)
   const imageSource = selectedVariant?.image_url ? selectedVariant : fallbackVariant
 
+  // Cards de catálogo: SOLO la portada (2026-09-21, Jose: "estas fotos solo
+  // se mostrarán dentro de la landing de un producto específico"). Las fotos
+  // 2 y 3 viven en la ficha del producto, con sus miniaturas.
   const galleryImages = imageSource?.image_url
-    ? [imageSource.image_url, imageSource.image_url_2, imageSource.image_url_3].filter(Boolean)
-    : (product.images?.length ? product.images : [product.image].filter(Boolean))
+    ? [imageSource.image_url]
+    : [product.image].filter(Boolean)
 
   // Descripción de la talla seleccionada si la tiene propia; si no, la del
   // producto (product.tag) — así, si todas las tallas comparten la misma

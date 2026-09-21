@@ -90,7 +90,8 @@ export default function MisProductosTiendaSection({ token, cloud_name, upload_pr
       fd.append('folder', 'inkognito-tienda-estudios')
       const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, { method: 'POST', body: fd })
       const data = await res.json()
-      if (data.secure_url) setNuevo((n) => ({ ...n, image_url: data.secure_url }))
+      if (!data.secure_url) throw new Error(data.error?.message || 'No se pudo subir la imagen')
+      setNuevo((n) => ({ ...n, image_url: data.secure_url }))
     } catch {
       setError('No pudimos subir la foto — intenta de nuevo.')
     } finally {

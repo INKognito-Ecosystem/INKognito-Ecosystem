@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useLoaderData, useParams, useNavigate, Link } from 'react-router'
 import { ArrowLeft, ShoppingCart, Share2, Store, MapPin, ExternalLink } from 'lucide-react'
 import ProductImageGallery from '../ProductImageGallery'
+import ProductImageThumbs from '../ProductImageThumbs'
 import { VariantSelectorSupply } from './SupplyProductCard'
 import NavbarCategory from './NavbarCategory'
 import SupplyMobileNav from './SupplyMobileNav'
@@ -155,7 +156,13 @@ export default function SupplyProductDetailPage() {
 
   const sel = variantes[activeVariant] || variantes[0] || {}
   const resolvedPrice = sel.price ? '$' + Math.round(sel.price).toLocaleString('es-CO') : null
-  const images = [sel.image_url, sel.image_url_2, sel.image_url_3].filter(Boolean)
+  // Si la presentación elegida no tiene fotos propias, sigue siendo el mismo
+  // producto: se muestran las de otra que sí las tenga (mismo criterio que las
+  // cards) — sin esto, una foto subida a otra variante "no se veía".
+  const fuenteFotos = sel.image_url ? sel : variantes.find(v => v.image_url)
+  const images = fuenteFotos
+    ? [fuenteFotos.image_url, fuenteFotos.image_url_2, fuenteFotos.image_url_3].filter(Boolean)
+    : []
   const sinStock = (sel.stock ?? 0) <= 0
 
   // Productos afiliados (Hotmart/Amazon/AliExpress) — cursos, kit externo,
@@ -450,7 +457,7 @@ export default function SupplyProductDetailPage() {
       <div className="md:hidden">
         <div ref={heroRef} className="relative w-full aspect-square bg-zinc-50 border-b border-zinc-200">
           {images.length > 0 ? (
-            <ProductImageGallery
+            <ProductImageGallery hoverScrub={false}
               images={images}
               alt={`${product.name}${sel.variant ? ' ' + sel.variant : ''}`}
               containerClassName="w-full h-full"
@@ -497,6 +504,7 @@ export default function SupplyProductDetailPage() {
         )}
 
         <div className="px-5 py-6 pb-28 flex flex-col gap-6">
+          <ProductImageThumbs images={images} activeIndex={imgIdx} onSelect={setImgIdx} />
           {infoBlock}
           {ctaButtons}
           {proveedorBlock}
@@ -510,9 +518,10 @@ export default function SupplyProductDetailPage() {
         <NavbarCategory pageName={product.categoria || 'Producto'} hideMenu />
         <div className="pt-24 pb-16 max-w-5xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-start">
+            <div className="flex flex-col gap-3">
             <div className="aspect-square w-full bg-zinc-50 rounded-2xl overflow-hidden border border-zinc-200">
               {images.length > 0 ? (
-                <ProductImageGallery
+                <ProductImageGallery hoverScrub={false}
                   images={images}
                   alt={`${product.name}${sel.variant ? ' ' + sel.variant : ''}`}
                   containerClassName="w-full h-full"
@@ -526,6 +535,8 @@ export default function SupplyProductDetailPage() {
                   <p className="text-zinc-400 uppercase tracking-[0.3em] text-xs text-center px-6">{product.name}</p>
                 </div>
               )}
+            </div>
+              <ProductImageThumbs images={images} activeIndex={imgIdx} onSelect={setImgIdx} />
             </div>
             <div className="flex flex-col gap-6">
               {infoBlock}

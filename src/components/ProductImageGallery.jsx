@@ -31,6 +31,10 @@ export default function ProductImageGallery({
   // con Supply multi-tenant, fotos de estudios de cualquier proporción
   // ya no tenían un formato consistente entre sí).
   square = false,
+  // hoverScrub (2026-09-21): en las cards de catálogo ya no hay varias fotos
+  // (solo la portada); en la ficha las fotos se eligen con miniaturas, así
+  // que mover el mouse por la foto grande NO debe cambiarla.
+  hoverScrub = true,
 }) {
   const [internalIdx, setInternalIdx] = useState(0)
   const controlled = activeIndex != null
@@ -41,7 +45,7 @@ export default function ProductImageGallery({
   const src = square ? cloudinarySquare(images[idx]) : images[idx]
 
   const handleMouseMove = (e) => {
-    if (!multi) return
+    if (!multi || !hoverScrub) return
     const rect = e.currentTarget.getBoundingClientRect()
     const ratio = (e.clientX - rect.left) / rect.width
     const next = Math.min(images.length - 1, Math.max(0, Math.floor(ratio * images.length)))

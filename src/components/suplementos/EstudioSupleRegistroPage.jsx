@@ -105,7 +105,8 @@ export default function EstudioSupleRegistroPage() {
       fd.append('folder', 'inkognito-suple-vendedores')
       const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, { method: 'POST', body: fd })
       const data = await res.json()
-      if (data.secure_url) setForm((f) => ({ ...f, logo_url: data.secure_url }))
+      if (!data.secure_url) throw new Error(data.error?.message || 'No se pudo subir la imagen')
+      setForm((f) => ({ ...f, logo_url: data.secure_url }))
     } catch {
       setError('No pudimos subir esa foto — intenta de nuevo.')
     } finally {
