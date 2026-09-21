@@ -1,12 +1,10 @@
-import { useState } from 'react'
-import { Link, useNavigate, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router-dom'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import GymMobileNav from '../GymMobileNav'
 import { fetchCatalogPage } from '../../../hooks/useCatalog'
-import { useGymCart } from '../../../contexts/GymCartContext'
-import { GYM_CART_CATEGORY, gymCartKey, gymCartItem, gymFormatPrice } from '../../../lib/gymCart'
-import { Wrench, ExternalLink, ArrowLeft, ArrowRight, ShoppingCart, Check } from 'lucide-react'
+import GymMaquinaCard from '../GymMaquinaCard'
+import { Wrench, ExternalLink, ArrowLeft, ArrowRight } from 'lucide-react'
 import { getAdjacentCategories } from '../../../data/gymCategoriesOrder'
 import { useScrolled } from '../../../hooks/useScrolled'
 
@@ -15,7 +13,7 @@ const WA = '573207911013'
 
 const GRID_PATTERN = {
   backgroundImage:
-    'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
+    'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(24,24,27,1) 39px,rgba(24,24,27,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(24,24,27,1) 39px,rgba(24,24,27,1) 40px)',
 }
 
 // Paginación real (2026-09-14) — antes traía TODO gym (fetchCatalogFull)
@@ -43,63 +41,19 @@ export function meta() {
 }
 
 export default function MaquinasPedidoPage() {
-  const navigate = useNavigate()
-  // Qué máquina tiene su modal de descripción abierto en móvil — mismo
-  // patrón que StoreProductCard/SupplyProductCard/SuplCard, pero como estas
-  // cards se renderizan inline (no en un sub-componente propio) alcanza con
-  // guardar el id en vez de un estado local por card (2026-08-02).
-  const [showDescId, setShowDescId] = useState(null)
   const { maquinas: apiMaquinas, afiliadosMateriales: gymAfiliados } = useLoaderData()
-  const { addItem, removeItem, items: cartItems } = useGymCart()
   const { prev, next } = getAdjacentCategories('maquinas-pedido')
   const scrolled = useScrolled()
 
-  // id = nombre de la máquina, no el índice del array (2026-09-20, dinámica
-  // de card al nivel de los demás módulos — mismo motivo que gymCart.js) —
-  // inventoryId real de inventory, sin esto el pedido no queda ligado a la
-  // fila real (2026-08-02) y tampoco la ficha (GymProductDetailPage.jsx)
-  // sabría qué producto abrir.
-  const productosFinales = apiMaquinas.map((item) => ({
-    id:          item.name,
-    inventoryId: item.variantes?.[0]?.id ?? null,
-    nombre:      item.name,
-    descripcion: item.descripcion || '',
-    precio:      item.variantes?.[0]?.price || null,
-    stock:       item.variantes?.[0]?.stock ?? null,
-    // Sin foto de referencia si no hay image_url real (2026-09-20, Jose:
-    // "si no tiene imagen, simplemente no se muestra imagen") — antes caía
-    // a una foto fija de otra máquina para que la card no se viera vacía;
-    // ahora, sin foto real, la card muestra "Imagen próximamente" (ver
-    // más abajo) tal como ya lo hacen Supply/Store/Suple.
-    image1:      item.image_url || null,
-  }))
-
-  // Toggle agregar/quitar (2026-09-20) — antes solo agregaba (sin forma de
-  // quitar desde la card); mismo patrón que SuplCard.jsx/StoreProductCard.jsx.
-  const handleToggleCart = (p) => {
-    const key = gymCartKey(p.nombre)
-    if (cartItems.some(i => i.key === key)) {
-      removeItem(key)
-      return
-    }
-    addItem(gymCartItem({
-      nombre:      p.nombre,
-      price:       gymFormatPrice(p.precio),
-      inventoryId: p.inventoryId,
-      image:       p.image1 || '',
-      stock:       p.stock,
-    }), GYM_CART_CATEGORY)
-  }
-
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-white text-zinc-900">
       <NavbarGym />
 
       {scrolled && prev && (
         <Link
           to={`/gym/${prev.slug}`} replace
           aria-label={`Ver ${prev.name}`}
-          className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-gray-400 hover:text-white bg-black/60 backdrop-blur-sm border border-gray-800 rounded-full p-2 transition-colors"
+          className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-600 hover:text-zinc-900 bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
         >
           <ArrowLeft size={20} />
         </Link>
@@ -108,7 +62,7 @@ export default function MaquinasPedidoPage() {
         <Link
           to={`/gym/${next.slug}`} replace
           aria-label={`Ver ${next.name}`}
-          className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-gray-400 hover:text-white bg-black/60 backdrop-blur-sm border border-gray-800 rounded-full p-2 transition-colors"
+          className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-600 hover:text-zinc-900 bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
         >
           <ArrowRight size={20} />
         </Link>
@@ -116,29 +70,28 @@ export default function MaquinasPedidoPage() {
 
       {/* HERO */}
       <section className="relative pt-16 md:pt-24 pb-6 md:pb-10 px-4 md:px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
           <div className="flex items-center gap-3 mb-2">
             {prev && (
-              <Link to={`/gym/${prev.slug}`} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
+              <Link to={`/gym/${prev.slug}`} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-500 hover:text-zinc-900 transition-colors">
                 <ArrowLeft size={18} />
               </Link>
             )}
-            <p className="flex-1 text-center uppercase tracking-[0.25em] text-gray-500 text-xs">Categoría</p>
+            <p className="flex-1 text-center uppercase tracking-[0.25em] text-zinc-500 text-xs">Categoría</p>
             {next && (
-              <Link to={`/gym/${next.slug}`} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
+              <Link to={`/gym/${next.slug}`} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-500 hover:text-zinc-900 transition-colors">
                 <ArrowRight size={18} />
               </Link>
             )}
           </div>
           <div className="flex items-center justify-center md:justify-between gap-3 md:gap-4 mb-4">
             <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none text-center md:text-left">
-              Máquinas <span className="text-gray-400">bajo pedido</span>
+              Máquinas <span className="text-zinc-500">bajo pedido</span>
             </h1>
-            <Wrench size={40} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+            <Wrench size={40} className="text-zinc-300 flex-shrink-0 md:hidden" strokeWidth={1} />
           </div>
-          <p className="text-gray-400 leading-relaxed max-w-2xl text-justify [hyphens:auto]">
+          <p className="text-zinc-600 leading-relaxed max-w-2xl text-justify [hyphens:auto]">
             Cada máquina sale de Chigorodó, hecha a mano con soldadura profesional y acero calibre grueso, lista para uso intenso diario. La tuya puede llegar a cualquier rincón de Colombia — cuéntanos qué necesitas y dónde estás.
           </p>
         </div>
@@ -146,110 +99,34 @@ export default function MaquinasPedidoPage() {
 
       {/* GRID */}
       <div className="pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto pt-6 md:pt-8">
-        {productosFinales.length === 0 && (
-          <div className="border border-gray-800 bg-gray-900/30 rounded-2xl py-16 text-center">
-            <p className="text-gray-500 uppercase tracking-[0.25em] text-sm mb-2">Catálogo en preparación</p>
-            <p className="text-gray-600 text-sm mb-6 max-w-sm mx-auto">Estamos cargando las máquinas disponibles. Mientras tanto, cuéntanos qué necesitas por WhatsApp.</p>
+        {apiMaquinas.length === 0 && (
+          <div className="border border-zinc-200 bg-zinc-50 rounded-2xl py-16 text-center">
+            <p className="text-zinc-500 uppercase tracking-[0.25em] text-sm mb-2">Catálogo en preparación</p>
+            <p className="text-zinc-400 text-sm mb-6 max-w-sm mx-auto">Estamos cargando las máquinas disponibles. Mientras tanto, cuéntanos qué necesitas por WhatsApp.</p>
             <a
               href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero consultar disponibilidad de máquinas de gym bajo pedido.')}`}
               target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-gray-950 font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-gray-200 transition"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-700 text-white font-bold uppercase tracking-[0.15em] text-xs rounded hover:bg-zinc-800 transition"
             >
               Consultar por WhatsApp →
             </a>
           </div>
         )}
-        <div className={`flex md:grid md:grid-cols-3 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide ${productosFinales.length === 0 ? 'hidden' : ''}`}>
-          {productosFinales.map((p) => {
-            const enCarrito = cartItems.some(i => i.key === gymCartKey(p.nombre))
-            return (
-              <div
-                key={p.id}
-                className="snap-start flex-shrink-0 w-[46vw] md:w-auto border border-gray-800 bg-gray-800/40 rounded-2xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
-              >
-                {/* IMAGEN — clic abre la ficha completa, mismo patrón que
-                    SuplCard.jsx/StoreProductCard.jsx (2026-09-20). El ícono
-                    de carrito pasa de botón ancho abajo a círculo incrustado
-                    en la foto (ShoppingCart ↔ Check, toggle). */}
-                <div
-                  className={`relative w-full aspect-video bg-gray-800 flex items-center justify-center flex-shrink-0 ${p.inventoryId ? 'cursor-pointer' : ''}`}
-                  onClick={p.inventoryId ? () => navigate(`/gym/producto/${p.inventoryId}`) : undefined}
-                >
-                  {p.image1
-                    ? <img src={p.image1} alt={p.nombre} className="w-full h-full object-cover" />
-                    : <span className="text-gray-700 text-xs uppercase tracking-widest text-center px-4">Imagen próximamente</span>
-                  }
-                  {/* stopPropagation: el contenedor también navega a la
-                      ficha — sin esto, tocar el ícono también navegaría. */}
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); handleToggleCart(p) }}
-                    aria-label={enCarrito ? 'Quitar del carrito' : 'Agregar al carrito'}
-                    className={`absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center shadow-md transition-all duration-300 ${
-                      enCarrito ? 'bg-white text-gray-950' : 'bg-black/60 text-white hover:bg-black/90'
-                    }`}
-                  >
-                    {enCarrito ? <Check size={13} /> : <ShoppingCart size={12} />}
-                  </button>
-                </div>
-
-                {/* INFO */}
-                <div className="p-3 flex flex-col flex-1">
-                  <div className="flex gap-1.5 mb-1">
-                    <span className="text-[9px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-2 py-0.5">Bajo pedido</span>
-                    <span className="text-[9px] font-bold uppercase tracking-widest bg-gray-700 text-gray-400 rounded-full px-2 py-0.5">Envío nacional</span>
-                  </div>
-                  <h3 className="font-black uppercase text-xs leading-tight mb-1">{p.nombre}</h3>
-                  <p className="text-white text-xs font-black">{gymFormatPrice(p.precio) || 'Desde $XX.000'}</p>
-                  {p.descripcion && (
-                    <>
-                      {/* Escritorio — texto completo, mismo patrón que
-                          Store/Supply/Suplementos (2026-08-02) */}
-                      <p className="hidden md:block text-gray-500 text-[9.5px] leading-snug mt-1.5">{p.descripcion}</p>
-                      {/* Móvil — botón que abre modal */}
-                      <button
-                        type="button"
-                        onClick={() => setShowDescId(p.id)}
-                        className="md:hidden self-start mt-1.5 text-gray-500 text-[9px] font-bold uppercase tracking-[0.15em] underline underline-offset-2"
-                      >
-                        Ver descripción
-                      </button>
-                    </>
-                  )}
-                  <div className="mt-auto" />
-                </div>
-
-                {showDescId === p.id && (
-                  <div
-                    className="md:hidden fixed inset-0 z-50 bg-black/70 flex items-end justify-center"
-                    onClick={() => setShowDescId(null)}
-                  >
-                    <div
-                      className="w-full max-w-md bg-gray-900 border-t border-gray-800 rounded-t-2xl p-5"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-xs font-black uppercase tracking-widest text-white">Descripción</h4>
-                        <button onClick={() => setShowDescId(null)} className="text-gray-500 text-lg leading-none px-1">✕</button>
-                      </div>
-                      <p className="text-gray-400 text-sm leading-relaxed">{p.descripcion}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )
-          })}
+        <div className={`flex md:grid md:grid-cols-3 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide ${apiMaquinas.length === 0 ? 'hidden' : ''}`}>
+          {apiMaquinas.map((item) => (
+            <GymMaquinaCard key={item.name} item={item} className="snap-start flex-shrink-0 w-[46vw] md:w-auto" />
+          ))}
         </div>
       </div>
 
       {/* ── PIEZAS Y MATERIALES — sección fija, siempre visible ── */}
-      <section className="border-t-2 border-yellow-500/20 bg-[#0c0c0c] px-4 md:px-6 py-10 md:py-14">
+      <section className="border-t-2 border-yellow-500/30 bg-zinc-50 px-4 md:px-6 py-10 md:py-14">
         <div className="max-w-7xl mx-auto">
-          <p className="text-yellow-400/70 text-[10px] font-bold uppercase tracking-widest mb-1">✦ Lo que necesitas para construir, disponible hoy</p>
-          <h2 className="text-2xl md:text-3xl font-black uppercase leading-none mb-2 text-white">
+          <p className="text-yellow-700 text-[10px] font-bold uppercase tracking-widest mb-1">✦ Lo que necesitas para construir, disponible hoy</p>
+          <h2 className="text-2xl md:text-3xl font-black uppercase leading-none mb-2 text-zinc-900">
             Fabrica sin que te falte nada
           </h2>
-          <p className="text-gray-500 text-sm mb-8 max-w-lg leading-relaxed">
+          <p className="text-zinc-500 text-sm mb-8 max-w-lg leading-relaxed">
             Ruedas, poleas, cables y componentes disponibles en AliExpress y Mercado Libre con envío a toda Colombia. Material verificado para que no improvises ni pagues de más. Un gym propio empieza con las piezas correctas.
           </p>
           {gymAfiliados.length > 0 ? (
@@ -257,21 +134,21 @@ export default function MaquinasPedidoPage() {
               {gymAfiliados.map((item, i) => {
                 const url = item.url_ventas || item.url_checkout || null
                 const inner = (
-                  <div className="border border-yellow-500/15 bg-gray-950 rounded-2xl overflow-hidden flex flex-col h-full hover:border-yellow-500/40 hover:shadow-[0_0_16px_rgba(234,179,8,0.08)] transition-all duration-300">
-                    <div className="aspect-square w-full bg-gray-900 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                  <div className="border border-yellow-500/30 bg-white rounded-2xl overflow-hidden flex flex-col h-full hover:border-yellow-500/60 hover:shadow-md transition-all duration-300">
+                    <div className="aspect-square w-full bg-zinc-50 overflow-hidden flex-shrink-0 flex items-center justify-center">
                       {item.image_url
                         ? <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" loading="lazy" />
-                        : <ExternalLink size={28} className="text-gray-700" strokeWidth={1} />
+                        : <ExternalLink size={28} className="text-zinc-300" strokeWidth={1} />
                       }
                     </div>
                     <div className="p-3 flex flex-col gap-1.5 flex-1">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-yellow-400/70">Recurso externo · {item.plataforma || item.categoria}</span>
-                      <h3 className="text-xs font-black uppercase leading-tight text-white">{item.name}</h3>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-yellow-700">Recurso externo · {item.plataforma || item.categoria}</span>
+                      <h3 className="text-xs font-black uppercase leading-tight text-zinc-900">{item.name}</h3>
                       {item.descripcion && (
-                        <p className="text-gray-500 text-[10px] leading-relaxed flex-1">{item.descripcion}</p>
+                        <p className="text-zinc-500 text-[10px] leading-relaxed flex-1">{item.descripcion}</p>
                       )}
                       {url && (
-                        <span className="mt-auto pt-1 text-[9px] font-bold uppercase tracking-widest text-yellow-400 flex items-center gap-1">
+                        <span className="mt-auto pt-1 text-[9px] font-bold uppercase tracking-widest text-yellow-700 flex items-center gap-1">
                           Ver producto <ExternalLink size={9} />
                         </span>
                       )}
@@ -284,7 +161,7 @@ export default function MaquinasPedidoPage() {
               })}
             </div>
           ) : (
-            <CategoriaVaciaCard className="border border-yellow-500/15 bg-gray-950" labelClassName="text-gray-500" titleClassName="text-white" />
+            <CategoriaVaciaCard className="border border-yellow-500/30 bg-white" />
           )}
         </div>
       </section>

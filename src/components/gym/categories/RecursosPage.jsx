@@ -11,7 +11,7 @@ import { useScrolled } from '../../../hooks/useScrolled'
 import CategoriaVaciaCard from '../../CategoriaVaciaCard'
 const GRID_PATTERN = {
   backgroundImage:
-    'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
+    'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(24,24,27,1) 39px,rgba(24,24,27,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(24,24,27,1) 39px,rgba(24,24,27,1) 40px)',
 }
 
 
@@ -40,14 +40,14 @@ export default function RecursosPage() {
   const scrolled = useScrolled()
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-white text-zinc-900">
       <NavbarGym />
 
       {scrolled && prev && (
         <Link
           to={`/gym/${prev.slug}`} replace
           aria-label={`Ver ${prev.name}`}
-          className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-gray-400 hover:text-white bg-black/60 backdrop-blur-sm border border-gray-800 rounded-full p-2 transition-colors"
+          className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-600 hover:text-zinc-900 bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
         >
           <ArrowLeft size={20} />
         </Link>
@@ -56,7 +56,7 @@ export default function RecursosPage() {
         <Link
           to={`/gym/${next.slug}`} replace
           aria-label={`Ver ${next.name}`}
-          className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-gray-400 hover:text-white bg-black/60 backdrop-blur-sm border border-gray-800 rounded-full p-2 transition-colors"
+          className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-600 hover:text-zinc-900 bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
         >
           <ArrowRight size={20} />
         </Link>
@@ -64,33 +64,32 @@ export default function RecursosPage() {
 
       {/* HERO */}
       <section className="relative pt-16 md:pt-24 pb-6 md:pb-10 px-4 md:px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
         <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
           <div className="flex items-center gap-3 mb-2">
             {prev && (
-              <Link to={`/gym/${prev.slug}`} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
+              <Link to={`/gym/${prev.slug}`} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-500 hover:text-zinc-900 transition-colors">
                 <ArrowLeft size={18} />
               </Link>
             )}
-            <p className="flex-1 text-center uppercase tracking-[0.25em] text-gray-500 text-xs">Categoría</p>
+            <p className="flex-1 text-center uppercase tracking-[0.25em] text-zinc-500 text-xs">Categoría</p>
             {next && (
-              <Link to={`/gym/${next.slug}`} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-gray-500 hover:text-white transition-colors">
+              <Link to={`/gym/${next.slug}`} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-500 hover:text-zinc-900 transition-colors">
                 <ArrowRight size={18} />
               </Link>
             )}
           </div>
           <div className="flex items-center justify-center md:justify-between gap-3 md:gap-4 mb-4">
             <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none text-center md:text-left">
-              Recursos <span className="text-gray-400">gratuitos</span>
+              Recursos <span className="text-zinc-500">gratuitos</span>
             </h1>
             <BookOpen
               size={40}
-              className="text-gray-800 flex-shrink-0 md:hidden"
+              className="text-zinc-300 flex-shrink-0 md:hidden"
               strokeWidth={1}
             />
           </div>
-          <p className="text-gray-400 leading-relaxed max-w-2xl text-justify [hyphens:auto]">
+          <p className="text-zinc-600 leading-relaxed max-w-2xl text-justify [hyphens:auto]">
             Ebooks y guías gratuitas nacidas de mi propia experiencia — construyendo mi gym desde cero, entrenando sin equipo y aprendiendo a base de prueba y error. Si a mí me sirvió, puede servirte a ti. Descárgalos y empieza donde estás.
           </p>
         </div>
@@ -105,10 +104,10 @@ export default function RecursosPage() {
               return (
                 <div
                   key={eb.name}
-                  className="border border-gray-800 bg-gray-800/40 rounded-xl overflow-hidden flex flex-col hover:border-gray-600 transition-all duration-300"
+                  className="border border-zinc-200 bg-white rounded-xl overflow-hidden flex flex-col hover:border-zinc-400 transition-all duration-300"
                 >
                   {/* PORTADA — proporción de libro (3:4), sin recortar el contenido */}
-                  <div className="relative bg-gray-800 flex items-center justify-center aspect-[3/4]">
+                  <div className="relative bg-zinc-100 flex items-center justify-center aspect-[3/4]">
                     {eb.image_url ? (
                       <img
                         src={eb.image_url}
@@ -117,23 +116,23 @@ export default function RecursosPage() {
                         onError={(e) => { e.target.style.display = 'none' }}
                       />
                     ) : (
-                      <span className="text-gray-700 text-[9px] uppercase tracking-widest">Portada próximamente</span>
+                      <span className="text-zinc-300 text-[9px] uppercase tracking-widest">Portada próximamente</span>
                     )}
                   </div>
 
                   {/* INFO — ancho completo, título arriba, botón abajo */}
-                  <div className="p-2 flex flex-col flex-1 border-t border-gray-800">
+                  <div className="p-2 flex flex-col flex-1 border-t border-zinc-200">
                     <div className="flex-1">
                       <h2 className="font-black uppercase text-[11px] leading-tight mb-1">{eb.name}</h2>
                       {eb.descripcion && (
-                        <p className="text-gray-500 text-[10px] leading-relaxed line-clamp-2">{eb.descripcion}</p>
+                        <p className="text-zinc-500 text-[10px] leading-relaxed line-clamp-2">{eb.descripcion}</p>
                       )}
                     </div>
-                    <div className="mt-2 pt-1.5 border-t border-gray-800">
+                    <div className="mt-2 pt-1.5 border-t border-zinc-200">
                       <a
                         href={url}
                         target="_blank" rel="noopener noreferrer"
-                        className="block text-center bg-white text-gray-950 font-black uppercase tracking-[0.1em] text-[10px] py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-300"
+                        className="block text-center bg-zinc-700 text-white font-black uppercase tracking-[0.1em] text-[10px] py-1.5 rounded-lg hover:bg-zinc-800 transition-all duration-300"
                       >
                         Descargar gratis
                       </a>
@@ -144,25 +143,25 @@ export default function RecursosPage() {
             })}
           </div>
         ) : (
-          <CategoriaVaciaCard className="border border-gray-800 bg-gray-800/40" labelClassName="text-gray-400" titleClassName="text-white" />
+          <CategoriaVaciaCard />
         )}
 
         {/* SECCIÓN REDES */}
-        <div className="mt-8 border-t border-gray-800 pt-8 text-center max-w-xl mx-auto">
-          <p className="text-gray-400 leading-relaxed text-sm md:text-base mb-8">
+        <div className="mt-8 border-t border-zinc-200 pt-8 text-center max-w-xl mx-auto">
+          <p className="text-zinc-600 leading-relaxed text-sm md:text-base mb-8">
             Si estos recursos te fueron de ayuda, te invito a seguirme en mis redes y a suscribirte a mi canal de YouTube — ahí comparto todo el proceso de construir esto desde cero.
           </p>
           <div className="flex items-center justify-center gap-8">
             <a href="https://www.instagram.com/jhumaneztattoo" target="_blank" rel="noopener noreferrer"
-               className="text-gray-500 hover:text-white transition-colors duration-300">
+               className="text-zinc-500 hover:text-zinc-900 transition-colors duration-300">
               <FaInstagram size={28} />
             </a>
             <a href="https://www.facebook.com/jhumaneztattoo" target="_blank" rel="noopener noreferrer"
-               className="text-gray-500 hover:text-white transition-colors duration-300">
+               className="text-zinc-500 hover:text-zinc-900 transition-colors duration-300">
               <FaFacebookF size={28} />
             </a>
             <a href="https://www.youtube.com/@JhumanezZ" target="_blank" rel="noopener noreferrer"
-               className="text-gray-500 hover:text-white transition-colors duration-300">
+               className="text-zinc-500 hover:text-zinc-900 transition-colors duration-300">
               <FaYoutube size={28} />
             </a>
           </div>

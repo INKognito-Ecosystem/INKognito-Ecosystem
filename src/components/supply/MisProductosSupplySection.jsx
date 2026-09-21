@@ -101,6 +101,11 @@ export default function MisProductosSupplySection({ token, cloud_name, upload_pr
   const [varianteDe, setVarianteDe] = useState(null)
   const fileInput = useRef(null)
   const masterSearchTimer = useRef(null)
+  // Autollenado de la descripción (ver prefillDescripcion más abajo):
+  // prefillSeq numera cada pedido para que solo cuente el último;
+  // marcaTimer da un respiro mientras se escribe una marca de texto libre.
+  const prefillSeq = useRef(0)
+  const marcaTimer = useRef(null)
   const cargadoRef = useRef(false)
   // Tabla tipo Excel (2026-08-27, Jose: "como hemos venido organizando los
   // del panel... si son muchos que se vean bien organizados en columnas,
@@ -159,6 +164,7 @@ export default function MisProductosSupplySection({ token, cloud_name, upload_pr
   }
 
   const iniciarEdicion = (p) => {
+    prefillSeq.current++
     setError(null)
     setEditando(p.id)
     setVarianteDe(null)
@@ -166,7 +172,7 @@ export default function MisProductosSupplySection({ token, cloud_name, upload_pr
     setNuevo({ product: p.product, variant: p.variant || '', price: p.price, stock: p.stock, categoria: p.categoria, marca: p.marca || '', image_url: p.image_url || '', descripcion: p.descripcion || '', descripcionAuto: false, master_product_id: null })
     setFormAbierto(true)
   }
-  const cancelarEdicion = () => { setEditando(null); setVarianteDe(null); setNuevo(PRODUCTO_VACIO); setMasterResults([]); setError(null); setFormAbierto(false) }
+  const cancelarEdicion = () => { prefillSeq.current++; setEditando(null); setVarianteDe(null); setNuevo(PRODUCTO_VACIO); setMasterResults([]); setError(null); setFormAbierto(false) }
   const abrirNuevoProducto = () => {
     setError(null)
     setEditando(null)
@@ -174,6 +180,9 @@ export default function MisProductosSupplySection({ token, cloud_name, upload_pr
     setMasterResults([])
     setNuevo(PRODUCTO_VACIO)
     setFormAbierto(true)
+    // La categoría ya viene elegida (la primera de la lista): la descripción
+    // se llena desde el primer momento, no solo después de cambiarla.
+    prefillDescripcion(PRODUCTO_VACIO.categoria, '')
   }
 
   // Agregar una variante (talla, sabor, color...) de un producto propio ya
@@ -183,6 +192,7 @@ export default function MisProductosSupplySection({ token, cloud_name, upload_pr
   // de Supply en vez de crear un producto aparte por una diferencia de
   // texto (mayúsculas, espacios) al retipear el nombre a mano.
   const agregarVariante = (p) => {
+    prefillSeq.current++
     setError(null)
     setEditando(null)
     setVarianteDe(p.product)
@@ -207,21 +217,31 @@ export default function MisProductosSupplySection({ token, cloud_name, upload_pr
     }, 300)
   }
 
-  // Autocompletar la descripción EN VIVO al elegir categoría/marca (no solo
-  // al guardar, que confundía — Jose, 2026-08-09: "mientras subía producto
-  // tampoco se autocompletó de manera automática"). Nunca pisa algo que el
-  // proveedor ya haya escrito — mismo criterio que la cascada del servidor.
+  // Autollenado de la descripción (Jose, 2026-08-09: "mientras subía producto
+  // tampoco se autocompletó de manera automática"; endurecido 2026-09-21).
+  // Al abrir el formulario y cada vez que cambia la categoría/marca se pide
+  // el texto por defecto (tabla catalogo_defaults del panel, editable por
+  // Jose). Reglas:
+  //  - Solo pisa lo que llegó solo: si el proveedor la escribió a mano, o vino de
+  //    un producto real (editar, catálogo maestro), no se toca; si la borra,
+  //    vuelve a poder llenarse.
+  //  - Si dos cambios seguidos hacen que las respuestas lleguen desordenadas
+  //    (o el formulario ya cambió de categoría), solo cuenta la última.
+  //  - Si la categoría nueva no tiene texto por defecto, el texto automático
+  //    de la anterior se quita: nunca queda la descripción de una categoría
+  //    dentro de un producto de otra.
   const prefillDescripcion = async (categoria, marca) => {
+    const mio = ++prefillSeq.current
     try {
       const res = await fetch(`${PANEL_URL}/api/catalogo-defaults-lookup?module=supply&categoria=${encodeURIComponent(categoria || '')}&marca=${encodeURIComponent(marca || '')}`)
-      const data = await res.json()
-      // Se refresca si el campo está vacío O si lo que hay ahí sigue
-      // siendo una sugerencia automática de una elección anterior — pero
-      // nunca si el proveedor ya la escribió a mano o vino de un
-      // producto real (editar, vincular del buscador).
-      if (data.descripcion) {
-        setNuevo((n) => (n.descripcion && !n.descripcionAuto ? n : { ...n, descripcion: data.descripcion, descripcionAuto: true }))
-      }
+      const data = res.ok ? await res.json() : {}
+      if (mio !== prefillSeq.current) return
+      setNuevo((n) => {
+        if ((n.categoria || '') !== (categoria || '')) return n
+        if (n.descripcion && !n.descripcionAuto) return n
+        if (data.descripcion) return { ...n, descripcion: data.descripcion, descripcionAuto: true }
+        return n.descripcionAuto ? { ...n, descripcion: '', descripcionAuto: false } : n
+      })
     } catch { /* silencioso — el proveedor siempre puede escribirla a mano */ }
   }
 
@@ -232,11 +252,13 @@ export default function MisProductosSupplySection({ token, cloud_name, upload_pr
       categoria: item.categoria || n.categoria,
       marca: item.marca || n.marca,
       descripcion: item.descripcion || n.descripcion,
-      descripcionAuto: false,
+      descripcionAuto: item.descripcion ? false : n.descripcionAuto,
       image_url: n.image_url || item.image_url || '',
       master_product_id: item.id,
     }))
     setMasterResults([])
+    // Sin descripción propia, la de la categoría (posiblemente otra) se recalcula.
+    if (!item.descripcion) prefillDescripcion(item.categoria || nuevo.categoria, item.marca || nuevo.marca)
   }
 
   const guardar = async () => {

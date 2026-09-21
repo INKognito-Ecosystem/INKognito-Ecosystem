@@ -167,6 +167,15 @@ export default [
   // Suplementos era una página de Gym — se independizó como módulo propio
   // (2026-08-02). Redirect preserva links/SEO viejos de /gym/suplementos.
   route('gym/suplementos', 'routes/RedirectGymSuplementos.jsx'),
+  // Tienda de Gym (2026-09-21, Jose: "solo habrá una tienda en este módulo y
+  // será la mía... así podría compartir directamente la tienda") — perfil
+  // público de la tienda "INKognito Gym Equipment" con sus máquinas. Sin
+  // panel de dueño: se gestiona desde el panel admin. Declaradas DESPUÉS de
+  // las rutas fijas de arriba (las estáticas ganan igual, pero así queda
+  // claro); el loader solo acepta filas `tipo='gym'`, así que /gym/<slug de
+  // otro módulo> no muestra nada.
+  route('gym/estudio/:id', 'components/gym/EstudioGymPage.jsx'),
+  route('gym/:slug', 'components/gym/EstudioGymPage.jsx', { id: 'gym-tienda-slug' }),
 
   // Suple (INKognito Suple — suplementos deportivos, módulo propio)
   route('suplementos', 'components/suplementos/SuplePage.jsx'),

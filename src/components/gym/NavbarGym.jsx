@@ -9,12 +9,15 @@ const LINK = 'uppercase text-sm tracking-[0.2em] text-gray-400 hover:text-white 
 const MOBILE_LINK = 'block px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300'
 const MOBILE_BTN  = 'block w-full text-left px-6 py-4 uppercase text-xs tracking-[0.2em] text-gray-400 hover:text-white hover:bg-gray-900 transition-all duration-300 bg-transparent border-none cursor-pointer'
 
+// 2026-09-21 (Jose, Gym pasa a fondo blanco como los demás módulos): este
+// navbar es lo ÚNICO oscuro que queda arriba — barra negra con el logo, el
+// texto "GYM SYSTEM", el botón de compartir, el carrito y el menú en blanco.
 // Navbar de Gym System (2026-09-20, Jose: "en el navbar de arriba, agregarás
 // el botón compartir al costado derecho, y ahora se llamará en el navbar gym
 // system, y no solo gym"). En móvil el carrito y el menú ya no viven acá:
 // pasaron al tab bar inferior (GymMobileNav.jsx, mismo esquema de los demás
 // módulos); en escritorio se mantienen con sus links de siempre.
-export default function NavbarGym() {
+export default function NavbarGym({ shareTitle = 'INKognito Gym System' }) {
   const [menuOpen, setMenuOpen]   = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [shareMsg, setShareMsg] = useState(null)
@@ -28,7 +31,7 @@ export default function NavbarGym() {
     const base = import.meta.env.VITE_SITE_URL || (typeof window !== 'undefined' ? window.location.origin : '')
     const url = `${base}${pathname}`
     if (navigator.share) {
-      try { await navigator.share({ title: 'INKognito Gym System', url }) } catch {}
+      try { await navigator.share({ title: shareTitle, url }) } catch {}
       return
     }
     try {
@@ -52,7 +55,7 @@ export default function NavbarGym() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full z-50 bg-gray-950 border-b border-gray-800">
+      <nav className="fixed top-0 left-0 w-full z-50 bg-black border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-6">
           <div className="h-16 md:h-20 flex items-center justify-between">
 
@@ -64,11 +67,11 @@ export default function NavbarGym() {
                 cero para quien ya la había visto — texto estático, como
                 queda siempre el wordmark al terminar de animar. */}
             <Link to="/gym" className="flex items-center gap-2">
-              <img src={logoGym} alt="INKognito Gym" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
-              <span className="font-black uppercase tracking-wide md:tracking-[0.2em] text-xl md:text-2xl text-gray-400 whitespace-nowrap">
+              <img src={logoGym} alt="INKognito Gym" className="w-12 h-12 md:w-14 md:h-14 object-contain brightness-0 invert" />
+              <span className="font-black uppercase tracking-wide md:tracking-[0.2em] text-xl md:text-2xl text-white whitespace-nowrap">
                 GYM SYSTEM
               </span>
-              <Dumbbell size={18} className="text-gray-500" />
+              <Dumbbell size={18} className="text-white" />
             </Link>
 
             {/* MENÚ DESKTOP */}
@@ -88,7 +91,7 @@ export default function NavbarGym() {
                 <button
                   onClick={compartir}
                   aria-label="Compartir"
-                  className="text-gray-400 hover:text-white transition-all duration-300"
+                  className="text-white hover:text-zinc-300 transition-all duration-300"
                 >
                   <Share2 size={20} />
                 </button>
@@ -101,7 +104,7 @@ export default function NavbarGym() {
               <div className="hidden md:flex items-center gap-4">
                 <button
                   onClick={() => setDrawerOpen(true)}
-                  className="relative text-gray-400 hover:text-white transition-all duration-300"
+                  className="relative text-white hover:text-zinc-300 transition-all duration-300"
                   aria-label="Abrir carrito"
                 >
                   <ShoppingCart size={20} />
@@ -114,7 +117,7 @@ export default function NavbarGym() {
                 <button
                   onClick={() => setMenuOpen(!menuOpen)}
                   aria-label="Abrir menú"
-                  className="text-gray-400 hover:text-white transition-all duration-300"
+                  className="text-white hover:text-zinc-300 transition-all duration-300"
                 >
                   {menuOpen ? <X size={22} /> : <Menu size={22} />}
                 </button>
@@ -125,14 +128,14 @@ export default function NavbarGym() {
 
         {/* DROPDOWN MÓVIL */}
         {menuOpen && (
-          <div className="fixed left-0 right-0 top-16 md:top-20 bg-gray-950 border-t border-gray-700 z-50 max-h-[calc(100vh-4rem)] overflow-y-auto">
+          <div className="fixed left-0 right-0 top-16 md:top-20 bg-black border-t border-zinc-800 z-50 max-h-[calc(100vh-4rem)] overflow-y-auto">
             <Link to="/gym"                 onClick={close} className={MOBILE_LINK}>Inicio</Link>
             <Link to="/gym/maquinas-pedido" onClick={close} className={MOBILE_LINK}>Máquinas</Link>
             <button                         onClick={goToPlanos} className={MOBILE_BTN}>Planos</button>
             <Link to="/gym/tutoriales"      onClick={close} className={MOBILE_LINK}>Tutoriales</Link>
             <Link to="/gym/cursos"          onClick={close} className={MOBILE_LINK}>Cursos</Link>
             <Link to="/gym/recursos"        onClick={close} className={MOBILE_LINK}>Recursos</Link>
-            <div className="border-t border-gray-800 mt-1 pt-1">
+            <div className="border-t border-zinc-800 mt-1 pt-1">
               <Link to="/jhumaneztattoo" onClick={close} className={MOBILE_LINK}>JHumanezTattoo</Link>
               <Link to="/supply"         onClick={close} className={MOBILE_LINK}>INKognito Supply</Link>
               <Link to="/store"          onClick={close} className={MOBILE_LINK}>INKognito Store</Link>

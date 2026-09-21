@@ -13,11 +13,12 @@ const inputClass = 'w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-
 // de SUPPLY_MARCAS/MARCAS_POR_CATEGORIA — Store no tiene páginas curadas
 // por marca como sí tiene Supply, así que `marca` acá es texto libre en
 // vez de una lista cerrada.
-// 'Accesorios' (2026-08-31, Jose: tiendas subirán gorras) no tiene página
-// de categoría propia todavía — el producto igual aparece en el catálogo
-// de SU tienda (EstudioTiendaPage.jsx filtra por lo que haya, no por esta
-// lista fija), solo no navega desde una card de categoría en el hub.
-const STORE_CATEGORIAS_ESTUDIO = ['Ropa Dama', 'Ropa Caballeros', 'Zapatos Deportivos', 'Zapatos Casuales', 'Guayos', 'Teniguayos', 'Ropa General', 'Accesorios']
+// Mismos nombres EXACTOS que STORE_CATEGORIAS_ESTUDIO de server.js, que
+// CATEGORIA_DB de cada página pública de categoría y que las llaves de
+// catalogo_defaults (module 'store'). 2026-09-21: antes decía 'Teniguayos'
+// (la página lee 'Tenis y guayo': esos productos no salían en ninguna
+// categoría) y el servidor rechazaba 'Accesorios'.
+const STORE_CATEGORIAS_ESTUDIO = ['Ropa Dama', 'Ropa Caballeros', 'Ropa General', 'Zapatos Deportivos', 'Zapatos Casuales', 'Guayos', 'Tenis y guayo', 'Accesorios']
 const PRODUCTO_VACIO_TIENDA = { product: '', variant: '', price: '', stock: '', categoria: STORE_CATEGORIAS_ESTUDIO[0], marca: '', image_url: '', descripcion: '', descripcionAuto: false, master_product_id: null }
 
 // "Mis productos en Store" (Store multitenant) — relocada 2026-08-30 al
@@ -43,6 +44,11 @@ export default function MisProductosTiendaSection({ token, cloud_name, upload_pr
   const [varianteDe, setVarianteDe] = useState(null)
   const fileInput = useRef(null)
   const masterSearchTimer = useRef(null)
+  // Autollenado de la descripción (ver prefillDescripcion más abajo):
+  // prefillSeq numera cada pedido para que solo cuente el último;
+  // marcaTimer da un respiro mientras se escribe una marca de texto libre.
+  const prefillSeq = useRef(0)
+  const marcaTimer = useRef(null)
   const [formAbierto, setFormAbierto] = useState(false)
   const [verGrupo, setVerGrupo] = useState(null)
   const [grupoExpandido, setGrupoExpandido] = useState(null)
@@ -93,6 +99,7 @@ export default function MisProductosTiendaSection({ token, cloud_name, upload_pr
   }
 
   const iniciarEdicion = (p) => {
+    prefillSeq.current++
     setError(null)
     setEditando(p.id)
     setVarianteDe(null)
@@ -100,7 +107,7 @@ export default function MisProductosTiendaSection({ token, cloud_name, upload_pr
     setNuevo({ product: p.product, variant: p.variant || '', price: p.price, stock: p.stock, categoria: p.categoria, marca: p.marca || '', image_url: p.image_url || '', descripcion: p.descripcion || '', descripcionAuto: false, master_product_id: null })
     setFormAbierto(true)
   }
-  const cancelarEdicion = () => { setEditando(null); setVarianteDe(null); setNuevo(PRODUCTO_VACIO_TIENDA); setMasterResults([]); setError(null); setFormAbierto(false) }
+  const cancelarEdicion = () => { prefillSeq.current++; setEditando(null); setVarianteDe(null); setNuevo(PRODUCTO_VACIO_TIENDA); setMasterResults([]); setError(null); setFormAbierto(false) }
   const abrirNuevoProducto = () => {
     setError(null)
     setEditando(null)
@@ -108,9 +115,13 @@ export default function MisProductosTiendaSection({ token, cloud_name, upload_pr
     setMasterResults([])
     setNuevo(PRODUCTO_VACIO_TIENDA)
     setFormAbierto(true)
+    // La categoría ya viene elegida (la primera de la lista): la descripción
+    // se llena desde el primer momento, no solo después de cambiarla.
+    prefillDescripcion(PRODUCTO_VACIO_TIENDA.categoria, '')
   }
 
   const agregarVariante = (p) => {
+    prefillSeq.current++
     setError(null)
     setEditando(null)
     setVarianteDe(p.product)
@@ -132,13 +143,31 @@ export default function MisProductosTiendaSection({ token, cloud_name, upload_pr
     }, 300)
   }
 
+  // Autollenado de la descripción (Jose, 2026-08-09: "mientras subía producto
+  // tampoco se autocompletó de manera automática"; endurecido 2026-09-21).
+  // Al abrir el formulario y cada vez que cambia la categoría/marca se pide
+  // el texto por defecto (tabla catalogo_defaults del panel, editable por
+  // Jose). Reglas:
+  //  - Solo pisa lo que llegó solo: si la tienda la escribió a mano, o vino de
+  //    un producto real (editar, catálogo maestro), no se toca; si la borra,
+  //    vuelve a poder llenarse.
+  //  - Si dos cambios seguidos hacen que las respuestas lleguen desordenadas
+  //    (o el formulario ya cambió de categoría), solo cuenta la última.
+  //  - Si la categoría nueva no tiene texto por defecto, el texto automático
+  //    de la anterior se quita: nunca queda la descripción de una categoría
+  //    dentro de un producto de otra.
   const prefillDescripcion = async (categoria, marca) => {
+    const mio = ++prefillSeq.current
     try {
       const res = await fetch(`${PANEL_URL}/api/catalogo-defaults-lookup?module=store&categoria=${encodeURIComponent(categoria || '')}&marca=${encodeURIComponent(marca || '')}`)
-      const data = await res.json()
-      if (data.descripcion) {
-        setNuevo((n) => (n.descripcion && !n.descripcionAuto ? n : { ...n, descripcion: data.descripcion, descripcionAuto: true }))
-      }
+      const data = res.ok ? await res.json() : {}
+      if (mio !== prefillSeq.current) return
+      setNuevo((n) => {
+        if ((n.categoria || '') !== (categoria || '')) return n
+        if (n.descripcion && !n.descripcionAuto) return n
+        if (data.descripcion) return { ...n, descripcion: data.descripcion, descripcionAuto: true }
+        return n.descripcionAuto ? { ...n, descripcion: '', descripcionAuto: false } : n
+      })
     } catch { /* silencioso — la tienda siempre puede escribirla a mano */ }
   }
 
@@ -149,11 +178,13 @@ export default function MisProductosTiendaSection({ token, cloud_name, upload_pr
       categoria: item.categoria || n.categoria,
       marca: item.marca || n.marca,
       descripcion: item.descripcion || n.descripcion,
-      descripcionAuto: false,
+      descripcionAuto: item.descripcion ? false : n.descripcionAuto,
       image_url: n.image_url || item.image_url || '',
       master_product_id: item.id,
     }))
     setMasterResults([])
+    // Sin descripción propia, la de la categoría (posiblemente otra) se recalcula.
+    if (!item.descripcion) prefillDescripcion(item.categoria || nuevo.categoria, item.marca || nuevo.marca)
   }
 
   const guardar = async () => {
@@ -418,7 +449,12 @@ export default function MisProductosTiendaSection({ token, cloud_name, upload_pr
                     placeholder="Marca (opcional)"
                     readOnly={categoriaMarcaBloqueada}
                     value={nuevo.marca}
-                    onChange={(e) => { setNuevo((n) => ({ ...n, marca: e.target.value })); prefillDescripcion(nuevo.categoria, e.target.value) }}
+                    onChange={(e) => {
+                      const marca = e.target.value
+                      setNuevo((n) => ({ ...n, marca }))
+                      clearTimeout(marcaTimer.current)
+                      marcaTimer.current = setTimeout(() => prefillDescripcion(nuevo.categoria, marca), 350)
+                    }}
                   />
                   {nuevo.master_product_id && !varianteDe && (
                     <div className="flex items-center justify-between bg-green-50 rounded-md px-2.5 py-1.5 -mt-1">

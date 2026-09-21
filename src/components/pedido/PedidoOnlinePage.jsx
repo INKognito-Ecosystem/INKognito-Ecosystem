@@ -38,11 +38,12 @@ const MUNICIPIOS = Object.keys(MUNICIPIO_LABELS)
 
 const MODULE_LABELS = { supply: 'INKognito Supply', store: 'INKognito Store', gym: 'INKognito Gym', suplementos: 'INKognito Suple' }
 
-// Tema claro SOLO para Suplementos (2026-09-19, migración de Suple a fondo
-// blanco, Jose: el flujo carrito → pedido debe quedar todo blanco). Supply,
-// Store y Gym siguen con las clases oscuras de siempre: cada lugar que
-// cambia usa `c(oscuro, claro)` — el primer argumento es exactamente la
-// clase que ya había, así que para esos módulos el resultado es idéntico.
+// Tema claro para Suplementos (2026-09-19, migración de Suple a fondo
+// blanco, Jose: el flujo carrito → pedido debe quedar todo blanco) y para Gym
+// (2026-09-21, misma migración). Supply y Store siguen con las clases
+// oscuras de siempre: cada lugar que cambia usa `c(oscuro, claro)` — el
+// primer argumento es exactamente la clase que ya había, así que para esos
+// módulos el resultado es idéntico.
 function ColHead({ n, title, sub, light = false }) {
   return (
     <div className="flex items-center gap-2.5 mb-5">
@@ -96,7 +97,8 @@ function MiniFooter({ moduleLabel, light = false }) {
 // no hace falta serializar nada al navegar aquí desde el drawer.
 export default function PedidoOnlinePage() {
   const { module } = useParams()
-  const light = module === 'suplementos'
+  // Suple y Gym van en claro (Gym pasó a fondo blanco el 2026-09-21).
+  const light = module === 'suplementos' || module === 'gym'
   const c = (dark, lite) => (light ? lite : dark)
   const supplyCart = useSupplyCart()
   const storeCart = useStoreCart()

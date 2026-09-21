@@ -10,9 +10,15 @@ import { GYM_SECCIONES } from '../../data/gymSecciones'
 const ogGym = '/og/gym.webp'
 const WA = '573207911013'
 
+// Cuadrícula decorativa — clara (líneas grises) para las tarjetas oscuras que
+// se quedan como estaban, oscura (líneas casi negras) para el fondo blanco.
 const GRID_PATTERN = {
   backgroundImage:
     'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
+}
+const GRID_PATTERN_CLARO = {
+  backgroundImage:
+    'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(24,24,27,1) 39px,rgba(24,24,27,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(24,24,27,1) 39px,rgba(24,24,27,1) 40px)',
 }
 
 const gymJsonLd = {
@@ -43,7 +49,7 @@ const gymJsonLd = {
 
 const RIBBON_ITEM = 'flex-shrink-0 text-[13px] font-extrabold text-white/70 pb-1.5 border-b-2 border-transparent whitespace-nowrap'
 
-const CARD_CLASS = 'border border-gray-800 bg-gray-900/60 rounded-xl p-4 md:p-5 flex flex-col gap-3 min-h-[190px] md:min-h-[210px] hover:border-gray-600 hover:bg-gray-900/80 transition-all duration-300 group'
+const CARD_CLASS = 'border border-gray-800 bg-gray-950 rounded-xl p-4 md:p-5 flex flex-col gap-3 min-h-[190px] md:min-h-[210px] hover:border-gray-600 hover:bg-gray-900 transition-all duration-300 group'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL
 
@@ -98,7 +104,7 @@ export default function GymPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-white text-zinc-900">
       <NavbarGym />
 
       {/* CATEGORÍAS — listón (2026-09-20, Jose: "que se muestren en un listón
@@ -152,7 +158,7 @@ export default function GymPage() {
         />
         <div className="relative z-10">
           <p className="uppercase tracking-[0.25em] text-zinc-300 text-[10px] font-semibold mb-2">INKognito Gym — Urabá</p>
-          <h1 className="text-2xl font-black uppercase leading-[1.1] mb-2">
+          <h1 className="text-2xl font-black uppercase leading-[1.1] mb-2 text-white">
             Tu gym en casa, <span className="inline-block bg-white text-gray-950 px-1.5 -mx-0.5">a tu medida</span>
           </h1>
           <p className="text-zinc-300 text-xs leading-relaxed mb-5 max-w-[18rem]">
@@ -178,25 +184,20 @@ export default function GymPage() {
 
       {/* HERO — solo escritorio; en móvil lo reemplaza el banner de arriba. */}
       <section className="hidden md:block relative pt-24 md:pt-32 pb-8 md:pb-14 px-4 md:px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-900" />
-        <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN} />
-        {/* Resplandor debajo del navbar — mismo recurso que ya usan Store/
-            Eljach en sus hero, acá en blanco/gris porque Gym no tiene color
-            de acento (2026-08-02). */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] max-w-[90vw] h-[280px] rounded-full bg-white/10 blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN_CLARO} />
         <div className="relative z-10 max-w-7xl mx-auto text-center md:text-left">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase leading-none mb-5">
             Construyo mi<br />
-            <span className="text-gray-400">propio gym</span><br />
+            <span className="text-zinc-600">propio gym</span><br />
             desde cero
           </h1>
           <button
             onClick={() => setHistoriaModalOpen(true)}
-            className="inline-block border border-gray-600 text-gray-300 text-sm font-bold uppercase tracking-[0.2em] py-3 px-7 rounded hover:border-gray-300 hover:text-white transition-all duration-300"
+            className="inline-block border border-zinc-400 text-zinc-700 text-sm font-bold uppercase tracking-[0.2em] py-3 px-7 rounded hover:border-zinc-600 hover:text-zinc-900 transition-all duration-300"
           >
             Nuestra historia
           </button>
-          <p className="mt-5 text-gray-400 text-xs md:text-sm italic tracking-wide">
+          <p className="mt-5 text-zinc-600 text-xs md:text-sm italic tracking-wide">
             “Hago arte para no morir, desafío cuerpo y mente.”
           </p>
         </div>
@@ -208,12 +209,12 @@ export default function GymPage() {
           descripción quedaban sueltos. En escritorio siguen con su grilla de
           tarjetas. */}
       <section className="hidden md:block pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-gray-800 pt-3 md:pt-8">
+        <div className="border-t border-zinc-200 pt-3 md:pt-8">
           <div className="mb-4 md:mb-8">
             <h2 className="float-left mr-6 md:mr-8 mb-2 text-base md:text-3xl font-black uppercase leading-none whitespace-nowrap">
               Lo que puedes conseguir aquí
             </h2>
-            <p className="text-gray-400 text-sm leading-relaxed text-justify [hyphens:auto]">
+            <p className="text-zinc-600 text-sm leading-relaxed text-justify [hyphens:auto]">
               Todo lo que necesitas para entrenar en casa sin depender de un gimnasio comercial:
               máquinas de gym fabricadas con soldadura profesional en Chigorodó, Urabá, planos
               técnicos para construir tu propio equipo, suplementos, tutoriales en video y
@@ -239,7 +240,7 @@ export default function GymPage() {
                       <Icon size={20} className="text-gray-400 group-hover:text-white transition-colors duration-300" />
                     </div>
                   )}
-                  <h3 className="text-sm md:text-base font-black uppercase tracking-wide leading-tight text-center md:text-left">{s.titulo}</h3>
+                  <h3 className="text-sm md:text-base font-black uppercase tracking-wide leading-tight text-center md:text-left text-white">{s.titulo}</h3>
                   <p className="text-xs md:text-sm leading-relaxed text-gray-500 group-hover:text-gray-400 transition-colors duration-300 flex-1 text-justify [hyphens:auto] text-center md:text-left">{s.texto}</p>
                 </>
               )
@@ -274,15 +275,15 @@ export default function GymPage() {
 
       {/* PLANOS DIGITALES */}
       <section id="planos" className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-gray-800 pt-3 md:pt-8">
+        <div className="border-t border-zinc-200 pt-3 md:pt-8">
           <div className="mb-6">
             <div className="float-left flex items-center gap-3 mr-6 md:mr-8 mb-2">
               <h2 className="text-base md:text-3xl font-black uppercase leading-none whitespace-nowrap">
                 Planos digitales
               </h2>
-              <FileText size={24} className="text-gray-800 flex-shrink-0 md:hidden" strokeWidth={1} />
+              <FileText size={24} className="text-zinc-300 flex-shrink-0 md:hidden" strokeWidth={1} />
             </div>
-            <p className="text-gray-400 text-sm md:text-base leading-relaxed text-justify [hyphens:auto]">
+            <p className="text-zinc-600 text-sm md:text-base leading-relaxed text-justify [hyphens:auto]">
               Planos técnicos completos en PDF, con medidas exactas y lista de materiales — para
               construir tus propias máquinas de gym en casa, en cualquier ciudad de Colombia.
               Pensados para uso personal o para quien quiere empezar su propio negocio de
@@ -306,7 +307,7 @@ export default function GymPage() {
                 <span className="inline-block text-[10px] font-black uppercase tracking-[0.25em] bg-white text-gray-950 rounded-full px-3 py-1 mb-4">
                   Acceso total
                 </span>
-                <h3 className="text-2xl md:text-3xl font-black uppercase leading-tight mb-3">
+                <h3 className="text-2xl md:text-3xl font-black uppercase leading-tight mb-3 text-white">
                   Membresía de por vida
                 </h3>
                 <p className="text-zinc-200 leading-relaxed text-sm md:text-base">
@@ -337,12 +338,12 @@ export default function GymPage() {
 
       {/* MIS CREACIONES */}
       <section className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-gray-800 pt-3 md:pt-8">
+        <div className="border-t border-zinc-200 pt-3 md:pt-8">
           <div className="mb-4 md:mb-8">
             <h2 className="float-left mr-6 md:mr-8 mb-2 text-base md:text-3xl font-black uppercase leading-none whitespace-nowrap">
               Mis creaciones
             </h2>
-            <p className="text-gray-400 text-sm leading-relaxed text-justify [hyphens:auto]">
+            <p className="text-zinc-600 text-sm leading-relaxed text-justify [hyphens:auto]">
               Portafolio real de máquinas construidas con mis propias manos — la prueba de que
               se puede entrenar fuerte sin gastar en equipos comerciales o importados. Cada
               pieza fabricada con soldadura profesional, pensada para durar años de uso intenso.
@@ -362,7 +363,7 @@ export default function GymPage() {
                     setCreacionImgActiva(0)
                     setCreacionSeleccionada(c)
                   }}
-                  className={`group relative aspect-square overflow-hidden rounded-xl border border-gray-800 bg-gray-900 text-left ${(c.descripcion || c.image_urls?.length > 1) ? 'cursor-pointer' : 'cursor-default'}`}
+                  className={`group relative aspect-square overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50 text-left ${(c.descripcion || c.image_urls?.length > 1) ? 'cursor-pointer' : 'cursor-default'}`}
                 >
                   <img
                     src={c.image_url}
@@ -373,16 +374,16 @@ export default function GymPage() {
                   {(c.titulo || c.categoria) && (
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent px-3 py-2.5">
                       {c.titulo && <p className="text-white text-xs md:text-sm font-bold leading-tight">{c.titulo}</p>}
-                      {c.categoria && <p className="text-gray-400 text-[10px] uppercase tracking-wide">{c.categoria}</p>}
+                      {c.categoria && <p className="text-gray-300 text-[10px] uppercase tracking-wide">{c.categoria}</p>}
                     </div>
                   )}
                 </button>
               ))}
             </div>
           ) : (
-            <div className="border border-gray-800 bg-gray-900/30 rounded-2xl py-20 text-center">
-              <p className="text-gray-500 uppercase tracking-[0.25em] text-sm mb-2">Próximamente</p>
-              <p className="text-gray-600 text-sm">Estamos cargando el portafolio de máquinas</p>
+            <div className="border border-zinc-200 bg-zinc-50 rounded-2xl py-20 text-center">
+              <p className="text-zinc-500 uppercase tracking-[0.25em] text-sm mb-2">Próximamente</p>
+              <p className="text-zinc-400 text-sm">Estamos cargando el portafolio de máquinas</p>
             </div>
           )}
         </div>
@@ -390,12 +391,12 @@ export default function GymPage() {
 
       {/* MÁQUINAS BAJO PEDIDO + CONTACTO — UNIFICADO */}
       <section className="pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-gray-800 pt-3 md:pt-8">
+        <div className="border-t border-zinc-200 pt-3 md:pt-8">
           <div className="mb-5 md:mb-8">
             <h2 className="float-left mr-6 md:mr-8 mb-2 text-base md:text-3xl font-black uppercase leading-none whitespace-nowrap">
               Máquinas bajo pedido
             </h2>
-            <p className="text-gray-400 text-sm leading-relaxed text-justify [hyphens:auto]">
+            <p className="text-zinc-600 text-sm leading-relaxed text-justify [hyphens:auto]">
               Máquinas de gym fabricadas a tu medida, con acero y soldadura profesional, en
               Chigorodó, Urabá — con envíos a toda Colombia. Cuéntanos qué necesitas construir
               y te damos un presupuesto real, sin intermediarios.
@@ -403,7 +404,7 @@ export default function GymPage() {
             <div className="clear-both" />
             <Link
               to="/gym/maquinas-pedido"
-              className="hidden md:inline-block mt-4 text-xs font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-white border border-gray-700 hover:border-gray-400 px-5 py-3 rounded transition-all duration-300"
+              className="hidden md:inline-block mt-4 text-xs font-bold uppercase tracking-[0.2em] text-zinc-600 hover:text-zinc-900 border border-zinc-300 hover:border-zinc-600 px-5 py-3 rounded transition-all duration-300"
             >
               Ver catálogo →
             </Link>
@@ -419,7 +420,7 @@ export default function GymPage() {
               <Wrench size={22} className="text-zinc-200" />
             </div>
             <p className="relative z-10 uppercase tracking-[0.25em] text-zinc-300 text-xs mb-4">Contacto directo</p>
-            <h3 className="relative z-10 text-2xl md:text-4xl font-black uppercase leading-none mb-4">
+            <h3 className="relative z-10 text-2xl md:text-4xl font-black uppercase leading-none mb-4 text-white">
               ¿Tienes alguna<br />
               <span className="text-zinc-300">idea en mente?</span>
             </h3>
@@ -453,42 +454,42 @@ export default function GymPage() {
       {/* MODAL NUESTRA HISTORIA */}
       {historiaModalOpen && (
         <div
-          className="fixed inset-0 bg-black/80 z-[80] flex items-center justify-center p-4 overflow-y-auto"
+          className="fixed inset-0 bg-black/60 z-[80] flex items-center justify-center p-4 overflow-y-auto"
           onClick={() => setHistoriaModalOpen(false)}
         >
           <div
-            className="relative bg-gray-950 border border-gray-800 rounded-2xl w-full max-w-xl mx-auto my-auto p-8 md:p-10 max-h-[90vh] overflow-y-auto"
+            className="relative bg-white border border-zinc-200 rounded-2xl w-full max-w-xl mx-auto my-auto p-8 md:p-10 max-h-[90vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
             <button
               onClick={() => setHistoriaModalOpen(false)}
               aria-label="Cerrar"
-              className="absolute top-5 right-6 text-gray-500 hover:text-white text-2xl leading-none bg-transparent border-none cursor-pointer"
+              className="absolute top-5 right-6 text-zinc-500 hover:text-zinc-900 text-2xl leading-none bg-transparent border-none cursor-pointer"
             >✕</button>
 
-            <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-6">Nuestra historia</p>
+            <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-6">Nuestra historia</p>
 
-            <p className="text-white text-base md:text-lg font-bold leading-relaxed mb-6 italic">
+            <p className="text-zinc-900 text-base md:text-lg font-bold leading-relaxed mb-6 italic">
               "Empecé como cualquiera: queriendo entrenar, sin poder pagar un gimnasio."
             </p>
 
-            <p className="text-gray-400 text-sm leading-relaxed mb-5">
+            <p className="text-zinc-600 text-sm leading-relaxed mb-5">
               No tenía el dinero para una membresía mensual, ni para comprar máquinas comerciales que cuestan millones. Así que hice lo que sabía hacer: aprendí a soldar, conseguí una pulidora, y empecé a construir mis propias herramientas — primero mancuernas de cemento, después discos, y con el tiempo, máquinas completas.
             </p>
 
-            <p className="text-gray-400 text-sm leading-relaxed mb-5">
+            <p className="text-zinc-600 text-sm leading-relaxed mb-5">
               Hoy entreno en mi propio gym, hecho con mis manos, en Chigorodó. Y me di cuenta de algo: si yo lo necesitaba, seguro hay muchas personas en Urabá y en toda Colombia que también quieren entrenar fuerte, sin gastar lo que cuesta un gimnasio comercial o una máquina importada.
             </p>
 
-            <p className="text-gray-400 text-sm leading-relaxed mb-5">
+            <p className="text-zinc-600 text-sm leading-relaxed mb-5">
               Por eso fabrico estas máquinas — con la misma calidad y resistencia que uso yo mismo todos los días, pero a un precio que tenga sentido para la gente real. No es un negocio que inventé desde un escritorio — es algo que vivo, que uso, y que sé que funciona.
             </p>
 
-            <p className="text-gray-400 text-sm leading-relaxed mb-8">
+            <p className="text-zinc-600 text-sm leading-relaxed mb-8">
               Si tú también quieres construirte a ti mismo, sin importar dónde empiezas, aquí tienes una alternativa real.
             </p>
 
-            <p className="text-white font-black uppercase tracking-[0.15em] text-sm">— Jose</p>
+            <p className="text-zinc-900 font-black uppercase tracking-[0.15em] text-sm">— Jose</p>
           </div>
         </div>
       )}
@@ -498,11 +499,11 @@ export default function GymPage() {
           (el título/categoría ya se ven en la card sin necesidad de clic). */}
       {creacionSeleccionada && (
         <div
-          className="fixed inset-0 bg-black/80 z-[80] flex items-center justify-center p-4 overflow-y-auto"
+          className="fixed inset-0 bg-black/60 z-[80] flex items-center justify-center p-4 overflow-y-auto"
           onClick={() => setCreacionSeleccionada(null)}
         >
           <div
-            className="relative bg-gray-950 border border-gray-800 rounded-2xl w-full max-w-xl mx-auto my-auto overflow-hidden max-h-[90vh] overflow-y-auto"
+            className="relative bg-white border border-zinc-200 rounded-2xl w-full max-w-xl mx-auto my-auto overflow-hidden max-h-[90vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
             <button
@@ -516,13 +517,13 @@ export default function GymPage() {
               className="w-full max-h-[45vh] object-cover"
             />
             {creacionSeleccionada.image_urls?.length > 1 && (
-              <div className="flex gap-2 p-3 bg-gray-950">
+              <div className="flex gap-2 p-3 bg-white">
                 {creacionSeleccionada.image_urls.map((url, i) => (
                   <button
                     key={i}
                     type="button"
                     onClick={() => setCreacionImgActiva(i)}
-                    className={`w-14 h-14 rounded-lg overflow-hidden border-2 flex-shrink-0 ${i === creacionImgActiva ? 'border-white' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                    className={`w-14 h-14 rounded-lg overflow-hidden border-2 flex-shrink-0 ${i === creacionImgActiva ? 'border-zinc-900' : 'border-transparent opacity-60 hover:opacity-100'}`}
                   >
                     <img src={url} alt="" className="w-full h-full object-cover" />
                   </button>
@@ -531,12 +532,12 @@ export default function GymPage() {
             )}
             <div className="p-6 md:p-8">
               {creacionSeleccionada.categoria && (
-                <p className="uppercase tracking-[0.25em] text-gray-500 text-xs mb-2">{creacionSeleccionada.categoria}</p>
+                <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-2">{creacionSeleccionada.categoria}</p>
               )}
               {creacionSeleccionada.titulo && (
-                <h3 className="text-white text-xl md:text-2xl font-black uppercase leading-tight mb-4">{creacionSeleccionada.titulo}</h3>
+                <h3 className="text-zinc-900 text-xl md:text-2xl font-black uppercase leading-tight mb-4">{creacionSeleccionada.titulo}</h3>
               )}
-              <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-line">{creacionSeleccionada.descripcion}</p>
+              <p className="text-zinc-600 text-sm leading-relaxed whitespace-pre-line">{creacionSeleccionada.descripcion}</p>
             </div>
           </div>
         </div>

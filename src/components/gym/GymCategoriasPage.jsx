@@ -16,33 +16,53 @@ export function meta() {
   ]
 }
 
-const CARD_CLASS = 'border border-gray-800 bg-gray-900/60 rounded-xl p-4 md:p-5 flex flex-col gap-3 hover:border-gray-600 hover:bg-gray-900/80 transition-all duration-300 group'
+// Puntos decorativos de fondo — los mismos de CategoriesSuple.jsx.
+const DOT_PATTERN = {
+  backgroundImage: 'radial-gradient(rgba(24,24,27,1) 1px, transparent 1px)',
+  backgroundSize: '18px 18px',
+}
 
 // Página propia de categorías (2026-09-20) — enlazada desde la pestaña
 // "Categorías" del tab bar inferior (GymMobileNav.jsx), mismo patrón que
 // StoreCategoriasPage.jsx / SupleCategoriasPage.jsx / SupplyCategoriasPage.jsx.
-// Reúne las mismas tarjetas que en escritorio muestra el home de Gym; en
-// móvil el home ya no las trae (las categorías van en su listón).
+// 2026-09-21 (Jose: "la card de las categorías se ven como anchas, deben ser
+// iguales a las de los demás módulos"): mosaicos cuadrados de 2 columnas con
+// ícono + nombre, calco de CategoriesSuple.jsx. Las tarjetas anchas con
+// descripción quedan solo en el home de escritorio.
 export default function GymCategoriasPage() {
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-white text-zinc-900">
       <NavbarGym />
 
-      <section className="pt-24 md:pt-32 pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto">
-        <h1 className="text-2xl md:text-4xl font-black uppercase leading-none mb-5 md:mb-8">Categorías</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-          {GYM_SECCIONES.map(s => {
-            const Icon = s.icon
-            return (
-              <Link key={s.titulo} to={gymSeccionHref(s)} className={CARD_CLASS}>
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gray-800/80 border border-gray-700 flex items-center justify-center group-hover:border-gray-500 group-hover:scale-105 transition-all duration-300">
-                  <Icon size={20} className="text-gray-400 group-hover:text-white transition-colors duration-300" />
-                </div>
-                <h2 className="text-base font-black uppercase tracking-wide leading-tight">{s.titulo}</h2>
-                <p className="text-sm leading-relaxed text-gray-500 group-hover:text-gray-400 transition-colors duration-300">{s.texto}</p>
-              </Link>
-            )
-          })}
+      <section className="relative overflow-hidden pt-16 md:pt-20 pb-8 md:pb-12 bg-white">
+        <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={DOT_PATTERN} />
+        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-6 md:pt-8">
+          <div className="mb-4 md:mb-8">
+            <h1 className="float-left mr-6 md:mr-8 mb-2 text-2xl md:text-4xl font-black uppercase leading-none text-zinc-900">
+              Categorías
+            </h1>
+            <p className="text-zinc-500 text-sm leading-relaxed text-justify [hyphens:auto]">
+              Todo lo que necesitas para entrenar en casa, organizado por sección — máquinas,
+              planos, suplementos, tutoriales, cursos y recursos, desde Urabá a toda Colombia.
+            </p>
+            <div className="clear-both" />
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {GYM_SECCIONES.map(s => {
+              const Icon = s.icon
+              return (
+                <Link
+                  key={s.titulo}
+                  to={gymSeccionHref(s)}
+                  className="relative h-36 w-full border bg-white rounded-xl transition-all duration-300 overflow-hidden uppercase tracking-[0.08em] font-bold text-[10px] md:text-xs flex flex-col items-center justify-center gap-2 text-center px-1 border-zinc-200 md:hover:border-zinc-500 md:hover:shadow-md text-zinc-700"
+                >
+                  <Icon size={26} className="text-zinc-700" />
+                  <span>{s.titulo}</span>
+                </Link>
+              )
+            })}
+          </div>
         </div>
       </section>
 
