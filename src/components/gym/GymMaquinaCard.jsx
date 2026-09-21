@@ -7,9 +7,9 @@ import { GYM_CART_CATEGORY, gymCartKey, gymCartItem, gymFormatPrice } from '../.
 // Card de una máquina de Gym — sacada de MaquinasPedidoPage.jsx (2026-09-21)
 // para que la misma card se vea idéntica en "Máquinas bajo pedido" y en la
 // página de la tienda (EstudioGymPage.jsx). Recibe el ítem tal cual lo
-// devuelve el catálogo paginado (`fetchCatalogPage`). Su ancho lo decide
-// quien la usa (`className`): carrusel en móvil en una página, grilla en la
-// otra.
+// devuelve el catálogo paginado (`fetchCatalogPage`). Su ancho lo decide la
+// grilla que la usa (2 columnas en móvil, como los demás módulos — ya no hay
+// filas con scroll horizontal).
 //
 // id = nombre de la máquina, no el índice del array (2026-09-20, dinámica de
 // card al nivel de los demás módulos — mismo motivo que gymCart.js) —
@@ -60,12 +60,21 @@ export default function GymMaquinaCard({ item, className = '' }) {
       {/* IMAGEN — clic abre la ficha completa, mismo patrón que
           SuplCard.jsx/StoreProductCard.jsx (2026-09-20). El ícono de carrito es
           un círculo incrustado en la foto (ShoppingCart ↔ Check, toggle). */}
+      {/* Cuadro SIEMPRE del mismo tamaño (2026-09-21, Jose: "las cards deben
+          tener el mismo tamaño... la imagen siempre su cuadro es el mismo
+          tamaño, mismo criterio que los demás módulos") — cuadrado como
+          SuplCard.jsx. Antes era aspect-video sin overflow-hidden y con la
+          imagen en el flujo: una foto más alta que ancha (dominadas y fondos)
+          empujaba el cuadro y agrandaba toda la card. Ahora la imagen va
+          `absolute inset-0` + object-cover dentro de un cuadro recortado, así
+          que ninguna foto puede cambiarle el tamaño; solo la descripción
+          puede alargar la card (hacia abajo, en el bloque de texto). */}
       <div
-        className={`relative w-full aspect-video bg-zinc-100 flex items-center justify-center flex-shrink-0 ${p.inventoryId ? 'cursor-pointer' : ''}`}
+        className={`relative w-full aspect-square overflow-hidden bg-zinc-100 flex items-center justify-center flex-shrink-0 ${p.inventoryId ? 'cursor-pointer' : ''}`}
         onClick={p.inventoryId ? () => navigate(`/gym/producto/${p.inventoryId}`) : undefined}
       >
         {p.image1
-          ? <img src={p.image1} alt={p.nombre} className="w-full h-full object-cover" />
+          ? <img src={p.image1} alt={p.nombre} className="absolute inset-0 w-full h-full object-cover" />
           : <span className="text-zinc-300 text-xs uppercase tracking-widest text-center px-4">Imagen próximamente</span>
         }
         {/* stopPropagation: el contenedor también navega a la ficha — sin

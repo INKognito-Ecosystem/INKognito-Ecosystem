@@ -45,7 +45,7 @@ export async function loader({ params, request }) {
   }
   if (estudio) {
     try {
-      const page = await fetchCatalogPage('gym', { tipo: 'fisico', limit: 100 })
+      const page = await fetchCatalogPage('gym', { tipo: 'fisico', limit: 100, orden: 'antiguos' })
       maquinas = page.items
     } catch {}
   }

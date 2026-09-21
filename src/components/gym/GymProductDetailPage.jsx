@@ -310,6 +310,25 @@ export default function GymProductDetailPage() {
     </div>
   )
 
+  // Ficha técnica (2026-09-21, Jose: "una ficha técnica a cada máquina, para
+  // que aparezca debajo de la landing de cada producto") — llega ya filtrada
+  // desde el panel: solo si Jose la marcó como publicada, y solo las filas
+  // con valor, así que si viene null/vacía no se dibuja nada.
+  const ficha = Array.isArray(product.ficha_tecnica) ? product.ficha_tecnica : []
+  const fichaBlock = ficha.length > 0 ? (
+    <section aria-labelledby="ficha-tecnica-titulo" className="w-full">
+      <h2 id="ficha-tecnica-titulo" className="text-zinc-900 text-sm font-black uppercase tracking-widest mb-3">Ficha técnica</h2>
+      <dl className="border border-zinc-200 rounded-xl overflow-hidden divide-y divide-zinc-100 bg-white">
+        {ficha.map((f) => (
+          <div key={f.etiqueta} className="grid grid-cols-[7.5rem_1fr] md:grid-cols-[13rem_1fr] gap-x-4 px-4 py-3">
+            <dt className="text-zinc-500 text-xs font-semibold leading-relaxed">{f.etiqueta}</dt>
+            <dd className="text-zinc-900 text-sm leading-relaxed">{f.valor}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  ) : null
+
   return (
     <div className="min-h-screen bg-white text-zinc-900">
 
@@ -364,6 +383,7 @@ export default function GymProductDetailPage() {
           {infoBlock}
           {ctaButtons}
           {origenBlock}
+          {fichaBlock}
         </div>
 
         <GymMobileNav />
@@ -400,6 +420,7 @@ export default function GymProductDetailPage() {
               {origenBlock}
             </div>
           </div>
+          {fichaBlock && <div className="mt-12 max-w-3xl">{fichaBlock}</div>}
         </div>
       </div>
 

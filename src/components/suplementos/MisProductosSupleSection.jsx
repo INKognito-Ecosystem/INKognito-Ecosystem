@@ -80,13 +80,29 @@ export default function MisProductosSupleSection({ token, cloud_name, upload_pre
   }
 
   const iniciarEdicion = (p) => {
-    prefillSeq.current++
+    const mio = ++prefillSeq.current
     setError(null)
     setEditando(p.id)
     setVarianteDe(null)
     setMasterResults([])
     setNuevo({ product: p.product, variant: p.variant || '', price: p.price, stock: p.stock, categoria: p.categoria, marca: p.marca || '', image_url: p.image_url || '', descripcion: p.descripcion || '', descripcionAuto: false, master_product_id: null })
     setFormAbierto(true)
+    detectarDescripcionAuto(p, mio)
+  }
+  // Al editar (2026-09-21, Jose: "estas descripciones no están cambiando de
+  // acuerdo a la categoría que elija"): si la descripción guardada es justo la
+  // de su categoría — la que se llenó sola al crear el producto —, sigue
+  // siendo "automática", así que cambiar la categoría la cambia también. Si
+  // alguien la escribió a mano, queda como está (misma regla que en el alta).
+  const detectarDescripcionAuto = async (p, mio) => {
+    try {
+      const res = await fetch(`${PANEL_URL}/api/catalogo-defaults-lookup?module=suplementos&categoria=${encodeURIComponent(p.categoria || '')}&marca=${encodeURIComponent(p.marca || '')}&producto=${encodeURIComponent(p.product || '')}`)
+      const data = res.ok ? await res.json() : {}
+      if (mio !== prefillSeq.current) return
+      if (data.descripcion && (p.descripcion || '').trim() === data.descripcion.trim()) {
+        setNuevo((n) => (n.categoria === p.categoria && n.descripcion === (p.descripcion || '') ? { ...n, descripcionAuto: true } : n))
+      }
+    } catch { /* silencioso — la descripción sigue siendo editable a mano */ }
   }
   const cancelarEdicion = () => { prefillSeq.current++; setEditando(null); setVarianteDe(null); setNuevo(PRODUCTO_VACIO_SUPLE); setMasterResults([]); setError(null); setFormAbierto(false) }
   const abrirNuevoProducto = () => {

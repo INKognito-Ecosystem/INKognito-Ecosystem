@@ -95,13 +95,13 @@ export default function CursosPage() {
 
       <div className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto pt-6 md:pt-8">
         {cursos.length > 0 ? (
-          <div className="flex md:grid md:grid-cols-2 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {cursos.map((curso) => {
               const url = curso.url_ventas || curso.url_checkout || '#'
               return (
                 <div
                   key={curso.name}
-                  className="snap-start flex-shrink-0 w-[72vw] md:w-auto border border-zinc-200 bg-white rounded-2xl overflow-hidden flex flex-col hover:border-zinc-400 transition-all duration-300"
+                  className="border border-zinc-200 bg-white rounded-2xl overflow-hidden flex flex-col hover:border-zinc-400 transition-all duration-300"
                 >
                   {curso.image_url && (
                     <div className="aspect-video w-full bg-zinc-50 overflow-hidden flex-shrink-0">

@@ -22,7 +22,9 @@ const GRID_PATTERN = {
 // alcanza sin necesitar "cargar más" — mismo criterio que Cursos/Recursos.
 export async function loader() {
   const [maquinasPage, afiliadosPage] = await Promise.all([
-    fetchCatalogPage('gym', { tipo: 'fisico', limit: 100 }),
+    // orden 'antiguos': las máquinas en el orden en que se crearon (banco
+    // primero, las nuevas al final) — no "la última creada arriba".
+    fetchCatalogPage('gym', { tipo: 'fisico', limit: 100, orden: 'antiguos' }),
     fetchCatalogPage('gym', { categoria: 'Materiales', tipo: 'afiliado', limit: 100 }),
   ])
   return { maquinas: maquinasPage.items, afiliadosMateriales: afiliadosPage.items }
@@ -112,9 +114,12 @@ export default function MaquinasPedidoPage() {
             </a>
           </div>
         )}
-        <div className={`flex md:grid md:grid-cols-3 gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-3 md:pb-0 scrollbar-hide ${apiMaquinas.length === 0 ? 'hidden' : ''}`}>
+        {/* Cuadrícula de 2 columnas en móvil, igual que los demás módulos
+            (2026-09-21, Jose: "las cards ya no se muestran con scroll
+            horizontal") — antes era una fila deslizable de cards de 46vw. */}
+        <div className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 ${apiMaquinas.length === 0 ? 'hidden' : ''}`}>
           {apiMaquinas.map((item) => (
-            <GymMaquinaCard key={item.name} item={item} className="snap-start flex-shrink-0 w-[46vw] md:w-auto" />
+            <GymMaquinaCard key={item.name} item={item} />
           ))}
         </div>
       </div>
@@ -130,7 +135,7 @@ export default function MaquinasPedidoPage() {
             Ruedas, poleas, cables y componentes disponibles en AliExpress y Mercado Libre con envío a toda Colombia. Material verificado para que no improvises ni pagues de más. Un gym propio empieza con las piezas correctas.
           </p>
           {gymAfiliados.length > 0 ? (
-            <div className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
               {gymAfiliados.map((item, i) => {
                 const url = item.url_ventas || item.url_checkout || null
                 const inner = (
@@ -156,8 +161,8 @@ export default function MaquinasPedidoPage() {
                   </div>
                 )
                 return url
-                  ? <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="snap-start flex-shrink-0 w-[44vw] md:w-auto">{inner}</a>
-                  : <div key={i} className="snap-start flex-shrink-0 w-[44vw] md:w-auto">{inner}</div>
+                  ? <a key={i} href={url} target="_blank" rel="noopener noreferrer">{inner}</a>
+                  : <div key={i}>{inner}</div>
               })}
             </div>
           ) : (
