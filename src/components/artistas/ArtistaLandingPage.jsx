@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
-import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle, Building2, Award, Tag, ClipboardList } from 'lucide-react'
+import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle, Building2, Award, ClipboardList } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { municipioDesdeNombreIP } from '../../data/colombiaGeo'
 import { idDesdeParam } from './artistaSlug'
@@ -567,14 +567,21 @@ export default function ArtistaLandingPage() {
                     ubicación, el estilo principal y la categoría de precio
                     en una sola barra de insignias debajo del nombre") —
                     antes ubicación y estilo iban apiladas en su propia
-                    línea cada una (2026-08-06) y el precio vivía aparte,
-                    pegado al borde derecho de toda la fila (ver más abajo,
-                    donde solo queda disponibilidad). Se unifican acá con
-                    un separador "•" — el link de Maps sigue siendo un
-                    <a> real (mismo mecanismo de siempre: link propio, o el
+                    línea cada una (2026-08-06). Se unifican acá con un
+                    separador "•" — el link de Maps sigue siendo un <a>
+                    real (mismo mecanismo de siempre: link propio, o el
                     punto capturado, o búsqueda por nombre+municipio), solo
                     que ahora comparte el mismo tratamiento visual plano
-                    que estilo/precio en vez de su propio botón con borde. */}
+                    que estilo en vez de su propio botón con borde.
+                    El precio (rango tarifario) SALIÓ de esta barra
+                    (2026-09-22, Jose: "debería aparecer justo en la zona
+                    donde estaba antes, justo debajo de la foto de portada
+                    en la esquina derecha, al frente del nombre... en
+                    editar el perfil este ítem sí aparece donde te lo estoy
+                    pidiendo") — vuelve a vivir pegado al borde derecho de
+                    toda la fila, como sigue estando en
+                    ArtistaEditarPerfilPage.jsx (nunca se movió ahí), ver el
+                    `<span>` fuera de este div, hermano de él. */}
                 <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[9px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500">
                   <a
                     href={urlGoogleMaps(artista)}
@@ -591,15 +598,6 @@ export default function ArtistaLandingPage() {
                       <span className="flex items-center gap-1 truncate">
                         <Palette size={10} className="flex-shrink-0" />
                         <span className="truncate">{artista.estilo}</span>
-                      </span>
-                    </>
-                  )}
-                  {artista.precio_nivel && (
-                    <>
-                      <span className="text-gray-300">•</span>
-                      <span className="flex items-center gap-1 flex-shrink-0">
-                        <Tag size={10} className="flex-shrink-0" />
-                        {'$'.repeat(artista.precio_nivel)}
                       </span>
                     </>
                   )}
@@ -629,6 +627,14 @@ export default function ArtistaLandingPage() {
                   )}
                 </div>
               </div>
+              {/* Rango tarifario ($$) — de vuelta pegado al borde derecho de
+                  la fila (2026-09-22), mismo `justify-between` del div
+                  padre y exactamente el mismo markup que
+                  ArtistaEditarPerfilPage.jsx (línea ~1453), para que el
+                  perfil público se vea igual que su vista de edición. */}
+              {artista.precio_nivel && (
+                <span className="flex-shrink-0 text-xs font-bold tracking-widest text-gray-500 pt-0.5">{'$'.repeat(artista.precio_nivel)}</span>
+              )}
             </div>
           </div>
 
