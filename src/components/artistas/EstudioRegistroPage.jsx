@@ -168,7 +168,12 @@ export default function EstudioRegistroPage() {
         </div>
       ) : (
         <div className="flex-1 pt-20 md:pt-24 max-w-2xl mx-auto px-4 pb-16 w-full">
-          <h1 className="text-xl font-black uppercase mb-2 text-center">Registra tu estudio</h1>
+          {/* Título de la página quitado (2026-09-22, Jose: "en el navbar
+              aparece 'Registrar estudio', luego el título más abajo dice
+              'Registra tu estudio'... es redundante, quita el título, y
+              solo deja el del navbar") — el <NavbarArtistas titulo="Registrar
+              estudio" /> de arriba ya cumple ese rol; el párrafo de abajo se
+              queda, no repite el título, explica qué hace el registro. */}
           <p className="text-gray-500 text-sm text-center mb-5">
             Agrupa a los artistas de tu equipo bajo un mismo perfil, y ayúdalos a que se sumen al buscador.
           </p>

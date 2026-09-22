@@ -539,8 +539,15 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
           envolviendo desde el hero en adelante, para que la portada llegue
           al borde real (o al borde de la columna max-w-3xl en escritorio).
           rounded-2xl también se quita de la portada — Artista no la tiene
-          redondeada, y ahora que llega al borde no tendría sentido. */}
-      <div className="max-w-3xl mx-auto lg:mx-0">
+          redondeada, y ahora que llega al borde no tendría sentido.
+          -mt-4 (2026-09-22, Jose: "en editar estudio la portada no pega
+          contra el navbar como sí lo hace en la vista para los clientes")
+          — el padre (`pt-20 md:pt-24`) despeja el navbar fijo (h-16/h-20)
+          con un colchón extra de 16px de sobra en ambos breakpoints; esto
+          lo cancela, mismo mecanismo que ya usa EditarPerfilTabs.jsx para
+          la portada de Artista. Solo dentro de esta pestaña (perfil) — la
+          barra con flecha de "equipo"/"supply" no lo necesita. */}
+      <div className="max-w-3xl mx-auto lg:mx-0 -mt-4">
 
       <div className="w-full h-40 sm:h-56 bg-gray-100 overflow-hidden relative">
         {form.foto_portada && <img src={form.foto_portada} alt="" className="w-full h-full object-cover" />}
