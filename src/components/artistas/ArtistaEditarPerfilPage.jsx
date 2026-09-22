@@ -4,7 +4,7 @@ import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, Ex
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
-import EditarPerfilTabs from './EditarPerfilTabs'
+import EditarPerfilTabs, { BotonMenuSecciones } from './EditarPerfilTabs'
 import { MESES_CALENDARIO, celdasDelMes } from './calendarioUtil'
 import { DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO } from '../../data/colombiaGeo'
 import { OPCIONES_DISPONIBILIDAD, DISPONIBILIDAD_COLOR, DISPONIBILIDAD_TEXTO } from './disponibilidad'
@@ -1342,6 +1342,12 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
       <div className="lg:max-w-3xl">
       <div className="w-full h-40 sm:h-56 md:h-72 bg-gray-100 overflow-hidden relative">
         {form.foto_url_2 && <img src={form.foto_url_2} alt="" className="w-full h-full object-cover" />}
+        {/* Botón de secciones incrustado en la esquina de la portada
+            (2026-09-22, Jose: "que quede en esa esquina, pero dentro de la
+            foto de portada, como lo hace Facebook") — antes era una barra
+            gris propia arriba de la portada; ahora vive acá, simétrico al
+            botón "Portada" de la esquina opuesta. */}
+        <BotonMenuSecciones className="absolute top-3 left-3 z-10 bg-black/50 text-white backdrop-blur-sm hover:bg-black/70" />
         <button
           type="button"
           onClick={() => elegirFoto('foto_url_2')}
@@ -1563,6 +1569,11 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
         </div>
       </div>
 
+      {/* aspect-[4/5] (2026-09-22, Jose: "el tamaño de las card de fotos
+          del portafolio... el que tienen las de Instagram, un poco más
+          largas de manera vertical") — antes aspect-square; mismo criterio
+          que el perfil público (ArtistaLandingPage.jsx), para que "mi
+          perfil editar" se vea igual a como queda publicado. */}
       <div className="mt-5 max-w-3xl mx-auto lg:mx-0">
         <div className="grid grid-cols-3 gap-0.5 sm:gap-1 w-full">
           {SLOTS.slice(2).map(({ key, label }) => (
@@ -1570,7 +1581,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
               key={key}
               type="button"
               onClick={() => elegirFoto(key)}
-              className="relative aspect-square bg-gray-50 overflow-hidden group"
+              className="relative aspect-[4/5] bg-gray-50 overflow-hidden group"
             >
               {form[key] ? (
                 <img src={form[key]} alt={label} className="w-full h-full object-cover" />
@@ -1769,6 +1780,13 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           a la izquierda, el hueco queda a la derecha. */}
       <div className="px-4 lg:px-0 lg:max-w-3xl">
 
+      {/* Esta pestaña no tiene portada donde incrustar el botón (ver "Mi
+          perfil" más arriba) — mismo botón suelto, para no perder la
+          forma de volver a cambiar de sección en móvil. */}
+      <div className="lg:hidden pt-3 mb-1">
+        <BotonMenuSecciones className="bg-gray-100 text-gray-700 hover:bg-gray-200" />
+      </div>
+
       <MisDisenosSection token={token} cloud_name={cloud_name} upload_preset={upload_preset} mpConectado={artista.mp_conectado} />
 
       </div>
@@ -1784,6 +1802,11 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           perfil"/"Mis diseños". Solo PC, sin mx-auto. */}
       <div className="lg:max-w-3xl">
       <div className="px-4 lg:px-0">
+      {/* Mismo botón suelto que "Mis diseños" — esta pestaña tampoco
+          tiene portada. */}
+      <div className="lg:hidden pt-3 mb-1">
+        <BotonMenuSecciones className="bg-gray-100 text-gray-700 hover:bg-gray-200" />
+      </div>
       <form onSubmit={guardar} className="space-y-4">
         {/* Reservas con anticipo (fase 2, 2026-08-06) — un solo campo
             obligatorio para activar el botón "Reservar" en el perfil: el
@@ -1882,6 +1905,20 @@ export default function ArtistaEditarPerfilPage() {
   const { token, artista, error, cloud_name, upload_preset, horario, reservas } = useLoaderData()
   const navigate = useNavigate()
 
+  // Evita el parpadeo de "pide tu correo" (2026-09-22, Jose: "si ya accedí,
+  // no debería mostrarme eso, debería cargar de una vez el perfil, eso solo
+  // aparece cuando la persona no ha registrado o cargado su perfil antes")
+  // — al entrar sin `?token=` en la URL (ej. desde "Mi cuenta → Artista" del
+  // navbar), el primer render de SIEMPRE (servidor y cliente, antes de que
+  // el efecto de abajo alcance a leer localStorage) no sabe todavía si hay
+  // una sesión guardada, así que `PedirLinkForm` se alcanzaba a pintar un
+  // instante antes de que el redirect con el token guardado lo reemplazara
+  // por el perfil real. `revisando` arranca en `true` solo en ese caso
+  // (con token en la URL no hace falta revisar nada) y se apaga recién
+  // cuando ya se sabe la respuesta real: hay token en la URL, o localStorage
+  // no tenía nada guardado.
+  const [revisando, setRevisando] = useState(!token)
+
   // Guardar el token válido para la próxima visita, y limpiar uno guardado
   // que ya no sirve (evita reintentar en bucle un token vencido guardado
   // de una sesión vieja).
@@ -1893,9 +1930,10 @@ export default function ArtistaEditarPerfilPage() {
   // Sin token en la URL — antes de mostrar "pide tu correo", intenta con
   // el que quedó guardado de una visita anterior.
   useEffect(() => {
-    if (token) return
+    if (token) { setRevisando(false); return }
     const guardado = localStorage.getItem(EDIT_TOKEN_KEY)
     if (guardado) navigate(`?token=${encodeURIComponent(guardado)}`, { replace: true })
+    else setRevisando(false)
   }, [token, navigate])
 
   return (
@@ -1908,7 +1946,11 @@ export default function ArtistaEditarPerfilPage() {
           se lo imponía). Mismo patrón que ArtistaLandingPage.jsx: el
           padding va sección por sección, no en el contenedor general. */}
       <div className="flex-1 pt-20 md:pt-24 pb-16 w-full">
-        {!token || !artista ? (
+        {revisando ? (
+          <div className="flex justify-center py-24">
+            <LoaderCircle size={22} className="animate-spin text-gray-300" />
+          </div>
+        ) : !token || !artista ? (
           // Bug real (2026-08-26, Jose: "no me deja poner el correo... o no
           // carga, o me devuelve al perfil") — antes, si el token guardado
           // en el navegador venció, esta rama SOLO mostraba el error, sin

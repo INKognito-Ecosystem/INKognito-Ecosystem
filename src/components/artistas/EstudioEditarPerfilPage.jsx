@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, redirect, useLoaderData, useNavigate, useSearchParams } from 'react-router-dom'
-import { Camera, LoaderCircle, Mail, Pencil, MapPin, Users, UserPlus, X, Navigation, Check, ShoppingBag, ExternalLink, ChevronLeft, ChevronRight, Copy } from 'lucide-react'
+import { Camera, LoaderCircle, Mail, Menu, Pencil, MapPin, Users, UserPlus, X, Navigation, Check, ShoppingBag, ExternalLink, ChevronLeft, ChevronRight, Copy } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
@@ -276,7 +276,14 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
   const puedeAutoactivarSupply = estudio.tipo === 'estudio'
   const muestraSupply = estudio.vende_supply || puedeAutoactivarSupply
 
-  const [vista, setVista] = useState('menu')
+  // Arranca en 'perfil', no en 'menu' (2026-09-22, Jose: "cuando abre el
+  // editor, este no muestra de entrada el perfil, sino que muestra los
+  // botones de edición... debería ser igual que en artistas") — antes lo
+  // primero que se veía era una lista de botones (Editar mi perfil/Mis
+  // artistas/Tienda en Supply), ahora se entra derecho al perfil editable
+  // (como ya hace ArtistaEditarPerfilPage.jsx), con el botón ☰ para llegar
+  // a esa misma lista incrustado en la esquina de la portada — ver más abajo.
+  const [vista, setVista] = useState('perfil')
 
   const linkPerfil = `${SITE_URL}/tattoo-artist-colombia/estudio/${estudio.id}`
   const linkSupply = `${SITE_URL}/supply/${estudio.slug || `estudio/${estudio.id}`}`
@@ -436,20 +443,27 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
         />
       ))}
 
-      <div className="px-4 max-w-md mx-auto lg:max-w-3xl">
-        <div className="flex items-center gap-2 mb-5 sticky top-16 md:top-20 bg-white pt-3 pb-2 -mx-4 px-4 z-10 border-b border-gray-100">
-          {vista !== 'menu' ? (
-            <button type="button" onClick={() => setVista('menu')} aria-label="Volver" className="text-gray-400 hover:text-gray-700 flex-shrink-0">
-              <ChevronLeft size={20} />
-            </button>
-          ) : (
-            <span className="w-5 flex-shrink-0" />
-          )}
-          <p className="flex-1 text-sm font-black uppercase tracking-widest text-gray-900">
-            {vista === 'menu' ? 'Panel de tu estudio' : vista === 'equipo' ? (esEmpresa ? 'Patrocinados' : 'Mis artistas') : VISTA_TITULOS[vista]}
-          </p>
+      {/* Esta barra ya no aparece en 'perfil' (2026-09-22) — ahí el botón
+          para llegar al resto de secciones vive incrustado en la esquina
+          de la portada (ver más abajo), igual que en Artista. Para
+          'equipo'/'supply' (sin portada donde meter un botón) se queda
+          exactamente igual que antes: flecha para volver a 'menu' + título. */}
+      {vista !== 'perfil' && (
+        <div className="px-4 max-w-md mx-auto lg:max-w-3xl">
+          <div className="flex items-center gap-2 mb-5 sticky top-16 md:top-20 bg-white pt-3 pb-2 -mx-4 px-4 z-10 border-b border-gray-100">
+            {vista !== 'menu' ? (
+              <button type="button" onClick={() => setVista('menu')} aria-label="Volver" className="text-gray-400 hover:text-gray-700 flex-shrink-0">
+                <ChevronLeft size={20} />
+              </button>
+            ) : (
+              <span className="w-5 flex-shrink-0" />
+            )}
+            <p className="flex-1 text-sm font-black uppercase tracking-widest text-gray-900">
+              {vista === 'menu' ? 'Panel de tu estudio' : vista === 'equipo' ? (esEmpresa ? 'Patrocinados' : 'Mis artistas') : VISTA_TITULOS[vista]}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {vista === 'menu' && (
         <div className="px-4 max-w-md mx-auto space-y-4">
@@ -523,6 +537,24 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
 
       <div className="w-full h-40 sm:h-56 bg-gray-100 overflow-hidden relative rounded-2xl">
         {form.foto_portada && <img src={form.foto_portada} alt="" className="w-full h-full object-cover" />}
+        {/* Botón para llegar a "Mis artistas"/"Tienda en Supply" incrustado
+            en la esquina de la portada (2026-09-22, Jose: "el botón
+            hamburguesa debería aparecer en la zona superior izquierda de
+            la portada... desde allí es que editaré") — mismo lugar y
+            estilo que ArtistaEditarPerfilPage.jsx, simétrico al botón
+            "Portada" de la esquina opuesta. A diferencia de Artista, acá
+            NO hay sidebar propio de escritorio (este dashboard siempre
+            fue el mismo layout en cualquier ancho) — sin `lg:hidden`, o en
+            escritorio quedaría sin ninguna forma de llegar a "Mis
+            artistas"/"Tienda en Supply". */}
+        <button
+          type="button"
+          onClick={() => setVista('menu')}
+          aria-label="Cambiar de sección"
+          className="absolute top-3 left-3 z-10 flex items-center justify-center w-9 h-9 rounded-full bg-black/50 text-white backdrop-blur-sm hover:bg-black/70 transition-colors"
+        >
+          <Menu size={17} />
+        </button>
         <button
           type="button"
           onClick={() => elegirFoto('foto_portada')}
@@ -784,22 +816,32 @@ export default function EstudioEditarPerfilPage() {
   const { token, estudio, error, cloud_name, upload_preset, invitaciones } = useLoaderData()
   const navigate = useNavigate()
 
+  // Mismo parpadeo de "pide tu correo" que ArtistaEditarPerfilPage.jsx
+  // (2026-09-22, Jose: "lo mismo pasa con estudios") — mismo arreglo: no
+  // mostrar PedirLinkForm hasta saber de verdad si hay una sesión guardada.
+  const [revisando, setRevisando] = useState(!token)
+
   useEffect(() => {
     if (token && estudio) localStorage.setItem(EDIT_TOKEN_KEY, token)
     else if (token && error) localStorage.removeItem(EDIT_TOKEN_KEY)
   }, [token, estudio, error])
 
   useEffect(() => {
-    if (token) return
+    if (token) { setRevisando(false); return }
     const guardado = localStorage.getItem(EDIT_TOKEN_KEY)
     if (guardado) navigate(`?token=${encodeURIComponent(guardado)}`, { replace: true })
+    else setRevisando(false)
   }, [token, navigate])
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
       <NavbarArtistas titulo="Editar mi estudio" />
       <div className="flex-1 pt-20 md:pt-24 pb-16 w-full">
-        {!token || !estudio ? (
+        {revisando ? (
+          <div className="flex justify-center py-24">
+            <LoaderCircle size={22} className="animate-spin text-gray-300" />
+          </div>
+        ) : !token || !estudio ? (
           // Mismo bug real que ArtistaEditarPerfilPage.jsx (2026-08-26) —
           // un token guardado vencido dejaba al estudio en una pantalla de
           // error sin ningún formulario para pedir un link nuevo.

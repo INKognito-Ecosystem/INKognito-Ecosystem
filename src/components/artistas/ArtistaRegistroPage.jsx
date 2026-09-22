@@ -359,13 +359,17 @@ export default function ArtistaRegistroPage() {
                     </div>
                   )}
 
+                  {/* aspect-[4/5] (2026-09-22) — igual que la landing real
+                      y "mi perfil editar" (ArtistaLandingPage.jsx,
+                      ArtistaEditarPerfilPage.jsx); esta preview del
+                      registro debe verse tal cual queda publicado. */}
                   <div className="grid grid-cols-3 gap-0.5 border-t border-gray-200">
                     {SLOTS.slice(2).map(({ key, label }) => (
                       <button
                         key={key}
                         type="button"
                         onClick={() => elegirFoto(key)}
-                        className="relative aspect-square bg-gray-50 overflow-hidden group"
+                        className="relative aspect-[4/5] bg-gray-50 overflow-hidden group"
                       >
                         {form[key] ? (
                           <img src={form[key]} alt={label} className="w-full h-full object-cover" />

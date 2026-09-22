@@ -709,15 +709,22 @@ export default function ArtistaLandingPage() {
                   <p className="px-4 pt-3.5 pb-2 text-gray-400 text-[11px] text-left overflow-x-auto whitespace-nowrap scrollbar-hide">
                     <span className="uppercase tracking-widest font-bold text-gray-500">Portafolio</span> — Tatuajes hechos por {artista.nombre} en {artista.municipio}
                   </p>
+                  {/* aspect-[4/5] (2026-09-22, Jose: "el tamaño de las card
+                      de fotos del portafolio... el que tienen las de
+                      Instagram, un poco más largas de manera vertical") —
+                      antes aspect-square; mismo criterio de 3 columnas,
+                      solo más alto. cloudinaryFill pide el recorte ya en
+                      4:5 (no 400x400 + recorte de más encima en el
+                      navegador), mismo w=400 de antes. */}
                   <div className="grid grid-cols-3 gap-0.5 sm:gap-1 w-full">
                     {trabajos.map((src, i) => (
                       <button
                         key={src}
                         type="button"
                         onClick={() => setLightbox(i)}
-                        className="relative aspect-square bg-gray-50 overflow-hidden group"
+                        className="relative aspect-[4/5] bg-gray-50 overflow-hidden group"
                       >
-                        <img src={cloudinaryFill(src, 400, 400)} alt={`Trabajo ${i + 1} de ${artista.nombre}`} className="w-full h-full object-cover" loading="lazy" />
+                        <img src={cloudinaryFill(src, 400, 500)} alt={`Trabajo ${i + 1} de ${artista.nombre}`} className="w-full h-full object-cover" loading="lazy" />
                         <span className="absolute bottom-1.5 right-1.5 flex items-center justify-center w-6 h-6 bg-black/60 text-white rounded-full backdrop-blur-sm group-hover:bg-black/80 transition-colors">
                           <Search size={12} />
                         </span>

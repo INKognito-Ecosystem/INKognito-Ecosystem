@@ -1,21 +1,58 @@
-import { useState } from 'react'
+import { createContext, useContext, useState } from 'react'
 import { Menu, X } from 'lucide-react'
 
-// Navegación por pestañas para "Editar mi perfil" (artista/estudio,
-// 2026-08-19, Jose: "deberían tener una especie de botón hamburguesa...
-// tal como funciona el panel") — mismo espíritu que el sidebar/hamburguesa
-// del panel admin (inkognito-panel/public/index.html): sidebar fijo en PC,
-// botón ☰ que abre una lista a pantalla completa en móvil. Compartido entre
-// ArtistaEditarPerfilPage.jsx y EstudioEditarPerfilPage.jsx para no
-// duplicar este layout dos veces.
+// Navegación por pestañas para "Editar mi perfil" (artista, 2026-08-19,
+// Jose: "deberían tener una especie de botón hamburguesa... tal como
+// funciona el panel") — sidebar fijo en PC, botón ☰ que abre una lista a
+// pantalla completa en móvil.
+//
+// v2 (2026-09-22, Jose: "el botón hamburguesa... la idea es que quede en
+// esa esquina, pero dentro de la foto de portada, como lo hace Facebook")
+// — antes el botón vivía en su propia barra gris arriba de la portada
+// (fila completa, con el nombre de la pestaña activa); ahora es un círculo
+// que se monta DENTRO de la portada (ver BotonMenuSecciones más abajo),
+// así que este componente ya no dibuja ninguna barra propia — solo expone
+// `abrir()` por contexto para que quien pinte la portada (o cualquier
+// pestaña sin portada) decida dónde poner el botón. Quitar esa barra
+// entera también es lo que deja la portada pegada al navbar sin hueco de
+// por medio (el -mt-4 de abajo ya cancelaba el colchón del padre; antes
+// caía sobre la barra, ahora cae directo sobre la portada).
 //
 // `children` es responsabilidad de quien llama: cada pestaña de contenido
 // debe traer su propia clase `block`/`hidden` según `activeTab` — este
 // componente solo pinta la navegación, nunca desmonta nada (así no se
-// pierde texto ya escrito en otra pestaña al cambiar de sección).
+// pierde texto ya escrito en otra pestaña al cambiar de sección). Cada
+// pestaña SIN portada (Mis diseños, Reservas y agenda) debe montar su
+// propio <BotonMenuSecciones /> en algún punto visible de su contenido —
+// si no, en móvil no hay forma de volver a "Mi perfil".
+const MenuSeccionesCtx = createContext(null)
+
+// Para pestañas sin portada: el mismo botón, sin overlay de foto detrás.
+export function useAbrirMenuSecciones() {
+  const abrir = useContext(MenuSeccionesCtx)
+  return abrir || (() => {})
+}
+
+// Círculo ☰ reutilizable — mismo look tanto incrustado en la portada
+// (fondo oscuro translúcido, como el botón "Portada" que ya vive en esa
+// misma esquina opuesta) como suelto en una pestaña sin foto (className
+// pisa el fondo/color para verse bien sobre blanco).
+export function BotonMenuSecciones({ className = 'bg-black/50 text-white backdrop-blur-sm hover:bg-black/70' }) {
+  const abrir = useAbrirMenuSecciones()
+  return (
+    <button
+      type="button"
+      onClick={abrir}
+      aria-label="Cambiar de sección"
+      className={`lg:hidden flex items-center justify-center w-9 h-9 rounded-full transition-colors ${className}`}
+    >
+      <Menu size={17} />
+    </button>
+  )
+}
+
 export default function EditarPerfilTabs({ tabs, activeTab, onChange, children }) {
   const [menuAbierto, setMenuAbierto] = useState(false)
-  const activo = tabs.find((t) => t.key === activeTab) || tabs[0]
 
   const elegir = (key) => {
     onChange(key)
@@ -23,25 +60,8 @@ export default function EditarPerfilTabs({ tabs, activeTab, onChange, children }
   }
 
   return (
+    <MenuSeccionesCtx.Provider value={() => setMenuAbierto(true)}>
     <div className="lg:flex lg:gap-6 lg:items-start lg:px-4 -mt-4">
-      {/* Barra móvil — botón ☰ + nombre de la pestaña activa. `-mt-4` en el
-          contenedor (2026-08-26, Jose: "sigue siendo mal, pegalo mas al
-          navbar") — el padre (ArtistaEditarPerfilPage/EstudioEditarPerfilPage)
-          aplica pt-20 md:pt-24 para despejar el navbar fijo (h-16/md:h-20),
-          lo que deja un colchón extra de 16px en ambos breakpoints; el
-          -mt-4 (16px) lo cancela para que la barra quede pegada justo
-          debajo del navbar. */}
-      <div className="lg:hidden flex items-center px-4 py-3 border-y border-gray-200 mb-2 bg-gray-50">
-        <button
-          type="button"
-          onClick={() => setMenuAbierto(true)}
-          className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-700"
-        >
-          <Menu size={16} />
-          {activo?.label}
-        </button>
-      </div>
-
       {/* Overlay móvil a pantalla completa — mismo espíritu que
           body.mobile-tabs-open del panel */}
       {menuAbierto && (
@@ -91,5 +111,6 @@ export default function EditarPerfilTabs({ tabs, activeTab, onChange, children }
         {children}
       </div>
     </div>
+    </MenuSeccionesCtx.Provider>
   )
 }
