@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import { Link, useLoaderData, redirect } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
-import { MapPin, Users, Building2, ShoppingBag, Award } from 'lucide-react'
+import { MapPin, Users, Building2, ShoppingBag, Award, Share2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { idDesdeParam } from './artistaSlug'
 import { urlGoogleMaps } from './mapaUrl'
@@ -84,6 +85,26 @@ function CatalogoCTA({ estudio }) {
 
 export default function EstudioLandingPage() {
   const { estudio } = useLoaderData()
+  // Compartir (2026-09-22, Jose: "un botón de compartir en la esquina
+  // superior derecha de la portada... de los perfiles de estudio y de
+  // artistas") — mismo mecanismo que ArtistaLandingPage.jsx/
+  // GymProductDetailPage.jsx: hoja nativa si el navegador la trae, o copia
+  // el link con un toast si no. Antes del `if (!estudio)`: los hooks no
+  // pueden ser condicionales.
+  const [shareMsg, setShareMsg] = useState(null)
+  const handleShare = async () => {
+    if (!estudio) return
+    const url = `${window.location.origin}/tattoo-artist-colombia/estudio/${estudio.id}`
+    if (navigator.share) {
+      try { await navigator.share({ title: estudio.nombre, url }) } catch {}
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(url)
+      setShareMsg('Link copiado')
+      setTimeout(() => setShareMsg(null), 2000)
+    } catch {}
+  }
 
   if (!estudio) {
     return (
@@ -158,9 +179,24 @@ export default function EstudioLandingPage() {
                 object-cover acá. El aviso de formato ideal vive en el
                 dashboard del estudio (donde se sube la foto), no en esta
                 página pública. */}
-            <div className="w-full h-40 sm:h-56 md:h-64 bg-gray-100 overflow-hidden">
+            <div className="relative w-full h-40 sm:h-56 md:h-64 bg-gray-100 overflow-hidden">
               {estudio.foto_portada && <img src={cloudinaryFill(estudio.foto_portada, 700, 300)} alt="" className="w-full h-full object-cover" />}
+              {/* Compartir (2026-09-22) — esquina superior derecha de la
+                  portada, mismo círculo que ArtistaLandingPage.jsx. */}
+              <button
+                type="button"
+                onClick={handleShare}
+                aria-label="Compartir"
+                className="absolute top-3 right-3 z-10 flex items-center justify-center w-9 h-9 rounded-full bg-black/50 text-white backdrop-blur-sm hover:bg-black/70 transition-colors"
+              >
+                <Share2 size={16} />
+              </button>
             </div>
+            {shareMsg && (
+              <div className="fixed top-16 inset-x-0 z-50 flex justify-center px-4">
+                <p className="bg-gray-900 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg">{shareMsg}</p>
+              </div>
+            )}
 
             <div className="max-w-3xl mx-auto px-4">
               <div className="relative min-h-16 sm:min-h-[85px]">

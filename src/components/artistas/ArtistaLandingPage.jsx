@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
-import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle, Building2, Award, ClipboardList } from 'lucide-react'
+import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle, Building2, Award, ClipboardList, Share2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { municipioDesdeNombreIP } from '../../data/colombiaGeo'
 import { idDesdeParam } from './artistaSlug'
@@ -113,6 +113,24 @@ export default function ArtistaLandingPage() {
   const { artista, ciudadDetectada } = useLoaderData()
   const [lightbox, setLightbox] = useState(null)
   const touchStartX = useRef(null)
+  // Compartir (2026-09-22, Jose: "un botón de compartir en la esquina
+  // superior derecha de la portada... le permitirá a cada artista
+  // compartir su perfil de manera rápida") — mismo mecanismo ya probado en
+  // GymProductDetailPage.jsx: hoja nativa de compartir si el navegador la
+  // trae (celular), o copia el link y avisa con un toast si no (escritorio).
+  const [shareMsg, setShareMsg] = useState(null)
+  const handleShare = async () => {
+    const url = `${window.location.origin}/artista/${artista.id}`
+    if (navigator.share) {
+      try { await navigator.share({ title: artista.nombre, url }) } catch {}
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(url)
+      setShareMsg('Link copiado')
+      setTimeout(() => setShareMsg(null), 2000)
+    } catch {}
+  }
   const [disenoComprando, setDisenoComprando] = useState(null)
   // "Ver más" por diseño (2026-08-06) — objeto {id: bool} compartido entre
   // ambas secciones (tatuar/digital), ya que los ids de disenos son
@@ -525,12 +543,29 @@ export default function ArtistaLandingPage() {
             con max-w-3xl en portada/redes/trabajos, igual que ya tenía el
             bloque de nombre/bio. */}
         <div className="max-w-3xl mx-auto">
-          <div className="w-full h-40 sm:h-56 md:h-72 bg-gray-100 overflow-hidden">
+          <div className="relative w-full h-40 sm:h-56 md:h-72 bg-gray-100 overflow-hidden">
             {artista.foto_url_2 && (
               <img src={cloudinaryFill(artista.foto_url_2, 700, 300)} alt="" className="w-full h-full object-cover" loading="eager" />
             )}
+            {/* Compartir (2026-09-22) — esquina superior derecha de la
+                portada, mismo círculo oscuro translúcido que ya usa el
+                botón de secciones de "mi perfil editar" (esquina opuesta). */}
+            <button
+              type="button"
+              onClick={handleShare}
+              aria-label="Compartir"
+              className="absolute top-3 right-3 z-10 flex items-center justify-center w-9 h-9 rounded-full bg-black/50 text-white backdrop-blur-sm hover:bg-black/70 transition-colors"
+            >
+              <Share2 size={16} />
+            </button>
           </div>
         </div>
+
+        {shareMsg && (
+          <div className="fixed top-16 inset-x-0 z-50 flex justify-center px-4">
+            <p className="bg-gray-900 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg">{shareMsg}</p>
+          </div>
+        )}
 
         <div className="max-w-3xl mx-auto px-4">
 
