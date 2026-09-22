@@ -123,6 +123,10 @@ export function SuplCard({ item }) {
   const proveedorId = sel.estudio_id ?? item.estudio_id ?? null
   const proveedorNombre = sel.estudio_nombre_display || item.estudio_nombre_display || null
   const proveedorMp = sel.estudio_mp_conectado ?? item.estudio_mp_conectado ?? false
+  // Ruta del Golfo (2026-09-22) — política de envío del vendedor, mismo
+  // fallback variante→producto que los 3 campos de arriba.
+  const proveedorPoliticaEnvio = sel.estudio_politica_envio ?? item.estudio_politica_envio ?? 'cliente_paga'
+  const proveedorEnvioGratisMonto = sel.estudio_envio_gratis_monto ?? item.estudio_envio_gratis_monto ?? null
 
   const handleToggle = () => {
     if (enCarrito) {
@@ -141,6 +145,8 @@ export function SuplCard({ item }) {
       estudioId: proveedorId,
       estudioNombre: proveedorNombre,
       mpConectado: !!proveedorMp,
+      politicaEnvio: proveedorPoliticaEnvio,
+      envioGratisMonto: proveedorEnvioGratisMonto,
     })
     if (!resultado.ok) {
       setBloqueoMsg(`Ya tienes productos de ${resultado.nombreActual} en tu carrito — termina esa compra antes de agregar de otro vendedor.`)

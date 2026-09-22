@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ArrowLeft, Share2, Minus, Plus, Trash2, Check, Package } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useStoreCart } from '../../contexts/StoreCartContext'
+import EnvioGratisBar from '../pedido/EnvioGratisBar'
 
 const GOLD = '#C9A84C'
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
@@ -298,6 +299,12 @@ export default function CartDrawerStore({ open, onClose }) {
           )}
 
         </div>
+
+        {/* Envío gratis (2026-09-22, Ruta del Golfo) — franja de ancho
+            completo entre el scroll de items y el footer, siempre visible
+            (no se pierde al hacer scroll). Usa selectedTotal/total, misma
+            convención que el Total del footer de abajo. */}
+        {items.length > 0 && <EnvioGratisBar vendorLock={vendorLock} subtotal={selectedCount > 0 ? selectedTotal : total} />}
 
         {/* FOOTER — Total + Agendar en línea (2-col, mismo criterio que
             CartDrawerSupply.jsx) y, debajo, WhatsApp como alternativa —

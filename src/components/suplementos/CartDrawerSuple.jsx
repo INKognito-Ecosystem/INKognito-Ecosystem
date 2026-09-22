@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, Share2, Minus, Plus, Trash2, Check, Package } from 'lucide-react'
 import { useSupleCart } from '../../contexts/SupleCartContext'
+import EnvioGratisBar from '../pedido/EnvioGratisBar'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
@@ -15,7 +16,7 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-pro
 export default function CartDrawerSuple({ open, onClose }) {
   const {
     items, removeItem, changeQty, count, total,
-    selectedKeys, toggleSelected, setAllSelected, allSelected, selectedCount, selectedTotal,
+    selectedKeys, toggleSelected, setAllSelected, allSelected, selectedCount, selectedTotal, vendorLock,
   } = useSupleCart()
 
   useEffect(() => {
@@ -261,6 +262,10 @@ export default function CartDrawerSuple({ open, onClose }) {
           )}
 
         </div>
+
+        {/* Envío gratis (2026-09-22, Ruta del Golfo) — mismo criterio que
+            CartDrawerStore.jsx. */}
+        {items.length > 0 && <EnvioGratisBar vendorLock={vendorLock} subtotal={selectedCount > 0 ? selectedTotal : total} />}
 
         {/* FOOTER — Total + Continuar (2-col, como CartDrawerStore.jsx). */}
         {items.length > 0 && (

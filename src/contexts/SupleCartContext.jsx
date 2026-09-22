@@ -53,7 +53,10 @@ export function SupleCartProvider({ children }) {
   // si se mezcla, el checkout genérico de Nequi/contraentrega le pagaría A
   // INKOGNITO por un producto que no es suyo (ver PedidoOnlinePage.jsx).
   const addItem = useCallback((product, category, opts = {}) => {
-    const { estudioId = null, estudioNombre = null, mpConectado = false } = opts
+    // politicaEnvio/envioGratisMonto (2026-09-22, Ruta del Golfo) — mismo
+    // mecanismo que estudioId/mpConectado, ver comentario gemelo en
+    // StoreCartContext.jsx.
+    const { estudioId = null, estudioNombre = null, mpConectado = false, politicaEnvio = 'cliente_paga', envioGratisMonto = null } = opts
     const primero = items[0]
     if (primero && (primero.estudioId || null) !== estudioId) {
       return { ok: false, motivo: 'otro_proveedor', nombreActual: primero.estudioNombre || 'el vendedor general' }
@@ -64,7 +67,7 @@ export function SupleCartProvider({ children }) {
       if (existing) {
         return prev.map(i => i.key === key ? { ...i, qty: i.qty + 1 } : i)
       }
-      return [...prev, { key, ...product, category, qty: 1, estudioId, estudioNombre, mpConectado }]
+      return [...prev, { key, ...product, category, qty: 1, estudioId, estudioNombre, mpConectado, politicaEnvio, envioGratisMonto }]
     })
     return { ok: true }
   }, [items])
@@ -72,9 +75,9 @@ export function SupleCartProvider({ children }) {
   // Reemplaza TODO el carrito por un único producto (2026-09-11) — ver
   // comentario en StoreCartContext.jsx (mismo motivo).
   const setSingleItem = useCallback((product, category, opts = {}) => {
-    const { estudioId = null, estudioNombre = null, mpConectado = false } = opts
+    const { estudioId = null, estudioNombre = null, mpConectado = false, politicaEnvio = 'cliente_paga', envioGratisMonto = null } = opts
     const key = `${category}-${product.id}`
-    setItems([{ key, ...product, category, qty: 1, estudioId, estudioNombre, mpConectado }])
+    setItems([{ key, ...product, category, qty: 1, estudioId, estudioNombre, mpConectado, politicaEnvio, envioGratisMonto }])
     return { ok: true }
   }, [])
 

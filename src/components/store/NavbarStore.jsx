@@ -1,13 +1,15 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
-import { Menu, ShoppingCart, X, LayoutGrid, Sparkles, Truck, Phone, Store, PlusCircle, UserCircle, Globe, FileText, Shield } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Menu, ShoppingCart, X, LayoutGrid, Sparkles, Truck, Phone, Store, PlusCircle, UserCircle, Globe, FileText, Shield, Package } from 'lucide-react'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import CartDrawerStore from './CartDrawerStore'
 import logoStore from '../../assets/milogo/store.webp'
 import AnimatedWordmark from '../AnimatedWordmark'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import LegalModal from '../legal/LegalModal'
+import MisComprasPanel from '../pedido/MisComprasPanel'
 import { irAMiTienda } from '../../lib/storeTienda'
+import { leerMisCompras } from '../../lib/misCompras'
 
 // Blanco (2026-09-16, Jose: "como la estructura de store está fácil pues
 // en su mayoría es blanco, procede con actualizar todos los navbar de las
@@ -21,6 +23,13 @@ export default function NavbarStore() {
   // legalOpen (2026-09-16, mismo patrón que NavbarSupply.jsx) — el modal
   // abre directo donde está el usuario en vez de navegar a /terminos.
   const [legalOpen, setLegalOpen] = useState(null)
+  const [comprasOpen, setComprasOpen] = useState(false)
+  // "Mis compras" (2026-09-22) — el ícono solo aparece si este navegador ya
+  // guardó alguna compra (mismo criterio condicional que el badge de
+  // cantidad del carrito, ver `count` arriba); se relee al montar, no hace
+  // falta más que eso para un ícono de utilidad.
+  const [misComprasCount, setMisComprasCount] = useState(0)
+  useEffect(() => { setMisComprasCount(leerMisCompras().length) }, [])
   const { count } = useStoreCart()
 
   const scrollTo = (id) => {
@@ -71,6 +80,19 @@ export default function NavbarStore() {
 
             {/* CARRITO + HAMBURGUESA */}
             <div className="flex items-center gap-4">
+
+              {/* MIS COMPRAS (2026-09-22) — solo si hay alguna guardada en
+                  este navegador, aparte de "Mi cuenta/perfil" (esa es para
+                  el DUEÑO de la tienda, no para el comprador). */}
+              {misComprasCount > 0 && (
+                <button
+                  onClick={() => setComprasOpen(true)}
+                  aria-label="Mis compras"
+                  className="text-zinc-500 hover:text-[#C9A84C] transition-all duration-300"
+                >
+                  <Package size={20} />
+                </button>
+              )}
 
               {/* CARRITO CON BADGE DORADO */}
               <button
@@ -174,6 +196,7 @@ export default function NavbarStore() {
       </nav>
 
       <CartDrawerStore open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <MisComprasPanel open={comprasOpen} onClose={() => setComprasOpen(false)} />
       <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
     </>
   )

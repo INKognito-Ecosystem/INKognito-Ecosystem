@@ -4,6 +4,7 @@ import { Mail, XCircle, Clock } from 'lucide-react'
 import NavbarCategory from './NavbarCategory'
 import FooterSupply from './FooterSupply'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
+import { guardarCompra } from '../../lib/misCompras'
 
 // A donde vuelve el comprador tras pagar en Mercado Pago (back_urls de
 // POST /api/estudios-supply-comprar). La fuente de verdad real es el
@@ -17,6 +18,8 @@ export function meta() {
 export default function SupplyCompraResultadoPage() {
   const [searchParams] = useSearchParams()
   const estado = searchParams.get('estado')
+  const compraId = searchParams.get('compra')
+  const token = searchParams.get('token')
   const esFallo = estado === 'failure'
   const { clearCart } = useSupplyCart()
 
@@ -27,7 +30,11 @@ export default function SupplyCompraResultadoPage() {
   // confirmación del proveedor).
   useEffect(() => {
     if (!esFallo) clearCart()
-  }, [esFallo])
+    // "Mis compras" (2026-09-22) — Supply no tiene envíos de Ruta del Golfo
+    // todavía, pero el estado de la compra en sí (aprobada/rechazada) sí
+    // vale la pena poder consultarlo después sin buscar el correo.
+    if (compraId && token) guardarCompra({ compraId, token, module: 'supply' })
+  }, [esFallo, compraId, token])
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">

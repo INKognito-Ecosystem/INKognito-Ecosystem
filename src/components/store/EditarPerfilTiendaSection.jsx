@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { Camera, LoaderCircle, MapPin, Navigation, Check } from 'lucide-react'
+import PoliticaEnvioCard from '../pedido/PoliticaEnvioCard'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import ComboboxBuscable from '../artistas/ComboboxBuscable'
 import { DEPARTAMENTOS_TIENDA, MUNICIPIOS_URABA_TIENDA } from '../../data/colombiaGeo'
@@ -34,6 +35,8 @@ export default function EditarPerfilTiendaSection({ token, estudio, cloud_name, 
     logo_url: estudio.logo_url || '',
     google_maps_url: estudio.google_maps_url || '',
     direccion: estudio.direccion || '',
+    politica_envio: estudio.politica_envio || 'cliente_paga',
+    envio_gratis_monto: estudio.envio_gratis_monto ?? '',
   })
   const [subiendo, setSubiendo] = useState(false)
   const [guardando, setGuardando] = useState(false)
@@ -86,6 +89,10 @@ export default function EditarPerfilTiendaSection({ token, estudio, cloud_name, 
     // — sin esto, Ruta del Golfo no tiene cómo recoger un pedido.
     if (!form.direccion.trim()) {
       setError('La dirección exacta es obligatoria.')
+      return
+    }
+    if (form.politica_envio === 'gratis_desde_monto' && !(Number(form.envio_gratis_monto) > 0)) {
+      setError('Indica desde qué monto el envío queda gratis.')
       return
     }
     setError(null)
@@ -185,6 +192,12 @@ export default function EditarPerfilTiendaSection({ token, estudio, cloud_name, 
           </div>
         </div>
       </div>
+
+      <PoliticaEnvioCard
+        politicaEnvio={form.politica_envio}
+        envioGratisMonto={form.envio_gratis_monto}
+        onChange={(patch) => setForm((f) => ({ ...f, ...patch }))}
+      />
 
       {/* CARD 2 — Redes de contacto */}
       <div className={`${cardClass} mt-5`}>

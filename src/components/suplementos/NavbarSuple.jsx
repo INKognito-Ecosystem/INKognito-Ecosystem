@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
-import { Menu, X, ShoppingCart, Search, Share2, Home, LayoutGrid, Globe, FileText, Shield, Store, PlusCircle, UserCircle } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Menu, X, ShoppingCart, Search, Share2, Home, LayoutGrid, Globe, FileText, Shield, Store, PlusCircle, UserCircle, Package } from 'lucide-react'
 // Mismo logo que ya usaba Gym (gris, coherente con el color de marca de
 // Suple) — no existe todavía un logo propio subido para el módulo, así
 // que se reusa el de Gym mientras tanto (2026-08-02, pedido de Jose:
@@ -12,7 +12,9 @@ import LegalModal from '../legal/LegalModal'
 import { useSupleCart } from '../../contexts/SupleCartContext'
 import { SUPLE_CATEGORIES_ORDER } from '../../data/supleCategoriesOrder'
 import { irAMiSuple } from '../../lib/supleTienda'
+import { leerMisCompras } from '../../lib/misCompras'
 import CartDrawerSuple from './CartDrawerSuple'
+import MisComprasPanel from '../pedido/MisComprasPanel'
 
 // Navbar superior ÚNICO de Suple, blanco (2026-09-19, migración de Suple a
 // fondo blanco) — cubre el home de escritorio Y las páginas internas
@@ -41,6 +43,10 @@ export default function NavbarSuple({
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [legalOpen, setLegalOpen] = useState(null)
   const [shareMsg, setShareMsg] = useState(null)
+  const [comprasOpen, setComprasOpen] = useState(false)
+  // "Mis compras" (2026-09-22) — mismo criterio que NavbarStore.jsx.
+  const [misComprasCount, setMisComprasCount] = useState(0)
+  useEffect(() => { setMisComprasCount(leerMisCompras().length) }, [])
   const { count } = useSupleCart()
 
   const close = () => setMenuOpen(false)
@@ -130,6 +136,15 @@ export default function NavbarSuple({
                 </div>
               )}
               <div className={`${hideMobileActions ? 'hidden md:flex' : 'flex'} items-center gap-4`}>
+                {misComprasCount > 0 && (
+                  <button
+                    onClick={() => setComprasOpen(true)}
+                    aria-label="Mis compras"
+                    className="text-zinc-500 hover:text-zinc-900 transition-all duration-300"
+                  >
+                    <Package size={20} />
+                  </button>
+                )}
                 <button
                   onClick={() => setDrawerOpen(true)}
                   className="relative text-zinc-500 hover:text-zinc-900 transition-all duration-300"
@@ -216,6 +231,7 @@ export default function NavbarSuple({
       </nav>
 
       <CartDrawerSuple open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <MisComprasPanel open={comprasOpen} onClose={() => setComprasOpen(false)} />
       <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
     </>
   )

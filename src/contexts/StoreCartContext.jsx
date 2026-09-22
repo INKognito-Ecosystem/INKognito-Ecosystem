@@ -55,7 +55,12 @@ export function StoreCartProvider({ children }) {
   // para que todo llamador existente (productos de Store sin tienda)
   // siga funcionando igual, sin lock.
   const addItem = useCallback((product, category, size = '', opts = {}) => {
-    const { estudioId = null, estudioNombre = null, mpConectado = false } = opts
+    // politicaEnvio/envioGratisMonto (2026-09-22, Ruta del Golfo) — mismo
+    // mecanismo que estudioId/mpConectado: viaja desde el JOIN del
+    // catálogo (ver StoreProductCard.jsx) hasta el ítem del carrito, sin
+    // ningún fetch nuevo. CartDrawerStore.jsx los lee de vendorLock para
+    // la barra de envío gratis.
+    const { estudioId = null, estudioNombre = null, mpConectado = false, politicaEnvio = 'cliente_paga', envioGratisMonto = null } = opts
     const primero = items[0]
     if (primero && (primero.estudioId || null) !== estudioId) {
       return { ok: false, motivo: 'otro_proveedor', nombreActual: primero.estudioNombre || 'la tienda general' }
@@ -66,7 +71,7 @@ export function StoreCartProvider({ children }) {
       if (existing) {
         return prev.map(i => i.key === key ? { ...i, qty: i.qty + 1 } : i)
       }
-      return [...prev, { key, ...product, category, size, qty: 1, estudioId, estudioNombre, mpConectado }]
+      return [...prev, { key, ...product, category, size, qty: 1, estudioId, estudioNombre, mpConectado, politicaEnvio, envioGratisMonto }]
     })
     return { ok: true }
   }, [items])
@@ -79,9 +84,9 @@ export function StoreCartProvider({ children }) {
   // exactamente 1 unidad de este producto. Ver comentario en
   // ProductLandingPage.jsx para el bug real que esto corrige.
   const setSingleItem = useCallback((product, category, size = '', opts = {}) => {
-    const { estudioId = null, estudioNombre = null, mpConectado = false } = opts
+    const { estudioId = null, estudioNombre = null, mpConectado = false, politicaEnvio = 'cliente_paga', envioGratisMonto = null } = opts
     const key = `${category}-${product.id}-${size}`
-    setItems([{ key, ...product, category, size, qty: 1, estudioId, estudioNombre, mpConectado }])
+    setItems([{ key, ...product, category, size, qty: 1, estudioId, estudioNombre, mpConectado, politicaEnvio, envioGratisMonto }])
     return { ok: true }
   }, [])
 

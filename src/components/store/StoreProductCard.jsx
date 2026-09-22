@@ -125,6 +125,10 @@ export default function StoreProductCard({ product, category, sizes }) {
   const proveedorId     = selectedVariant?.estudio_id ?? product._item?.estudio_id ?? null
   const proveedorNombre = selectedVariant?.estudio_nombre_display || selectedVariant?.estudio_nombre || product._item?.estudio_nombre_display || product._item?.estudio_nombre || null
   const proveedorMp     = selectedVariant?.estudio_mp_conectado ?? product._item?.estudio_mp_conectado ?? false
+  // Ruta del Golfo (2026-09-22) — política de envío de la tienda, mismo
+  // fallback variante→producto que los 3 campos de arriba.
+  const proveedorPoliticaEnvio     = selectedVariant?.estudio_politica_envio ?? product._item?.estudio_politica_envio ?? 'cliente_paga'
+  const proveedorEnvioGratisMonto  = selectedVariant?.estudio_envio_gratis_monto ?? product._item?.estudio_envio_gratis_monto ?? null
 
   // Variante activa a nivel de card (2026-09-17) — misma variante que ya
   // resuelve handleAdd, pero elevada acá para que el clic en la foto (abre
@@ -150,6 +154,8 @@ export default function StoreProductCard({ product, category, sizes }) {
       estudioId:     proveedorId,
       estudioNombre: proveedorNombre,
       mpConectado:   !!proveedorMp,
+      politicaEnvio:      proveedorPoliticaEnvio,
+      envioGratisMonto:   proveedorEnvioGratisMonto,
     })
     if (resultado && !resultado.ok) {
       setBloqueoMsg(`Ya tienes productos de ${resultado.nombreActual} en tu carrito — termina esa compra antes de agregar de otra tienda.`)

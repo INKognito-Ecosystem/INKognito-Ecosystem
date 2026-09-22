@@ -4,6 +4,7 @@ import { Mail, XCircle, Clock } from 'lucide-react'
 import NavbarSuple from './NavbarSuple'
 import FooterSuple from './FooterSuple'
 import { useSupleCart } from '../../contexts/SupleCartContext'
+import { guardarCompra } from '../../lib/misCompras'
 
 // A donde vuelve el comprador tras pagar en Mercado Pago (back_urls de
 // POST /api/estudios-suple-comprar). Clon de TiendaCompraResultadoPage.jsx
@@ -16,12 +17,15 @@ export function meta() {
 export default function SupleCompraResultadoPage() {
   const [searchParams] = useSearchParams()
   const estado = searchParams.get('estado')
+  const compraId = searchParams.get('compra')
+  const token = searchParams.get('token')
   const esFallo = estado === 'failure'
   const { clearCart } = useSupleCart()
 
   useEffect(() => {
     if (!esFallo) clearCart()
-  }, [esFallo])
+    if (compraId && token) guardarCompra({ compraId, token, module: 'suplementos' })
+  }, [esFallo, compraId, token])
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">

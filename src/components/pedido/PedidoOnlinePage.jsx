@@ -38,12 +38,20 @@ const MUNICIPIOS = Object.keys(MUNICIPIO_LABELS)
 
 const MODULE_LABELS = { supply: 'INKognito Supply', store: 'INKognito Store', gym: 'INKognito Gym', suplementos: 'INKognito Suple' }
 
-// Tema claro para Suplementos (2026-09-19, migración de Suple a fondo
-// blanco, Jose: el flujo carrito → pedido debe quedar todo blanco) y para Gym
-// (2026-09-21, misma migración). Supply y Store siguen con las clases
-// oscuras de siempre: cada lugar que cambia usa `c(oscuro, claro)` — el
-// primer argumento es exactamente la clase que ya había, así que para esos
-// módulos el resultado es idéntico.
+// Módulos que permiten un carrito bloqueado a un proveedor con Mercado Pago
+// propio (fase 5, 2026-08-07; Store 2026-08-29; Suple 2026-09-20) — a nivel
+// de módulo (no dentro del componente) porque se necesita ANTES del primer
+// render para calcular el estado inicial de vendorChecking, ver más abajo.
+const VENDOR_LOCK_MODULES = ['supply', 'store', 'suplementos']
+
+// Tema claro para TODOS los módulos (2026-09-22, Jose: "cuando le doy
+// continuar, a un carrito sea cual sea el módulo, la página es de color
+// negro... vamos a migrarla a color blanco para todos los módulos") —
+// empezó solo con Suplementos (2026-09-19) y Gym (2026-09-21); ahora
+// también Supply y Store. Cada lugar que cambia sigue usando
+// `c(oscuro, claro)` (el primer argumento es la clase oscura que ya había,
+// por si algún día hiciera falta volver atrás para un módulo puntual) —
+// con `light` siempre en true, el resultado es siempre el segundo argumento.
 function ColHead({ n, title, sub, light = false }) {
   return (
     <div className="flex items-center gap-2.5 mb-5">
@@ -97,8 +105,8 @@ function MiniFooter({ moduleLabel, light = false }) {
 // no hace falta serializar nada al navegar aquí desde el drawer.
 export default function PedidoOnlinePage() {
   const { module } = useParams()
-  // Suple y Gym van en claro (Gym pasó a fondo blanco el 2026-09-21).
-  const light = module === 'suplementos' || module === 'gym'
+  // Todos los módulos van en claro (2026-09-22) — ver comentario arriba.
+  const light = true
   const c = (dark, lite) => (light ? lite : dark)
   const supplyCart = useSupplyCart()
   const storeCart = useStoreCart()
@@ -131,16 +139,28 @@ export default function PedidoOnlinePage() {
   // caer al formulario genérico de Nequi/contraentrega — ese pago
   // llegaría a la cuenta de INKognito por un producto que no es suyo, y
   // el proveedor real nunca se entera del pedido (Jose, 2026-08-30).
-  const [vendorInfo, setVendorInfo] = useState(null)
-  const [vendorChecking, setVendorChecking] = useState(false)
   // Store multitenant (2026-08-29) — mismo mecanismo de revalidación en
   // vivo que ya tenía Supply, extendido a Store: ambos módulos permiten
   // un carrito bloqueado a un proveedor con Mercado Pago propio. Suple
   // multitenant (2026-09-20) se suma con el mismo criterio exacto.
-  const VENDOR_LOCK_MODULES = ['supply', 'store', 'suplementos']
+  // Se calcula ANTES de los useState de abajo (no después) porque
+  // vendorChecking necesita este valor para su estado inicial.
   const estudioIdsEnCarrito = VENDOR_LOCK_MODULES.includes(module)
     ? [...new Set(cart?.items.map(i => i.estudioId).filter(Boolean))]
     : []
+  const [vendorInfo, setVendorInfo] = useState(null)
+  // Arranca en `true` cuando el carrito YA llega bloqueado a un proveedor
+  // (el caso normal de "Continuar" desde un carrito de una sola tienda) —
+  // corrige un flash real (Jose, 2026-09-22: "siempre que le doy continuar
+  // a algún carrito... primero espabila intentando mostrar otra pestaña").
+  // Antes arrancaba en `false`: el primer render caía derecho al
+  // formulario genérico de Nequi/contraentrega (¡la "otra pestaña"!) porque
+  // ni vendorChecking ni vendorInfo se habían actualizado todavía — recién
+  // en el segundo render (una vez el useEffect de abajo alcanzaba a
+  // correr) aparecía "Cargando...", y en el tercero el checkout real de
+  // Mercado Pago. Con el estado inicial ya calculado en el primer render,
+  // ese primer frame equivocado desaparece.
+  const [vendorChecking, setVendorChecking] = useState(() => estudioIdsEnCarrito.length === 1)
   useEffect(() => {
     if (estudioIdsEnCarrito.length !== 1) { setVendorInfo(null); return }
     let active = true
@@ -154,7 +174,19 @@ export default function PedidoOnlinePage() {
   }, [estudioIdsEnCarrito.join(',')])
 
   const vendorNombreVivo = vendorInfo ? ((module === 'store' ? vendorInfo.nombre_tienda : module === 'suplementos' ? vendorInfo.nombre_suple : vendorInfo.nombre_supply) || vendorInfo.nombre) : null
-  const vendorLive = vendorInfo?.mp_conectado ? { estudioId: vendorInfo.id, estudioNombre: vendorNombreVivo } : null
+  // Ruta del Golfo (2026-09-22) — municipio/politica_envio/envio_gratis_monto/
+  // en_cobertura_ruta ya vienen frescos en la misma respuesta de
+  // /api/estudios/:id (ver server.js) — se pasan tal cual a
+  // PedidoSupplyVendorCheckout.jsx para decidir si muestra el monto exacto
+  // del flete, un aviso sin monto, o "Gratis".
+  const vendorLive = vendorInfo?.mp_conectado ? {
+    estudioId: vendorInfo.id,
+    estudioNombre: vendorNombreVivo,
+    municipio: vendorInfo.municipio,
+    politicaEnvio: vendorInfo.politica_envio,
+    envioGratisMonto: vendorInfo.envio_gratis_monto,
+    enCoberturaRuta: vendorInfo.en_cobertura_ruta,
+  } : null
 
   useEffect(() => {
     fetch(`${PANEL_URL}/api/visual/flete`)
@@ -173,13 +205,13 @@ export default function PedidoOnlinePage() {
   if (!cart || !MODULE_LABELS[module]) {
     return (
       <>
-        <section className="min-h-[60vh] flex items-center justify-center py-16 px-4 bg-black">
+        <section className="min-h-[60vh] flex items-center justify-center py-16 px-4 bg-white">
           <div className="text-center">
-            <p className="text-gray-400">Esta página no existe.</p>
-            <Link to="/" className="text-green-500 hover:text-green-400 text-sm font-semibold">Volver al inicio</Link>
+            <p className="text-zinc-500">Esta página no existe.</p>
+            <Link to="/" className="text-zinc-700 hover:text-zinc-900 text-sm font-semibold">Volver al inicio</Link>
           </div>
         </section>
-        <MiniFooter />
+        <MiniFooter light />
       </>
     )
   }
@@ -352,7 +384,7 @@ export default function PedidoOnlinePage() {
   if (VENDOR_LOCK_MODULES.includes(module) && vendorLive) {
     return (
       <>
-        <PedidoSupplyVendorCheckout cart={{ ...cart, vendorLock: vendorLive }} module={module} />
+        <PedidoSupplyVendorCheckout cart={{ ...cart, vendorLock: vendorLive }} module={module} fleteTabla={fleteTabla} fleteOrigen={fleteOrigen} />
         <MiniFooter moduleLabel={MODULE_LABELS[module]} light={light} />
       </>
     )

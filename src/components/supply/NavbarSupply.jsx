@@ -1,13 +1,15 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
-import { Menu, ShoppingCart, X, Sparkles, LayoutGrid, Tag, Phone, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Menu, ShoppingCart, X, Sparkles, LayoutGrid, Tag, Phone, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle, Package } from 'lucide-react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import logoSupply from '../../assets/milogo/supply.webp'
 import AnimatedWordmark from '../AnimatedWordmark'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import LegalModal from '../legal/LegalModal'
+import MisComprasPanel from '../pedido/MisComprasPanel'
 import { irAMiSupply } from '../../lib/supplyTienda'
+import { leerMisCompras } from '../../lib/misCompras'
 
 export default function NavbarSupply() {
   const navigate = useNavigate()
@@ -16,6 +18,13 @@ export default function NavbarSupply() {
   // legalOpen (2026-09-15, Jose: "el modal abre directo donde estoy...
   // blanco... ocupa toda la pantalla" — mismo patrón que EcosystemNavbar.jsx).
   const [legalOpen, setLegalOpen] = useState(null)
+  const [comprasOpen, setComprasOpen] = useState(false)
+  // "Mis compras" (2026-09-22) — mismo criterio que NavbarStore.jsx. Supply
+  // no tiene envíos de Ruta del Golfo todavía, pero sí vale la pena poder
+  // consultar el estado de la compra en sí (MisComprasPanel.jsx lo maneja
+  // mostrando solo "compra aprobada", sin sección de envío).
+  const [misComprasCount, setMisComprasCount] = useState(0)
+  useEffect(() => { setMisComprasCount(leerMisCompras().length) }, [])
   const { count } = useSupplyCart()
 
   const scrollTo = (id) => {
@@ -63,6 +72,16 @@ export default function NavbarSupply() {
 
             {/* CARRITO + HAMBURGUESA */}
             <div className="flex items-center gap-4">
+
+              {misComprasCount > 0 && (
+                <button
+                  onClick={() => setComprasOpen(true)}
+                  aria-label="Mis compras"
+                  className="text-zinc-400 hover:text-white transition-all duration-300"
+                >
+                  <Package size={20} />
+                </button>
+              )}
 
               {/* CARRITO CON BADGE */}
               <button
@@ -187,6 +206,7 @@ export default function NavbarSupply() {
       </nav>
 
       <CartDrawerSupply open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <MisComprasPanel open={comprasOpen} onClose={() => setComprasOpen(false)} />
       <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
     </>
   )

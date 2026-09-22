@@ -4,6 +4,7 @@ import { Mail, XCircle, Clock } from 'lucide-react'
 import NavbarCategoryStore from './NavbarCategoryStore'
 import FooterStore from './FooterStore'
 import { useStoreCart } from '../../contexts/StoreCartContext'
+import { guardarCompra } from '../../lib/misCompras'
 
 // A donde vuelve el comprador tras pagar en Mercado Pago (back_urls de
 // POST /api/estudios-tienda-comprar). Clon de SupplyCompraResultadoPage.jsx
@@ -16,12 +17,18 @@ export function meta() {
 export default function TiendaCompraResultadoPage() {
   const [searchParams] = useSearchParams()
   const estado = searchParams.get('estado')
+  const compraId = searchParams.get('compra')
+  const token = searchParams.get('token')
   const esFallo = estado === 'failure'
   const { clearCart } = useStoreCart()
 
   useEffect(() => {
     if (!esFallo) clearCart()
-  }, [esFallo])
+    // "Mis compras" (2026-09-22) — se guarda sin importar el estado (incluso
+    // 'failure'/'pending'): el comprador necesita el link de rastreo para
+    // saber si el pago quedó aprobado después, no solo cuando ya lo está.
+    if (compraId && token) guardarCompra({ compraId, token, module: 'store' })
+  }, [esFallo, compraId, token])
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">

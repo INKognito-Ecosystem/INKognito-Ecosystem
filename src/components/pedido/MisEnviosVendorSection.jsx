@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Truck } from 'lucide-react'
+import { Truck, CheckCircle2, AlertTriangle } from 'lucide-react'
 import { ZONAS_FLETE } from '../../data/colombiaGeo'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
-const ESTADO_LABEL = { asignado: 'Asignado', recogido: 'Recogido', entregado: 'Entregado' }
-const ESTADO_CLASE = { asignado: 'bg-amber-100 text-amber-700', recogido: 'bg-blue-100 text-blue-700', entregado: 'bg-green-100 text-green-700' }
+// Exportados (2026-09-22) — MisComprasPanel.jsx los reusa para el lado
+// comprador, mismos colores/etiquetas que ya ve la tienda del lado vendedor.
+export const ESTADO_LABEL = { asignado: 'Asignado', recogido: 'Recogido', entregado: 'Entregado' }
+export const ESTADO_CLASE = { asignado: 'bg-amber-100 text-amber-700', recogido: 'bg-blue-100 text-blue-700', entregado: 'bg-green-100 text-green-700' }
 
 // "Mis envíos" — generalizado (2026-09-20, Suple multitenant) de
 // MisEnviosTiendaSection.jsx (Store) para servir también a Suple: mismo
@@ -22,14 +24,27 @@ const ENVIOS_ASIGNAR_ENDPOINT = {
   store: 'estudios-envios-asignar-por-token',
   suplementos: 'estudios-envios-asignar-suple-por-token',
 }
+// Reasignar (2026-09-22, Jose: "si una transportadora no recoje, la tienda
+// debería poder reasignar a otra") — un solo endpoint para ambos módulos,
+// a diferencia de pendientes/asignar de arriba: opera sobre un envío que YA
+// existe (guarda su propio compra_tipo), no hace falta duplicarlo por
+// módulo — ver POST /api/estudios-envios-reasignar-por-token en el panel.
+const ENVIOS_REASIGNAR_ENDPOINT = 'estudios-envios-reasignar-por-token'
 
-export default function MisEnviosVendorSection({ token, module = 'store' }) {
+function formatFechaHora(iso) {
+  if (!iso) return null
+  return new Date(iso).toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })
+}
+
+export default function MisEnviosVendorSection({ token, module = 'store', enCoberturaRuta }) {
   const [pendientes, setPendientes] = useState(null)
   const [enCamino, setEnCamino] = useState([])
   const [municipioTienda, setMunicipioTienda] = useState(null)
   const [zonaFiltro, setZonaFiltro] = useState('')
   const [transportadoras, setTransportadoras] = useState([])
   const [asignando, setAsignando] = useState(null)
+  const [reasignarAbierto, setReasignarAbierto] = useState(null)
+  const [reasignando, setReasignando] = useState(null)
   const [error, setError] = useState(null)
 
   const endpointPendientes = ENVIOS_PENDIENTES_ENDPOINT[module] || ENVIOS_PENDIENTES_ENDPOINT.store
@@ -81,6 +96,26 @@ export default function MisEnviosVendorSection({ token, module = 'store' }) {
     }
   }
 
+  const reasignar = async (envioId, transportadoraId) => {
+    setError(null)
+    setReasignando(envioId)
+    try {
+      const res = await fetch(`${PANEL_URL}/api/${ENVIOS_REASIGNAR_ENDPOINT}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, envio_id: envioId, transportadora_id: transportadoraId }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || '')
+      setReasignarAbierto(null)
+      cargar()
+    } catch (err) {
+      setError(err.message || 'No pudimos reasignar la transportadora — intenta de nuevo.')
+    } finally {
+      setReasignando(null)
+    }
+  }
+
   if (pendientes === null) return <p className="text-gray-400 text-xs text-center py-4">Cargando...</p>
 
   return (
@@ -88,6 +123,29 @@ export default function MisEnviosVendorSection({ token, module = 'store' }) {
       <p className="text-gray-600 text-sm mb-4 leading-relaxed">
         Compras aprobadas listas para recoger — elige con qué transportadora de Ruta del Golfo la vas a enviar.
       </p>
+
+      {/* Estado de cobertura permanente (2026-09-22, Jose: "eso debería
+          verse desde antes, no a mitad de un pedido") — antes solo
+          aparecía el aviso de abajo, y solo si ya había un pedido
+          pendiente por asignar. Este usa en_cobertura_ruta (calculado
+          server-side sobre el municipio real de la tienda, ver
+          GET /api/estudios-por-token), no el dropdown de zona de abajo —
+          es más preciso porque no depende de que el municipio de la
+          tienda esté entre las 10 opciones fijas de ZONAS_FLETE. */}
+      {typeof enCoberturaRuta === 'boolean' && (
+        <div className={`mb-4 flex items-start gap-2 rounded-lg border px-3 py-2.5 text-xs ${
+          enCoberturaRuta ? 'bg-green-50 border-green-200 text-green-700' : 'bg-amber-50 border-amber-200 text-amber-700'
+        }`}>
+          {enCoberturaRuta
+            ? <CheckCircle2 size={14} className="flex-shrink-0 mt-0.5" />
+            : <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />}
+          <p className="leading-relaxed">
+            {enCoberturaRuta
+              ? 'Tu zona está cubierta por Ruta del Golfo — puedes asignar transportadora a tus envíos.'
+              : 'Todavía no hay ninguna transportadora activa en tu zona — coordina cada entrega directo con tus clientes.'}
+          </p>
+        </div>
+      )}
 
       <div className="mb-4">
         <label className="text-[9px] font-bold uppercase tracking-wide text-gray-400 mb-1.5 block">Buscar transportadora en</label>
@@ -103,7 +161,7 @@ export default function MisEnviosVendorSection({ token, module = 'store' }) {
         </select>
       </div>
 
-      {zonaFiltro && !transportadoras.length && pendientes.length > 0 && (
+      {zonaFiltro && !transportadoras.length && (
         <p className="text-amber-600 text-xs bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4">
           Todavía no hay transportadoras activas en tu zona — coordina la entrega directo con el cliente mientras tanto.
         </p>
@@ -161,6 +219,14 @@ export default function MisEnviosVendorSection({ token, module = 'store' }) {
                   <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full flex-shrink-0 ${ESTADO_CLASE[e.estado]}`}>{ESTADO_LABEL[e.estado]}</span>
                 </div>
                 <p className="text-gray-500 text-xs">{e.cliente_direccion || 'Sin dirección'}, {ZONAS_FLETE[e.cliente_municipio] || e.cliente_municipio}</p>
+                {/* Timestamps de cada paso (2026-09-22, fortalecer el rastreo) */}
+                {(e.recogido_at || e.entregado_at) && (
+                  <p className="text-gray-400 text-[10px] mt-1">
+                    {e.recogido_at && <>Recogido {formatFechaHora(e.recogido_at)}</>}
+                    {e.recogido_at && e.entregado_at && ' · '}
+                    {e.entregado_at && <>Entregado {formatFechaHora(e.entregado_at)}</>}
+                  </p>
+                )}
                 <div className="flex items-center gap-1.5 mt-2.5 pt-2.5 border-t border-gray-100">
                   {e.transportadora_logo ? (
                     <img src={e.transportadora_logo} alt="" className="w-5 h-5 rounded-full object-cover flex-shrink-0" />
@@ -172,6 +238,54 @@ export default function MisEnviosVendorSection({ token, module = 'store' }) {
                     {e.transportadora_municipio && <span className="font-normal text-gray-400"> · {ZONAS_FLETE[e.transportadora_municipio] || e.transportadora_municipio}</span>}
                   </span>
                 </div>
+
+                {/* Reasignar (2026-09-22) — solo tiene sentido mientras la
+                    transportadora no ha actuado todavía. */}
+                {e.estado === 'asignado' && (
+                  <div className="mt-2.5 pt-2.5 border-t border-gray-100">
+                    {reasignarAbierto === e.envio_id ? (
+                      <>
+                        <p className="text-[9px] font-bold uppercase tracking-wide text-gray-400 mb-1.5">Reasignar a</p>
+                        <div className="flex flex-wrap gap-2">
+                          {transportadoras.filter((t) => t.id !== e.transportadora_id).map((t) => (
+                            <button
+                              key={t.id}
+                              type="button"
+                              onClick={() => reasignar(e.envio_id, t.id)}
+                              disabled={reasignando === e.envio_id}
+                              className="flex items-center gap-1.5 pl-1.5 pr-3 py-1.5 rounded-full border border-gray-300 hover:border-gray-500 text-xs font-bold text-gray-700 transition-colors disabled:opacity-60"
+                            >
+                              {t.logo_url ? (
+                                <img src={t.logo_url} alt="" className="w-5 h-5 rounded-full object-cover flex-shrink-0" />
+                              ) : (
+                                <Truck size={14} className="text-gray-400 flex-shrink-0" />
+                              )}
+                              {reasignando === e.envio_id ? '...' : t.nombre}
+                            </button>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => setReasignarAbierto(null)}
+                            className="text-xs font-bold text-gray-400 px-2 py-1.5"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                        {!transportadoras.length && (
+                          <p className="text-gray-400 text-[11px]">Elige una zona arriba para ver otras transportadoras.</p>
+                        )}
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setReasignarAbierto(e.envio_id)}
+                        className="text-xs font-bold text-gray-500 hover:text-gray-800 transition-colors"
+                      >
+                        ¿No ha recogido? Reasignar transportadora →
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>

@@ -3,6 +3,7 @@ import { Camera, LoaderCircle, MapPin, Navigation, Check } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import ComboboxBuscable from '../artistas/ComboboxBuscable'
 import { DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO } from '../../data/colombiaGeo'
+import PoliticaEnvioCard from '../pedido/PoliticaEnvioCard'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const BTN = '#3f3f46' // zinc-700, mismo acento que ya usa Suple
@@ -23,6 +24,8 @@ export default function EditarPerfilSupleSection({ token, estudio, cloud_name, u
     logo_url: estudio.logo_url || '',
     google_maps_url: estudio.google_maps_url || '',
     direccion: estudio.direccion || '',
+    politica_envio: estudio.politica_envio || 'cliente_paga',
+    envio_gratis_monto: estudio.envio_gratis_monto ?? '',
   })
   const [subiendo, setSubiendo] = useState(false)
   const [guardando, setGuardando] = useState(false)
@@ -70,6 +73,10 @@ export default function EditarPerfilSupleSection({ token, estudio, cloud_name, u
     e.preventDefault()
     if (!form.direccion.trim()) {
       setError('La dirección exacta es obligatoria.')
+      return
+    }
+    if (form.politica_envio === 'gratis_desde_monto' && !(Number(form.envio_gratis_monto) > 0)) {
+      setError('Indica desde qué monto el envío queda gratis.')
       return
     }
     setError(null)
@@ -169,6 +176,12 @@ export default function EditarPerfilSupleSection({ token, estudio, cloud_name, u
           </div>
         </div>
       </div>
+
+      <PoliticaEnvioCard
+        politicaEnvio={form.politica_envio}
+        envioGratisMonto={form.envio_gratis_monto}
+        onChange={(patch) => setForm((f) => ({ ...f, ...patch }))}
+      />
 
       {/* CARD 2 — Redes de contacto */}
       <div className={`${cardClass} mt-5`}>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Landmark, ShoppingBag } from 'lucide-react'
-import { ZONAS_FLETE, DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO } from '../../data/colombiaGeo'
+import { ZONAS_FLETE, DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO, normalize } from '../../data/colombiaGeo'
 import ComboboxBuscable from '../artistas/ComboboxBuscable'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
@@ -32,9 +32,11 @@ const SHIPPING_MODULES = ['store', 'suplementos']
 // después de pagar, mismo criterio que las reservas de artista. Reemplaza
 // el formulario normal de PedidoOnlinePage.jsx solo cuando cart.vendorLock
 // está seteado (ver Supply/Store/SupleCartContext.jsx).
-export default function PedidoSupplyVendorCheckout({ cart, module = 'supply' }) {
+export default function PedidoSupplyVendorCheckout({ cart, module = 'supply', fleteTabla }) {
   const { items, vendorLock, total } = cart
-  const light = module === 'suplementos'
+  // Todos los módulos van en claro (2026-09-22, mismo pedido de Jose que
+  // PedidoOnlinePage.jsx) — antes solo Suplementos.
+  const light = true
   const c = (dark, lite) => (light ? lite : dark)
   const inputClass = c(
     'w-full bg-zinc-900 border border-gray-700 text-white p-3.5 rounded outline-none placeholder:text-gray-600',
@@ -43,6 +45,20 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply' }) 
   const [form, setForm] = useState({ nombre: '', telefono: '', email: '', municipio: '', departamento: '', direccion: '', mensaje: '' })
   const [enviando, setEnviando] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
+
+  // Ruta del Golfo (2026-09-22) — normaliza igual que _normCiudadFlete en
+  // el panel (server.js): sin acentos, solo letras. `normalize()` ya
+  // existe en colombiaGeo.js (usada para geolocalización), solo le falta
+  // el paso de quitar todo lo que no sea letra.
+  const normMunicipio = (s) => (s ? normalize(s).replace(/[^a-z]/g, '') : null)
+  const origenNorm = normMunicipio(vendorLock.municipio)
+  const destinoNorm = normMunicipio(form.municipio)
+  const metaGratis = Number(vendorLock.envioGratisMonto) || 0
+  const envioGratis = vendorLock.politicaEnvio === 'siempre_gratis'
+    || (vendorLock.politicaEnvio === 'gratis_desde_monto' && metaGratis > 0 && total >= metaGratis)
+  const fleteExacto = SHIPPING_MODULES.includes(module) && vendorLock.enCoberturaRuta && origenNorm && destinoNorm && fleteTabla
+    ? (fleteTabla[origenNorm]?.[destinoNorm] ?? null)
+    : null
 
   // Mismo fix de bfcache ya usado en ArtistaLandingPage.jsx — sin esto, si
   // el comprador le da "Atrás" desde Mercado Pago sin pagar, el botón
@@ -126,6 +142,33 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply' }) 
                 </div>
               )
             })}
+            {/* Envío (2026-09-22, Ruta del Golfo) — SOLO informativo: no se
+                suma a `total` ni al cobro de Mercado Pago de abajo. El
+                flete se sigue cobrando aparte (en efectivo, al recibir),
+                igual que ya funciona en el checkout genérico de Eljach
+                (PedidoOnlinePage.jsx) — decisión de diseño explícita, no
+                un olvido. Supply queda fuera (SHIPPING_MODULES no lo
+                incluye — no recolecta municipio, así que no hay destino
+                con qué calcular nada). */}
+            {SHIPPING_MODULES.includes(module) && (
+              envioGratis ? (
+                <div className="flex items-center justify-between px-4 py-2.5 text-sm">
+                  <span className={c('text-gray-300', 'text-zinc-700')}>Envío</span>
+                  <span className="font-bold text-green-600">Gratis</span>
+                </div>
+              ) : form.municipio && vendorLock.enCoberturaRuta && fleteExacto > 0 ? (
+                <div className="flex items-center justify-between px-4 py-2.5 text-sm">
+                  <span className={c('text-gray-300', 'text-zinc-700')}>Envío (se paga al recibir)</span>
+                  <span className={c('text-gray-500', 'text-zinc-500')}>${fleteExacto.toLocaleString('es-CO')}</span>
+                </div>
+              ) : form.municipio && !vendorLock.enCoberturaRuta ? (
+                <div className="px-4 py-2.5">
+                  <p className={`text-xs leading-relaxed ${c('text-amber-400/90', 'text-amber-700')}`}>
+                    Deberás cubrir el envío — {vendorLock.estudioNombre} lo coordina directo contigo al recibir, sin un monto fijo.
+                  </p>
+                </div>
+              ) : null
+            )}
             <div className="flex items-center justify-between px-4 py-3 font-bold">
               <span className={`text-sm uppercase tracking-wide ${c('text-white', 'text-zinc-900')}`}>Total</span>
               <span className={c('text-white', 'text-zinc-900')}>${total.toLocaleString('es-CO')}</span>
