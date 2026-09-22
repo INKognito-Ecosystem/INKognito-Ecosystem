@@ -693,44 +693,44 @@ export default function ArtistaLandingPage() {
               </div>
             )}
 
-            {/* PORTAFOLIO — v2 (2026-08-06, Jose: "encierra portafolio en
-                una card gris... ponlo a la izquierda, para que el título
-                y descripción sean una sola línea... para que no quede
-                lejos de la card de sobre mí") — pasa de sección suelta a
-                todo el ancho, a una card compacta del mismo ancho que la
-                burbuja de bio (max-w-xl) y dentro del mismo space-y-2,
-                así el espaciado entre ambas es automático y mínimo.
-                Título+descripción combinados en un solo `<p>` con
-                truncate — nunca se parte en dos líneas sin importar el
-                largo del nombre/municipio. */}
+            {/* PORTAFOLIO — v3 (2026-09-22, Jose: "en editar perfil ocupan
+                toda la pantalla, pero para el usuario está dentro de una
+                burbuja o card, sácalas de allí, deben ocupar toda la
+                pantalla") — se quita la burbuja gris/bordeada (v2,
+                2026-08-06) que encerraba título+fotos; las fotos vuelven a
+                ir a todo el ancho, igual que en "mi perfil editar"
+                (ArtistaEditarPerfilPage.jsx) y que la portada de arriba:
+                `-mx-4` cancela el `px-4` de este contenedor (mobile llega
+                al borde real de la pantalla; en escritorio llega al borde
+                de la columna `max-w-3xl`, como la portada). El título se
+                queda con su propio padding, ya no necesita el `px-4` que
+                antes le daba la burbuja. */}
             {trabajos.length > 0 && (
-              <div className="max-w-xl">
-                <div className="bg-gray-100 border border-gray-200 rounded-2xl overflow-hidden">
-                  <p className="px-4 pt-3.5 pb-2 text-gray-400 text-[11px] text-left overflow-x-auto whitespace-nowrap scrollbar-hide">
-                    <span className="uppercase tracking-widest font-bold text-gray-500">Portafolio</span> — Tatuajes hechos por {artista.nombre} en {artista.municipio}
-                  </p>
-                  {/* aspect-[4/5] (2026-09-22, Jose: "el tamaño de las card
-                      de fotos del portafolio... el que tienen las de
-                      Instagram, un poco más largas de manera vertical") —
-                      antes aspect-square; mismo criterio de 3 columnas,
-                      solo más alto. cloudinaryFill pide el recorte ya en
-                      4:5 (no 400x400 + recorte de más encima en el
-                      navegador), mismo w=400 de antes. */}
-                  <div className="grid grid-cols-3 gap-0.5 sm:gap-1 w-full">
-                    {trabajos.map((src, i) => (
-                      <button
-                        key={src}
-                        type="button"
-                        onClick={() => setLightbox(i)}
-                        className="relative aspect-[4/5] bg-gray-50 overflow-hidden group"
-                      >
-                        <img src={cloudinaryFill(src, 400, 500)} alt={`Trabajo ${i + 1} de ${artista.nombre}`} className="w-full h-full object-cover" loading="lazy" />
-                        <span className="absolute bottom-1.5 right-1.5 flex items-center justify-center w-6 h-6 bg-black/60 text-white rounded-full backdrop-blur-sm group-hover:bg-black/80 transition-colors">
-                          <Search size={12} />
-                        </span>
-                      </button>
-                    ))}
-                  </div>
+              <div>
+                <p className="text-gray-400 text-[11px] text-left overflow-x-auto whitespace-nowrap scrollbar-hide mb-2">
+                  <span className="uppercase tracking-widest font-bold text-gray-500">Portafolio</span> — Tatuajes hechos por {artista.nombre} en {artista.municipio}
+                </p>
+                {/* aspect-[4/5] (2026-09-22, Jose: "el tamaño de las card
+                    de fotos del portafolio... el que tienen las de
+                    Instagram, un poco más largas de manera vertical") —
+                    antes aspect-square; mismo criterio de 3 columnas,
+                    solo más alto. cloudinaryFill pide el recorte ya en
+                    4:5 (no 400x400 + recorte de más encima en el
+                    navegador), mismo w=400 de antes. */}
+                <div className="-mx-4 grid grid-cols-3 gap-0.5 sm:gap-1">
+                  {trabajos.map((src, i) => (
+                    <button
+                      key={src}
+                      type="button"
+                      onClick={() => setLightbox(i)}
+                      className="relative aspect-[4/5] bg-gray-50 overflow-hidden group"
+                    >
+                      <img src={cloudinaryFill(src, 400, 500)} alt={`Trabajo ${i + 1} de ${artista.nombre}`} className="w-full h-full object-cover" loading="lazy" />
+                      <span className="absolute bottom-1.5 right-1.5 flex items-center justify-center w-6 h-6 bg-black/60 text-white rounded-full backdrop-blur-sm group-hover:bg-black/80 transition-colors">
+                        <Search size={12} />
+                      </span>
+                    </button>
+                  ))}
                 </div>
               </div>
             )}

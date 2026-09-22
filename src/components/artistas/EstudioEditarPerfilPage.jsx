@@ -533,9 +533,16 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
       )}
 
       <div className={vista === 'perfil' ? 'block' : 'hidden'}>
-      <div className="px-4 max-w-3xl mx-auto lg:mx-0">
+      {/* Sin px-4 acá (2026-09-22, Jose: "¿por qué la portada de estudios
+          no ocupa toda la pantalla como sí lo hace artistas?") — mismo
+          criterio que ArtistaEditarPerfilPage.jsx: el padding va después,
+          envolviendo desde el hero en adelante, para que la portada llegue
+          al borde real (o al borde de la columna max-w-3xl en escritorio).
+          rounded-2xl también se quita de la portada — Artista no la tiene
+          redondeada, y ahora que llega al borde no tendría sentido. */}
+      <div className="max-w-3xl mx-auto lg:mx-0">
 
-      <div className="w-full h-40 sm:h-56 bg-gray-100 overflow-hidden relative rounded-2xl">
+      <div className="w-full h-40 sm:h-56 bg-gray-100 overflow-hidden relative">
         {form.foto_portada && <img src={form.foto_portada} alt="" className="w-full h-full object-cover" />}
         {/* Botón para llegar a "Mis artistas"/"Tienda en Supply" incrustado
             en la esquina de la portada (2026-09-22, Jose: "el botón
@@ -564,6 +571,11 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
           Portada
         </button>
       </div>
+
+      {/* Padding para todo lo que sigue (hero, datos, contacto, guardar) —
+          la portada de arriba queda afuera a propósito, ver comentario de
+          más arriba. */}
+      <div className="px-4">
 
       <div className="relative min-h-16 sm:min-h-[85px]">
         <div className="absolute left-0 top-0 -translate-y-1/3">
@@ -759,6 +771,7 @@ function FormularioEdicionEstudio({ token, estudio, cloud_name, upload_preset, i
         {guardando ? 'Guardando...' : guardado ? '✓ Guardado' : 'Guardar cambios'}
       </button>
 
+      </div>
       </div>
       </div>
 
