@@ -239,6 +239,16 @@ export default function MisEnviosVendorSection({ token, module = 'store', enCobe
                   </span>
                 </div>
 
+                {/* Quién paga el flete (2026-09-23) — confirmación para que
+                    veas que tu política se aplicó bien en este envío
+                    puntual; la transportadora ve el mismo mensaje en su
+                    panel. */}
+                <p className="text-gray-400 text-[10px] mt-1.5">
+                  {e.cobrar_flete_cliente
+                    ? `El cliente paga $${Number(e.monto_flete).toLocaleString('es-CO')} de flete al recibir`
+                    : `Tú le pagas $${Number(e.monto_flete).toLocaleString('es-CO')} a la transportadora al recoger — el cliente no paga flete`}
+                </p>
+
                 {/* Reasignar (2026-09-22) — solo tiene sentido mientras la
                     transportadora no ha actuado todavía. */}
                 {e.estado === 'asignado' && (

@@ -108,17 +108,12 @@ export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, up
                   >
                     <Icon size={16} className="text-gray-400 flex-shrink-0" />
                     <span className="flex-1 text-sm font-bold text-gray-900">{label}</span>
-                    {/* Punto de cobertura de Ruta del Golfo (2026-09-22) —
-                        mismo slot que el badge rojo de notificaciones, pero
-                        visible siempre (no solo cuando hay algo nuevo) para
-                        que la tienda sepa su estado desde el menú, sin
-                        tener que entrar a "Mis envíos". */}
-                    {key === 'envios' && typeof estudio.en_cobertura_ruta === 'boolean' && (
-                      <span
-                        title={estudio.en_cobertura_ruta ? 'Tu zona está cubierta por Ruta del Golfo' : 'Sin transportadoras activas en tu zona'}
-                        className={`w-2 h-2 rounded-full flex-shrink-0 ${estudio.en_cobertura_ruta ? 'bg-green-500' : 'bg-amber-500'}`}
-                      />
-                    )}
+                    {/* El punto de cobertura de Ruta del Golfo que vivía acá
+                        se quitó (2026-09-23, Jose: "confuso... esa info la
+                        dice al abrir mis envíos") — ese aviso ya se muestra
+                        dentro de "Mis envíos" (badge permanente, ver
+                        MisEnviosVendorSection.jsx), no hacía falta
+                        duplicarlo acá afuera. */}
                     {conteoNotif > 0 && (
                       <span className="min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-600 text-white text-[10px] font-black leading-none flex-shrink-0">
                         {conteoNotif > 9 ? '9+' : conteoNotif}

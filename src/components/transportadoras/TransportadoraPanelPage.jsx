@@ -334,9 +334,20 @@ function EnviosSection({ token, envios: enviosIniciales }) {
               <p className="truncate">{e.cliente_direccion || 'Sin dirección — coordina por WhatsApp'}, {ZONAS_FLETE[e.municipio_destino] || e.municipio_destino}</p>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 text-gray-600 text-xs mb-3">
-            <Package size={12} className="flex-shrink-0" />
-            Flete: ${Number(e.monto_flete).toLocaleString('es-CO')}
+          {/* Quién paga el flete (2026-09-23, Jose: "la tienda le pagará a
+              la transportadora cuando esta vaya a recoger el paquete") —
+              antes solo decía "Flete: $X" sin aclarar a quién cobrárselo;
+              acá SIEMPRE es explícito, para que nunca le cobren de más (o
+              de menos) al cliente por accidente. */}
+          <div className={`flex items-start gap-1.5 text-xs mb-3 rounded-lg px-2.5 py-2 ${
+            e.cobrar_flete_cliente ? 'bg-amber-50 text-amber-800' : 'bg-green-50 text-green-800'
+          }`}>
+            <Package size={12} className="flex-shrink-0 mt-0.5" />
+            <p className="font-bold">
+              {e.cobrar_flete_cliente
+                ? `Cobra $${Number(e.monto_flete).toLocaleString('es-CO')} de flete al cliente al entregar`
+                : `No le cobres flete al cliente — ${e.tienda_nombre_display} te paga los $${Number(e.monto_flete).toLocaleString('es-CO')} a ti cuando recojas el paquete`}
+            </p>
           </div>
           {SIGUIENTE_ESTADO[e.estado] && (
             <button

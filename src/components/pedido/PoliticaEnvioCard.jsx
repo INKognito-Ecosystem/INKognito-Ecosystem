@@ -1,3 +1,5 @@
+import { Check } from 'lucide-react'
+
 // Tarjeta "Envío" — Ruta del Golfo (2026-09-22, Jose: "la tienda podrá
 // elegir si asume los envíos, o podrá elegirlo por pedido... por compra
 // mayores a x precio, el envío es gratis"). Compartida por
@@ -32,24 +34,49 @@ const OPCIONES = [
   },
 ]
 
+const DEFAULT_POLITICA = 'cliente_paga'
+
 export default function PoliticaEnvioCard({ politicaEnvio, envioGratisMonto, onChange }) {
+  // Toggle real (2026-09-23, Jose: "cuando yo seleccione una... no hay nada
+  // que me diga que esa opción está seleccionada... si la presiono de nuevo
+  // se desselecciona") — al presionar la opción YA activa, vuelve a
+  // "el cliente paga" (la política base); presionarla a ELLA de nuevo no
+  // hace nada, porque siempre tiene que quedar exactamente una política
+  // elegida (nunca "ninguna") — este archivo siempre manda un valor válido.
+  const seleccionar = (value) => {
+    if ((politicaEnvio || DEFAULT_POLITICA) === value) {
+      if (value !== DEFAULT_POLITICA) onChange({ politica_envio: DEFAULT_POLITICA, envio_gratis_monto: '' })
+      return
+    }
+    onChange({ politica_envio: value })
+  }
+
   return (
     <div className={`${cardClass} mt-5`}>
       <h2 className={cardTitleClass}>Envío</h2>
       <div className="flex flex-col gap-2">
         {OPCIONES.map((opt) => {
-          const activo = (politicaEnvio || 'cliente_paga') === opt.value
+          const activo = (politicaEnvio || DEFAULT_POLITICA) === opt.value
           return (
             <button
               key={opt.value}
               type="button"
-              onClick={() => onChange({ politica_envio: opt.value })}
-              className={`text-left px-4 py-3 rounded-lg border transition-colors ${
-                activo ? 'border-gray-700 bg-gray-50' : 'border-gray-200 hover:border-gray-300'
+              onClick={() => seleccionar(opt.value)}
+              className={`text-left px-4 py-3 rounded-lg border-2 transition-colors flex items-start gap-3 ${
+                activo ? 'border-green-600 bg-green-50' : 'border-gray-200 hover:border-gray-300'
               }`}
             >
-              <p className="text-sm font-bold text-gray-900">{opt.label}</p>
-              <p className="text-gray-500 text-xs mt-0.5 leading-relaxed">{opt.desc}</p>
+              <span
+                className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
+                  activo ? 'bg-green-600' : 'border-2 border-gray-300'
+                }`}
+              >
+                {activo && <Check size={12} className="text-white" strokeWidth={3} />}
+              </span>
+              <span className="min-w-0">
+                <p className={`text-sm font-bold ${activo ? 'text-green-800' : 'text-gray-900'}`}>{opt.label}</p>
+                <p className="text-gray-500 text-xs mt-0.5 leading-relaxed">{opt.desc}</p>
+              </span>
             </button>
           )
         })}

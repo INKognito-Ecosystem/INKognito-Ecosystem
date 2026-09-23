@@ -182,7 +182,7 @@ const SLOTS_DISENO = [
   { key: 'imagen_url_3', label: 'Secundaria 2' },
 ]
 
-function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
+function MisDisenosSection({ token, cloud_name, upload_preset }) {
   const [disenos, setDisenos] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [subiendo, setSubiendo] = useState(null)
@@ -349,36 +349,13 @@ function MisDisenosSection({ token, cloud_name, upload_preset, mpConectado }) {
     // border-y (arriba Y abajo) es la "división acentuada" con el resto
     // del formulario, que sigue en blanco liso.
     <div className="mb-8 -mx-4 md:mx-0 bg-gray-50 border-y md:border border-gray-200 md:rounded-2xl px-4 py-5">
-      {/* Estado de Mercado Pago (2026-08-06, Jose: "ponlo arriba del
-          título") — es la condición previa para que cualquier diseño se
-          pueda vender, tiene sentido que se vea antes de "Mis diseños en
-          venta", no después. */}
-      <div className="flex items-center justify-between gap-3 mb-3 px-3 py-2.5 rounded-lg bg-white border border-gray-200">
-        <div className="flex items-center gap-2">
-          <Wallet size={16} className={mpConectado ? 'text-green-600' : 'text-gray-400'} />
-          <span className="text-xs font-bold">
-            {mpConectado ? 'Mercado Pago conectado' : 'Sin Mercado Pago conectado'}
-          </span>
-        </div>
-        {/* Reconectar sigue visible aun ya conectado (2026-08-06, Jose:
-            "¿cómo hago para conectar con mi cuenta real si ya me muestra
-            que estoy conectado?") — antes el link desaparecía del todo al
-            conectar, sin forma de cambiar de cuenta. Autorizar de nuevo
-            sobrescribe el token guardado, no hace falta desconectar antes. */}
-        <a
-          href={`${PANEL_URL}/api/artistas-mp-conectar?token=${encodeURIComponent(token)}`}
-          className={mpConectado
-            ? 'text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors'
-            : 'inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-white hover:opacity-90 transition-opacity'}
-          style={mpConectado ? undefined : { backgroundColor: MP_BLUE }}
-        >
-          {mpConectado ? 'Reconectar' : (<>Conectar <ExternalLink size={11} /></>)}
-        </a>
-      </div>
-      {!mpConectado && (
-        <p className="text-gray-400 text-[10px] mb-4">Conecta tu cuenta de Mercado Pago para empezar a vender tus diseños y recibir pagos de Agenda en línea — el dinero llega directo a ti.</p>
-      )}
-
+      {/* El estado de Mercado Pago se movió afuera, a su propia sección en
+          "Mi perfil" (2026-09-23, Jose: "sácalo del botón mis diseños en
+          venta... como ya pasa en los demás módulos") — es la conexión de
+          TODA la cuenta (también cobra Agenda en línea), no algo específico
+          de vender diseños, así que no tenía que vivir escondida detrás de
+          esta pestaña. Ver el bloque "Mercado Pago" en la pestaña "Mi
+          perfil", justo debajo de "Sobre mí". */}
       <p className={labelClass}>Mis diseños en venta</p>
 
       {cargando ? (
@@ -1486,6 +1463,48 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
             </div>
           )}
 
+          {/* Mercado Pago (2026-09-23, Jose: "sácalo del botón mis diseños
+              en venta... como ya pasa en los demás módulos") — antes vivía
+              escondido dentro de la pestaña "Mis diseños", como si fuera
+              algo propio de vender diseños; en realidad es la conexión de
+              TODA la cuenta (también cobra Agenda en línea), así que ahora
+              es su propia sección acá, visible sin tener que entrar a
+              ninguna otra pestaña — mismo criterio visual que usan
+              Store/Suple/Supply (label + insignia conectado / botón azul
+              de conectar). */}
+          <div className="relative max-w-xl">
+            <div className="bg-gray-100 border border-gray-200 rounded-2xl px-4 py-3.5">
+              <div className="flex items-center justify-between gap-3 mb-1.5">
+                <label className={labelClass + ' mb-0'}>Mercado Pago</label>
+                {artista.mp_conectado && (
+                  <a
+                    href={`${PANEL_URL}/api/artistas-mp-conectar?token=${encodeURIComponent(token)}`}
+                    className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    Reconectar
+                  </a>
+                )}
+              </div>
+              {artista.mp_conectado ? (
+                <span className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border" style={{ borderColor: MP_BLUE }}>
+                  <img src={MP_LOGO_URL} alt="Mercado Pago" className="h-4" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: MP_BLUE }}>Conectado</span>
+                </span>
+              ) : (
+                <a
+                  href={`${PANEL_URL}/api/artistas-mp-conectar?token=${encodeURIComponent(token)}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-white text-[11px] font-black uppercase tracking-widest shadow-md hover:opacity-90 transition-opacity"
+                  style={{ backgroundColor: MP_BLUE }}
+                >
+                  Conecta Mercado Pago <ExternalLink size={12} />
+                </a>
+              )}
+              {!artista.mp_conectado && (
+                <p className="text-gray-400 text-[10px] mt-1.5">Sin esto conectado, nadie puede pagarte por tus diseños ni por Agenda en línea — la plata te llega directo a tu cuenta, sin pasar por INKognito.</p>
+              )}
+            </div>
+          </div>
+
           {/* Agenda en línea — SIEMPRE visible en la vista previa, aunque
               el artista no haya llenado nada aún (2026-08-06, Jose: "el
               texto de cómo se vería completo debe estar presente"). Los
@@ -1787,7 +1806,7 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
         <BotonMenuSecciones className="bg-gray-100 text-gray-700 hover:bg-gray-200" />
       </div>
 
-      <MisDisenosSection token={token} cloud_name={cloud_name} upload_preset={upload_preset} mpConectado={artista.mp_conectado} />
+      <MisDisenosSection token={token} cloud_name={cloud_name} upload_preset={upload_preset} />
 
       </div>
       </div>
