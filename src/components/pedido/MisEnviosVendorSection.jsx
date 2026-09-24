@@ -176,8 +176,11 @@ export default function MisEnviosVendorSection({ token, module = 'store', enCobe
             <div key={c.id} className="border border-gray-200 rounded-xl p-4">
               <p className="font-black text-sm">{c.cliente_nombre || 'Cliente'}</p>
               <p className="text-gray-500 text-xs mt-0.5">{c.cliente_direccion || 'Sin dirección registrada'}, {ZONAS_FLETE[c.cliente_municipio] || c.cliente_municipio}</p>
+              {/* Info completa del comprador (2026-09-23, Jose: "así no
+                  dependerán solo del correo") — correo sumado al teléfono
+                  que ya estaba, para no tener que ir a buscarlo aparte. */}
               <p className="text-gray-400 text-[10px] uppercase tracking-wide mb-3">
-                {c.cliente_telefono} · ${Number(c.monto_total).toLocaleString('es-CO')}
+                {c.cliente_telefono}{c.cliente_email ? ` · ${c.cliente_email}` : ''} · ${Number(c.monto_total).toLocaleString('es-CO')}
               </p>
               <p className="text-[9px] font-bold uppercase tracking-wide text-gray-400 mb-1.5">Elige transportadora</p>
               <div className="flex flex-wrap gap-2">
@@ -219,6 +222,14 @@ export default function MisEnviosVendorSection({ token, module = 'store', enCobe
                   <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full flex-shrink-0 ${ESTADO_CLASE[e.estado]}`}>{ESTADO_LABEL[e.estado]}</span>
                 </div>
                 <p className="text-gray-500 text-xs">{e.cliente_direccion || 'Sin dirección'}, {ZONAS_FLETE[e.cliente_municipio] || e.cliente_municipio}</p>
+                {/* Teléfono/correo (2026-09-23) — esta card "en camino"
+                    nunca los mostraba, a diferencia de la de arriba
+                    (pendientes) — mismo criterio de info completa. */}
+                {(e.cliente_telefono || e.cliente_email) && (
+                  <p className="text-gray-400 text-[10px] uppercase tracking-wide mt-0.5">
+                    {e.cliente_telefono}{e.cliente_telefono && e.cliente_email ? ' · ' : ''}{e.cliente_email}
+                  </p>
+                )}
                 {/* Timestamps de cada paso (2026-09-22, fortalecer el rastreo) */}
                 {(e.recogido_at || e.entregado_at) && (
                   <p className="text-gray-400 text-[10px] mt-1">

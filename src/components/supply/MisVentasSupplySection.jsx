@@ -47,7 +47,14 @@ export default function MisVentasSupplySection({ token, standalone = false }) {
           <div key={v.id} className="flex items-center justify-between gap-3 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-xs">
             <div className="min-w-0">
               <p className="font-bold truncate">{v.items.map((i) => `${i.cantidad}x ${i.product_nombre}`).join(', ')}</p>
-              <p className="text-gray-400">{v.cliente_nombre || v.cliente_telefono} · {new Date(v.created_at).toLocaleDateString('es-CO')}</p>
+              <p className="text-gray-400">{v.cliente_nombre || 'Cliente'} · {new Date(v.created_at).toLocaleDateString('es-CO')}</p>
+              {/* Info completa del comprador (2026-09-23, Jose: "así no
+                  dependerán solo del correo") — Supply pide dirección
+                  desde hoy mismo (ver PedidoSupplyVendorCheckout.jsx). */}
+              <p className="text-gray-400 truncate">{v.cliente_telefono}{v.cliente_email ? ` · ${v.cliente_email}` : ''}</p>
+              {v.cliente_direccion && (
+                <p className="text-gray-400 truncate">{v.cliente_direccion}, {v.cliente_municipio}</p>
+              )}
             </div>
             <div className="flex-shrink-0 text-right">
               <p className="font-black">${Number(v.monto_estudio).toLocaleString('es-CO')}</p>
@@ -85,7 +92,11 @@ export default function MisVentasSupplySection({ token, standalone = false }) {
             <div key={v.id} className="flex items-center justify-between gap-3 bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-xs">
               <div className="min-w-0">
                 <p className="font-bold truncate">{v.items.map((i) => `${i.cantidad}x ${i.product_nombre}`).join(', ')}</p>
-                <p className="text-gray-400">{v.cliente_nombre || v.cliente_telefono} · {new Date(v.created_at).toLocaleDateString('es-CO')}</p>
+                <p className="text-gray-400">{v.cliente_nombre || 'Cliente'} · {new Date(v.created_at).toLocaleDateString('es-CO')}</p>
+                <p className="text-gray-400 truncate">{v.cliente_telefono}{v.cliente_email ? ` · ${v.cliente_email}` : ''}</p>
+                {v.cliente_direccion && (
+                  <p className="text-gray-400 truncate">{v.cliente_direccion}, {v.cliente_municipio}</p>
+                )}
               </div>
               <div className="flex-shrink-0 text-right">
                 <p className="font-black">${Number(v.monto_estudio).toLocaleString('es-CO')}</p>

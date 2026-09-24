@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ArrowLeft, Share2, Minus, Plus, Trash2, Check, Package } from 'lucide-react'
 import { useSupleCart } from '../../contexts/SupleCartContext'
 import EnvioGratisBar from '../pedido/EnvioGratisBar'
+import GuardarDireccionButton from '../pedido/GuardarDireccionButton'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
@@ -120,6 +121,9 @@ export default function CartDrawerSuple({ open, onClose }) {
             </div>
           )}
         </div>
+
+        {/* GUARDAR DIRECCIÓN (2026-09-23) — arriba de "Todos los productos" */}
+        {items.length > 0 && <GuardarDireccionButton />}
 
         {/* SELECCIONAR TODOS */}
         {items.length > 0 && (

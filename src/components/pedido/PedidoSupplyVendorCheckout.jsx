@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Landmark, ShoppingBag } from 'lucide-react'
 import { ZONAS_FLETE, DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO, normalize } from '../../data/colombiaGeo'
 import ComboboxBuscable from '../artistas/ComboboxBuscable'
+import { leerDireccionGuardada } from '../../utils/direccionGuardada'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
@@ -15,15 +16,26 @@ const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-pro
 // difieren.
 const COMPRAR_ENDPOINT = { supply: 'estudios-supply-comprar', store: 'estudios-tienda-comprar', suplementos: 'estudios-suple-comprar' }
 
-// Municipio de entrega obligatorio ("Ruta del Golfo") — Store y Suple lo
-// piden, Supply no. Store cubre solo Urabá (combobox de ZONAS_FLETE fijo);
-// Suple es nacional (un vendedor puede estar en cualquier parte de
+// Cálculo/aviso de flete ("Ruta del Golfo") — SOLO Store y Suple: son los
+// únicos módulos con transportadoras/flete_tabla/política de envío
+// configurada por tienda. Store cubre solo Urabá (combobox de ZONAS_FLETE
+// fijo); Suple es nacional (un vendedor puede estar en cualquier parte de
 // Colombia, y su comprador también) — combobox Departamento+Municipio,
 // mismo patrón que los formularios de registro. `_calcularFlete` en el
 // panel ya devuelve 0 sin error cuando la combinación no está en
 // flete_tabla, así que un comprador fuera de Urabá no rompe nada, solo
 // no tiene flete calculado hasta que el vendedor coordine directo.
 const SHIPPING_MODULES = ['store', 'suplementos']
+
+// Dirección de entrega obligatoria (2026-09-23, Jose) — los 3 módulos la
+// piden ahora, incluido Supply (antes solo pedía teléfono/correo y el
+// vendedor coordinaba la dirección a mano por WhatsApp tras el pago). Esto
+// es DISTINTO de SHIPPING_MODULES de arriba: Supply pide dirección para
+// que le llegue al vendedor por correo, pero no tiene Ruta del Golfo
+// (transportadora/flete calculado) — esa integración no se pidió, solo la
+// dirección. Supply es nacional igual que Suple, mismo combobox
+// Departamento+Municipio.
+const ADDRESS_MODULES = ['store', 'suplementos', 'supply']
 
 // Checkout dedicado para un carrito de Supply/Store/Suple bloqueado a un
 // vendedor con Mercado Pago propio (fase 5, 2026-08-07; extendido a Store
@@ -77,12 +89,45 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply', fl
 
   const formCompleto = Boolean(
     form.telefono && form.email &&
-    (!SHIPPING_MODULES.includes(module) || (
-      module === 'suplementos'
-        ? (form.departamento && form.municipio && form.direccion.trim())
-        : (form.municipio && form.direccion.trim())
+    (!ADDRESS_MODULES.includes(module) || (
+      module === 'store'
+        ? (form.municipio && form.direccion.trim())
+        : (form.departamento && form.municipio && form.direccion.trim())
     ))
   )
+
+  // Precarga desde "Mi dirección" guardada (2026-09-23, ver
+  // GuardarDireccionButton.jsx) — se guarda siempre en forma nacional
+  // (departamento + municipio + dirección), la misma que ya usan Suple/
+  // Supply, así que ahí el prefill es 1:1. Store usa una lista de zonas
+  // más granular (ZONAS_FLETE, incluye corregimientos) — se busca el
+  // municipio guardado por nombre entre las etiquetas de esa lista; si no
+  // hay match exacto (ej. guardó un municipio fuera de Urabá) el resto del
+  // formulario igual queda precargado, solo el municipio se deja para
+  // elegir a mano.
+  useEffect(() => {
+    const guardada = leerDireccionGuardada()
+    if (!guardada) return
+    setForm(f => {
+      const next = { ...f }
+      if (guardada.nombre) next.nombre = guardada.nombre
+      if (guardada.telefono) next.telefono = guardada.telefono
+      if (guardada.email) next.email = guardada.email
+      if (guardada.direccion) next.direccion = guardada.direccion
+      if (module === 'store') {
+        if (guardada.municipio) {
+          const buscado = normMunicipio(guardada.municipio)
+          const match = Object.entries(ZONAS_FLETE).find(([, label]) => normMunicipio(label) === buscado)
+          if (match) next.municipio = match[0]
+        }
+      } else {
+        if (guardada.departamento) next.departamento = guardada.departamento
+        if (guardada.municipio) next.municipio = guardada.municipio
+      }
+      return next
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [module])
 
   const enviar = async (e) => {
     e.preventDefault()
@@ -107,7 +152,7 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply', fl
           cliente_nombre: form.nombre || null,
           cliente_telefono: form.telefono,
           cliente_email: form.email,
-          ...(SHIPPING_MODULES.includes(module) ? { cliente_municipio: form.municipio, cliente_direccion: form.direccion.trim() } : {}),
+          ...(ADDRESS_MODULES.includes(module) ? { cliente_municipio: form.municipio, cliente_direccion: form.direccion.trim() } : {}),
           mensaje: form.mensaje || null,
         }),
       })
@@ -147,9 +192,11 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply', fl
                 flete se sigue cobrando aparte (en efectivo, al recibir),
                 igual que ya funciona en el checkout genérico de Eljach
                 (PedidoOnlinePage.jsx) — decisión de diseño explícita, no
-                un olvido. Supply queda fuera (SHIPPING_MODULES no lo
-                incluye — no recolecta municipio, así que no hay destino
-                con qué calcular nada). */}
+                un olvido. Supply queda fuera de este bloque (no está en
+                SHIPPING_MODULES) — sí recolecta municipio/dirección desde
+                2026-09-23 (ver ADDRESS_MODULES), pero no tiene
+                transportadora/flete_tabla propia, así que no hay nada que
+                calcular ni avisar acá todavía. */}
             {SHIPPING_MODULES.includes(module) && (
               envioGratis ? (
                 <div className="flex items-center justify-between px-4 py-2.5 text-sm">
@@ -194,7 +241,11 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply', fl
                 <input type="text" value={form.direccion} onChange={e => update('direccion', e.target.value)} placeholder="Dirección exacta — calle, carrera, barrio *" required className={inputClass} />
               </>
             )}
-            {module === 'suplementos' && (
+            {/* Suple y Supply comparten el mismo combobox nacional
+                (Departamento+Municipio) — a diferencia de Store, ninguno
+                de los dos está limitado a Urabá. Supply lo ganó 2026-09-23
+                (antes no pedía dirección, ver ADDRESS_MODULES arriba). */}
+            {(module === 'suplementos' || module === 'supply') && (
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <ComboboxBuscable value={form.departamento} onChange={setDepartamento} options={DEPARTAMENTOS} placeholder="Departamento *" inputClassName={inputClass} />

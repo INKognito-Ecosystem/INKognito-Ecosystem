@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ZONAS_FLETE } from '../../data/colombiaGeo'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
@@ -38,7 +39,21 @@ export default function MisVentasVendorSection({ token, module = 'store' }) {
         <div key={v.id} className="flex items-center justify-between gap-3 bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-xs">
           <div className="min-w-0">
             <p className="font-bold truncate">{v.items.map((i) => `${i.cantidad}x ${i.product_nombre}`).join(', ')}</p>
-            <p className="text-gray-400">{v.cliente_nombre || v.cliente_telefono} · {new Date(v.created_at).toLocaleDateString('es-CO')}</p>
+            <p className="text-gray-400">{v.cliente_nombre || 'Cliente'} · {new Date(v.created_at).toLocaleDateString('es-CO')}</p>
+            {/* Info completa del comprador (2026-09-23, Jose: "toda la
+                info necesaria, desde lo que se vendió hasta la info del
+                comprador... así no dependerán solo del correo") — antes
+                esta card no traía ni teléfono visible ni correo ni
+                dirección. */}
+            <p className="text-gray-400 truncate">{v.cliente_telefono}{v.cliente_email ? ` · ${v.cliente_email}` : ''}</p>
+            {v.cliente_direccion && (
+              // Store guarda el municipio como clave corta (ZONAS_FLETE,
+              // ej. "chigorodo") — Suple guarda el nombre real de una vez
+              // (nacional). El mapa cubre el caso de Store y no le hace
+              // nada al de Suple (una clave que no calza en ZONAS_FLETE
+              // se muestra tal cual).
+              <p className="text-gray-400 truncate">{v.cliente_direccion}, {ZONAS_FLETE[v.cliente_municipio] || v.cliente_municipio}</p>
+            )}
           </div>
           <div className="flex-shrink-0 text-right">
             <p className="font-black">${Number(v.monto_estudio).toLocaleString('es-CO')}</p>
