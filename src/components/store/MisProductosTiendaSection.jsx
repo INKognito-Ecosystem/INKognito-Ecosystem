@@ -4,6 +4,7 @@ import ComboboxBuscable from '../artistas/ComboboxBuscable'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const BTN = '#374151'
+const MP_BLUE = '#3483FA'
 const inputClass = 'w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-500 transition-colors'
 
 // Store multitenant (2026-08-29) — mismas 7 categorías fijas que ya usan
@@ -32,7 +33,7 @@ const PRODUCTO_VACIO_TIENDA = { product: '', variant: '', price: '', stock: '', 
 // en su propia pantalla dentro de EstudioTiendaOwnerPanel.jsx, la
 // navegación del panel YA decide cuándo se muestra, no hace falta un
 // segundo toggle acá adentro.
-export default function MisProductosTiendaSection({ token, cloud_name, upload_preset, estudioId, estudioSlug }) {
+export default function MisProductosTiendaSection({ token, cloud_name, upload_preset, estudioId, estudioSlug, mpConectado = false }) {
   const [productos, setProductos] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [subiendo, setSubiendo] = useState(false)
@@ -287,15 +288,32 @@ export default function MisProductosTiendaSection({ token, cloud_name, upload_pr
             <p className="text-gray-400 text-xs text-center py-4">Cargando...</p>
           ) : (
             <>
-              <button
-                type="button"
-                onClick={abrirNuevoProducto}
-                className="w-full mb-4 py-2.5 flex items-center justify-center gap-1.5 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity"
-                style={{ backgroundColor: BTN }}
-              >
-                <Plus size={14} />
-                Agregar producto a mi tienda
-              </button>
+              {/* Todo vendedor debe tener Mercado Pago conectado para poder
+                  subir productos (2026-09-24, Jose) — ver mismo bloque en
+                  MisProductosSupplySection.jsx. Solo bloquea el ALTA. */}
+              {mpConectado ? (
+                <button
+                  type="button"
+                  onClick={abrirNuevoProducto}
+                  className="w-full mb-4 py-2.5 flex items-center justify-center gap-1.5 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity"
+                  style={{ backgroundColor: BTN }}
+                >
+                  <Plus size={14} />
+                  Agregar producto a mi tienda
+                </button>
+              ) : (
+                <div className="mb-4 rounded-lg border p-4" style={{ borderColor: MP_BLUE, backgroundColor: '#3483FA0D' }}>
+                  <p className="text-sm font-bold mb-1" style={{ color: MP_BLUE }}>Conecta Mercado Pago para poder subir productos</p>
+                  <p className="text-gray-500 text-xs mb-3">Así el pago de cada venta te llega directo a tu cuenta, con tu comisión ya descontada.</p>
+                  <a
+                    href={`${PANEL_URL}/api/estudios-mp-conectar?token=${encodeURIComponent(token)}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-white text-[11px] font-black uppercase tracking-widest shadow-md hover:opacity-90 transition-opacity"
+                    style={{ backgroundColor: MP_BLUE }}
+                  >
+                    Conecta Mercado Pago <ExternalLink size={12} />
+                  </a>
+                </div>
+              )}
 
               {grupos.length === 0 ? (
                 <p className="text-gray-400 text-xs text-center py-6">Todavía no tienes productos — agrega el primero arriba.</p>

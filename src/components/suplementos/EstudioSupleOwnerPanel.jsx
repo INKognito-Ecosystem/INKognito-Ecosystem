@@ -146,7 +146,7 @@ export default function EstudioSupleOwnerPanel({ estudio, token, cloud_name, upl
         )}
 
         {vista === 'productos' && (
-          <MisProductosSupleSection token={token} cloud_name={cloud_name} upload_preset={upload_preset} estudioId={estudio.id} estudioSlug={estudio.slug} />
+          <MisProductosSupleSection token={token} cloud_name={cloud_name} upload_preset={upload_preset} estudioId={estudio.id} estudioSlug={estudio.slug} mpConectado={estudio.mp_conectado} />
         )}
 
         {vista === 'ventas' && (

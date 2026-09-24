@@ -135,7 +135,7 @@ export default function EstudioSupplyOwnerPanel({ estudio, token, cloud_name, up
         )}
 
         {vista === 'productos' && (
-          <MisProductosSupplySection token={token} cloud_name={cloud_name} upload_preset={upload_preset} standalone />
+          <MisProductosSupplySection token={token} cloud_name={cloud_name} upload_preset={upload_preset} standalone mpConectado={estudio.mp_conectado} />
         )}
 
         {vista === 'ventas' && (

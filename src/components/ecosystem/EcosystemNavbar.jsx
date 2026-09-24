@@ -48,7 +48,7 @@ import { irAMiSuple } from '../../lib/supleTienda'
 // necesitan volverse oscuros SOLO en móvil para seguir siendo visibles —
 // en desktop ese mismo navbar sigue sobre el fondo oscuro de siempre.
 // Default false para no afectar ProductLandingPage.jsx, que no lo pasa.
-export default function EcosystemNavbar({ logoFilter = null, showTagline = false, mobileLight = false }) {
+export default function EcosystemNavbar({ logoFilter = null, showTagline = false, mobileLight = false, hideMenu = false }) {
   const navigate = useNavigate()
   const [menuOpen,  setMenuOpen]  = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
@@ -129,18 +129,26 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
             ellas. bg-white/85, no bg-white sólido (Jose: "déjalo con
             opacidad como antes") — translúcida en vez de un bloque blanco
             opaco. Desktop se queda sin caja, transparente como siempre. */}
-        <button
-          onClick={() => setMenuOpen(true)}
-          aria-label="Abrir menú"
-          aria-expanded={menuOpen}
-          className={`flex flex-col gap-[5px] cursor-pointer border-none ${
-            mobileLight ? 'p-2.5 bg-white/85 rounded-lg shadow-sm md:p-1 md:bg-transparent md:rounded-none md:shadow-none' : 'p-1 bg-transparent'
-          }`}
-        >
-          <span className={`block w-6 h-[2px] rounded-sm ${mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90'}`} />
-          <span className={`block w-6 h-[2px] rounded-sm ${mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90'}`} />
-          <span className={`block w-6 h-[2px] rounded-sm ${mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90'}`} />
-        </button>
+        {/* hideMenu (2026-09-24, Jose: "esas landing son para ventas, no
+            pueden distraer al cliente") — ProductLandingPage.jsx es la
+            única que lo pasa: una landing de un solo producto no debe
+            ofrecer una salida a navegar el resto del sitio. El drawer/menú
+            de abajo queda igual, simplemente nunca se puede abrir sin este
+            botón (menuOpen nunca pasa a true). */}
+        {!hideMenu && (
+          <button
+            onClick={() => setMenuOpen(true)}
+            aria-label="Abrir menú"
+            aria-expanded={menuOpen}
+            className={`flex flex-col gap-[5px] cursor-pointer border-none ${
+              mobileLight ? 'p-2.5 bg-white/85 rounded-lg shadow-sm md:p-1 md:bg-transparent md:rounded-none md:shadow-none' : 'p-1 bg-transparent'
+            }`}
+          >
+            <span className={`block w-6 h-[2px] rounded-sm ${mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90'}`} />
+            <span className={`block w-6 h-[2px] rounded-sm ${mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90'}`} />
+            <span className={`block w-6 h-[2px] rounded-sm ${mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90'}`} />
+          </button>
+        )}
       </nav>
 
       {/* OVERLAY MENÚ */}

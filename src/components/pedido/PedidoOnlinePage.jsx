@@ -202,6 +202,24 @@ export default function PedidoOnlinePage() {
       .catch(() => {})
   }, [])
 
+  // Carrito huérfano (2026-09-24, Jose: "¿esto pasará con algún proveedor?")
+  // — Supply/Store/Suple ya no tienen inventario propio: si NINGÚN ítem
+  // resuelve a un vendedor real (carrito viejo guardado en el navegador de
+  // antes de que el módulo fuera multitenant, o un producto de catálogo sin
+  // vendedor — ver el chequeo nuevo en POST /api/inventory del panel), no
+  // hay a quién pagarle. Antes esto caía al formulario genérico de Nequi/
+  // contraentrega/Eljach de abajo, que ya no aplica a estos 3 módulos —
+  // mejor vaciarlo solo y mandar al comprador de vuelta con un aviso claro
+  // (ver el return de "carrito inválido" más abajo, después de items.length
+  // === 0) que reconstruir un pedido a medias sobre un vendedor que ya no
+  // existe.
+  useEffect(() => {
+    if (!VENDOR_LOCK_MODULES.includes(module)) return
+    if (!cart || (cart.items?.length || 0) === 0) return
+    if (estudioIdsEnCarrito.length > 0) return
+    cart.clearCart?.()
+  }, [module, cart, estudioIdsEnCarrito.join(',')])
+
   if (!cart || !MODULE_LABELS[module]) {
     return (
       <>
@@ -365,6 +383,27 @@ export default function PedidoOnlinePage() {
     )
   }
 
+  // Carrito huérfano — ver el useEffect de arriba (mismo criterio). Este
+  // frame se ve solo un instante, mientras ese efecto todavía no vació el
+  // carrito: sin este bloque, ese primer frame caía en el formulario
+  // genérico de Nequi/contraentrega/Eljach de más abajo.
+  if (VENDOR_LOCK_MODULES.includes(module) && estudioIdsEnCarrito.length === 0) {
+    return (
+      <>
+        <section className={`min-h-[60vh] flex items-center justify-center py-16 px-4 ${c('bg-black', 'bg-white')}`}>
+          <div className="text-center max-w-md mx-auto">
+            <ShoppingBag size={40} className={`mx-auto mb-4 ${c('text-gray-700', 'text-zinc-300')}`} />
+            <p className={`mb-2 ${c('text-gray-400', 'text-zinc-500')}`}>Ese carrito ya no es válido — vuelve a agregar el producto.</p>
+            <Link to={`/${module}`} className={`text-sm font-semibold ${c('text-green-500 hover:text-green-400', 'text-zinc-700 hover:text-zinc-900')}`}>
+              Ir a {MODULE_LABELS[module]} →
+            </Link>
+          </div>
+        </section>
+        <MiniFooter moduleLabel={MODULE_LABELS[module]} light={light} />
+      </>
+    )
+  }
+
   // Carrito bloqueado a un proveedor con Mercado Pago propio (fase 5,
   // 2026-08-07) — checkout completamente distinto (sin nequi/contraentrega/
   // Eljach, paga directo por Split), ver PedidoSupplyVendorCheckout.jsx.
@@ -395,8 +434,12 @@ export default function PedidoOnlinePage() {
   // (Nequi o contraentrega) le llegaría a INKognito por un producto que
   // no es suyo, y el proveedor nunca se enteraría del pedido (esa
   // información solo le llega vía el webhook del checkout de Split, que
-  // acá no puede correr sin una cuenta conectada). Se ofrece contactar a
-  // la tienda directo por SU propio WhatsApp — nunca el de INKognito.
+  // acá no puede correr sin una cuenta conectada). Antes se ofrecía
+  // contactar a la tienda por WhatsApp — quitado (2026-09-24, Jose: "el
+  // botón al wpp debería sobrar"), mismo criterio que ya aplica en
+  // ProductLandingPage.jsx: un pedido coordinado por WhatsApp nunca pasa
+  // por Split, así que ofrecerlo como salida contradice la regla de que
+  // todo vendedor debe cobrar en línea — el aviso solo, sin ninguna salida.
   if (VENDOR_LOCK_MODULES.includes(module) && estudioIdsEnCarrito.length === 1 && vendorInfo && !vendorInfo.mp_conectado) {
     const vendorHref = module === 'store'
       ? `/store/${vendorInfo.slug || `estudio/${vendorInfo.id}`}`
@@ -412,19 +455,6 @@ export default function PedidoOnlinePage() {
             <p className={`leading-relaxed mb-6 ${c('text-gray-400', 'text-zinc-600')}`}>
               {vendorNombreVivo || 'Este vendedor'} todavía no conecta su cuenta de pago, así que no podemos procesar este pedido en línea por ahora.
             </p>
-            {vendorInfo.whatsapp ? (
-              <a
-                href={`https://wa.me/${vendorInfo.whatsapp}?text=${encodeURIComponent(`Hola, quiero comprar un producto de tu catálogo en ${MODULE_LABELS[module]}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-green-600 text-white font-black py-3.5 px-8 rounded uppercase tracking-widest text-sm hover:bg-green-500 transition-all"
-              >
-                <FaWhatsapp size={16} />
-                Escribirle directo por WhatsApp
-              </a>
-            ) : (
-              <p className={c('text-gray-500', 'text-zinc-500') + ' text-sm'}>Intenta más tarde, o quita este producto del carrito.</p>
-            )}
             <div className="mt-6">
               {/* 2026-08-30 (Jose: "me mandó al ecosistema, y no a la
                   tienda en la que estaba parado") — antes volvía siempre

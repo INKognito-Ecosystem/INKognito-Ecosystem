@@ -225,6 +225,20 @@ export default function ProductLandingPage() {
     estudioNombre: variant?.estudio_nombre_display || variant?.estudio_nombre || product.estudio_nombre_display || product.estudio_nombre || null,
     mpConectado:   !!(variant?.estudio_mp_conectado ?? product.estudio_mp_conectado),
   } : undefined
+  // Todo vendedor multitenant debe tener Mercado Pago conectado para poder
+  // subir productos (2026-09-24, Jose) — un pedido coordinado por WhatsApp
+  // no pasa por el Split, así que no te deja comisión. Con esa regla ya
+  // aplicada en el alta de producto, WhatsApp deja de ofrecerse del todo acá
+  // para supply/store/suplementos — antes competía de igual a igual con el
+  // pedido en línea ("tú eliges"), pero esa opción nunca te pagaba nada.
+  // Gym (sin vendedores externos) y los afiliados (Amazon/Hotmart/etc, cada
+  // uno con su propio checkout externo) no cambian.
+  const ocultarWhatsapp = tieneVendorLock
+  // Vendedores ya activos desde antes de esta regla, sin MP conectado
+  // todavía (caso real confirmado 2026-09-24, no hipotético) — sin botón de
+  // ningún tipo, un aviso honesto en vez de ofrecer un pedido que no se
+  // puede cobrar.
+  const vendorSinMP = tieneVendorLock && !!cart && !vendorOpts?.mpConectado
   const handlePedidoOnline = () => {
     if (sinStock || !cart) return
     const productId = product.name + (variant?.variant ? '-' + variant.variant : '')
@@ -281,6 +295,15 @@ export default function ProductLandingPage() {
     </div>
   )
 
+  // Vendedor sin Mercado Pago conectado (ver vendorSinMP) — ni el pedido en
+  // línea (no habría a quién pagarle) ni WhatsApp (ya no se ofrece para
+  // estos módulos). Solo un aviso, nada que tocar.
+  const SinPagoEnLineaAviso = ({ className = '' }) => (
+    <p className={`text-center text-xs text-zinc-500 border border-zinc-800 rounded py-4 px-3 ${className}`}>
+      Este vendedor todavía no tiene pago en línea disponible.
+    </p>
+  )
+
   const CTAButton = ({ className = '' }) => isAfiliado ? (
     <a
       href={product.url_checkout || product.url_ventas}
@@ -309,7 +332,7 @@ export default function ProductLandingPage() {
 
   return (
     <div className={`min-h-screen bg-black text-white md:pb-0 ${!isAfiliado && cart ? 'pb-36' : 'pb-20'}`}>
-      <EcosystemNavbar logoFilter="brightness(0) invert(1)" showTagline />
+      <EcosystemNavbar logoFilter="brightness(0) invert(1)" showTagline hideMenu />
 
       <div className="pt-20 max-w-5xl mx-auto px-4 py-8 md:py-16">
         <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-start">
@@ -517,11 +540,12 @@ export default function ProductLandingPage() {
               </div>
             )}
 
-            {/* CTA desktop — pedido online primero (queda nuestro), WhatsApp
-                como alternativa, igual que en los CartDrawer */}
+            {/* CTA desktop — un solo camino real por vendedor (ver
+                ocultarWhatsapp/vendorSinMP arriba): supply/store/suplementos
+                ya no ofrecen WhatsApp como vía de pedido. */}
             <div className="hidden md:flex md:flex-col md:gap-3">
-              {!isAfiliado && cart && <PedidoOnlineButton className="w-full" />}
-              <CTAButton className="w-full" />
+              {!isAfiliado && cart && (vendorSinMP ? <SinPagoEnLineaAviso /> : <PedidoOnlineButton className="w-full" />)}
+              {!ocultarWhatsapp && <CTAButton className="w-full" />}
             </div>
 
             {/* Trust signals — solo modulos con proveedor externo (no Gym: maquinas propias) */}
@@ -597,7 +621,7 @@ export default function ProductLandingPage() {
                 )}
                 <div className="flex items-center gap-3 text-zinc-400 text-xs">
                   <MessageSquare size={13} className="shrink-0" style={{ color: accent }} />
-                  <span>Agenda tu pedido en línea o por WhatsApp — tú eliges, sin intermediarios</span>
+                  <span>Pago directo y seguro en línea, sin intermediarios</span>
                 </div>
                 {/* Ya dice "envío a toda Colombia" en la línea de arriba para
                     mobiliario — esta línea sería redundante/confusa ahí. Para
@@ -655,10 +679,10 @@ export default function ProductLandingPage() {
         </div>
       </footer>
 
-      {/* CTA fijo móvil — pedido online + WhatsApp apiladas, igual que desktop */}
+      {/* CTA fijo móvil — mismo criterio que el bloque desktop de arriba */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-black/95 backdrop-blur-sm border-t border-white/10 px-4 py-3 flex flex-col gap-2">
-        {!isAfiliado && cart && <PedidoOnlineButton className="w-full" />}
-        <CTAButton className="w-full" />
+        {!isAfiliado && cart && (vendorSinMP ? <SinPagoEnLineaAviso /> : <PedidoOnlineButton className="w-full" />)}
+        {!ocultarWhatsapp && <CTAButton className="w-full" />}
       </div>
 
     </div>
