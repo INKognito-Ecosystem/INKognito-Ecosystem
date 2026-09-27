@@ -221,7 +221,12 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply', fl
   // Así, cada invocación real del efecto maneja su propio intento de punta
   // a punta, sin pisarse con la siguiente.
   useEffect(() => {
-    if (!vendorLock.mpPublicKey || total <= 0) return
+    if (total <= 0) return
+    // Vendedor conectado a Mercado Pago pero sin llave pública todavía
+    // (ej. el panel aún no desplegó la migración que la trae) — antes se
+    // quedaba en "Cargando el formulario de pago..." para siempre, sin
+    // avisar nada; ahora se explica en vez de fingir que está cargando.
+    if (!vendorLock.mpPublicKey) { setBrickError('El pago en línea no está disponible en este momento — intenta de nuevo en unos minutos o escríbele al vendedor.'); return }
     let activo = true
     let controllerLocal = null
     cargarSdkMercadoPago()
