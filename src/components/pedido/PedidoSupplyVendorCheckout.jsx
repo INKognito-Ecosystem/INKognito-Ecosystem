@@ -271,7 +271,7 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply', fl
           Confirma tu <span className={c('text-zinc-600', 'text-zinc-400')}>Compra</span>
         </h2>
         <p className={`text-sm text-center max-w-md mx-auto mb-8 ${c('text-gray-500', 'text-zinc-500')}`}>
-          Pagas directo a {vendorLock.estudioNombre} por Mercado Pago, sin salir de esta página. En cuanto se apruebe el pago, le llega tu pedido por correo para que lo despache y te escribe por WhatsApp para coordinar la entrega.
+          Pagas directo a {vendorLock.estudioNombre} por Mercado Pago. En cuanto se apruebe el pago, le llega tu pedido por correo para que lo despache y te escribe por WhatsApp para coordinar la entrega.
         </p>
 
         <div className={`border rounded-xl p-6 md:p-10 space-y-6 ${c('bg-zinc-950 border-gray-800', 'bg-white border-zinc-200 shadow-sm')}`}>

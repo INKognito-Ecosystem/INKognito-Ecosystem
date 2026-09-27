@@ -12,11 +12,18 @@ import { cloudinaryFill } from '../../lib/cloudinary'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL
 
-// Logo real de Mercado Pago, mismo asset/patrón que ya usa
-// ArtistaLandingPage.jsx (hospedado en el propio CDN de Mercado Pago,
-// mlstatic.com) — si algún día cambian la ruta, el onError lo oculta solo
-// sin romper el layout.
-const MP_LOGO_URL = 'https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/5.21.0/mercadopago/logo__large@2x.png'
+// Íconos reales de cada medio de pago (Jose, 2026-09-27: quiere ver las
+// tarjetas/PSE, no solo el logo genérico de Mercado Pago — como se ve en
+// Mercado Libre) — URLs oficiales, sacadas directo de la respuesta real de
+// GET /v1/payment_methods de Mercado Pago (mismo CDN mlstatic.com/
+// mercadopago.com que ya se usaba para el logo). Si alguno deja de cargar,
+// el onError lo oculta solo, sin romper el resto de la fila.
+const MEDIOS_PAGO_ICONS = [
+  { alt: 'Visa', src: 'https://http2.mlstatic.com/storage/logos-api-admin/d589be70-eb86-11e9-b9a8-097ac027487d-xl.png' },
+  { alt: 'Mastercard', src: 'https://http2.mlstatic.com/storage/logos-api-admin/0daa1670-5c81-11ec-ae75-df2bef173be2-xl.svg' },
+  { alt: 'PSE', src: 'https://www.mercadopago.com/org-img/MP3/API/logos/pse.gif' },
+  { alt: 'Efecty', src: 'https://http2.mlstatic.com/storage/logos-api-admin/e5ee1d00-f39b-11eb-8e0d-6f4af49bf82e-l.png' },
+]
 
 // Mismo criterio de nombre por plataforma que SupplyProductCard.jsx/
 // ProductLandingPage.jsx — solo para la insignia/CTA de un producto
@@ -292,14 +299,11 @@ export default function SupplyProductDetailPage() {
               Mercado Pago (cae al flujo manual de WhatsApp/Nequi), mostrar el
               logo igual sería prometer algo que no aplica para este producto. */}
           {proveedorMp && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs text-zinc-500">Medios de pago:</span>
-              <img
-                src={MP_LOGO_URL}
-                alt="Mercado Pago"
-                className="h-4"
-                onError={(e) => { e.currentTarget.style.display = 'none' }}
-              />
+              {MEDIOS_PAGO_ICONS.map(({ alt, src }) => (
+                <img key={alt} src={src} alt={alt} className="h-5" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+              ))}
             </div>
           )}
           {sinStock ? (
