@@ -1,13 +1,15 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
-import { ShoppingCart, Menu, X, LayoutGrid, Store, PlusCircle, UserCircle, Globe, FileText, Shield } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { ShoppingCart, Menu, X, LayoutGrid, Store, PlusCircle, UserCircle, Globe, FileText, Shield, Package } from 'lucide-react'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import CartDrawerStore from './CartDrawerStore'
 import logoStore from '../../assets/milogo/store.webp'
 import AnimatedWordmark from '../AnimatedWordmark'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import LegalModal from '../legal/LegalModal'
+import MisComprasPanel from '../pedido/MisComprasPanel'
 import { irAMiTienda } from '../../lib/storeTienda'
+import { leerMisCompras } from '../../lib/misCompras'
 
 // hideMenu (2026-08-30, Jose; corregido 2026-09-13) — el catálogo de una
 // tienda (EstudioTiendaPage.jsx) ya tiene su propio botón de gestión en el
@@ -35,6 +37,9 @@ export default function NavbarCategoryStore({ pageName, hideMenu = false, hideMo
   const [menuOpen, setMenuOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [legalOpen, setLegalOpen] = useState(null)
+  const [comprasOpen, setComprasOpen] = useState(false)
+  const [misComprasCount, setMisComprasCount] = useState(0)
+  useEffect(() => { setMisComprasCount(leerMisCompras().length) }, [])
   const { count } = useStoreCart()
 
   return (
@@ -67,6 +72,18 @@ export default function NavbarCategoryStore({ pageName, hideMenu = false, hideMo
             {/* CARRITO + HAMBURGUESA — ocultos en móvil cuando la página ya
                 tiene su propio StoreMobileNav abajo (hideMobileActions). */}
             <div className={`${hideMobileActions ? 'hidden md:flex' : 'flex'} items-center gap-4`}>
+
+              {/* MIS COMPRAS (2026-09-27) — mismo criterio que
+                  NavbarStore.jsx: solo si este navegador ya guardó alguna. */}
+              {misComprasCount > 0 && (
+                <button
+                  onClick={() => setComprasOpen(true)}
+                  aria-label="Mis compras"
+                  className="text-zinc-500 hover:text-[#C9A84C] transition-all duration-300"
+                >
+                  <Package size={20} />
+                </button>
+              )}
 
               {/* CARRITO CON BADGE DORADO */}
               <button
@@ -149,6 +166,7 @@ export default function NavbarCategoryStore({ pageName, hideMenu = false, hideMo
       </nav>
 
       <CartDrawerStore open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <MisComprasPanel open={comprasOpen} onClose={() => setComprasOpen(false)} />
       <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
     </>
   )

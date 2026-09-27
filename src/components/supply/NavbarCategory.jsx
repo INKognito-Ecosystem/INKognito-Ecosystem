@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
-import { ShoppingCart, Menu, X, Share2, Search, Home, LayoutGrid, Tag, Sparkles, Phone, Store, PlusCircle, GraduationCap, Globe, FileText, Shield } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { ShoppingCart, Menu, X, Share2, Search, Home, LayoutGrid, Tag, Sparkles, Phone, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, Package } from 'lucide-react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import logoSupply from '../../assets/milogo/supply.webp'
 import AnimatedWordmark from '../AnimatedWordmark'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import LegalModal from '../legal/LegalModal'
+import MisComprasPanel from '../pedido/MisComprasPanel'
+import { leerMisCompras } from '../../lib/misCompras'
 
 // hideMenu (2026-09-13, Jose) — mismo criterio que NavbarCategoryStore.jsx:
 // el catálogo de un proveedor (EstudioSupplyPage.jsx) ya tiene su propio
@@ -52,6 +54,9 @@ export default function NavbarCategory({ pageName, hideMenu = false, hideMobileA
   const [legalOpen, setLegalOpen] = useState(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [shareMsg, setShareMsg] = useState(null)
+  const [comprasOpen, setComprasOpen] = useState(false)
+  const [misComprasCount, setMisComprasCount] = useState(0)
+  useEffect(() => { setMisComprasCount(leerMisCompras().length) }, [])
   const { count } = useSupplyCart()
 
   const handleShare = async () => {
@@ -137,6 +142,17 @@ export default function NavbarCategory({ pageName, hideMenu = false, hideMobileA
                 </button>
               )}
               <div className={`${hideMobileActions ? 'hidden md:flex' : 'flex'} items-center gap-4`}>
+
+              {/* MIS COMPRAS (2026-09-27) */}
+              {misComprasCount > 0 && (
+                <button
+                  onClick={() => setComprasOpen(true)}
+                  aria-label="Mis compras"
+                  className={`transition-all duration-300 ${t.icon}`}
+                >
+                  <Package size={20} />
+                </button>
+              )}
 
               {/* CARRITO CON BADGE */}
               <button
@@ -260,6 +276,7 @@ export default function NavbarCategory({ pageName, hideMenu = false, hideMobileA
       </nav>
 
       <CartDrawerSupply open={drawerOpen} onClose={() => setDrawerOpen(false)} light={light} />
+      <MisComprasPanel open={comprasOpen} onClose={() => setComprasOpen(false)} />
       <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
     </>
   )

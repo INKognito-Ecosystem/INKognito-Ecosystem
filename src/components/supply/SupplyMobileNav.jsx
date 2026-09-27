@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle } from 'lucide-react'
+import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle, Package } from 'lucide-react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import LegalModal from '../legal/LegalModal'
+import MisComprasPanel from '../pedido/MisComprasPanel'
 import logoSupply from '../../assets/milogo/supply.webp'
 import { irAMiSupply } from '../../lib/supplyTienda'
+import { leerMisCompras } from '../../lib/misCompras'
 
 // Tab bar + menú de pantalla completa para páginas de Supply DISTINTAS al
 // home (categorías, marcas, etc.) — 2026-09-15, mismo patrón visual que ya
@@ -24,6 +26,9 @@ export default function SupplyMobileNav({ active = null, light = false }) {
   // legalOpen (2026-09-15, Jose: "el modal abre directo donde estoy...
   // blanco... ocupa toda la pantalla" — mismo patrón que EcosystemNavbar.jsx).
   const [legalOpen, setLegalOpen] = useState(null)
+  const [comprasOpen, setComprasOpen] = useState(false)
+  const [misComprasCount, setMisComprasCount] = useState(0)
+  useEffect(() => { setMisComprasCount(leerMisCompras().length) }, [])
 
   // Íconos negros por default (2026-09-15, Jose: "azul será cuando el
   // carrito tenga una notificación de algo agregado") — el azul queda
@@ -81,6 +86,16 @@ export default function SupplyMobileNav({ active = null, light = false }) {
             <button onClick={() => setMenuOpen(false)} className={`${closeIconClass} p-1`}><X size={22} /></button>
           </div>
           <div className="flex-1 overflow-y-auto">
+            {misComprasCount > 0 && (
+              <>
+                <p className={`px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.15em] ${menuLabelText}`}>Tus compras</p>
+                <button type="button" onClick={() => { setMenuOpen(false); setComprasOpen(true) }} className={`flex items-center gap-3 w-full text-left px-6 py-4 text-[15px] font-medium ${menuItemText}`}>
+                  <Package size={18} className="flex-shrink-0" />
+                  Mis compras
+                </button>
+                <div className={`border-t ${menuDividerBorder}`} />
+              </>
+            )}
             <p className={`px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.15em] ${menuLabelText}`}>Proveedores</p>
             <Link to="/supply/proveedores" onClick={() => setMenuOpen(false)} className={`flex items-center gap-3 px-6 py-4 text-[15px] font-medium ${menuItemText}`}>
               <Store size={18} className="flex-shrink-0" />
@@ -145,6 +160,7 @@ export default function SupplyMobileNav({ active = null, light = false }) {
       )}
 
       <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
+      <MisComprasPanel open={comprasOpen} onClose={() => setComprasOpen(false)} />
     </>
   )
 }

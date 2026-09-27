@@ -1,17 +1,19 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Search, Bell, Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle } from 'lucide-react'
+import { Search, Bell, Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle, Package } from 'lucide-react'
 import { categories } from './CategoriesSupply'
 import BrandsMarquee from './BrandsMarquee'
 import SupplyProductCard from './SupplyProductCard'
 import CartDrawerSupply from './CartDrawerSupply'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import LegalModal from '../legal/LegalModal'
+import MisComprasPanel from '../pedido/MisComprasPanel'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { useLoadMore, fetchCatalogPage } from '../../hooks/useCatalog'
 import logoSupply from '../../assets/milogo/supply.webp'
 import bannerBg from '../../assets/supply/banner-tattoo-swirl.jpg'
 import { irAMiSupply } from '../../lib/supplyTienda'
+import { leerMisCompras } from '../../lib/misCompras'
 
 // Home móvil de Supply en formato marketplace (2026-09-14, boceto + mockup
 // aprobados por Jose) — reemplaza SOLO en móvil a NavbarSupply/HeroSupply/
@@ -29,6 +31,15 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
   // legalOpen (2026-09-15, Jose: "el modal abre directo donde estoy...
   // blanco... ocupa toda la pantalla" — mismo patrón que EcosystemNavbar.jsx).
   const [legalOpen, setLegalOpen] = useState(null)
+  // Mis compras (2026-09-27) — este menú es un duplicado a propósito del de
+  // SupplyMobileNav.jsx (nunca se refactorizó a componente compartido, ver
+  // comentario del bloque del menú más abajo), y por eso se le había
+  // olvidado agregar acá — Jose lo notó al probar "Mis compras" desde el
+  // home de Supply (`/supply`) y no encontrarlo. Mismo criterio exacto que
+  // SupplyMobileNav.jsx.
+  const [comprasOpen, setComprasOpen] = useState(false)
+  const [misComprasCount, setMisComprasCount] = useState(0)
+  useEffect(() => { setMisComprasCount(leerMisCompras().length) }, [])
   const [busqueda, setBusqueda] = useState('')
   const [buscando, setBuscando] = useState(false)
   const [resultados, setResultados] = useState(null) // null = sin búsqueda activa
@@ -318,6 +329,16 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
               legal, así que apuntan a las mismas /terminos y /privacidad
               que ya usa FooterSupply.jsx. */}
           <div className="flex-1 overflow-y-auto">
+            {misComprasCount > 0 && (
+              <>
+                <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400">Tus compras</p>
+                <button type="button" onClick={() => { setMenuOpen(false); setComprasOpen(true) }} className="flex items-center gap-3 w-full text-left px-6 py-4 text-[15px] font-medium text-zinc-800">
+                  <Package size={18} className="flex-shrink-0" />
+                  Mis compras
+                </button>
+                <div className="border-t border-zinc-100" />
+              </>
+            )}
             <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400">Proveedores</p>
             <Link to="/supply/proveedores" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-800">
               <Store size={18} className="flex-shrink-0" />
@@ -384,6 +405,7 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
       )}
 
       <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
+      <MisComprasPanel open={comprasOpen} onClose={() => setComprasOpen(false)} />
     </div>
   )
 }

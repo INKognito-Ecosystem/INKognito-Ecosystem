@@ -1,13 +1,20 @@
 import { useEffect, useState } from 'react'
 import { ArrowLeft, Package, Truck } from 'lucide-react'
 import { leerMisCompras } from '../../lib/misCompras'
-import { ESTADO_LABEL, ESTADO_CLASE } from './MisEnviosVendorSection'
+import BarraEstadoCompra from './BarraEstadoCompra'
+import ModalDetalleEstadoCompra from './ModalDetalleEstadoCompra'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
-const ESTADO_COMPRA_LABEL = { aprobado: 'Pago aprobado', pendiente: 'Confirmando pago', rechazado: 'Pago rechazado' }
-const ESTADO_COMPRA_CLASE = { aprobado: 'bg-green-100 text-green-700', pendiente: 'bg-amber-100 text-amber-700', rechazado: 'bg-red-100 text-red-700' }
-const MODULO_LABEL = { store: 'INKognito Store', suplementos: 'INKognito Suple', supply: 'INKognito Supply' }
+// Etiqueta CORTA del módulo — a propósito distinta del nombre real de la
+// tienda (2026-09-27, Jose: "no sé si el de arriba es el módulo y el de
+// abajo el nombre de la tienda... veo que está repetido, dice INKognito
+// Suple y abajo lo mismo"). El nombre real (`data.vendedor_nombre`) casi
+// siempre COINCIDE con esta marca hoy (todavía no hay tiendas de terceros
+// reales comprando de prueba) — por eso la etiqueta de módulo se muestra
+// como tag chico ("Suple") y el nombre de la tienda como título en negrita,
+// nunca los dos como texto igual de grande.
+const MODULO_LABEL = { store: 'Store', suplementos: 'Suple', supply: 'Supply' }
 
 function formatFecha(ms) {
   try { return new Date(ms).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' }) } catch { return '' }
@@ -29,6 +36,26 @@ function formatFecha(ms) {
 export default function MisComprasPanel({ open, onClose }) {
   const [compras, setCompras] = useState([])
   const [detalle, setDetalle] = useState({})
+  const [verMasKey, setVerMasKey] = useState(null)
+  const [marcandoKey, setMarcandoKey] = useState(null)
+
+  // Supply: el comprador confirma que ya recibió su pedido (mismo mecanismo
+  // que SeguimientoCompraPage.jsx — ver POST /api/estudios-compra-marcar-recibido,
+  // 2026-09-27). Acá también, porque Jose confirmó que la compra debe poder
+  // verse y actuarse desde los dos lugares (el link de WhatsApp Y este panel).
+  const marcarRecibido = async (c, key) => {
+    setMarcandoKey(key)
+    try {
+      const res = await fetch(`${PANEL_URL}/api/estudios-compra-marcar-recibido`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ compra_id: c.compraId, token: c.token, module: c.module }),
+      })
+      if (res.ok) setDetalle((prev) => ({ ...prev, [key]: { ...prev[key], recibido_at: new Date().toISOString() } }))
+    } finally {
+      setMarcandoKey(null)
+    }
+  }
 
   useEffect(() => {
     if (!open) return
@@ -87,35 +114,49 @@ export default function MisComprasPanel({ open, onClose }) {
                 return (
                   <li key={key} className="border border-zinc-200 rounded-xl p-4">
                     <div className="flex items-start justify-between gap-2 mb-1">
-                      <p className="font-black text-sm text-gray-900">{MODULO_LABEL[c.module] || c.module}</p>
+                      <span className="inline-block px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500 text-[10px] font-bold uppercase tracking-wide">
+                        {MODULO_LABEL[c.module] || c.module}
+                      </span>
                       <span className="text-zinc-400 text-[10px] flex-shrink-0">{formatFecha(c.fecha)}</span>
                     </div>
 
                     {data === undefined ? (
-                      <p className="text-zinc-400 text-xs">Consultando...</p>
+                      <p className="text-zinc-400 text-xs mt-1">Consultando...</p>
                     ) : !data ? (
-                      <p className="text-zinc-400 text-xs">No pudimos consultar esta compra.</p>
+                      <p className="text-zinc-400 text-xs mt-1">No pudimos consultar esta compra.</p>
                     ) : (
                       <>
-                        <p className="text-zinc-500 text-xs mb-2">{data.vendedor_nombre}</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full ${ESTADO_COMPRA_CLASE[data.estado_compra] || 'bg-gray-100 text-gray-600'}`}>
-                            {ESTADO_COMPRA_LABEL[data.estado_compra] || data.estado_compra}
-                          </span>
-                          {/* Solo Store/Suple llegan a tener envío de Ruta del
-                              Golfo — Supply nunca tiene `envio` (ver
-                              GET /api/estudios-compra-seguimiento). */}
-                          {data.envio && (
-                            <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full ${ESTADO_CLASE[data.envio.estado] || 'bg-gray-100 text-gray-600'}`}>
-                              Envío: {ESTADO_LABEL[data.envio.estado] || data.envio.estado}
-                            </span>
-                          )}
-                        </div>
+                        <p className="font-black text-sm text-gray-900 mt-1 mb-3">{data.vendedor_nombre}</p>
+                        <BarraEstadoCompra
+                          estadoCompra={data.estado_compra}
+                          envio={data.envio}
+                          module={c.module}
+                          recibidoConfirmado={!!data.recibido_at}
+                        />
                         {data.envio?.transportadora_nombre && (
                           <p className="text-zinc-400 text-[11px] mt-2 flex items-center gap-1.5">
                             <Truck size={12} className="flex-shrink-0" /> {data.envio.transportadora_nombre}
                           </p>
                         )}
+                        <div className="flex items-center gap-3 mt-3">
+                          <button
+                            type="button"
+                            onClick={() => setVerMasKey(key)}
+                            className="text-xs font-bold text-zinc-500 hover:text-black transition-colors duration-200 underline"
+                          >
+                            Ver más
+                          </button>
+                          {c.module === 'supply' && data.estado_compra === 'aprobado' && !data.recibido_at && (
+                            <button
+                              type="button"
+                              onClick={() => marcarRecibido(c, key)}
+                              disabled={marcandoKey === key}
+                              className="text-xs font-bold text-white bg-zinc-900 hover:bg-black transition-colors duration-200 rounded-full px-3 py-1 disabled:opacity-50"
+                            >
+                              {marcandoKey === key ? 'Guardando...' : 'Ya recibí mi pedido'}
+                            </button>
+                          )}
+                        </div>
                       </>
                     )}
                   </li>
@@ -125,6 +166,23 @@ export default function MisComprasPanel({ open, onClose }) {
           )}
         </div>
       </aside>
+
+      {verMasKey && (() => {
+        const c = compras.find((x) => `${x.module}-${x.compraId}` === verMasKey)
+        const data = detalle[verMasKey]
+        if (!c || !data) return null
+        return (
+          <ModalDetalleEstadoCompra
+            open
+            onClose={() => setVerMasKey(null)}
+            estadoCompra={data.estado_compra}
+            envio={data.envio}
+            module={c.module}
+            recibidoConfirmado={!!data.recibido_at}
+            vendorNombre={data.vendedor_nombre}
+          />
+        )
+      })()}
     </>
   )
 }

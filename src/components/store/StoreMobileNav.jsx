@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, UserCircle, Globe, FileText, Shield } from 'lucide-react'
+import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, UserCircle, Globe, FileText, Shield, Package } from 'lucide-react'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import CartDrawerStore from './CartDrawerStore'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import LegalModal from '../legal/LegalModal'
+import MisComprasPanel from '../pedido/MisComprasPanel'
 import logoStore from '../../assets/milogo/store.webp'
 import { irAMiTienda } from '../../lib/storeTienda'
+import { leerMisCompras } from '../../lib/misCompras'
 
 const GOLD = '#C9A84C'
 
@@ -22,6 +24,15 @@ export default function StoreMobileNav({ active = null }) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [legalOpen, setLegalOpen] = useState(null)
+  const [comprasOpen, setComprasOpen] = useState(false)
+  // "Mis compras" (2026-09-27, Jose: casi no se podía ver — solo existía en
+  // el navbar de escritorio de la portada) — este componente sí es
+  // compartido por TODAS las páginas de Store (ver comentario de arriba),
+  // así que agregarlo aquí lo deja disponible sin importar desde dónde
+  // entre el comprador, a diferencia de NavbarStore.jsx (solo escritorio,
+  // solo /store).
+  const [misComprasCount, setMisComprasCount] = useState(0)
+  useEffect(() => { setMisComprasCount(leerMisCompras().length) }, [])
 
   const tabColor = (key) => (active === key ? GOLD : '#000')
 
@@ -63,6 +74,19 @@ export default function StoreMobileNav({ active = null }) {
             <button onClick={() => setMenuOpen(false)} className="text-zinc-500 p-1"><X size={22} /></button>
           </div>
           <div className="flex-1 overflow-y-auto">
+            {/* Distinto de "Mi cuenta/perfil" de abajo (ese es para el
+                DUEÑO de la tienda) — esta sección es para el COMPRADOR,
+                mismo criterio que MisComprasPanel.jsx. */}
+            {misComprasCount > 0 && (
+              <>
+                <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400">Tus compras</p>
+                <button type="button" onClick={() => { setMenuOpen(false); setComprasOpen(true) }} className="flex items-center gap-3 w-full text-left px-6 py-4 text-[15px] font-medium text-zinc-800">
+                  <Package size={18} className="flex-shrink-0" />
+                  Mis compras
+                </button>
+                <div className="border-t border-zinc-100" />
+              </>
+            )}
             <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400">Tiendas</p>
             <Link to="/store/tiendas" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-6 py-4 text-[15px] font-medium text-zinc-800">
               <Store size={18} className="flex-shrink-0" />
@@ -108,6 +132,7 @@ export default function StoreMobileNav({ active = null }) {
       )}
 
       <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
+      <MisComprasPanel open={comprasOpen} onClose={() => setComprasOpen(false)} />
     </>
   )
 }

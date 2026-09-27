@@ -1,13 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Globe, FileText, Shield, Store, PlusCircle, UserCircle } from 'lucide-react'
+import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Globe, FileText, Shield, Store, PlusCircle, UserCircle, Package } from 'lucide-react'
 import { useSupleCart } from '../../contexts/SupleCartContext'
 import CartDrawerSuple from './CartDrawerSuple'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import LegalModal from '../legal/LegalModal'
+import MisComprasPanel from '../pedido/MisComprasPanel'
 import { SUPLE_CATEGORIES_ORDER } from '../../data/supleCategoriesOrder'
 import { CAT_ICONS } from './CategoriesSuple'
 import { irAMiSuple } from '../../lib/supleTienda'
+import { leerMisCompras } from '../../lib/misCompras'
 import logoSuple from '../../assets/milogo/gym.webp'
 
 // Tab bar + menú de pantalla completa compartidos por TODAS las páginas de
@@ -23,6 +25,9 @@ export default function SupleMobileNav({ active = null }) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [legalOpen, setLegalOpen] = useState(null)
+  const [comprasOpen, setComprasOpen] = useState(false)
+  const [misComprasCount, setMisComprasCount] = useState(0)
+  useEffect(() => { setMisComprasCount(leerMisCompras().length) }, [])
 
   const marca = (key) => (
     active === key ? <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-zinc-700" /> : null
@@ -71,6 +76,16 @@ export default function SupleMobileNav({ active = null }) {
             <button onClick={() => setMenuOpen(false)} aria-label="Cerrar menú" className="text-zinc-500 p-1"><X size={22} /></button>
           </div>
           <div className="flex-1 overflow-y-auto">
+            {misComprasCount > 0 && (
+              <>
+                <p className={etiqueta}>Tus compras</p>
+                <button type="button" onClick={() => { setMenuOpen(false); setComprasOpen(true) }} className={`${itemMenu} w-full text-left`}>
+                  <Package size={18} className="flex-shrink-0" />
+                  Mis compras
+                </button>
+                <div className="border-t border-zinc-100" />
+              </>
+            )}
             <p className={etiqueta}>Categorías</p>
             {SUPLE_CATEGORIES_ORDER.map(c => {
               const Icon = CAT_ICONS[c.name]
@@ -122,6 +137,7 @@ export default function SupleMobileNav({ active = null }) {
       )}
 
       <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
+      <MisComprasPanel open={comprasOpen} onClose={() => setComprasOpen(false)} />
     </>
   )
 }
