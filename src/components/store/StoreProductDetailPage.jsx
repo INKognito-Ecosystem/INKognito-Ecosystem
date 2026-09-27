@@ -13,18 +13,19 @@ import { cloudinaryFill } from '../../lib/cloudinary'
 const PANEL_URL = import.meta.env.VITE_PANEL_URL
 const GOLD = '#C9A84C'
 
-// Íconos reales de cada medio de pago (Jose, 2026-09-27: quiere ver las
-// tarjetas/PSE, no solo el logo genérico de Mercado Pago — como se ve en
-// Mercado Libre) — URLs oficiales, sacadas directo de la respuesta real de
-// GET /v1/payment_methods de Mercado Pago (mismo CDN mlstatic.com/
-// mercadopago.com que ya se usaba para el logo). Si alguno deja de cargar,
-// el onError lo oculta solo, sin romper el resto de la fila.
+// Íconos reales de cada medio de pago, en circulitos como en Mercado Libre
+// (Jose, 2026-09-27) — URLs oficiales, sacadas directo de la respuesta real
+// de GET /v1/payment_methods de Mercado Pago (mismo CDN mlstatic.com que ya
+// se usaba para el logo). PSE queda aparte (ver PSE_BADGE_COLOR): el único
+// ícono que ofrece esa API es un gif de 17x18px, se ve borroso al agrandarlo
+// — se reemplaza por una insignia de texto en su color real (muestreado del
+// ícono real del Payment Brick embebido, ver PedidoSupplyVendorCheckout.jsx).
 const MEDIOS_PAGO_ICONS = [
   { alt: 'Visa', src: 'https://http2.mlstatic.com/storage/logos-api-admin/d589be70-eb86-11e9-b9a8-097ac027487d-xl.png' },
   { alt: 'Mastercard', src: 'https://http2.mlstatic.com/storage/logos-api-admin/0daa1670-5c81-11ec-ae75-df2bef173be2-xl.svg' },
-  { alt: 'PSE', src: 'https://www.mercadopago.com/org-img/MP3/API/logos/pse.gif' },
   { alt: 'Efecty', src: 'https://http2.mlstatic.com/storage/logos-api-admin/e5ee1d00-f39b-11eb-8e0d-6f4af49bf82e-l.png' },
 ]
+const PSE_BADGE_COLOR = '#314979'
 
 // Ficha de producto estilo Mercado Libre para Store (2026-09-17, Jose:
 // "vamos a implementar lo que ya hicimos en supply... no importa donde se
@@ -252,11 +253,16 @@ export default function StoreProductDetailPage() {
           al flujo manual de WhatsApp/contraentrega), mostrar el logo igual
           sería prometer algo que no aplica para este producto. */}
       {proveedorMp && (
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-zinc-500">Medios de pago:</span>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="text-xs text-zinc-500 mr-0.5">Medios de pago:</span>
           {MEDIOS_PAGO_ICONS.map(({ alt, src }) => (
-            <img key={alt} src={src} alt={alt} className="h-5" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+            <span key={alt} className="w-7 h-7 rounded-full bg-white border border-zinc-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+              <img src={src} alt={alt} className="w-5 h-5 object-contain" onError={(e) => { e.currentTarget.parentElement.style.display = 'none' }} />
+            </span>
           ))}
+          <span className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: PSE_BADGE_COLOR }} title="PSE">
+            <span className="text-white text-[9px] font-bold italic tracking-tighter">pse</span>
+          </span>
         </div>
       )}
       {sinStock ? (
