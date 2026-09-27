@@ -150,7 +150,7 @@ export default function EstudioSupleOwnerPanel({ estudio, token, cloud_name, upl
         )}
 
         {vista === 'ventas' && (
-          <MisVentasVendorSection token={token} module="suplementos" />
+          <MisVentasVendorSection token={token} module="suplementos" vendorNombre={estudio?.nombre_suple || estudio?.nombre} />
         )}
 
         {vista === 'envios' && (

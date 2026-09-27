@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Wallet, ChevronDown } from 'lucide-react'
+import VentasTable from '../pedido/VentasTable'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const BTN = '#374151'
@@ -22,7 +23,7 @@ const BTN = '#374151'
 // y el caso sin ventas no puede devolver null (una pantalla en blanco se
 // ve rota, a diferencia del acordeón dentro de una página larga, donde
 // "no aparece nada" es una opción válida).
-export default function MisVentasSupplySection({ token, standalone = false }) {
+export default function MisVentasSupplySection({ token, standalone = false, vendorNombre }) {
   const [ventas, setVentas] = useState(null)
   const [open, setOpen] = useState(false)
 
@@ -41,33 +42,7 @@ export default function MisVentasSupplySection({ token, standalone = false }) {
     if (lista.length === 0) {
       return <p className="text-gray-400 text-xs text-center py-6">Todavía no tienes ventas.</p>
     }
-    return (
-      <div className="space-y-2">
-        {lista.map((v) => (
-          <div key={v.id} className="flex items-center justify-between gap-3 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-xs">
-            <div className="min-w-0">
-              <p className="font-bold truncate">{v.items.map((i) => `${i.cantidad}x ${i.product_nombre}`).join(', ')}</p>
-              <p className="text-gray-400">{v.cliente_nombre || 'Cliente'} · {new Date(v.created_at).toLocaleDateString('es-CO')}</p>
-              {/* Info completa del comprador (2026-09-23, Jose: "así no
-                  dependerán solo del correo") — Supply pide dirección
-                  desde hoy mismo (ver PedidoSupplyVendorCheckout.jsx). */}
-              <p className="text-gray-400 truncate">{v.cliente_telefono}{v.cliente_email ? ` · ${v.cliente_email}` : ''}</p>
-              {v.cliente_direccion && (
-                <p className="text-gray-400 truncate">{v.cliente_direccion}, {v.cliente_municipio}</p>
-              )}
-            </div>
-            <div className="flex-shrink-0 text-right">
-              <p className="font-black">${Number(v.monto_estudio).toLocaleString('es-CO')}</p>
-              <p className={
-                v.estado === 'aprobado' ? 'text-green-600 font-bold' : v.estado === 'rechazado' ? 'text-gray-400' : 'text-amber-600 font-bold'
-              }>
-                {v.estado === 'aprobado' ? 'Pagado' : v.estado === 'rechazado' ? 'Rechazado' : 'Pendiente'}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    )
+    return <VentasTable ventas={lista} module="supply" vendorNombre={vendorNombre} />
   }
 
   return (
@@ -87,27 +62,8 @@ export default function MisVentasSupplySection({ token, standalone = false }) {
         <ChevronDown size={16} className={`text-gray-400 flex-shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className="px-4 pb-5 space-y-2">
-          {lista.map((v) => (
-            <div key={v.id} className="flex items-center justify-between gap-3 bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-xs">
-              <div className="min-w-0">
-                <p className="font-bold truncate">{v.items.map((i) => `${i.cantidad}x ${i.product_nombre}`).join(', ')}</p>
-                <p className="text-gray-400">{v.cliente_nombre || 'Cliente'} · {new Date(v.created_at).toLocaleDateString('es-CO')}</p>
-                <p className="text-gray-400 truncate">{v.cliente_telefono}{v.cliente_email ? ` · ${v.cliente_email}` : ''}</p>
-                {v.cliente_direccion && (
-                  <p className="text-gray-400 truncate">{v.cliente_direccion}, {v.cliente_municipio}</p>
-                )}
-              </div>
-              <div className="flex-shrink-0 text-right">
-                <p className="font-black">${Number(v.monto_estudio).toLocaleString('es-CO')}</p>
-                <p className={
-                  v.estado === 'aprobado' ? 'text-green-600 font-bold' : v.estado === 'rechazado' ? 'text-gray-400' : 'text-amber-600 font-bold'
-                }>
-                  {v.estado === 'aprobado' ? 'Pagado' : v.estado === 'rechazado' ? 'Rechazado' : 'Pendiente'}
-                </p>
-              </div>
-            </div>
-          ))}
+        <div className="px-4 pb-5">
+          <VentasTable ventas={lista} module="supply" vendorNombre={vendorNombre} />
         </div>
       )}
     </div>

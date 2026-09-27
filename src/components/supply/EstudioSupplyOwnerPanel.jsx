@@ -139,7 +139,7 @@ export default function EstudioSupplyOwnerPanel({ estudio, token, cloud_name, up
         )}
 
         {vista === 'ventas' && (
-          <MisVentasSupplySection token={token} standalone />
+          <MisVentasSupplySection token={token} standalone vendorNombre={estudio?.nombre_supply || estudio?.nombre} />
         )}
       </div>
     </div>

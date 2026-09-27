@@ -178,7 +178,7 @@ export default function EstudioTiendaOwnerPanel({ estudio, token, cloud_name, up
         )}
 
         {vista === 'ventas' && (
-          <MisVentasVendorSection token={token} module="store" />
+          <MisVentasVendorSection token={token} module="store" vendorNombre={estudio?.nombre_tienda || estudio?.nombre} />
         )}
 
         {vista === 'envios' && (

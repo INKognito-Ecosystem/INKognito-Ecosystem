@@ -13,6 +13,9 @@ import { SUPLE_CART_CATEGORY, supleCartKey, supleCartItem, supleFormatPrice } fr
 import { cloudinaryFill } from '../../lib/cloudinary'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+// Mismo azul que ya usa Mercado Libre/Mercado Pago para su marca (y que
+// ya reutiliza el resto del ecosistema, ver MP_BLUE en ArtistaLandingPage.jsx).
+const MP_BLUE = '#3483FA'
 // Íconos reales de cada medio de pago, en circulitos como en Mercado Libre
 // (Jose, 2026-09-27) — URLs oficiales, sacadas directo de la respuesta real
 // de GET /v1/payment_methods de Mercado Pago (mismo CDN mlstatic.com que ya
@@ -245,7 +248,7 @@ export default function SupleProductDetailPage() {
           igual sería prometer algo que no aplica para este producto. */}
       {proveedorMp && (
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-xs text-zinc-500 mr-0.5">Medios de pago:</span>
+          <span className="text-sm font-semibold mr-0.5" style={{ color: MP_BLUE }}>Medios de pago:</span>
           {MEDIOS_PAGO_ICONS.map(({ alt, src }) => (
             <span key={alt} className="w-7 h-7 rounded-full bg-white border border-zinc-200 flex items-center justify-center overflow-hidden flex-shrink-0">
               <img src={src} alt={alt} className="w-5 h-5 object-contain" onError={(e) => { e.currentTarget.parentElement.style.display = 'none' }} />
@@ -323,6 +326,13 @@ export default function SupleProductDetailPage() {
         Agregar al carrito
       </button>
     </div>
+  )
+
+  // Cantidad disponible (2026-09-27, Jose) — antes solo se veía dentro del
+  // carrito ("Quedan X", solo si stock bajo); esta es informativa y siempre
+  // visible en la ficha, justo debajo del producto y encima de la tienda.
+  const cantidadBlock = typeof sel.stock === 'number' && (
+    <p className="text-sm"><span className="font-bold text-zinc-900">Cantidad:</span> <span className="font-semibold text-zinc-700">{sel.stock}</span></p>
   )
 
   // Bloque de vendedor (Suple multitenant, 2026-09-20) — mismos campos reales que ya muestran
@@ -451,6 +461,7 @@ export default function SupleProductDetailPage() {
           <ProductImageThumbs images={images} activeIndex={imgIdx} onSelect={setImgIdx} />
           {infoBlock}
           {ctaButtons}
+          {cantidadBlock}
           {proveedorBlock}
         </div>
 
@@ -485,6 +496,7 @@ export default function SupleProductDetailPage() {
             <div className="flex flex-col gap-6">
               {infoBlock}
               {ctaButtons}
+              {cantidadBlock}
               {proveedorBlock}
             </div>
           </div>

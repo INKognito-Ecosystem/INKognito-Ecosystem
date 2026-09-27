@@ -134,6 +134,20 @@ export default function MisProductosSupplySection({ token, cloud_name, upload_pr
     }).catch(() => {})
   }
 
+  // Aviso en vivo del precio final (2026-09-27, Jose: "¿cómo se entera el
+  // proveedor de que se le sumará... el 10%?") — antes el proveedor no
+  // tenía forma de saber, al escribir su precio, cuánto verá el cliente
+  // final. Mismo % que ya aplica /api/catalog/:module (settings.
+  // comision_supply) — leído acá solo para mostrar el estimado, el cobro
+  // real lo sigue calculando el servidor.
+  const [comisionSupply, setComisionSupply] = useState(0)
+  useEffect(() => {
+    fetch(`${PANEL_URL}/api/visual/comisiones`)
+      .then((r) => r.json())
+      .then((d) => setComisionSupply(Number(d.comision_supply) || 0))
+      .catch(() => {})
+  }, [])
+
   useEffect(() => {
     if (!open || cargadoRef.current) return
     cargadoRef.current = true
@@ -559,6 +573,11 @@ export default function MisProductosSupplySection({ token, cloud_name, upload_pr
                     </div>
                     <input className={inputClass} type="number" min="0" placeholder="Stock" value={nuevo.stock} onChange={(e) => setNuevo((n) => ({ ...n, stock: e.target.value }))} />
                   </div>
+                  {Number(nuevo.price) > 0 && (
+                    <p className="text-gray-400 text-[11px] -mt-1.5">
+                      Tu cliente verá: <span className="font-bold text-gray-600">${Math.round(Number(nuevo.price) * (1 + comisionSupply / 100)).toLocaleString('es-CO')}</span> (incluye la comisión de INKognito, {comisionSupply}%)
+                    </p>
+                  )}
                   <ComboboxBuscable
                     value={nuevo.categoria}
                     options={SUPPLY_CATEGORIAS}

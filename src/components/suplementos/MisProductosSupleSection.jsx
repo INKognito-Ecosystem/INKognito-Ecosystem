@@ -46,6 +46,17 @@ export default function MisProductosSupleSection({ token, cloud_name, upload_pre
     }).catch(() => {})
   }
 
+  // Aviso en vivo del precio final (2026-09-27, Jose: "¿cómo se entera el
+  // proveedor de que se le sumará... el 10%?") — mismo criterio que
+  // MisProductosSupplySection.jsx (settings.comision_suplementos, %).
+  const [comisionSuple, setComisionSuple] = useState(0)
+  useEffect(() => {
+    fetch(`${PANEL_URL}/api/visual/comisiones`)
+      .then((r) => r.json())
+      .then((d) => setComisionSuple(Number(d.comision_suplementos) || 0))
+      .catch(() => {})
+  }, [])
+
   const hayModalAbierto = formAbierto || !!verGrupo
   useEffect(() => {
     document.body.style.overflow = hayModalAbierto ? 'hidden' : ''
@@ -453,6 +464,11 @@ export default function MisProductosSupleSection({ token, cloud_name, upload_pre
                     </div>
                     <input className={inputClass} type="number" min="0" placeholder="Stock" value={nuevo.stock} onChange={(e) => setNuevo((n) => ({ ...n, stock: e.target.value }))} />
                   </div>
+                  {Number(nuevo.price) > 0 && (
+                    <p className="text-gray-400 text-[11px] -mt-1.5">
+                      Tu cliente verá: <span className="font-bold text-gray-600">${Math.round(Number(nuevo.price) * (1 + comisionSuple / 100)).toLocaleString('es-CO')}</span> (incluye la comisión de INKognito, {comisionSuple}%)
+                    </p>
+                  )}
                   <ComboboxBuscable
                     value={nuevo.categoria}
                     options={SUPLE_CATEGORIAS_ESTUDIO}

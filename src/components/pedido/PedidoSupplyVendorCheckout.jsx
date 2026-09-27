@@ -227,6 +227,15 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply', fl
     // quedaba en "Cargando el formulario de pago..." para siempre, sin
     // avisar nada; ahora se explica en vez de fingir que está cargando.
     if (!vendorLock.mpPublicKey) { setBrickError('El pago en línea no está disponible en este momento — intenta de nuevo en unos minutos o escríbele al vendedor.'); return }
+    // Espera a que el formulario de arriba esté completo (Jose, 2026-09-27:
+    // "¿por qué pide correo otra vez?") — Mercado Pago SÍ deja precargar su
+    // propia casilla de correo (initialization.payer.email), pero solo al
+    // momento de crear el formulario; no hay forma de actualizarla después
+    // sin destruirlo y crearlo de nuevo (confirmado en su documentación). En
+    // vez de crearlo vacío apenas se monta la página, se espera a que el
+    // comprador ya haya escrito su correo arriba — así nace precargado, sin
+    // pedirlo dos veces.
+    if (!formCompleto) return
     let activo = true
     let controllerLocal = null
     cargarSdkMercadoPago()
@@ -261,7 +270,7 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply', fl
       controllerLocal?.unmount?.()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vendorLock.mpPublicKey])
+  }, [vendorLock.mpPublicKey, formCompleto])
 
   return (
     <section className={`py-10 md:py-16 px-4 border-t ${c('bg-black border-white/5', 'bg-white border-zinc-200')}`}>

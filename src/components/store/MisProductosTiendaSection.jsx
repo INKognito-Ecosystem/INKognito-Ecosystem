@@ -61,6 +61,23 @@ export default function MisProductosTiendaSection({ token, cloud_name, upload_pr
     }).catch(() => {})
   }
 
+  // Aviso en vivo del precio final (2026-09-27, Jose: "¿cómo se entera el
+  // proveedor de que se le sumará el 2000...?") — antes el vendedor no
+  // tenía forma de saber, al escribir su precio, cuánto verá el cliente
+  // final. Store usa un monto FIJO (no %), mismo criterio que /api/catalog/
+  // :module (settings.comision_store_fijo) — leído acá solo para el
+  // estimado; no contempla comision_fija_override por tienda (esa
+  // excepción puntual la configura Jose a mano, ver COMISIONES_PUBLIC_
+  // SETTINGS en server.js), así que una tienda con excepción ve un
+  // estimado un poco distinto a su precio real.
+  const [comisionStoreFija, setComisionStoreFija] = useState(0)
+  useEffect(() => {
+    fetch(`${PANEL_URL}/api/visual/comisiones`)
+      .then((r) => r.json())
+      .then((d) => setComisionStoreFija(Number(d.comision_store_fijo) || 0))
+      .catch(() => {})
+  }, [])
+
   // Bloquea el scroll de la página de atrás mientras cualquiera de los
   // dos modales de acción (agregar/editar producto, "ojito" de ver
   // producto) está abierto (2026-08-30, Jose: "por debajo se sigue
@@ -452,6 +469,11 @@ export default function MisProductosTiendaSection({ token, cloud_name, upload_pr
                     </div>
                     <input className={inputClass} type="number" min="0" placeholder="Stock" value={nuevo.stock} onChange={(e) => setNuevo((n) => ({ ...n, stock: e.target.value }))} />
                   </div>
+                  {Number(nuevo.price) > 0 && (
+                    <p className="text-gray-400 text-[11px] -mt-1.5">
+                      Tu cliente verá: <span className="font-bold text-gray-600">${Math.round(Number(nuevo.price) + comisionStoreFija).toLocaleString('es-CO')}</span> (incluye la comisión de INKognito, ${comisionStoreFija.toLocaleString('es-CO')})
+                    </p>
+                  )}
                   <ComboboxBuscable
                     value={nuevo.categoria}
                     options={STORE_CATEGORIAS_ESTUDIO}
