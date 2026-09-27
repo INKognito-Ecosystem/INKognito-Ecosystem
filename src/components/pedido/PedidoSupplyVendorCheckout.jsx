@@ -1,11 +1,30 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { Landmark, ShoppingBag } from 'lucide-react'
+import { Landmark, CheckCircle2, Clock } from 'lucide-react'
 import { ZONAS_FLETE, DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO, normalize } from '../../data/colombiaGeo'
 import ComboboxBuscable from '../artistas/ComboboxBuscable'
 import { leerDireccionGuardada } from '../../utils/direccionGuardada'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
+
+// Carga el SDK de Mercado Pago una sola vez para toda la sesión del
+// navegador (2026-09-27, checkout embebido — ver
+// project_checkout_pago_embebido_bricks.md) — varios carritos/checkouts
+// pueden montarse uno tras otro sin recargar la página; sin este guard se
+// insertaría el mismo <script> varias veces.
+let mpSdkPromise = null
+function cargarSdkMercadoPago() {
+  if (window.MercadoPago) return Promise.resolve(window.MercadoPago)
+  if (mpSdkPromise) return mpSdkPromise
+  mpSdkPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script')
+    script.src = 'https://sdk.mercadopago.com/js/v2'
+    script.onload = () => resolve(window.MercadoPago)
+    script.onerror = () => { mpSdkPromise = null; reject(new Error('No se pudo cargar Mercado Pago')) }
+    document.head.appendChild(script)
+  })
+  return mpSdkPromise
+}
 
 // Endpoint de compra por módulo — Store multitenant (2026-08-29) y Suple
 // multitenant (2026-09-20) reusan este mismo componente en vez de
@@ -55,7 +74,6 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply', fl
     'w-full bg-zinc-50 border border-zinc-300 text-zinc-900 p-3.5 rounded outline-none placeholder:text-zinc-400 focus:border-zinc-500'
   )
   const [form, setForm] = useState({ nombre: '', telefono: '', email: '', municipio: '', departamento: '', direccion: '', mensaje: '' })
-  const [enviando, setEnviando] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
   // Ruta del Golfo (2026-09-22) — normaliza igual que _normCiudadFlete en
@@ -71,16 +89,6 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply', fl
   const fleteExacto = SHIPPING_MODULES.includes(module) && vendorLock.enCoberturaRuta && origenNorm && destinoNorm && fleteTabla
     ? (fleteTabla[origenNorm]?.[destinoNorm] ?? null)
     : null
-
-  // Mismo fix de bfcache ya usado en ArtistaLandingPage.jsx — sin esto, si
-  // el comprador le da "Atrás" desde Mercado Pago sin pagar, el botón
-  // vuelve congelado en "Redirigiendo..." porque ese código nunca corrió
-  // de nuevo.
-  useEffect(() => {
-    const alRestaurar = (e) => { if (e.persisted) setEnviando(false) }
-    window.addEventListener('pageshow', alRestaurar)
-    return () => window.removeEventListener('pageshow', alRestaurar)
-  }, [])
 
   const update = (campo, valor) => setForm(f => ({ ...f, [campo]: valor }))
   const setDepartamento = (nuevo) => setForm(f => ({ ...f, departamento: nuevo, municipio: '' }))
@@ -129,41 +137,126 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply', fl
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [module])
 
-  const enviar = async (e) => {
-    e.preventDefault()
-    if (!formCompleto || enviando) return
-    setEnviando(true)
-    setErrorMsg('')
-    try {
-      const res = await fetch(`${PANEL_URL}/api/${COMPRAR_ENDPOINT[module]}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          estudio_id: vendorLock.estudioId,
-          items: items.filter(i => i.inventoryId != null).map(i => ({
-            inventory_id: i.inventoryId,
-            cantidad: i.qty,
-            // Cajas surtidas (2026-08-09): el inventory_id de arriba es
-            // solo referencia de precio real del proveedor — esto le dice
-            // al backend que no es literalmente lo comprado, para que no
-            // le descuente stock a un producto ajeno a la mezcla.
-            ...(i.nombrePersonalizado ? { nombre_personalizado: i.nombrePersonalizado } : {}),
-          })),
-          cliente_nombre: form.nombre || null,
-          cliente_telefono: form.telefono,
-          cliente_email: form.email,
-          ...(ADDRESS_MODULES.includes(module) ? { cliente_municipio: form.municipio, cliente_direccion: form.direccion.trim() } : {}),
-          mensaje: form.mensaje || null,
-        }),
-      })
-      const data = await res.json()
-      if (!res.ok || !data.init_point) throw new Error(data.error || '')
-      window.location.href = data.init_point
-    } catch (err) {
-      setErrorMsg(err.message || 'No pudimos iniciar el pago — intenta de nuevo.')
-      setEnviando(false)
+  // Checkout embebido con Payment Brick (2026-09-27, pieza 2/3 del plan —
+  // ver project_checkout_pago_embebido_bricks.md) — reemplaza el botón
+  // "Pagar con Mercado Pago" (que redirigía a su página) por el formulario
+  // de pago de Mercado Pago incrustado aquí mismo. Todo lo demás (carrito,
+  // envío, datos de entrega, lo que le llega al vendedor) se queda igual.
+  const [resultado, setResultado] = useState(null) // null | { status, statusDetail }
+  const [brickReady, setBrickReady] = useState(false)
+  const [brickError, setBrickError] = useState('')
+  const brickContainerId = 'mp-payment-brick-container'
+  // El callback onSubmit del Brick se define una sola vez, al crearlo — sin
+  // esto, seguiría viendo el `form`/`formCompleto` del primer render (stale
+  // closure de React), aunque el comprador ya haya llenado sus datos.
+  const formRef = useRef(form)
+  const formCompletoRef = useRef(formCompleto)
+  useEffect(() => { formRef.current = form; formCompletoRef.current = formCompleto })
+
+  const procesarPagoBrick = (mpFormData) => new Promise((resolve, reject) => {
+    if (!formCompletoRef.current) {
+      setErrorMsg('Completa tus datos de contacto y entrega arriba antes de pagar.')
+      reject()
+      return
     }
-  }
+    setErrorMsg('')
+    const f = formRef.current
+    fetch(`${PANEL_URL}/api/${COMPRAR_ENDPOINT[module]}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        estudio_id: vendorLock.estudioId,
+        items: items.filter(i => i.inventoryId != null).map(i => ({
+          inventory_id: i.inventoryId,
+          cantidad: i.qty,
+          // Cajas surtidas (2026-08-09): el inventory_id de arriba es
+          // solo referencia de precio real del proveedor — esto le dice
+          // al backend que no es literalmente lo comprado, para que no
+          // le descuente stock a un producto ajeno a la mezcla.
+          ...(i.nombrePersonalizado ? { nombre_personalizado: i.nombrePersonalizado } : {}),
+        })),
+        cliente_nombre: f.nombre || null,
+        cliente_telefono: f.telefono,
+        cliente_email: f.email,
+        ...(ADDRESS_MODULES.includes(module) ? { cliente_municipio: f.municipio, cliente_direccion: f.direccion.trim() } : {}),
+        mensaje: f.mensaje || null,
+        mp: mpFormData,
+      }),
+    })
+      .then(async (res) => {
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error || 'No pudimos procesar el pago — intenta de nuevo.')
+        // PSE (y en teoría Efecty): Mercado Pago entrega una URL a la que
+        // hay que mandar al comprador para terminar de autorizar/pagar —
+        // mismo salto que ya existía, solo que directo al banco, sin pasar
+        // antes por la página de Mercado Pago.
+        if (data.accionUrl) { resolve(); window.location.href = data.accionUrl; return }
+        // "rejected" NO reemplaza la pantalla — el Brick se queda montado y
+        // listo para que el comprador intente de nuevo ahí mismo (mismo
+        // comportamiento nativo del widget tras un resolve()); si
+        // reemplazáramos la vista por ResultadoPago perderíamos el
+        // contenedor del Brick sin volver a crearlo (brickCreadoRef ya
+        // quedó en true), dejando un hueco vacío en un reintento.
+        if (data.status === 'rejected') {
+          setErrorMsg('Tu banco no aprobó este pago — intenta con otra tarjeta o método aquí mismo.')
+        } else {
+          setResultado({ status: data.status, statusDetail: data.statusDetail })
+        }
+        resolve()
+      })
+      .catch((err) => {
+        setErrorMsg(err.message || 'No pudimos procesar el pago — intenta de nuevo.')
+        reject()
+      })
+  })
+
+  // Crear el Payment Brick una vez que tengamos la llave pública del
+  // vendedor — el monto (`total`) no cambia durante este checkout (carrito
+  // bloqueado a un solo vendedor), así que no hace falta recrearlo si el
+  // comprador sigue editando sus datos de contacto/entrega más abajo.
+  // `activo`/`controllerLocal` (variables del closure, no refs) son a
+  // propósito: en desarrollo, StrictMode monta→limpia→remonta este efecto
+  // una vez de entrada (para detectar bugs) — con un ref "ya se creó" esa
+  // limpieza intermedia deja el Brick a medio crear y nunca se reintenta.
+  // Así, cada invocación real del efecto maneja su propio intento de punta
+  // a punta, sin pisarse con la siguiente.
+  useEffect(() => {
+    if (!vendorLock.mpPublicKey || total <= 0) return
+    let activo = true
+    let controllerLocal = null
+    cargarSdkMercadoPago()
+      .then((MercadoPago) => {
+        if (!activo) return null
+        const mp = new MercadoPago(vendorLock.mpPublicKey, { locale: 'es-CO' })
+        return mp.bricks().create('payment', brickContainerId, {
+          initialization: { amount: total, payer: { email: form.email || undefined } },
+          // Sin "mercadoPago" a propósito: ese método necesita una
+          // preferencia creada antes (preferenceId) — no aplica, cobramos
+          // directo por /v1/payments (ver _procesarPagoBrick en el panel).
+          // Mercado Pago excluye un método si simplemente no está en este
+          // objeto (no hace falta una lista de exclusión aparte).
+          customization: {
+            paymentMethods: { creditCard: 'all', debitCard: 'all', bankTransfer: 'all', ticket: 'all' },
+          },
+          callbacks: {
+            onReady: () => { if (activo) setBrickReady(true) },
+            onSubmit: ({ formData }) => procesarPagoBrick(formData),
+            onError: (error) => { console.error('[mercadopago brick]', error) },
+          },
+        })
+      })
+      .then((controller) => {
+        if (!controller) return
+        if (!activo) { controller.unmount?.(); return }
+        controllerLocal = controller
+      })
+      .catch(() => { if (activo) setBrickError('No pudimos cargar el formulario de pago. Recarga la página o escríbele a INKognito.') })
+    return () => {
+      activo = false
+      controllerLocal?.unmount?.()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vendorLock.mpPublicKey])
 
   return (
     <section className={`py-10 md:py-16 px-4 border-t ${c('bg-black border-white/5', 'bg-white border-zinc-200')}`}>
@@ -173,10 +266,10 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply', fl
           Confirma tu <span className={c('text-zinc-600', 'text-zinc-400')}>Compra</span>
         </h2>
         <p className={`text-sm text-center max-w-md mx-auto mb-8 ${c('text-gray-500', 'text-zinc-500')}`}>
-          Pagas directo a {vendorLock.estudioNombre} por Mercado Pago. En cuanto se apruebe el pago, le llega tu pedido por correo para que lo despache y te escribe por WhatsApp para coordinar la entrega.
+          Pagas directo a {vendorLock.estudioNombre} por Mercado Pago, sin salir de esta página. En cuanto se apruebe el pago, le llega tu pedido por correo para que lo despache y te escribe por WhatsApp para coordinar la entrega.
         </p>
 
-        <form onSubmit={enviar} className={`border rounded-xl p-6 md:p-10 space-y-6 ${c('bg-zinc-950 border-gray-800', 'bg-white border-zinc-200 shadow-sm')}`}>
+        <div className={`border rounded-xl p-6 md:p-10 space-y-6 ${c('bg-zinc-950 border-gray-800', 'bg-white border-zinc-200 shadow-sm')}`}>
           <div className={`border rounded-lg divide-y ${c('bg-zinc-900 border-gray-800 divide-gray-800', 'bg-zinc-50 border-zinc-200 divide-zinc-200')}`}>
             {items.map(item => {
               const unitPrice = parseInt(String(item.price).replace(/[^0-9]/g, ''), 10) || 0
@@ -259,23 +352,69 @@ export default function PedidoSupplyVendorCheckout({ cart, module = 'supply', fl
 
           {errorMsg && <p className="text-red-500 text-sm">{errorMsg}</p>}
 
-          <div className={`flex items-start gap-3 border rounded-lg p-4 ${c('bg-zinc-900 border-amber-500/30', 'bg-amber-50 border-amber-300')}`}>
-            <Landmark size={18} className={`flex-shrink-0 mt-0.5 ${c('text-amber-500', 'text-amber-600')}`} />
-            <p className={`text-[13px] leading-relaxed ${c('text-gray-400', 'text-zinc-600')}`}>
-              Al confirmar, Mercado Pago te pedirá el pago completo (${total.toLocaleString('es-CO')}) — le llega directo a la cuenta de {vendorLock.estudioNombre}, sin pasar por INKognito. Con el pago aprobado, {vendorLock.estudioNombre} recibe tu pedido y tus datos por correo para despacharlo, y te escribe por WhatsApp para coordinar la entrega.
-            </p>
-          </div>
+          {resultado ? (
+            <ResultadoPago resultado={resultado} vendorNombre={vendorLock.estudioNombre} module={module} total={total} c={c} />
+          ) : (
+            <>
+              <div className={`flex items-start gap-3 border rounded-lg p-4 ${c('bg-zinc-900 border-amber-500/30', 'bg-amber-50 border-amber-300')}`}>
+                <Landmark size={18} className={`flex-shrink-0 mt-0.5 ${c('text-amber-500', 'text-amber-600')}`} />
+                <p className={`text-[13px] leading-relaxed ${c('text-gray-400', 'text-zinc-600')}`}>
+                  El pago (${total.toLocaleString('es-CO')}) le llega directo a la cuenta de {vendorLock.estudioNombre}, sin pasar por INKognito. Con el pago aprobado, {vendorLock.estudioNombre} recibe tu pedido y tus datos por correo para despacharlo, y te escribe por WhatsApp para coordinar la entrega.
+                </p>
+              </div>
 
-          <button
-            type="submit"
-            disabled={enviando || !formCompleto}
-            className="w-full flex items-center justify-center gap-3 bg-blue-600 text-white font-black py-4 px-6 rounded uppercase tracking-widest text-sm hover:bg-blue-500 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <ShoppingBag size={18} />
-            {enviando ? 'Redirigiendo a Mercado Pago...' : 'Pagar con Mercado Pago'}
-          </button>
-        </form>
+              {brickError && <p className="text-red-500 text-sm">{brickError}</p>}
+              {!formCompleto && !brickError && (
+                <p className={`text-sm text-center py-2 ${c('text-gray-500', 'text-zinc-500')}`}>Completa tus datos de contacto y entrega arriba para continuar con el pago.</p>
+              )}
+              {!brickReady && formCompleto && !brickError && (
+                <p className={`text-sm text-center ${c('text-gray-500', 'text-zinc-500')}`}>Cargando el formulario de pago...</p>
+              )}
+              {/* El contenedor SIEMPRE está montado en el DOM (nunca se
+                  quita ni se agrega condicionalmente) — Mercado Pago busca
+                  este id una sola vez al crear el Brick; si no existe en
+                  ese momento, la creación falla en silencio. Solo se
+                  oculta visualmente mientras el formulario de arriba está
+                  incompleto. */}
+              <div id={brickContainerId} className={formCompleto ? '' : 'hidden'} />
+            </>
+          )}
+        </div>
       </div>
     </section>
+  )
+}
+
+// Resultado del pago sin salir de esta página (2026-09-27, pieza 4 del
+// plan de checkout embebido) — antes esta pantalla era de Mercado Pago
+// (el comprador nunca salía de la nuestra). Solo reemplaza la vista en
+// los 2 casos donde ya no hay nada más que hacer aquí (aprobado/en
+// revisión) — un pago rechazado NO llega hasta acá, ver procesarPagoBrick
+// (se queda en el Brick para reintentar). PSE tampoco llega aquí: ese
+// método siempre redirige y usa la pantalla de resultado existente
+// (/*/compra/resultado).
+function ResultadoPago({ resultado, vendorNombre, module, total, c }) {
+  if (resultado.status === 'approved') {
+    return (
+      <div className="text-center py-6">
+        <CheckCircle2 size={40} className="text-green-500 mx-auto mb-3" />
+        <h3 className={`text-lg font-black uppercase italic mb-2 ${c('text-white', 'text-zinc-900')}`}>¡Pago aprobado!</h3>
+        <p className={`text-sm leading-relaxed mb-5 ${c('text-gray-400', 'text-zinc-600')}`}>
+          Pagaste ${total.toLocaleString('es-CO')} a {vendorNombre}. Ya le llegó tu pedido por correo para que lo despache, y te escribe por WhatsApp para coordinar la entrega.
+        </p>
+        <Link to={`/${module}`} className={c('text-green-500 hover:text-green-400', 'text-zinc-700 hover:text-zinc-900') + ' text-sm font-semibold'}>
+          Volver a {vendorNombre}
+        </Link>
+      </div>
+    )
+  }
+  return (
+    <div className="text-center py-6">
+      <Clock size={40} className="text-amber-500 mx-auto mb-3" />
+      <h3 className={`text-lg font-black uppercase italic mb-2 ${c('text-white', 'text-zinc-900')}`}>Pago en revisión</h3>
+      <p className={`text-sm leading-relaxed ${c('text-gray-400', 'text-zinc-600')}`}>
+        Mercado Pago está revisando tu pago — te llega un correo apenas se confirme, sin que tengas que hacer nada más.
+      </p>
+    </div>
   )
 }

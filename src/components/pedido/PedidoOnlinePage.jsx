@@ -179,6 +179,12 @@ export default function PedidoOnlinePage() {
   // /api/estudios/:id (ver server.js) — se pasan tal cual a
   // PedidoSupplyVendorCheckout.jsx para decidir si muestra el monto exacto
   // del flete, un aviso sin monto, o "Gratis".
+  // mpPublicKey (2026-09-27, checkout embebido — ver
+  // project_checkout_pago_embebido_bricks.md): llave PÚBLICA del vendedor,
+  // segura de exponer en el navegador (identifica de quién es el
+  // formulario de pago, no mueve plata — a diferencia del access_token,
+  // que nunca sale del servidor). También viaja fresca en la misma
+  // respuesta de /api/estudios/:id.
   const vendorLive = vendorInfo?.mp_conectado ? {
     estudioId: vendorInfo.id,
     estudioNombre: vendorNombreVivo,
@@ -186,6 +192,7 @@ export default function PedidoOnlinePage() {
     politicaEnvio: vendorInfo.politica_envio,
     envioGratisMonto: vendorInfo.envio_gratis_monto,
     enCoberturaRuta: vendorInfo.en_cobertura_ruta,
+    mpPublicKey: vendorInfo.mp_public_key,
   } : null
 
   useEffect(() => {
