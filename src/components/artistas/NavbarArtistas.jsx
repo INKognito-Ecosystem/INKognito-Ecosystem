@@ -303,8 +303,21 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
           pedacito") — pasa de un dropdown chico en la esquina a un
           overlay a pantalla completa (fixed inset-0, debajo del navbar),
           mismo patrón de menú full-screen que usa Tattoodo en móvil. */}
-      {menuOpen && (
-        <div className="fixed inset-0 top-16 md:top-20 bg-white z-50 overflow-y-auto">
+      {/* Drawer SIEMPRE montado (2026-11-21, Jose: "el módulo ink... la
+          transición no es de derecha a izquierda como las demás, sino que
+          aparece y desaparece") — antes era `{menuOpen && (...)}`, así que
+          React lo insertaba/quitaba del DOM sin animación. Ahora se queda
+          montado y se desliza con translate-x, igual que SupplyMobileNav /
+          StoreMobileNav / GymMobileNav / SupleMobileNav y que el drawer del
+          EcosystemNavbar: abierto `translate-x-0`, cerrado
+          `translate-x-full pointer-events-none` para que el panel fuera de
+          pantalla no capture clics. */}
+      <div
+        role="dialog"
+        aria-modal={menuOpen ? 'true' : undefined}
+        aria-label="Menú de navegación"
+        className={`fixed inset-0 top-16 md:top-20 bg-white z-50 overflow-y-auto transition-transform duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${menuOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'}`}
+      >
           {/* Jerarquía por secciones (2026-09-15) — antes era una lista
               plana sin agrupar; ahora sigue el mismo criterio que
               EcosystemNavbar.jsx: un eyebrow por tema, con íconos en cada
@@ -385,7 +398,6 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
             Privacidad
           </MenuLink>
         </div>
-      )}
 
       <LegalModal type={legalOpen} variant="artistas" onClose={() => setLegalOpen(null)} />
     </nav>
