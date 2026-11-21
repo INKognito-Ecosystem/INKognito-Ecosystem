@@ -49,14 +49,15 @@ export default function SupplyMobileNav({ active = null, light = false }) {
 
   return (
     <>
-      {/* z-[60] con el menú abierto (2026-11-20, Jose: "cuando lo presiono
-          se abre el modal... y este navbar inferior desaparece; para que
-          ocurra el giro de este botón deberíamos poner que este navbar sea
-          estático") — antes el drawer (z-50) tapaba esta barra (z-40) y el
-          botón desaparecía. Ahora la barra queda por encima SOLO mientras el
-          menú está abierto, así el mismo botón sigue visible y gira; el
-          carrito (z-60 overlay / z-70 panel) sigue por encima de todo. */}
-      <div className={`md:hidden fixed bottom-0 left-0 right-0 ${menuOpen ? 'z-[60]' : 'z-40'} flex justify-around items-center ${barBg} backdrop-blur-md border-t ${barBorder} py-2.5`}>
+      {/* z-[60] SIEMPRE (2026-11-21, Jose: "al dar click para cerrar la
+          transición no es limpia") — con el z condicional, al cerrar la barra
+          bajaba a z-40 al instante y el drawer (z-50) la tapaba durante los
+          350ms del deslizamiento: se veía como si la barra desapareciera y
+          entrara barriéndose. Dejándola fija en z-[60] queda por encima del
+          drawer en apertura Y cierre, igual que el navbar fijo del home del
+          ecosistema (z-[75] sobre su drawer z-[70]). El carrito no se afecta:
+          su overlay (z-60) va después en el DOM y su panel es z-70. */}
+      <div className={`md:hidden fixed bottom-0 left-0 right-0 z-[60] flex justify-around items-center ${barBg} backdrop-blur-md border-t ${barBorder} py-2.5`}>
         <Link to="/supply" prefetch="viewport" className={`flex flex-col items-center gap-1 ${tab('inicio')}`}>
           <Home size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Inicio</span>

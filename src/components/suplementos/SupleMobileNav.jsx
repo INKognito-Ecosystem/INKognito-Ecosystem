@@ -38,10 +38,10 @@ export default function SupleMobileNav({ active = null }) {
 
   return (
     <>
-      {/* z-[60] con el menú abierto (2026-11-20, mismo patrón que
-          SupplyMobileNav.jsx): la barra queda encima del drawer (z-50) para
-          que el botón Menú siga visible y pueda girar/cerrar. */}
-      <div className={`md:hidden fixed bottom-0 left-0 right-0 ${menuOpen ? 'z-[60]' : 'z-40'} flex justify-around items-center bg-white/95 backdrop-blur-md border-t border-zinc-200 py-2.5`}>
+      {/* z-[60] SIEMPRE (2026-11-21): la barra debe quedar encima del drawer
+          (z-50) también mientras este se cierra; si bajaba a z-40 al cerrar,
+          el panel la tapaba durante los 350ms y la transición se veía sucia. */}
+      <div className={`md:hidden fixed bottom-0 left-0 right-0 z-[60] flex justify-around items-center bg-white/95 backdrop-blur-md border-t border-zinc-200 py-2.5`}>
         <Link to="/suplementos" prefetch="viewport" className="relative flex flex-col items-center gap-1 text-black">
           {marca('inicio')}
           <Home size={19} />

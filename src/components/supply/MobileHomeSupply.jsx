@@ -276,10 +276,12 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
           (2026-09-15) — mismos tokens que ya usa SupplyMobileNav.jsx en su
           versión light (fondo blanco, borde blue-500/20 conservado tal
           cual, íconos negros). */}
-      {/* z-[60] con el menú abierto (2026-11-20, mismo criterio que
-          SupplyMobileNav.jsx) — la barra queda encima del drawer (z-50) para
-          que el botón Menú siga visible y pueda girar/cerrar. */}
-      <div className={`fixed bottom-0 left-0 right-0 ${menuOpen ? 'z-[60]' : 'z-40'} flex justify-around items-center bg-white/95 backdrop-blur-md border-t border-blue-500/20 py-2.5`}>
+      {/* z-[60] SIEMPRE (2026-11-21, Jose: "al dar click para cerrar la
+          transición no es limpia") — con el z condicional, al cerrar la barra
+          bajaba a z-40 al instante y el drawer (z-50) la tapaba durante los
+          350ms del deslizamiento. Fija en z-[60] queda por encima del drawer
+          en apertura Y cierre, igual que el navbar del home del ecosistema. */}
+      <div className={`fixed bottom-0 left-0 right-0 z-[60] flex justify-around items-center bg-white/95 backdrop-blur-md border-t border-blue-500/20 py-2.5`}>
         <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex flex-col items-center gap-1 text-blue-500">
           <Home size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Inicio</span>
