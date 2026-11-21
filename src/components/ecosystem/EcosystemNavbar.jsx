@@ -99,17 +99,31 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
   return (
     <>
       {/* NAVBAR */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between pl-2 pr-6 py-4">
+      {/* z-[75] (2026-11-20, Jose: "quiero que el botón hamburguesa gire
+          sobre su eje a la izquierda... en vez de desaparecer y mostrar una
+          x") — la barra queda POR ENCIMA del drawer (z-70) para que el mismo
+          botón siga visible y clicable con el menú abierto, en vez del "✕"
+          que vivía dentro del drawer. Sigue debajo del modal "Sobre
+          INKognito" (z-80) y de LegalModal (z-95). */}
+      <nav className={`fixed top-0 left-0 right-0 z-[75] flex items-center justify-between pl-2 pr-6 py-4 transition-colors duration-300 ${menuOpen ? 'bg-white' : 'bg-transparent'}`}>
         {/* Logo blanco siempre (2026-09-15, Jose: "que el logo sea blanco y
             no negro") — mobileLight ya no lo toca; con la opacidad/overlay
             de InkognitoHome.jsx restaurada, el blanco vuelve a leerse bien
             sin necesidad de oscurecerlo. Solo la hamburguesa (abajo) sigue
-            reaccionando a mobileLight. */}
+            reaccionando a mobileLight.
+            Excepción 2026-11-20: con el menú abierto el navbar queda sobre
+            el drawer blanco, así que el logo (blanco en el asset) tiene que
+            volverse negro para no desaparecer — mismo brightness(0) que ya
+            usa el logo del drawer. La transición de filter suaviza el
+            cambio mientras el drawer se desliza. */}
         <img
           src={inkognitoLogo}
           alt="INKognito"
           className="h-[52px] w-auto object-contain mr-8"
-          style={logoFilter ? { filter: logoFilter } : {}}
+          style={{
+            filter: menuOpen ? 'brightness(0)' : (logoFilter || undefined),
+            transition: 'filter 300ms ease',
+          }}
         />
 
         {showTagline && (
@@ -135,18 +149,45 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
             ofrecer una salida a navegar el resto del sitio. El drawer/menú
             de abajo queda igual, simplemente nunca se puede abrir sin este
             botón (menuOpen nunca pasa a true). */}
+        {/* Botón único de abrir/cerrar (2026-11-20, Jose: "cuando presione
+            ese botón hamburguesa, en vez de desaparecer y mostrar una x para
+            salir, quiero que el botón gire sobre su eje a la izquierda... y
+            que al presionarlo vuelva a su estado original") — antes el click
+            solo abría (setMenuOpen(true)) y cerrar era tarea del "✕" del
+            drawer. Ahora el mismo botón alterna, y las tres barras
+            horizontales rotan -90° (a la izquierda) hasta quedar verticales;
+            al volver a tocarlo regresan a 0°.
+            Inversión de colores al abrir (2026-11-20, Jose: "él está en una
+            burbuja blanca porque el fondo de la página donde están los
+            módulos es más oscurita o grisácea... cuando cambia, este nuevo
+            fondo es blanco y se pierde un poco... ¿qué tal si invertimos,
+            que aquí sea más gris?") — cerrado: burbuja blanca con barras
+            negras (fondo de módulos). Abierto: burbuja gris oscura con
+            barras blancas (drawer blanco), el negativo exacto del estado
+            cerrado. Se aplica en los dos breakpoints: con el menú abierto el
+            navbar es blanco en desktop también, así que las barras blancas
+            necesitan la burbuja oscura para leerse. */}
         {!hideMenu && (
           <button
-            onClick={() => setMenuOpen(true)}
-            aria-label="Abrir menú"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
             aria-expanded={menuOpen}
-            className={`flex flex-col gap-[5px] cursor-pointer border-none ${
-              mobileLight ? 'p-2.5 bg-white/85 rounded-lg shadow-sm md:p-1 md:bg-transparent md:rounded-none md:shadow-none' : 'p-1 bg-transparent'
+            className={`flex items-center justify-center cursor-pointer border-none transition-colors duration-300 ${
+              menuOpen
+                ? 'p-2.5 bg-zinc-800 rounded-lg shadow-sm'
+                : (mobileLight
+                    ? 'p-2.5 bg-white/85 rounded-lg shadow-sm md:p-1 md:bg-transparent md:rounded-none md:shadow-none'
+                    : 'p-1 bg-transparent')
             }`}
           >
-            <span className={`block w-6 h-[2px] rounded-sm ${mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90'}`} />
-            <span className={`block w-6 h-[2px] rounded-sm ${mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90'}`} />
-            <span className={`block w-6 h-[2px] rounded-sm ${mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90'}`} />
+            <span
+              className="flex flex-col gap-[5px] origin-center transition-transform duration-300 ease-in-out"
+              style={{ transform: menuOpen ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+            >
+              <span className={`block w-6 h-[2px] rounded-sm transition-colors duration-300 ${menuOpen ? 'bg-white/90' : (mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90')}`} />
+              <span className={`block w-6 h-[2px] rounded-sm transition-colors duration-300 ${menuOpen ? 'bg-white/90' : (mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90')}`} />
+              <span className={`block w-6 h-[2px] rounded-sm transition-colors duration-300 ${menuOpen ? 'bg-white/90' : (mobileLight ? 'bg-black/80 md:bg-white/90' : 'bg-white/90')}`} />
+            </span>
           </button>
         )}
       </nav>
@@ -183,15 +224,15 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
             arriba, a propósito FUERA del max-w-2xl del contenido: así el
             logo no salta de sitio al abrir el menú, queda pegado al
             mismo borde izquierdo real de la pantalla.*/}
-        <div className="flex items-center justify-between pl-2 pr-6 py-4 flex-shrink-0">
-          <img src={inkognitoLogo} alt="INKognito" className="h-[52px] w-auto object-contain" style={{ filter: 'brightness(0)' }} />
-          <button
-            onClick={() => setMenuOpen(false)}
-            aria-label="Cerrar menú"
-            className="bg-transparent border-none cursor-pointer text-zinc-400 text-2xl leading-none p-1 hover:text-black transition-colors"
-          >
-            ✕
-          </button>
+        <div className="flex items-center pl-2 pr-6 py-4 flex-shrink-0">
+          {/* Logo duplicado a propósito: mantiene la MISMA altura de fila
+              (pl-2/pr-6/py-4 + h-52px = 84px) que el navbar fijo de arriba,
+              así el contenido del menú no salta al abrirse. Queda tapado por
+              el logo del navbar (z-[75]); alt vacío para no repetirlo a los
+              lectores de pantalla.
+              El "✕" que vivía aquí se quitó (2026-11-20, Jose): el botón
+              hamburguesa del navbar ahora es el único que abre y cierra. */}
+          <img src={inkognitoLogo} alt="" aria-hidden="true" className="h-[52px] w-auto object-contain" style={{ filter: 'brightness(0)' }} />
         </div>
 
         {/* max-w-2xl mx-auto (2026-09-16, Jose: "el menú debe ocupar toda

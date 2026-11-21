@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Search, Bell, Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle, Package } from 'lucide-react'
+import { Search, Bell, Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle, Package } from 'lucide-react'
 import { categories } from './CategoriesSupply'
 import BrandsMarquee from './BrandsMarquee'
 import SupplyProductCard from './SupplyProductCard'
@@ -276,7 +276,10 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
           (2026-09-15) — mismos tokens que ya usa SupplyMobileNav.jsx en su
           versión light (fondo blanco, borde blue-500/20 conservado tal
           cual, íconos negros). */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center bg-white/95 backdrop-blur-md border-t border-blue-500/20 py-2.5">
+      {/* z-[60] con el menú abierto (2026-11-20, mismo criterio que
+          SupplyMobileNav.jsx) — la barra queda encima del drawer (z-50) para
+          que el botón Menú siga visible y pueda girar/cerrar. */}
+      <div className={`fixed bottom-0 left-0 right-0 ${menuOpen ? 'z-[60]' : 'z-40'} flex justify-around items-center bg-white/95 backdrop-blur-md border-t border-blue-500/20 py-2.5`}>
         <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex flex-col items-center gap-1 text-blue-500">
           <Home size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Inicio</span>
@@ -298,8 +301,20 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
           )}
           <span className="text-[9px] font-bold uppercase tracking-wide">Carrito</span>
         </button>
-        <button onClick={() => setMenuOpen(true)} className="flex flex-col items-center gap-1 text-black">
-          <MenuIcon size={19} />
+        {/* 2026-11-20 — mismo giro que SupplyMobileNav.jsx; sin cambio de
+            color, la barra conserva su plano blanco. */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+          aria-expanded={menuOpen}
+          className="flex flex-col items-center gap-1 text-black"
+        >
+          <span
+            className="inline-flex transition-transform duration-300 ease-in-out"
+            style={{ transform: menuOpen ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+          >
+            <MenuIcon size={19} />
+          </span>
           <span className="text-[9px] font-bold uppercase tracking-wide">Menú</span>
         </button>
       </div>
@@ -310,14 +325,18 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
           dejaba ver el fondo; mismo contenido que el dropdown de NavbarSupply).
           Blanco (2026-09-15) — mismos tokens que la versión light de
           SupplyMobileNav.jsx. */}
-      {menuOpen && (
-        <div className="fixed inset-0 z-50 bg-white flex flex-col">
-          <div className="flex-shrink-0 flex items-center justify-between px-5 py-4 border-b border-zinc-200">
+      {/* 2026-11-20 — mismo deslizamiento derecha→izquierda que el menú del
+          home del ecosistema: el panel queda montado y entra con
+          translate-x. Al cerrar se va a la derecha y deja de recibir clicks. */}
+      <div
+        aria-hidden={!menuOpen}
+        className={`fixed inset-0 z-50 bg-white flex flex-col transition-transform duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${menuOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'}`}
+      >
+          <div className="flex-shrink-0 flex items-center px-5 py-4 border-b border-zinc-200">
             <div className="flex items-center gap-2">
               <img src={logoSupply} alt="INKognito Supply" className="w-12 h-12 object-contain" />
               <span className="text-xs font-black uppercase tracking-widest text-zinc-900">Menú</span>
             </div>
-            <button onClick={() => setMenuOpen(false)} className="text-zinc-500 p-1"><X size={22} /></button>
           </div>
           {/* Jerarquía por secciones (2026-09-15, Jose: "armalo para los 4
               [navbars de Supply], tal como lo hicimos con el home del
@@ -328,7 +347,8 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
               el home del ecosistema") — Supply no tiene su propia página
               legal, así que apuntan a las mismas /terminos y /privacidad
               que ya usa FooterSupply.jsx. */}
-          <div className="flex-1 overflow-y-auto">
+          {/* pb-[70px]: la barra inferior sigue visible encima del menú. */}
+          <div className="flex-1 overflow-y-auto pb-[70px]">
             {misComprasCount > 0 && (
               <>
                 <p className="px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400">Tus compras</p>
@@ -402,7 +422,6 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
             </button>
           </div>
         </div>
-      )}
 
       <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
       <MisComprasPanel open={comprasOpen} onClose={() => setComprasOpen(false)} />

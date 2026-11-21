@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { Menu, ShoppingCart, X, Sparkles, LayoutGrid, Tag, Phone, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle, Package } from 'lucide-react'
+import { Menu, ShoppingCart, Sparkles, LayoutGrid, Tag, Phone, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle, Package } from 'lucide-react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import logoSupply from '../../assets/milogo/supply.webp'
@@ -100,7 +100,12 @@ export default function NavbarSupply() {
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="text-zinc-400 hover:text-white transition-all duration-300"
               >
-                {menuOpen ? <X size={22} /> : <Menu size={22} />}
+                <span
+                  className="inline-flex transition-transform duration-300 ease-in-out"
+                  style={{ transform: menuOpen ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+                >
+                  <Menu size={22} />
+                </span>
               </button>
             </div>
 

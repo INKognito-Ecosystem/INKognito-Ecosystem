@@ -58,7 +58,12 @@ export default function Navbar({ showInicio = false }) {
               onClick={() => setMenuOpen(!menuOpen)}
               className={`justify-self-end transition-colors duration-300 ${showFull ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-200'}`}
             >
-              {menuOpen ? <X size={24} /> : <Menu size={24} />}
+              <span
+                className="inline-flex transition-transform duration-300 ease-in-out"
+                style={{ transform: menuOpen ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+              >
+                <Menu size={24} />
+              </span>
             </button>
 
           </div>

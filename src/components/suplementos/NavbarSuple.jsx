@@ -163,7 +163,12 @@ export default function NavbarSuple({
                     aria-label="Menú"
                     className="text-zinc-500 hover:text-zinc-900 transition-all duration-300"
                   >
-                    {menuOpen ? <X size={22} /> : <Menu size={22} />}
+                    <span
+                      className="inline-flex transition-transform duration-300 ease-in-out"
+                      style={{ transform: menuOpen ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+                    >
+                      <Menu size={22} />
+                    </span>
                   </button>
                 )}
               </div>

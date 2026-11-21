@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Globe, FileText, Shield } from 'lucide-react'
+import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, Globe, FileText, Shield } from 'lucide-react'
 import { useGymCart } from '../../contexts/GymCartContext'
 import CartDrawerGym from './CartDrawerGym'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
@@ -35,7 +35,10 @@ export default function GymMobileNav({ active = null }) {
 
   return (
     <>
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center bg-white/95 backdrop-blur-md border-t border-zinc-200 py-2.5">
+      {/* z-[60] con el menú abierto (2026-11-20, mismo patrón que
+          SupplyMobileNav.jsx): la barra queda encima del drawer (z-50) para
+          que el botón Menú siga visible y pueda girar/cerrar. */}
+      <div className={`md:hidden fixed bottom-0 left-0 right-0 ${menuOpen ? 'z-[60]' : 'z-40'} flex justify-around items-center bg-white/95 backdrop-blur-md border-t border-zinc-200 py-2.5`}>
         <Link to="/gym" className="relative flex flex-col items-center gap-1 text-black">
           {marca('inicio')}
           <Home size={19} />
@@ -55,24 +58,40 @@ export default function GymMobileNav({ active = null }) {
           )}
           <span className="text-[9px] font-bold uppercase tracking-wide">Carrito</span>
         </button>
-        <button onClick={() => setMenuOpen(true)} className="flex flex-col items-center gap-1 text-black">
-          <MenuIcon size={19} />
+        {/* 2026-11-20 — mismo giro que EcosystemNavbar/SupplyMobileNav. */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+          aria-expanded={menuOpen}
+          className="flex flex-col items-center gap-1 text-black"
+        >
+          <span
+            className="inline-flex transition-transform duration-300 ease-in-out"
+            style={{ transform: menuOpen ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+          >
+            <MenuIcon size={19} />
+          </span>
           <span className="text-[9px] font-bold uppercase tracking-wide">Menú</span>
         </button>
       </div>
 
       <CartDrawerGym open={drawerOpen} onClose={() => setDrawerOpen(false)} />
 
-      {menuOpen && (
-        <div className="md:hidden fixed inset-0 z-50 bg-white flex flex-col">
-          <div className="flex-shrink-0 flex items-center justify-between px-5 py-4 border-b border-zinc-200">
+      {/* 2026-11-20 — mismo deslizamiento derecha→izquierda que el menú del
+          home del ecosistema: el panel queda montado y entra con
+          translate-x. Al cerrar se va a la derecha y deja de recibir clicks. */}
+      <div
+        aria-hidden={!menuOpen}
+        className={`md:hidden fixed inset-0 z-50 bg-white flex flex-col transition-transform duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${menuOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'}`}
+      >
+          <div className="flex-shrink-0 flex items-center px-5 py-4 border-b border-zinc-200">
             <div className="flex items-center gap-2">
               <img src={logoGym} alt="INKognito Gym System" className="w-12 h-12 object-contain" />
               <span className="text-xs font-black uppercase tracking-widest text-zinc-900">Menú</span>
             </div>
-            <button onClick={() => setMenuOpen(false)} aria-label="Cerrar menú" className="text-zinc-500 p-1"><X size={22} /></button>
           </div>
-          <div className="flex-1 overflow-y-auto">
+          {/* pb-[70px]: la barra inferior sigue visible encima del menú. */}
+          <div className="flex-1 overflow-y-auto pb-[70px]">
             <p className={etiqueta}>Categorías</p>
             {GYM_SECCIONES.map(s => {
               const Icon = s.icon
@@ -103,7 +122,6 @@ export default function GymMobileNav({ active = null }) {
             </button>
           </div>
         </div>
-      )}
 
       <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
     </>

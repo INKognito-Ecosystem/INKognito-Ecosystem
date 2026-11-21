@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, UserCircle, Globe, FileText, Shield, Package } from 'lucide-react'
+import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, Store, PlusCircle, UserCircle, Globe, FileText, Shield, Package } from 'lucide-react'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import CartDrawerStore from './CartDrawerStore'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
@@ -38,7 +38,10 @@ export default function StoreMobileNav({ active = null }) {
 
   return (
     <>
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center bg-white/95 backdrop-blur-md border-t border-[#C9A84C]/20 py-2.5">
+      {/* z-[60] con el menú abierto (2026-11-20, mismo patrón que
+          SupplyMobileNav.jsx): la barra queda encima del drawer (z-50) para
+          que el botón Menú siga visible y pueda girar/cerrar. */}
+      <div className={`md:hidden fixed bottom-0 left-0 right-0 ${menuOpen ? 'z-[60]' : 'z-40'} flex justify-around items-center bg-white/95 backdrop-blur-md border-t border-[#C9A84C]/20 py-2.5`}>
         <Link to="/store" prefetch="viewport" className="flex flex-col items-center gap-1" style={{ color: tabColor('inicio') }}>
           <Home size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Inicio</span>
@@ -56,24 +59,40 @@ export default function StoreMobileNav({ active = null }) {
           )}
           <span className="text-[9px] font-bold uppercase tracking-wide">Carrito</span>
         </button>
-        <button onClick={() => setMenuOpen(true)} className="flex flex-col items-center gap-1 text-black">
-          <MenuIcon size={19} />
+        {/* 2026-11-20 — mismo giro que EcosystemNavbar/SupplyMobileNav. */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+          aria-expanded={menuOpen}
+          className="flex flex-col items-center gap-1 text-black"
+        >
+          <span
+            className="inline-flex transition-transform duration-300 ease-in-out"
+            style={{ transform: menuOpen ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+          >
+            <MenuIcon size={19} />
+          </span>
           <span className="text-[9px] font-bold uppercase tracking-wide">Menú</span>
         </button>
       </div>
 
       <CartDrawerStore open={drawerOpen} onClose={() => setDrawerOpen(false)} />
 
-      {menuOpen && (
-        <div className="md:hidden fixed inset-0 z-50 bg-white flex flex-col">
-          <div className="flex-shrink-0 flex items-center justify-between px-5 py-4 border-b border-zinc-200">
+      {/* 2026-11-20 — mismo deslizamiento derecha→izquierda que el menú del
+          home del ecosistema: el panel queda montado y entra con
+          translate-x. Al cerrar se va a la derecha y deja de recibir clicks. */}
+      <div
+        aria-hidden={!menuOpen}
+        className={`md:hidden fixed inset-0 z-50 bg-white flex flex-col transition-transform duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${menuOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'}`}
+      >
+          <div className="flex-shrink-0 flex items-center px-5 py-4 border-b border-zinc-200">
             <div className="flex items-center gap-2">
               <img src={logoStore} alt="INKognito Store" className="w-12 h-12 object-contain" />
               <span className="text-xs font-black uppercase tracking-widest text-zinc-900">Menú</span>
             </div>
-            <button onClick={() => setMenuOpen(false)} className="text-zinc-500 p-1"><X size={22} /></button>
           </div>
-          <div className="flex-1 overflow-y-auto">
+          {/* pb-[70px]: la barra inferior sigue visible encima del menú. */}
+          <div className="flex-1 overflow-y-auto pb-[70px]">
             {/* Distinto de "Mi cuenta/perfil" de abajo (ese es para el
                 DUEÑO de la tienda) — esta sección es para el COMPRADOR,
                 mismo criterio que MisComprasPanel.jsx. */}
@@ -129,7 +148,6 @@ export default function StoreMobileNav({ active = null }) {
             </button>
           </div>
         </div>
-      )}
 
       <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
       <MisComprasPanel open={comprasOpen} onClose={() => setComprasOpen(false)} />

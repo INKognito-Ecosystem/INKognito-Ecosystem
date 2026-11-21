@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
-import { Menu, X, Dumbbell, ShoppingCart, Share2 } from 'lucide-react'
+import { Menu, Dumbbell, ShoppingCart, Share2 } from 'lucide-react'
 import logoGym from '../../assets/milogo/gym.webp'
 import { useGymCart } from '../../contexts/GymCartContext'
 import CartDrawerGym from './CartDrawerGym'
@@ -119,7 +119,12 @@ export default function NavbarGym({ shareTitle = 'INKognito Gym System' }) {
                   aria-label="Abrir menú"
                   className="text-white hover:text-zinc-300 transition-all duration-300"
                 >
-                  {menuOpen ? <X size={22} /> : <Menu size={22} />}
+                  <span
+                    className="inline-flex transition-transform duration-300 ease-in-out"
+                    style={{ transform: menuOpen ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+                  >
+                    <Menu size={22} />
+                  </span>
                 </button>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, X, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle, Package } from 'lucide-react'
+import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle, Package } from 'lucide-react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
@@ -42,7 +42,6 @@ export default function SupplyMobileNav({ active = null, light = false }) {
   const menuHeaderBorder = light ? 'border-zinc-200' : 'border-zinc-900'
   const menuText = light ? 'text-zinc-900' : 'text-white'
   const menuItemText = light ? 'text-zinc-800' : 'text-zinc-200'
-  const closeIconClass = light ? 'text-zinc-500' : 'text-zinc-400'
   // Jerarquía por secciones (2026-09-15, Jose: "armalo para los 4, tal como
   // lo hicimos con el home del ecosistema y con INK") — eyebrow + divisores.
   const menuLabelText = light ? 'text-zinc-400' : 'text-zinc-500'
@@ -50,7 +49,14 @@ export default function SupplyMobileNav({ active = null, light = false }) {
 
   return (
     <>
-      <div className={`md:hidden fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center ${barBg} backdrop-blur-md border-t ${barBorder} py-2.5`}>
+      {/* z-[60] con el menú abierto (2026-11-20, Jose: "cuando lo presiono
+          se abre el modal... y este navbar inferior desaparece; para que
+          ocurra el giro de este botón deberíamos poner que este navbar sea
+          estático") — antes el drawer (z-50) tapaba esta barra (z-40) y el
+          botón desaparecía. Ahora la barra queda por encima SOLO mientras el
+          menú está abierto, así el mismo botón sigue visible y gira; el
+          carrito (z-60 overlay / z-70 panel) sigue por encima de todo. */}
+      <div className={`md:hidden fixed bottom-0 left-0 right-0 ${menuOpen ? 'z-[60]' : 'z-40'} flex justify-around items-center ${barBg} backdrop-blur-md border-t ${barBorder} py-2.5`}>
         <Link to="/supply" prefetch="viewport" className={`flex flex-col items-center gap-1 ${tab('inicio')}`}>
           <Home size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Inicio</span>
@@ -68,24 +74,44 @@ export default function SupplyMobileNav({ active = null, light = false }) {
           )}
           <span className="text-[9px] font-bold uppercase tracking-wide">Carrito</span>
         </button>
-        <button onClick={() => setMenuOpen(true)} className={`flex flex-col items-center gap-1 ${cartIconClass}`}>
-          <MenuIcon size={19} />
+        {/* Botón único abrir/cerrar (2026-11-20, Jose: "solo sería el giro,
+            no el color, pues se mantendrá en un mismo plano") — el ícono
+            rota -90° con el menú abierto y vuelve a 0° al cerrarlo. Sin
+            inversión de colores: la barra conserva su fondo. */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+          aria-expanded={menuOpen}
+          className={`flex flex-col items-center gap-1 ${cartIconClass}`}
+        >
+          <span
+            className="inline-flex transition-transform duration-300 ease-in-out"
+            style={{ transform: menuOpen ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+          >
+            <MenuIcon size={19} />
+          </span>
           <span className="text-[9px] font-bold uppercase tracking-wide">Menú</span>
         </button>
       </div>
 
       <CartDrawerSupply open={drawerOpen} onClose={() => setDrawerOpen(false)} light={light} />
 
-      {menuOpen && (
-        <div className={`md:hidden fixed inset-0 z-50 ${menuBg} flex flex-col`}>
-          <div className={`flex-shrink-0 flex items-center justify-between px-5 py-4 border-b ${menuHeaderBorder}`}>
+      {/* 2026-11-20 — mismo deslizamiento derecha→izquierda que el menú del
+          home del ecosistema: el panel queda montado y entra con
+          translate-x. Al cerrar se va a la derecha y deja de recibir clicks. */}
+      <div
+        aria-hidden={!menuOpen}
+        className={`md:hidden fixed inset-0 z-50 ${menuBg} flex flex-col transition-transform duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${menuOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'}`}
+      >
+          <div className={`flex-shrink-0 flex items-center px-5 py-4 border-b ${menuHeaderBorder}`}>
             <div className="flex items-center gap-2">
               <img src={logoSupply} alt="INKognito Supply" className="w-12 h-12 object-contain" />
               <span className={`text-xs font-black uppercase tracking-widest ${menuText}`}>Menú</span>
             </div>
-            <button onClick={() => setMenuOpen(false)} className={`${closeIconClass} p-1`}><X size={22} /></button>
           </div>
-          <div className="flex-1 overflow-y-auto">
+          {/* pb-[70px]: la barra inferior queda visible encima del menú, así
+              que el último ítem no debe quedar tapado por ella. */}
+          <div className="flex-1 overflow-y-auto pb-[70px]">
             {misComprasCount > 0 && (
               <>
                 <p className={`px-6 pt-5 pb-1 text-[11px] font-black uppercase tracking-[0.15em] ${menuLabelText}`}>Tus compras</p>
@@ -157,7 +183,6 @@ export default function SupplyMobileNav({ active = null, light = false }) {
             </button>
           </div>
         </div>
-      )}
 
       <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
       <MisComprasPanel open={comprasOpen} onClose={() => setComprasOpen(false)} />

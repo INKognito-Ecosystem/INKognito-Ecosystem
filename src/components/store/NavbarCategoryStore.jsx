@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { ShoppingCart, Menu, X, LayoutGrid, Store, PlusCircle, UserCircle, Globe, FileText, Shield, Package } from 'lucide-react'
+import { ShoppingCart, Menu, LayoutGrid, Store, PlusCircle, UserCircle, Globe, FileText, Shield, Package } from 'lucide-react'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import CartDrawerStore from './CartDrawerStore'
 import logoStore from '../../assets/milogo/store.webp'
@@ -106,7 +106,12 @@ export default function NavbarCategoryStore({ pageName, hideMenu = false, hideMo
                   onClick={() => setMenuOpen(!menuOpen)}
                   className="text-zinc-500 hover:text-[#C9A84C] transition-all duration-300"
                 >
-                  {menuOpen ? <X size={20} /> : <Menu size={20} />}
+                  <span
+                    className="inline-flex transition-transform duration-300 ease-in-out"
+                    style={{ transform: menuOpen ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+                  >
+                    <Menu size={20} />
+                  </span>
                 </button>
               )}
             </div>

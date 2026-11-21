@@ -190,11 +190,12 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
             aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
             className="flex-shrink-0 flex items-center justify-center w-[22px] h-[22px]"
           >
-            {menuOpen ? (
-              <X size={22} className="text-gray-300 hover:text-white transition-colors" />
-            ) : (
+            <span
+              className="inline-flex transition-transform duration-300 ease-in-out"
+              style={{ transform: menuOpen ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+            >
               <Menu size={22} className="text-gray-300 hover:text-white transition-colors" />
-            )}
+            </span>
           </button>
         </div>
       </div>

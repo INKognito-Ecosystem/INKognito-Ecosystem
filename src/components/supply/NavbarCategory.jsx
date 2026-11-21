@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { ShoppingCart, Menu, X, Share2, Search, Home, LayoutGrid, Tag, Sparkles, Phone, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, Package } from 'lucide-react'
+import { ShoppingCart, Menu, Share2, Search, Home, LayoutGrid, Tag, Sparkles, Phone, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, Package } from 'lucide-react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import logoSupply from '../../assets/milogo/supply.webp'
@@ -172,7 +172,12 @@ export default function NavbarCategory({ pageName, hideMenu = false, hideMobileA
                   onClick={() => setMenuOpen(!menuOpen)}
                   className={`transition-all duration-300 ${t.icon}`}
                 >
-                  {menuOpen ? <X size={20} /> : <Menu size={20} />}
+                  <span
+                    className="inline-flex transition-transform duration-300 ease-in-out"
+                    style={{ transform: menuOpen ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+                  >
+                    <Menu size={20} />
+                  </span>
                 </button>
               )}
               </div>
