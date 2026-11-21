@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router'
 import { ArrowLeft, ArrowRight, BookOpen, X, Search } from 'lucide-react'
 import NavbarCategoryStore from '../NavbarCategoryStore'
 import StoreMobileNav from '../StoreMobileNav'

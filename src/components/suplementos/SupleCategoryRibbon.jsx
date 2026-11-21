@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { BookOpen } from 'lucide-react'
 import { SUPLE_CATEGORIES_ORDER } from '../../data/supleCategoriesOrder'
 

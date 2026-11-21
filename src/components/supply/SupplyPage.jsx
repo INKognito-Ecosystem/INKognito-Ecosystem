@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLoaderData } from 'react-router-dom'
+import { useLoaderData } from 'react-router'
 import { motion } from 'motion/react'
 import NavbarSupply from './NavbarSupply'
 import HeroSupply from './HeroSupply'
@@ -27,7 +27,7 @@ const REVEAL = {
   viewport: { once: true, amount: 0.2 },
   transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
 }
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
 const supplyJsonLd = {
   "@context": "https://schema.org",

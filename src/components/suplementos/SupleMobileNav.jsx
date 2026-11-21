@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router'
 import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, Globe, FileText, Shield, Store, PlusCircle, UserCircle, Package } from 'lucide-react'
 import { useSupleCart } from '../../contexts/SupleCartContext'
 import CartDrawerSuple from './CartDrawerSuple'

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { ShoppingCart, Check } from 'lucide-react'
 import { useGymCart } from '../../contexts/GymCartContext'
 import { GYM_CART_CATEGORY, gymCartKey, gymCartItem, gymFormatPrice } from '../../lib/gymCart'

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router'
 import { Search, Bell, Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle, Package } from 'lucide-react'
 import { categories } from './CategoriesSupply'
 import BrandsMarquee from './BrandsMarquee'

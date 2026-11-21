@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { ArrowLeft } from 'lucide-react'
 
 // El meta() de SEO ya no se maneja acá — cada página que usa LegalPage

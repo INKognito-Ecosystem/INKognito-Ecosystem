@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { ChevronDown } from 'lucide-react'
 
 // "INKognito Store" → "Moda & estilo" (2026-09-15, Jose, en el contexto del

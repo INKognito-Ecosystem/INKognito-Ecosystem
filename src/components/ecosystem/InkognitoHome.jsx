@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import EcosystemNavbar from './EcosystemNavbar'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import LegalModal from '../legal/LegalModal'
 import ecosystemBg from '../../assets/ecosystem/ecosystem-bg.jpg'
 // Imagen nueva subida a Obsidian (2026-09-15, Jose: "esta imagen la usarás

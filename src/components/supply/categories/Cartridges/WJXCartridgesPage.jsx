@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'

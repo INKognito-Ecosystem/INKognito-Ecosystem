@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Link, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router'
 import { CheckCircle2, Camera, LoaderCircle, Navigation, Check } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'

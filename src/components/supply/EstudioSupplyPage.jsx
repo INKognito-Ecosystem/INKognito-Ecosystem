@@ -1,4 +1,4 @@
-import { useLoaderData, redirect, useSearchParams, useNavigate } from 'react-router-dom'
+import { useLoaderData, redirect, useSearchParams, useNavigate } from 'react-router'
 import { useEffect, useMemo, useState } from 'react'
 import { Award, MapPin, Menu } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'

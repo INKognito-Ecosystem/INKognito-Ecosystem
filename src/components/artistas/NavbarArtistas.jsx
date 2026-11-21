@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { useState } from 'react'
 import { Menu, X, Search, Palette, Building2, UserPlus, UserCircle, FileText, Shield, Navigation, LoaderCircle, Store, Globe, GraduationCap } from 'lucide-react'
 // Recorte del logo genérico (assets/ecosystem/logo.png) sin el margen

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { FaWhatsapp } from 'react-icons/fa'
 
 // Antes era un solo botón "Reservar" → WhatsApp. Ahora "Reserva" es una

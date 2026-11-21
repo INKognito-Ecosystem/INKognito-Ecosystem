@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router'
 import { Mail, XCircle, Clock } from 'lucide-react'
 import NavbarCategory from './NavbarCategory'
 import FooterSupply from './FooterSupply'

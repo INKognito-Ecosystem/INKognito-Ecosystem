@@ -1,5 +1,5 @@
-import { useLoaderData, redirect } from 'react-router-dom'
-import { Link } from 'react-router-dom'
+import { useLoaderData, redirect } from 'react-router'
+import { Link } from 'react-router'
 import { useState } from 'react'
 import { CheckCircle2, MapPin, Share2 } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'

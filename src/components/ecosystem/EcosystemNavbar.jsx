@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router'
 import { Info, Store, Truck, UserCircle, FileText, Shield } from 'lucide-react'
 import inkognitoLogo from '../../assets/ecosystem/logo.png'
 import LegalModal from '../legal/LegalModal'

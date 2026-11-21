@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router'
 import { MapPin, ShieldCheck, Search } from 'lucide-react'
 import NavbarCategoryStore from './NavbarCategoryStore'
 import StoreMobileNav from './StoreMobileNav'

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Search } from 'lucide-react'
 import { categories } from '../../data/storeCategories.jsx'
 import StoreProductCard from './StoreProductCard'

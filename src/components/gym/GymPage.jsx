@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { FileText, Wrench, Dumbbell } from 'lucide-react'
 import NavbarGym from './NavbarGym'
 import GymMobileNav from './GymMobileNav'

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router'
 import { ArrowRight, MapPin } from 'lucide-react'
 import NavbarCategory from '../../NavbarCategory'
 import FooterSupply from '../../FooterSupply'

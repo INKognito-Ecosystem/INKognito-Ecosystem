@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router'
 import { ShoppingCart, Check, ExternalLink, GraduationCap } from 'lucide-react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import ProductImageGallery from '../ProductImageGallery'

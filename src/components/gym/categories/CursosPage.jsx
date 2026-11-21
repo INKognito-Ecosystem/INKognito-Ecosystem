@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import GymMobileNav from '../GymMobileNav'

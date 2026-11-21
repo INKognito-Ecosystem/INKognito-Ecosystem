@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useParams, useLoaderData, useNavigate } from 'react-router-dom'
+import { Link, useParams, useLoaderData, useNavigate } from 'react-router'
 import { FaWhatsapp } from 'react-icons/fa'
 import { Package, ExternalLink, Truck, Shield, ShieldCheck, MessageSquare, Zap, Globe, CalendarCheck } from 'lucide-react'
 import EcosystemNavbar from '../ecosystem/EcosystemNavbar'

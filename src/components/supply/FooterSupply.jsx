@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import LegalModal from '../legal/LegalModal'
 
 const DOT_PATTERN = {

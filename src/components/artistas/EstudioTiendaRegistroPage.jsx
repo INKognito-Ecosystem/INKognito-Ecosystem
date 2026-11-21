@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Link, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router'
 import { CheckCircle2, UploadCloud, Image as ImageIcon, LoaderCircle, Navigation, Check } from 'lucide-react'
 import { FaWhatsapp, FaInstagram, FaFacebook } from 'react-icons/fa'
 import NavbarCategoryStore from '../store/NavbarCategoryStore'

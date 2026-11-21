@@ -1,4 +1,4 @@
-import { useLoaderData } from 'react-router-dom'
+import { useLoaderData } from 'react-router'
 import { PANEL_URL, SeccionAfiliados, AprendePageShell } from './AprendeShared'
 
 export async function loader() {

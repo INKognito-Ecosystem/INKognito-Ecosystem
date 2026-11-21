@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router'
 import NavbarSuple from './NavbarSuple'
 import FooterSuple from './FooterSuple'
 import MobileHomeSuple from './MobileHomeSuple'

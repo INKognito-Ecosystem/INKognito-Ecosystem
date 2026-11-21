@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { FlaskConical } from 'lucide-react'
 
 // Blanco (2026-09-19, migración de Suple a fondo blanco) — mismo criterio

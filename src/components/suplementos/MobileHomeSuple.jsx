@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Search, Zap, Share2 } from 'lucide-react'
 import FooterSuple from './FooterSuple'
 import SupleMobileNav from './SupleMobileNav'

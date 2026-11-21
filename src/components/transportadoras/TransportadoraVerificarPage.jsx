@@ -1,4 +1,4 @@
-import { redirect, useLoaderData } from 'react-router-dom'
+import { redirect, useLoaderData } from 'react-router'
 import { XCircle } from 'lucide-react'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'

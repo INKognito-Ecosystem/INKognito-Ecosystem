@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import ecosystemBg from '../../assets/ecosystem/ecosystem-bg.jpg'
 import Seo from '../Seo'
 

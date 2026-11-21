@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import footerBg from '../../assets/footer/footer-bg.webp'
 import { TATTOO_HOURS } from '../../config/business'
 

@@ -1,4 +1,4 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router'
 import { FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa'
 import { Dumbbell } from 'lucide-react'
 

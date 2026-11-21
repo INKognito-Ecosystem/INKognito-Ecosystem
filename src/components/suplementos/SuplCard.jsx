@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { ShoppingCart, Check } from 'lucide-react'
 import ProductImageGallery from '../ProductImageGallery'
 import { useSupleCart } from '../../contexts/SupleCartContext'

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router'
 import { useEffect, useState } from 'react'
 import { Menu, X, ShoppingCart, Search, Share2, Home, LayoutGrid, Globe, FileText, Shield, Store, PlusCircle, UserCircle, Package } from 'lucide-react'
 // Mismo logo que ya usaba Gym (gris, coherente con el color de marca de

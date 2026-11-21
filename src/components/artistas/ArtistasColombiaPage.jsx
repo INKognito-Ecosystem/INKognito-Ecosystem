@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router'
 import { Search, MapPin, Palette, BadgeCheck, ChevronRight, LoaderCircle, Share2, Sparkles, Check, Building2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import LegalModal from '../legal/LegalModal'

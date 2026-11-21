@@ -1,4 +1,4 @@
-import { useLoaderData, redirect, useNavigate, useSearchParams } from 'react-router-dom'
+import { useLoaderData, redirect, useNavigate, useSearchParams } from 'react-router'
 import { useEffect, useMemo, useState } from 'react'
 import { CheckCircle2, MapPin, Menu, Bell } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'

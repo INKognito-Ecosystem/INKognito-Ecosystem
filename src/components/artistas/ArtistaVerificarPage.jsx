@@ -1,4 +1,4 @@
-import { Link, redirect, useLoaderData } from 'react-router-dom'
+import { Link, redirect, useLoaderData } from 'react-router'
 import { XCircle } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 

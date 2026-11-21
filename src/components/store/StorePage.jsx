@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router'
 import { motion } from 'motion/react'
 import { STORE_HOURS } from '../../config/business'
 import { FaWhatsapp } from 'react-icons/fa'

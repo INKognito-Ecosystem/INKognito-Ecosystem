@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLoaderData, useSearchParams } from 'react-router-dom'
+import { useLoaderData, useSearchParams } from 'react-router'
 import { Mail, Camera, LoaderCircle, Package, MapPin, Check } from 'lucide-react'
 import ZonasCoberturaCheckboxes from './ZonasCoberturaCheckboxes'
 import { ZONAS_FLETE } from '../../data/colombiaGeo'

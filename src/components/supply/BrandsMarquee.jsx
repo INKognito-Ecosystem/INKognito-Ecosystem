@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { brands, brandKey } from './BrandsSupply'
 
 // Prueba (2026-09-13, Jose: "tomar los logos de las marcas de Supply y

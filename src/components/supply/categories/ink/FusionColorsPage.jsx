@@ -1,4 +1,4 @@
-import { useLoaderData } from 'react-router-dom'
+import { useLoaderData } from 'react-router'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'

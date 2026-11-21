@@ -1,4 +1,4 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router'
 import { useState } from 'react'
 import { Menu, Dumbbell, ShoppingCart, Share2 } from 'lucide-react'
 import logoGym from '../../assets/milogo/gym.webp'

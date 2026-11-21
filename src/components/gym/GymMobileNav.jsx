@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, Globe, FileText, Shield } from 'lucide-react'
 import { useGymCart } from '../../contexts/GymCartContext'
 import CartDrawerGym from './CartDrawerGym'

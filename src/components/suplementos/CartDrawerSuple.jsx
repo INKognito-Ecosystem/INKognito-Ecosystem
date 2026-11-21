@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { ArrowLeft, Share2, Minus, Plus, Trash2, Check, Package } from 'lucide-react'
 import { useSupleCart } from '../../contexts/SupleCartContext'
 import EnvioGratisBar from '../pedido/EnvioGratisBar'

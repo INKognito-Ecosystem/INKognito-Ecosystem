@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import NavbarSuple from './NavbarSuple'
 import FooterSuple from './FooterSuple'
 import SupleMobileNav from './SupleMobileNav'

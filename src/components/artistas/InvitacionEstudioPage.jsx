@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router'
 import { CheckCircle2, XCircle } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { artistaUrl } from './artistaSlug'

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router'
 import { CheckCircle2, ImagePlus, X, ShoppingBag, Landmark } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'

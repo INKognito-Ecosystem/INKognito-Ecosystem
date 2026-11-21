@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle, Building2, Award, ClipboardList, Share2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Beef, Zap, Flame, Pill, Dumbbell } from 'lucide-react'
 import { SUPLE_CATEGORIES_ORDER } from '../../data/supleCategoriesOrder'
 

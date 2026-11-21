@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Landmark, CheckCircle2, Clock } from 'lucide-react'
 import { ZONAS_FLETE, DEPARTAMENTOS, MUNICIPIOS_POR_DEPARTAMENTO, normalize } from '../../data/colombiaGeo'
 import ComboboxBuscable from '../artistas/ComboboxBuscable'
