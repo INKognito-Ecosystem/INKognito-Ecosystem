@@ -1,7 +1,7 @@
 import LegalPage from '../legal/LegalPage'
 
 export const PRIVACIDAD_ARTISTAS_TITLE = 'Política de Privacidad — Tattoo Artist Colombia'
-export const PRIVACIDAD_ARTISTAS_UPDATED = '6 de agosto de 2026'
+export const PRIVACIDAD_ARTISTAS_UPDATED = '6 de octubre de 2026'
 const DESCRIPTION = 'Política de privacidad del directorio de artistas Tattoo Artist Colombia: qué datos recolectamos de artistas y clientes, y tus derechos como titular.'
 
 export function meta() {
@@ -37,6 +37,12 @@ export function PrivacidadArtistasContent() {
           conectas Mercado Pago, guardamos el token de acceso de tu cuenta (no tus datos bancarios ni de
           tarjeta — eso lo administra Mercado Pago) para poder crear los cobros de tus ventas y
           reservas.
+        </p>
+        <p>
+          Si el visitante permite su ubicación para el buscador "Cerca de ti", la usamos solo para ordenar
+          los resultados por distancia; se guarda en su navegador y no la asociamos a su identidad. Las
+          visitas a las páginas del directorio se registran con un identificador anónimo aleatorio, sin
+          datos personales ni dirección IP.
         </p>
       </div>
 
