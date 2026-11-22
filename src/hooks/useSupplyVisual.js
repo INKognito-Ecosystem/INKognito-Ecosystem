@@ -2,6 +2,17 @@ import { useState, useEffect } from 'react'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
+// Fallbacks locales inmediatos para evitar fallos de render en localhost o DNS offline
+export const SUPPLY_LOCAL_LOGOS = {
+  supply_brand_tattoo_vision: '/supply-assets/logos/supply_brand_tattoo_vision.webp',
+  supply_brand_heaven_pro: '/supply-assets/logos/supply_brand_heaven_pro.webp',
+  supply_brand_wjx: '/supply-assets/logos/supply_brand_wjx.webp',
+  supply_brand_kwadron: '/supply-assets/logos/supply_brand_kwadron.jpg',
+  supply_brand_royal_three: '/supply-assets/logos/supply_brand_royal_three.png',
+  supply_brand_dynamic: '/supply-assets/logos/supply_brand_dynamic.jpg',
+  supply_brand_vice_colors: '/supply-assets/logos/supply_brand_vice_colors.png',
+}
+
 let cache = null
 let inflightPromise = null
 
@@ -17,21 +28,19 @@ function fetchVisual() {
 }
 
 export function useSupplyVisual(key) {
-  // Siempre arranca en undefined, sin mirar el cache de módulo — en el
-  // servidor ese cache puede seguir vivo entre requests (según cómo
-  // reutilice Vercel la instancia), y el cliente SIEMPRE arranca en
-  // undefined (módulo nuevo en el navegador). Si el servidor a veces
-  // devolviera el valor ya resuelto y el cliente no, sería un mismatch
-  // de hidratación — igual al que ya se corrigió en useScrolled/CuidadosPage.
-  const [url, setUrl] = useState(undefined)
+  // Inicializa con el fallback local si existe, evitando parpadeos o pantallas vacías
+  const [url, setUrl] = useState(() => SUPPLY_LOCAL_LOGOS[key] || undefined)
 
   useEffect(() => {
     let active = true
     fetchVisual().then(data => {
-      if (active) setUrl(data[key] || null)
+      if (active) {
+        setUrl(data[key] || SUPPLY_LOCAL_LOGOS[key] || null)
+      }
     })
     return () => { active = false }
   }, [key])
 
   return url
 }
+

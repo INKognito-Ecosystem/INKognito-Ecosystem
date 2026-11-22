@@ -75,15 +75,15 @@ export default function TattooVisionPage() {
         </>
       )}
 
-      {/* SHOWCASE PREMIUM: Producto fotográfico real flotando en blanco con sombra y specs */}
+      {/* SHOWCASE PREMIUM: Sistema de hardware flotando en blanco con sombra y specs */}
       <BrandShowcaseHero
         brandKey="tattoo-vision"
         logoUrl={logoUrl}
-        distribuidorOficial={distribuidorOficial}
+        distribuidorOficial={false}
         onExploreCatalog={handleScrollToCatalog}
       />
 
-      {/* CATÁLOGO DE PRODUCTOS & DETALLES DE MARCA */}
+      {/* VITRINA DE PRODUCTOS & STOCK DE TIENDAS SUPPLY */}
       <div id="catalogo-marca" className="pt-10 md:pt-14 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
 
         <div className="flex items-center justify-between gap-3 mb-8 pb-4 border-b border-zinc-100">
@@ -94,11 +94,14 @@ export default function TattooVisionPage() {
           ) : <span />}
           <div className="text-center">
             <p className="uppercase tracking-[0.25em] text-zinc-400 text-xs font-semibold">
-              Catálogo Oficial
+              Vitrina Multi-Tienda · Stock Disponible
             </p>
             <h3 className="text-xl sm:text-2xl font-black uppercase text-zinc-900 tracking-tight mt-0.5">
-              Productos & Equipamiento Tattoo Vision
+              Stock de Tiendas Aliadas en INKognito Supply
             </h3>
+            <p className="text-xs text-zinc-500 mt-1 max-w-md mx-auto">
+              Inventario publicado y comercializado directamente por distribuidores y tiendas supply registradas.
+            </p>
           </div>
           {mostrarFlechas ? (
             <Link to={next.path} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
@@ -107,7 +110,19 @@ export default function TattooVisionPage() {
           ) : <span />}
         </div>
 
-        <BrandCatalogSection brandName="Tattoo Vision" products={products} supplierBadge={null} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} light />
+        <BrandCatalogSection
+          brandName="Tattoo Vision"
+          products={products}
+          supplierBadge={null}
+          hasMore={hasMoreProductos}
+          onLoadMore={cargarMasProductos}
+          loadingMore={cargandoMasProductos}
+          light
+          officialUrl="https://tattoovision.com"
+          emptyTitle="Vitrina Multi-Tienda Supply"
+          emptyMessage="En este momento ninguna tienda supply aliada ha cargado inventario activo de Tattoo Vision en la plataforma. Cuando un proveedor suba unidades, se listarán automáticamente aquí. Puedes consultar la disponibilidad técnica o adquirir equipos directamente en su canal oficial:"
+          hideWhatsapp={true}
+        />
 
         <SupplyFAQ items={faqItems} nombre="Tattoo Vision" light />
 

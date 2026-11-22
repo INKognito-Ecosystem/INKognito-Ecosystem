@@ -36,26 +36,53 @@ const WA = '573207911013'
 // blanco también... actualiza cómo se ven y se interactúan las card") —
 // default false para no tocar los 17 consumidores existentes (páginas de
 // marca, categorías EZ/WJX, colores de tinta...), que siguen oscuros.
-export default function BrandCatalogSection({ brandName, products = [], supplierBadge = null, whatsapp = WA, showEstudioBadge = true, hasMore = false, onLoadMore = null, loadingMore = false, light = false }) {
+export default function BrandCatalogSection({
+  brandName,
+  products = [],
+  supplierBadge = null,
+  whatsapp = WA,
+  showEstudioBadge = true,
+  hasMore = false,
+  onLoadMore = null,
+  loadingMore = false,
+  light = false,
+  officialUrl = null,
+  emptyTitle = null,
+  emptyMessage = null,
+  hideWhatsapp = false,
+}) {
   if (products.length === 0) {
     return (
       <div className={`border rounded-2xl p-10 md:p-16 text-center ${light ? 'border-zinc-200 bg-zinc-50' : 'border-zinc-800 bg-zinc-950'}`}>
         <p className={`uppercase tracking-[0.25em] text-xs md:text-sm mb-4 ${light ? 'text-zinc-500' : 'text-zinc-500'}`}>
-          Marca de referencia
+          {emptyTitle || 'Marca de referencia'}
         </p>
         <p className={`text-sm md:text-base max-w-lg mx-auto mb-8 leading-relaxed ${light ? 'text-zinc-600' : 'text-zinc-400'}`}>
-          Aún no tenemos catálogo activo de {brandName}. Si buscas algo puntual
-          de esta marca, escríbenos y te orientamos.
+          {emptyMessage || `Aún no tenemos catálogo activo de ${brandName}. Si buscas algo puntual de esta marca, escríbenos y te orientamos.`}
         </p>
-        <a
-          href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(`Hola, quiero orientación sobre productos ${brandName}.`)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white font-bold uppercase tracking-[0.15em] text-xs rounded hover:opacity-90 transition"
-        >
-          <FaWhatsapp size={16} />
-          Escribir por WhatsApp →
-        </a>
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          {officialUrl && (
+            <a
+              href={officialUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-zinc-900 hover:bg-black text-white font-bold uppercase tracking-[0.15em] text-xs rounded transition shadow-md"
+            >
+              Visitar Web Oficial de {brandName} ↗
+            </a>
+          )}
+          {!hideWhatsapp && !officialUrl && (
+            <a
+              href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(`Hola, quiero orientación sobre productos ${brandName}.`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white font-bold uppercase tracking-[0.15em] text-xs rounded hover:opacity-90 transition"
+            >
+              <FaWhatsapp size={16} />
+              Escribir por WhatsApp →
+            </a>
+          )}
+        </div>
       </div>
     )
   }
