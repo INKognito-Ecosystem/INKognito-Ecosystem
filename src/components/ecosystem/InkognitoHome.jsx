@@ -1,6 +1,11 @@
-import { useState } from 'react'
-import EcosystemNavbar from './EcosystemNavbar'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { EffectCoverflow, Keyboard, A11y } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/effect-coverflow'
+import { PenTool, Package, ShoppingBag, Dumbbell, Pill, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
+import EcosystemNavbar from './EcosystemNavbar'
 import LegalModal from '../legal/LegalModal'
 import ecosystemBg from '../../assets/ecosystem/ecosystem-bg.jpg'
 // Imagen nueva subida a Obsidian (2026-09-15, Jose: "esta imagen la usarás
@@ -9,6 +14,17 @@ import ecosystemBg from '../../assets/ecosystem/ecosystem-bg.jpg'
 // de ecosystemBg); desktop se queda con el fondo de siempre hasta que Jose
 // decida algo para esa vista.
 import ecosystemBgMobile from '../../assets/ecosystem/ecosystem-bg-mobile.jpg'
+// Máscara de las líneas del fondo móvil (2026-11-21, Jose: "que esas texturas
+// parecidas a neuronas se iluminen también, del color de la card que esté al
+// frente") — mismo dibujo que ecosystem-bg-mobile.jpg pero solo el trazo:
+// blanco con transparencia donde hay línea y transparente en el resto (sin el
+// blob turquesa ni la marca de agua). Se usa como mask-image de las capas de
+// color de abajo, así el color solo se ve sobre las líneas.
+import ecosystemLinesMobile from '../../assets/ecosystem/ecosystem-lines-mobile.png'
+// Monograma "INK" del banner del módulo INK (mismo asset vertical 398×824
+// que usa ArtistasColombiaPage.jsx en el hero del directorio). En el home
+// reemplaza el ícono + la palabra "INK" dentro de la card del carrusel.
+import inkMark from '../../assets/artistas-ink-mark.png'
 
 export function meta() {
   const title = 'INKognito | Tattoo, Supply y Store en Urabá, Colombia'
@@ -25,18 +41,159 @@ export function meta() {
   ]
 }
 
+// Tipografía propia para "INK" en el home (2026-11-21, Jose: "deja las
+// letras como estaban antes, pero usando una tipografía diferente a la que
+// tiene ognito"). Cinzel es una serif de inscripción romana —el aire de
+// letra grabada/tatuaje— y contrasta con el sans itálico pesado de OGNITO.
+// Se carga solo en esta ruta para no tocar el resto del ecosistema.
+export function links() {
+  return [
+    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+    { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
+    {
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap',
+    },
+  ]
+}
+
+// Carrusel de módulos (2026-11-20) — reemplaza la lista vertical de 5
+// botones. Mismas 5 rutas, mismo orden. `color` sale de los hover que ya
+// tenía cada botón (rojo INK, azul Supply, dorado #C9A84C Store, gris Gym,
+// gris claro Suple) y se usa para: borde de la card activa, botón "Entrar",
+// punto de la paginación y tinte del fondo. `on` = color del texto sobre ese
+// color (negro sobre dorado/gris claro, igual que el hover viejo de Store).
+//
+// TODO Jose: los textos de `tagline` y `facts` de INK/Supply/Store salen de
+// lo que ya dice el sitio (menú, "Sobre INKognito", meta). Los de Gym y Suple
+// son provisionales — cámbialos por lo que realmente ofrece cada módulo.
+const MODULES = [
+  {
+    id: 'ink',
+    to: '/tattoo-artist-colombia',
+    eyebrow: 'INK',
+    name: 'Encuentra tu tatuador',
+    Icon: PenTool,
+    color: '#dc2626',
+    on: '#ffffff',
+    tagline: 'El directorio de artistas y estudios de tatuaje de Colombia.',
+    facts: ['Artistas y estudios', 'Perfil de cada artista', 'Registro para artistas'],
+  },
+  {
+    id: 'supply',
+    to: '/supply',
+    eyebrow: 'Supply',
+    name: 'Tattoo supply',
+    Icon: Package,
+    color: '#2563eb',
+    on: '#ffffff',
+    tagline: 'Insumos profesionales para tatuadores, de proveedores verificados.',
+    facts: ['Proveedores verificados', 'Locales y nacionales', 'Catálogo en línea'],
+  },
+  {
+    id: 'store',
+    to: '/store',
+    eyebrow: 'Store',
+    name: 'Moda & estilo',
+    Icon: ShoppingBag,
+    color: '#C9A84C',
+    on: '#000000',
+    tagline: 'Ropa y calzado de tiendas aliadas.',
+    facts: ['Ropa y calzado', 'Tiendas aliadas', 'Catálogo en línea'],
+  },
+  {
+    id: 'gym',
+    to: '/gym',
+    eyebrow: 'Gym',
+    name: 'Gym systems',
+    Icon: Dumbbell,
+    color: '#6b7280',
+    on: '#ffffff',
+    tagline: 'Disciplina que se entrena.',
+    facts: ['Entrenamiento', 'Disciplina', 'Constancia'],
+  },
+  {
+    id: 'suple',
+    to: '/suplementos',
+    eyebrow: 'Suple',
+    name: 'Suplementación',
+    Icon: Pill,
+    color: '#9E9E9E',
+    on: '#000000',
+    tagline: 'Suplementos de proveedores aliados.',
+    facts: ['Proveedores aliados', 'Catálogo en línea', 'Tu tienda: Mi Suple'],
+  },
+]
+
 export default function InkognitoHome() {
   // legalOpen (2026-09-15, Jose: "lo mismo si le doy desde el copyright" —
   // mismo modal blanco a pantalla completa que EcosystemNavbar.jsx usa
   // desde su propio menú, ver LegalModal.jsx) — estado propio, independiente
   // del de EcosystemNavbar (el copyright vive fuera de ese componente).
   const [legalOpen, setLegalOpen] = useState(null)
+  // Índice del módulo que está al centro del carrusel.
+  const [active, setActive] = useState(0)
+  const swiperRef = useRef(null)
+  const bgRef = useRef(null)
+
+  // "Zoom de cámara" del fondo: cada vez que cambia el módulo, la imagen
+  // arranca un poco más grande y se asienta en 1. Va por ref/estilo directo
+  // (no por estado) para no re-renderizar ni parpadear las imágenes.
+  useEffect(() => {
+    const el = bgRef.current
+    if (!el) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    el.style.transition = 'none'
+    el.style.transform = 'scale(1.07)'
+    void el.offsetWidth
+    el.style.transition = 'transform 1400ms cubic-bezier(0.2, 0.7, 0.2, 1)'
+    el.style.transform = 'scale(1)'
+  }, [active])
+
+  const goTo = (i) => swiperRef.current?.slideTo(i)
+
   return (
     <section className="relative h-dvh bg-black text-white flex flex-col items-center px-6 overflow-hidden">
 
       {/* meta() arriba ya cubre SSR — no se renderiza <Seo>/<Helmet> para
           evitar que las dos mecánicas escriban <head> a la vez (rompía la
           hidratación, ver nota en HomePage.jsx). */}
+
+      <style>{`
+        @keyframes inkFloat { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
+        .ink-float { animation: inkFloat 4.2s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) { .ink-float { animation: none; } }
+
+        /* Líneas iluminadas del fondo móvil (2026-11-21). Tailwind no cubre
+           máscaras, por eso viven acá. La capa de color se ve solo a través
+           de la máscara (--ink-lines); screen suma el color a la imagen. */
+        /* --ink-lvl (0 a 1) es cuánta luz tienen las líneas en reposo: sube o
+           baja ESTE número para regularlo. La "corriente" que las recorre
+           no depende de él, siempre va a todo brillo. */
+        .ink-lines { mix-blend-mode: screen; --ink-lvl: 0.3; }
+        .ink-mod { position: absolute; inset: 0; transition: opacity 700ms ease-in-out; }
+        .ink-ln {
+          position: absolute; inset: 0;
+          -webkit-mask: var(--ink-lines) center / cover no-repeat;
+          mask: var(--ink-lines) center / cover no-repeat;
+        }
+        .ink-solid { background: var(--m); }
+        .ink-base { opacity: var(--ink-lvl); }
+        .ink-glow { position: absolute; inset: 0; filter: blur(7px); opacity: var(--ink-lvl); }
+        .ink-glow-wide { filter: blur(18px); opacity: calc(var(--ink-lvl) * 0.5); }
+        .ink-core {
+          background: radial-gradient(circle at 50% 50%, #fff 0%, var(--m) 14%, transparent 38%);
+          background-size: 260% 260%;
+        }
+        /* Las animaciones corren solo en la capa activa para no gastar batería. */
+        .ink-mod.is-on .ink-glow:not(.ink-glow-wide) { animation: inkBreathe 4s ease-in-out infinite; }
+        .ink-mod.is-on .ink-core { animation: inkSweep 9s ease-in-out infinite; }
+        @keyframes inkBreathe { 0%, 100% { opacity: calc(var(--ink-lvl) * 0.6) } 50% { opacity: calc(var(--ink-lvl) * 1.4) } }
+        @keyframes inkSweep { 0%, 100% { background-position: 0% 0% } 50% { background-position: 100% 100% } }
+        @media (prefers-reduced-motion: reduce) {
+          .ink-mod.is-on .ink-glow, .ink-mod.is-on .ink-core { animation: none; }
+        }
+      `}</style>
 
       {/* NAVBAR — mobileLight (2026-09-15, ver EcosystemNavbar.jsx) SOLO
           afecta la hamburguesa en móvil ahora (caja blanca + barras
@@ -47,111 +204,297 @@ export default function InkognitoHome() {
       {/* FONDO — imagen distinta en móvil (ver import arriba), desktop se
           queda con el hoyo negro de siempre. opacity-80 de vuelta en móvil
           (2026-09-15, Jose: "revierte los cambios, deja la opacidad" —
-          deshace el "quítale la opacidad" de un mensaje anterior). */}
-      <img
-        src={ecosystemBgMobile}
-        alt=""
-        className="md:hidden absolute inset-0 w-full h-full object-cover opacity-80"
-      />
-      <img
-        src={ecosystemBg}
-        alt=""
-        className="hidden md:block absolute inset-0 w-full h-full object-cover opacity-80"
-      />
+          deshace el "quítale la opacidad" de un mensaje anterior).
+          2026-11-20: las dos imágenes van dentro de un div con ref (bgRef)
+          para poder hacerles el zoom de cada cambio de módulo.
+          2026-11-21: ese mismo div ahora también lleva adentro el overlay
+          oscuro, el tinte por módulo y las líneas iluminadas. Así todo hace
+          el zoom a la vez y las líneas siguen pegadas a los trazos de la
+          imagen; si estuvieran afuera, durante el zoom se separarían de ella. */}
+      <div ref={bgRef} className="absolute inset-0" style={{ willChange: 'transform' }}>
+        <img
+          src={ecosystemBgMobile}
+          alt=""
+          className="md:hidden absolute inset-0 w-full h-full object-cover opacity-80"
+        />
+        <img
+          src={ecosystemBg}
+          alt=""
+          className="hidden md:block absolute inset-0 w-full h-full object-cover opacity-80"
+        />
 
-      {/* OVERLAY OSCURO — de vuelta en móvil también (2026-09-15, Jose:
-          "revierte los cambios, deja la opacidad"). Con la opacidad
-          restaurada, los colores originales (blancos) de "Disciplina · Arte
-          · Identidad" y "Select Module" vuelven a leerse bien — por eso
-          esos dos textos también vuelven a su color de siempre más abajo. */}
-      <div className="absolute inset-0 bg-black/45 md:bg-black/60"></div>
+        {/* OVERLAY OSCURO — de vuelta en móvil también (2026-09-15, Jose:
+            "revierte los cambios, deja la opacidad"). Con la opacidad
+            restaurada, los colores originales (blancos) de "Disciplina · Arte
+            · Identidad" y "Select Module" vuelven a leerse bien — por eso
+            esos dos textos también vuelven a su color de siempre más abajo.
+            2026-11-21: móvil baja de /45 a /35 (Jose, probando la vista
+            previa del brillo de líneas: "oscurecer fondo lo dejé en 35");
+            escritorio se queda en /60. */}
+        <div className="absolute inset-0 bg-black/35 md:bg-black/60"></div>
+
+        {/* TINTE POR MÓDULO (2026-11-20) — una capa por módulo con el color de
+            su card; solo la activa es visible y el cambio es un crossfade. Va
+            ENCIMA del overlay oscuro para que el color se note, y sin
+            imágenes: cuando tengas una imagen propia por módulo, se cambia
+            este bloque por <img> con la misma lógica de opacity. */}
+        {MODULES.map((m, i) => (
+          <div
+            key={m.id}
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none transition-opacity duration-700 ease-in-out"
+            style={{
+              opacity: i === active ? 1 : 0,
+              background: `radial-gradient(ellipse at 50% 62%, ${m.color}73 0%, ${m.color}26 42%, transparent 72%)`,
+            }}
+          />
+        ))}
+
+        {/* LÍNEAS ILUMINADAS (2026-11-21, Jose: "que esas texturas parecidas a
+            neuronas se iluminen también, del color de la card que esté al
+            frente") — SOLO móvil, que es donde el fondo es la imagen de
+            líneas; el de escritorio es otra imagen y no tiene líneas. Cada
+            módulo tiene su capa, de su color, que solo se ve a través de la
+            máscara ecosystemLinesMobile; la activa aparece con un crossfade,
+            igual que el tinte de arriba. Cada capa lleva dos halos
+            desenfocados (ink-glow) y el trazo nítido con un punto de luz que
+            lo recorre (ink-core). Estilos en el <style> de arriba.
+            2026-11-21 (Jose: "el azul, el rojo y el amarillo brillan
+            demasiado, la corriente está bien, pero el color inicial es muy
+            brillante"): el trazo en reposo (ink-base) y los halos bajan con
+            --ink-lvl; la corriente va aparte (ink-core, con degradado a
+            transparente) para que se vea igual de fuerte sobre líneas más
+            tenues.
+            mix-blend-mode: screen hace que el color se sume a la imagen
+            oscurecida en vez de taparla. */}
+        <div
+          aria-hidden="true"
+          className="md:hidden absolute inset-0 pointer-events-none ink-lines"
+          style={{ '--ink-lines': `url("${ecosystemLinesMobile}")` }}
+        >
+          {MODULES.map((m, i) => (
+            <div
+              key={m.id}
+              className={`ink-mod ${i === active ? 'is-on' : ''}`}
+              style={{ '--m': m.color, opacity: i === active ? 1 : 0 }}
+            >
+              <div className="ink-glow ink-glow-wide"><div className="ink-ln ink-solid" /></div>
+              <div className="ink-glow"><div className="ink-ln ink-solid" /></div>
+              <div className="ink-ln ink-solid ink-base" />
+              <div className="ink-ln ink-core" />
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* CONTENIDO — ocupa todo el espacio disponible entre navbar y copyright.
           Todo compactado (paddings/gaps/tamaños de letra reducidos) para que
           la pantalla completa (logo + módulos + copyright) quepa en un solo
-          viewport sin scroll — antes con py-20 + gap-6 + py-5 por botón el
-          bloque se pasaba de la altura disponible en pantallas de laptop
-          típicas y obligaba a hacer scroll para ver el copyright
-          (reportado 2026-08-02). */}
-      <div className="relative z-10 flex flex-col items-center justify-center w-full flex-1 py-2 md:py-3 min-h-0">
+          viewport sin scroll (reportado 2026-08-02).
+          2026-11-20: pt-[84px] deja libre la altura del navbar fijo (52px de
+          logo + py-4), porque ahora el carrusel se estira (flex-1) y ya no
+          queda aire arriba que lo separe. */}
+      <div className="relative z-10 flex flex-col items-center w-full flex-1 min-h-0 pt-[84px] pb-1">
 
         {/* INK en negro (2026-09-15, Jose lo pidió mantener incluso tras
             revertir el resto) — el resto del bloque (OGNITO, tagline,
             "Select module") vuelve a su color original de siempre, ahora
             que la opacidad/overlay de arriba está de vuelta y ya no hace
-            falta oscurecerlos a mano. */}
-        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black uppercase italic tracking-[0.12em] text-center">
-          <span className="text-black md:text-white">INK</span>
+            falta oscurecerlos a mano.
+            2026-11-21: "INK" se queda como texto (la idea de meter la
+            caligrafía del banner acá quedó descartada: "la imagen la vamos
+            a ubicar en otro lugar"), pero con una tipografía propia,
+            Cinzel 700, para que no sea exactamente la misma letra de
+            "OGNITO". La fuente se carga solo en esta ruta — ver links().
+            2026-11-20: md:text-6xl lg:text-7xl (antes md:text-7xl
+            lg:text-8xl) para que el carrusel quepa sin scroll en laptops. */}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase italic tracking-[0.12em] text-center">
+          <span
+            className="text-black md:text-white not-italic"
+            style={{ fontFamily: "'Cinzel', ui-serif, Georgia, serif", fontWeight: 700 }}
+          >
+            INK
+          </span>
           <span className="text-zinc-300">OGNITO</span>
         </h1>
 
-        <p className="mt-1 mb-2 sm:mb-4 text-zinc-300 uppercase tracking-[0.15em] sm:tracking-[0.5em] text-sm md:text-base font-semibold text-center whitespace-nowrap px-2">
+        <p className="mt-1 mb-1 sm:mb-2 text-zinc-300 uppercase tracking-[0.15em] sm:tracking-[0.5em] text-sm md:text-base font-semibold text-center whitespace-nowrap px-2">
           Disciplina • Arte • Identidad
         </p>
 
-        <p className="text-white uppercase tracking-[0.45em] text-sm text-center mb-2 sm:mb-4 font-medium">
+        <p className="text-white uppercase tracking-[0.45em] text-sm text-center mb-1 sm:mb-2 font-medium">
           Select Module
         </p>
 
-        <div className="flex flex-col gap-2.5 sm:gap-3 w-full max-w-md">
-          {/* Nombres en frase, más limpio (2026-09-16, Jose: "por lo menos
-              que la primera letra sea mayúscula, y usa una tipografía más
-              limpia, no esa así toda gorda") — antes todo el bloque
-              forzaba uppercase + font-black; ahora solo la primera letra
-              va en mayúscula (texto real, no un transform de CSS) y el
-              peso baja a font-medium con tracking más angosto, más acorde
-              a texto de frase que a un bloque en mayúsculas. Store/Gym/
-              Suple renombrados: "Moda y estilo", "Gym systems",
-              "Suplementación" — mismas rutas, mismo orden. */}
-          {/* "Tattoo studio" → INK (2026-09-16, Jose: "vamos a cambiar el
-              nombre del módulo tattoo studio... asignar esa URL del
-              módulo para INK, encuentra tu tatuador") — reemplaza el link
-              directo al estudio propio de Jose (/jhumaneztattoo) por el
-              directorio de artistas completo. "INK" se queda en mayúscula
-              (nombre de marca, mismo criterio que "INKognito"/"Supply"/
-              "Store" en los demás botones) — el resto del label copia la
-              frase real que ya usa el h1 de ArtistasColombiaPage.jsx
-              ("Encuentra tu tatuador"), no una nueva. jhumaneztattoo sigue
-              siendo un estudio real DENTRO de ese directorio (id 20,
-              buscable), no desaparece, solo deja de ser el único acceso
-              directo desde el home. */}
-          <Link
-            to="/tattoo-artist-colombia"
-            className="w-full py-3 sm:py-4 bg-zinc-700 rounded text-center uppercase tracking-wide font-medium hover:bg-red-600 transition-all duration-300"
+        {/* CARRUSEL (2026-11-20) — w-screen: sale del padding lateral del
+            section para que las cards de los lados lleguen al borde. */}
+        <div className="relative w-screen flex-1 min-h-0 max-h-[430px]">
+          <Swiper
+            modules={[EffectCoverflow, Keyboard, A11y]}
+            effect="coverflow"
+            grabCursor
+            centeredSlides
+            slidesPerView="auto"
+            slideToClickedSlide
+            speed={550}
+            keyboard={{ enabled: true }}
+            a11y={{ prevSlideMessage: 'Módulo anterior', nextSlideMessage: 'Módulo siguiente' }}
+            coverflowEffect={{ rotate: 14, stretch: 0, depth: 140, modifier: 1, scale: 0.86, slideShadows: false }}
+            onSwiper={(s) => { swiperRef.current = s }}
+            onSlideChange={(s) => setActive(s.activeIndex)}
+            style={{ width: '100%', height: '100%', padding: '14px 0' }}
           >
-            INK — encuentra tu tatuador
-          </Link>
+            {MODULES.map((m, i) => {
+              const isActive = i === active
+              const Icon = m.Icon
+              return (
+                <SwiperSlide
+                  key={m.id}
+                  aria-label={`${m.name}, ${i + 1} de ${MODULES.length}`}
+                  style={{ width: 'min(74vw, 300px)', height: '100%' }}
+                >
+                  {/* Flotar solo la activa — ver @keyframes inkFloat arriba. */}
+                  <div className={`h-full ${isActive ? 'ink-float' : ''}`}>
+                    <article
+                      className="relative h-full overflow-hidden rounded-lg border p-5 flex flex-col justify-between backdrop-blur-md transition-[border-color,box-shadow] duration-500"
+                      style={{
+                        background: `linear-gradient(160deg, ${m.color}33 0%, rgba(0,0,0,0.58) 62%)`,
+                        borderColor: isActive ? m.color : 'rgba(255,255,255,0.14)',
+                        boxShadow: isActive ? `0 18px 40px -18px ${m.color}` : 'none',
+                      }}
+                    >
+                      {/* Ícono grande de fondo — es lo que se ve en las cards
+                          de los lados, como el póster de un catálogo. */}
+                      <Icon
+                        aria-hidden="true"
+                        size={190}
+                        strokeWidth={1}
+                        className="absolute -right-5 -bottom-5 pointer-events-none"
+                        style={{ opacity: 0.1, color: m.color }}
+                      />
 
-          <Link
-            to="/supply"
-            className="w-full py-3 sm:py-4 bg-zinc-700 rounded text-center uppercase tracking-wide font-medium hover:bg-blue-600 transition-all duration-300"
-          >
-            Tattoo supply
-          </Link>
+                      <div className="relative">
+                        {/* Card de INK: la caligrafía del banner reemplaza el
+                            ícono y la palabra "INK" (2026-11-21, Jose: "la
+                            imagen... va a reemplazar el icono y la palabra
+                            ink").
+                            Corrección (2026-11-21, Jose: "el título de la
+                            card del módulo INK está quedando encima del logo
+                            INK"): antes el logo era absoluto (arriba a la
+                            izquierda, h-20) y el título lo cruzaba por
+                            delante, con contorno y sombra para leerse sobre
+                            el arte blanco. Ahora los dos van en el flujo
+                            normal y en la MISMA fila (2026-11-21, Jose:
+                            "ponlo al frente del logo, para que logo y título
+                            ocupen una misma fila, así ganar espacio" — el
+                            botón "Entrar" se cortaba abajo): logo a la
+                            izquierda, título a su lado. Ocupan una sola
+                            altura en vez de dos, y al ir cada uno en su
+                            propia columna nunca se tocan. Sin superposición
+                            ya no hacen falta el contorno ni la sombra: el
+                            título queda igual que el de las otras cards.
+                            flex-shrink-0 evita que el título aplaste el
+                            logo. El logo mide h-16 y sube a h-20 en
+                            pantallas altas. */}
+                        {m.id === 'ink' ? (
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={inkMark}
+                              alt={m.eyebrow}
+                              className="block h-16 w-auto flex-shrink-0 pointer-events-none [@media(min-height:760px)]:h-20"
+                            />
+                            <h2 className="min-w-0 text-2xl font-bold leading-tight tracking-wide text-white">
+                              {m.name}
+                            </h2>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex items-center gap-2">
+                              <Icon size={16} aria-hidden="true" style={{ color: m.color }} />
+                              <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/70">
+                                {m.eyebrow}
+                              </span>
+                            </div>
+                            <h2 className="mt-3 text-2xl font-bold leading-tight tracking-wide text-white">
+                              {m.name}
+                            </h2>
+                          </>
+                        )}
+                      </div>
 
-          <Link
-            to="/store"
-            className="w-full py-3 sm:py-4 bg-zinc-700 rounded text-center uppercase tracking-wide font-medium transition-all duration-300"
-            style={{ color: 'white' }}
-            onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#C9A84C'; e.currentTarget.style.color = '#000' }}
-            onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#3f3f46'; e.currentTarget.style.color = '#fff' }}
-          >
-            Moda & estilo
-          </Link>
+                      {/* Información extra: solo visible y enfocable en la
+                          card activa. */}
+                      <div
+                        className="relative transition-all duration-500"
+                        style={{ opacity: isActive ? 1 : 0, transform: isActive ? 'none' : 'translateY(8px)' }}
+                        aria-hidden={!isActive}
+                      >
+                        <p className="text-sm leading-relaxed text-white/80 [@media(max-height:700px)]:hidden">
+                          {m.tagline}
+                        </p>
+                        <ul className="mt-3 flex flex-col gap-1.5">
+                          {m.facts.map((f) => (
+                            <li key={f} className="flex items-start gap-2 text-[13px] text-white/90">
+                              <span
+                                aria-hidden="true"
+                                className="mt-[7px] h-1 w-1 flex-shrink-0 rounded-full"
+                                style={{ backgroundColor: m.color }}
+                              />
+                              {f}
+                            </li>
+                          ))}
+                        </ul>
+                        <Link
+                          to={m.to}
+                          tabIndex={isActive ? 0 : -1}
+                          className="mt-4 flex w-full items-center justify-center gap-2 rounded py-3 text-center font-medium uppercase tracking-wide transition-opacity duration-300 hover:opacity-90"
+                          style={{ backgroundColor: m.color, color: m.on }}
+                        >
+                          Entrar <ArrowRight size={16} aria-hidden="true" />
+                        </Link>
+                      </div>
+                    </article>
+                  </div>
+                </SwiperSlide>
+              )
+            })}
+          </Swiper>
 
-          <Link
-            to="/gym"
-            className="w-full py-3 sm:py-4 bg-zinc-700 rounded text-center uppercase tracking-wide font-medium hover:bg-gray-500 transition-all duration-300"
+          {/* Flechas — solo desktop; en móvil se desliza con el dedo. */}
+          <button
+            type="button"
+            onClick={() => swiperRef.current?.slidePrev()}
+            disabled={active === 0}
+            aria-label="Módulo anterior"
+            className="hidden md:flex absolute left-6 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur-sm cursor-pointer transition-opacity hover:bg-white/20 disabled:opacity-30 disabled:cursor-default"
           >
-            Gym systems
-          </Link>
+            <ChevronLeft size={20} aria-hidden="true" />
+ </button>
+          <button
+            type="button"
+            onClick={() => swiperRef.current?.slideNext()}
+            disabled={active === MODULES.length - 1}
+            aria-label="Módulo siguiente"
+            className="hidden md:flex absolute right-6 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur-sm cursor-pointer transition-opacity hover:bg-white/20 disabled:opacity-30 disabled:cursor-default"
+          >
+            <ChevronRight size={20} aria-hidden="true" />
+          </button>
+        </div>
 
-          <Link
-            to="/suplementos"
-            className="w-full py-3 sm:py-4 bg-zinc-700 rounded text-center uppercase tracking-wide font-medium hover:bg-[#9E9E9E] transition-all duration-300"
-          >
-            Suplementación
-          </Link>
+        {/* Paginación — un punto por módulo, el activo se alarga y toma el
+            color del módulo. */}
+        <div className="mt-1 flex items-center gap-2.5" role="group" aria-label="Elegir módulo">
+          {MODULES.map((m, i) => (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => goTo(i)}
+              aria-label={`Ir a ${m.name}`}
+              aria-current={i === active}
+              className="h-2 rounded-full border-none p-0 cursor-pointer transition-all duration-300"
+              style={{ width: i === active ? 24 : 8, backgroundColor: i === active ? m.color : 'rgba(255,255,255,0.35)' }}
+            />
+          ))}
         </div>
 
       </div>
