@@ -47,7 +47,18 @@ import { leerMisCompras } from '../../lib/misCompras'
 // lo pasa hoy, Cartuchos/ficha de producto siguen mostrando pageName.
 // Sin "hidden md:block": a diferencia de pageName, el buscador importa
 // tanto en móvil como en PC.
-export default function NavbarCategory({ pageName, hideMenu = false, hideMobileActions = false, light = false, hideWordmark = false, shareUrl = null, searchValue = null, onSearchChange = null, searchPlaceholder = 'Buscar' }) {
+export default function NavbarCategory({
+  pageName,
+  hideMenu = false,
+  hideMobileActions = false,
+  light = false,
+  hideWordmark = false,
+  shareUrl = null,
+  searchValue = null,
+  onSearchChange = null,
+  searchPlaceholder = 'Buscar',
+  hideCart = false,
+}) {
   const [menuOpen, setMenuOpen] = useState(false)
   // legalOpen (2026-09-15, Jose: "el modal abre directo donde estoy...
   // blanco... ocupa toda la pantalla" — mismo patrón que EcosystemNavbar.jsx).
@@ -131,12 +142,12 @@ export default function NavbarCategory({ pageName, hideMenu = false, hideMobileA
             )}
 
             {/* COMPARTIR + CARRITO + HAMBURGUESA */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 md:gap-4">
               {shareUrl && (
                 <button
                   onClick={handleShare}
                   aria-label="Compartir"
-                  className={`transition-all duration-300 ${t.icon}`}
+                  className={`p-2 rounded-full transition-all duration-300 ${t.icon}`}
                 >
                   <Share2 size={20} />
                 </button>
@@ -144,7 +155,7 @@ export default function NavbarCategory({ pageName, hideMenu = false, hideMobileA
               <div className={`${hideMobileActions ? 'hidden md:flex' : 'flex'} items-center gap-4`}>
 
               {/* MIS COMPRAS (2026-09-27) */}
-              {misComprasCount > 0 && (
+              {!hideCart && misComprasCount > 0 && (
                 <button
                   onClick={() => setComprasOpen(true)}
                   aria-label="Mis compras"
@@ -155,17 +166,19 @@ export default function NavbarCategory({ pageName, hideMenu = false, hideMobileA
               )}
 
               {/* CARRITO CON BADGE */}
-              <button
-                onClick={() => setDrawerOpen(true)}
-                className={`relative transition-all duration-300 ${t.icon}`}
-              >
-                <ShoppingCart size={20} />
-                {count > 0 && (
-                  <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] rounded-full bg-blue-500 text-white text-[9px] font-black flex items-center justify-center px-0.5">
-                    {count > 99 ? '99+' : count}
-                  </span>
-                )}
-              </button>
+              {!hideCart && (
+                <button
+                  onClick={() => setDrawerOpen(true)}
+                  className={`relative transition-all duration-300 ${t.icon}`}
+                >
+                  <ShoppingCart size={20} />
+                  {count > 0 && (
+                    <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] rounded-full bg-blue-500 text-white text-[9px] font-black flex items-center justify-center px-0.5">
+                      {count > 99 ? '99+' : count}
+                    </span>
+                  )}
+                </button>
+              )}
 
               {!hideMenu && (
                 <button

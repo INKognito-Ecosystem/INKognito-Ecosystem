@@ -42,7 +42,6 @@ export default function TattooVisionPage() {
   const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { marca: 'tattoo-vision' }, { items: productosIniciales, nextCursor, hasMore })
   const logoUrl = useSupplyVisual('supply_brand_tattoo_vision')
   const { prev, next } = getAdjacentBrands(0)
-  const scrolled = useScrolled(120)
 
   const handleScrollToCatalog = () => {
     const el = document.getElementById('catalogo-marca')
@@ -51,29 +50,21 @@ export default function TattooVisionPage() {
     }
   }
 
+  const shareUrl = typeof window !== 'undefined' && window.location?.href
+    ? window.location.href
+    : 'https://inkognito.com.co/supply/brands/tattoo-vision'
+
   return (
     <div className="min-h-screen bg-white text-zinc-900">
-      {/* Navbar en blanco puro coherente con todo Supply */}
-      <NavbarCategory pageName="Tattoo Vision" light />
-
-      {mostrarFlechas && scrolled && (
-        <>
-          <Link
-            to={prev.path} replace
-            aria-label={`Ver ${prev.name}`}
-            className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-600 hover:text-black bg-white/90 backdrop-blur-md border border-zinc-200/80 shadow-sm rounded-full p-2 transition-colors"
-          >
-            <ArrowLeft size={20} />
-          </Link>
-          <Link
-            to={next.path} replace
-            aria-label={`Ver ${next.name}`}
-            className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-600 hover:text-black bg-white/90 backdrop-blur-md border border-zinc-200/80 shadow-sm rounded-full p-2 transition-colors"
-          >
-            <ArrowRight size={20} />
-          </Link>
-        </>
-      )}
+      {/* Navbar en blanco puro sin "SUPPLY Tienda Online", sin carrito ni hamburguesa, con botón para compartir */}
+      <NavbarCategory
+        pageName="Tattoo Vision"
+        light
+        hideWordmark
+        hideCart
+        hideMenu
+        shareUrl={shareUrl}
+      />
 
       {/* SHOWCASE PREMIUM: Sistema de hardware flotando en blanco con sombra y specs */}
       <BrandShowcaseHero

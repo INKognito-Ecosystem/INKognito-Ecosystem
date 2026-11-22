@@ -1,45 +1,50 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { ChevronDown, ChevronLeft, ChevronRight, CheckCircle2, ArrowDown, ExternalLink } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, ArrowDown, ExternalLink } from 'lucide-react'
 import { BRAND_SHOWCASE_DATA } from './brandShowcaseData'
 
 /**
  * Componente MAESTRO Premium para Páginas de Marca en INKognito Supply.
  *
- * Jerarquía visual de alta gama:
- * 1. ZONA SUPERIOR: Exclusivamente el Navbar y el Visor Flotante Interactivo
- *    - Permite deslizar a los lados (swipe / flechas / selector de herramientas) para ver cada objeto del kit por separado.
- *    - Cada objeto levita en el centro con su sombra de contacto realista sincronizada.
- * 2. ZONA MEDIA: Logotipo oficial de la marca incorporado DEBAJO de las herramientas, modelo y descripción editorial.
- * 3. DESGLOSE DEL SISTEMA: 4 módulos de hardware de precisión.
- * 4. BENTO GRID: Demostración fotográfica real sobre tatuaje en piel y detalles técnicos.
- * 5. TELEMETRÍA Y ACCESO A CATÁLOGO / SITIO OFICIAL.
+ * Jerarquía visual solicitada:
+ * 1. ZONA SUPERIOR (Hero Stage):
+ *    - Exclusivamente el Navbar y el objeto fotográfico real flotando en el centro con sombra.
+ *    - Flechas laterales SIEMPRE visibles (ancladas con absolute, nunca desaparecen, bucle infinito).
+ *    - NINGÚN texto ni clasificación encima de la imagen.
+ * 2. CLASIFICACIÓN DEBAJO DE LAS IMÁGENES:
+ *    - Pills interactivas de herramientas (01. Gafas TR90, 02. Clip-On, etc.) situadas DEBAJO del producto y su sombra.
+ *    - Categoría, título de la pieza, micro-especificación y contador 01 / 05.
+ * 3. ZONA MEDIA (Revelación de Marca):
+ *    - Logotipo oficial de Tattoo Vision incorporado debajo del stage.
+ *    - Modelo, ingeniería de Hernán Yepes y descripción técnica.
+ *    - Botones de acción: Vitrina de stock en Supply y enlace al sitio oficial.
+ * 4. DESGLOSE DEL SISTEMA & BENTO GRID.
  */
 
 const slideVariants = {
   enter: (direction) => ({
-    x: direction > 0 ? 140 : -140,
+    x: direction > 0 ? 120 : -120,
     opacity: 0,
-    scale: 0.94,
+    scale: 0.95,
   }),
   center: {
     x: 0,
     opacity: 1,
     scale: 1,
     transition: {
-      x: { type: 'spring', stiffness: 320, damping: 32 },
-      opacity: { duration: 0.35 },
-      scale: { duration: 0.35 },
+      x: { type: 'spring', stiffness: 300, damping: 30 },
+      opacity: { duration: 0.3 },
+      scale: { duration: 0.3 },
     },
   },
   exit: (direction) => ({
-    x: direction > 0 ? -140 : 140,
+    x: direction > 0 ? -120 : 120,
     opacity: 0,
-    scale: 0.94,
+    scale: 0.95,
     transition: {
-      x: { type: 'spring', stiffness: 320, damping: 32 },
-      opacity: { duration: 0.25 },
-      scale: { duration: 0.25 },
+      x: { type: 'spring', stiffness: 300, damping: 30 },
+      opacity: { duration: 0.2 },
+      scale: { duration: 0.2 },
     },
   }),
 }
@@ -56,11 +61,11 @@ export default function BrandShowcaseHero({
 
   const [[currentIndex, direction], setSlide] = useState([0, 0])
 
+  // Bucle infinito circular garantizado: nunca se detiene ni deshabilita
   const paginate = useCallback((newDirection) => {
     setSlide(([prevIndex]) => {
-      let nextIndex = prevIndex + newDirection
-      if (nextIndex < 0) nextIndex = slides.length - 1
-      if (nextIndex >= slides.length) nextIndex = 0
+      const total = slides.length || 1
+      const nextIndex = (prevIndex + newDirection + total) % total
       return [nextIndex, newDirection]
     })
   }, [slides.length])
@@ -103,9 +108,9 @@ export default function BrandShowcaseHero({
       />
 
       {/* ==================================================================== */}
-      {/* 1. ZONA SUPERIOR: VISOR FLOTANTE INTERACTIVO (DESLIZAR A LOS LADOS)   */}
+      {/* 1. ZONA SUPERIOR: EXCLUSIVAMENTE EL OBJETO FLOTANTE & FLECHAS FIJAS   */}
       {/* ==================================================================== */}
-      <div className="relative w-full min-h-[64vh] sm:min-h-[72vh] md:min-h-[78vh] flex flex-col items-center justify-between pt-20 sm:pt-24 pb-8 px-4 overflow-hidden">
+      <div className="relative w-full min-h-[66vh] sm:min-h-[74vh] md:min-h-[80vh] flex flex-col items-center justify-between pt-24 sm:pt-28 pb-10 px-4 overflow-hidden">
 
         {/* Resplandor ambiental de acento difuso detrás del producto */}
         <div
@@ -113,42 +118,31 @@ export default function BrandShowcaseHero({
           style={{ backgroundColor: data.accentColor }}
         />
 
-        {/* SELECTOR SUPERIOR DE HERRAMIENTAS (PILLS DE NAVEGACIÓN DIRECTA) */}
-        <div className="relative z-20 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 max-w-3xl mx-auto px-2 mb-2">
-          {slides.map((item, idx) => {
-            const isActive = idx === currentIndex
-            return (
-              <button
-                key={item.id}
-                onClick={() => goToSlide(idx)}
-                className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-mono font-semibold transition-all cursor-pointer select-none ${
-                  isActive
-                    ? 'bg-zinc-900 text-white shadow-sm ring-1 ring-zinc-900 scale-105'
-                    : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200/80 hover:text-zinc-900'
-                }`}
-              >
-                <span>{`0${idx + 1}. `}</span>
-                <span className="hidden xs:inline">{item.badge}</span>
-                <span className="xs:hidden">{item.badge.split(' ')[0]}</span>
-              </button>
-            )
-          })}
-        </div>
+        {/* CONTENEDOR DEL VISOR CON FLECHAS ANCLADAS A LOS EXTREMOS (SIEMPRE VISIBLES) */}
+        <div className="relative w-full max-w-5xl mx-auto my-auto flex items-center justify-center min-h-[320px] sm:min-h-[380px] md:min-h-[440px]">
 
-        {/* ESCENARIO DEL PRODUCTO FLOTANTE CON GESTOS Y CONTROLES LATERALES */}
-        <div className="relative w-full max-w-4xl mx-auto my-auto flex items-center justify-between z-10 px-2 sm:px-6">
-
-          {/* BOTÓN ANTERIOR (FLECHA IZQUIERDA) */}
+          {/* FLECHA ANTERIOR — SIEMPRE VISIBLE, ANCLADA A LA IZQUIERDA */}
           <button
+            type="button"
             onClick={() => paginate(-1)}
             aria-label="Ver herramienta anterior"
-            className="flex-shrink-0 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 border border-zinc-200/90 text-zinc-700 hover:text-black hover:border-zinc-400 hover:bg-white shadow-md flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer"
+            className="absolute left-2 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-zinc-800 hover:bg-zinc-900 hover:text-white border border-zinc-200/90 hover:border-zinc-900 shadow-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer select-none"
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={22} />
           </button>
 
-          {/* ÁREA CENTRAL: OBJETO FLOTANTE ACTIVO (SWIPEABLE / ARRASTRABLE) */}
-          <div className="relative flex-1 flex flex-col items-center justify-center min-h-[300px] sm:min-h-[360px] md:min-h-[420px] px-2 sm:px-4 overflow-visible">
+          {/* FLECHA SIGUIENTE — SIEMPRE VISIBLE, ANCLADA A LA DERECHA */}
+          <button
+            type="button"
+            onClick={() => paginate(1)}
+            aria-label="Ver siguiente herramienta"
+            className="absolute right-2 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-zinc-800 hover:bg-zinc-900 hover:text-white border border-zinc-200/90 hover:border-zinc-900 shadow-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer select-none"
+          >
+            <ChevronRight size={22} />
+          </button>
+
+          {/* ÁREA CENTRAL: OBJETO FOTOGRÁFICO REAL FLOTANDO CON SU SOMBRA (SWIPEABLE) */}
+          <div className="relative w-full max-w-xl mx-auto flex flex-col items-center justify-center px-10 sm:px-16 overflow-visible">
 
             <AnimatePresence custom={direction} mode="wait">
               <motion.div
@@ -160,25 +154,19 @@ export default function BrandShowcaseHero({
                 exit="exit"
                 drag="x"
                 dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={0.3}
+                dragElastic={0.25}
                 onDragEnd={(e, { offset, velocity }) => {
                   const swipe = offset.x
-                  if (swipe < -40 || velocity.x < -400) {
+                  if (swipe < -40 || velocity.x < -350) {
                     paginate(1)
-                  } else if (swipe > 40 || velocity.x > 400) {
+                  } else if (swipe > 40 || velocity.x > 350) {
                     paginate(-1)
                   }
                 }}
                 className="relative w-full flex flex-col items-center justify-center cursor-grab active:cursor-grabbing select-none"
               >
 
-                {/* Categoría y Badge de la herramienta activa */}
-                <div className="mb-3 sm:mb-4 flex items-center gap-2 text-[10px] sm:text-[11px] font-mono tracking-widest uppercase text-zinc-400 font-semibold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                  <span>{currentSlide.category}</span>
-                </div>
-
-                {/* FOTOGRAFÍA REAL FLOTANTE (Animación suave de levitación física) */}
+                {/* FOTOGRAFÍA REAL FLOTANTE (Movimiento de levitación física suave) */}
                 <motion.div
                   animate={{ y: [0, -14, 0] }}
                   transition={{
@@ -210,51 +198,76 @@ export default function BrandShowcaseHero({
                   className={`${currentSlide.shadowWidth} h-6 sm:h-7 mt-3 rounded-[100%] bg-gradient-to-r from-zinc-900/5 via-zinc-900/60 to-zinc-900/5 blur-xl pointer-events-none`}
                 />
 
-                {/* Título de la pieza y micro-descripción */}
-                <div className="mt-4 text-center max-w-md mx-auto">
-                  <h4 className="text-base sm:text-lg font-bold text-zinc-900 tracking-tight">
-                    {currentSlide.title}
-                  </h4>
-                  <p className="text-xs text-zinc-500 mt-0.5 line-clamp-2">
-                    {currentSlide.detail}
-                  </p>
-                </div>
-
               </motion.div>
             </AnimatePresence>
 
           </div>
 
-          {/* BOTÓN SIGUIENTE (FLECHA DERECHA) */}
-          <button
-            onClick={() => paginate(1)}
-            aria-label="Ver siguiente herramienta"
-            className="flex-shrink-0 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 border border-zinc-200/90 text-zinc-700 hover:text-black hover:border-zinc-400 hover:bg-white shadow-md flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer"
-          >
-            <ChevronRight size={20} />
-          </button>
-
         </div>
 
-        {/* PIE DEL VISOR: CONTADOR E INDICACIÓN DE DESLIZAMIENTO */}
-        <div className="relative z-10 mt-3 flex flex-col items-center gap-1 text-zinc-400">
-          <div className="flex items-center gap-3 text-[11px] font-mono tracking-wider font-semibold">
+        {/* ==================================================================== */}
+        {/* 2. CLASIFICACIÓN DE LOS OBJETOS SITUADA DEBAJO DE LAS IMÁGENES       */}
+        {/* ==================================================================== */}
+        <div className="relative z-20 w-full max-w-3xl mx-auto flex flex-col items-center gap-3 mt-4 text-center">
+
+          {/* SELECTOR DE HERRAMIENTAS (PILLS DE CLASIFICACIÓN DEBAJO DE LA IMAGEN) */}
+          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 px-2">
+            {slides.map((item, idx) => {
+              const isActive = idx === currentIndex
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => goToSlide(idx)}
+                  className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-mono font-semibold transition-all cursor-pointer select-none ${
+                    isActive
+                      ? 'bg-zinc-900 text-white shadow-md ring-1 ring-zinc-900 scale-105'
+                      : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200/90 hover:text-zinc-900'
+                  }`}
+                >
+                  <span>{`0${idx + 1}. `}</span>
+                  <span className="hidden xs:inline">{item.badge}</span>
+                  <span className="xs:hidden">{item.badge.split(' ')[0]}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* CATEGORÍA Y DETALLES TÉCNICOS DEL OBJETO SELECCIONADO */}
+          <div className="mt-1 flex flex-col items-center">
+            <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-mono tracking-widest uppercase text-zinc-400 font-semibold mb-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+              <span>{currentSlide.category}</span>
+            </div>
+
+            <h4 className="text-base sm:text-lg font-bold text-zinc-900 tracking-tight">
+              {currentSlide.title}
+            </h4>
+
+            <p className="text-xs text-zinc-500 max-w-md mx-auto mt-0.5 leading-relaxed">
+              {currentSlide.detail}
+            </p>
+          </div>
+
+          {/* CONTADOR DE PIEZAS */}
+          <div className="flex items-center gap-2 text-[11px] font-mono tracking-wider font-semibold text-zinc-400 mt-1">
             <span className="text-zinc-900 font-bold">{`0${currentIndex + 1}`}</span>
             <span className="text-zinc-300">/</span>
             <span className="text-zinc-400">{`0${slides.length}`}</span>
             <span className="text-zinc-300">·</span>
-            <span className="text-[10px] text-zinc-400 uppercase tracking-widest hidden sm:inline">Desliza para explorar el kit</span>
+            <span className="text-[10px] uppercase tracking-widest text-zinc-400">Desliza para explorar el kit</span>
           </div>
 
+          {/* Flecha suave de scroll */}
           <div className="mt-2 text-zinc-300">
             <ArrowDown size={14} className="animate-bounce" />
           </div>
+
         </div>
 
       </div>
 
       {/* ==================================================================== */}
-      {/* 2. ZONA MEDIA: LOGO DE LA MARCA DEBAJO DE LAS GAFAS & MODELO         */}
+      {/* 3. ZONA MEDIA: LOGO DE LA MARCA DEBAJO DE LAS GAFAS & MODELO         */}
       {/* ==================================================================== */}
       <div className="relative w-full max-w-5xl mx-auto px-4 sm:px-6 pt-6 pb-12 sm:pb-16 text-center border-t border-zinc-100">
 
@@ -319,7 +332,7 @@ export default function BrandShowcaseHero({
       </div>
 
       {/* ==================================================================== */}
-      {/* 3. DESGLOSE DEL SISTEMA DE HARDWARE (4 COMPONENTES INTEGRALES)        */}
+      {/* 4. DESGLOSE DEL SISTEMA DE HARDWARE (4 COMPONENTES INTEGRALES)        */}
       {/* ==================================================================== */}
       {data.systemTools?.length > 0 && (
         <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 pb-12">
@@ -356,7 +369,7 @@ export default function BrandShowcaseHero({
       )}
 
       {/* ==================================================================== */}
-      {/* 4. ZONA EDITORIAL PREMIUM: BENTO GRID DE INGENIERÍA & EN ACCIÓN      */}
+      {/* 5. ZONA EDITORIAL PREMIUM: BENTO GRID DE INGENIERÍA & EN ACCIÓN      */}
       {/* ==================================================================== */}
       <div className="relative w-full max-w-6xl mx-auto px-4 sm:px-6 pb-16">
 
@@ -456,7 +469,7 @@ export default function BrandShowcaseHero({
         </div>
 
         {/* ==================================================================== */}
-        {/* 5. FRANJA INFERIOR: MÉTRICAS DE HARDWARE Y ACCESO A CATÁLOGO         */}
+        {/* 6. FRANJA INFERIOR: MÉTRICAS DE HARDWARE Y ACCESO A CATÁLOGO         */}
         {/* ==================================================================== */}
         <div className="w-full mt-10 pt-8 border-t border-zinc-200 flex flex-col sm:flex-row items-center justify-between gap-6">
 
