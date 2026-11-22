@@ -1,241 +1,214 @@
 import { motion } from 'motion/react'
 
 /**
- * Renderizado vectorial por capas independientes para el visor de precisión Tattoo Vision (Vision-X Pro).
- * Cada capa se desacopla independientemente en el espacio 3D según el avance del scroll (Scrollytelling tipo Wiltech).
+ * Renderizado vectorial por capas independientes para las GAFAS POLARIZADAS TR90
+ * REALES DE TATTOO VISION creadas por HERNÁN YEPES.
+ *
+ * Muestra el diseño auténtico de armazón TR90 negro mate, lentes polarizados
+ * lineales semitransparentes (que eliminan el 100% de los reflejos en combinación
+ * con la luz polarizada), bisagras metálicas y cordón de sujeción ergonómico.
  */
 
 export function TattooVisionObjectSvg({
-  explodedProgress, // MotionValue 0 -> 1
   layerTransforms = {},
   activeLayer = null,
   onHoverLayer,
 }) {
   return (
-    <div className="relative w-full max-w-[580px] h-[340px] sm:h-[400px] flex items-center justify-center select-none perspective-[1200px]">
+    <div className="relative w-full max-w-[620px] h-[340px] sm:h-[400px] flex items-center justify-center select-none perspective-[1200px]">
 
       {/* SVG Canvas de Alta Definición */}
       <svg
-        viewBox="0 0 680 440"
+        viewBox="0 0 720 440"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full overflow-visible drop-shadow-[0_20px_45px_rgba(0,0,0,0.12)]"
+        className="w-full h-full overflow-visible drop-shadow-[0_25px_50px_rgba(0,0,0,0.25)]"
       >
         <defs>
-          {/* Gradientes y filtros para apariencia técnica de titanio y óptica */}
-          <linearGradient id="titaniumGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#334155" />
-            <stop offset="40%" stopColor="#64748b" />
-            <stop offset="70%" stopColor="#1e293b" />
-            <stop offset="100%" stopColor="#475569" />
+          {/* TR90 Negro Mate con sombreado sutil de polímero suizo */}
+          <linearGradient id="tr90Matte" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#1e2229" />
+            <stop offset="35%" stopColor="#2a303c" />
+            <stop offset="70%" stopColor="#16191f" />
+            <stop offset="100%" stopColor="#0f1115" />
           </linearGradient>
 
-          <linearGradient id="lensGradLeft" x1="0%" y1="0%" x2="100%" y2="80%">
-            <stop offset="0%" stopColor="#0284c7" stopOpacity="0.45" />
-            <stop offset="30%" stopColor="#38bdf8" stopOpacity="0.25" />
-            <stop offset="70%" stopColor="#6366f1" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0.55" />
+          <linearGradient id="tr90Bevel" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#475569" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#0f172a" stopOpacity="0.9" />
           </linearGradient>
 
-          <linearGradient id="lensGradRight" x1="0%" y1="0%" x2="100%" y2="80%">
-            <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.55" />
-            <stop offset="40%" stopColor="#38bdf8" stopOpacity="0.25" />
-            <stop offset="80%" stopColor="#6366f1" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#0284c7" stopOpacity="0.45" />
+          {/* Lente polarizado lineal semitransparente (aclarado para no oscurecer la sesión de tatuaje) */}
+          <linearGradient id="polarizedLens" x1="0%" y1="0%" x2="100%" y2="85%">
+            <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.28" />
+            <stop offset="35%" stopColor="#0284c7" stopOpacity="0.18" />
+            <stop offset="70%" stopColor="#0369a1" stopOpacity="0.22" />
+            <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.32" />
           </linearGradient>
 
-          <linearGradient id="ledGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#fef08a" stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#eab308" stopOpacity="0.8" />
+          {/* Destello de polarización óptica */}
+          <linearGradient id="reflectionGlint" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.5" />
+            <stop offset="40%" stopColor="#ffffff" stopOpacity="0.0" />
+            <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.3" />
           </linearGradient>
 
-          <linearGradient id="goldPins" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#d97706" />
-            <stop offset="50%" stopColor="#fde047" />
-            <stop offset="100%" stopColor="#b45309" />
+          {/* Bisagras mecánicas de acero inoxidable */}
+          <linearGradient id="steelHinge" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#94a3b8" />
+            <stop offset="50%" stopColor="#f8fafc" />
+            <stop offset="100%" stopColor="#64748b" />
           </linearGradient>
 
-          <linearGradient id="siliconeGrip" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#10b981" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#047857" stopOpacity="0.9" />
+          {/* Cordón textil trenzado */}
+          <linearGradient id="lanyardBraid" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#10b981" />
+            <stop offset="50%" stopColor="#047857" />
+            <stop offset="100%" stopColor="#064e3b" />
           </linearGradient>
-
-          <filter id="laserGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="3" result="blur" />
-            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-          </filter>
         </defs>
 
         {/* ============================================================ */}
-        {/* CAPA 04: ALMOHADILLAS & BIO-GRIP SILICONADO (Fondo / Apoyo)   */}
+        {/* CAPA 04: CORDÓN DE SEGURIDAD AJUSTABLE                       */}
         {/* ============================================================ */}
         <motion.g
-          id="layer-biogrip"
-          style={layerTransforms.biogrip}
+          id="layer-lanyard"
+          style={layerTransforms.lanyard}
           className="cursor-pointer transition-opacity"
-          opacity={activeLayer && activeLayer !== 'biogrip' ? 0.35 : 1}
-          onMouseEnter={() => onHoverLayer && onHoverLayer('biogrip')}
+          opacity={activeLayer && activeLayer !== 'lanyard' ? 0.35 : 1}
+          onMouseEnter={() => onHoverLayer && onHoverLayer('lanyard')}
           onMouseLeave={() => onHoverLayer && onHoverLayer(null)}
         >
-          {/* Apoyos nasales de silicona médica */}
+          {/* Lazo del cordón que cae por detrás */}
           <path
-            d="M320 236 C314 246 312 264 316 276 C318 280 324 282 328 277 C332 271 334 252 328 240 Z"
-            fill="url(#siliconeGrip)"
-            stroke="#065f46"
-            strokeWidth="1.5"
+            d="M92 195 C60 270 120 370 360 370 C600 370 660 270 628 195"
+            stroke="url(#lanyardBraid)"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            strokeDasharray="6 3"
+            fill="none"
           />
-          <path
-            d="M360 236 C366 246 368 264 364 276 C362 280 356 282 352 277 C348 271 346 252 352 240 Z"
-            fill="url(#siliconeGrip)"
-            stroke="#065f46"
-            strokeWidth="1.5"
-          />
-          {/* Ranuras micro-fluidas anti-sudor */}
-          <line x1="316" y1="250" x2="324" y2="252" stroke="#ecfdf5" strokeWidth="1" strokeLinecap="round" />
-          <line x1="316" y1="258" x2="325" y2="260" stroke="#ecfdf5" strokeWidth="1" strokeLinecap="round" />
-          <line x1="318" y1="266" x2="326" y2="268" stroke="#ecfdf5" strokeWidth="1" strokeLinecap="round" />
 
-          <line x1="364" y1="250" x2="356" y2="252" stroke="#ecfdf5" strokeWidth="1" strokeLinecap="round" />
-          <line x1="364" y1="258" x2="355" y2="260" stroke="#ecfdf5" strokeWidth="1" strokeLinecap="round" />
-          <line x1="362" y1="266" x2="354" y2="268" stroke="#ecfdf5" strokeWidth="1" strokeLinecap="round" />
+          {/* Pasador de tensión regulable central */}
+          <circle cx="360" cy="370" r="10" fill="#0f172a" stroke="#10b981" strokeWidth="2" />
+          <circle cx="360" cy="370" r="4" fill="#10b981" />
 
-          {/* Terminales ergonómicos en las patillas traseras */}
-          <path
-            d="M65 142 C50 148 42 165 48 180 C52 190 62 195 72 188 C76 182 82 165 80 152 Z"
-            fill="url(#siliconeGrip)"
-            stroke="#065f46"
-            strokeWidth="1"
-            opacity="0.85"
-          />
-          <path
-            d="M615 142 C630 148 638 165 632 180 C628 190 618 195 608 188 C604 182 598 165 600 152 Z"
-            fill="url(#siliconeGrip)"
-            stroke="#065f46"
-            strokeWidth="1"
-            opacity="0.85"
-          />
+          {/* Terminales de sujeción de goma a las puntas de las patillas */}
+          <rect x="86" y="190" width="12" height="18" rx="4" fill="#047857" stroke="#10b981" strokeWidth="1" />
+          <rect x="622" y="190" width="12" height="18" rx="4" fill="#047857" stroke="#10b981" strokeWidth="1" />
         </motion.g>
 
         {/* ============================================================ */}
-        {/* CAPA 03: CHASIS AEROESPACIAL DE TITANIO (Estructura Base)    */}
+        {/* CAPA 03: PATILLAS LATERALES Y BISAGRAS DE PRECISIÓN          */}
         {/* ============================================================ */}
         <motion.g
-          id="layer-chassis"
-          style={layerTransforms.chassis}
+          id="layer-temples"
+          style={layerTransforms.temples}
           className="cursor-pointer transition-opacity"
-          opacity={activeLayer && activeLayer !== 'chassis' ? 0.35 : 1}
-          onMouseEnter={() => onHoverLayer && onHoverLayer('chassis')}
+          opacity={activeLayer && activeLayer !== 'temples' ? 0.35 : 1}
+          onMouseEnter={() => onHoverLayer && onHoverLayer('temples')}
           onMouseLeave={() => onHoverLayer && onHoverLayer(null)}
         >
-          {/* Patilla izquierda en perspectiva */}
+          {/* Patilla Izquierda TR90 en perspectiva */}
           <path
-            d="M178 186 L70 148 C60 144 54 150 58 158 L82 178 L170 205 Z"
-            fill="url(#titaniumGrad)"
+            d="M192 192 L96 172 C80 168 76 176 82 188 L94 204 L190 208 Z"
+            fill="url(#tr90Matte)"
             stroke="#0f172a"
             strokeWidth="1.5"
           />
-          {/* Aligeramientos esqueletizados en patilla izquierda */}
-          <polygon points="95,162 125,172 120,178 92,168" fill="#090d16" />
-          <polygon points="135,176 160,185 156,190 132,182" fill="#090d16" />
+          {/* Bisagra de acero inoxidable izquierda */}
+          <rect x="186" y="194" width="8" height="12" rx="2" fill="url(#steelHinge)" stroke="#334155" strokeWidth="1" />
+          <circle cx="190" cy="200" r="1.5" fill="#0f172a" />
 
-          {/* Patilla derecha en perspectiva */}
+          {/* Patilla Derecha TR90 en perspectiva */}
           <path
-            d="M502 186 L610 148 C620 144 626 150 622 158 L598 178 L510 205 Z"
-            fill="url(#titaniumGrad)"
+            d="M528 192 L624 172 C640 168 644 176 638 188 L626 204 L530 208 Z"
+            fill="url(#tr90Matte)"
             stroke="#0f172a"
             strokeWidth="1.5"
           />
-          {/* Aligeramientos esqueletizados en patilla derecha */}
-          <polygon points="585,162 555,172 560,178 588,168" fill="#090d16" />
-          <polygon points="545,176 520,185 524,190 548,182" fill="#090d16" />
+          {/* Bisagra de acero inoxidable derecha */}
+          <rect x="526" y="194" width="8" height="12" rx="2" fill="url(#steelHinge)" stroke="#334155" strokeWidth="1" />
+          <circle cx="530" cy="200" r="1.5" fill="#0f172a" />
 
-          {/* Barra superior de cejas (Dual Brow Armor) */}
-          <path
-            d="M165 174 C220 160 300 162 340 170 C380 162 460 160 515 174 L524 186 C460 172 380 174 340 182 C300 174 220 172 156 186 Z"
-            fill="url(#titaniumGrad)"
-            stroke="#0f172a"
-            strokeWidth="2"
-          />
+          {/* Grabado discreto en la patilla izquierda */}
+          <text x="110" y="192" fill="#64748b" fontSize="7" fontFamily="sans-serif" fontWeight="bold" letterSpacing="0.1em">
+            TR90 · HERNÁN YEPES
+          </text>
+        </motion.g>
 
-          {/* Marco exterior izquierdo del lente */}
+        {/* ============================================================ */}
+        {/* CAPA 02: ARMAZÓN FRONTAL TR90 SU IZO (Diseño Real Yepes)     */}
+        {/* ============================================================ */}
+        <motion.g
+          id="layer-frame"
+          style={layerTransforms.frame}
+          className="cursor-pointer transition-opacity"
+          opacity={activeLayer && activeLayer !== 'frame' ? 0.35 : 1}
+          onMouseEnter={() => onHoverLayer && onHoverLayer('frame')}
+          onMouseLeave={() => onHoverLayer && onHoverLayer(null)}
+        >
+          {/* Marco exterior completo de las gafas estilo Wayfarer/D-frame ergonómico */}
           <path
-            d="M162 182 C190 174 290 176 322 198 C330 204 330 220 324 238 C314 266 288 288 238 290 C182 292 150 256 148 222 C146 198 152 186 162 182 Z"
-            fill="#1e293b"
-            stroke="#334155"
+            d="
+              M176 172
+              C210 166 310 168 344 186
+              C352 190 368 190 376 186
+              C410 168 510 166 544 172
+              C554 174 558 186 552 202
+              L538 250
+              C528 278 500 292 450 294
+              C392 296 366 264 362 238
+              C360 226 348 226 346 238
+              C342 264 316 296 258 294
+              C208 292 180 278 170 250
+              L156 202
+              C150 186 160 174 176 172 Z
+            "
+            fill="url(#tr90Matte)"
+            stroke="#090d16"
             strokeWidth="2.5"
           />
 
-          {/* Marco exterior derecho del lente */}
+          {/* Biselado superior de luz para dar sensación de volumen tridimensional al TR90 */}
           <path
-            d="M518 182 C490 174 390 176 358 198 C350 204 350 220 356 238 C366 266 392 288 442 290 C498 292 530 256 532 222 C534 198 528 186 518 182 Z"
-            fill="#1e293b"
-            stroke="#334155"
-            strokeWidth="2.5"
+            d="M178 174 C215 168 305 170 342 188 C354 192 366 192 378 188 C415 170 505 168 542 174"
+            stroke="url(#tr90Bevel)"
+            strokeWidth="1.8"
+            fill="none"
           />
 
-          {/* Puente nasal central reforzado */}
+          {/* Vaciado interior izquierdo para el cristal */}
           <path
-            d="M320 202 C330 196 350 196 360 202 L364 220 C354 214 326 214 316 220 Z"
-            fill="url(#titaniumGrad)"
-            stroke="#0f172a"
+            d="M192 186 C225 180 300 182 322 198 C332 205 334 220 326 238 C316 262 292 280 256 282 C214 284 190 262 184 236 C180 216 182 192 192 186 Z"
+            fill="#090d16"
+            stroke="#2a303c"
             strokeWidth="1.5"
           />
 
-          {/* Pernos y tornillos micrométricos en titanio */}
-          <circle cx="166" cy="180" r="3" fill="#cbd5e1" stroke="#0f172a" strokeWidth="1" />
-          <circle cx="514" cy="180" r="3" fill="#cbd5e1" stroke="#0f172a" strokeWidth="1" />
-          <line x1="164.5" y1="180" x2="167.5" y2="180" stroke="#0f172a" strokeWidth="0.8" />
-          <line x1="512.5" y1="180" x2="515.5" y2="180" stroke="#0f172a" strokeWidth="0.8" />
-        </motion.g>
-
-        {/* ============================================================ */}
-        {/* CAPA 02: MÓDULO MICRO-LED & ILUMINACIÓN COAXIAL              */}
-        {/* ============================================================ */}
-        <motion.g
-          id="layer-lighting"
-          style={layerTransforms.lighting}
-          className="cursor-pointer transition-opacity"
-          opacity={activeLayer && activeLayer !== 'lighting' ? 0.35 : 1}
-          onMouseEnter={() => onHoverLayer && onHoverLayer('lighting')}
-          onMouseLeave={() => onHoverLayer && onHoverLayer(null)}
-        >
-          {/* Haz cónico de luz proyectada hacia el campo de trabajo */}
-          <polygon
-            points="332,176 348,176 430,360 250,360"
-            fill="url(#ledGlow)"
-            opacity="0.16"
-            className="pointer-events-none"
-          />
-
-          {/* Bloque proyector micro-LED central */}
-          <rect
-            x="326"
-            y="156"
-            width="28"
-            height="26"
-            rx="4"
-            fill="#0f172a"
-            stroke="#fbbf24"
+          {/* Vaciado interior derecho para el cristal */}
+          <path
+            d="M528 186 C495 180 420 182 398 198 C388 205 386 220 394 238 C404 262 428 280 464 282 C506 284 530 262 536 236 C540 216 538 192 528 186 Z"
+            fill="#090d16"
+            stroke="#2a303c"
             strokeWidth="1.5"
           />
 
-          {/* Disipador pasivo superior de grafeno */}
-          <line x1="330" y1="154" x2="350" y2="154" stroke="#475569" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="332" y1="151" x2="348" y2="151" stroke="#475569" strokeWidth="1.5" strokeLinecap="round" />
+          {/* Remaches metálicos clásicos en las esquinas superiores */}
+          <ellipse cx="174" cy="182" rx="3" ry="1.5" fill="url(#steelHinge)" />
+          <ellipse cx="546" cy="182" rx="3" ry="1.5" fill="url(#steelHinge)" />
 
-          {/* Doble lente colimador LED de alta reproducción de color */}
-          <circle cx="334" cy="169" r="4.5" fill="url(#ledGlow)" filter="url(#laserGlow)" />
-          <circle cx="346" cy="169" r="4.5" fill="url(#ledGlow)" filter="url(#laserGlow)" />
-          <circle cx="334" cy="169" r="2" fill="#ffffff" />
-          <circle cx="346" cy="169" r="2" fill="#ffffff" />
-
-          {/* Pines de conexión y carga magnética chapados en oro */}
-          <rect x="330" y="145" width="4" height="4" rx="1" fill="url(#goldPins)" />
-          <rect x="346" y="145" width="4" height="4" rx="1" fill="url(#goldPins)" />
+          {/* Puente nasal anatómico suave integrado */}
+          <path
+            d="M346 224 C352 220 368 220 374 224"
+            stroke="#475569"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
         </motion.g>
 
         {/* ============================================================ */}
-        {/* CAPA 01: ESCUDO ÓPTICO POLARIZADO HD (Cristales Frontales)   */}
+        {/* CAPA 01: LENTES POLARIZADOS LINEALES SEMITRANSPARENTES       */}
         {/* ============================================================ */}
         <motion.g
           id="layer-optics"
@@ -245,63 +218,58 @@ export function TattooVisionObjectSvg({
           onMouseEnter={() => onHoverLayer && onHoverLayer('optics')}
           onMouseLeave={() => onHoverLayer && onHoverLayer(null)}
         >
-          {/* Lente Izquierdo Polarizado */}
+          {/* Lente Izquierdo Polarizado Lineal Semitransparente */}
           <path
-            d="M172 188 C198 180 285 182 312 202 C320 208 320 220 314 236 C304 260 280 280 236 282 C186 284 158 252 156 222 C154 202 162 192 172 188 Z"
-            fill="url(#lensGradLeft)"
+            d="M194 187 C226 181 299 183 320 199 C330 206 332 219 324 237 C314 260 291 278 256 280 C216 282 192 260 186 235 C182 215 184 193 194 187 Z"
+            fill="url(#polarizedLens)"
             stroke="#38bdf8"
-            strokeWidth="1.8"
+            strokeWidth="1.6"
           />
 
-          {/* Lente Derecho Polarizado */}
+          {/* Lente Derecho Polarizado Lineal Semitransparente */}
           <path
-            d="M508 188 C482 180 395 182 368 202 C360 208 360 220 366 236 C376 260 400 280 444 282 C494 284 522 252 524 222 C526 202 518 192 508 188 Z"
-            fill="url(#lensGradRight)"
+            d="M526 187 C494 181 421 183 400 199 C390 206 388 219 396 237 C406 260 429 278 464 280 C504 282 528 260 534 235 C538 215 536 193 526 187 Z"
+            fill="url(#polarizedLens)"
             stroke="#38bdf8"
-            strokeWidth="1.8"
+            strokeWidth="1.6"
           />
 
-          {/* Destellos y reflejos de polarización técnica */}
+          {/* Reflejo diagonal sutil de polarización óptica */}
           <path
-            d="M180 196 Q240 188 286 210"
-            stroke="#ffffff"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            opacity="0.65"
+            d="M200 192 L290 196 L240 274 L190 240 Z"
+            fill="url(#reflectionGlint)"
+            opacity="0.35"
           />
           <path
-            d="M500 196 Q440 188 394 210"
-            stroke="#ffffff"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            opacity="0.65"
+            d="M520 192 L430 196 L480 274 L530 240 Z"
+            fill="url(#reflectionGlint)"
+            opacity="0.35"
           />
 
-          {/* Retícula de grabado láser y puntos de calibración milimétrica */}
-          {/* Ojo Izquierdo: Cruz de enfoque óptico */}
-          <line x1="235" y1="228" x2="245" y2="228" stroke="#38bdf8" strokeWidth="1" opacity="0.8" />
-          <line x1="240" y1="223" x2="240" y2="233" stroke="#38bdf8" strokeWidth="1" opacity="0.8" />
-          <circle cx="240" cy="228" r="8" stroke="#38bdf8" strokeWidth="0.8" strokeDasharray="2 2" opacity="0.5" />
-          <text x="218" y="248" fill="#38bdf8" fontSize="7" fontFamily="monospace" opacity="0.75" letterSpacing="0.08em">
-            OPTIC.CAL · L
+          {/* Indicador de eje de polarización lineal y firma óptica de Tattoo Vision */}
+          <g opacity="0.8">
+            <line x1="250" y1="210" x2="250" y2="250" stroke="#38bdf8" strokeWidth="0.8" strokeDasharray="3 2" />
+            <line x1="244" y1="230" x2="256" y2="230" stroke="#38bdf8" strokeWidth="0.8" />
+            <text x="214" y="248" fill="#38bdf8" fontSize="6.5" fontFamily="monospace" letterSpacing="0.08em">
+              POLARIZED · 90°
+            </text>
+          </g>
+
+          <g opacity="0.8">
+            <line x1="470" y1="210" x2="470" y2="250" stroke="#38bdf8" strokeWidth="0.8" strokeDasharray="3 2" />
+            <line x1="464" y1="230" x2="476" y2="230" stroke="#38bdf8" strokeWidth="0.8" />
+            <text x="434" y="248" fill="#38bdf8" fontSize="6.5" fontFamily="monospace" letterSpacing="0.08em">
+              POLARIZED · 90°
+            </text>
+          </g>
+
+          {/* Sello de autenticidad en esquina superior del lente */}
+          <text x="300" y="202" fill="#7dd3fc" fontSize="5.5" fontFamily="monospace" opacity="0.7">
+            TATTOO VISION
           </text>
-
-          {/* Ojo Derecho: Cruz de enfoque óptico */}
-          <line x1="435" y1="228" x2="445" y2="228" stroke="#38bdf8" strokeWidth="1" opacity="0.8" />
-          <line x1="440" y1="223" x2="440" y2="233" stroke="#38bdf8" strokeWidth="1" opacity="0.8" />
-          <circle cx="440" cy="228" r="8" stroke="#38bdf8" strokeWidth="0.8" strokeDasharray="2 2" opacity="0.5" />
-          <text x="418" y="248" fill="#38bdf8" fontSize="7" fontFamily="monospace" opacity="0.75" letterSpacing="0.08em">
-            OPTIC.CAL · R
+          <text x="404" y="202" fill="#7dd3fc" fontSize="5.5" fontFamily="monospace" opacity="0.7">
+            TATTOO VISION
           </text>
-
-          {/* Micro-marcas de escala en bordes */}
-          <line x1="168" y1="206" x2="174" y2="208" stroke="#7dd3fc" strokeWidth="1" opacity="0.6" />
-          <line x1="166" y1="214" x2="172" y2="216" stroke="#7dd3fc" strokeWidth="1" opacity="0.6" />
-          <line x1="165" y1="222" x2="171" y2="224" stroke="#7dd3fc" strokeWidth="1" opacity="0.6" />
-
-          <line x1="512" y1="206" x2="506" y2="208" stroke="#7dd3fc" strokeWidth="1" opacity="0.6" />
-          <line x1="514" y1="214" x2="508" y2="216" stroke="#7dd3fc" strokeWidth="1" opacity="0.6" />
-          <line x1="515" y1="222" x2="509" y2="224" stroke="#7dd3fc" strokeWidth="1" opacity="0.6" />
         </motion.g>
 
       </svg>

@@ -34,8 +34,8 @@ export async function loader({ request }) {
 }
 
 export function meta() {
-  const title = 'Tattoo Vision | Sistemas visuales para tatuadores — INKognito Supply'
-  const description = 'Lámparas, gafas y sistemas de visión Tattoo Vision para tatuadores profesionales. Precisión óptica en cada sesión. Disponibles en toda Colombia.'
+  const title = 'Tattoo Vision | Gafas Polarizadas y Sistemas Ópticos de Hernán Yepes — INKognito Supply'
+  const description = 'Gafas de tecnología polarizada TR90 y sistemas ópticos creados por Hernán Yepes. Eliminan el 100% de los reflejos en la piel para control de saturación y degradado. Disponibles en Colombia.'
   return [
     { title },
     { name: 'description', content: description },
@@ -160,10 +160,11 @@ export default function TattooVisionPage() {
                 {distribuidorOficial && <InsigniaDistribuidorOficial />}
               </div>
               <p className="text-zinc-600 text-sm md:text-base leading-relaxed text-justify [hyphens:auto]">
-                Sistemas visuales diseñados para tatuadores profesionales.
-                Gafas especializadas, iluminación avanzada y accesorios
-                desarrollados para mejorar la visibilidad, reducir reflejos
-                y aumentar la precisión durante el proceso de tatuaje.
+                Tecnología óptica polarizada original creada por el artista Hernán Yepes.
+                Diseñada bajo el principio de polarización cruzada (gafas TR90 con lentes
+                lineales semitransparentes en sincronía con luz LED polarizada) para cancelar
+                el 100% de los reflejos en la piel, permitiendo evaluar la saturación, empates
+                y degradados en tiempo real.
               </p>
               <div className="clear-both" />
             </div>
@@ -176,10 +177,11 @@ export default function TattooVisionPage() {
                 {distribuidorOficial && <InsigniaDistribuidorOficial />}
               </div>
               <p className="max-w-xl text-zinc-600 text-sm md:text-base leading-relaxed text-justify [hyphens:auto] sm:border-l sm:border-zinc-200 sm:pl-8">
-                Sistemas visuales diseñados para tatuadores profesionales.
-                Gafas especializadas, iluminación avanzada y accesorios
-                desarrollados para mejorar la visibilidad, reducir reflejos
-                y aumentar la precisión durante el proceso de tatuaje.
+                Tecnología óptica polarizada original creada por el artista Hernán Yepes.
+                Diseñada bajo el principio de polarización cruzada (gafas TR90 con lentes
+                lineales semitransparentes en sincronía con luz LED polarizada) para cancelar
+                el 100% de los reflejos en la piel, permitiendo evaluar la saturación, empates
+                y degradados en tiempo real.
               </p>
             </div>
           )}

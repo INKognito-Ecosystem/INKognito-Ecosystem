@@ -113,7 +113,7 @@ export default function BrandExplodedHero({
           <div className="flex items-center gap-3">
             <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
             <span className="text-[10px] md:text-xs font-mono font-semibold tracking-[0.2em] text-zinc-400 uppercase">
-              {config.badge} // WILTECH-EXPLODED VIEW
+              {config.badge} // DESPIECE TÉCNICO
             </span>
           </div>
 
