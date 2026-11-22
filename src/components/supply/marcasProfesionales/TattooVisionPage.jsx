@@ -1,21 +1,17 @@
 import { Link, useLoaderData } from 'react-router'
-import { useState, useEffect } from 'react'
 import { ArrowLeft, ArrowRight, Award } from 'lucide-react'
 import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
 import BrandCatalogSection from '../BrandCatalogSection'
 import SupplyFAQ from '../SupplyFAQ'
 import SupplyMobileNav from '../SupplyMobileNav'
-import BrandExplodedHero from '../scrollytelling/BrandExplodedHero'
+import BrandShowcaseHero from '../BrandShowcaseHero'
 import { getAdjacentBrands } from '../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../hooks/useScrolled'
 import { fetchCatalogMarca, fetchSupplyFaq, useLoadMore } from '../../../hooks/useCatalog'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
-// fase 6.1 (2026-08-07) — id real en `estudios` vinculado a esta marca,
-// solo para leer distribuidor_oficial (la insignia paga). Si el fetch
-// falla, simplemente no se muestra insignia — no rompe la página.
 const ESTUDIO_ID = 4
 
 export async function loader({ request }) {
@@ -25,10 +21,6 @@ export async function loader({ request }) {
     fetchSupplyFaq({ marca: 'tattoo-vision' }),
   ])
   const estudio = estudioRes && estudioRes.ok ? await estudioRes.json() : null
-  // ?flechas=0 (fase 6.1, bug real de Jose) — quien llega acá desde el
-  // perfil de un estudio en el buscador no debe poder saltar a otra
-  // marca sin relación; navegando normal desde el menú de Supply, el
-  // parámetro no viene y las flechas se ven como siempre.
   const mostrarFlechas = new URL(request.url).searchParams.get('flechas') !== '0'
   return { ...catalogo, distribuidorOficial: estudio?.distribuidor_oficial || false, mostrarFlechas, faqItems }
 }
@@ -45,39 +37,12 @@ export function meta() {
   ]
 }
 
-const DOT_PATTERN = {
-  backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
-  backgroundSize: '18px 18px',
-}
-
-function InsigniaDistribuidorOficial() {
-  return (
-    <span className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-black text-[9px] font-black uppercase tracking-widest bg-amber-400">
-      <Award size={10} /> Distribuidor Oficial
-    </span>
-  )
-}
-
 export default function TattooVisionPage() {
   const { products: productosIniciales, nextCursor, hasMore, distribuidorOficial, mostrarFlechas, faqItems } = useLoaderData()
   const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { marca: 'tattoo-vision' }, { items: productosIniciales, nextCursor, hasMore })
   const logoUrl = useSupplyVisual('supply_brand_tattoo_vision')
   const { prev, next } = getAdjacentBrands(0)
-  const scrolled = useScrolled(200)
-  const [inCatalog, setInCatalog] = useState(false)
-
-  useEffect(() => {
-    const el = document.getElementById('catalogo-marca')
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        setInCatalog(entry.isIntersecting || entry.boundingClientRect.top <= 100)
-      },
-      { threshold: 0, rootMargin: '-80px 0px 0px 0px' }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
+  const scrolled = useScrolled(120)
 
   const handleScrollToCatalog = () => {
     const el = document.getElementById('catalogo-marca')
@@ -88,38 +53,30 @@ export default function TattooVisionPage() {
 
   return (
     <div className="min-h-screen bg-white text-zinc-900">
-      {/* El navbar se sincroniza: oscuro y técnico durante el despiece, blanco puro en el catálogo */}
-      <NavbarCategory pageName="Tattoo Vision" light={inCatalog} />
+      {/* Navbar en blanco puro coherente con todo Supply */}
+      <NavbarCategory pageName="Tattoo Vision" light />
 
       {mostrarFlechas && scrolled && (
         <>
           <Link
             to={prev.path} replace
             aria-label={`Ver ${prev.name}`}
-            className={`fixed top-16 md:top-20 left-2 md:left-4 z-40 backdrop-blur-sm border rounded-full p-2 transition-colors ${
-              inCatalog
-                ? 'text-zinc-600 hover:text-black bg-white/80 border-zinc-200'
-                : 'text-zinc-300 hover:text-white bg-zinc-900/80 border-zinc-700'
-            }`}
+            className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-600 hover:text-black bg-white/90 backdrop-blur-md border border-zinc-200/80 shadow-sm rounded-full p-2 transition-colors"
           >
             <ArrowLeft size={20} />
           </Link>
           <Link
             to={next.path} replace
             aria-label={`Ver ${next.name}`}
-            className={`fixed top-16 md:top-20 right-2 md:right-4 z-40 backdrop-blur-sm border rounded-full p-2 transition-colors ${
-              inCatalog
-                ? 'text-zinc-600 hover:text-black bg-white/80 border-zinc-200'
-                : 'text-zinc-300 hover:text-white bg-zinc-900/80 border-zinc-700'
-            }`}
+            className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-600 hover:text-black bg-white/90 backdrop-blur-md border border-zinc-200/80 shadow-sm rounded-full p-2 transition-colors"
           >
             <ArrowRight size={20} />
           </Link>
         </>
       )}
 
-      {/* HERO SCROLLYTELLING: Despiece técnico interactivo estilo Wiltech con logo incorporado */}
-      <BrandExplodedHero
+      {/* SHOWCASE PREMIUM: Producto fotográfico real flotando en blanco con sombra y specs */}
+      <BrandShowcaseHero
         brandKey="tattoo-vision"
         logoUrl={logoUrl}
         distribuidorOficial={distribuidorOficial}
@@ -127,9 +84,9 @@ export default function TattooVisionPage() {
       />
 
       {/* CATÁLOGO DE PRODUCTOS & DETALLES DE MARCA */}
-      <div id="catalogo-marca" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
+      <div id="catalogo-marca" className="pt-10 md:pt-14 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
 
-        <div className="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-100">
+        <div className="flex items-center justify-between gap-3 mb-8 pb-4 border-b border-zinc-100">
           {mostrarFlechas ? (
             <Link to={prev.path} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
               <ArrowLeft size={18} />
