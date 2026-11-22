@@ -171,34 +171,51 @@ export default function InkognitoHome() {
         .ink-float { animation: inkFloat 4.2s ease-in-out infinite; }
         @media (prefers-reduced-motion: reduce) { .ink-float { animation: none; } }
 
-        /* Líneas iluminadas del fondo móvil (2026-11-21). Tailwind no cubre
-           máscaras, por eso viven acá. La capa de color se ve solo a través
-           de la máscara (--ink-lines); screen suma el color a la imagen. */
-        /* --ink-lvl (0 a 1) es cuánta luz tienen las líneas en reposo: sube o
-           baja ESTE número para regularlo. La "corriente" que las recorre
-           no depende de él, siempre va a todo brillo. */
-        .ink-lines { mix-blend-mode: screen; --ink-lvl: 0.3; }
-        .ink-mod { position: absolute; inset: 0; transition: opacity 700ms ease-in-out; }
+        /* Corrientazo del fondo móvil (2026-11-21). Tailwind no cubre las
+           máscaras, por eso viven acá. La textura se usa SOLO como máscara:
+           el fondo queda negro como antes y lo único que se enciende es la
+           luz que la recorre (--corriente). */
+        .ink-lines { mix-blend-mode: screen; }
+        .ink-mod { position: absolute; inset: 0; }
         .ink-ln {
           position: absolute; inset: 0;
           -webkit-mask: var(--ink-lines) center / cover no-repeat;
           mask: var(--ink-lines) center / cover no-repeat;
         }
-        .ink-solid { background: var(--m); }
-        .ink-base { opacity: var(--ink-lvl); }
-        .ink-glow { position: absolute; inset: 0; filter: blur(7px); opacity: var(--ink-lvl); }
-        .ink-glow-wide { filter: blur(18px); opacity: calc(var(--ink-lvl) * 0.5); }
-        .ink-core {
-          background: radial-gradient(circle at 50% 50%, #fff 0%, var(--m) 14%, transparent 38%);
-          background-size: 260% 260%;
+        /* Banda de luz ancha: blanca al centro y del color del módulo hacia
+           los bordes. El color solo se ve a través de las líneas.
+           La hoja de luz va DENTRO de la máscara y se mueve con transform
+           (translateY), no con background-position: así el navegador solo
+           desliza una capa ya dibujada en la GPU y no repinta la pantalla
+           en cada cuadro. Ver .ink-core-light. */
+        .ink-core { opacity: 0; }
+        .ink-core-light {
+          position: absolute; inset: 0;
+          background: radial-gradient(ellipse 68% 32% at 50% 50%, #fff 0%, var(--m) 58%, transparent 80%);
+          transform: translateY(130%);
         }
-        /* Las animaciones corren solo en la capa activa para no gastar batería. */
-        .ink-mod.is-on .ink-glow:not(.ink-glow-wide) { animation: inkBreathe 4s ease-in-out infinite; }
-        .ink-mod.is-on .ink-core { animation: inkSweep 9s ease-in-out infinite; }
-        @keyframes inkBreathe { 0%, 100% { opacity: calc(var(--ink-lvl) * 0.6) } 50% { opacity: calc(var(--ink-lvl) * 1.4) } }
-        @keyframes inkSweep { 0%, 100% { background-position: 0% 0% } 50% { background-position: 100% 100% } }
+        /* Un solo corrientazo por módulo: entra al pararse en la card y no
+           se repite. Los módulos pares (INK, Store, Suple) lo suben de abajo
+           hacia arriba; los impares (Supply, Gym) lo bajan. La hoja arranca
+           y termina a 130% (totalmente fuera de pantalla), por eso no se
+           queda a medio salir en los bordes. */
+        .ink-mod.is-on .ink-core { opacity: 1; }
+        .ink-mod.is-on .ink-core-light {
+          animation: inkSurgeUp 2000ms cubic-bezier(0.45, 0, 0.3, 1) 1 both;
+          will-change: transform;
+        }
+        .ink-mod.is-on.ink-down .ink-core-light { animation-name: inkSurgeDown; }
+        @keyframes inkSurgeUp {
+          from { transform: translateY(130%); }
+          to { transform: translateY(-130%); }
+        }
+        @keyframes inkSurgeDown {
+          from { transform: translateY(-130%); }
+          to { transform: translateY(130%); }
+        }
         @media (prefers-reduced-motion: reduce) {
-          .ink-mod.is-on .ink-glow, .ink-mod.is-on .ink-core { animation: none; }
+          .ink-mod.is-on .ink-core { opacity: 0; }
+          .ink-mod.is-on .ink-core-light { animation: none; }
         }
       ` }} />
 
@@ -240,40 +257,19 @@ export default function InkognitoHome() {
             escritorio se queda en /60. */}
         <div className="absolute inset-0 bg-black/35 md:bg-black/60"></div>
 
-        {/* TINTE POR MÓDULO (2026-11-20) — una capa por módulo con el color de
-            su card; solo la activa es visible y el cambio es un crossfade. Va
-            ENCIMA del overlay oscuro para que el color se note, y sin
-            imágenes: cuando tengas una imagen propia por módulo, se cambia
-            este bloque por <img> con la misma lógica de opacity. */}
-        {MODULES.map((m, i) => (
-          <div
-            key={m.id}
-            aria-hidden="true"
-            className="absolute inset-0 pointer-events-none transition-opacity duration-700 ease-in-out"
-            style={{
-              opacity: i === active ? 1 : 0,
-              background: `radial-gradient(ellipse at 50% 62%, ${m.color}73 0%, ${m.color}26 42%, transparent 72%)`,
-            }}
-          />
-        ))}
-
-        {/* LÍNEAS ILUMINADAS (2026-11-21, Jose: "que esas texturas parecidas a
-            neuronas se iluminen también, del color de la card que esté al
-            frente") — SOLO móvil, que es donde el fondo es la imagen de
-            líneas; el de escritorio es otra imagen y no tiene líneas. Cada
-            módulo tiene su capa, de su color, que solo se ve a través de la
-            máscara ecosystemLinesMobile; la activa aparece con un crossfade,
-            igual que el tinte de arriba. Cada capa lleva dos halos
-            desenfocados (ink-glow) y el trazo nítido con un punto de luz que
-            lo recorre (ink-core). Estilos en el <style> de arriba.
-            2026-11-21 (Jose: "el azul, el rojo y el amarillo brillan
-            demasiado, la corriente está bien, pero el color inicial es muy
-            brillante"): el trazo en reposo (ink-base) y los halos bajan con
-            --ink-lvl; la corriente va aparte (ink-core, con degradado a
-            transparente) para que se vea igual de fuerte sobre líneas más
-            tenues.
-            mix-blend-mode: screen hace que el color se sume a la imagen
-            oscurecida en vez de taparla. */}
+        {/* CORRIENTAZO (2026-11-21) — SOLO móvil, que es donde el fondo es la
+            imagen de líneas; el de escritorio es otra imagen y no tiene
+            líneas. El fondo ya no se tiñe ni se ilumina con el color del
+            módulo: queda negro como antes. La textura (ecosystemLinesMobile)
+            se usa solo como máscara y lo único que se enciende es una banda
+            de luz que la recorre de un borde al otro.
+            Dirección: los módulos pares (INK, Store, Suple) la suben de
+            abajo hacia arriba; los impares (Supply, Gym) la bajan. Pasa una
+            sola vez al pararse en cada módulo, no en bucle.
+            La luz es una hoja (.ink-core-light) dentro de la máscara y se
+            mueve con transform: la GPU la desliza sin repintar el fondo.
+            mix-blend-mode: screen suma la luz a la imagen oscurecida en vez
+            de taparla. */}
         <div
           aria-hidden="true"
           className="md:hidden absolute inset-0 pointer-events-none ink-lines"
@@ -282,13 +278,12 @@ export default function InkognitoHome() {
           {MODULES.map((m, i) => (
             <div
               key={m.id}
-              className={`ink-mod ${i === active ? 'is-on' : ''}`}
-              style={{ '--m': m.color, opacity: i === active ? 1 : 0 }}
+              className={`ink-mod ${i === active ? 'is-on' : ''} ${i % 2 === 0 ? 'ink-up' : 'ink-down'}`}
+              style={{ '--m': m.color }}
             >
-              <div className="ink-glow ink-glow-wide"><div className="ink-ln ink-solid" /></div>
-              <div className="ink-glow"><div className="ink-ln ink-solid" /></div>
-              <div className="ink-ln ink-solid ink-base" />
-              <div className="ink-ln ink-core" />
+              <div className="ink-ln ink-core">
+                <div className="ink-core-light" />
+              </div>
             </div>
           ))}
         </div>
