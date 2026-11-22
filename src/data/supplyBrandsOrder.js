@@ -4,6 +4,7 @@ export const SUPPLY_BRANDS_ORDER = [
   { name: 'WJX', path: '/supply/cartridges/wjx' },
   { name: 'Vice Colors', path: '/supply/ink/vice-colors' },
   { name: 'Dynamic', path: '/supply/ink/dynamic' },
+  { name: 'Hype Ink', path: '/supply/ink/hype-ink' },
   { name: 'Heaven Pro', path: '/supply/brands/heaven-pro' },
   { name: 'Royal Three', path: '/supply/brands/royal-three' },
 ]

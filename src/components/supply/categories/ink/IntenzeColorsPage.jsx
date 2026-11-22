@@ -2,6 +2,7 @@ import { useLoaderData } from 'react-router'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
+import SupplyMobileNav from '../../SupplyMobileNav'
 import { fetchCatalogMarca, useLoadMore } from '../../../../hooks/useCatalog'
 
 export async function loader() {
@@ -20,45 +21,44 @@ export function meta() {
   ]
 }
 
-// Reescrito 2026-07-30 — antes mostraba una grilla de colores y precios
-// inventados ("$XX.XXX") con un botón que sí agregaba al carrito real. Ahora
-// usa BrandCatalogSection con productos reales filtrados por `marca='intenze'`.
 export default function IntenzeColorsPage() {
-  const { products: productosIniciales, nextCursor, hasMore,  } = useLoaderData()
+  const { products: productosIniciales, nextCursor, hasMore } = useLoaderData()
   const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { marca: 'intenze' }, { items: productosIniciales, nextCursor, hasMore })
   return (
-    <div className="min-h-screen bg-black text-white">
-      <NavbarCategory pageName="Intenze Ink" />
+    <div className="min-h-screen bg-white text-zinc-900">
+      <NavbarCategory pageName="Intenze Ink" light />
 
       <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">
 
         <div className="mb-10 md:mb-16">
-          <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm mb-3">
+          <p className="uppercase tracking-[0.25em] text-zinc-400 text-xs md:text-sm mb-3">
             Intenze Ink
           </p>
 
-          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
+          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none text-zinc-900">
             Catálogo Completo
           </h1>
 
           <div className="mt-10 max-w-4xl">
-            <p className="text-zinc-400 leading-relaxed mb-5">
+            <p className="text-zinc-600 leading-relaxed mb-5">
               Intenze Ink es una de las marcas de tinta para tatuaje más reconocidas a nivel mundial. Utilizada por miles de artistas profesionales, destaca por la intensidad de sus pigmentos, la consistencia de sus colores y la amplia variedad de tonos disponibles.
             </p>
-            <p className="text-zinc-400 leading-relaxed mb-5">
+            <p className="text-zinc-600 leading-relaxed mb-5">
               Sus líneas incluyen colores sólidos, tonos para realismo, mezclas para retrato y pigmentos desarrollados junto a artistas reconocidos de la industria del tatuaje.
             </p>
-            <p className="text-zinc-400 leading-relaxed">
+            <p className="text-zinc-600 leading-relaxed">
               Explora el catálogo completo de Intenze Ink y encuentra referencias originales para trabajos de color, black and grey, ilustración, neotradicional y realismo.
             </p>
           </div>
         </div>
 
-        <BrandCatalogSection brandName="Intenze Ink" products={products} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} />
+        <BrandCatalogSection brandName="Intenze Ink" products={products} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} light />
 
       </div>
 
-      <FooterSupply />
+      <FooterSupply light />
+      <div className="h-16 md:hidden" />
+      <SupplyMobileNav active="marcas" light />
 
     </div>
   )

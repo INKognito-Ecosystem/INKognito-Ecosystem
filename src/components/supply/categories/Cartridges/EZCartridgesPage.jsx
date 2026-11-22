@@ -3,6 +3,7 @@ import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
 import SupplyFAQ from '../../SupplyFAQ'
+import SupplyMobileNav from '../../SupplyMobileNav'
 import { fetchCatalogMarca, fetchSupplyFaq, useLoadMore } from '../../../../hooks/useCatalog'
 
 export async function loader() {
@@ -34,23 +35,23 @@ export default function EZCartridgesPage() {
   const { products: productosIniciales, nextCursor, hasMore, faqItems } = useLoaderData()
   const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { marca: 'ez-tattoo' }, { items: productosIniciales, nextCursor, hasMore })
   return (
-    <div className="min-h-screen bg-black text-white">
-      <NavbarCategory pageName="EZ Tattoo" />
+    <div className="min-h-screen bg-white text-zinc-900">
+      <NavbarCategory pageName="EZ Tattoo" light />
 
-      <div className="pt-28 md:pt-32 pb-24 px-4 md:px-6 max-w-7xl mx-auto">
+      <div className="pt-24 md:pt-32 pb-20 px-4 md:px-6 max-w-7xl mx-auto">
 
-        <div className="mb-12 md:mb-20">
+        <div className="mb-10 md:mb-16">
 
           <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm mb-3">
             EZ Tattoo Cartridges
           </p>
 
-          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-6">
+          <h1 className="text-4xl md:text-7xl font-black uppercase leading-none mb-6 text-zinc-900">
             Catálogo Completo
           </h1>
 
           <div className="max-w-3xl">
-            <p className="text-zinc-400 leading-relaxed">
+            <p className="text-zinc-600 leading-relaxed text-sm md:text-base">
               EZ Tattoo es una de las marcas de cartuchos más utilizadas por artistas
               alrededor del mundo. Sus agujas destacan por su consistencia, precisión
               y excelente relación calidad-precio, siendo una opción popular para
@@ -60,13 +61,15 @@ export default function EZCartridgesPage() {
 
         </div>
 
-        <BrandCatalogSection brandName="EZ Tattoo" products={products} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} />
+        <BrandCatalogSection brandName="EZ Tattoo" products={products} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} light />
 
-        <SupplyFAQ items={faqItems} nombre="EZ Tattoo" />
+        <SupplyFAQ items={faqItems} nombre="EZ Tattoo" light />
 
       </div>
 
-      <FooterSupply />
+      <FooterSupply light />
+      <div className="h-16 md:hidden" />
+      <SupplyMobileNav active="marcas" light />
 
     </div>
   )

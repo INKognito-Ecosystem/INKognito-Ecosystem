@@ -55,6 +55,7 @@ export default [
   route('supply/ink', 'components/supply/categories/ink/InkPage.jsx'),
   route('supply/ink/vice-colors', 'components/supply/categories/ink/ViceColorsPage.jsx'),
   route('supply/ink/dynamic', 'components/supply/categories/ink/DynamicColorsPage.jsx'),
+  route('supply/ink/hype-ink', 'components/supply/categories/ink/HypeInkColorsPage.jsx'),
   route('supply/ink/eternal', 'components/supply/categories/ink/EternalColorsPage.jsx'),
   route('supply/ink/intenze', 'components/supply/categories/ink/IntenzeColorsPage.jsx'),
   route('supply/ink/fusion', 'components/supply/categories/ink/FusionColorsPage.jsx'),

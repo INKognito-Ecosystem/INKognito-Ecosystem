@@ -60,7 +60,7 @@ export default function RoyalThreePage() {
   const { products: productosIniciales, nextCursor, hasMore, distribuidorOficial, mostrarFlechas, faqItems } = useLoaderData()
   const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { marca: 'royal-three' }, { items: productosIniciales, nextCursor, hasMore })
   const logoUrl = useSupplyVisual('supply_brand_royal_three')
-  const { prev, next } = getAdjacentBrands(6)
+  const { prev, next } = getAdjacentBrands(7)
   const scrolled = useScrolled()
 
   return (

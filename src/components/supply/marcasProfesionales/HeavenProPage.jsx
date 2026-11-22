@@ -69,7 +69,7 @@ export default function HeavenProPage() {
   const { products: productosIniciales, nextCursor, hasMore, distribuidorOficial, mostrarFlechas, faqItems } = useLoaderData()
   const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { estudioId: ESTUDIO_ID }, { items: productosIniciales, nextCursor, hasMore })
   const logoUrl = useSupplyVisual('supply_brand_heaven_pro')
-  const { prev, next } = getAdjacentBrands(5)
+  const { prev, next } = getAdjacentBrands(6)
   const scrolled = useScrolled()
 
   return (

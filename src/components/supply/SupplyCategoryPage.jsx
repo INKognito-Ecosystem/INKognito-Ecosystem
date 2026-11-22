@@ -313,20 +313,20 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
           SupplyCategoryPage.jsx es el componente compartido de todas). */}
       {/* Barra superior — blanca con íconos azules en el piloto de Cartuchos
           (2026-09-15, Jose: "ambos navbar blancos, íconos azul claro"). */}
-      <div className={`md:hidden sticky top-0 z-40 flex items-center gap-2 px-4 py-2 ${light ? 'bg-white' : 'bg-black'} border-b border-blue-500/20`}>
+      <div className={`md:hidden sticky top-0 z-40 flex items-center gap-2 px-4 py-2 ${light ? 'bg-white border-zinc-200' : 'bg-black border-blue-500/20'} border-b`}>
         <Link to="/supply" aria-label="Volver a Supply" className="flex-shrink-0">
-          <img src={logoSupply} alt="INKognito Supply" className="w-12 h-12 object-contain" />
+          <img src={logoSupply} alt="INKognito Supply" className="w-11 h-11 object-contain" />
         </Link>
         <>
           <div className="relative flex-1 min-w-0">
-            <Search size={14} className={`absolute left-2.5 top-1/2 -translate-y-1/2 ${light ? 'text-blue-400' : 'text-zinc-600'} pointer-events-none`} />
+            <Search size={14} className={`absolute left-2.5 top-1/2 -translate-y-1/2 ${light ? 'text-zinc-400' : 'text-zinc-600'} pointer-events-none`} />
               <input
                 type="text"
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
-                placeholder={`Buscar en categoría ${title.toLowerCase()}`}
+                placeholder={`Buscar en ${title.toLowerCase()}`}
                 className={light
-                  ? 'w-full min-w-0 bg-zinc-100 border border-zinc-200 text-zinc-900 text-xs rounded-lg pl-8 pr-2 py-2 placeholder:text-zinc-500 focus:outline-none focus:border-blue-400'
+                  ? 'w-full min-w-0 bg-zinc-100 border border-zinc-200 text-zinc-900 text-xs rounded-lg pl-8 pr-2 py-2 placeholder:text-zinc-500 focus:outline-none focus:border-blue-500'
                   : 'w-full min-w-0 bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-lg pl-8 pr-2 py-2 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500'}
               />
             </div>
@@ -338,22 +338,22 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                   aria-label="Filtrar por proveedor"
                   aria-expanded={provAbiertoM}
                   className={`flex items-center justify-center w-9 h-9 border rounded-lg transition-colors ${light ? 'bg-zinc-100' : 'bg-zinc-900'} ${
-                    provAbiertoM || provFiltro !== 'todos' ? 'border-blue-500 text-blue-400' : light ? 'border-zinc-200 text-blue-400' : 'border-zinc-800 text-zinc-400'
+                    provAbiertoM || provFiltro !== 'todos' ? 'border-blue-500 text-blue-500' : light ? 'border-zinc-200 text-zinc-500' : 'border-zinc-800 text-zinc-400'
                   }`}
                 >
                   <MapPin size={14} />
                 </button>
                 {provAbiertoM && (
-                  <div className="absolute right-0 top-full mt-1.5 z-20 w-64 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl overflow-hidden">
-                    <div className="p-2 border-b border-zinc-800">
+                  <div className={`absolute right-0 top-full mt-1.5 z-20 w-64 border rounded-lg shadow-xl overflow-hidden ${light ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
+                    <div className={`p-2 border-b ${light ? 'border-zinc-100' : 'border-zinc-800'}`}>
                       <div className="relative">
-                        <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
+                        <Search size={12} className={`absolute left-2 top-1/2 -translate-y-1/2 ${light ? 'text-zinc-400' : 'text-zinc-600'} pointer-events-none`} />
                         <input
                           type="text"
                           value={provBusqueda}
                           onChange={(e) => setProvBusqueda(e.target.value)}
                           placeholder="Buscar proveedor o ciudad"
-                          className="w-full bg-zinc-950 border border-zinc-800 text-zinc-300 text-xs rounded-md pl-7 pr-2 py-1.5 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500"
+                          className={`w-full border text-xs rounded-md pl-7 pr-2 py-1.5 focus:outline-none focus:border-blue-500 ${light ? 'bg-zinc-50 border-zinc-200 text-zinc-900 placeholder:text-zinc-400' : 'bg-zinc-950 border-zinc-800 text-zinc-300 placeholder:text-zinc-600'}`}
                         />
                       </div>
                     </div>
@@ -361,31 +361,31 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                       type="button"
                       onClick={() => { setProvFiltro('todos'); setProvBusqueda(''); setProvAbiertoM(false) }}
                       className={`w-full text-left px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors ${
-                        provFiltro === 'todos' ? 'text-blue-400 bg-blue-500/10' : 'text-zinc-300'
+                        provFiltro === 'todos' ? 'text-blue-500 bg-blue-50' : light ? 'text-zinc-700 hover:bg-zinc-50' : 'text-zinc-300'
                       }`}
                     >
                       Todos los proveedores
                     </button>
-                    <div className="max-h-60 overflow-y-auto border-t border-zinc-800">
+                    <div className={`max-h-60 overflow-y-auto border-t ${light ? 'border-zinc-100' : 'border-zinc-800'}`}>
                       {proveedoresFiltrados.length === 0 ? (
-                        <p className="px-3 py-3 text-xs text-zinc-600">Ningún proveedor coincide</p>
+                        <p className={`px-3 py-3 text-xs ${light ? 'text-zinc-400' : 'text-zinc-600'}`}>Ningún proveedor coincide</p>
                       ) : proveedoresFiltrados.map(p => (
                         <div key={p.id} className="flex items-center">
                           <button
                             type="button"
                             onClick={() => { setProvFiltro(String(p.id)); setProvBusqueda(''); setProvAbiertoM(false) }}
                             className={`flex-1 min-w-0 text-left px-3 py-2 text-xs truncate transition-colors ${
-                              provFiltro === String(p.id) ? 'text-blue-400 bg-blue-500/10 font-bold' : 'text-zinc-300'
+                              provFiltro === String(p.id) ? 'text-blue-500 bg-blue-50 font-bold' : light ? 'text-zinc-700 hover:bg-zinc-50' : 'text-zinc-300'
                             }`}
                           >
                             {p.nombre}
-                            {p.municipio && <span className="text-zinc-600 font-normal"> · {p.municipio}</span>}
+                            {p.municipio && <span className={`${light ? 'text-zinc-400' : 'text-zinc-600'} font-normal`}> · {p.municipio}</span>}
                           </button>
                           <Link
                             to={`/supply/${p.slug || `estudio/${p.id}`}`}
                             onClick={(e) => e.stopPropagation()}
                             title={`Ver catálogo completo de ${p.nombre}`}
-                            className="flex-shrink-0 px-2.5 py-2 text-zinc-600"
+                            className={`flex-shrink-0 px-2.5 py-2 transition-colors ${light ? 'text-zinc-400 hover:text-blue-600' : 'text-zinc-600'}`}
                           >
                             <ExternalLink size={12} />
                           </Link>
@@ -403,20 +403,20 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                 aria-label="Ordenar por"
                 aria-expanded={ordenAbiertoM}
                 className={`flex items-center justify-center w-9 h-9 border rounded-lg transition-colors ${light ? 'bg-zinc-100' : 'bg-zinc-900'} ${
-                  ordenAbiertoM ? 'border-blue-500 text-blue-400' : light ? 'border-zinc-200 text-blue-400' : 'border-zinc-800 text-zinc-400'
+                  ordenAbiertoM ? 'border-blue-500 text-blue-500' : light ? 'border-zinc-200 text-zinc-500' : 'border-zinc-800 text-zinc-400'
                 }`}
               >
                 <SlidersHorizontal size={14} />
               </button>
               {ordenAbiertoM && (
-                <div className="absolute right-0 top-full mt-1.5 z-20 min-w-[140px] bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-xl">
+                <div className={`absolute right-0 top-full mt-1.5 z-20 min-w-[140px] border rounded-lg overflow-hidden shadow-xl ${light ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
                   {ORDEN_OPTIONS.map(o => (
                     <button
                       key={o.value}
                       type="button"
                       onClick={() => { setOrden(o.value); setOrdenAbiertoM(false) }}
                       className={`w-full text-left px-3 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors ${
-                        orden === o.value ? 'text-blue-400 bg-blue-500/10' : 'text-zinc-400'
+                        orden === o.value ? 'text-blue-500 bg-blue-50' : light ? 'text-zinc-700 hover:bg-zinc-50' : 'text-zinc-400'
                       }`}
                     >
                       {o.label}

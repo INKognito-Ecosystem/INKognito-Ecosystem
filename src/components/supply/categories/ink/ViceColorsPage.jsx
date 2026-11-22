@@ -4,6 +4,7 @@ import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
 import SupplyFAQ from '../../SupplyFAQ'
+import SupplyMobileNav from '../../SupplyMobileNav'
 import { getAdjacentBrands } from '../../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../../hooks/useScrolled'
@@ -42,22 +43,22 @@ export default function ViceColorsPage() {
   const scrolled = useScrolled()
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <NavbarCategory pageName="Vice Colors" />
+    <div className="min-h-screen bg-white text-zinc-900">
+      <NavbarCategory pageName="Vice Colors" light />
 
       {scrolled && (
         <>
           <Link
             to={prev.path} replace
             aria-label={`Ver ${prev.name}`}
-            className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
+            className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-600 hover:text-black bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
           >
             <ArrowLeft size={20} />
           </Link>
           <Link
             to={next.path} replace
             aria-label={`Ver ${next.name}`}
-            className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
+            className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-600 hover:text-black bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
           >
             <ArrowRight size={20} />
           </Link>
@@ -67,16 +68,16 @@ export default function ViceColorsPage() {
       <div className="pt-20 md:pt-24 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
 
         <div className="relative overflow-hidden mb-6 md:mb-8">
-          <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+          <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
           <div className="relative z-10">
           <div className="flex items-center justify-between gap-3 mb-3">
-            <Link to={prev.path} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors">
+            <Link to={prev.path} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
               <ArrowLeft size={18} />
             </Link>
             <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm text-center flex-1">
               Marca Profesional
             </p>
-            <Link to={next.path} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors">
+            <Link to={next.path} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
               <ArrowRight size={18} />
             </Link>
           </div>
@@ -92,31 +93,31 @@ export default function ViceColorsPage() {
                   className="h-20 md:h-32 w-auto max-w-full object-contain"
                 />
               </div>
-              <p className="text-zinc-400 leading-relaxed mb-3">
+              <p className="text-zinc-600 leading-relaxed mb-3">
                 Vice Colors es una de las marcas de pigmentos más innovadoras y de mayor crecimiento en el sector europeo y latinoamericano. Con una personalidad audaz e ingredientes seleccionados meticulosamente, ha conquistado a los tatuadores que buscan colores con nombres rebeldes y saturaciones extremas.
               </p>
-              <p className="text-zinc-400 leading-relaxed mb-3">
+              <p className="text-zinc-600 leading-relaxed mb-3">
                 Su formulación destaca por su excelente viscosidad y rapidez de implantación. Productos estrella como Black Sabbath, El Gato Blanco y El Gato Patrón han redefinido la manera en que los artistas abordan los rellenos puros y los delineados de alto contraste.
               </p>
-              <p className="text-zinc-400 leading-relaxed">
+              <p className="text-zinc-600 leading-relaxed">
                 Explora una gama cromática llena de actitud y diseñada para aguantar el paso del tiempo intacta. Perfecta para realismo, neotradicional, lettering, y estilos modernos de alta exigencia visual.
               </p>
               <div className="clear-both" />
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8">
-              <h1 className="text-4xl md:text-7xl font-black uppercase leading-none flex-shrink-0">
+              <h1 className="text-4xl md:text-7xl font-black uppercase leading-none flex-shrink-0 text-zinc-900">
                 Vice Colors
               </h1>
 
-              <div className="max-w-xl text-justify [hyphens:auto] sm:border-l sm:border-zinc-800 sm:pl-8">
-                <p className="text-zinc-400 leading-relaxed mb-3">
+              <div className="max-w-xl text-justify [hyphens:auto] sm:border-l sm:border-zinc-200 sm:pl-8">
+                <p className="text-zinc-600 leading-relaxed mb-3">
                   Vice Colors es una de las marcas de pigmentos más innovadoras y de mayor crecimiento en el sector europeo y latinoamericano. Con una personalidad audaz e ingredientes seleccionados meticulosamente, ha conquistado a los tatuadores que buscan colores con nombres rebeldes y saturaciones extremas.
                 </p>
-                <p className="text-zinc-400 leading-relaxed mb-3">
+                <p className="text-zinc-600 leading-relaxed mb-3">
                   Su formulación destaca por su excelente viscosidad y rapidez de implantación. Productos estrella como Black Sabbath, El Gato Blanco y El Gato Patrón han redefinido la manera en que los artistas abordan los rellenos puros y los delineados de alto contraste.
                 </p>
-                <p className="text-zinc-400 leading-relaxed">
+                <p className="text-zinc-600 leading-relaxed">
                   Explora una gama cromática llena de actitud y diseñada para aguantar el paso del tiempo intacta. Perfecta para realismo, neotradicional, lettering, y estilos modernos de alta exigencia visual.
                 </p>
               </div>
@@ -125,13 +126,15 @@ export default function ViceColorsPage() {
           </div>
         </div>
 
-        <BrandCatalogSection brandName="Vice Colors" products={products} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} />
+        <BrandCatalogSection brandName="Vice Colors" products={products} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} light />
 
-        <SupplyFAQ items={faqItems} nombre="Vice Colors" />
+        <SupplyFAQ items={faqItems} nombre="Vice Colors" light />
 
       </div>
 
-      <FooterSupply />
+      <FooterSupply light />
+      <div className="h-16 md:hidden" />
+      <SupplyMobileNav active="marcas" light />
     </div>
   )
 }
