@@ -1,10 +1,12 @@
 import { Link, useLoaderData } from 'react-router'
+import { useState, useEffect } from 'react'
 import { ArrowLeft, ArrowRight, Award } from 'lucide-react'
 import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
 import BrandCatalogSection from '../BrandCatalogSection'
 import SupplyFAQ from '../SupplyFAQ'
 import SupplyMobileNav from '../SupplyMobileNav'
+import BrandExplodedHero from '../scrollytelling/BrandExplodedHero'
 import { getAdjacentBrands } from '../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../hooks/useScrolled'
@@ -61,32 +63,69 @@ export default function TattooVisionPage() {
   const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { marca: 'tattoo-vision' }, { items: productosIniciales, nextCursor, hasMore })
   const logoUrl = useSupplyVisual('supply_brand_tattoo_vision')
   const { prev, next } = getAdjacentBrands(0)
-  const scrolled = useScrolled()
+  const scrolled = useScrolled(200)
+  const [inCatalog, setInCatalog] = useState(false)
+
+  useEffect(() => {
+    const el = document.getElementById('catalogo-marca')
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        setInCatalog(entry.isIntersecting || entry.boundingClientRect.top <= 100)
+      },
+      { threshold: 0, rootMargin: '-80px 0px 0px 0px' }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  const handleScrollToCatalog = () => {
+    const el = document.getElementById('catalogo-marca')
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white text-zinc-900">
-      <NavbarCategory pageName="Tattoo Vision" light />
+      {/* El navbar se sincroniza: oscuro y técnico durante el despiece, blanco puro en el catálogo */}
+      <NavbarCategory pageName="Tattoo Vision" light={inCatalog} />
 
       {mostrarFlechas && scrolled && (
         <>
           <Link
             to={prev.path} replace
             aria-label={`Ver ${prev.name}`}
-            className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-600 hover:text-black bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
+            className={`fixed top-16 md:top-20 left-2 md:left-4 z-40 backdrop-blur-sm border rounded-full p-2 transition-colors ${
+              inCatalog
+                ? 'text-zinc-600 hover:text-black bg-white/80 border-zinc-200'
+                : 'text-zinc-300 hover:text-white bg-zinc-900/80 border-zinc-700'
+            }`}
           >
             <ArrowLeft size={20} />
           </Link>
           <Link
             to={next.path} replace
             aria-label={`Ver ${next.name}`}
-            className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-600 hover:text-black bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
+            className={`fixed top-16 md:top-20 right-2 md:right-4 z-40 backdrop-blur-sm border rounded-full p-2 transition-colors ${
+              inCatalog
+                ? 'text-zinc-600 hover:text-black bg-white/80 border-zinc-200'
+                : 'text-zinc-300 hover:text-white bg-zinc-900/80 border-zinc-700'
+            }`}
           >
             <ArrowRight size={20} />
           </Link>
         </>
       )}
 
-      <div className="pt-20 md:pt-24 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
+      {/* HERO SCROLLYTELLING: Despiece técnico interactivo estilo Wiltech */}
+      <BrandExplodedHero
+        brandKey="tattoo-vision"
+        onExploreCatalog={handleScrollToCatalog}
+      />
+
+      {/* CATÁLOGO DE PRODUCTOS & DETALLES DE MARCA */}
+      <div id="catalogo-marca" className="pt-12 md:pt-16 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
 
         <div className="relative overflow-hidden mb-6 md:mb-8">
           <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
