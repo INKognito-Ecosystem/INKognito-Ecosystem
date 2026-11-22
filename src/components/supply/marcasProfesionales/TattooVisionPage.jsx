@@ -69,36 +69,25 @@ export default function TattooVisionPage() {
       {/* SHOWCASE PREMIUM: Sistema de hardware flotando en blanco con sombra y specs */}
       <BrandShowcaseHero
         brandKey="tattoo-vision"
-        logoUrl={logoUrl}
+        logoUrl="/supply-assets/logos/supply_brand_tattoo_vision.webp"
         distribuidorOficial={false}
         onExploreCatalog={handleScrollToCatalog}
+        brandNav={{ show: mostrarFlechas, prev, next }}
       />
 
       {/* VITRINA DE PRODUCTOS & STOCK DE TIENDAS SUPPLY */}
       <div id="catalogo-marca" className="pt-10 md:pt-14 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
 
-        <div className="flex items-center justify-between gap-3 mb-8 pb-4 border-b border-zinc-100">
-          {mostrarFlechas ? (
-            <Link to={prev.path} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
-              <ArrowLeft size={18} />
-            </Link>
-          ) : <span />}
-          <div className="text-center">
-            <p className="uppercase tracking-[0.25em] text-zinc-400 text-xs font-semibold">
-              Vitrina Multi-Tienda · Stock Disponible
-            </p>
-            <h3 className="text-xl sm:text-2xl font-black uppercase text-zinc-900 tracking-tight mt-0.5">
-              Stock de Tiendas Aliadas en INKognito Supply
-            </h3>
-            <p className="text-xs text-zinc-500 mt-1 max-w-md mx-auto">
-              Inventario publicado y comercializado directamente por distribuidores y tiendas supply registradas.
-            </p>
-          </div>
-          {mostrarFlechas ? (
-            <Link to={next.path} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
-              <ArrowRight size={18} />
-            </Link>
-          ) : <span />}
+        <div className="text-center mb-8 pb-4 border-b border-zinc-100">
+          <p className="uppercase tracking-[0.25em] text-zinc-400 text-xs font-semibold">
+            Vitrina Multi-Tienda · Stock Disponible
+          </p>
+          <h3 className="text-xl sm:text-2xl font-black uppercase text-zinc-900 tracking-tight mt-0.5">
+            Stock de Tiendas Aliadas en INKognito Supply
+          </h3>
+          <p className="text-xs text-zinc-500 mt-1 max-w-md mx-auto">
+            Inventario publicado y comercializado directamente por distribuidores y tiendas supply registradas.
+          </p>
         </div>
 
         <BrandCatalogSection

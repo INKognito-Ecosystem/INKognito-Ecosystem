@@ -68,6 +68,7 @@ export default [
   route('supply/furniture', 'components/supply/categories/FurniturePage.jsx'),
   route('supply/bundles', 'components/supply/categories/BundlesPage.jsx'),
   route('supply/brands/tattoo-vision', 'components/supply/marcasProfesionales/TattooVisionPage.jsx'),
+  route('supply/brands/don-melo', 'components/supply/marcasProfesionales/DonMeloPage.jsx'),
   route('supply/brands/heaven-pro', 'components/supply/marcasProfesionales/HeavenProPage.jsx'),
   route('supply/brands/royal-three', 'components/supply/marcasProfesionales/RoyalThreePage.jsx'),
   route('supply/mobiliario/warlock', 'components/supply/marcasProfesionales/IndustriasWarlockPage.jsx'),

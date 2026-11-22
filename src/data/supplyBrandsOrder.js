@@ -7,6 +7,7 @@ export const SUPPLY_BRANDS_ORDER = [
   { name: 'Hype Ink', path: '/supply/ink/hype-ink' },
   { name: 'Heaven Pro', path: '/supply/brands/heaven-pro' },
   { name: 'Royal Three', path: '/supply/brands/royal-three' },
+  { name: 'Don Melo', path: '/supply/brands/don-melo' },
 ]
 
 export function getAdjacentBrands(currentIndex) {

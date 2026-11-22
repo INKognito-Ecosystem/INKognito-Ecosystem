@@ -90,6 +90,11 @@ export const BRAND_SHOWCASE_DATA = {
       { label: 'Visión', value: 'RX Apta', note: 'Lunas formuladas' },
     ],
 
+    systemSection: {
+      eyebrow: 'Arquitectura del Kit',
+      title: 'Sistema Integral de Precisión',
+    },
+
     systemTools: [
       {
         name: 'Gafas TR90 + Clip-On',
@@ -112,6 +117,35 @@ export const BRAND_SHOWCASE_DATA = {
         tag: 'Estabilidad',
       },
     ],
+
+    bento: {
+      featured: {
+        image: '/supply-assets/tattoovision/tattoo_demonstration.webp',
+        imageAlt: 'Demostración real de lentes Tattoo Vision cancelando reflejos sobre tatuaje',
+        overlayLeft: 'Lente Izquierdo: Polarizado',
+        overlayRight: 'Exterior: Brillo Superficial',
+        eyebrow: 'TECNOLOGÍA DE POLARIZACIÓN CRUZADA',
+        badge: 'Zero Glare',
+        title: 'Visión Real de la Dermis sin Reflejos',
+        description: 'Al sincronizar el filtro de las gafas con la luz polarizada, se anula el 100% del rebote de luz especular provocado por la vaselina, el brillo de las tintas y los fluidos. El artista evalúa la saturación real, el empastado y los degradados en tiempo real sin tener que esperar la cicatrización.',
+      },
+      cards: [
+        {
+          eyebrow: 'MODULARIDAD DUAL',
+          badge: 'Neodimio N52',
+          title: 'Clip-On Magnético Instantáneo',
+          description: 'El sobrelente polarizado se acopla o retira en una fracción de segundo gracias a micro-imanes de neodimio de alta atracción integrados en los vértices del armazón.',
+          footer: 'Acople firme que no se desprende con el movimiento',
+        },
+        {
+          eyebrow: 'ERGONOMÍA & FÓRMULA ÓPTICA',
+          badge: 'TR90 Suizo',
+          title: 'Polímero Ultraligero & Apta para Fórmula',
+          description: 'Estructura en TR90 suizo con memoria elástica indeformable (peso pluma de 42g). Permite que cualquier óptica adapte tus cristales formulados (miopía o astigmatismo) en la montura base sin perder la función polarizada del Clip-On.',
+          footer: 'Compatible con cristales formulados y de descanso',
+        },
+      ],
+    },
 
     technicalHighlights: [
       {
@@ -143,6 +177,104 @@ export const BRAND_SHOWCASE_DATA = {
         badge: 'Formula Ready',
       },
     ],
+  },
+
+  // Don Melo — Máquinas de tatuar artesanales de bobinas (Colombia)
+  'don-melo': {
+    brandId: 'don-melo',
+    brandName: 'Don Melo',
+    logoFallback: '/marcas-marquee/don-melo.png',
+    officialUrl: 'https://www.instagram.com/donmelotattoomachines/',
+    officialLabel: 'Instagram Oficial Don Melo',
+    eyebrow: 'INGENIERÍA METALMECÁNICA ARTESANAL · COLOMBIA',
+    title: 'Don Melo Handmade Coil Liner',
+    subtitle: 'Máquina de Bobinas Calibrada a Mano: Golpe Seco, Chasis Sólido y Precisión Clásica',
+    description: 'Fabricada artesanalmente en Colombia por Cristian Melo (Don Melo), tatuador e ingeniero metalmecánico. Cada máquina es ensamblada y calibrada pieza por pieza para entregar un golpe seco, estable y contundente en líneas sólidas (Power Liner), honrando la mecánica clásica de bobinas magnéticas.',
+    accentColor: '#8a852b',
+    badge: 'Máquina Artesanal de Bobinas',
+
+    // Una sola máquina insignia flotante (sin slider de kit)
+    heroSlides: [
+      {
+        id: 'coil-liner',
+        title: 'Don Melo Power Liner · Bobinas Artesanal',
+        subtitle: 'Chasis Metálico Forjado · Bobinas Calibradas · Contacto en Cobre Puro',
+        category: 'MÁQUINA DE BOBINAS · HANDMADE COLOMBIA',
+        src: '/supply-assets/donmelo/don_melo_coil_liner_clean.webp',
+        alt: 'Máquina de tatuar artesanal de bobinas Don Melo Power Liner',
+        maxHeight: 'max-h-[270px] sm:max-h-[340px] md:max-h-[400px]',
+        maxWidth: 'max-w-[350px] sm:max-w-[450px] md:max-w-[520px]',
+        shadowWidth: 'w-[240px] sm:w-[330px] md:w-[400px]',
+        badge: 'Coil Power Liner',
+        detail: 'Calibrada a mano para líneas limpias y sólidas (3RL a 13RL+), con rango nominal de 4V–6V, frecuencia estable de 120–145 Hz y chasis sólido de ~165g.',
+      },
+    ],
+
+    stats: [
+      { label: 'Voltaje', value: '4V – 6V', note: 'Rango óptimo' },
+      { label: 'Frecuencia', value: '120–145 Hz', note: 'Golpe lineal' },
+      { label: 'Peso', value: '~165 g', note: 'Chasis metálico' },
+      { label: 'Origen', value: 'Handmade', note: 'Colombia' },
+    ],
+
+    systemSection: {
+      eyebrow: 'Anatomía Mecánica',
+      title: 'Componentes Calibrados a Mano',
+    },
+
+    systemTools: [
+      {
+        name: 'Chasis Metálico Forjado',
+        desc: 'Estructura rígida con acabado artesanal texturizado, diseñada para absorber vibraciones y equilibrar el peso en cabina.',
+        tag: 'Estructura',
+      },
+      {
+        name: 'Bobinas Magnéticas Propias',
+        desc: 'Embobinado calibrado con carretes translúcidos sellados y condensador de respuesta rápida para empuje continuo.',
+        tag: 'Electromagnetismo',
+      },
+      {
+        name: 'Contacto en Cobre Puro',
+        desc: 'Tornillo de contacto y bornera en cobre puro que maximizan la conductividad eléctrica y reducen el calentamiento.',
+        tag: 'Conductividad',
+      },
+      {
+        name: 'Flejes & Martillo DM',
+        desc: 'Flejes templados a medida y barra armadura grabada con sello DM para un recorrido firme en líneas exigentes.',
+        tag: 'Calibración',
+      },
+    ],
+
+    bento: {
+      featured: {
+        image: '/supply-assets/donmelo/don_melo_workshop.webp',
+        imageAlt: 'Colección de máquinas de tatuar artesanales Don Melo en taller',
+        overlayLeft: 'Calibración Artesanal · 1 a 1',
+        overlayRight: 'Fusagasugá, Colombia',
+        eyebrow: 'MANUFACTURA METALMECÁNICA PROPIA',
+        badge: 'Custom Tuned',
+        title: 'Precisión de Taller para Trazos Contundentes',
+        description: 'A diferencia de las máquinas producidas en serie, cada chasis Don Melo pasa por un ajuste manual de flejes, tensión de bobinas y alineación de barra armadura. El resultado es un golpe firme y predecible que clava líneas sólidas en una sola pasada sin maltratar la piel.',
+      },
+      cards: [
+        {
+          eyebrow: 'POTENCIA EN LÍNEA',
+          badge: 'Power Liner',
+          title: 'De Micro Liner a Líneas Gruesas',
+          description: 'Configurada para mover agrupaciones desde 3RL hasta 13RL+ con soltura en voltajes bajos (4V a 6V), manteniendo velocidad constante y sin pérdida de empuje en pieles exigentes.',
+          footer: 'Respuesta inmediata desde el primer contacto del pedal',
+        },
+        {
+          eyebrow: 'DURABILIDAD DE POR VIDA',
+          badge: 'Cobre & Acero',
+          title: 'Mecánica Reparable y Eterna',
+          description: 'Construida con metales sólidos, borneras en cobre y tornillería estándar industrial. Una herramienta hecha para durar décadas en cabina, con mantenimiento sencillo y calibración a gusto del tatuador.',
+          footer: 'Respaldada por la trayectoria de Cristian Melo en Colombia',
+        },
+      ],
+    },
+
+    technicalHighlights: [],
   },
 
   // Plantilla para la siguiente marca

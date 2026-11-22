@@ -63,7 +63,7 @@ export const brands = [
   // el recorte a mano de otras marcas en BrandsMarquee.jsx, reusado acá
   // también para que la sección "Marcas" de escritorio (que solo lee
   // `imgs[key]`) las muestre igual.
-  { name: 'DON MELO', to: null, img: '/marcas-marquee/don-melo.png' },
+  { name: 'DON MELO', to: '/supply/brands/don-melo', img: '/marcas-marquee/don-melo.png' },
   { name: 'DIFUSO GALERIA', to: null, img: '/marcas-marquee/difuso-galeria.png' },
 ]
 

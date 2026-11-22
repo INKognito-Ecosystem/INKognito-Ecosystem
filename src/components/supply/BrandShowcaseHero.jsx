@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
+import { Link } from 'react-router'
 import { motion, AnimatePresence } from 'motion/react'
-import { ChevronDown, ChevronLeft, ChevronRight, ArrowDown, ExternalLink, CheckCircle2 } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, ArrowDown, ArrowLeft, ArrowRight, ExternalLink, CheckCircle2 } from 'lucide-react'
 import { BRAND_SHOWCASE_DATA } from './brandShowcaseData'
 
 /**
@@ -54,15 +55,18 @@ export default function BrandShowcaseHero({
   logoUrl = null,
   distribuidorOficial = false,
   onExploreCatalog,
+  brandNav = null,
 }) {
   const data = BRAND_SHOWCASE_DATA[brandKey] || BRAND_SHOWCASE_DATA['tattoo-vision']
   const slides = data.heroSlides || []
+  const isMultiSlide = slides.length > 1
   const resolvedLogo = logoUrl || data.logoFallback
 
   const [[currentIndex, direction], setSlide] = useState([0, 0])
 
   // Bucle infinito circular garantizado: nunca se detiene ni deshabilita
   const paginate = useCallback((newDirection) => {
+    if (slides.length <= 1) return
     setSlide(([prevIndex]) => {
       const total = slides.length || 1
       const nextIndex = (prevIndex + newDirection + total) % total
@@ -71,18 +75,20 @@ export default function BrandShowcaseHero({
   }, [slides.length])
 
   const goToSlide = (targetIndex) => {
+    if (slides.length <= 1) return
     setSlide(([prevIndex]) => [targetIndex, targetIndex > prevIndex ? 1 : -1])
   }
 
   // Soporte de navegación por teclado (flechas izquierda / derecha)
   useEffect(() => {
+    if (!isMultiSlide) return
     const handleKeyDown = (e) => {
       if (e.key === 'ArrowLeft') paginate(-1)
       if (e.key === 'ArrowRight') paginate(1)
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [paginate])
+  }, [paginate, isMultiSlide])
 
   const currentSlide = slides[currentIndex] || slides[0]
 
@@ -121,27 +127,31 @@ export default function BrandShowcaseHero({
         {/* CONTENEDOR DEL VISOR CON FLECHAS ANCLADAS A LOS EXTREMOS (SIEMPRE VISIBLES) */}
         <div className="relative w-full max-w-5xl mx-auto my-auto flex items-center justify-center min-h-[320px] sm:min-h-[380px] md:min-h-[440px]">
 
-          {/* FLECHA ANTERIOR — SIEMPRE VISIBLE, ANCLADA A LA IZQUIERDA */}
-          <button
-            type="button"
-            onClick={() => paginate(-1)}
-            aria-label="Ver herramienta anterior"
-            className="absolute left-2 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-zinc-800 hover:bg-zinc-900 hover:text-white border border-zinc-200/90 hover:border-zinc-900 shadow-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer select-none"
-          >
-            <ChevronLeft size={22} />
-          </button>
+          {/* FLECHA ANTERIOR — SOLO EN MODO MULTI-SLIDE (KIT) */}
+          {isMultiSlide && (
+            <button
+              type="button"
+              onClick={() => paginate(-1)}
+              aria-label="Ver herramienta anterior"
+              className="absolute left-2 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-zinc-800 hover:bg-zinc-900 hover:text-white border border-zinc-200/90 hover:border-zinc-900 shadow-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer select-none"
+            >
+              <ChevronLeft size={22} />
+            </button>
+          )}
 
-          {/* FLECHA SIGUIENTE — SIEMPRE VISIBLE, ANCLADA A LA DERECHA */}
-          <button
-            type="button"
-            onClick={() => paginate(1)}
-            aria-label="Ver siguiente herramienta"
-            className="absolute right-2 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-zinc-800 hover:bg-zinc-900 hover:text-white border border-zinc-200/90 hover:border-zinc-900 shadow-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer select-none"
-          >
-            <ChevronRight size={22} />
-          </button>
+          {/* FLECHA SIGUIENTE — SOLO EN MODO MULTI-SLIDE (KIT) */}
+          {isMultiSlide && (
+            <button
+              type="button"
+              onClick={() => paginate(1)}
+              aria-label="Ver siguiente herramienta"
+              className="absolute right-2 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-zinc-800 hover:bg-zinc-900 hover:text-white border border-zinc-200/90 hover:border-zinc-900 shadow-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer select-none"
+            >
+              <ChevronRight size={22} />
+            </button>
+          )}
 
-          {/* ÁREA CENTRAL: OBJETO FOTOGRÁFICO REAL FLOTANDO CON SU SOMBRA (SWIPEABLE) */}
+          {/* ÁREA CENTRAL: OBJETO FOTOGRÁFICO REAL FLOTANDO CON SU SOMBRA (SWIPEABLE SI ES KIT) */}
           <div className="relative w-full max-w-xl mx-auto flex flex-col items-center justify-center px-10 sm:px-16 overflow-visible">
 
             <AnimatePresence custom={direction} mode="wait">
@@ -152,10 +162,11 @@ export default function BrandShowcaseHero({
                 initial="enter"
                 animate="center"
                 exit="exit"
-                drag="x"
+                drag={isMultiSlide ? 'x' : false}
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.25}
                 onDragEnd={(e, { offset, velocity }) => {
+                  if (!isMultiSlide) return
                   const swipe = offset.x
                   if (swipe < -40 || velocity.x < -350) {
                     paginate(1)
@@ -163,7 +174,7 @@ export default function BrandShowcaseHero({
                     paginate(-1)
                   }
                 }}
-                className="relative w-full flex flex-col items-center justify-center cursor-grab active:cursor-grabbing select-none"
+                className={`relative w-full flex flex-col items-center justify-center select-none ${isMultiSlide ? 'cursor-grab active:cursor-grabbing' : ''}`}
               >
 
                 {/* FOTOGRAFÍA REAL FLOTANTE (Movimiento de levitación física suave) */}
@@ -210,32 +221,34 @@ export default function BrandShowcaseHero({
         {/* ==================================================================== */}
         <div className="relative z-20 w-full max-w-3xl mx-auto flex flex-col items-center gap-3 mt-4 text-center">
 
-          {/* SELECTOR DE HERRAMIENTAS (PILLS DE CLASIFICACIÓN DEBAJO DE LA IMAGEN) */}
-          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 px-2">
-            {slides.map((item, idx) => {
-              const isActive = idx === currentIndex
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => goToSlide(idx)}
-                  className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-mono font-semibold transition-all cursor-pointer select-none ${
-                    isActive
-                      ? 'bg-zinc-900 text-white shadow-md ring-1 ring-zinc-900 scale-105'
-                      : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200/90 hover:text-zinc-900'
-                  }`}
-                >
-                  <span>{`0${idx + 1}. `}</span>
-                  <span className="hidden xs:inline">{item.badge}</span>
-                  <span className="xs:hidden">{item.badge.split(' ')[0]}</span>
-                </button>
-              )
-            })}
-          </div>
+          {/* SELECTOR DE HERRAMIENTAS (PILLS DE CLASIFICACIÓN — SOLO EN KITS MULTI-PIEZA) */}
+          {isMultiSlide && (
+            <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 px-2">
+              {slides.map((item, idx) => {
+                const isActive = idx === currentIndex
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => goToSlide(idx)}
+                    className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-mono font-semibold transition-all cursor-pointer select-none ${
+                      isActive
+                        ? 'bg-zinc-900 text-white shadow-md ring-1 ring-zinc-900 scale-105'
+                        : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200/90 hover:text-zinc-900'
+                    }`}
+                  >
+                    <span>{`0${idx + 1}. `}</span>
+                    <span className="hidden xs:inline">{item.badge}</span>
+                    <span className="xs:hidden">{item.badge.split(' ')[0]}</span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
 
           {/* CATEGORÍA Y DETALLES TÉCNICOS DEL OBJETO SELECCIONADO */}
           <div className="mt-1 flex flex-col items-center">
             <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-mono tracking-widest uppercase text-zinc-400 font-semibold mb-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: data.accentColor || '#3b82f6' }} />
               <span>{currentSlide.category}</span>
             </div>
 
@@ -248,14 +261,16 @@ export default function BrandShowcaseHero({
             </p>
           </div>
 
-          {/* CONTADOR DE PIEZAS */}
-          <div className="flex items-center gap-2 text-[11px] font-mono tracking-wider font-semibold text-zinc-400 mt-1">
-            <span className="text-zinc-900 font-bold">{`0${currentIndex + 1}`}</span>
-            <span className="text-zinc-300">/</span>
-            <span className="text-zinc-400">{`0${slides.length}`}</span>
-            <span className="text-zinc-300">·</span>
-            <span className="text-[10px] uppercase tracking-widest text-zinc-400">Desliza para explorar el kit</span>
-          </div>
+          {/* CONTADOR DE PIEZAS (SOLO EN KITS MULTI-PIEZA) */}
+          {isMultiSlide && (
+            <div className="flex items-center gap-2 text-[11px] font-mono tracking-wider font-semibold text-zinc-400 mt-1">
+              <span className="text-zinc-900 font-bold">{`0${currentIndex + 1}`}</span>
+              <span className="text-zinc-300">/</span>
+              <span className="text-zinc-400">{`0${slides.length}`}</span>
+              <span className="text-zinc-300">·</span>
+              <span className="text-[10px] uppercase tracking-widest text-zinc-400">Desliza para explorar el kit</span>
+            </div>
+          )}
 
           {/* Flecha suave de scroll */}
           <div className="mt-2 text-zinc-300">
@@ -271,19 +286,45 @@ export default function BrandShowcaseHero({
       {/* ==================================================================== */}
       <div className="relative w-full max-w-5xl mx-auto px-4 sm:px-6 pt-6 pb-12 sm:pb-16 text-center border-t border-zinc-100">
 
-        {/* Logotipo oficial de la marca incorporado en el centro */}
-        <div className="flex flex-col items-center justify-center mb-6">
-          {resolvedLogo ? (
-            <img
-              src={resolvedLogo}
-              alt={data.brandName}
-              className="h-14 sm:h-16 md:h-20 w-auto max-w-[240px] sm:max-w-[280px] object-contain drop-shadow-sm"
-            />
-          ) : (
-            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-zinc-900">
-              {data.brandName}
-            </h2>
-          )}
+        {/* Logotipo oficial de la marca en el centro + flechas sutiles en los extremos para cambiar de marca */}
+        <div className="relative w-full flex items-center justify-between gap-4 mb-6">
+          {brandNav?.show && brandNav?.prev ? (
+            <Link
+              to={brandNav.prev.path}
+              replace
+              aria-label={`Ver ${brandNav.prev.name}`}
+              title={`Anterior: ${brandNav.prev.name}`}
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100/90 border border-transparent hover:border-zinc-200/80 flex items-center justify-center transition-all flex-shrink-0"
+            >
+              <ArrowLeft size={18} />
+            </Link>
+          ) : <span className="w-9 sm:w-10 flex-shrink-0" />}
+
+          <div className="flex flex-col items-center justify-center mx-auto px-2">
+            {resolvedLogo ? (
+              <img
+                src={resolvedLogo}
+                alt={data.brandName}
+                className="h-14 sm:h-16 md:h-20 w-auto max-w-[230px] sm:max-w-[300px] md:max-w-[360px] object-contain drop-shadow-sm"
+              />
+            ) : (
+              <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-zinc-900">
+                {data.brandName}
+              </h2>
+            )}
+          </div>
+
+          {brandNav?.show && brandNav?.next ? (
+            <Link
+              to={brandNav.next.path}
+              replace
+              aria-label={`Ver ${brandNav.next.name}`}
+              title={`Siguiente: ${brandNav.next.name}`}
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100/90 border border-transparent hover:border-zinc-200/80 flex items-center justify-center transition-all flex-shrink-0"
+            >
+              <ArrowRight size={18} />
+            </Link>
+          ) : <span className="w-9 sm:w-10 flex-shrink-0" />}
         </div>
 
         {/* Eyebrow de ingeniería y autor */}
@@ -323,7 +364,7 @@ export default function BrandShowcaseHero({
               rel="noopener noreferrer"
               className="group inline-flex items-center gap-2 px-6 sm:px-7 py-3 rounded-full bg-white hover:bg-zinc-50 text-zinc-800 text-xs font-bold tracking-wider uppercase border border-zinc-300 transition-all shadow-xs hover:border-zinc-400 hover:-translate-y-0.5"
             >
-              <span>Sitio Oficial Tattoo Vision</span>
+              <span>{data.officialLabel || `Sitio Oficial ${data.brandName}`}</span>
               <ExternalLink size={14} className="text-zinc-400 group-hover:text-zinc-700 transition-colors" />
             </a>
           )}
@@ -338,10 +379,10 @@ export default function BrandShowcaseHero({
         <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 pb-12">
           <div className="text-center mb-7">
             <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-zinc-400 font-bold">
-              Arquitectura del Kit
+              {data.systemSection?.eyebrow || 'Arquitectura del Hardware'}
             </p>
             <h4 className="text-xl sm:text-2xl font-black text-zinc-900 tracking-tight mt-0.5">
-              Sistema Integral de Precisión
+              {data.systemSection?.title || 'Sistema Integral de Precisión'}
             </h4>
           </div>
 
@@ -373,100 +414,78 @@ export default function BrandShowcaseHero({
       {/* ==================================================================== */}
       <div className="relative w-full max-w-6xl mx-auto px-4 sm:px-6 pb-16">
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        {data.bento && (
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
 
-          {/* TARJETA DESTACADA: Demostración fotográfica real en sesión de tatuaje (Col span 7) */}
-          <div className="md:col-span-7 rounded-3xl bg-zinc-900 text-white overflow-hidden p-6 sm:p-8 flex flex-col justify-between shadow-xl relative group">
+            {/* TARJETA DESTACADA: Fotografía real editorial (Col span 7) */}
+            <div className="md:col-span-7 rounded-3xl bg-zinc-900 text-white overflow-hidden p-6 sm:p-8 flex flex-col justify-between shadow-xl relative group">
 
-            {/* Fotografía de demostración real (el tatuador mirando a través del lente polarizado) */}
-            <div className="relative w-full h-[240px] sm:h-[300px] rounded-2xl overflow-hidden mb-6 bg-zinc-950">
-              <img
-                src="/supply-assets/tattoovision/tattoo_demonstration.webp"
-                alt="Demostración real de lentes Tattoo Vision cancelando reflejos sobre tatuaje"
-                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-90"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-80" />
-              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] font-mono text-zinc-300 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10">
-                <span className="text-blue-400 font-bold">Lente Izquierdo: Polarizado</span>
-                <span className="text-zinc-400">Exterior: Brillo Superficial</span>
+              <div className="relative w-full h-[240px] sm:h-[300px] rounded-2xl overflow-hidden mb-6 bg-zinc-950">
+                <img
+                  src={data.bento.featured.image}
+                  alt={data.bento.featured.imageAlt}
+                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-90"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-80" />
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] font-mono text-zinc-300 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10">
+                  <span className="text-blue-400 font-bold">{data.bento.featured.overlayLeft}</span>
+                  <span className="text-zinc-400">{data.bento.featured.overlayRight}</span>
+                </div>
               </div>
-            </div>
 
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-[10px] font-mono font-bold tracking-wider text-blue-400 uppercase">
-                  TECNOLOGÍA DE POLARIZACIÓN CRUZADA
-                </span>
-                <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-semibold">
-                  Zero Glare
-                </span>
-              </div>
-              <h4 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                Visión Real de la Dermis sin Reflejos
-              </h4>
-              <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed mt-2">
-                Al sincronizar el filtro de las gafas con la luz polarizada, se anula el 100% del rebote de luz especular provocado por la vaselina, el brillo de las tintas y los fluidos. El artista evalúa la saturación real, el empastado y los degradados en tiempo real sin tener que esperar la cicatrización.
-              </p>
-            </div>
-
-          </div>
-
-          {/* COLUMNA DERECHA: 2 Tarjetas estratégicas de hardware (Col span 5) */}
-          <div className="md:col-span-5 flex flex-col gap-6">
-
-            {/* TARJETA 1: Sistema Clip-On Magnético */}
-            <div className="rounded-3xl bg-zinc-50 border border-zinc-200/80 p-6 sm:p-7 flex flex-col justify-between hover:bg-white hover:border-zinc-300 transition-all shadow-sm">
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-mono font-bold tracking-wider text-blue-600 uppercase">
-                    MODULARIDAD DUAL
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[10px] font-mono font-bold tracking-wider text-blue-400 uppercase">
+                    {data.bento.featured.eyebrow}
                   </span>
-                  <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-zinc-200/70 text-zinc-700 font-semibold">
-                    Neodimio N52
+                  <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-semibold">
+                    {data.bento.featured.badge}
                   </span>
                 </div>
-                <h4 className="text-lg font-bold text-zinc-900 tracking-tight">
-                  Clip-On Magnético Instantáneo
+                <h4 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                  {data.bento.featured.title}
                 </h4>
-                <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed mt-2">
-                  El sobrelente polarizado se acopla o retira en una fracción de segundo gracias a micro-imanes de neodimio de alta atracción integrados en los vértices del armazón.
+                <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed mt-2">
+                  {data.bento.featured.description}
                 </p>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-zinc-200/60 flex items-center gap-2 text-[11px] font-mono text-zinc-500">
-                <CheckCircle2 size={13} className="text-emerald-500" />
-                <span>Acople firme que no se desprende con el movimiento</span>
-              </div>
             </div>
 
-            {/* TARJETA 2: Montura TR90 y Compatibilidad RX */}
-            <div className="rounded-3xl bg-zinc-50 border border-zinc-200/80 p-6 sm:p-7 flex flex-col justify-between hover:bg-white hover:border-zinc-300 transition-all shadow-sm">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-mono font-bold tracking-wider text-blue-600 uppercase">
-                    ERGONOMÍA & FÓRMULA ÓPTICA
-                  </span>
-                  <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-zinc-200/70 text-zinc-700 font-semibold">
-                    TR90 Suizo
-                  </span>
-                </div>
-                <h4 className="text-lg font-bold text-zinc-900 tracking-tight">
-                  Polímero Ultraligero & Apta para Fórmula
-                </h4>
-                <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed mt-2">
-                  Estructura en TR90 suizo con memoria elástica indeformable (peso pluma de 42g). Permite que cualquier óptica adapte tus cristales formulados (miopía o astigmatismo) en la montura base sin perder la función polarizada del Clip-On.
-                </p>
-              </div>
+            {/* COLUMNA DERECHA: 2 Tarjetas estratégicas de hardware (Col span 5) */}
+            <div className="md:col-span-5 flex flex-col gap-6">
+              {data.bento.cards.map((card, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-3xl bg-zinc-50 border border-zinc-200/80 p-6 sm:p-7 flex flex-col justify-between hover:bg-white hover:border-zinc-300 transition-all shadow-sm flex-1"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-mono font-bold tracking-wider text-blue-600 uppercase">
+                        {card.eyebrow}
+                      </span>
+                      <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-zinc-200/70 text-zinc-700 font-semibold">
+                        {card.badge}
+                      </span>
+                    </div>
+                    <h4 className="text-lg font-bold text-zinc-900 tracking-tight">
+                      {card.title}
+                    </h4>
+                    <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed mt-2">
+                      {card.description}
+                    </p>
+                  </div>
 
-              <div className="mt-4 pt-3 border-t border-zinc-200/60 flex items-center gap-2 text-[11px] font-mono text-zinc-500">
-                <CheckCircle2 size={13} className="text-emerald-500" />
-                <span>Compatible con cristales formulados y de descanso</span>
-              </div>
+                  <div className="mt-4 pt-3 border-t border-zinc-200/60 flex items-center gap-2 text-[11px] font-mono text-zinc-500">
+                    <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+                    <span>{card.footer}</span>
+                  </div>
+                </div>
+              ))}
             </div>
 
           </div>
-
-        </div>
+        )}
 
         {/* ==================================================================== */}
         {/* 6. FRANJA INFERIOR: MÉTRICAS DE HARDWARE Y ACCESO A CATÁLOGO         */}
