@@ -6,6 +6,7 @@ import 'swiper/css'
 import 'swiper/css/effect-coverflow'
 import { PenTool, Package, ShoppingBag, Dumbbell, Pill, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
 import EcosystemNavbar from './EcosystemNavbar'
+import EcosystemBootIntro from './EcosystemBootIntro'
 import LegalModal from '../legal/LegalModal'
 import ecosystemBg from '../../assets/ecosystem/ecosystem-bg.jpg'
 // Imagen nueva subida a Obsidian (2026-09-15, Jose: "esta imagen la usarás
@@ -126,17 +127,22 @@ const MODULES = [
 ]
 
 export default function InkognitoHome() {
-  // legalOpen (2026-09-15, Jose: "lo mismo si le doy desde el copyright" —
-  // mismo modal blanco a pantalla completa que EcosystemNavbar.jsx usa
-  // desde su propio menú, ver LegalModal.jsx) — estado propio, independiente
-  // del de EcosystemNavbar (el copyright vive fuera de ese componente).
   const [legalOpen, setLegalOpen] = useState(null)
-  // Índice del módulo que está al centro del carrusel.
   const [active, setActive] = useState(0)
+  const [showBoot, setShowBoot] = useState(false)
   const swiperRef = useRef(null)
-  // Hojas de luz de cada módulo (una por card). Se animan por JS para que el
-  // destello arranque al cambiar de módulo.
   const lightRefs = useRef([])
+
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search)
+      const force = params.get('boot') === '1'
+      const seen = sessionStorage.getItem('ink_ecosystem_boot_seen_v1')
+      if (force || !seen) {
+        setShowBoot(true)
+      }
+    } catch {}
+  }, [])
 
   // Corrientazo: cada vez que cambia el módulo la hoja de luz del módulo nuevo
   // cruza la pantalla (2000ms). Se cancela cualquier destello anterior antes
@@ -166,6 +172,8 @@ export default function InkognitoHome() {
 
   return (
     <section className="relative h-dvh bg-black text-white flex flex-col items-center px-6 overflow-hidden">
+      {/* ── SECUENCIA DE ENCENDIDO ECOSYSTEM (BOOT TO NAVBAR ESTILO WILTECH) ── */}
+      {showBoot && <EcosystemBootIntro onComplete={() => setShowBoot(false)} />}
 
       {/* meta() arriba ya cubre SSR — no se renderiza <Seo>/<Helmet> para
           evitar que las dos mecánicas escriban <head> a la vez (rompía la
@@ -515,7 +523,11 @@ export default function InkognitoHome() {
         <p className="text-white text-[9.5px] sm:text-[12px]">
           © 2026 INKognito. Todos los derechos reservados.
         </p>
-        <div className="flex justify-center items-center gap-6 mt-2 text-[12px]">
+        <div className="flex justify-center items-center gap-5 mt-2 text-[12px]">
+          <button type="button" onClick={() => setShowBoot(true)} className="text-zinc-400 hover:text-amber-400 transition-colors flex items-center gap-1.5 text-[11px]">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" /> Probar Encendido
+          </button>
+          <span className="text-zinc-700">·</span>
           {/* Botones, no Links (2026-09-15) — abren el modal en vez de
               navegar a /terminos //privacidad, ver comentario de estado
               arriba. */}

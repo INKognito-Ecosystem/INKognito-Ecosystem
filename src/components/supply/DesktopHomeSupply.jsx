@@ -6,7 +6,6 @@ import {
   Store, Globe, UserCircle, Truck,
   ShieldCheck, Check, ArrowRight, X, Sparkles
 } from 'lucide-react'
-import SupplyBootIntro from './SupplyBootIntro'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import SupplyProductCard from './SupplyProductCard'
@@ -36,7 +35,6 @@ export default function DesktopHomeSupply({ counts = {}, imgs = {}, initialProdu
   const [comprasOpen, setComprasOpen] = useState(false)
   const [legalOpen, setLegalOpen] = useState(null)
   const [misComprasCount, setMisComprasCount] = useState(0)
-  const [showBoot, setShowBoot] = useState(false)
 
   // Scroll reactivo para efectos de profundidad y stagger estilo Fractaill
   const { scrollY } = useScroll()
@@ -47,14 +45,6 @@ export default function DesktopHomeSupply({ counts = {}, imgs = {}, initialProdu
 
   useEffect(() => {
     setMisComprasCount(leerMisCompras().length)
-    try {
-      const params = new URLSearchParams(window.location.search)
-      const force = params.get('boot') === '1'
-      const seen = sessionStorage.getItem('ink_supply_boot_seen_v1')
-      if (force || !seen) {
-        setShowBoot(true)
-      }
-    } catch {}
   }, [])
 
   // Búsqueda inteligente interactiva en Desktop
@@ -108,9 +98,6 @@ export default function DesktopHomeSupply({ counts = {}, imgs = {}, initialProdu
 
   return (
     <div className="min-h-screen bg-white text-zinc-900 font-sans antialiased selection:bg-blue-600 selection:text-white">
-      {/* ── SECUENCIA DE ENCENDIDO ESTILO WILTECH (BOOT TO NAVBAR) ── */}
-      {showBoot && <SupplyBootIntro onComplete={() => setShowBoot(false)} />}
-
       {/* ── TOP HEADER / NAVBAR EMPRESARIAL BLANCO ── */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-zinc-200 shadow-[0_2px_15px_rgba(0,0,0,0.03)] transition-all">
         {/* Barra superior fina de contexto */}
@@ -126,15 +113,6 @@ export default function DesktopHomeSupply({ counts = {}, imgs = {}, initialProdu
               </span>
             </div>
             <div className="flex items-center gap-5">
-              <button
-                type="button"
-                onClick={() => setShowBoot(true)}
-                title="Probar animación de encendido (Wiltech style)"
-                className="hover:text-amber-300 text-zinc-300 transition-colors flex items-center gap-1.5 font-bold"
-              >
-                <Sparkles size={11} className="text-amber-400" /> Probar Encendido
-              </button>
-              <span className="text-zinc-500">|</span>
               <button
                 type="button"
                 onClick={() => irAMiSupply(navigate)}
