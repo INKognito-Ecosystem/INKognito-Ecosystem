@@ -159,7 +159,14 @@ export default function InkognitoHome() {
           evitar que las dos mecánicas escriban <head> a la vez (rompía la
           hidratación, ver nota en HomePage.jsx). */}
 
-      <style>{`
+      {/* El CSS va como texto crudo (dangerouslySetInnerHTML) a propósito:
+          React escapa las comillas de los nodos de texto en el SSR
+          (" → &quot;), pero <style> es un elemento de texto crudo donde el
+          navegador NO decodifica esas entidades. El comentario que dice
+          la "corriente" llegaba al cliente como &quot;corriente&quot; y React
+          abortaba la hidratación del home entero (errores #418/#425/#423 en
+          producción). Con texto crudo, servidor y cliente coinciden. */}
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes inkFloat { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
         .ink-float { animation: inkFloat 4.2s ease-in-out infinite; }
         @media (prefers-reduced-motion: reduce) { .ink-float { animation: none; } }
@@ -193,7 +200,7 @@ export default function InkognitoHome() {
         @media (prefers-reduced-motion: reduce) {
           .ink-mod.is-on .ink-glow, .ink-mod.is-on .ink-core { animation: none; }
         }
-      `}</style>
+      ` }} />
 
       {/* NAVBAR — mobileLight (2026-09-15, ver EcosystemNavbar.jsx) SOLO
           afecta la hamburguesa en móvil ahora (caja blanca + barras
