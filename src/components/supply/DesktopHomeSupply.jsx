@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router'
+import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react'
 import {
   Search, ShoppingCart, Package, GraduationCap,
   Store, Globe, UserCircle, Truck,
   ShieldCheck, Check, ArrowRight, X, Sparkles
 } from 'lucide-react'
+import SupplyBootIntro from './SupplyBootIntro'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import CartDrawerSupply from './CartDrawerSupply'
 import SupplyProductCard from './SupplyProductCard'
@@ -34,9 +36,25 @@ export default function DesktopHomeSupply({ counts = {}, imgs = {}, initialProdu
   const [comprasOpen, setComprasOpen] = useState(false)
   const [legalOpen, setLegalOpen] = useState(null)
   const [misComprasCount, setMisComprasCount] = useState(0)
+  const [showBoot, setShowBoot] = useState(false)
+
+  // Scroll reactivo para efectos de profundidad y stagger estilo Fractaill
+  const { scrollY } = useScroll()
+  const heroCopyY = useTransform(scrollY, [0, 450], [0, 24])
+  const heroShowcaseY = useTransform(scrollY, [0, 450], [0, -24])
+  const heroOpacity = useTransform(scrollY, [0, 500], [1, 0.88])
+  const scrollPillOpacity = useTransform(scrollY, [0, 90], [1, 0])
 
   useEffect(() => {
     setMisComprasCount(leerMisCompras().length)
+    try {
+      const params = new URLSearchParams(window.location.search)
+      const force = params.get('boot') === '1'
+      const seen = sessionStorage.getItem('ink_supply_boot_seen_v1')
+      if (force || !seen) {
+        setShowBoot(true)
+      }
+    } catch {}
   }, [])
 
   // Búsqueda inteligente interactiva en Desktop
@@ -89,7 +107,10 @@ export default function DesktopHomeSupply({ counts = {}, imgs = {}, initialProdu
   const displayedProducts = resultados !== null ? resultados : products
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 font-sans antialiased">
+    <div className="min-h-screen bg-white text-zinc-900 font-sans antialiased selection:bg-blue-600 selection:text-white">
+      {/* ── SECUENCIA DE ENCENDIDO ESTILO WILTECH (BOOT TO NAVBAR) ── */}
+      {showBoot && <SupplyBootIntro onComplete={() => setShowBoot(false)} />}
+
       {/* ── TOP HEADER / NAVBAR EMPRESARIAL BLANCO ── */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-zinc-200 shadow-[0_2px_15px_rgba(0,0,0,0.03)] transition-all">
         {/* Barra superior fina de contexto */}
@@ -105,6 +126,15 @@ export default function DesktopHomeSupply({ counts = {}, imgs = {}, initialProdu
               </span>
             </div>
             <div className="flex items-center gap-5">
+              <button
+                type="button"
+                onClick={() => setShowBoot(true)}
+                title="Probar animación de encendido (Wiltech style)"
+                className="hover:text-amber-300 text-zinc-300 transition-colors flex items-center gap-1.5 font-bold"
+              >
+                <Sparkles size={11} className="text-amber-400" /> Probar Encendido
+              </button>
+              <span className="text-zinc-500">|</span>
               <button
                 type="button"
                 onClick={() => irAMiSupply(navigate)}
@@ -268,14 +298,23 @@ export default function DesktopHomeSupply({ counts = {}, imgs = {}, initialProdu
         </div>
       </header>
 
-      {/* ── HERO BANNER EMPRESARIAL DESKTOP (BLANCO) ── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-blue-50/40 via-white to-white py-12 px-8 border-b border-zinc-100">
+      {/* ── HERO BANNER EMPRESARIAL DESKTOP (BLANCO CON EFECTO FRACTAILL) ── */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-blue-50/50 via-white to-white py-14 px-8 border-b border-zinc-100">
         <div className="absolute inset-0 pointer-events-none" style={DOT_PATTERN_LIGHT} />
+        {/* Glow ambiental sutil */}
+        <div className="absolute top-0 right-1/4 w-[500px] h-[350px] bg-gradient-to-bl from-blue-400/10 via-sky-300/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+
         <div className="relative z-10 max-w-7xl mx-auto grid grid-cols-12 gap-8 items-center">
-          {/* Izquierda: Copy institucional y propuesta de valor */}
-          <div className="col-span-7">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100/70 border border-blue-200 text-blue-700 rounded-full text-xs font-bold uppercase tracking-widest mb-4">
-              <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+          {/* Izquierda: Copy institucional con stagger y parallax suave */}
+          <motion.div
+            style={{ y: heroCopyY, opacity: heroOpacity }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="col-span-7"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100/70 border border-blue-200 text-blue-700 rounded-full text-xs font-bold uppercase tracking-widest mb-4 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping" />
               Plataforma B2B de Suministros
             </div>
             <h1 className="text-4xl lg:text-5xl font-black uppercase tracking-tight leading-[1.05] text-zinc-950 mb-4">
@@ -287,28 +326,34 @@ export default function DesktopHomeSupply({ counts = {}, imgs = {}, initialProdu
 
             {/* Badges de confianza */}
             <div className="grid grid-cols-3 gap-4 pt-2 border-t border-zinc-200/80 max-w-xl">
-              <div>
+              <div className="hover:-translate-y-0.5 transition-transform">
                 <p className="text-2xl font-black text-zinc-900">100%</p>
                 <p className="text-zinc-500 text-xs font-medium">Marcas originales y verificadas</p>
               </div>
-              <div className="border-l border-zinc-200 pl-4">
+              <div className="border-l border-zinc-200 pl-4 hover:-translate-y-0.5 transition-transform">
                 <p className="text-2xl font-black text-blue-600">Nacional</p>
                 <p className="text-zinc-500 text-xs font-medium">Envíos directos a toda Colombia</p>
               </div>
-              <div className="border-l border-zinc-200 pl-4">
+              <div className="border-l border-zinc-200 pl-4 hover:-translate-y-0.5 transition-transform">
                 <p className="text-2xl font-black text-zinc-900">Mercado Pago</p>
                 <p className="text-zinc-500 text-xs font-medium">Pagos y compras protegidas</p>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Derecha: Vitrina destacada de marcas aliadas */}
-          <div className="col-span-5 bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm">
+          {/* Derecha: Vitrina destacada con offset opuesto de parallax */}
+          <motion.div
+            style={{ y: heroShowcaseY }}
+            initial={{ opacity: 0, scale: 0.96, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className="col-span-5 bg-white/90 backdrop-blur-md border border-zinc-200 rounded-2xl p-6 shadow-lg shadow-zinc-200/50"
+          >
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-100">
-              <span className="text-xs font-black uppercase tracking-wider text-zinc-800">
-                Marcas Oficiales Verificadas
+              <span className="text-xs font-black uppercase tracking-wider text-zinc-800 flex items-center gap-1.5">
+                <Sparkles size={13} className="text-blue-600" /> Marcas Oficiales Verificadas
               </span>
-              <span className="text-[11px] font-semibold text-blue-600 uppercase tracking-widest">
+              <span className="text-[11px] font-semibold text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
                 Catálogo en línea
               </span>
             </div>
@@ -322,13 +367,24 @@ export default function DesktopHomeSupply({ counts = {}, imgs = {}, initialProdu
               <span className="text-xs text-zinc-500 italic">“De un tatuador, para tatuadores.”</span>
               <button
                 onClick={() => scrollToSection('categorias')}
-                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group/btn"
               >
-                Explorar catálogo <ArrowRight size={13} />
+                Explorar catálogo <ArrowRight size={13} className="transition-transform group-hover/btn:translate-x-1" />
               </button>
             </div>
-          </div>
+          </motion.div>
         </div>
+
+        {/* Indicador de scroll flotante estilo Fractaill */}
+        <motion.div
+          style={{ opacity: scrollPillOpacity }}
+          className="max-w-7xl mx-auto mt-8 flex justify-center"
+        >
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-zinc-200 shadow-sm text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-bounce" />
+            Desliza para explorar el ecosistema de insumos ↓
+          </div>
+        </motion.div>
       </section>
 
       {/* ── RESULTADOS DE BÚSQUEDA ACTIVOS (SI EL USUARIO ESCRIBIÓ ALGO) ── */}
@@ -388,61 +444,68 @@ export default function DesktopHomeSupply({ counts = {}, imgs = {}, initialProdu
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-          {categories.map((cat) => {
+          {categories.map((cat, idx) => {
             const count = counts[cat.cat] || 0
             const hasStock = count > 0
             const imgKey = cat.imgKey || catKey(cat.cat)
             const imgUrl = imgs[imgKey]
 
             return (
-              <Link
+              <motion.div
                 key={cat.name}
-                to={cat.path}
-                className="group relative h-40 bg-zinc-50 hover:bg-white rounded-2xl border border-zinc-200 hover:border-blue-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-4 flex flex-col justify-between overflow-hidden"
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-20px' }}
+                transition={{ duration: 0.45, delay: (idx % 5) * 0.05 }}
               >
-                {imgUrl ? (
-                  <>
-                    <img
-                      src={imgUrl}
-                      alt={cat.name}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                    <div className="relative z-10 flex justify-end">
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${hasStock ? 'bg-blue-600 text-white' : 'bg-black/60 text-zinc-300'}`}>
-                        {hasStock ? `${count} ${count > 1 ? 'prods' : 'prod'}` : 'Consultar'}
-                      </span>
-                    </div>
-                    <div className="relative z-10">
-                      <h3 className="text-sm font-black uppercase tracking-wider text-white">
-                        {cat.name}
-                      </h3>
-                      <span className="text-[10px] font-semibold text-blue-300 uppercase tracking-widest flex items-center gap-1 mt-0.5">
-                        Ver catálogo →
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex items-center justify-between">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                        <cat.icon size={20} />
+                <Link
+                  to={cat.path}
+                  className="group relative h-40 bg-zinc-50 hover:bg-white rounded-2xl border border-zinc-200 hover:border-blue-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-4 flex flex-col justify-between overflow-hidden"
+                >
+                  {imgUrl ? (
+                    <>
+                      <img
+                        src={imgUrl}
+                        alt={cat.name}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                      <div className="relative z-10 flex justify-end">
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${hasStock ? 'bg-blue-600 text-white' : 'bg-black/60 text-zinc-300'}`}>
+                          {hasStock ? `${count} ${count > 1 ? 'prods' : 'prod'}` : 'Consultar'}
+                        </span>
                       </div>
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${hasStock ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-zinc-200 text-zinc-500'}`}>
-                        {hasStock ? `${count} disponibles` : 'Consultar'}
-                      </span>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-black uppercase tracking-wider text-zinc-900 group-hover:text-blue-600 transition-colors">
-                        {cat.name}
-                      </h3>
-                      <span className="text-[10px] font-bold text-zinc-400 group-hover:text-blue-500 transition-colors uppercase tracking-wider flex items-center gap-1 mt-0.5">
-                        Explorar →
-                      </span>
-                    </div>
-                  </>
-                )}
-              </Link>
+                      <div className="relative z-10">
+                        <h3 className="text-sm font-black uppercase tracking-wider text-white">
+                          {cat.name}
+                        </h3>
+                        <span className="text-[10px] font-semibold text-blue-300 uppercase tracking-widest flex items-center gap-1 mt-0.5">
+                          Ver catálogo →
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                          <cat.icon size={20} />
+                        </div>
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${hasStock ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'bg-zinc-200 text-zinc-500'}`}>
+                          {hasStock ? `${count} disponibles` : 'Consultar'}
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-black uppercase tracking-wider text-zinc-900 group-hover:text-blue-600 transition-colors">
+                          {cat.name}
+                        </h3>
+                        <span className="text-[10px] font-bold text-zinc-400 group-hover:text-blue-500 transition-colors uppercase tracking-wider flex items-center gap-1 mt-0.5">
+                          Explorar →
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </Link>
+              </motion.div>
             )
           })}
         </div>
