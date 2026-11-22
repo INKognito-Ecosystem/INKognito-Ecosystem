@@ -135,19 +135,46 @@ export default function InkognitoHome() {
   const [active, setActive] = useState(0)
   const swiperRef = useRef(null)
   const bgRef = useRef(null)
+  // Hojas de luz de cada módulo (una por card). Se animan por JS para que el
+  // destello y la pulsación del fondo arranquen en el mismo instante.
+  const lightRefs = useRef([])
 
-  // "Zoom de cámara" del fondo: cada vez que cambia el módulo, la imagen
-  // arranca un poco más grande y se asienta en 1. Va por ref/estilo directo
-  // (no por estado) para no re-renderizar ni parpadear las imágenes.
+  // "Zoom de cámara" del fondo + corrientazo: cada vez que cambia el módulo
+  // la imagen arranca un poco más grande y se asienta en 1, y la hoja de luz
+  // del módulo nuevo cruza la pantalla. Los dos se lanzan acá, con la MISMA
+  // duración (2000ms) y la MISMA curva, para que vayan al unísono. Antes el
+  // destello lo movía una animación CSS que arrancaba por su cuenta y duraba
+  // distinto que la pulsación; se veía desfasado y a veces a medias.
+  // El destello se reinicia siempre desde fuera de pantalla (no importa si
+  // se cambia de módulo rápido), y usa transform para no repintar.
   useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const el = bgRef.current
-    if (!el) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    el.style.transition = 'none'
-    el.style.transform = 'scale(1.07)'
-    void el.offsetWidth
-    el.style.transition = 'transform 1400ms cubic-bezier(0.2, 0.7, 0.2, 1)'
-    el.style.transform = 'scale(1)'
+    if (el) {
+      el.style.transition = 'none'
+      el.style.transform = reduced ? 'scale(1)' : 'scale(1.07)'
+      if (!reduced) {
+        void el.offsetWidth
+        el.style.transition = 'transform 2000ms cubic-bezier(0.2, 0.7, 0.2, 1)'
+        el.style.transform = 'scale(1)'
+      }
+    }
+
+    // Cancela cualquier destello anterior antes de lanzar el nuevo.
+    lightRefs.current.forEach((node) => {
+      node?.getAnimations().forEach((anim) => anim.cancel())
+    })
+    const light = lightRefs.current[active]
+    if (!light || reduced) return
+
+    const up = active % 2 === 0
+    light.animate(
+      [
+        { transform: `translateY(${up ? '130%' : '-130%'})` },
+        { transform: `translateY(${up ? '-130%' : '130%'})` },
+      ],
+      { duration: 2000, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)', fill: 'both' },
+    )
   }, [active])
 
   const goTo = (i) => swiperRef.current?.slideTo(i)
@@ -196,27 +223,13 @@ export default function InkognitoHome() {
         }
         /* Un solo corrientazo por módulo: entra al pararse en la card y no
            se repite. Los módulos pares (INK, Store, Suple) lo suben de abajo
-           hacia arriba; los impares (Supply, Gym) lo bajan. La hoja arranca
-           y termina a 130% (totalmente fuera de pantalla), por eso no se
-           queda a medio salir en los bordes. */
+           hacia arriba; los impares (Supply, Gym) lo bajan. El movimiento lo
+           lanza el useEffect de la sección (Web Animations API), junto con la
+           pulsación del fondo, para que vayan al unísono. La hoja arranca y
+           termina a 130% (totalmente fuera de pantalla), por eso no se queda
+           a medio salir en los bordes. */
         .ink-mod.is-on .ink-core { opacity: 1; }
-        .ink-mod.is-on .ink-core-light {
-          animation: inkSurgeUp 2000ms cubic-bezier(0.45, 0, 0.3, 1) 1 both;
-          will-change: transform;
-        }
-        .ink-mod.is-on.ink-down .ink-core-light { animation-name: inkSurgeDown; }
-        @keyframes inkSurgeUp {
-          from { transform: translateY(130%); }
-          to { transform: translateY(-130%); }
-        }
-        @keyframes inkSurgeDown {
-          from { transform: translateY(-130%); }
-          to { transform: translateY(130%); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .ink-mod.is-on .ink-core { opacity: 0; }
-          .ink-mod.is-on .ink-core-light { animation: none; }
-        }
+        .ink-mod.is-on .ink-core-light { will-change: transform; }
       ` }} />
 
       {/* NAVBAR — mobileLight (2026-09-15, ver EcosystemNavbar.jsx) SOLO
@@ -267,7 +280,9 @@ export default function InkognitoHome() {
             abajo hacia arriba; los impares (Supply, Gym) la bajan. Pasa una
             sola vez al pararse en cada módulo, no en bucle.
             La luz es una hoja (.ink-core-light) dentro de la máscara y se
-            mueve con transform: la GPU la desliza sin repintar el fondo.
+            mueve con transform: la GPU la desliza sin repintar el fondo. La
+            animación se lanza desde el useEffect de la sección, al mismo
+            tiempo que la pulsación del fondo (ver lightRefs).
             mix-blend-mode: screen suma la luz a la imagen oscurecida en vez
             de taparla. */}
         <div
@@ -278,11 +293,14 @@ export default function InkognitoHome() {
           {MODULES.map((m, i) => (
             <div
               key={m.id}
-              className={`ink-mod ${i === active ? 'is-on' : ''} ${i % 2 === 0 ? 'ink-up' : 'ink-down'}`}
+              className={`ink-mod ${i === active ? 'is-on' : ''}`}
               style={{ '--m': m.color }}
             >
               <div className="ink-ln ink-core">
-                <div className="ink-core-light" />
+                <div
+                  ref={(node) => { if (node) lightRefs.current[i] = node }}
+                  className="ink-core-light"
+                />
               </div>
             </div>
           ))}
