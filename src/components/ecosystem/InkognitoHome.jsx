@@ -134,31 +134,16 @@ export default function InkognitoHome() {
   // Índice del módulo que está al centro del carrusel.
   const [active, setActive] = useState(0)
   const swiperRef = useRef(null)
-  const bgRef = useRef(null)
   // Hojas de luz de cada módulo (una por card). Se animan por JS para que el
-  // destello y la pulsación del fondo arranquen en el mismo instante.
+  // destello arranque al cambiar de módulo.
   const lightRefs = useRef([])
 
-  // "Zoom de cámara" del fondo + corrientazo: cada vez que cambia el módulo
-  // la imagen arranca un poco más grande y se asienta en 1, y la hoja de luz
-  // del módulo nuevo cruza la pantalla. Los dos se lanzan acá, con la MISMA
-  // duración (2000ms) y la MISMA curva, para que vayan al unísono. Antes el
-  // destello lo movía una animación CSS que arrancaba por su cuenta y duraba
-  // distinto que la pulsación; se veía desfasado y a veces a medias.
-  // El destello se reinicia siempre desde fuera de pantalla (no importa si
-  // se cambia de módulo rápido), y usa transform para no repintar.
+  // Corrientazo: cada vez que cambia el módulo la hoja de luz del módulo nuevo
+  // cruza la pantalla (2000ms). Se cancela cualquier destello anterior antes
+  // de lanzar el nuevo. El destello se reinicia siempre desde fuera de pantalla
+  // (no importa si se cambia de módulo rápido), y usa transform para no repintar.
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const el = bgRef.current
-    if (el) {
-      el.style.transition = 'none'
-      el.style.transform = reduced ? 'scale(1)' : 'scale(1.07)'
-      if (!reduced) {
-        void el.offsetWidth
-        el.style.transition = 'transform 2000ms cubic-bezier(0.2, 0.7, 0.2, 1)'
-        el.style.transform = 'scale(1)'
-      }
-    }
 
     // Cancela cualquier destello anterior antes de lanzar el nuevo.
     lightRefs.current.forEach((node) => {
@@ -224,8 +209,7 @@ export default function InkognitoHome() {
         /* Un solo corrientazo por módulo: entra al pararse en la card y no
            se repite. Los módulos pares (INK, Store, Suple) lo suben de abajo
            hacia arriba; los impares (Supply, Gym) lo bajan. El movimiento lo
-           lanza el useEffect de la sección (Web Animations API), junto con la
-           pulsación del fondo, para que vayan al unísono. La hoja arranca y
+           lanza el useEffect de la sección (Web Animations API). La hoja arranca y
            termina a 130% (totalmente fuera de pantalla), por eso no se queda
            a medio salir en los bordes. */
         .ink-mod.is-on .ink-core { opacity: 1; }
@@ -242,13 +226,9 @@ export default function InkognitoHome() {
           queda con el hoyo negro de siempre. opacity-80 de vuelta en móvil
           (2026-09-15, Jose: "revierte los cambios, deja la opacidad" —
           deshace el "quítale la opacidad" de un mensaje anterior).
-          2026-11-20: las dos imágenes van dentro de un div con ref (bgRef)
-          para poder hacerles el zoom de cada cambio de módulo.
-          2026-11-21: ese mismo div ahora también lleva adentro el overlay
-          oscuro, el tinte por módulo y las líneas iluminadas. Así todo hace
-          el zoom a la vez y las líneas siguen pegadas a los trazos de la
-          imagen; si estuvieran afuera, durante el zoom se separarían de ella. */}
-      <div ref={bgRef} className="absolute inset-0" style={{ willChange: 'transform' }}>
+          Lleva adentro el overlay oscuro, el tinte por módulo y las líneas
+          iluminadas para que las líneas sigan pegadas a los trazos de la imagen. */}
+      <div className="absolute inset-0">
         <img
           src={ecosystemBgMobile}
           alt=""
@@ -281,8 +261,7 @@ export default function InkognitoHome() {
             sola vez al pararse en cada módulo, no en bucle.
             La luz es una hoja (.ink-core-light) dentro de la máscara y se
             mueve con transform: la GPU la desliza sin repintar el fondo. La
-            animación se lanza desde el useEffect de la sección, al mismo
-            tiempo que la pulsación del fondo (ver lightRefs).
+            animación se lanza desde el useEffect de la sección (ver lightRefs).
             mix-blend-mode: screen suma la luz a la imagen oscurecida en vez
             de taparla. */}
         <div
