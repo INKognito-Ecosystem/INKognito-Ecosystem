@@ -124,7 +124,7 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
           style={{
             opacity: hideLogo ? 0 : 1,
             filter: menuOpen ? 'brightness(0)' : (logoFilter || undefined),
-            transition: 'filter 300ms ease, opacity 200ms ease',
+            transition: 'filter 300ms ease',
           }}
         />
 

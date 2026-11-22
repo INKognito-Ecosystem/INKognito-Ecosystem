@@ -3,62 +3,57 @@ import { motion, AnimatePresence } from 'motion/react'
 import inkognitoLogo from '../../assets/ecosystem/logo.png'
 
 const STORAGE_KEY = 'ink_ecosystem_boot_seen_v1'
-
-const MODULE_PULSES = [
-  { name: 'INK', color: '#dc2626' },
-  { name: 'SUPPLY', color: '#2563eb' },
-  { name: 'STORE', color: '#C9A84C' },
-  { name: 'GYM', color: '#6b7280' },
-  { name: 'SUPLE', color: '#9E9E9E' },
-]
+const LOGO_ASPECT_RATIO = 1.791667 // 1376 / 768
+const H_CENTER = 96 // Altura del logo cuando está encendido al centro
+const W_CENTER = H_CENTER * LOGO_ASPECT_RATIO // Ancho proporcional ≈ 172px
 
 export default function EcosystemBootIntro({ onComplete }) {
   // 'init' -> 'ignite' -> 'fade_text' -> 'travel' -> 'done'
   const [stage, setStage] = useState('init')
-  const [target, setTarget] = useState({ x: 0, y: 0, scale: 0.52 })
+  const [destRect, setDestRect] = useState(null)
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 })
 
   useEffect(() => {
-    const computeTarget = () => {
+    const updateMeasurements = () => {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight })
       const navLogo = document.getElementById('ecosystem-nav-logo')
       if (navLogo) {
-        const rect = navLogo.getBoundingClientRect()
-        // Centro del logo destino en el navbar
-        const targetCenterX = rect.left + rect.width / 2
-        const targetCenterY = rect.top + rect.height / 2
-        // Centro del viewport (donde parte el logo inicial centrado)
-        const startCenterX = window.innerWidth / 2
-        const startCenterY = window.innerHeight / 2
-
-        const dx = targetCenterX - startCenterX
-        const dy = targetCenterY - startCenterY
-        // Altura de inicio es 100px. Altura destino es rect.height (52px).
-        const scaleFactor = (rect.height || 52) / 100
-        setTarget({ x: dx, y: dy, scale: scaleFactor })
-      } else {
-        // Fallback matemático responsive si el ref tardara un frame
-        const isMobile = window.innerWidth < 768
-        const dx = -window.innerWidth / 2 + (isMobile ? 50 : 56)
-        const dy = -window.innerHeight / 2 + 42
-        setTarget({ x: dx, y: dy, scale: 0.52 })
+        const r = navLogo.getBoundingClientRect()
+        if (r.width > 0 && r.height > 0) {
+          setDestRect({
+            top: r.top,
+            left: r.left,
+            width: r.width,
+            height: r.height,
+          })
+          return
+        }
       }
+      // Fallback matemático responsive si la imagen tardase un frame en reportar rect
+      const isMobile = window.innerWidth < 768
+      setDestRect({
+        top: 16,
+        left: isMobile ? 8 : 8,
+        width: 52 * LOGO_ASPECT_RATIO,
+        height: 52,
+      })
     }
 
-    // Medimos inmediatamente y tras el primer frame
-    computeTarget()
-    const raf = requestAnimationFrame(computeTarget)
-    window.addEventListener('resize', computeTarget)
+    updateMeasurements()
+    const raf = requestAnimationFrame(updateMeasurements)
+    window.addEventListener('resize', updateMeasurements)
 
     // Cronología de la animación:
-    // T=60ms: Encendido e ignición del logo en el centro
+    // T=60ms: Ignición y encendido del logo en el centro
     const t1 = setTimeout(() => setStage('ignite'), 60)
 
-    // T=850ms: Desaparecen los textos y badges del centro
+    // T=850ms: Desaparece la información de texto central (limpiando la escena)
     const t2 = setTimeout(() => setStage('fade_text'), 850)
 
-    // T=1150ms: El logo emprende el vuelo y desplazamiento visible hacia la esquina superior izquierda
+    // T=1150ms: El logo se desplaza en línea recta directa hacia el navbar
     const t3 = setTimeout(() => setStage('travel'), 1150)
 
-    // T=1950ms: El logo aterriza en la posición exacta del navbar, concluye y cede el relevo
+    // T=1950ms: El logo encaja exactamente en el navbar; concluimos y damos relevo
     const t4 = setTimeout(() => {
       setStage('done')
       if (onComplete) onComplete()
@@ -69,7 +64,7 @@ export default function EcosystemBootIntro({ onComplete }) {
 
     return () => {
       cancelAnimationFrame(raf)
-      window.removeEventListener('resize', computeTarget)
+      window.removeEventListener('resize', updateMeasurements)
       clearTimeout(t1)
       clearTimeout(t2)
       clearTimeout(t3)
@@ -82,6 +77,26 @@ export default function EcosystemBootIntro({ onComplete }) {
   const isTraveling = stage === 'travel'
   const isFadingText = stage === 'fade_text' || isTraveling
 
+  // Destino exacto en el navbar
+  const rect = destRect || {
+    top: 16,
+    left: 8,
+    width: 52 * LOGO_ASPECT_RATIO,
+    height: 52,
+  }
+
+  const screenW = windowSize.width || (typeof window !== 'undefined' ? window.innerWidth : 1200)
+  const screenH = windowSize.height || (typeof window !== 'undefined' ? window.innerHeight : 800)
+
+  // Coordenadas del centro exacto del viewport
+  const centerX = screenW / 2 - W_CENTER / 2
+  const centerY = screenH / 2 - H_CENTER / 2
+
+  // Desplazamiento desde el destino (rect.left, rect.top) hasta el centro exacto
+  const startX = centerX - rect.left
+  const startY = centerY - rect.top
+  const startScale = H_CENTER / rect.height
+
   return (
     <AnimatePresence>
       <motion.div
@@ -90,7 +105,7 @@ export default function EcosystemBootIntro({ onComplete }) {
         animate={{ opacity: isTraveling ? 0 : 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.75, ease: 'easeOut' }}
-        className="fixed inset-0 z-[100] pointer-events-none flex items-center justify-center bg-black overflow-hidden select-none"
+        className="fixed inset-0 z-[100] pointer-events-none bg-black overflow-hidden select-none"
       >
         {/* Glow de fondo de ignición inicial */}
         <motion.div
@@ -100,93 +115,90 @@ export default function EcosystemBootIntro({ onComplete }) {
             scale: stage === 'ignite' ? 1.15 : 0.8,
           }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="absolute w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.2)_0%,rgba(37,99,235,0.1)_40%,transparent_70%)] pointer-events-none blur-xl"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.22)_0%,rgba(37,99,235,0.1)_40%,transparent_70%)] pointer-events-none blur-xl"
         />
 
-        {/* CONTENEDOR PRINCIPAL */}
-        <div className="relative flex flex-col items-center justify-center">
-          {/* EL LOGO: VISIBLE EN TODO MOMENTO (OPACITY: 1) DURANTE EL VUELO */}
-          <motion.div
-            initial={{ scale: 0.7, opacity: 0, x: 0, y: 15 }}
-            animate={
-              isTraveling
-                ? {
-                    x: target.x,
-                    y: target.y,
-                    scale: target.scale,
-                    opacity: 1, // Sigue completamente visible durante el desplazamiento
-                  }
-                : stage === 'ignite' || stage === 'fade_text'
-                ? {
-                    x: 0,
-                    y: 0,
-                    scale: 1,
-                    opacity: 1,
-                  }
-                : {
-                    x: 0,
-                    y: 15,
-                    scale: 0.7,
-                    opacity: 0,
-                  }
-            }
-            transition={
-              isTraveling
-                ? {
-                    duration: 0.75,
-                    ease: [0.16, 1, 0.3, 1], // Curva física suave Apple / Wiltech
-                  }
-                : {
-                    duration: 0.65,
-                    ease: [0.16, 1, 0.3, 1],
-                  }
-            }
-            className="relative flex items-center justify-center origin-center"
-          >
-            <img
-              src={inkognitoLogo}
-              alt="INKognito"
-              className="h-[100px] w-auto object-contain drop-shadow-[0_0_25px_rgba(255,255,255,0.45)]"
-            />
-          </motion.div>
+        {/* LOGO EN VUELO: Anclado en las coordenadas exactas de destino (rect.top, rect.left, rect.width, rect.height)
+            En reposo (centro): transform = translate(startX, startY) scale(startScale) -> Cae en el centro exacto de la pantalla.
+            En viaje: transform = translate(0, 0) scale(1) -> Cae milimétricamente en la posición real del navbar logo. */}
+        <motion.div
+          style={{
+            position: 'fixed',
+            top: rect.top,
+            left: rect.left,
+            width: rect.width,
+            height: rect.height,
+            transformOrigin: 'top left',
+          }}
+          initial={{
+            x: startX,
+            y: startY,
+            scale: startScale,
+            opacity: 0,
+          }}
+          animate={
+            isTraveling
+              ? {
+                  x: 0,
+                  y: 0,
+                  scale: 1,
+                  opacity: 1, // Sigue 100% visible todo el trayecto
+                }
+              : stage === 'ignite' || stage === 'fade_text'
+              ? {
+                  x: startX,
+                  y: startY,
+                  scale: startScale,
+                  opacity: 1,
+                }
+              : {
+                  x: startX,
+                  y: startY,
+                  scale: startScale,
+                  opacity: 0,
+                }
+          }
+          transition={
+            isTraveling
+              ? {
+                  duration: 0.75,
+                  ease: [0.16, 1, 0.3, 1], // Curva física Apple / Wiltech suave
+                }
+              : {
+                  duration: 0.65,
+                  ease: [0.16, 1, 0.3, 1],
+                }
+          }
+          className="pointer-events-none"
+        >
+          <img
+            src={inkognitoLogo}
+            alt="INKognito"
+            className="w-full h-full object-contain drop-shadow-[0_0_25px_rgba(255,255,255,0.45)]"
+          />
+        </motion.div>
 
-          {/* TEXTO Y MÓDULOS DEL CENTRO: SE DESVANECEN ANTES DEL DESPLAZAMIENTO */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{
-              opacity: isFadingText ? 0 : stage === 'ignite' ? 1 : 0,
-              y: isFadingText ? 15 : stage === 'ignite' ? 0 : 10,
-            }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="text-center mt-4 flex flex-col items-center pointer-events-none"
-          >
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-              <p className="text-[12px] font-black uppercase tracking-[0.35em] text-white">
-                INKOGNITO <span className="text-zinc-400 font-light">ECOSYSTEM</span>
-              </p>
-            </div>
-
-            <p className="text-[9px] uppercase tracking-[0.3em] text-zinc-500 font-medium mb-3">
-              PLATAFORMA MODULAR INTEGRADA
+        {/* TEXTO INFORMATIVO CENTRAL (SIN MÓDULOS)
+            Desaparece suavemente antes del desplazamiento del logo */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{
+            opacity: isFadingText ? 0 : stage === 'ignite' ? 1 : 0,
+            y: isFadingText ? 15 : stage === 'ignite' ? 0 : 10,
+          }}
+          transition={{ duration: 0.35, ease: 'easeInOut' }}
+          className="absolute top-[calc(50%+58px)] left-0 right-0 flex flex-col items-center pointer-events-none text-center px-4"
+        >
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            <p className="text-[12px] sm:text-[13px] font-black uppercase tracking-[0.35em] text-white">
+              INKOGNITO <span className="text-zinc-400 font-light">ECOSYSTEM</span>
             </p>
-
-            {/* Micro-luces de estado de los módulos */}
-            <div className="flex items-center gap-3 px-3 py-1 rounded-full bg-zinc-900/90 border border-zinc-800/80 backdrop-blur-sm">
-              {MODULE_PULSES.map((m) => (
-                <div key={m.name} className="flex items-center gap-1.5">
-                  <span
-                    className="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_currentColor]"
-                    style={{ backgroundColor: m.color, color: m.color }}
-                  />
-                  <span className="text-[8.5px] font-black uppercase tracking-wider text-zinc-300">
-                    {m.name}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
+          </div>
+          <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-medium">
+            PLATAFORMA MODULAR INTEGRADA
+          </p>
+        </motion.div>
       </motion.div>
     </AnimatePresence>
   )
