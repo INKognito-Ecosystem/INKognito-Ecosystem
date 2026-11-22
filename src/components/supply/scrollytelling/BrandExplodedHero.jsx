@@ -5,7 +5,7 @@ import {
   Sparkles, Sliders, ArrowDown, Activity, Info, Award
 } from 'lucide-react'
 import { BRAND_EXPLODED_CONFIGS } from './brandExplodedData'
-import { TattooVisionObjectSvg } from './TattooVisionObjectSvg'
+import TattooVisionRealObject from './TattooVisionRealObject'
 
 /**
  * Componente MAESTRO universal de Scrollytelling y Despiece Técnico (Estilo Wiltech).
@@ -219,9 +219,9 @@ export default function BrandExplodedHero({
             ))}
           </motion.div>
 
-          {/* RENDERIZADO DEL OBJETO (Capas SVG despiezadas con física Motion) */}
+          {/* RENDERIZADO DEL OBJETO (Fotografías reales despiezadas con física Motion) */}
           <div className="relative flex items-center justify-center w-full">
-            <TattooVisionObjectSvg
+            <TattooVisionRealObject
               layerTransforms={layerTransforms}
               activeLayer={activeLayerId}
               onHoverLayer={setActiveLayerId}
