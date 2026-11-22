@@ -228,7 +228,7 @@ export default function InkognitoHome() {
           afecta la hamburguesa en móvil ahora (caja blanca + barras
           negras) — el logo se revirtió a blanco (Jose: "que el logo sea
           blanco y no negro"). */}
-      <EcosystemNavbar mobileLight />
+      <EcosystemNavbar mobileLight hideLogo={showBoot} />
 
       {/* FONDO — imagen distinta en móvil (ver import arriba), desktop se
           queda con el hoyo negro de siempre. opacity-80 de vuelta en móvil

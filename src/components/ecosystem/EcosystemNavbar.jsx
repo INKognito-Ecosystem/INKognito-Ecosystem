@@ -48,7 +48,7 @@ import { irAMiSuple } from '../../lib/supleTienda'
 // necesitan volverse oscuros SOLO en móvil para seguir siendo visibles —
 // en desktop ese mismo navbar sigue sobre el fondo oscuro de siempre.
 // Default false para no afectar ProductLandingPage.jsx, que no lo pasa.
-export default function EcosystemNavbar({ logoFilter = null, showTagline = false, mobileLight = false, hideMenu = false }) {
+export default function EcosystemNavbar({ logoFilter = null, showTagline = false, mobileLight = false, hideMenu = false, hideLogo = false }) {
   const navigate = useNavigate()
   const [menuOpen,  setMenuOpen]  = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
@@ -117,12 +117,14 @@ export default function EcosystemNavbar({ logoFilter = null, showTagline = false
             usa el logo del drawer. La transición de filter suaviza el
             cambio mientras el drawer se desliza. */}
         <img
+          id="ecosystem-nav-logo"
           src={inkognitoLogo}
           alt="INKognito"
           className="h-[52px] w-auto object-contain mr-8"
           style={{
+            opacity: hideLogo ? 0 : 1,
             filter: menuOpen ? 'brightness(0)' : (logoFilter || undefined),
-            transition: 'filter 300ms ease',
+            transition: 'filter 300ms ease, opacity 200ms ease',
           }}
         />
 
