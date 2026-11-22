@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { ChevronDown, ChevronLeft, ChevronRight, ArrowDown, ExternalLink } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, ArrowDown, ExternalLink, CheckCircle2 } from 'lucide-react'
 import { BRAND_SHOWCASE_DATA } from './brandShowcaseData'
 
 /**
