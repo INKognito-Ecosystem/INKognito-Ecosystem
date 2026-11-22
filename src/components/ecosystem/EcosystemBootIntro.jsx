@@ -53,14 +53,14 @@ export default function EcosystemBootIntro({ onComplete }) {
     // T=1150ms: El logo se desplaza en línea recta directa hacia el navbar
     const t3 = setTimeout(() => setStage('travel'), 1150)
 
-    // T=1950ms: El logo encaja exactamente en el navbar; concluimos y damos relevo
+    // T=1920ms: El logo encaja exactamente en el navbar; concluimos y damos relevo
     const t4 = setTimeout(() => {
       setStage('done')
       if (onComplete) onComplete()
       try {
         sessionStorage.setItem(STORAGE_KEY, '1')
       } catch {}
-    }, 1950)
+    }, 1920)
 
     return () => {
       cancelAnimationFrame(raf)
@@ -99,12 +99,13 @@ export default function EcosystemBootIntro({ onComplete }) {
 
   return (
     <AnimatePresence>
+      {/* 1. FONDO NEGRO Y TEXTOS CENTRALES (SE DESVANECEN SUAVEMENTE AL VIAJAR) */}
       <motion.div
-        key="ecosystem-boot-overlay"
+        key="ecosystem-boot-backdrop"
         initial={{ opacity: 1 }}
         animate={{ opacity: isTraveling ? 0 : 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.75, ease: 'easeOut' }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
         className="fixed inset-0 z-[100] pointer-events-none bg-black overflow-hidden select-none"
       >
         {/* Glow de fondo de ignición inicial */}
@@ -117,66 +118,6 @@ export default function EcosystemBootIntro({ onComplete }) {
           transition={{ duration: 0.6, ease: 'easeOut' }}
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.22)_0%,rgba(37,99,235,0.1)_40%,transparent_70%)] pointer-events-none blur-xl"
         />
-
-        {/* LOGO EN VUELO: Anclado en las coordenadas exactas de destino (rect.top, rect.left, rect.width, rect.height)
-            En reposo (centro): transform = translate(startX, startY) scale(startScale) -> Cae en el centro exacto de la pantalla.
-            En viaje: transform = translate(0, 0) scale(1) -> Cae milimétricamente en la posición real del navbar logo. */}
-        <motion.div
-          style={{
-            position: 'fixed',
-            top: rect.top,
-            left: rect.left,
-            width: rect.width,
-            height: rect.height,
-            transformOrigin: 'top left',
-          }}
-          initial={{
-            x: startX,
-            y: startY,
-            scale: startScale,
-            opacity: 0,
-          }}
-          animate={
-            isTraveling
-              ? {
-                  x: 0,
-                  y: 0,
-                  scale: 1,
-                  opacity: 1, // Sigue 100% visible todo el trayecto
-                }
-              : stage === 'ignite' || stage === 'fade_text'
-              ? {
-                  x: startX,
-                  y: startY,
-                  scale: startScale,
-                  opacity: 1,
-                }
-              : {
-                  x: startX,
-                  y: startY,
-                  scale: startScale,
-                  opacity: 0,
-                }
-          }
-          transition={
-            isTraveling
-              ? {
-                  duration: 0.75,
-                  ease: [0.16, 1, 0.3, 1], // Curva física Apple / Wiltech suave
-                }
-              : {
-                  duration: 0.65,
-                  ease: [0.16, 1, 0.3, 1],
-                }
-          }
-          className="pointer-events-none"
-        >
-          <img
-            src={inkognitoLogo}
-            alt="INKognito"
-            className="w-full h-full object-contain drop-shadow-[0_0_25px_rgba(255,255,255,0.45)]"
-          />
-        </motion.div>
 
         {/* TEXTO INFORMATIVO CENTRAL (SIN MÓDULOS)
             Desaparece suavemente antes del desplazamiento del logo */}
@@ -199,6 +140,74 @@ export default function EcosystemBootIntro({ onComplete }) {
             PLATAFORMA MODULAR INTEGRADA
           </p>
         </motion.div>
+      </motion.div>
+
+      {/* 2. EL LOGO EN VUELO INDEPENDIENTE (z-[101])
+          NO es hijo del overlay que se desvanece, garantizando OPACIDAD 100% SÓLIDA
+          durante todo el trayecto hasta el aterrizaje en el navbar (cero espabilar ni parpadeo) */}
+      <motion.div
+        key="ecosystem-boot-flying-logo"
+        style={{
+          position: 'fixed',
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+          transformOrigin: 'top left',
+          zIndex: 101,
+        }}
+        initial={{
+          x: startX,
+          y: startY,
+          scale: startScale,
+          opacity: 0,
+        }}
+        animate={
+          isTraveling
+            ? {
+                x: 0,
+                y: 0,
+                scale: 1,
+                opacity: 1, // Totalmente sólido (100% opaco) todo el vuelo
+              }
+            : stage === 'ignite' || stage === 'fade_text'
+            ? {
+                x: startX,
+                y: startY,
+                scale: startScale,
+                opacity: 1,
+              }
+            : {
+                x: startX,
+                y: startY,
+                scale: startScale,
+                opacity: 0,
+              }
+        }
+        transition={
+          isTraveling
+            ? {
+                duration: 0.75,
+                ease: [0.16, 1, 0.3, 1], // Curva física Apple / Wiltech suave
+              }
+            : {
+                duration: 0.65,
+                ease: [0.16, 1, 0.3, 1],
+              }
+        }
+        className="pointer-events-none select-none"
+      >
+        <motion.img
+          src={inkognitoLogo}
+          alt="INKognito"
+          animate={{
+            filter: isTraveling
+              ? 'drop-shadow(0 0 0px rgba(255,255,255,0))'
+              : 'drop-shadow(0 0 25px rgba(255,255,255,0.45))',
+          }}
+          transition={{ duration: 0.7 }}
+          className="w-full h-full object-contain"
+        />
       </motion.div>
     </AnimatePresence>
   )
