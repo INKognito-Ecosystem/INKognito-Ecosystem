@@ -4,6 +4,7 @@ import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
 import BrandCatalogSection from '../BrandCatalogSection'
 import SupplyFAQ from '../SupplyFAQ'
+import SupplyMobileNav from '../SupplyMobileNav'
 import { getAdjacentBrands } from '../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../hooks/useSupplyVisual'
 import { useScrolled } from '../../../hooks/useScrolled'
@@ -63,22 +64,22 @@ export default function RoyalThreePage() {
   const scrolled = useScrolled()
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <NavbarCategory pageName="Royal Three" />
+    <div className="min-h-screen bg-white text-zinc-900">
+      <NavbarCategory pageName="Royal Three" light />
 
       {mostrarFlechas && scrolled && (
         <>
           <Link
             to={prev.path} replace
             aria-label={`Ver ${prev.name}`}
-            className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
+            className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-600 hover:text-black bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
           >
             <ArrowLeft size={20} />
           </Link>
           <Link
             to={next.path} replace
             aria-label={`Ver ${next.name}`}
-            className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-400 hover:text-white bg-black/60 backdrop-blur-sm border border-zinc-800 rounded-full p-2 transition-colors"
+            className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-600 hover:text-black bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
           >
             <ArrowRight size={20} />
           </Link>
@@ -88,12 +89,12 @@ export default function RoyalThreePage() {
       <div className="pt-20 md:pt-24 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
 
         <div className="relative overflow-hidden mb-6 md:mb-8">
-          <div className="absolute inset-0 opacity-[0.11]" style={DOT_PATTERN} />
+          <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
           <div className="relative z-10">
 
           <div className="flex items-center justify-between gap-3 mb-3">
             {mostrarFlechas ? (
-              <Link to={prev.path} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors">
+              <Link to={prev.path} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
                 <ArrowLeft size={18} />
               </Link>
             ) : <span />}
@@ -101,7 +102,7 @@ export default function RoyalThreePage() {
               Marca Profesional
             </p>
             {mostrarFlechas ? (
-              <Link to={next.path} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-500 hover:text-white transition-colors">
+              <Link to={next.path} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
                 <ArrowRight size={18} />
               </Link>
             ) : <span />}
@@ -119,7 +120,7 @@ export default function RoyalThreePage() {
                 />
                 {distribuidorOficial && <InsigniaDistribuidorOficial />}
               </div>
-              <p className="text-zinc-400 text-sm md:text-base leading-relaxed text-justify [hyphens:auto]">
+              <p className="text-zinc-600 text-sm md:text-base leading-relaxed text-justify [hyphens:auto]">
                 Cremas, jabones y productos de bioseguridad desarrollados para estudios
                 de tatuaje profesionales. Royal Three combina eficacia clínica con
                 formulaciones pensadas para la rutina diaria del tatuador.
@@ -129,12 +130,12 @@ export default function RoyalThreePage() {
           ) : (
             <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8">
               <div className="flex-shrink-0">
-                <h1 className="text-4xl md:text-7xl font-black uppercase leading-none">
+                <h1 className="text-4xl md:text-7xl font-black uppercase leading-none text-zinc-900">
                   Royal Three
                 </h1>
                 {distribuidorOficial && <InsigniaDistribuidorOficial />}
               </div>
-              <p className="max-w-xl text-zinc-400 text-sm md:text-base leading-relaxed text-justify [hyphens:auto] sm:border-l sm:border-zinc-800 sm:pl-8">
+              <p className="max-w-xl text-zinc-600 text-sm md:text-base leading-relaxed text-justify [hyphens:auto] sm:border-l sm:border-zinc-200 sm:pl-8">
                 Cremas, jabones y productos de bioseguridad desarrollados para estudios
                 de tatuaje profesionales. Royal Three combina eficacia clínica con
                 formulaciones pensadas para la rutina diaria del tatuador.
@@ -145,13 +146,15 @@ export default function RoyalThreePage() {
           </div>
         </div>
 
-        <BrandCatalogSection brandName="Royal Three" products={products} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} />
+        <BrandCatalogSection brandName="Royal Three" products={products} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} light />
 
-        <SupplyFAQ items={faqItems} nombre="Royal Three" />
+        <SupplyFAQ items={faqItems} nombre="Royal Three" light />
 
       </div>
 
-      <FooterSupply />
+      <FooterSupply light />
+      <div className="h-16 md:hidden" />
+      <SupplyMobileNav active="marcas" light />
     </div>
   )
 }

@@ -535,7 +535,7 @@ export default function SupplyProductDetailPage() {
 
       {/* ===== ESCRITORIO — layout simple de 2 columnas ===== */}
       <div className="hidden md:block">
-        <NavbarCategory pageName={product.categoria || 'Producto'} hideMenu />
+        <NavbarCategory pageName={product.categoria || 'Producto'} hideMenu light />
         <div className="pt-24 pb-16 max-w-5xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-start">
             <div className="flex flex-col gap-3">

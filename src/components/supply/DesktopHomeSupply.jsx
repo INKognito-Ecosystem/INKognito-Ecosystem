@@ -683,7 +683,7 @@ export default function DesktopHomeSupply({ counts = {}, imgs = {}, initialProdu
       <FooterSupply light={true} />
 
       {/* Modales y drawers */}
-      <CartDrawerSupply open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <CartDrawerSupply open={drawerOpen} onClose={() => setDrawerOpen(false)} light={true} />
       <MisComprasPanel open={comprasOpen} onClose={() => setComprasOpen(false)} />
       <LegalModal type={legalOpen} variant="ecosystem" onClose={() => setLegalOpen(null)} />
     </div>

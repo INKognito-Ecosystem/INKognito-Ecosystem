@@ -97,21 +97,14 @@ export default function SupplyProveedoresPage() {
           <p className="text-zinc-500 text-sm text-center py-10">Ninguna tienda coincide con "{busqueda}".</p>
         ) : (
           <>
-            <div className="max-w-xl mx-auto flex flex-col divide-y divide-zinc-200 border-t border-b border-zinc-200 mt-4">
+            {/* Lista compacta solo móvil */}
+            <div className="md:hidden max-w-xl mx-auto flex flex-col divide-y divide-zinc-200 border-t border-b border-zinc-200 mt-4">
               {proveedoresFiltrados.slice(0, visibleCount).map((p) => (
                 <Link
                   key={p.id}
                   to={`/supply/${p.slug || `estudio/${p.id}`}`}
                   className="flex items-center gap-3 py-3 hover:bg-zinc-50 transition-colors"
                 >
-                  {/* Insignia de verificado SOBRE la foto, no junto al
-                      nombre (2026-09-15, Jose: "las insignias al final del
-                      nombre hace que quede dispareja, pues no todos los
-                      nombres tienen el mismo tamaño") — mismo recurso de
-                      badge-sobre-avatar ya usado en ArtistaRegistroPage.jsx
-                      (círculo blanco con borde, esquina inferior derecha),
-                      así la fila queda alineada sin importar el largo del
-                      nombre. */}
                   <div className="relative flex-shrink-0">
                     <div className="w-11 h-11 rounded-full overflow-hidden bg-zinc-100 border border-zinc-200 flex items-center justify-center">
                       {p.logo_url
@@ -133,17 +126,61 @@ export default function SupplyProveedoresPage() {
                       </p>
                     )}
                   </div>
-                  {/* Aprovechar el espacio en blanco de la derecha
-                      (2026-09-15, Jose) — "Ver tienda" arriba, cantidad de
-                      productos debajo. cantidad_productos viene del
-                      directorio (nuevo campo en el backend, misma
-                      definición de "producto" que counts=1: distinto por
-                      nombre, no por variante). */}
                   <div className="flex-shrink-0 text-right pl-2">
                     <p className="text-blue-500 text-xs font-bold uppercase tracking-wide whitespace-nowrap">Ver tienda</p>
                     <p className="text-zinc-400 text-[11px] whitespace-nowrap mt-0.5">
                       {p.cantidad_productos ?? 0} producto{(p.cantidad_productos ?? 0) === 1 ? '' : 's'}
                     </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Grid de tarjetas para escritorio */}
+            <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
+              {proveedoresFiltrados.slice(0, visibleCount).map((p) => (
+                <Link
+                  key={p.id}
+                  to={`/supply/${p.slug || `estudio/${p.id}`}`}
+                  className="group relative bg-white border border-zinc-200 hover:border-blue-500/50 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="relative flex-shrink-0">
+                      <div className="w-14 h-14 rounded-2xl overflow-hidden bg-zinc-100 border border-zinc-200 flex items-center justify-center">
+                        {p.logo_url
+                          ? <img src={cloudinaryFill(p.logo_url, 120, 120)} alt={p.nombre_supply} className="w-full h-full object-cover" loading="lazy" />
+                          : <span className="text-zinc-400 text-lg font-black">{p.nombre_supply?.[0]?.toUpperCase() || '?'}</span>}
+                      </div>
+                      <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white border border-zinc-200 shadow-sm flex items-center justify-center">
+                        <ShieldCheck size={12} className="text-blue-500" />
+                      </span>
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                          Verificado
+                        </span>
+                      </div>
+                      <h3 className="font-black uppercase text-sm text-zinc-900 group-hover:text-blue-600 transition-colors truncate mt-1">
+                        {p.nombre_supply}
+                      </h3>
+                      {p.municipio && (
+                        <p className="text-zinc-500 text-xs flex items-center gap-1 truncate mt-0.5">
+                          <MapPin size={11} className="flex-shrink-0 text-zinc-400" />
+                          {p.municipio}{p.departamento ? `, ${p.departamento}` : ''}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-5 pt-3 border-t border-zinc-100 flex items-center justify-between text-xs">
+                    <span className="text-zinc-500 font-medium">
+                      {p.cantidad_productos ?? 0} producto{(p.cantidad_productos ?? 0) === 1 ? '' : 's'} disponible{(p.cantidad_productos ?? 0) === 1 ? '' : 's'}
+                    </span>
+                    <span className="text-blue-600 font-bold uppercase tracking-wide group-hover:translate-x-0.5 transition-transform">
+                      Ver tienda →
+                    </span>
                   </div>
                 </Link>
               ))}

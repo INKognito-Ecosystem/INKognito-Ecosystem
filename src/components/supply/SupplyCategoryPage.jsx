@@ -303,7 +303,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
   return (
     <>
       <div className="hidden md:block">
-        <NavbarCategory pageName={title} backPath="/supply" backLabel="Supply" />
+        <NavbarCategory pageName={title} backPath="/supply" backLabel="Supply" light={light} />
       </div>
 
       {/* Top bar compacta + tab bar inferior, solo móvil (2026-09-15) —
@@ -617,23 +617,23 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                     onClick={() => setProvAbierto(o => !o)}
                     aria-label="Filtrar por proveedor"
                     aria-expanded={provAbierto}
-                    className={`flex items-center justify-center w-9 h-9 bg-zinc-900 border rounded-lg transition-colors ${
-                      provAbierto || provFiltro !== 'todos' ? 'border-blue-500 text-blue-400' : 'border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
+                    className={`flex items-center justify-center w-9 h-9 border rounded-lg transition-colors ${light ? 'bg-zinc-100' : 'bg-zinc-900'} ${
+                      provAbierto || provFiltro !== 'todos' ? 'border-blue-500 text-blue-500' : light ? 'border-zinc-200 text-zinc-500 hover:text-zinc-900' : 'border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
                     }`}
                   >
                     <MapPin size={14} />
                   </button>
                   {provAbierto && (
-                    <div className="absolute right-0 top-full mt-1.5 z-20 w-64 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl overflow-hidden">
-                      <div className="p-2 border-b border-zinc-800">
+                    <div className={`absolute right-0 top-full mt-1.5 z-20 w-64 border rounded-lg shadow-xl overflow-hidden ${light ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
+                      <div className={`p-2 border-b ${light ? 'border-zinc-100' : 'border-zinc-800'}`}>
                         <div className="relative">
-                          <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
+                          <Search size={12} className={`absolute left-2 top-1/2 -translate-y-1/2 ${light ? 'text-zinc-400' : 'text-zinc-600'} pointer-events-none`} />
                           <input
                             type="text"
                             value={provBusqueda}
                             onChange={(e) => setProvBusqueda(e.target.value)}
                             placeholder="Buscar proveedor o ciudad"
-                            className="w-full bg-zinc-950 border border-zinc-800 text-zinc-300 text-xs rounded-md pl-7 pr-2 py-1.5 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500"
+                            className={`w-full border text-xs rounded-md pl-7 pr-2 py-1.5 focus:outline-none focus:border-blue-500 ${light ? 'bg-zinc-50 border-zinc-200 text-zinc-900 placeholder:text-zinc-400' : 'bg-zinc-950 border-zinc-800 text-zinc-300 placeholder:text-zinc-600'}`}
                           />
                         </div>
                       </div>
@@ -641,31 +641,31 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                         type="button"
                         onClick={() => { setProvFiltro('todos'); setProvBusqueda(''); setProvAbierto(false) }}
                         className={`w-full text-left px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors ${
-                          provFiltro === 'todos' ? 'text-blue-400 bg-blue-500/10' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
+                          provFiltro === 'todos' ? 'text-blue-500 bg-blue-50' : light ? 'text-zinc-700 hover:bg-zinc-50' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
                         }`}
                       >
                         Todos los proveedores
                       </button>
-                      <div className="max-h-60 overflow-y-auto border-t border-zinc-800">
+                      <div className={`max-h-60 overflow-y-auto border-t ${light ? 'border-zinc-100' : 'border-zinc-800'}`}>
                         {proveedoresFiltrados.length === 0 ? (
-                          <p className="px-3 py-3 text-xs text-zinc-600">Ningún proveedor coincide</p>
+                          <p className={`px-3 py-3 text-xs ${light ? 'text-zinc-400' : 'text-zinc-600'}`}>Ningún proveedor coincide</p>
                         ) : proveedoresFiltrados.map(p => (
                           <div key={p.id} className="flex items-center">
                             <button
                               type="button"
                               onClick={() => { setProvFiltro(String(p.id)); setProvBusqueda(''); setProvAbierto(false) }}
                               className={`flex-1 min-w-0 text-left px-3 py-2 text-xs truncate transition-colors ${
-                                provFiltro === String(p.id) ? 'text-blue-400 bg-blue-500/10 font-bold' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
+                                provFiltro === String(p.id) ? 'text-blue-500 bg-blue-50 font-bold' : light ? 'text-zinc-700 hover:bg-zinc-50' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
                               }`}
                             >
                               {p.nombre}
-                              {p.municipio && <span className="text-zinc-600 font-normal"> · {p.municipio}</span>}
+                              {p.municipio && <span className={`${light ? 'text-zinc-400' : 'text-zinc-600'} font-normal`}> · {p.municipio}</span>}
                             </button>
                             <Link
                               to={`/supply/${p.slug || `estudio/${p.id}`}`}
                               onClick={(e) => e.stopPropagation()}
                               title={`Ver catálogo completo de ${p.nombre}`}
-                              className="flex-shrink-0 px-2.5 py-2 text-zinc-600 hover:text-blue-400 transition-colors"
+                              className={`flex-shrink-0 px-2.5 py-2 transition-colors ${light ? 'text-zinc-400 hover:text-blue-600' : 'text-zinc-600 hover:text-blue-400'}`}
                             >
                               <ExternalLink size={12} />
                             </Link>
@@ -682,21 +682,21 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
                   onClick={() => setOrdenAbierto(o => !o)}
                   aria-label="Ordenar por"
                   aria-expanded={ordenAbierto}
-                  className={`flex items-center justify-center w-9 h-9 bg-zinc-900 border rounded-lg transition-colors ${
-                    ordenAbierto ? 'border-blue-500 text-blue-400' : 'border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
+                  className={`flex items-center justify-center w-9 h-9 border rounded-lg transition-colors ${light ? 'bg-zinc-100' : 'bg-zinc-900'} ${
+                    ordenAbierto ? 'border-blue-500 text-blue-500' : light ? 'border-zinc-200 text-zinc-500 hover:text-zinc-900' : 'border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
                   }`}
                 >
                   <SlidersHorizontal size={14} />
                 </button>
                 {ordenAbierto && (
-                  <div className="absolute right-0 top-full mt-1.5 z-20 min-w-[140px] bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-xl">
+                  <div className={`absolute right-0 top-full mt-1.5 z-20 min-w-[140px] border rounded-lg overflow-hidden shadow-xl ${light ? 'bg-white border-zinc-200' : 'bg-zinc-900 border-zinc-800'}`}>
                     {ORDEN_OPTIONS.map(o => (
                       <button
                         key={o.value}
                         type="button"
                         onClick={() => { setOrden(o.value); setOrdenAbierto(false) }}
                         className={`w-full text-left px-3 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors ${
-                          orden === o.value ? 'text-blue-400 bg-blue-500/10' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+                          orden === o.value ? 'text-blue-500 bg-blue-50' : light ? 'text-zinc-700 hover:bg-zinc-50' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
                         }`}
                       >
                         {o.label}

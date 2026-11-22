@@ -7,7 +7,7 @@ import AccordionCard from './AccordionCard'
 // loader — este componente es puramente presentacional. Las 10 páginas
 // de categoría NO usan esto — siguen pasando `faqs` directo a
 // SupplyCategoryPage.jsx, que ya sabía pintarlo antes de este cambio.
-export default function SupplyFAQ({ items, nombre }) {
+export default function SupplyFAQ({ items, nombre, light = false }) {
   if (!items?.length) return null
   return (
     <section className="mt-10 md:mt-14">
@@ -15,12 +15,13 @@ export default function SupplyFAQ({ items, nombre }) {
         icon="❓"
         title="Preguntas frecuentes"
         subtitle={`Todo lo que necesitas saber sobre ${nombre} antes de tu pedido. Toca para ver las respuestas.`}
+        light={light}
       >
         <div className="flex flex-col gap-5">
           {items.map((item, i) => (
-            <div key={item.id} className={i < items.length - 1 ? 'pb-5 border-b border-zinc-800' : ''}>
-              <p className="font-bold text-white text-sm mb-2">{item.pregunta}</p>
-              <p className="text-zinc-500 text-sm leading-relaxed">{item.respuesta}</p>
+            <div key={item.id} className={i < items.length - 1 ? `pb-5 border-b ${light ? 'border-zinc-200' : 'border-zinc-800'}` : ''}>
+              <p className={`font-bold ${light ? 'text-zinc-900' : 'text-white'} text-sm mb-2`}>{item.pregunta}</p>
+              <p className={`${light ? 'text-zinc-600' : 'text-zinc-500'} text-sm leading-relaxed`}>{item.respuesta}</p>
             </div>
           ))}
         </div>
