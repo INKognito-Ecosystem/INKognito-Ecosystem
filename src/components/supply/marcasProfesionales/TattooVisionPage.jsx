@@ -118,75 +118,36 @@ export default function TattooVisionPage() {
         </>
       )}
 
-      {/* HERO SCROLLYTELLING: Despiece técnico interactivo estilo Wiltech */}
+      {/* HERO SCROLLYTELLING: Despiece técnico interactivo estilo Wiltech con logo incorporado */}
       <BrandExplodedHero
         brandKey="tattoo-vision"
+        logoUrl={logoUrl}
+        distribuidorOficial={distribuidorOficial}
         onExploreCatalog={handleScrollToCatalog}
       />
 
       {/* CATÁLOGO DE PRODUCTOS & DETALLES DE MARCA */}
-      <div id="catalogo-marca" className="pt-12 md:pt-16 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
+      <div id="catalogo-marca" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
 
-        <div className="relative overflow-hidden mb-6 md:mb-8">
-          <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
-          <div className="relative z-10">
-
-          <div className="flex items-center justify-between gap-3 mb-3">
-            {mostrarFlechas ? (
-              <Link to={prev.path} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
-                <ArrowLeft size={18} />
-              </Link>
-            ) : <span />}
-            <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm text-center flex-1">
-              Marca Profesional
+        <div className="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-100">
+          {mostrarFlechas ? (
+            <Link to={prev.path} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
+              <ArrowLeft size={18} />
+            </Link>
+          ) : <span />}
+          <div className="text-center">
+            <p className="uppercase tracking-[0.25em] text-zinc-400 text-xs font-semibold">
+              Catálogo Oficial
             </p>
-            {mostrarFlechas ? (
-              <Link to={next.path} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
-                <ArrowRight size={18} />
-              </Link>
-            ) : <span />}
+            <h3 className="text-xl sm:text-2xl font-black uppercase text-zinc-900 tracking-tight mt-0.5">
+              Productos & Equipamiento Tattoo Vision
+            </h3>
           </div>
-
-          {logoUrl === undefined ? (
-            <div className="h-20 md:h-32" />
-          ) : logoUrl ? (
-            <div>
-              <div className="float-left w-[180px] mr-6 md:mr-8 mb-2 flex flex-col items-start">
-                <img
-                  src={logoUrl}
-                  alt="Tattoo Vision"
-                  className="h-20 md:h-32 w-auto max-w-full object-contain"
-                />
-                {distribuidorOficial && <InsigniaDistribuidorOficial />}
-              </div>
-              <p className="text-zinc-600 text-sm md:text-base leading-relaxed text-justify [hyphens:auto]">
-                Tecnología óptica polarizada original creada por el artista Hernán Yepes.
-                Diseñada bajo el principio de polarización cruzada (gafas TR90 con lentes
-                lineales semitransparentes en sincronía con luz LED polarizada) para cancelar
-                el 100% de los reflejos en la piel, permitiendo evaluar la saturación, empates
-                y degradados en tiempo real.
-              </p>
-              <div className="clear-both" />
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8">
-              <div className="flex-shrink-0">
-                <h1 className="text-4xl md:text-7xl font-black uppercase leading-none text-zinc-900">
-                  Tattoo Vision
-                </h1>
-                {distribuidorOficial && <InsigniaDistribuidorOficial />}
-              </div>
-              <p className="max-w-xl text-zinc-600 text-sm md:text-base leading-relaxed text-justify [hyphens:auto] sm:border-l sm:border-zinc-200 sm:pl-8">
-                Tecnología óptica polarizada original creada por el artista Hernán Yepes.
-                Diseñada bajo el principio de polarización cruzada (gafas TR90 con lentes
-                lineales semitransparentes en sincronía con luz LED polarizada) para cancelar
-                el 100% de los reflejos en la piel, permitiendo evaluar la saturación, empates
-                y degradados en tiempo real.
-              </p>
-            </div>
-          )}
-
-          </div>
+          {mostrarFlechas ? (
+            <Link to={next.path} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
+              <ArrowRight size={18} />
+            </Link>
+          ) : <span />}
         </div>
 
         <BrandCatalogSection brandName="Tattoo Vision" products={products} supplierBadge={null} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} light />

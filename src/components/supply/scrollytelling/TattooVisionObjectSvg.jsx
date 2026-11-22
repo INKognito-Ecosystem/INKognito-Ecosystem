@@ -1,12 +1,14 @@
 import { motion } from 'motion/react'
 
 /**
- * Renderizado vectorial por capas independientes para las GAFAS POLARIZADAS TR90
- * REALES DE TATTOO VISION creadas por HERNÁN YEPES.
+ * Renderizado vectorial por capas independientes para las GAFAS TATTOO VISION 2
+ * CON SISTEMA CLIP-ON MAGNÉTICO (El modelo más vendido e icónico de HERNÁN YEPES).
  *
- * Muestra el diseño auténtico de armazón TR90 negro mate, lentes polarizados
- * lineales semitransparentes (que eliminan el 100% de los reflejos en combinación
- * con la luz polarizada), bisagras metálicas y cordón de sujeción ergonómico.
+ * Muestra el despiece de ingeniería real:
+ * - Sobrelente Magnético (Clip-On) con imanes de neodimio y lentes polarizados lineales.
+ * - Lentes transparentes base (compatibles con fórmula médica u óptica).
+ * - Armazón principal en polímero suizo TR90 negro mate con receptores magnéticos.
+ * - Patillas biomecánicas, bisagras de acero inoxidable y cordón de seguridad.
  */
 
 export function TattooVisionObjectSvg({
@@ -15,53 +17,69 @@ export function TattooVisionObjectSvg({
   onHoverLayer,
 }) {
   return (
-    <div className="relative w-full max-w-[620px] h-[340px] sm:h-[400px] flex items-center justify-center select-none perspective-[1200px]">
+    <div className="relative w-full max-w-[640px] h-[340px] sm:h-[400px] flex items-center justify-center select-none perspective-[1200px]">
 
       {/* SVG Canvas de Alta Definición */}
       <svg
-        viewBox="0 0 720 440"
+        viewBox="0 0 740 440"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full overflow-visible drop-shadow-[0_25px_50px_rgba(0,0,0,0.25)]"
+        className="w-full h-full overflow-visible drop-shadow-[0_25px_50px_rgba(0,0,0,0.3)]"
       >
         <defs>
-          {/* TR90 Negro Mate con sombreado sutil de polímero suizo */}
-          <linearGradient id="tr90Matte" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#1e2229" />
-            <stop offset="35%" stopColor="#2a303c" />
-            <stop offset="70%" stopColor="#16191f" />
-            <stop offset="100%" stopColor="#0f1115" />
+          {/* TR90 Negro Mate profundo de alta densidad */}
+          <linearGradient id="tr90MatteDark" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#181b22" />
+            <stop offset="40%" stopColor="#242934" />
+            <stop offset="80%" stopColor="#12141a" />
+            <stop offset="100%" stopColor="#0b0d11" />
           </linearGradient>
 
-          <linearGradient id="tr90Bevel" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#475569" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#0f172a" stopOpacity="0.9" />
+          {/* Bisel sutil de luz sobre el marco TR90 */}
+          <linearGradient id="frameBevelLight" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#64748b" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="#0f172a" stopOpacity="0.8" />
           </linearGradient>
 
-          {/* Lente polarizado lineal semitransparente (aclarado para no oscurecer la sesión de tatuaje) */}
-          <linearGradient id="polarizedLens" x1="0%" y1="0%" x2="100%" y2="85%">
-            <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.28" />
-            <stop offset="35%" stopColor="#0284c7" stopOpacity="0.18" />
-            <stop offset="70%" stopColor="#0369a1" stopOpacity="0.22" />
-            <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.32" />
+          {/* Sobrelente Clip-on (Polímero ultradelgado negro con acento técnico) */}
+          <linearGradient id="clipOnFrame" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#272e3b" />
+            <stop offset="50%" stopColor="#161b24" />
+            <stop offset="100%" stopColor="#0f131a" />
           </linearGradient>
 
-          {/* Destello de polarización óptica */}
-          <linearGradient id="reflectionGlint" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.5" />
-            <stop offset="40%" stopColor="#ffffff" stopOpacity="0.0" />
-            <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.3" />
+          {/* Lente polarizado lineal de alta transmitancia para el Clip-On */}
+          <linearGradient id="polarizedClipOnLens" x1="0%" y1="0%" x2="100%" y2="90%">
+            <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.32" />
+            <stop offset="35%" stopColor="#0284c7" stopOpacity="0.22" />
+            <stop offset="70%" stopColor="#0369a1" stopOpacity="0.26" />
+            <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.38" />
           </linearGradient>
 
-          {/* Bisagras mecánicas de acero inoxidable */}
-          <linearGradient id="steelHinge" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#94a3b8" />
-            <stop offset="50%" stopColor="#f8fafc" />
+          {/* Lente base transparente (claro óptico para fórmula médica) */}
+          <linearGradient id="baseClearLens" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.12" />
+            <stop offset="50%" stopColor="#38bdf8" stopOpacity="0.06" />
+            <stop offset="100%" stopColor="#ffffff" stopOpacity="0.08" />
+          </linearGradient>
+
+          {/* Imanes de Neodimio N52 (Cromo pulido / brillo plateado magnético) */}
+          <linearGradient id="neodymiumMagnet" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#e2e8f0" />
+            <stop offset="45%" stopColor="#94a3b8" />
+            <stop offset="70%" stopColor="#f8fafc" />
             <stop offset="100%" stopColor="#64748b" />
           </linearGradient>
 
+          {/* Reflejos especulares de luz polarizada */}
+          <linearGradient id="opticalGlint" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.6" />
+            <stop offset="35%" stopColor="#ffffff" stopOpacity="0.0" />
+            <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.3" />
+          </linearGradient>
+
           {/* Cordón textil trenzado */}
-          <linearGradient id="lanyardBraid" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id="lanyardBraidGreen" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#10b981" />
             <stop offset="50%" stopColor="#047857" />
             <stop offset="100%" stopColor="#064e3b" />
@@ -69,76 +87,63 @@ export function TattooVisionObjectSvg({
         </defs>
 
         {/* ============================================================ */}
-        {/* CAPA 04: CORDÓN DE SEGURIDAD AJUSTABLE                       */}
+        {/* CAPA 04: PATILLAS BIOMECÁNICAS, BISAGRAS Y CORDÓN TEXTIL     */}
         {/* ============================================================ */}
         <motion.g
-          id="layer-lanyard"
-          style={layerTransforms.lanyard}
+          id="layer-temples_lanyard"
+          style={layerTransforms.temples_lanyard}
           className="cursor-pointer transition-opacity"
-          opacity={activeLayer && activeLayer !== 'lanyard' ? 0.35 : 1}
-          onMouseEnter={() => onHoverLayer && onHoverLayer('lanyard')}
+          opacity={activeLayer && activeLayer !== 'temples_lanyard' ? 0.35 : 1}
+          onMouseEnter={() => onHoverLayer && onHoverLayer('temples_lanyard')}
           onMouseLeave={() => onHoverLayer && onHoverLayer(null)}
         >
-          {/* Lazo del cordón que cae por detrás */}
+          {/* Lazo del cordón Tattoo Vision que cae por detrás */}
           <path
-            d="M92 195 C60 270 120 370 360 370 C600 370 660 270 628 195"
-            stroke="url(#lanyardBraid)"
+            d="M96 195 C62 270 120 375 370 375 C620 375 678 270 644 195"
+            stroke="url(#lanyardBraidGreen)"
             strokeWidth="3.5"
             strokeLinecap="round"
             strokeDasharray="6 3"
             fill="none"
           />
+          {/* Pasador de tensión regulable con seguro */}
+          <circle cx="370" cy="375" r="10" fill="#0f172a" stroke="#10b981" strokeWidth="2" />
+          <circle cx="370" cy="375" r="4" fill="#10b981" />
 
-          {/* Pasador de tensión regulable central */}
-          <circle cx="360" cy="370" r="10" fill="#0f172a" stroke="#10b981" strokeWidth="2" />
-          <circle cx="360" cy="370" r="4" fill="#10b981" />
+          {/* Terminales de sujeción de goma a las patillas */}
+          <rect x="90" y="190" width="12" height="18" rx="4" fill="#047857" stroke="#10b981" strokeWidth="1" />
+          <rect x="638" y="190" width="12" height="18" rx="4" fill="#047857" stroke="#10b981" strokeWidth="1" />
 
-          {/* Terminales de sujeción de goma a las puntas de las patillas */}
-          <rect x="86" y="190" width="12" height="18" rx="4" fill="#047857" stroke="#10b981" strokeWidth="1" />
-          <rect x="622" y="190" width="12" height="18" rx="4" fill="#047857" stroke="#10b981" strokeWidth="1" />
-        </motion.g>
-
-        {/* ============================================================ */}
-        {/* CAPA 03: PATILLAS LATERALES Y BISAGRAS DE PRECISIÓN          */}
-        {/* ============================================================ */}
-        <motion.g
-          id="layer-temples"
-          style={layerTransforms.temples}
-          className="cursor-pointer transition-opacity"
-          opacity={activeLayer && activeLayer !== 'temples' ? 0.35 : 1}
-          onMouseEnter={() => onHoverLayer && onHoverLayer('temples')}
-          onMouseLeave={() => onHoverLayer && onHoverLayer(null)}
-        >
-          {/* Patilla Izquierda TR90 en perspectiva */}
+          {/* Patilla Izquierda TR90 en perspectiva anatómica */}
           <path
-            d="M192 192 L96 172 C80 168 76 176 82 188 L94 204 L190 208 Z"
-            fill="url(#tr90Matte)"
-            stroke="#0f172a"
+            d="M202 192 L102 172 C86 168 82 176 88 188 L100 204 L200 208 Z"
+            fill="url(#tr90MatteDark)"
+            stroke="#0a0c10"
             strokeWidth="1.5"
           />
           {/* Bisagra de acero inoxidable izquierda */}
-          <rect x="186" y="194" width="8" height="12" rx="2" fill="url(#steelHinge)" stroke="#334155" strokeWidth="1" />
-          <circle cx="190" cy="200" r="1.5" fill="#0f172a" />
+          <rect x="196" y="194" width="8" height="12" rx="2" fill="url(#neodymiumMagnet)" stroke="#334155" strokeWidth="1" />
+          <circle cx="200" cy="200" r="1.5" fill="#0f172a" />
 
-          {/* Patilla Derecha TR90 en perspectiva */}
+          {/* Patilla Derecha TR90 en perspectiva anatómica */}
           <path
-            d="M528 192 L624 172 C640 168 644 176 638 188 L626 204 L530 208 Z"
-            fill="url(#tr90Matte)"
-            stroke="#0f172a"
+            d="M538 192 L638 172 C654 168 658 176 652 188 L640 204 L540 208 Z"
+            fill="url(#tr90MatteDark)"
+            stroke="#0a0c10"
             strokeWidth="1.5"
           />
           {/* Bisagra de acero inoxidable derecha */}
-          <rect x="526" y="194" width="8" height="12" rx="2" fill="url(#steelHinge)" stroke="#334155" strokeWidth="1" />
-          <circle cx="530" cy="200" r="1.5" fill="#0f172a" />
+          <rect x="536" y="194" width="8" height="12" rx="2" fill="url(#neodymiumMagnet)" stroke="#334155" strokeWidth="1" />
+          <circle cx="540" cy="200" r="1.5" fill="#0f172a" />
 
-          {/* Grabado discreto en la patilla izquierda */}
-          <text x="110" y="192" fill="#64748b" fontSize="7" fontFamily="sans-serif" fontWeight="bold" letterSpacing="0.1em">
-            TR90 · HERNÁN YEPES
+          {/* Grabado icónico de autor en la patilla izquierda */}
+          <text x="115" y="192" fill="#64748b" fontSize="6.5" fontFamily="sans-serif" fontWeight="bold" letterSpacing="0.1em">
+            TATTOO VISION 2 · HERNÁN YEPES
           </text>
         </motion.g>
 
         {/* ============================================================ */}
-        {/* CAPA 02: ARMAZÓN FRONTAL TR90 SU IZO (Diseño Real Yepes)     */}
+        {/* CAPA 03: ARMAZÓN BASE TR90 CON RECEPTORES MAGNÉTICOS         */}
         {/* ============================================================ */}
         <motion.g
           id="layer-frame"
@@ -148,126 +153,189 @@ export function TattooVisionObjectSvg({
           onMouseEnter={() => onHoverLayer && onHoverLayer('frame')}
           onMouseLeave={() => onHoverLayer && onHoverLayer(null)}
         >
-          {/* Marco exterior completo de las gafas estilo Wayfarer/D-frame ergonómico */}
+          {/* Armazón principal Wayfarer/D-frame TR90 */}
           <path
             d="
-              M176 172
-              C210 166 310 168 344 186
-              C352 190 368 190 376 186
-              C410 168 510 166 544 172
-              C554 174 558 186 552 202
-              L538 250
-              C528 278 500 292 450 294
-              C392 296 366 264 362 238
-              C360 226 348 226 346 238
-              C342 264 316 296 258 294
-              C208 292 180 278 170 250
-              L156 202
-              C150 186 160 174 176 172 Z
+              M186 172
+              C220 166 320 168 354 186
+              C362 190 378 190 386 186
+              C420 168 520 166 554 172
+              C564 174 568 186 562 202
+              L548 250
+              C538 278 510 292 460 294
+              C402 296 376 264 372 238
+              C370 226 358 226 356 238
+              C352 264 326 296 268 294
+              C218 292 190 278 180 250
+              L166 202
+              C160 186 170 174 186 172 Z
             "
-            fill="url(#tr90Matte)"
-            stroke="#090d16"
+            fill="url(#tr90MatteDark)"
+            stroke="#07080b"
             strokeWidth="2.5"
           />
 
-          {/* Biselado superior de luz para dar sensación de volumen tridimensional al TR90 */}
+          {/* Bisel de luz superior sobre el puente y cejas */}
           <path
-            d="M178 174 C215 168 305 170 342 188 C354 192 366 192 378 188 C415 170 505 168 542 174"
-            stroke="url(#tr90Bevel)"
+            d="M188 174 C225 168 315 170 352 188 C364 192 376 192 388 188 C425 170 515 168 552 174"
+            stroke="url(#frameBevelLight)"
             strokeWidth="1.8"
             fill="none"
           />
 
-          {/* Vaciado interior izquierdo para el cristal */}
+          {/* Abertura ocular izquierda para el cristal base */}
           <path
-            d="M192 186 C225 180 300 182 322 198 C332 205 334 220 326 238 C316 262 292 280 256 282 C214 284 190 262 184 236 C180 216 182 192 192 186 Z"
+            d="M202 186 C235 180 310 182 332 198 C342 205 344 220 336 238 C326 262 302 280 266 282 C224 284 200 262 194 236 C190 216 192 192 202 186 Z"
             fill="#090d16"
-            stroke="#2a303c"
+            stroke="#202633"
             strokeWidth="1.5"
           />
 
-          {/* Vaciado interior derecho para el cristal */}
+          {/* Abertura ocular derecha para el cristal base */}
           <path
-            d="M528 186 C495 180 420 182 398 198 C388 205 386 220 394 238 C404 262 428 280 464 282 C506 284 530 262 536 236 C540 216 538 192 528 186 Z"
+            d="M538 186 C505 180 430 182 408 198 C398 205 396 220 404 238 C414 262 438 280 474 282 C516 284 540 262 546 236 C550 216 548 192 538 186 Z"
             fill="#090d16"
-            stroke="#2a303c"
+            stroke="#202633"
             strokeWidth="1.5"
           />
 
-          {/* Remaches metálicos clásicos en las esquinas superiores */}
-          <ellipse cx="174" cy="182" rx="3" ry="1.5" fill="url(#steelHinge)" />
-          <ellipse cx="546" cy="182" rx="3" ry="1.5" fill="url(#steelHinge)" />
+          {/* RECEPTOR MAGNÉTICO IZQUIERDO (Para acoplar el Clip-On) */}
+          <circle cx="182" cy="182" r="3.5" fill="url(#neodymiumMagnet)" stroke="#334155" strokeWidth="1" />
+          <circle cx="182" cy="182" r="1.5" fill="#0f172a" />
 
-          {/* Puente nasal anatómico suave integrado */}
-          <path
-            d="M346 224 C352 220 368 220 374 224"
-            stroke="#475569"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
+          {/* RECEPTOR MAGNÉTICO DERECHO (Para acoplar el Clip-On) */}
+          <circle cx="558" cy="182" r="3.5" fill="url(#neodymiumMagnet)" stroke="#334155" strokeWidth="1" />
+          <circle cx="558" cy="182" r="1.5" fill="#0f172a" />
+
+          {/* Puente nasal ergonómico */}
+          <path d="M356 224 C362 220 378 220 384 224" stroke="#475569" strokeWidth="1.5" strokeLinecap="round" />
         </motion.g>
 
         {/* ============================================================ */}
-        {/* CAPA 01: LENTES POLARIZADOS LINEALES SEMITRANSPARENTES       */}
+        {/* CAPA 02: CRISTALES BASE DE VISIÓN (Compatibles con Fórmula)  */}
         {/* ============================================================ */}
         <motion.g
-          id="layer-optics"
-          style={layerTransforms.optics}
+          id="layer-base_lenses"
+          style={layerTransforms.base_lenses}
           className="cursor-pointer transition-opacity"
-          opacity={activeLayer && activeLayer !== 'optics' ? 0.35 : 1}
-          onMouseEnter={() => onHoverLayer && onHoverLayer('optics')}
+          opacity={activeLayer && activeLayer !== 'base_lenses' ? 0.35 : 1}
+          onMouseEnter={() => onHoverLayer && onHoverLayer('base_lenses')}
           onMouseLeave={() => onHoverLayer && onHoverLayer(null)}
         >
-          {/* Lente Izquierdo Polarizado Lineal Semitransparente */}
+          {/* Lente Base Izquierdo (Neutro o Formulado en Óptica) */}
           <path
-            d="M194 187 C226 181 299 183 320 199 C330 206 332 219 324 237 C314 260 291 278 256 280 C216 282 192 260 186 235 C182 215 184 193 194 187 Z"
-            fill="url(#polarizedLens)"
-            stroke="#38bdf8"
-            strokeWidth="1.6"
+            d="M204 187 C236 181 309 183 330 199 C340 206 342 219 334 237 C324 260 301 278 266 280 C226 282 202 260 196 235 C192 215 194 193 204 187 Z"
+            fill="url(#baseClearLens)"
+            stroke="#7dd3fc"
+            strokeWidth="1.2"
+            strokeDasharray="4 2"
           />
 
-          {/* Lente Derecho Polarizado Lineal Semitransparente */}
+          {/* Lente Base Derecho (Neutro o Formulado en Óptica) */}
           <path
-            d="M526 187 C494 181 421 183 400 199 C390 206 388 219 396 237 C406 260 429 278 464 280 C504 282 528 260 534 235 C538 215 536 193 526 187 Z"
-            fill="url(#polarizedLens)"
-            stroke="#38bdf8"
-            strokeWidth="1.6"
+            d="M536 187 C504 181 431 183 410 199 C400 206 398 219 406 237 C416 260 439 278 474 280 C514 282 538 260 544 235 C548 215 546 193 536 187 Z"
+            fill="url(#baseClearLens)"
+            stroke="#7dd3fc"
+            strokeWidth="1.2"
+            strokeDasharray="4 2"
           />
 
-          {/* Reflejo diagonal sutil de polarización óptica */}
-          <path
-            d="M200 192 L290 196 L240 274 L190 240 Z"
-            fill="url(#reflectionGlint)"
-            opacity="0.35"
-          />
-          <path
-            d="M520 192 L430 196 L480 274 L530 240 Z"
-            fill="url(#reflectionGlint)"
-            opacity="0.35"
-          />
-
-          {/* Indicador de eje de polarización lineal y firma óptica de Tattoo Vision */}
-          <g opacity="0.8">
-            <line x1="250" y1="210" x2="250" y2="250" stroke="#38bdf8" strokeWidth="0.8" strokeDasharray="3 2" />
-            <line x1="244" y1="230" x2="256" y2="230" stroke="#38bdf8" strokeWidth="0.8" />
-            <text x="214" y="248" fill="#38bdf8" fontSize="6.5" fontFamily="monospace" letterSpacing="0.08em">
-              POLARIZED · 90°
-            </text>
-          </g>
-
-          <g opacity="0.8">
-            <line x1="470" y1="210" x2="470" y2="250" stroke="#38bdf8" strokeWidth="0.8" strokeDasharray="3 2" />
-            <line x1="464" y1="230" x2="476" y2="230" stroke="#38bdf8" strokeWidth="0.8" />
-            <text x="434" y="248" fill="#38bdf8" fontSize="6.5" fontFamily="monospace" letterSpacing="0.08em">
-              POLARIZED · 90°
-            </text>
-          </g>
-
-          {/* Sello de autenticidad en esquina superior del lente */}
-          <text x="300" y="202" fill="#7dd3fc" fontSize="5.5" fontFamily="monospace" opacity="0.7">
-            TATTOO VISION
+          {/* Rótulo de compatibilidad óptica */}
+          <text x="236" y="240" fill="#7dd3fc" fontSize="6" fontFamily="monospace" opacity="0.8" letterSpacing="0.08em">
+            RX / FORMULA COMPATIBLE
           </text>
-          <text x="404" y="202" fill="#7dd3fc" fontSize="5.5" fontFamily="monospace" opacity="0.7">
+          <text x="446" y="240" fill="#7dd3fc" fontSize="6" fontFamily="monospace" opacity="0.8" letterSpacing="0.08em">
+            OPTICAL CLEAR GRADE
+          </text>
+        </motion.g>
+
+        {/* ============================================================ */}
+        {/* CAPA 01: SOBRELENTE MAGNÉTICO POLARIZADO (CLIP-ON FRONTAL)   */}
+        {/* ============================================================ */}
+        <motion.g
+          id="layer-clipon"
+          style={layerTransforms.clipon}
+          className="cursor-pointer transition-opacity"
+          opacity={activeLayer && activeLayer !== 'clipon' ? 0.35 : 1}
+          onMouseEnter={() => onHoverLayer && onHoverLayer('clipon')}
+          onMouseLeave={() => onHoverLayer && onHoverLayer(null)}
+        >
+          {/* Estructura ultraligera del Clip-On magnético */}
+          <path
+            d="
+              M188 174
+              C222 168 318 170 352 188
+              C360 192 376 192 384 188
+              C418 170 514 168 548 174
+              C558 176 562 188 556 204
+              L542 252
+              C532 278 506 292 458 294
+              C402 296 376 266 372 242
+              C370 230 358 230 356 242
+              C352 266 326 296 270 294
+              C222 292 196 278 186 252
+              L172 204
+              C166 188 174 176 188 174 Z
+            "
+            fill="url(#clipOnFrame)"
+            stroke="#38bdf8"
+            strokeWidth="1.8"
+          />
+
+          {/* Lente Polarizado Lineal Izquierdo en Clip-On */}
+          <path
+            d="M204 188 C236 182 309 184 330 200 C340 207 342 220 334 238 C324 261 301 279 266 281 C226 283 202 261 196 236 C192 216 194 194 204 188 Z"
+            fill="url(#polarizedClipOnLens)"
+            stroke="#38bdf8"
+            strokeWidth="1.8"
+          />
+
+          {/* Lente Polarizado Lineal Derecho en Clip-On */}
+          <path
+            d="M536 188 C504 182 431 184 410 200 C400 207 398 220 406 238 C416 261 439 279 474 281 C514 283 538 261 544 236 C548 216 546 194 536 188 Z"
+            fill="url(#polarizedClipOnLens)"
+            stroke="#38bdf8"
+            strokeWidth="1.8"
+          />
+
+          {/* IMÁN DE NEODIMIO N52 IZQUIERDO */}
+          <circle cx="184" cy="184" r="4.2" fill="url(#neodymiumMagnet)" stroke="#38bdf8" strokeWidth="1.5" />
+          <circle cx="184" cy="184" r="1.8" fill="#0284c7" />
+
+          {/* IMÁN DE NEODIMIO N52 DERECHO */}
+          <circle cx="552" cy="184" r="4.2" fill="url(#neodymiumMagnet)" stroke="#38bdf8" strokeWidth="1.5" />
+          <circle cx="552" cy="184" r="1.8" fill="#0284c7" />
+
+          {/* Líneas de campo magnético sutiles */}
+          <path d="M178 184 C175 180 175 188 178 184" stroke="#38bdf8" strokeWidth="0.8" />
+          <path d="M558 184 C561 180 561 188 558 184" stroke="#38bdf8" strokeWidth="0.8" />
+
+          {/* Reflejos de polarización en los lentes del Clip-On */}
+          <path d="M210 194 L300 198 L250 274 L200 242 Z" fill="url(#opticalGlint)" opacity="0.35" />
+          <path d="M530 194 L440 198 L490 274 L540 242 Z" fill="url(#opticalGlint)" opacity="0.35" />
+
+          {/* Eje de polarización ortogonal 90° grabado en cristal */}
+          <g opacity="0.85">
+            <line x1="265" y1="210" x2="265" y2="250" stroke="#38bdf8" strokeWidth="0.9" strokeDasharray="3 2" />
+            <line x1="259" y1="230" x2="271" y2="230" stroke="#38bdf8" strokeWidth="0.9" />
+            <text x="226" y="248" fill="#38bdf8" fontSize="6.5" fontFamily="monospace" letterSpacing="0.08em">
+              POLARIZED · 90°
+            </text>
+          </g>
+
+          <g opacity="0.85">
+            <line x1="475" y1="210" x2="475" y2="250" stroke="#38bdf8" strokeWidth="0.9" strokeDasharray="3 2" />
+            <line x1="469" y1="230" x2="481" y2="230" stroke="#38bdf8" strokeWidth="0.9" />
+            <text x="436" y="248" fill="#38bdf8" fontSize="6.5" fontFamily="monospace" letterSpacing="0.08em">
+              POLARIZED · 90°
+            </text>
+          </g>
+
+          {/* Marca grabada oficial en el Clip-on */}
+          <text x="312" y="202" fill="#7dd3fc" fontSize="6" fontFamily="monospace" opacity="0.85" fontWeight="bold">
+            CLIP-ON MAGNET
+          </text>
+          <text x="402" y="202" fill="#7dd3fc" fontSize="6" fontFamily="monospace" opacity="0.85" fontWeight="bold">
             TATTOO VISION
           </text>
         </motion.g>

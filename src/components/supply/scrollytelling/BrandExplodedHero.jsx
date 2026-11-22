@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react'
 import {
   Layers, Cpu, Eye, ShieldCheck, ChevronDown,
-  Sparkles, Sliders, ArrowDown, Activity, Info
+  Sparkles, Sliders, ArrowDown, Activity, Info, Award
 } from 'lucide-react'
 import { BRAND_EXPLODED_CONFIGS } from './brandExplodedData'
 import { TattooVisionObjectSvg } from './TattooVisionObjectSvg'
@@ -12,12 +12,15 @@ import { TattooVisionObjectSvg } from './TattooVisionObjectSvg'
  * Utiliza una jerarquía fija para todas las marcas:
  * - Pinned sticky viewport (h-screen fijado en track de 300vh).
  * - Separación cinemática de capas 3D vinculada a useScroll.
+ * - Incorporación del logo oficial de la marca en la cabecera.
  * - Callouts de telemetría e ingeniería con puntos de anclaje.
  * - Modo responsivo con offsets adaptativos para móvil y escritorio.
  */
 
 export default function BrandExplodedHero({
   brandKey = 'tattoo-vision',
+  logoUrl = null,
+  distribuidorOficial = false,
   onExploreCatalog,
 }) {
   const config = BRAND_EXPLODED_CONFIGS[brandKey] || BRAND_EXPLODED_CONFIGS['tattoo-vision']
@@ -107,14 +110,35 @@ export default function BrandExplodedHero({
         />
 
         {/* ========================================================== */}
-        {/* ENCABEZADO SUPERIOR / HUD TÉCNICO                          */}
+        {/* ENCABEZADO SUPERIOR / HUD TÉCNICO & LOGO OFICIAL           */}
         {/* ========================================================== */}
         <div className="relative z-20 flex items-center justify-between gap-4 pt-16 md:pt-4">
-          <div className="flex items-center gap-3">
-            <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
-            <span className="text-[10px] md:text-xs font-mono font-semibold tracking-[0.2em] text-zinc-400 uppercase">
-              {config.badge} // DESPIECE TÉCNICO
-            </span>
+          <div className="flex items-center gap-3 md:gap-4">
+            {logoUrl && (
+              <div className="flex items-center gap-2 bg-white px-2.5 py-1 rounded-lg shadow-sm">
+                <img
+                  src={logoUrl}
+                  alt={config.brandName}
+                  className="h-6 md:h-8 w-auto max-w-[120px] object-contain"
+                />
+              </div>
+            )}
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
+                <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                <span className="text-[10px] md:text-xs font-mono font-semibold tracking-[0.2em] text-zinc-300 uppercase">
+                  {config.badge}
+                </span>
+                {distribuidorOficial && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-black text-[9px] font-black uppercase tracking-wider bg-amber-400">
+                    <Award size={10} /> Oficial
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] text-zinc-400 font-mono hidden sm:inline">
+                SISTEMA CLIP-ON MAGNÉTICO // INGENIERÍA ÓPTICA
+              </span>
+            </div>
           </div>
 
           {/* Botón rápido para saltar al catálogo */}
