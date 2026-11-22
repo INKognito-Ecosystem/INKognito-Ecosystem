@@ -102,16 +102,16 @@ const MODULES = [
   {
     id: 'store',
     to: '/store',
-    eyebrow: 'Moda & Streetwear',
-    name: 'Moda Urbana & Calzado',
+    eyebrow: 'Comercio & Oficios',
+    name: 'Tiendas & Oficios Aliados',
     Icon: ShoppingBag,
     color: '#C9A84C',
     on: '#000000',
-    tagline: 'Marketplace multitienda de indumentaria urbana, calzado deportivo y accesorios de marcas aliadas.',
+    tagline: 'Marketplace de marcas y talleres aliados: indumentaria urbana, calzado, carpintería, herrería y manufactura.',
     facts: [
-      'Tiendas y marcas aliadas verificadas',
-      'Calzado deportivo y moda urbana',
-      'Gestión de pedidos con entrega coordinada',
+      'Tiendas aliadas, talleres y marcas verificadas',
+      'Moda urbana, carpintería y herrería a medida',
+      'Catálogos directos con compra y entrega coordinada',
     ],
   },
   {
@@ -314,48 +314,24 @@ export default function InkognitoHome() {
         </div>
       </div>
 
-      {/* CONTENIDO — ocupa todo el espacio disponible entre navbar y copyright.
-          Todo compactado (paddings/gaps/tamaños de letra reducidos) para que
-          la pantalla completa (logo + módulos + copyright) quepa en un solo
-          viewport sin scroll (reportado 2026-08-02).
-          2026-11-20: pt-[84px] deja libre la altura del navbar fijo (52px de
-          logo + py-4), porque ahora el carrusel se estira (flex-1) y ya no
-          queda aire arriba que lo separe. */}
-      <div className="relative z-10 flex flex-col items-center w-full flex-1 min-h-0 pt-[84px] pb-1">
+      {/* CONTENIDO — espacio reorganizado sin el título INKOGNITO (el nombre ya se establece
+          en el encendido y se ancla al logo del navbar, liberando espacio para que el carrusel
+          respire con holgura tanto en móvil como en laptop/PC) */}
+      <div className="relative z-10 flex flex-col items-center justify-between w-full flex-1 min-h-0 pt-[76px] sm:pt-[82px] pb-2">
 
-        {/* INK en negro (2026-09-15, Jose lo pidió mantener incluso tras
-            revertir el resto) — el resto del bloque (OGNITO, tagline,
-            "Select module") vuelve a su color original de siempre, ahora
-            que la opacidad/overlay de arriba está de vuelta y ya no hace
-            falta oscurecerlos a mano.
-            2026-11-21: "INK" se queda como texto (la idea de meter la
-            caligrafía del banner acá quedó descartada: "la imagen la vamos
-            a ubicar en otro lugar"), pero con una tipografía propia,
-            Cinzel 700, para que no sea exactamente la misma letra de
-            "OGNITO". La fuente se carga solo en esta ruta — ver links().
-            2026-11-20: md:text-6xl lg:text-7xl (antes md:text-7xl
-            lg:text-8xl) para que el carrusel quepa sin scroll en laptops. */}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase italic tracking-[0.12em] text-center">
-          <span
-            className="text-black md:text-white not-italic"
-            style={{ fontFamily: "'Cinzel', ui-serif, Georgia, serif", fontWeight: 700 }}
-          >
-            INK
-          </span>
-          <span className="text-zinc-300">OGNITO</span>
-        </h1>
+        {/* Encabezado limpio y proporcionado */}
+        <div className="text-center my-auto shrink-0 py-1 sm:py-2">
+          <p className="text-zinc-300 uppercase tracking-[0.25em] sm:tracking-[0.5em] text-xs sm:text-sm md:text-base font-semibold whitespace-nowrap px-2">
+            Disciplina • Arte • Identidad
+          </p>
 
-        <p className="mt-1 mb-1 sm:mb-2 text-zinc-300 uppercase tracking-[0.15em] sm:tracking-[0.5em] text-sm md:text-base font-semibold text-center whitespace-nowrap px-2">
-          Disciplina • Arte • Identidad
-        </p>
+          <p className="text-white/80 uppercase tracking-[0.35em] sm:tracking-[0.45em] text-[11px] sm:text-xs mt-1.5 font-medium">
+            Select Module
+          </p>
+        </div>
 
-        <p className="text-white uppercase tracking-[0.45em] text-sm text-center mb-1 sm:mb-2 font-medium">
-          Select Module
-        </p>
-
-        {/* CARRUSEL (2026-11-20) — w-screen: sale del padding lateral del
-            section para que las cards de los lados lleguen al borde. */}
-        <div className="relative w-screen flex-1 min-h-0 max-h-[430px]">
+        {/* CARRUSEL — mayor altura disponible para que las tarjetas respiren sin cortes */}
+        <div className="relative w-screen flex-1 min-h-0 max-h-[460px] [@media(min-height:780px)]:max-h-[500px]">
           <Swiper
             modules={[EffectCoverflow, Keyboard, A11y]}
             effect="coverflow"

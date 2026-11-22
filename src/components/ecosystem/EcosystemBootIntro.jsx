@@ -43,24 +43,24 @@ export default function EcosystemBootIntro({ onComplete }) {
     const raf = requestAnimationFrame(updateMeasurements)
     window.addEventListener('resize', updateMeasurements)
 
-    // Cronología de la animación:
+    // Cronología de la animación (con 1s adicional para lectura cómoda):
     // T=60ms: Ignición y encendido del logo en el centro
     const t1 = setTimeout(() => setStage('ignite'), 60)
 
-    // T=850ms: Desaparece la información de texto central (limpiando la escena)
-    const t2 = setTimeout(() => setStage('fade_text'), 850)
+    // T=1850ms: Desaparece la información de texto central (1.8s de lectura pausada)
+    const t2 = setTimeout(() => setStage('fade_text'), 1850)
 
-    // T=1150ms: El logo se desplaza en línea recta directa hacia el navbar
-    const t3 = setTimeout(() => setStage('travel'), 1150)
+    // T=2200ms: El logo se desplaza en línea recta directa hacia el navbar
+    const t3 = setTimeout(() => setStage('travel'), 2200)
 
-    // T=1920ms: El logo encaja exactamente en el navbar; concluimos y damos relevo
+    // T=2950ms: El logo encaja exactamente en el navbar; concluimos y damos relevo
     const t4 = setTimeout(() => {
       setStage('done')
       if (onComplete) onComplete()
       try {
         sessionStorage.setItem(STORAGE_KEY, '1')
       } catch {}
-    }, 1920)
+    }, 2950)
 
     return () => {
       cancelAnimationFrame(raf)
