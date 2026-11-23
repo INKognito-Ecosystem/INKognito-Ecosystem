@@ -1,31 +1,42 @@
-# INKognito
+# INKognito Ecosystem
 
-> Ecosistema de negocios de Jose Humanez en Chigorodó, Urabá, Antioquia, Colombia: estudio de tatuajes, insumos profesionales para tatuadores, ropa y calzado deportivo, y máquinas de gym bajo pedido.
+> Ecosistema digital modular y marketplace multitenant en Colombia (con sede en Chigorodó, Urabá, Antioquia y cobertura nacional), fundado por Jose Humanez. Integra seis verticales activas: INK (buscador nacional de tatuadores y estudios), Supply (insumos profesionales para tatuaje), Store (tiendas y oficios aliados), Suple (suplementación deportiva), Gym (máquinas a pedido y entrenamiento) y Ruta del Golfo (red logística de envíos en Urabá y Colombia), además de INKognito Development Studio.
 
-INKognito atiende Chigorodó, Apartadó, Turbo, Carepa y toda la región de Urabá, con envíos a toda Colombia. El contacto principal es por WhatsApp: +57 320 791 1013.
+- Sitio principal: https://inkognito-ecosystem.com/
+- Red logística Ruta del Golfo: https://rutadelgolfo.inkognito-ecosystem.com/
+- API oficial: https://api.inkognito-ecosystem.com/
+- Correo oficial de soporte y PQR: soporte@inkognito-ecosystem.com
 
-## Tattoo Studio
-- [Estudio de tatuajes Jose Humanez](https://inkognito-ecosystem.com/jhumaneztattoo): realismo, sombras, línea fina y diseños personalizados.
-- [Portafolio](https://inkognito-ecosystem.com/portafolio): trabajos realizados.
-- [Cuidados antes y después del tatuaje](https://inkognito-ecosystem.com/cuidados)
+## INK — Buscador Nacional de Tatuadores y Estudios (Tattoo Artist Colombia)
+- [Buscador INK](https://inkognito-ecosystem.com/tattoo-artist-colombia): directorio y buscador de artistas tatuadores y estudios verificados en Colombia por ciudad, estilo y cercanía ("Cerca de ti"), con portafolios reales, agenda de reservas con anticipo y venta de diseños digitales.
+- [Registro de artistas](https://inkognito-ecosystem.com/tattoo-artist-colombia/unete): registro gratuito para tatuadores en Colombia.
+- [Registro de estudios](https://inkognito-ecosystem.com/tattoo-artist-colombia/estudio/unete): perfiles de estudios de tatuaje con vinculación de artistas.
+- [Estudio fundador Jose Humanez](https://inkognito-ecosystem.com/jhumaneztattoo): realismo, sombras, línea fina, portafolio y guía de cuidados.
 
-## INKognito Supply — insumos para tatuadores
-- [Catálogo Supply](https://inkognito-ecosystem.com/supply): máquinas, tintas, cartuchos, agujas, guantes y accesorios.
-- [Tintas](https://inkognito-ecosystem.com/supply/ink) — Vice Colors, Dynamic, Eternal, Intenze, Fusion, World Famous, Solid Ink.
-- [Cartuchos](https://inkognito-ecosystem.com/supply/cartridges) — EZ Tattoo, WJX, Kwadron.
-- [Marcas](https://inkognito-ecosystem.com/supply/brands/tattoo-vision): Tattoo Vision, Heaven Pro, Royal Three.
-- [Cursos para tatuadores](https://inkognito-ecosystem.com/supply/aprende/cursos)
-- [Kit recomendado para tatuadores](https://inkognito-ecosystem.com/supply/aprende/kit)
-- [Recursos gratuitos para tatuadores](https://inkognito-ecosystem.com/supply/aprende/recursos)
+## INKognito Supply — Equipamiento e Insumos Profesionales para Tatuaje
+- [Catálogo Supply](https://inkognito-ecosystem.com/supply): marketplace B2B y distribución oficial de máquinas, tintas, cartuchos, agujas, guantes, fuentes, cuidados y mobiliario con stock verificado y despacho a toda Colombia.
+- [Marcas oficiales](https://inkognito-ecosystem.com/supply/brands/tattoo-vision): Tattoo Vision, Don Melo (máquinas artesanales), Heaven Pro, Royal Three, WJX, Dynamic, Vice Colors e Industrias Warlock (mobiliario).
+- [Proveedores Supply](https://inkognito-ecosystem.com/supply/proveedores): directorio de proveedores verificados y [registro de proveedores](https://inkognito-ecosystem.com/supply/proveedores/unete).
+- [Educación Supply](https://inkognito-ecosystem.com/supply/aprende/cursos): cursos, kits recomendados y recursos gratuitos para tatuadores.
 
-## INKognito Store — ropa y calzado deportivo
-- [Catálogo Store](https://inkognito-ecosystem.com/store): ropa dama y caballero, zapatos deportivos y casuales, guayos, tenis.
+## INKognito Store — Tiendas y Oficios Aliados
+- [Catálogo Store](https://inkognito-ecosystem.com/store): marketplace de tiendas y talleres aliados en ropa urbana y deportiva, calzado, accesorios, carpintería, herrería y manufactura local.
+- [Directorio de tiendas](https://inkognito-ecosystem.com/store/tiendas) y [registro de tiendas](https://inkognito-ecosystem.com/tattoo-artist-colombia/tienda/unete).
 
-## INKognito Gym
-- [Catálogo Gym](https://inkognito-ecosystem.com/gym): máquinas de gimnasio construidas bajo pedido en acero estructural, planos digitales, suplementos deportivos.
-- [Máquinas bajo pedido](https://inkognito-ecosystem.com/gym/maquinas-pedido)
-- [Suplementos](https://inkognito-ecosystem.com/gym/suplementos)
+## INKognito Suple — Suplementación y Nutrición Deportiva
+- [Catálogo Suple](https://inkognito-ecosystem.com/suplementos): proteínas, creatina, pre-entrenos, vitaminas y accesorios de tiendas aliadas verificadas con envío nacional.
+- [Tiendas Suple](https://inkognito-ecosystem.com/suplementos/tiendas) y [registro de proveedores Suple](https://inkognito-ecosystem.com/suplementos/proveedores/unete).
 
-## Notas
-- Los precios y la disponibilidad exacta de cada producto se confirman por WhatsApp; el catálogo web puede no reflejar el inventario en tiempo real para todos los productos.
-- Pago contraentrega disponible solo en Urabá; el resto de Colombia recibe envío con pago por Nequi/transferencia.
+## INKognito Gym — Máquinas a Pedido y Entrenamiento
+- [Catálogo Gym](https://inkognito-ecosystem.com/gym): máquinas de gimnasio fabricadas bajo pedido en acero estructural ([ver máquinas](https://inkognito-ecosystem.com/gym/maquinas-pedido)), tutoriales en video, cursos y recursos.
+
+## Ruta del Golfo — Red Logística y Transportadoras
+- [Portal Ruta del Golfo](https://rutadelgolfo.inkognito-ecosystem.com/): red logística multitenant de mensajería, recogidas y envíos locales/regionales en Urabá (Chigorodó, Apartadó, Carepa, Turbo, Mutatá) y conexión nacional integrada a las tiendas de INKognito Ecosystem.
+- [Registro de transportadoras](https://inkognito-ecosystem.com/transportadoras/unete): vinculación de aliados logísticos.
+- Nota de desambiguación: Ruta del Golfo (rutadelgolfo.inkognito-ecosystem.com) es una red logística terrestre y de paquetería en Urabá, Antioquia, Colombia perteneciente a INKognito Ecosystem; no guarda relación con servicios marítimos de Centroamérica ni con eventos deportivos.
+
+## Pagos, Legalidad y Cumplimiento (Colombia)
+- Pagos en línea procesados con Mercado Pago (Payment Brick y Checkout Pro con dispersión directa OAuth a vendedores y artistas), además de Nequi y contraentrega en pedidos directos.
+- [Términos y Condiciones](https://inkognito-ecosystem.com/terminos) (Ley 1480 de 2011, Ley 2439 de 2024, Decreto 587 de 2016).
+- [Política de Privacidad y Datos Personales](https://inkognito-ecosystem.com/privacidad) (Ley 1581 de 2012, Decreto 1377 de 2013).
+- [Política de Envíos, Cambios y Devoluciones](https://inkognito-ecosystem.com/envios-cambios-devoluciones).

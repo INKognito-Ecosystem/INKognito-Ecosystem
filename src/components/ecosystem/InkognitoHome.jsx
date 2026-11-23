@@ -28,8 +28,9 @@ import ecosystemLinesMobile from '../../assets/ecosystem/ecosystem-lines-mobile.
 import inkMark from '../../assets/artistas-ink-mark.png'
 
 export function meta() {
-  const title = 'INKognito | Tattoo, Supply y Store en Urabá, Colombia'
-  const description = 'Ecosistema de servicios en Chigorodó, Urabá: estudio de tatuajes, insumos profesionales para tatuadores y tienda deportiva. Conoce todos nuestros módulos.'
+  const title = 'INKognito Ecosystem | Buscador INK, Supply, Store, Suple, Gym y Ruta del Golfo'
+  const description =
+    'Ecosistema digital en Colombia con sede en Chigorodó, Urabá: buscador nacional de tatuadores (INK), insumos profesionales para tatuaje (Supply), tiendas y oficios aliados (Store), suplementación deportiva (Suple), máquinas a pedido (Gym) y red logística (Ruta del Golfo).'
   return [
     { title },
     { name: 'description', content: description },

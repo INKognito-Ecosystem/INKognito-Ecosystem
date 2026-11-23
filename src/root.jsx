@@ -14,66 +14,109 @@ const ORGANIZATION_JSONLD = {
       '@type': 'WebSite',
       '@id': 'https://inkognito-ecosystem.com/#website',
       url: 'https://inkognito-ecosystem.com/',
-      name: 'INKognito',
-      description: 'Ecosistema de servicios en Chigorodó, Urabá: estudio de tatuajes, insumos para tatuadores y tienda deportiva.',
+      name: 'INKognito Ecosystem',
+      description:
+        'Ecosistema digital modular en Colombia (sede en Chigorodó, Urabá): buscador nacional de tatuadores (INK), insumos profesionales para tatuaje (Supply), marketplace de tiendas y oficios aliados (Store), suplementación deportiva (Suple), entrenamiento y máquinas a pedido (Gym) y red logística (Ruta del Golfo).',
       publisher: { '@id': 'https://inkognito-ecosystem.com/#organization' },
       inLanguage: 'es-CO',
     },
     {
       '@type': 'Organization',
       '@id': 'https://inkognito-ecosystem.com/#organization',
-      name: 'INKognito',
+      name: 'INKognito Ecosystem',
+      alternateName: 'INKognito',
       url: 'https://inkognito-ecosystem.com/',
       logo: { '@type': 'ImageObject', url: 'https://inkognito-ecosystem.com/logo.png' },
-      telephone: '+57-320-791-1013',
+      email: 'soporte@inkognito-ecosystem.com',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Chigorodó',
+        addressRegion: 'Antioquia',
+        addressCountry: 'CO',
+      },
       contactPoint: {
         '@type': 'ContactPoint',
-        telephone: '+57-320-791-1013',
-        contactType: 'customer service',
+        email: 'soporte@inkognito-ecosystem.com',
+        contactType: 'customer support',
         areaServed: 'CO',
         availableLanguage: 'Spanish',
+      },
+      subOrganization: {
+        '@type': 'Organization',
+        '@id': 'https://rutadelgolfo.inkognito-ecosystem.com/#organization',
+        name: 'Ruta del Golfo — Red Logística INKognito',
+        url: 'https://rutadelgolfo.inkognito-ecosystem.com/',
+        description:
+          'Red logística multitenant de mensajería, transportadoras locales y envíos en Urabá (Chigorodó, Apartadó, Carepa, Turbo, Mutatá) y Colombia, integrada al ecosistema INKognito.',
+        areaServed: 'CO',
       },
     },
     {
       '@type': 'ItemList',
-      name: 'Módulos INKognito',
+      name: 'Módulos de INKognito Ecosystem',
       itemListElement: [
         {
           '@type': 'SiteNavigationElement',
           position: 1,
-          name: 'Tattoo Studio — Jose Humanez',
-          description: 'Estudio de tatuajes en Chigorodó. Realismo, sombras, línea fina y diseños personalizados. Atendemos Chigorodó, Apartadó, Turbo, Carepa y Mutatá.',
-          url: 'https://inkognito-ecosystem.com/jhumaneztattoo',
+          name: 'INK — Buscador Nacional de Tatuadores y Estudios en Colombia',
+          description:
+            'Buscador de artistas tatuadores y estudios verificados en Colombia por estilo y ciudad, con portafolios reales, reservas con anticipo y venta de diseños digitales.',
+          url: 'https://inkognito-ecosystem.com/tattoo-artist-colombia',
         },
         {
           '@type': 'SiteNavigationElement',
           position: 2,
-          name: 'INKognito Supply — Insumos para tatuadores',
-          description: 'Máquinas, tintas, cartuchos y accesorios para tatuadores, con proveedores verificados y despacho a toda Colombia.',
+          name: 'INKognito Supply — Insumos Profesionales para Tatuaje',
+          description:
+            'Distribución B2B y marketplace de máquinas, tintas, cartuchos, mobiliario y marcas oficiales (Tattoo Vision, Don Melo, WJX, Dynamic, Vice Colors, Industrias Warlock) con despacho a toda Colombia.',
           url: 'https://inkognito-ecosystem.com/supply',
         },
         {
           '@type': 'SiteNavigationElement',
           position: 3,
-          name: 'INKognito Store — Ropa y calzado deportivo',
-          description: 'Tienda de ropa deportiva, zapatos y guayos en Chigorodó, Urabá antioqueño.',
+          name: 'INKognito Store — Tiendas y Oficios Aliados',
+          description:
+            'Marketplace de tiendas locales, indumentaria urbana, calzado, carpintería, herrería y manufactura aliada con envíos coordinados.',
           url: 'https://inkognito-ecosystem.com/store',
+        },
+        {
+          '@type': 'SiteNavigationElement',
+          position: 4,
+          name: 'INKognito Suple — Suplementación y Nutrición Deportiva',
+          description:
+            'Marketplace de proteínas, creatina, pre-entrenos y vitaminas de tiendas aliadas verificadas con envío nacional en Colombia.',
+          url: 'https://inkognito-ecosystem.com/suplementos',
+        },
+        {
+          '@type': 'SiteNavigationElement',
+          position: 5,
+          name: 'INKognito Gym — Máquinas a Pedido y Entrenamiento',
+          description:
+            'Máquinas de gimnasio fabricadas bajo pedido en acero estructural, tutoriales en video, cursos y recursos de entrenamiento.',
+          url: 'https://inkognito-ecosystem.com/gym',
+        },
+        {
+          '@type': 'SiteNavigationElement',
+          position: 6,
+          name: 'Ruta del Golfo — Red Logística y Transportadoras',
+          description:
+            'Plataforma logística de envíos locales y regionales en Urabá (Antioquia, Colombia) integrada a las tiendas de INKognito Ecosystem.',
+          url: 'https://rutadelgolfo.inkognito-ecosystem.com/',
         },
       ],
     },
   ],
 }
 
-// Fallback para rutas que todavía no tienen su propio export `meta()` (todo lo
-// que no sea el bloque piloto /  y /jhumaneztattoo) — antes vivía como <title>
-// y <meta description> estáticos en index.html. Cada ruta puede reemplazarlo
-// exportando su propio meta() (gana el de la ruta hoja, no se mezclan).
+// Fallback para rutas que todavía no tienen su propio export `meta()` — cada
+// ruta hoja puede reemplazarlo exportando su propio meta().
 export function meta() {
   return [
-    { title: 'INKognito Ecosystem | Tattoo, Supply y Store en Urabá, Colombia' },
+    { title: 'INKognito Ecosystem | INK, Supply, Store, Suple, Gym y Ruta del Golfo' },
     {
       name: 'description',
-      content: 'INKognito: estudio de tatuajes, insumos para tatuadores y tienda deportiva en Urabá, Antioquia. Chigorodó, Apartadó, Turbo, Carepa y toda la región.',
+      content:
+        'Ecosistema digital en Colombia: buscador de tatuadores INK, insumos profesionales Supply, tiendas y oficios Store, suplementación Suple, Gym y red logística Ruta del Golfo.',
     },
   ]
 }
