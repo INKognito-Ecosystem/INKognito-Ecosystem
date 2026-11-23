@@ -87,10 +87,15 @@ export default function EcosystemBootIntro({ onComplete }) {
 
   const screenW = windowSize.width || (typeof window !== 'undefined' ? window.innerWidth : 1200)
   const screenH = windowSize.height || (typeof window !== 'undefined' ? window.innerHeight : 800)
+  const isMobile = screenW < 768
 
-  // Coordenadas del centro exacto del viewport
+  // Ajuste óptico vertical para que el conjunto (logo + texto) quede
+  // realmente centrado en pantalla, especialmente en móvil
+  const opticalOffsetY = isMobile ? -44 : -20
+
+  // Coordenadas del centro óptico del viewport
   const centerX = screenW / 2 - W_CENTER / 2
-  const centerY = screenH / 2 - H_CENTER / 2
+  const centerY = screenH / 2 - H_CENTER / 2 + opticalOffsetY
 
   // Desplazamiento desde el destino (rect.left, rect.top) hasta el centro exacto
   const startX = centerX - rect.left
@@ -116,7 +121,8 @@ export default function EcosystemBootIntro({ onComplete }) {
             scale: stage === 'ignite' ? 1.15 : 0.8,
           }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.22)_0%,rgba(37,99,235,0.1)_40%,transparent_70%)] pointer-events-none blur-xl"
+          style={{ top: `calc(50% + ${opticalOffsetY}px)` }}
+          className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.22)_0%,rgba(37,99,235,0.1)_40%,transparent_70%)] pointer-events-none blur-xl"
         />
 
         {/* TEXTO INFORMATIVO CENTRAL (SIN MÓDULOS)
@@ -128,7 +134,8 @@ export default function EcosystemBootIntro({ onComplete }) {
             y: isFadingText ? 15 : stage === 'ignite' ? 0 : 10,
           }}
           transition={{ duration: 0.35, ease: 'easeInOut' }}
-          className="absolute top-[calc(50%+58px)] left-0 right-0 flex flex-col items-center pointer-events-none text-center px-4"
+          style={{ top: `calc(50% + ${58 + opticalOffsetY}px)` }}
+          className="absolute left-0 right-0 flex flex-col items-center pointer-events-none text-center px-4"
         >
           <div className="flex items-center gap-2 mb-1">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />

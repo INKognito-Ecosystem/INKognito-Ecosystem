@@ -1,99 +1,131 @@
 import LegalPage from '../legal/LegalPage'
 
-export const PRIVACIDAD_ARTISTAS_TITLE = 'Política de Privacidad — Tattoo Artist Colombia'
-export const PRIVACIDAD_ARTISTAS_UPDATED = '6 de octubre de 2026'
-const DESCRIPTION = 'Política de privacidad del directorio de artistas Tattoo Artist Colombia: qué datos recolectamos de artistas y clientes, y tus derechos como titular.'
+export const PRIVACIDAD_ARTISTAS_TITLE = 'Política de Privacidad — INK (Tattoo Artist Colombia)'
+export const PRIVACIDAD_ARTISTAS_UPDATED = '23 de noviembre de 2026'
+const DESCRIPTION =
+  'Política de privacidad y tratamiento de datos personales del buscador nacional INK (Tattoo Artist Colombia) bajo la Ley 1581 de 2012: datos de artistas, estudios y clientes, infraestructura y derechos ARCO.'
 
 export function meta() {
   return [
-    { title: `${PRIVACIDAD_ARTISTAS_TITLE} | INKognito` },
+    { title: `${PRIVACIDAD_ARTISTAS_TITLE} | INKognito Ecosystem` },
     { name: 'description', content: DESCRIPTION },
     { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/tattoo-artist-colombia/privacidad` },
   ]
 }
 
-// Contenido separado del layout de ruta (2026-09-15) — ver mismo comentario
-// en TerminosPage.jsx; LegalModal.jsx reusa este contenido como overlay.
+// Contenido compartido entre /tattoo-artist-colombia/privacidad (theme="light") y LegalModal.jsx (variant="artistas").
 export function PrivacidadArtistasContent() {
   return (
     <>
       <div>
-        <h2>1. Responsable del tratamiento</h2>
+        <h2>1. Responsable del Tratamiento</h2>
         <p>
-          INKognito, con sede en Chigorodó, Urabá, Antioquia, Colombia, opera Tattoo Artist Colombia
-          como estudio de desarrollo de software — es responsable del tratamiento de los datos
-          personales que se describen en esta política dentro de este directorio.
+          <strong>INKognito Ecosystem</strong>, con sede en <strong>Chigorodó, Urabá, Antioquia, Colombia</strong>{' '}
+          (fundado por Jose Humanez), opera el buscador <strong>INK (Tattoo Artist Colombia)</strong> y actúa como
+          Responsable del Tratamiento de los datos personales aquí descritos conforme a la{' '}
+          <strong>Ley 1581 de 2012</strong> y el <strong>Decreto 1377 de 2013</strong> (Decreto 1074 de 2015).
         </p>
         <p>
-          <strong>Contacto para temas de privacidad:</strong> inkognitoecosystem@gmail.com
-        </p>
-      </div>
-
-      <div>
-        <h2>2. Datos de artistas</h2>
-        <p>
-          Al crear tu perfil recolectamos: nombre, municipio/departamento (y ubicación exacta, si la
-          activas), estilo, bio, WhatsApp, redes sociales, correo, y las fotos/diseños que subas. Si
-          conectas Mercado Pago, guardamos el token de acceso de tu cuenta (no tus datos bancarios ni de
-          tarjeta — eso lo administra Mercado Pago) para poder crear los cobros de tus ventas y
-          reservas.
-        </p>
-        <p>
-          Si el visitante permite su ubicación para el buscador "Cerca de ti", la usamos solo para ordenar
-          los resultados por distancia; se guarda en su navegador y no la asociamos a su identidad. Las
-          visitas a las páginas del directorio se registran con un identificador anónimo aleatorio, sin
-          datos personales ni dirección IP.
+          <strong>Contacto oficial de privacidad y PQR:</strong>{' '}
+          <a href="mailto:inkognitoecosystem@gmail.com">inkognitoecosystem@gmail.com</a> · WhatsApp:{' '}
+          <a href="https://wa.me/573207911013" target="_blank" rel="noreferrer">
+            +57 320 791 1013
+          </a>
         </p>
       </div>
 
       <div>
-        <h2>3. Datos de clientes</h2>
+        <h2>2. Datos de Artistas y Estudios</h2>
         <p>
-          Al comprar un diseño o reservar con un artista, recolectamos tu correo (y, en reservas,
-          nombre y WhatsApp) para poder enviarte la confirmación y para que el artista pueda contactarte
-          y coordinar la cita. Estos datos se comparten con el artista correspondiente — es necesario
-          para que el servicio funcione.
+          Al registrar un perfil de <strong>artista</strong> o de <strong>estudio de tatuaje</strong> recolectamos:
+          nombre, departamento, municipio, dirección/ubicación exacta (si la activas), estilo, biografía, WhatsApp,
+          redes sociales, correo electrónico, horarios/bloqueos de agenda y las fotos de perfil, portafolio o diseños
+          que subas. Si conectas <strong>Mercado Pago</strong>, almacenamos únicamente los tokens OAuth necesarios
+          para crear los cobros de tus ventas y reservas (nunca tus contraseñas ni datos bancarios).
+        </p>
+        <p>
+          El acceso para editar tu perfil funciona mediante enlaces y tokens personales almacenados en tu navegador
+          (<code>localStorage</code>); cuida esos enlaces para que nadie más edite tu información.
         </p>
       </div>
 
       <div>
-        <h2>4. Pagos</h2>
-        <p>
-          Los pagos se procesan directamente por Mercado Pago. INKognito no ve ni almacena tu número de
-          tarjeta ni otros datos financieros — solo recibe la confirmación de si el pago fue aprobado.
-        </p>
-      </div>
-
-      <div>
-        <h2>5. Con quién compartimos datos</h2>
-        <p>
-          Con el artista correspondiente (datos de contacto de quien compra o reserva) y con Mercado
-          Pago (para procesar el pago). No compartimos tus datos con otras empresas ni los usamos con
-          fines distintos a los descritos en esta política.
-        </p>
-      </div>
-
-      <div>
-        <h2>6. Tus derechos (Ley 1581 de 2012, Colombia)</h2>
-        <p>Como titular de tus datos personales, tienes derecho a:</p>
+        <h2>3. Datos de Clientes y Visitantes</h2>
         <ul>
-          <li>Conocer, actualizar y rectificar tus datos.</li>
-          <li>Solicitar prueba de la autorización otorgada.</li>
-          <li>Ser informado sobre el uso que se les ha dado.</li>
-          <li>Presentar quejas ante la Superintendencia de Industria y Comercio (SIC).</li>
-          <li>Revocar la autorización y/o solicitar la supresión de tus datos.</li>
-          <li>Acceder gratuitamente a tus datos.</li>
+          <li>
+            <strong>Compras de diseños y reservas con anticipo:</strong> recolectamos tu correo electrónico y, en
+            reservas, tu nombre, WhatsApp, fecha/hora elegida y mensaje para enviarte la confirmación y entregarle
+            tus datos de contacto al artista seleccionado.
+          </li>
+          <li>
+            <strong>Buscador &quot;Cerca de ti&quot;:</strong> si autorizas tu ubicación en el navegador, usamos tus
+            coordenadas aproximadas solo para ordenar resultados por distancia; se guardan localmente en tu navegador
+            y no se asocian a tu identidad.
+          </li>
+          <li>
+            <strong>Analítica de visitas:</strong> registramos visitas a perfiles y páginas del buscador con un
+            identificador anónimo aleatorio (<code>inkognito_visitor_id</code>), sin almacenar dirección IP.
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h2>4. Pagos (Mercado Pago)</h2>
+        <p>
+          Los pagos de diseños y reservas se procesan directamente en <strong>Mercado Pago</strong>. INKognito no ve
+          ni almacena números de tarjeta ni datos financieros; únicamente recibe la notificación y el identificador
+          de la transacción para confirmar el estado del pago.
+        </p>
+      </div>
+
+      <div>
+        <h2>5. Con Quién Compartimos Datos y Proveedores Tecnológicos</h2>
+        <p>
+          No vendemos tus datos. Solo se comparten o transmiten con los terceros estrictamente necesarios para operar
+          el buscador (incluyendo transmisión y transferencia internacional conforme al Art. 26 de la Ley 1581 de
+          2012):
+        </p>
+        <ul>
+          <li><strong>Artista o estudio elegido:</strong> recibe los datos de contacto del cliente que reserva o compra un diseño.</li>
+          <li><strong>Mercado Pago:</strong> procesa los pagos, prevención de fraude y dispersión OAuth.</li>
+          <li><strong>Infraestructura y operación:</strong> <strong>Vercel</strong> (alojamiento web), <strong>Railway</strong> (servidor y base de datos), <strong>Cloudinary</strong> (almacenamiento de fotos, portafolios y diseños) y <strong>Resend</strong> (correos de verificación, enlaces de edición y confirmaciones).</li>
+          <li><strong>Analítica y medición global del sitio:</strong> <strong>Google Analytics 4</strong> y <strong>Meta Pixel</strong> (puedes bloquear sus cookies desde la configuración de tu navegador).</li>
+        </ul>
+      </div>
+
+      <div>
+        <h2>6. Menores de Edad</h2>
+        <p>
+          El registro de perfiles, la compra de diseños y las reservas de citas de tatuaje están dirigidos a{' '}
+          <strong>mayores de 18 años</strong>. No recolectamos intencionalmente datos de menores sin autorización
+          legal de sus representantes (Art. 7, Ley 1581 de 2012).
+        </p>
+      </div>
+
+      <div>
+        <h2>7. Derechos ARCO y Plazos Legales (Ley 1581 de 2012)</h2>
+        <p>
+          Como titular tienes derecho a <strong>conocer, actualizar, rectificar y suprimir</strong> tus datos,
+          solicitar prueba de la autorización, ser informado sobre su uso, revocar tu autorización, acceder
+          gratuitamente a tus datos y presentar quejas ante la{' '}
+          <strong>Superintendencia de Industria y Comercio (SIC)</strong> previo agotamiento del trámite directo ante
+          INKognito.
+        </p>
+        <ul>
+          <li><strong>Consultas (Art. 14):</strong> respuesta en máximo <strong>10 días hábiles</strong> (prorrogable hasta 5 días hábiles adicionales informando motivos).</li>
+          <li><strong>Reclamos (Art. 15):</strong> respuesta en máximo <strong>15 días hábiles</strong> (prorrogable hasta 8 días hábiles adicionales; si está incompleto se requiere en 5 días hábiles).</li>
         </ul>
         <p>
-          Para ejercer cualquiera de estos derechos, escríbenos a inkognitoecosystem@gmail.com.
+          Radica tus solicitudes en{' '}
+          <a href="mailto:inkognitoecosystem@gmail.com">inkognitoecosystem@gmail.com</a>.
         </p>
       </div>
 
       <div>
-        <h2>7. Vigencia y cambios</h2>
+        <h2>8. Vigencia y Cambios</h2>
         <p>
-          Esta política puede actualizarse para reflejar cambios en el directorio o en la normativa
-          aplicable. La fecha de la última actualización siempre aparece al inicio de este documento.
+          Esta política rige desde la fecha indicada al inicio. Los cambios sustanciales se comunicarán antes o al
+          momento de implementarlos conforme al Decreto 1074 de 2015.
         </p>
       </div>
     </>

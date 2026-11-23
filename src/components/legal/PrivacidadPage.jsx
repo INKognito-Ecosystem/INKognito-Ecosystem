@@ -1,175 +1,295 @@
 import LegalPage from './LegalPage'
 
-export const PRIVACIDAD_TITLE = 'Política de Privacidad y Cookies'
-export const PRIVACIDAD_UPDATED = '6 de octubre de 2026'
-const DESCRIPTION = 'Política de privacidad y cookies de INKognito: qué datos usamos al comprar, quién los recibe, Mercado Pago, analítica del sitio y tus derechos como titular de datos personales.'
+export const PRIVACIDAD_TITLE = 'Política de Privacidad, Datos Personales y Cookies'
+export const PRIVACIDAD_UPDATED = '23 de noviembre de 2026'
+const DESCRIPTION =
+  'Política de tratamiento de datos personales y cookies de INKognito Ecosystem (Ley 1581 de 2012, Decreto 1377 de 2013): datos por rol, Mercado Pago, infraestructura cloud, derechos ARCO y plazos legales.'
 
 export function meta() {
   return [
-    { title: `${PRIVACIDAD_TITLE} | INKognito` },
+    { title: `${PRIVACIDAD_TITLE} | INKognito Ecosystem` },
     { name: 'description', content: DESCRIPTION },
     { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/privacidad` },
   ]
 }
 
-// Contenido separado del layout de ruta (2026-09-15) — ver mismo comentario
-// en TerminosPage.jsx; LegalModal.jsx reusa este contenido como overlay.
+// Contenido compartido entre la ruta /privacidad (tema oscuro) y LegalModal.jsx (overlay blanco).
 export function PrivacidadContent() {
   return (
     <>
       <div>
-        <h2>1. Responsable del tratamiento</h2>
-        <p>
-          INKognito, con sede en Chigorodó, Urabá, Antioquia, Colombia, fundado por Jose Humanez, es
-          responsable del tratamiento de los datos personales descritos en esta política. INKognito
-          administra este ecosistema digital (estudio de tatuajes, Supply, Store, Suple, Gym y el
-          directorio de artistas INK) y opera la plataforma de compra, pago y seguimiento que usan los
-          proveedores independientes que venden aquí.
-        </p>
-        <p>
-          <strong>Contacto para temas de privacidad:</strong> inkognitoecosystem@gmail.com
-        </p>
-      </div>
-
-      <div>
-        <h2>2. Qué datos recolectamos</h2>
-        <p>
-          <strong>Al comprar en el sitio</strong> (Supply, Store, Suple y pedidos directos de INKognito):
-          nombre, teléfono de WhatsApp, correo, municipio y dirección de entrega, y el mensaje opcional
-          que escribas. Con estos datos se arma tu pedido.
-        </p>
-        <p>
-          <strong>Pagos:</strong> los pagos los procesa Mercado Pago. Los datos de tu tarjeta o de tu
-          cuenta los captura y guarda Mercado Pago; INKognito no los ve ni los almacena. Nosotros solo
-          guardamos el estado del pago y su identificador.
-        </p>
-        <p>
-          <strong>Reservas y servicios de tatuaje:</strong> nombre, teléfono, correo y los datos de la
-          reserva o cita que solicites.
-        </p>
-        <p>
-          <strong>"Cerca de ti" en el directorio de artistas:</strong> si permites el acceso a tu
-          ubicación en el navegador, usamos tu ubicación aproximada para ordenar los resultados por
-          distancia. Esa ubicación se guarda solo en tu navegador y se envía al servidor únicamente para
-          esa búsqueda; no la guardamos asociada a tu identidad.
-        </p>
-        <p>
-          <strong>Datos de navegación:</strong> un identificador anónimo aleatorio, la página visitada y
-          el módulo al que pertenece. No guardamos tu dirección IP junto a estos registros.
-        </p>
-        <p>
-          <strong>Datos guardados en tu navegador:</strong> tus compras para la sección "Mis compras"
-          (número de compra y un código de seguimiento), tu carrito y algunas preferencias, como los
-          avisos de ayuda que ya viste. Estos datos viven en tu navegador, no en nuestros servidores, y
-          puedes borrarlos desde la configuración de tu navegador.
-        </p>
-        <p>
-          <strong>Ojo con el enlace de seguimiento:</strong> quien tenga el enlace de una compra puede
-          ver su estado, sus productos, su total, el nombre del vendedor y el de la transportadora. Por
-          eso no lo compartas con terceros.
-        </p>
-      </div>
-
-      <div>
-        <h2>3. Finalidad del tratamiento</h2>
+        <h2>En pocas palabras</h2>
         <ul>
-          <li>Procesar, confirmar y entregar tus pedidos y reservas.</li>
-          <li>Permitir que el proveedor o estudio que te vende te entregue el pedido o agende tu servicio, y te contacte por WhatsApp.</li>
-          <li>Mostrarte el estado de tu compra y, cuando aplique, avisarte por WhatsApp sobre el envío.</li>
-          <li>Entender qué páginas y productos generan más interés, para mejorar el catálogo.</li>
-          <li>Medir el resultado de campañas publicitarias (Meta, Instagram, Facebook).</li>
-          <li>Cumplir obligaciones contables y tributarias.</li>
+          <li>
+            <strong>Cumplimiento colombiano:</strong> Tratamos tus datos conforme a la{' '}
+            <strong>Ley 1581 de 2012</strong>, el <strong>Decreto 1377 de 2013</strong> (compilado en el Decreto
+            1074 de 2015) y la <strong>Ley 1266 de 2008</strong>.
+          </li>
+          <li>
+            <strong>No vendemos tus datos:</strong> Solo compartimos lo estrictamente necesario con el vendedor,
+            artista, transportadora (Ruta del Golfo) y proveedores tecnológicos que permiten operar el servicio.
+          </li>
+          <li>
+            <strong>Pagos seguros:</strong> Los datos de tarjeta se tokenizan directamente en{' '}
+            <strong>Mercado Pago</strong>; INKognito nunca almacena números de tarjeta ni códigos CVV.
+          </li>
+          <li>
+            <strong>Control total (ARCO):</strong> Puedes conocer, actualizar, rectificar o suprimir tus datos
+            escribiendo a <strong>inkognitoecosystem@gmail.com</strong> (consultas en máximo 10 días hábiles;
+            reclamos en máximo 15 días hábiles).
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h2>1. Responsable del Tratamiento</h2>
+        <p>
+          <strong>INKognito Ecosystem</strong>, fundado por <strong>Jose Humanez</strong> con domicilio principal en{' '}
+          <strong>Chigorodó, Urabá, Antioquia, Colombia</strong>, es el Responsable del Tratamiento de los datos
+          personales recolectados a través de <strong>inkognito-ecosystem.com</strong> y sus módulos asociados (
+          <strong>INK</strong>, <strong>Supply</strong>, <strong>Store</strong>, <strong>Suple</strong>,{' '}
+          <strong>Gym</strong>, <strong>Ruta del Golfo</strong> y <strong>INKognito Development Studio</strong>).
+        </p>
+        <p>
+          <strong>Área y canal oficial de Protección de Datos y PQR:</strong>{' '}
+          <a href="mailto:inkognitoecosystem@gmail.com">inkognitoecosystem@gmail.com</a> · WhatsApp:{' '}
+          <a href="https://wa.me/573207911013" target="_blank" rel="noreferrer">
+            +57 320 791 1013
+          </a>
+        </p>
+      </div>
+
+      <div>
+        <h2>2. Qué Datos Recolectamos según tu Rol</h2>
+        <div className="overflow-x-auto my-3">
+          <table>
+            <thead>
+              <tr>
+                <th>Rol</th>
+                <th>Datos recolectados</th>
+                <th>Finalidad principal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Compradores y Clientes</strong></td>
+                <td>Nombre, WhatsApp/teléfono, correo, departamento, municipio, dirección de entrega, mensaje opcional, comprobante Nequi (en pedidos directos) e identificador de pago.</td>
+                <td>Procesar pedidos, coordinar entregas, habilitar seguimiento y atender garantías o PQR.</td>
+              </tr>
+              <tr>
+                <td><strong>Clientes de INK (Citas y Diseños)</strong></td>
+                <td>Nombre, correo, WhatsApp, fecha/hora de reserva, mensaje y foto de referencia (cuando aplica).</td>
+                <td>Confirmar la compra de diseños o reservas y compartir tus datos con el artista elegido.</td>
+              </tr>
+              <tr>
+                <td><strong>Tatuadores y Estudios (INK)</strong></td>
+                <td>Nombre, ciudad/ubicación, estilo, biografía, WhatsApp, redes sociales, correo, fotos/portafolio, diseños, horarios y tokens OAuth de Mercado Pago.</td>
+                <td>Publicar el perfil en el buscador nacional, gestionar agenda y habilitar pagos directos (split).</td>
+              </tr>
+              <tr>
+                <td><strong>Tiendas y Proveedores (Supply, Store, Suple)</strong></td>
+                <td>Nombre comercial, ubicación, dirección, WhatsApp, correo, logo, portada, catálogo, política de envío y credenciales OAuth/clave pública de Mercado Pago.</td>
+                <td>Operar el catálogo multitenant, cumplir el registro de oferentes (Art. 53 Ley 1480) y dispersar pagos.</td>
+              </tr>
+              <tr>
+                <td><strong>Transportadoras y Envíos Directos (Ruta del Golfo)</strong></td>
+                <td>Nombre, NIT, dirección, municipio, logo, WhatsApp, correo, zonas de cobertura, vehículos/tarifas; en envíos directos: datos de remitente, destinatario y recaudo.</td>
+                <td>Coordinar recogidas, entregas, trazabilidad de envíos y liquidaciones de flete.</td>
+              </tr>
+              <tr>
+                <td><strong>Visitantes ("Cerca de ti" y navegación)</strong></td>
+                <td>Identificador anónimo aleatorio (<code>inkognito_visitor_id</code>), ruta visitada y coordenadas aproximadas solo si autorizas geolocalización.</td>
+                <td>Ordenar artistas por cercanía (sin asociarlo a tu identidad) y medir visitas por módulo sin guardar IP.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <h2>3. Procesamiento de Pagos (Mercado Pago)</h2>
+        <p>
+          Los pagos en línea se procesan a través de <strong>Mercado Pago</strong>:
+        </p>
+        <ul>
+          <li>
+            En <strong>Supply, Store y Suple</strong> usamos <strong>Mercado Pago Payment Brick (SDK v2)</strong>: los
+            datos de tu tarjeta son capturados y tokenizados directamente por Mercado Pago en tu navegador. Nuestro
+            servidor recibe únicamente el token seguro, el método de pago (y los datos mínimos de identificación
+            exigidos por PSE cuando eliges esa opción) para crear la transacción en la API de Mercado Pago.
+          </li>
+          <li>
+            En <strong>INK</strong> (diseños y reservas) el pago se realiza en <strong>Mercado Pago Checkout Pro</strong>.
+          </li>
+          <li>
+            INKognito <strong>nunca almacena números de tarjeta, fechas de vencimiento ni códigos CVV</strong>. Solo
+            conservamos el identificador de pago y su estado para confirmar tu orden.
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h2>4. Datos Guardados en tu Navegador (localStorage y sessionStorage)</h2>
+        <p>
+          Para mejorar tu experiencia sin obligarte a crear contraseña, guardamos ciertos datos localmente en tu
+          dispositivo (que puedes borrar en cualquier momento desde la configuración de tu navegador):
+        </p>
+        <ul>
+          <li><strong>Carrito y compras:</strong> carrito por módulo, historial local de &quot;Mis compras&quot; (ID y código de seguimiento) y tu dirección guardada para agilizar futuras compras.</li>
+          <li><strong>Cercanía y preferencias UI:</strong> coordenadas aproximadas de &quot;Cerca de ti&quot; (si diste permiso), avisos ya vistos y control de animación de inicio.</li>
+          <li><strong>Gestión de aliados:</strong> tokens de acceso para editar tu perfil de artista, estudio, tienda o catálogo desde tu dispositivo.</li>
         </ul>
         <p>
-          No usamos tus datos para tomar decisiones automatizadas que te afecten individualmente, ni los
-          vendemos a terceros.
+          <strong>Cuidado con tus enlaces personales:</strong> quien tenga el enlace de seguimiento de una compra o tu
+          enlace de edición de perfil/tienda puede ver o gestionar esa información. No los compartas con terceros.
         </p>
       </div>
 
       <div>
-        <h2>4. Cookies y tecnologías de rastreo</h2>
-        <table>
-          <thead>
-            <tr><th>Herramienta</th><th>Qué instala</th><th>Para qué</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Google Analytics 4</td><td>_ga, _ga_*</td><td>Medir visitas, páginas vistas y origen del tráfico</td></tr>
-            <tr><td>Meta Pixel</td><td>_fbp, _fbc</td><td>Medir efectividad de anuncios y retargeting</td></tr>
-            <tr><td>Analítica propia del sitio</td><td>Identificador aleatorio en tu navegador (inkognito_visitor_id)</td><td>Contar visitas por página y módulo, sin datos personales</td></tr>
-          </tbody>
-        </table>
-        <p>
-          Google LLC y Meta Platforms, Inc. operan fuera de Colombia: al usar el sitio, tus datos de
-          navegación pueden ser transferidos y procesados en sus servidores, conforme a sus propias
-          políticas de privacidad.
-        </p>
-        <p>
-          <strong>Cómo rechazarlas hoy:</strong> el sitio aún no tiene un banner de consentimiento. Puedes
-          bloquear las cookies de terceros desde la configuración de tu navegador, usar el modo incógnito
-          o instalar un bloqueador de rastreadores.
-        </p>
-      </div>
-
-      <div>
-        <h2>5. Con quién compartimos datos</h2>
-        <p>Compartimos solo lo necesario para cada finalidad:</p>
+        <h2>5. Finalidades del Tratamiento</h2>
         <ul>
-          <li><strong>Mercado Pago:</strong> procesa los pagos y recibe los datos necesarios para cobrar.</li>
-          <li><strong>El proveedor o estudio que te vende</strong> (tienda, proveedor de Supply, estudio o artista): recibe tu nombre, teléfono, correo, dirección y el detalle de tu pedido, para entregártelo o agendar tu servicio.</li>
-          <li><strong>Transportadoras de la red Ruta del Golfo</strong> (incluida Eljach): reciben tu nombre, teléfono y dirección de entrega para recoger y llevar el pedido.</li>
-          <li><strong>Google LLC</strong> (Google Analytics) y <strong>Meta Platforms, Inc.</strong> (Meta Pixel y WhatsApp Business).</li>
-          <li><strong>Proveedores de infraestructura</strong> que alojan el sitio y las bases de datos y envían los mensajes automáticos de WhatsApp: Vercel, Railway y Twilio.</li>
+          <li>Gestionar compras, pagos, reservas con anticipo, entregas y notificaciones por correo o WhatsApp.</li>
+          <li>Compartir con el vendedor, artista, estudio o transportadora los datos indispensables para ejecutar tu pedido o cita.</li>
+          <li>Verificar cuentas de aliados mediante enlaces enviados por correo electrónico y prevenir fraude o suplantación.</li>
+          <li>Analizar el rendimiento de páginas y módulos para mejorar el catálogo y medir campañas publicitarias.</li>
+          <li>Cumplir deberes legales, contables, tributarios y requerimientos de autoridades competentes en Colombia.</li>
         </ul>
         <p>
-          No vendemos tus datos. Cada tercero trata tus datos bajo sus propias políticas y solo para las
-          finalidades indicadas.
+          <strong>No vendemos tus datos personales</strong> ni los usamos para decisiones automatizadas que produzcan
+          efectos jurídicos negativos sin intervención humana.
         </p>
       </div>
 
       <div>
-        <h2>6. Autorización</h2>
+        <h2>6. Cookies y Tecnologías de Rastreo</h2>
+        <div className="overflow-x-auto my-3">
+          <table>
+            <thead>
+              <tr>
+                <th>Herramienta</th>
+                <th>Identificador / Cookie</th>
+                <th>Finalidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Google Analytics 4</td>
+                <td><code>_ga</code>, <code>_ga_*</code></td>
+                <td>Medir tráfico, páginas visitadas y origen de visitas.</td>
+              </tr>
+              <tr>
+                <td>Meta Pixel</td>
+                <td><code>_fbp</code>, <code>_fbc</code></td>
+                <td>Medir efectividad de campañas en Instagram y Facebook.</td>
+              </tr>
+              <tr>
+                <td>Analítica propia</td>
+                <td><code>inkognito_visitor_id</code></td>
+                <td>Conteo anónimo de visitas por página y módulo, sin almacenar IP.</td>
+              </tr>
+              <tr>
+                <td>Sesión técnica (solo panel)</td>
+                <td><code>connect.sid</code> (HttpOnly)</td>
+                <td>Autenticación segura de administradores y operadores logísticos.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <p>
-          Al completar una compra, una reserva o un formulario del sitio, autorizas el tratamiento de tus
-          datos para las finalidades de la sección 3.
+          Puedes bloquear o eliminar cookies en cualquier momento desde la configuración de tu navegador, usar modo
+          incógnito o activar bloqueadores de rastreadores.
         </p>
       </div>
 
       <div>
-        <h2>7. Tus derechos (Ley 1581 de 2012, Colombia)</h2>
-        <p>Como titular de tus datos personales, tienes derecho a:</p>
+        <h2>7. Con Quién Compartimos Datos y Transferencia/Transmisión Internacional</h2>
+        <p>
+          Compartimos datos únicamente cuando es indispensable para prestar el servicio. Debido a nuestra arquitectura
+          en la nube, algunos proveedores procesan información en servidores fuera de Colombia conforme al{' '}
+          <strong>Artículo 26 de la Ley 1581 de 2012</strong> y los{' '}
+          <strong>Artículos 2.2.2.25.5.1 y 2.2.2.25.5.2 del Decreto 1074 de 2015</strong>:
+        </p>
         <ul>
-          <li>Conocer, actualizar y rectificar tus datos.</li>
-          <li>Solicitar prueba de la autorización otorgada.</li>
-          <li>Ser informado sobre el uso que se les ha dado.</li>
-          <li>Presentar quejas ante la Superintendencia de Industria y Comercio (SIC).</li>
-          <li>Revocar la autorización y/o solicitar la supresión de tus datos, cuando no exista un deber legal o contractual que lo impida.</li>
-          <li>Acceder gratuitamente a tus datos.</li>
+          <li><strong>Vendedores, proveedores, artistas y estudios:</strong> reciben los datos de tu pedido o reserva para cumplir la entrega o cita.</li>
+          <li><strong>Transportadoras de Ruta del Golfo:</strong> reciben nombre, teléfono, dirección y valor de flete/recaudo para realizar la entrega.</li>
+          <li><strong>Mercado Pago (Transferencia internacional / Responsable independiente):</strong> procesa pagos, tokenización, prevención de fraude y dispersión OAuth.</li>
+          <li><strong>Proveedores tecnológicos (Transmisión internacional / Encargados):</strong> <strong>Vercel</strong> (alojamiento web), <strong>Railway</strong> (servidor y base de datos PostgreSQL), <strong>Cloudinary</strong> (almacenamiento de fotos, portafolios, diseños y comprobantes), <strong>Resend</strong> (correos transaccionales y verificación) y <strong>Google Sheets API</strong> (control interno de liquidaciones).</li>
+          <li><strong>Analítica y mensajería:</strong> <strong>Google LLC</strong> (Google Analytics 4) y <strong>Meta Platforms, Inc.</strong> (Meta Pixel y WhatsApp).</li>
         </ul>
         <p>
-          Para ejercer cualquiera de estos derechos, escríbenos a inkognitoecosystem@gmail.com o por
-          WhatsApp al número de contacto del estudio.
+          Al registrarte, comprar o usar la plataforma otorgas tu autorización previa, expresa e informada para el
+          tratamiento, transmisión y transferencia internacional necesarios para las finalidades aquí descritas.
         </p>
       </div>
 
       <div>
-        <h2>8. Conservación y seguridad</h2>
+        <h2>8. Menores de Edad (Art. 7, Ley 1581 de 2012)</h2>
         <p>
-          Conservamos tus datos mientras sean necesarios para las finalidades descritas y para cumplir
-          obligaciones legales. Los registros contables y tributarios se conservan por el tiempo que exige
-          la ley.
-        </p>
-        <p>
-          El sitio funciona con conexión cifrada (HTTPS). Los pagos no pasan por nuestros servidores. Los
-          enlaces de seguimiento y de gestión de cada tienda o artista funcionan con un código personal que
-          solo tú debes conocer.
+          INKognito Ecosystem está dirigido a <strong>mayores de 18 años</strong>. No recolectamos intencionalmente
+          datos personales de niños, niñas o adolescentes sin la autorización previa de sus padres o representantes
+          legales y el respeto irrestricto de su interés superior. Si detectamos datos suministrados por un menor sin
+          autorización, procederemos a su supresión inmediata.
         </p>
       </div>
 
       <div>
-        <h2>9. Vigencia y cambios</h2>
+        <h2>9. Derechos ARCO (Habeas Data) y Plazos de Respuesta</h2>
         <p>
-          Esta política puede actualizarse para reflejar cambios en el sitio o en la normativa aplicable.
-          La fecha de la última actualización siempre aparece al inicio de este documento.
+          Como titular de tus datos personales (<strong>Art. 8, Ley 1581 de 2012</strong>), tienes derecho a:{' '}
+          <strong>conocer, actualizar y rectificar</strong> tus datos; solicitar prueba de la autorización; ser
+          informado sobre su uso; <strong>revocar la autorización y/o solicitar la supresión</strong> cuando no exista
+          un deber legal o contractual de conservarlos; acceder gratuitamente a ellos; y presentar quejas ante la{' '}
+          <strong>Superintendencia de Industria y Comercio (SIC)</strong>, previo agotamiento del trámite directo ante
+          INKognito (Art. 16).
+        </p>
+        <div className="overflow-x-auto my-3">
+          <table>
+            <thead>
+              <tr>
+                <th>Tipo de solicitud</th>
+                <th>Plazo máximo de respuesta</th>
+                <th>Prórroga legal máxima</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Consultas</strong> (Art. 14, Ley 1581)</td>
+                <td>10 días hábiles</td>
+                <td>+ 5 días hábiles adicionales (informando motivos)</td>
+              </tr>
+              <tr>
+                <td><strong>Reclamos</strong> — corrección, supresión o revocatoria (Art. 15, Ley 1581)</td>
+                <td>15 días hábiles</td>
+                <td>+ 8 días hábiles adicionales (informando motivos; si está incompleto se requiere en 5 días hábiles)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Para radicar una consulta o reclamo, escribe a{' '}
+          <a href="mailto:inkognitoecosystem@gmail.com">inkognitoecosystem@gmail.com</a> indicando tu nombre completo,
+          documento/teléfono asociado, descripción clara de tu solicitud y correo para recibir respuesta.
+        </p>
+      </div>
+
+      <div>
+        <h2>10. Seguridad de la Información y Conservación</h2>
+        <p>
+          Implementamos medidas técnicas y administrativas acordes al riesgo: cifrado en tránsito (HTTPS/TLS),
+          almacenamiento de contraseñas mediante algoritmos criptográficos de hash, control de acceso por roles,
+          verificación de correos por token y tokenización externa de pagos. Conservamos los datos mientras sean
+          necesarios para las finalidades descritas y por los términos exigidos por la normativa contable, tributaria
+          y comercial colombiana.
+        </p>
+      </div>
+
+      <div>
+        <h2>11. Vigencia y Modificaciones</h2>
+        <p>
+          Esta política rige a partir de la fecha indicada al inicio. Cualquier cambio sustancial respecto a la
+          identificación del responsable o las finalidades del tratamiento será comunicado oportunamente a través de
+          la plataforma o por correo electrónico antes o al momento de su entrada en vigencia (Art. 2.2.2.25.2.2,
+          Decreto 1074 de 2015).
         </p>
       </div>
     </>

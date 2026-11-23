@@ -1,11 +1,13 @@
 import LegalPage from './LegalPage'
 
 const TITLE = 'Envíos, Cambios y Devoluciones'
-const DESCRIPTION = 'Política de envíos, cambios y devoluciones de INKognito Supply, Store, Suple y Gym: cómo se compra, métodos de pago, envío, seguimiento y derecho de retracto.'
+const UPDATED = '23 de noviembre de 2026'
+const DESCRIPTION =
+  'Política de envíos, cambios, garantías, derecho de retracto (Ley 2439 de 2024) y reversión del pago (Decreto 587 de 2016) para Supply, Store, Suple, Gym y Ruta del Golfo.'
 
 export function meta() {
   return [
-    { title: `${TITLE} | INKognito` },
+    { title: `${TITLE} | INKognito Ecosystem` },
     { name: 'description', content: DESCRIPTION },
     { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/envios-cambios-devoluciones` },
   ]
@@ -13,102 +15,125 @@ export function meta() {
 
 export default function EnviosPage() {
   return (
-    <LegalPage title={TITLE} updated="6 de octubre de 2026">
+    <LegalPage title={TITLE} updated={UPDATED}>
       <div>
         <p>
-          Aplica a los productos físicos de Supply, Store, Suple y Gym. No aplica al servicio de tatuaje, que
-          se rige por acuerdo directo con el artista.
+          Esta política aplica a los productos físicos comercializados en <strong>Supply</strong>,{' '}
+          <strong>Store</strong>, <strong>Suple</strong> y <strong>Gym</strong>, así como a los despachos
+          coordinados a través de la red <strong>Ruta del Golfo</strong>. Los servicios de tatuaje y diseños digitales
+          de <strong>INK</strong> se rigen por los términos propios de Tattoo Artist Colombia.
         </p>
       </div>
 
       <div>
-        <h2>1. Cómo se compra</h2>
+        <h2>1. Cómo se Compra y Métodos de Pago</h2>
         <ul>
-          <li><strong>Productos de un proveedor (Store, Suple, Supply):</strong> agregas productos al carrito, eliges el municipio de entrega y pagas en el sitio con Mercado Pago. El carrito acepta productos de un solo proveedor a la vez.</li>
-          <li><strong>Pedidos directos de INKognito:</strong> se confirman por WhatsApp con nuestro equipo.</li>
+          <li>
+            <strong>Productos de proveedores y tiendas aliadas (Supply, Store, Suple):</strong> agregas productos al
+            carrito (un proveedor por compra), eliges tu municipio de entrega y pagas dentro del sitio con{' '}
+            <strong>Mercado Pago</strong> (tarjeta de crédito/débito, PSE o medios habilitados).
+          </li>
+          <li>
+            <strong>Pedidos directos de INKognito (incluyendo Gym):</strong> se confirman por WhatsApp y se pagan por{' '}
+            <strong>Nequi</strong> (con comprobante verificado antes de despachar) o contraentrega en rutas
+            habilitadas. Las máquinas de Gym fabricadas a pedido pueden requerir un anticipo acordado previamente.
+          </li>
         </ul>
       </div>
 
       <div>
-        <h2>2. Métodos de pago</h2>
+        <h2>2. Envío y Red Logística Ruta del Golfo</h2>
         <ul>
-          <li><strong>Productos de un proveedor:</strong> tarjeta de crédito o débito, PSE y efectivo en puntos autorizados, según lo que ofrezca Mercado Pago en tu compra.</li>
-          <li><strong>Pedidos directos de INKognito:</strong> Nequi (con comprobante verificado antes de despachar) o contraentrega en las rutas que indiquemos. Las máquinas de Gym bajo pedido pueden requerir un anticipo.</li>
+          <li>
+            <strong>Ruta del Golfo (transportadoras multitenant):</strong> cuando la tienda o proveedor tiene
+            cobertura en tu zona, el checkout muestra antes de pagar el costo de envío según tu municipio y la tabla
+            de fletes vigente.
+          </li>
+          <li>
+            <strong>Política de envío del vendedor:</strong> cada proveedor o tienda define si asume el envío, si es
+            gratis desde un monto mínimo o si corre por cuenta del comprador (siempre visible antes de pagar).
+          </li>
+          <li>
+            <strong>Supply y envíos nacionales:</strong> cuando el despacho es fuera de ruta local o en compras de
+            Supply, el proveedor coordina la transportadora y guía contigo por WhatsApp.
+          </li>
+          <li>
+            <strong>Plazo máximo legal (Art. 50, Ley 1480 de 2011):</strong> si no se pacta un plazo distinto antes
+            del pago, el tiempo máximo de entrega es de <strong>30 días calendario</strong>.
+          </li>
         </ul>
       </div>
 
       <div>
-        <h2>3. Envío</h2>
-        <ul>
-          <li><strong>Ruta del Golfo (Urabá):</strong> cuando el proveedor tiene cobertura en tu zona, el checkout muestra antes de pagar el envío según el municipio de destino y la tabla vigente.</li>
-          <li><strong>Política de envío del proveedor:</strong> cada proveedor define si asume el envío, si lo ofrece gratis desde un monto, o si lo paga el comprador. Esa política se muestra antes de pagar.</li>
-          <li><strong>Cuando el envío lo paga el comprador:</strong> si el checkout muestra un monto, se paga aparte al recibir el pedido. Si no muestra monto, el proveedor coordina el envío contigo directamente por WhatsApp.</li>
-          <li><strong>Supply:</strong> el proveedor coordina la entrega contigo directamente por WhatsApp.</li>
-        </ul>
-      </div>
-
-      <div>
-        <h2>4. Seguimiento del pedido</h2>
+        <h2>3. Seguimiento del Pedido</h2>
         <p>
-          Al pagar, recibes un enlace de seguimiento y tu compra queda en "Mis compras" del navegador donde
-          pagaste.
+          Al confirmar tu compra recibes un enlace de seguimiento y tu orden queda guardada en{' '}
+          <strong>&quot;Mis compras&quot;</strong> en el navegador donde realizaste el pago:
         </p>
         <ul>
-          <li><strong>Store y Suple:</strong> Pedido realizado → Pago aprobado → Preparando envío → En camino → Entregado. La transportadora registra cada paso. Cuando recoge o entrega tu pedido, te podemos avisar por WhatsApp.</li>
-          <li><strong>Supply:</strong> Pedido realizado → Pago aprobado → Recibido. El paso final lo confirmas tú con el botón "Ya recibí mi pedido", porque la entrega se coordina directamente con el proveedor.</li>
+          <li><strong>Store y Suple:</strong> Pedido realizado → Pago aprobado → Preparando envío → En camino → Entregado (con trazabilidad de la transportadora asignada).</li>
+          <li><strong>Supply:</strong> Pedido realizado → Pago aprobado → Recibido (confirmado por el comprador al recibir del proveedor).</li>
         </ul>
       </div>
 
       <div>
-        <h2>5. Derecho de retracto (Ley 1480 de 2011)</h2>
+        <h2>4. Derecho de Retracto (Art. 47, Ley 1480 de 2011 y Ley 2439 de 2024)</h2>
         <p>
-          Si compraste a distancia (en el sitio o por WhatsApp), tienes derecho a retractarte dentro de los{' '}
-          <strong>5 días hábiles siguientes</strong> a la entrega, siempre que:
+          Para compras a distancia de productos físicos no exceptuados, tienes derecho a retractarte dentro de los{' '}
+          <strong>5 días hábiles siguientes</strong> a la entrega, siempre que el producto esté sin usar, en su
+          empaque original y con etiquetas y accesorios completos.
         </p>
-        <ul>
-          <li>El producto esté sin usar, en su empaque original, con etiquetas y accesorios completos.</li>
-          <li>No aplique alguna de las excepciones de la sección 6.</li>
-        </ul>
         <p>
-          El retracto lo atiende el vendedor del producto; si el producto es de INKognito, lo atiende
-          INKognito. Para ejercerlo, escribe por WhatsApp dentro del plazo indicando el número de pedido y el
-          motivo.
-        </p>
-      </div>
-
-      <div>
-        <h2>6. Excepciones al derecho de retracto</h2>
-        <p>Por razones de higiene y seguridad, no aceptamos devolución de:</p>
-        <ul>
-          <li>Agujas, cartuchos y otros insumos de tatuaje que hayan salido de su empaque sellado.</li>
-          <li>Productos de higiene o de uso personal que hayan sido desprecintados.</li>
-          <li>Productos personalizados o hechos a pedido.</li>
-        </ul>
-      </div>
-
-      <div>
-        <h2>7. Cambios por defecto de fábrica</h2>
-        <p>
-          Si el producto llega defectuoso o distinto a lo solicitado, se cambia sin costo adicional. Contacta al
-          vendedor por WhatsApp con fotos del producto y del empaque dentro de los 5 días siguientes a la
-          entrega.
+          Conforme a la <strong>Ley 2439 de 2024</strong>, el reembolso total del dinero se efectuará en un plazo
+          máximo de <strong>15 días calendario</strong> contados desde que ejerces el retracto, suministras los datos
+          para la devolución y entregas el producto en las mismas condiciones. El costo del flete de retorno por
+          retracto voluntario corre por cuenta del comprador.
         </p>
       </div>
 
       <div>
-        <h2>8. Costos de flete en devoluciones y cambios</h2>
+        <h2>5. Excepciones al Derecho de Retracto</h2>
+        <p>Por mandato legal (Art. 47, Ley 1480 de 2011), seguridad e higiene, no aplica retracto en:</p>
         <ul>
-          <li>Si el cambio es por error del vendedor o producto defectuoso, el flete de retorno corre por cuenta del vendedor.</li>
-          <li>Si es un retracto voluntario del comprador (producto en buen estado, sin defecto), el flete de retorno corre por cuenta del comprador.</li>
+          <li>Agujas, cartuchos estériles, tintas y consumibles de tatuaje que hayan salido de su empaque sellado (<strong>Supply</strong>).</li>
+          <li>Suplementos dietarios (proteínas, creatina, pre-entrenos, vitaminas) cuyo sello de seguridad haya sido roto o alterado (<strong>Suple</strong>).</li>
+          <li>Prendas de uso íntimo o personal desprecintadas (<strong>Store</strong>).</li>
+          <li>Productos fabricados a pedido o a medida: máquinas de gimnasio bajo pedido (<strong>Gym</strong>) y piezas personalizadas de carpintería o herrería (<strong>Store</strong>).</li>
+          <li>Contenidos digitales descargables o cursos una vez entregados o habilitado su acceso.</li>
         </ul>
       </div>
 
       <div>
-        <h2>9. Contacto</h2>
+        <h2>6. Garantía, Defectos de Fábrica y Reversión del Pago</h2>
+        <ul>
+          <li>
+            <strong>Defectos o error en el despacho:</strong> si el producto llega defectuoso o distinto a lo pedido,
+            reporta con fotos del producto y del empaque al vendedor (cuyo WhatsApp figura en tu seguimiento). El
+            flete de retorno por error o defecto corre por cuenta del vendedor.
+          </li>
+          <li>
+            <strong>Garantía legal:</strong> 1 año para productos nuevos (o el término mayor informado por el
+            fabricante) y hasta la fecha de vencimiento en bienes perecederos (suplementos/tintas).
+          </li>
+          <li>
+            <strong>Reversión del pago (Decreto 587 de 2016):</strong> para pagos electrónicos (tarjeta o PSE vía
+            Mercado Pago), puedes solicitarla dentro de los <strong>5 días hábiles</strong> ante fraude, operación no
+            solicitada, producto no recibido, diferente o defectuoso; se hace efectiva en hasta{' '}
+            <strong>15 días hábiles</strong>.
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h2>7. Contacto y PQR</h2>
         <p>
-          Cualquier solicitud se gestiona por WhatsApp con el vendedor, cuyo número aparece en el seguimiento de
-          tu pedido. Si el producto es de INKognito, la gestiona nuestro equipo en inkognitoecosystem@gmail.com
-          o por WhatsApp.
+          Para compras a un proveedor o tienda aliada, contacta primero al vendedor desde el enlace de seguimiento de
+          tu pedido. Para productos propios de INKognito o mediación en casos de incumplimiento, escríbenos a{' '}
+          <a href="mailto:inkognitoecosystem@gmail.com">inkognitoecosystem@gmail.com</a> o por WhatsApp al{' '}
+          <a href="https://wa.me/573207911013" target="_blank" rel="noreferrer">
+            +57 320 791 1013
+          </a>
+          .
         </p>
       </div>
     </LegalPage>

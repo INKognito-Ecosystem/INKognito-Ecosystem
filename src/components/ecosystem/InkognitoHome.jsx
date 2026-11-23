@@ -73,11 +73,11 @@ const MODULES = [
     id: 'ink',
     to: '/tattoo-artist-colombia',
     eyebrow: 'Directorio Nacional',
-    name: 'Artistas & Estudios',
+    name: 'Encuentra tu Tatuador',
     Icon: PenTool,
     color: '#dc2626',
     on: '#ffffff',
-    tagline: 'Plataforma nacional de artistas profesionales, portafolios verificados y agenda directa.',
+    tagline: 'Plataforma nacional de artistas tatuadores, portafolios verificados y agenda directa.',
     facts: [
       'Portafolios por estilo y técnica',
       'Contacto y agenda directa con el artista',
@@ -87,7 +87,7 @@ const MODULES = [
       // Listo para recibir { type: 'image', src } o { type: 'video', src, poster }
       media: null,
       badge: 'INK · BUSCADOR DE TATUADORES',
-      headline: 'Encuentra tu tatuador ideal en segundos',
+      headline: 'Elige con certeza y agenda sin intermediarios',
       copy: 'Filtra artistas y estudios verificados por ciudad, técnica y estilo, o crea tu perfil profesional con citas en línea.',
       highlights: ['Buscador por estilo', 'Citas directas', 'Venta de diseños'],
       secondaryCta: { label: 'Soy tatuador · Registrarme', to: '/tattoo-artist-colombia/unete' },
@@ -730,20 +730,17 @@ export default function InkognitoHome() {
           señal (ahora son blancos de base): subrayan al pasar el mouse. */}
       <div className="relative z-10 w-full text-center pb-2 sm:pb-3 shrink-0" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.75)' }}>
         <p className="text-white text-[9.5px] sm:text-[12px]">
-          © 2026 INKognito. Todos los derechos reservados.
+          © 2026 INKognito Ecosystem. Todos los derechos reservados.
         </p>
-        <div className="flex justify-center items-center gap-5 mt-2 text-[12px]">
-          <button type="button" onClick={() => setShowBoot(true)} className="text-zinc-400 hover:text-amber-400 transition-colors flex items-center gap-1.5 text-[11px]">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" /> Probar Encendido
-          </button>
-          <span className="text-zinc-700">·</span>
+        <div className="flex justify-center items-center gap-3 mt-1.5 text-[11px] sm:text-[12px]">
           {/* Botones, no Links (2026-09-15) — abren el modal en vez de
               navegar a /terminos //privacidad, ver comentario de estado
               arriba. */}
-          <button type="button" onClick={() => setLegalOpen('terminos')} className="text-white hover:underline underline-offset-2 transition-colors">
+          <button type="button" onClick={() => setLegalOpen('terminos')} className="text-white/90 hover:text-white hover:underline underline-offset-2 transition-colors">
             Términos
           </button>
-          <button type="button" onClick={() => setLegalOpen('privacidad')} className="text-white hover:underline underline-offset-2 transition-colors">
+          <span className="text-white/35" aria-hidden="true">·</span>
+          <button type="button" onClick={() => setLegalOpen('privacidad')} className="text-white/90 hover:text-white hover:underline underline-offset-2 transition-colors">
             Privacidad
           </button>
         </div>
