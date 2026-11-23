@@ -72,14 +72,14 @@ const MODULES = [
   {
     id: 'ink',
     to: '/tattoo-artist-colombia',
-    eyebrow: 'Buscador Nacional',
-    name: 'Encuentra tu Tatuador',
+    eyebrow: 'Directorio Nacional',
+    name: 'Artistas & Estudios',
     Icon: PenTool,
     color: '#dc2626',
     on: '#ffffff',
-    tagline: 'El buscador oficial de tatuadores y estudios verificados en Colombia.',
+    tagline: 'Plataforma nacional de artistas profesionales, portafolios verificados y agenda directa.',
     facts: [
-      'Busca por estilo, ciudad y portafolio real',
+      'Portafolios por estilo y técnica',
       'Contacto y agenda directa con el artista',
       'Registro oficial para tatuadores y estudios',
     ],
