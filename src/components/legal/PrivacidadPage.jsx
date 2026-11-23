@@ -35,7 +35,7 @@ export function PrivacidadContent() {
           </li>
           <li>
             <strong>Control total (ARCO):</strong> Puedes conocer, actualizar, rectificar o suprimir tus datos
-            escribiendo a <strong>inkognitoecosystem@gmail.com</strong> (consultas en máximo 10 días hábiles;
+            escribiendo a <strong>soporte@inkognito-ecosystem.com</strong> (consultas en máximo 10 días hábiles;
             reclamos en máximo 15 días hábiles).
           </li>
         </ul>
@@ -52,7 +52,7 @@ export function PrivacidadContent() {
         </p>
         <p>
           <strong>Área y canal oficial de Protección de Datos y PQR:</strong>{' '}
-          <a href="mailto:inkognitoecosystem@gmail.com">inkognitoecosystem@gmail.com</a> · WhatsApp:{' '}
+          <a href="mailto:soporte@inkognito-ecosystem.com">soporte@inkognito-ecosystem.com</a> · WhatsApp:{' '}
           <a href="https://wa.me/573207911013" target="_blank" rel="noreferrer">
             +57 320 791 1013
           </a>
@@ -267,7 +267,7 @@ export function PrivacidadContent() {
         </div>
         <p>
           Para radicar una consulta o reclamo, escribe a{' '}
-          <a href="mailto:inkognitoecosystem@gmail.com">inkognitoecosystem@gmail.com</a> indicando tu nombre completo,
+          <a href="mailto:soporte@inkognito-ecosystem.com">soporte@inkognito-ecosystem.com</a> indicando tu nombre completo,
           documento/teléfono asociado, descripción clara de tu solicitud y correo para recibir respuesta.
         </p>
       </div>

@@ -342,7 +342,7 @@ export function TerminosContent() {
         </p>
         <p>
           <strong>Canales de atención y PQR:</strong>{' '}
-          <a href="mailto:inkognitoecosystem@gmail.com">inkognitoecosystem@gmail.com</a> · WhatsApp:{' '}
+          <a href="mailto:soporte@inkognito-ecosystem.com">soporte@inkognito-ecosystem.com</a> · WhatsApp:{' '}
           <a href="https://wa.me/573207911013" target="_blank" rel="noreferrer">
             +57 320 791 1013
           </a>{' '}

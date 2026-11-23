@@ -129,7 +129,7 @@ export default function EnviosPage() {
         <p>
           Para compras a un proveedor o tienda aliada, contacta primero al vendedor desde el enlace de seguimiento de
           tu pedido. Para productos propios de INKognito o mediación en casos de incumplimiento, escríbenos a{' '}
-          <a href="mailto:inkognitoecosystem@gmail.com">inkognitoecosystem@gmail.com</a> o por WhatsApp al{' '}
+          <a href="mailto:soporte@inkognito-ecosystem.com">soporte@inkognito-ecosystem.com</a> o por WhatsApp al{' '}
           <a href="https://wa.me/573207911013" target="_blank" rel="noreferrer">
             +57 320 791 1013
           </a>
