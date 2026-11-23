@@ -188,7 +188,7 @@ export default function InkognitoHome() {
     )
   }, [active])
 
-  const goTo = (i) => swiperRef.current?.slideTo(i)
+  const goTo = (i) => swiperRef.current?.slideToLoop(i)
 
   return (
     <section className="relative h-dvh bg-black text-white flex flex-col items-center px-6 overflow-hidden">
@@ -314,27 +314,30 @@ export default function InkognitoHome() {
         </div>
       </div>
 
-      {/* CONTENIDO — espacio reorganizado sin el título INKOGNITO (el nombre ya se establece
-          en el encendido y se ancla al logo del navbar, liberando espacio para que el carrusel
-          respire con holgura tanto en móvil como en laptop/PC) */}
-      <div className="relative z-10 flex flex-col items-center justify-between w-full flex-1 min-h-0 pt-[76px] sm:pt-[82px] pb-2">
+      {/* CONTENIDO — espacio reorganizado arriba en móvil (sin el h1 INKOGNITO) para que la frase,
+          Select Module y las cards queden centradas/elevadas con balance natural y sin empujarse abajo */}
+      <div className="relative z-10 flex flex-col items-center justify-start md:justify-center gap-2 sm:gap-4 w-full flex-1 min-h-0 pt-[62px] sm:pt-[76px] pb-2">
 
         {/* Encabezado limpio y proporcionado */}
-        <div className="text-center my-auto shrink-0 py-1 sm:py-2">
+        <div className="text-center shrink-0 pt-1 pb-0.5 sm:py-2">
           <p className="text-zinc-300 uppercase tracking-[0.25em] sm:tracking-[0.5em] text-xs sm:text-sm md:text-base font-semibold whitespace-nowrap px-2">
             Disciplina • Arte • Identidad
           </p>
 
-          <p className="text-white/80 uppercase tracking-[0.35em] sm:tracking-[0.45em] text-[11px] sm:text-xs mt-1.5 font-medium">
+          <p className="text-white/80 uppercase tracking-[0.35em] sm:tracking-[0.45em] text-[11px] sm:text-xs mt-1 font-medium">
             Select Module
           </p>
         </div>
 
-        {/* CARRUSEL — mayor altura disponible para que las tarjetas respiren sin cortes */}
-        <div className="relative w-screen flex-1 min-h-0 max-h-[460px] [@media(min-height:780px)]:max-h-[500px]">
+        {/* CARRUSEL — bucle infinito bidireccional arrancando SIEMPRE en INK al centro,
+            con Supply asomando a la derecha y Suplementación asomando a la izquierda */}
+        <div className="relative w-screen flex-1 min-h-0 max-h-[450px] [@media(min-height:780px)]:max-h-[500px]">
           <Swiper
             modules={[EffectCoverflow, Keyboard, A11y]}
             effect="coverflow"
+            loop
+            initialSlide={0}
+            loopAdditionalSlides={2}
             grabCursor
             centeredSlides
             slidesPerView="auto"
@@ -343,16 +346,20 @@ export default function InkognitoHome() {
             keyboard={{ enabled: true }}
             a11y={{ prevSlideMessage: 'Módulo anterior', nextSlideMessage: 'Módulo siguiente' }}
             coverflowEffect={{ rotate: 14, stretch: 0, depth: 140, modifier: 1, scale: 0.86, slideShadows: false }}
-            onSwiper={(s) => { swiperRef.current = s }}
-            onSlideChange={(s) => setActive(s.activeIndex)}
-            style={{ width: '100%', height: '100%', padding: '14px 0' }}
+            onSwiper={(s) => {
+              swiperRef.current = s
+              setActive(s.realIndex % MODULES.length)
+            }}
+            onSlideChange={(s) => setActive(s.realIndex % MODULES.length)}
+            style={{ width: '100%', height: '100%', padding: '10px 0' }}
           >
-            {MODULES.map((m, i) => {
+            {[...MODULES, ...MODULES].map((m, idx) => {
+              const i = idx % MODULES.length
               const isActive = i === active
               const Icon = m.Icon
               return (
                 <SwiperSlide
-                  key={m.id}
+                  key={`${m.id}-${idx}`}
                   aria-label={`${m.name}, ${i + 1} de ${MODULES.length}`}
                   style={{ width: 'min(74vw, 300px)', height: '100%' }}
                 >
@@ -463,22 +470,20 @@ export default function InkognitoHome() {
             })}
           </Swiper>
 
-          {/* Flechas — solo desktop; en móvil se desliza con el dedo. */}
+          {/* Flechas — solo desktop; en móvil se desliza con el dedo (bucle infinito). */}
           <button
             type="button"
             onClick={() => swiperRef.current?.slidePrev()}
-            disabled={active === 0}
             aria-label="Módulo anterior"
-            className="hidden md:flex absolute left-6 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur-sm cursor-pointer transition-opacity hover:bg-white/20 disabled:opacity-30 disabled:cursor-default"
+            className="hidden md:flex absolute left-6 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur-sm cursor-pointer transition-opacity hover:bg-white/20"
           >
             <ChevronLeft size={20} aria-hidden="true" />
- </button>
+          </button>
           <button
             type="button"
             onClick={() => swiperRef.current?.slideNext()}
-            disabled={active === MODULES.length - 1}
             aria-label="Módulo siguiente"
-            className="hidden md:flex absolute right-6 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur-sm cursor-pointer transition-opacity hover:bg-white/20 disabled:opacity-30 disabled:cursor-default"
+            className="hidden md:flex absolute right-6 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur-sm cursor-pointer transition-opacity hover:bg-white/20"
           >
             <ChevronRight size={20} aria-hidden="true" />
           </button>

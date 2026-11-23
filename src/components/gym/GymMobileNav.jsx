@@ -49,6 +49,10 @@ export default function GymMobileNav({ active = null }) {
           <LayoutGrid size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Categorías</span>
         </Link>
+        <Link to="/" aria-label="Ir al Ecosistema" className="flex flex-col items-center gap-1 text-black">
+          <Globe size={19} />
+          <span className="text-[9px] font-bold uppercase tracking-wide">Ecosistema</span>
+        </Link>
         <button onClick={() => setDrawerOpen(true)} className="relative flex flex-col items-center gap-1 text-black">
           <ShoppingCart size={19} />
           {count > 0 && (

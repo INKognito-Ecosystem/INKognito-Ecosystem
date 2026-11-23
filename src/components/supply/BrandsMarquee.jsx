@@ -197,6 +197,26 @@ function useAutoScrollCarousel(active, speedPxPerSec = 26) {
   return { trackRef, pause, scheduleResume }
 }
 
+// Orden visual alternado (grande/ancho ↔ chico/compacto) para el carrusel:
+// evita agrupar logos anchos juntos (Tattoo Vision, WJX, Dynamic) o
+// cuadrados/compactos juntos (Royal Three, Don Melo, Difuso Galeria, Heaven Pro).
+const MARQUEE_ORDER = [
+  'TATTOO VISION',
+  'HEAVEN PRO',
+  'DYNAMIC',
+  'DON MELO',
+  'WJX',
+  'ROYAL THREE',
+  'VICE COLORS',
+  'DIFUSO GALERIA',
+  'INDUSTRIAS WARLOCK',
+]
+
+const marqueeBrands = [
+  ...MARQUEE_ORDER.map((name) => brands.find((b) => b.name === name)).filter(Boolean),
+  ...brands.filter((b) => !MARQUEE_ORDER.includes(b.name)),
+]
+
 // imgs viene del loader de SupplyPage.jsx vía HeroSupply.jsx (2026-09-13,
 // Jose: "al volver atrás... espabila primero sin imagen luego aparece")
 // — antes este componente pedía `/api/visual/supply` por su cuenta (un
@@ -222,10 +242,8 @@ export default function BrandsMarquee({ imgs = {}, light = false }) {
             abajo ya trae su propio gap + pr al final (mismo mecanismo que
             el marquee animado de escritorio); un gap ACÁ TAMBIÉN se
             sumaba al pr de la copia, duplicando el espacio justo en la
-            costura entre el último logo de una copia (Royal Three) y el
-            primero de la siguiente (Heaven Pro) — invisible en el
-            marquee animado de siempre porque nadie podía pararse justo
-            ahí, pero sí en este que se puede arrastrar a mano. */}
+            costura entre el último logo de una copia y el primero de la
+            siguiente. */}
         <div
           ref={trackRef}
           className="flex items-center overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -236,7 +254,7 @@ export default function BrandsMarquee({ imgs = {}, light = false }) {
         >
           {[0, 1].map((copy) => (
             <div key={copy} className="flex items-center gap-8 md:gap-12 pr-8 md:pr-12 flex-shrink-0">
-              {brands.map((brand) => (
+              {marqueeBrands.map((brand) => (
                 <BrandLogo key={brand.name} brand={brand} img={imgs[brand.imgKey || brandKey(brand.name)]} light />
               ))}
             </div>
@@ -257,7 +275,7 @@ export default function BrandsMarquee({ imgs = {}, light = false }) {
       <div className="brands-marquee-track flex items-center w-max">
         {[0, 1].map((copy) => (
           <div key={copy} className="flex items-center gap-8 md:gap-12 pr-8 md:pr-12 flex-shrink-0">
-            {brands.map((brand) => (
+            {marqueeBrands.map((brand) => (
               <BrandLogo key={brand.name} brand={brand} img={imgs[brand.imgKey || brandKey(brand.name)]} light={light} />
             ))}
           </div>

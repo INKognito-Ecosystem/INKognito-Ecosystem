@@ -66,6 +66,10 @@ export default function SupplyMobileNav({ active = null, light = false }) {
           <LayoutGrid size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Categorías</span>
         </Link>
+        <Link to="/" prefetch="viewport" aria-label="Ir al Ecosistema" className={`flex flex-col items-center gap-1 ${cartIconClass}`}>
+          <Globe size={19} />
+          <span className="text-[9px] font-bold uppercase tracking-wide">Ecosistema</span>
+        </Link>
         <button onClick={() => setDrawerOpen(true)} className={`relative flex flex-col items-center gap-1 ${cartIconClass}`}>
           <ShoppingCart size={19} />
           {count > 0 && (
