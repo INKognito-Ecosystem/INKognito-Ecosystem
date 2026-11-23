@@ -4,7 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { EffectCoverflow, Keyboard, A11y } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/effect-coverflow'
-import { PenTool, Package, ShoppingBag, Dumbbell, Pill, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
+import { PenTool, Package, ShoppingBag, Dumbbell, Pill, ChevronLeft, ChevronRight, ArrowRight, RotateCw, RotateCcw, Sparkles } from 'lucide-react'
 import EcosystemNavbar from './EcosystemNavbar'
 import EcosystemBootIntro from './EcosystemBootIntro'
 import LegalModal from '../legal/LegalModal'
@@ -72,17 +72,26 @@ const MODULES = [
   {
     id: 'ink',
     to: '/tattoo-artist-colombia',
-    eyebrow: 'Directorio Nacional',
-    name: 'Artistas & Estudios',
+    eyebrow: 'Buscador Nacional',
+    name: 'Encuentra tu Tatuador',
     Icon: PenTool,
     color: '#dc2626',
     on: '#ffffff',
-    tagline: 'Plataforma nacional de artistas profesionales, portafolios verificados y agenda directa.',
+    tagline: 'El buscador oficial de tatuadores y estudios verificados en Colombia.',
     facts: [
-      'Portafolios por estilo y técnica',
+      'Busca por estilo, ciudad y portafolio real',
       'Contacto y agenda directa con el artista',
       'Registro oficial para tatuadores y estudios',
     ],
+    back: {
+      // Listo para recibir { type: 'image', src } o { type: 'video', src, poster }
+      media: null,
+      badge: 'INK · BUSCADOR DE TATUADORES',
+      headline: 'Encuentra tu tatuador ideal en segundos',
+      copy: 'Filtra artistas y estudios verificados por ciudad, técnica y estilo, o crea tu perfil profesional con citas en línea.',
+      highlights: ['Buscador por estilo', 'Citas directas', 'Venta de diseños'],
+      secondaryCta: { label: 'Soy tatuador · Registrarme', to: '/tattoo-artist-colombia/unete' },
+    },
   },
   {
     id: 'supply',
@@ -98,6 +107,14 @@ const MODULES = [
       'Inventario con stock real y compra protegida',
       'Despacho inmediato a toda Colombia',
     ],
+    back: {
+      media: null,
+      badge: 'DISTRIBUCIÓN OFICIAL',
+      headline: 'Equipamiento real para estudios exigentes',
+      copy: 'Accede a Tattoo Vision, WJX, Dynamic, Vice Colors, Warlock y Don Melo con respaldo y envío nacional.',
+      highlights: ['Stock verificado', 'Compra protegida', 'Envío nacional'],
+      secondaryCta: { label: 'Unirme como proveedor', to: '/supply/proveedores/unete' },
+    },
   },
   {
     id: 'store',
@@ -113,6 +130,14 @@ const MODULES = [
       'Moda urbana, carpintería y herrería a medida',
       'Catálogos directos con compra y entrega coordinada',
     ],
+    back: {
+      media: null,
+      badge: 'MARKETPLACE ALIADO',
+      headline: 'Talento local, oficios y marcas independientes',
+      copy: 'Compra directo a tiendas y talleres verificados con logística integrada de Ruta del Golfo y despachos al país.',
+      highlights: ['Moda & Calzado', 'Talleres locales', 'Ruta del Golfo'],
+      secondaryCta: { label: 'Registrar mi tienda', to: '/tattoo-artist-colombia/tienda/unete' },
+    },
   },
   {
     id: 'gym',
@@ -128,6 +153,14 @@ const MODULES = [
       'Metodologías de entrenamiento funcional',
       'Cultura deportiva y seguimiento atlético',
     ],
+    back: {
+      media: null,
+      badge: 'GYM SYSTEM · INKOGNITO',
+      headline: 'Disciplina física, maquinaria y método propio',
+      copy: 'Explora máquinas fabricadas a pedido, guías en video, cursos y recursos diseñados para progreso real.',
+      highlights: ['Máquinas a pedido', 'Tutoriales', 'Cursos & Guías'],
+      secondaryCta: { label: 'Ver máquinas a pedido', to: '/gym/maquinas-pedido' },
+    },
   },
   {
     id: 'suple',
@@ -143,15 +176,25 @@ const MODULES = [
       'Fórmulas avaladas con calidad garantizada',
       'Tiendas aliadas con entrega nacional',
     ],
+    back: {
+      media: null,
+      badge: 'NUTRICIÓN CERTIFICADA',
+      headline: 'Combustible real para llevar tu cuerpo al límite',
+      copy: 'Proteínas, creatinas, pre-entrenos y vitaminas originales de tiendas aliadas con despacho rápido.',
+      highlights: ['Proteínas', 'Creatina', 'Pre-entreno'],
+      secondaryCta: { label: 'Vender en Suple', to: '/suplementos/proveedores/unete' },
+    },
   },
 ]
 
 export default function InkognitoHome() {
   const [legalOpen, setLegalOpen] = useState(null)
   const [active, setActive] = useState(0)
+  const [flippedKey, setFlippedKey] = useState(null)
   const [showBoot, setShowBoot] = useState(false)
   const swiperRef = useRef(null)
   const lightRefs = useRef([])
+  const pointerStartRef = useRef(null)
 
   useEffect(() => {
     try {
@@ -242,6 +285,25 @@ export default function InkognitoHome() {
            a medio salir en los bordes. */
         .ink-mod.is-on .ink-core { opacity: 1; }
         .ink-mod.is-on .ink-core-light { will-change: transform; }
+
+        /* Giro 3D (Flip Card) — cara frontal traslúcida y reverso sólido con soporte
+           para imagen o video sin interferir con el gesto de deslizamiento de Swiper. */
+        .ink-flip-scene { perspective: 1200px; }
+        .ink-flip-inner {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          transform-style: preserve-3d;
+          transition: transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .ink-flip-inner.is-flipped { transform: rotateY(180deg); }
+        .ink-flip-face {
+          position: absolute;
+          inset: 0;
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+        }
+        .ink-flip-back { transform: rotateY(180deg); }
       ` }} />
 
       {/* NAVBAR — mobileLight (2026-09-15, ver EcosystemNavbar.jsx) SOLO
@@ -314,9 +376,8 @@ export default function InkognitoHome() {
         </div>
       </div>
 
-      {/* CONTENIDO — espacio reorganizado arriba en móvil (sin el h1 INKOGNITO) para que la frase,
-          Select Module y las cards queden centradas/elevadas con balance natural y sin empujarse abajo */}
-      <div className="relative z-10 flex flex-col items-center justify-start md:justify-center gap-2 sm:gap-4 w-full flex-1 min-h-0 pt-[62px] sm:pt-[76px] pb-2">
+      {/* CONTENIDO — espacio equilibrado en móvil: ni muy abajo ni pegado al navbar */}
+      <div className="relative z-10 flex flex-col items-center justify-start md:justify-center gap-3 sm:gap-4 w-full flex-1 min-h-0 pt-[88px] sm:pt-[96px] pb-2">
 
         {/* Encabezado limpio y proporcionado */}
         <div className="text-center shrink-0 pt-1 pb-0.5 sm:py-2">
@@ -350,120 +411,267 @@ export default function InkognitoHome() {
               swiperRef.current = s
               setActive(s.realIndex % MODULES.length)
             }}
-            onSlideChange={(s) => setActive(s.realIndex % MODULES.length)}
+            onSlideChange={(s) => {
+              setActive(s.realIndex % MODULES.length)
+              setFlippedKey(null)
+            }}
             style={{ width: '100%', height: '100%', padding: '10px 0' }}
           >
             {[...MODULES, ...MODULES].map((m, idx) => {
               const i = idx % MODULES.length
+              const slideKey = `${m.id}-${idx}`
               const isActive = i === active
+              const isFlipped = isActive && flippedKey === slideKey
               const Icon = m.Icon
+              const backMedia = m.back?.media
+
+              const handleCardPointerDown = (e) => {
+                pointerStartRef.current = { x: e.clientX, y: e.clientY }
+              }
+
+              const handleCardPointerUp = (e) => {
+                if (!isActive || !pointerStartRef.current) return
+                const dx = Math.abs(e.clientX - pointerStartRef.current.x)
+                const dy = Math.abs(e.clientY - pointerStartRef.current.y)
+                pointerStartRef.current = null
+                // Solo girar si fue toque directo (no swipe) y fuera de enlaces/botones
+                if (dx < 8 && dy < 8 && !e.target.closest('a, button')) {
+                  setFlippedKey((prev) => (prev === slideKey ? null : slideKey))
+                }
+              }
+
               return (
                 <SwiperSlide
-                  key={`${m.id}-${idx}`}
+                  key={slideKey}
                   aria-label={`${m.name}, ${i + 1} de ${MODULES.length}`}
                   style={{ width: 'min(74vw, 300px)', height: '100%' }}
                 >
-                  {/* Flotar solo la activa — ver @keyframes inkFloat arriba. */}
-                  <div className={`h-full ${isActive ? 'ink-float' : ''}`}>
-                    <article
-                      className="relative h-full overflow-hidden rounded-lg border p-5 flex flex-col justify-between backdrop-blur-md transition-[border-color,box-shadow] duration-500"
-                      style={{
-                        background: `linear-gradient(160deg, ${m.color}33 0%, rgba(0,0,0,0.58) 62%)`,
-                        borderColor: isActive ? m.color : 'rgba(255,255,255,0.14)',
-                        boxShadow: isActive ? `0 18px 40px -18px ${m.color}` : 'none',
-                      }}
-                    >
-                      {/* Ícono grande de fondo — es lo que se ve en las cards
-                          de los lados, como el póster de un catálogo. */}
-                      <Icon
-                        aria-hidden="true"
-                        size={190}
-                        strokeWidth={1}
-                        className="absolute -right-5 -bottom-5 pointer-events-none"
-                        style={{ opacity: 0.1, color: m.color }}
-                      />
-
-                      <div className="relative">
-                        {/* Card de INK: la caligrafía del banner reemplaza el
-                            ícono y la palabra "INK" (2026-11-21, Jose: "la
-                            imagen... va a reemplazar el icono y la palabra
-                            ink").
-                            Corrección (2026-11-21, Jose: "el título de la
-                            card del módulo INK está quedando encima del logo
-                            INK"): antes el logo era absoluto (arriba a la
-                            izquierda, h-20) y el título lo cruzaba por
-                            delante, con contorno y sombra para leerse sobre
-                            el arte blanco. Ahora los dos van en el flujo
-                            normal y en la MISMA fila (2026-11-21, Jose:
-                            "ponlo al frente del logo, para que logo y título
-                            ocupen una misma fila, así ganar espacio" — el
-                            botón "Entrar" se cortaba abajo): logo a la
-                            izquierda, título a su lado. Ocupan una sola
-                            altura en vez de dos, y al ir cada uno en su
-                            propia columna nunca se tocan. Sin superposición
-                            ya no hacen falta el contorno ni la sombra: el
-                            título queda igual que el de las otras cards.
-                            flex-shrink-0 evita que el título aplaste el
-                            logo. El logo mide h-16 y sube a h-20 en
-                            pantallas altas. */}
-                        {m.id === 'ink' ? (
-                          <div className="flex items-center gap-3">
-                            <img
-                              src={inkMark}
-                              alt={m.eyebrow}
-                              className="block h-16 w-auto flex-shrink-0 pointer-events-none [@media(min-height:760px)]:h-20"
-                            />
-                            <h2 className="min-w-0 text-2xl font-bold leading-tight tracking-wide text-white">
-                              {m.name}
-                            </h2>
-                          </div>
-                        ) : (
-                          <>
-                            <div className="flex items-center gap-2">
-                              <Icon size={16} aria-hidden="true" style={{ color: m.color }} />
-                              <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/70">
-                                {m.eyebrow}
-                              </span>
-                            </div>
-                            <h2 className="mt-3 text-2xl font-bold leading-tight tracking-wide text-white">
-                              {m.name}
-                            </h2>
-                          </>
-                        )}
-                      </div>
-
-                      {/* Información extra: solo visible y enfocable en la
-                          card activa. */}
-                      <div
-                        className="relative transition-all duration-500"
-                        style={{ opacity: isActive ? 1 : 0, transform: isActive ? 'none' : 'translateY(8px)' }}
-                        aria-hidden={!isActive}
+                  {/* Flotar solo la activa mientras está de frente */}
+                  <div
+                    className={`h-full ink-flip-scene ${isActive && !isFlipped ? 'ink-float' : ''}`}
+                    onPointerDown={handleCardPointerDown}
+                    onPointerUp={handleCardPointerUp}
+                  >
+                    <div className={`ink-flip-inner ${isFlipped ? 'is-flipped' : ''}`}>
+                      {/* ── CARA FRONTAL ── */}
+                      <article
+                        className={`ink-flip-face overflow-hidden rounded-lg border p-5 flex flex-col justify-between backdrop-blur-md transition-[border-color,box-shadow] duration-500 ${isFlipped ? 'pointer-events-none' : 'pointer-events-auto'} ${isActive ? 'cursor-pointer' : ''}`}
+                        style={{
+                          background: `linear-gradient(160deg, ${m.color}33 0%, rgba(0,0,0,0.58) 62%)`,
+                          borderColor: isActive ? m.color : 'rgba(255,255,255,0.14)',
+                          boxShadow: isActive ? `0 18px 40px -18px ${m.color}` : 'none',
+                        }}
                       >
-                        <p className="text-sm leading-relaxed text-white/80 [@media(max-height:700px)]:hidden">
-                          {m.tagline}
-                        </p>
-                        <ul className="mt-3 flex flex-col gap-1.5">
-                          {m.facts.map((f) => (
-                            <li key={f} className="flex items-start gap-2 text-[13px] text-white/90">
-                              <span
-                                aria-hidden="true"
-                                className="mt-[7px] h-1 w-1 flex-shrink-0 rounded-full"
-                                style={{ backgroundColor: m.color }}
+                        {/* Ícono grande de fondo — póster del catálogo */}
+                        <Icon
+                          aria-hidden="true"
+                          size={190}
+                          strokeWidth={1}
+                          className="absolute -right-5 -bottom-5 pointer-events-none"
+                          style={{ opacity: 0.1, color: m.color }}
+                        />
+
+                        {/* Indicador sutil de giro (solo card activa) */}
+                        {isActive && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setFlippedKey(slideKey)
+                            }}
+                            aria-label={`Ver más de ${m.name}`}
+                            className="absolute top-3 right-3 z-20 flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-black/35 text-white/75 backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-white cursor-pointer"
+                          >
+                            <RotateCw size={13} aria-hidden="true" />
+                          </button>
+                        )}
+
+                        <div className="relative pr-7">
+                          {m.id === 'ink' ? (
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={inkMark}
+                                alt={m.eyebrow}
+                                className="block h-16 w-auto flex-shrink-0 pointer-events-none [@media(min-height:760px)]:h-20"
                               />
-                              {f}
-                            </li>
-                          ))}
-                        </ul>
-                        <Link
-                          to={m.to}
-                          tabIndex={isActive ? 0 : -1}
-                          className="mt-4 flex w-full items-center justify-center gap-2 rounded py-3 text-center font-medium uppercase tracking-wide transition-opacity duration-300 hover:opacity-90"
-                          style={{ backgroundColor: m.color, color: m.on }}
+                              <h2 className="min-w-0 text-2xl font-bold leading-tight tracking-wide text-white">
+                                {m.name}
+                              </h2>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex items-center gap-2">
+                                <Icon size={16} aria-hidden="true" style={{ color: m.color }} />
+                                <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/70">
+                                  {m.eyebrow}
+                                </span>
+                              </div>
+                              <h2 className="mt-3 text-2xl font-bold leading-tight tracking-wide text-white">
+                                {m.name}
+                              </h2>
+                            </>
+                          )}
+                        </div>
+
+                        {/* Información extra: solo visible y enfocable en la card activa */}
+                        <div
+                          className="relative transition-all duration-500"
+                          style={{ opacity: isActive ? 1 : 0, transform: isActive ? 'none' : 'translateY(8px)' }}
+                          aria-hidden={!isActive}
                         >
-                          Entrar <ArrowRight size={16} aria-hidden="true" />
-                        </Link>
-                      </div>
-                    </article>
+                          <p className="text-sm leading-relaxed text-white/80 [@media(max-height:700px)]:hidden">
+                            {m.tagline}
+                          </p>
+                          <ul className="mt-3 flex flex-col gap-1.5">
+                            {m.facts.map((f) => (
+                              <li key={f} className="flex items-start gap-2 text-[13px] text-white/90">
+                                <span
+                                  aria-hidden="true"
+                                  className="mt-[7px] h-1 w-1 flex-shrink-0 rounded-full"
+                                  style={{ backgroundColor: m.color }}
+                                />
+                                {f}
+                              </li>
+                            ))}
+                          </ul>
+                          <Link
+                            to={m.to}
+                            onClick={(e) => e.stopPropagation()}
+                            tabIndex={isActive && !isFlipped ? 0 : -1}
+                            className="mt-4 flex w-full items-center justify-center gap-2 rounded py-3 text-center font-medium uppercase tracking-wide transition-opacity duration-300 hover:opacity-90"
+                            style={{ backgroundColor: m.color, color: m.on }}
+                          >
+                            Entrar <ArrowRight size={16} aria-hidden="true" />
+                          </Link>
+                        </div>
+                      </article>
+
+                      {/* ── CARA TRASERA (SÓLIDA · PREPARADA PARA IMAGEN O VIDEO) ── */}
+                      <article
+                        aria-hidden={!isFlipped}
+                        className={`ink-flip-face ink-flip-back overflow-hidden rounded-lg border flex flex-col justify-between bg-[#0d0e12] ${isFlipped ? 'pointer-events-auto cursor-pointer' : 'pointer-events-none'}`}
+                        style={{
+                          borderColor: m.color,
+                          boxShadow: isFlipped ? `0 20px 44px -18px ${m.color}` : 'none',
+                        }}
+                      >
+                        {/* BANNER EDITORIAL SUPERIOR — acepta imagen, video o escena sólida base */}
+                        <div className="relative h-[38%] min-h-[126px] w-full overflow-hidden bg-[#14161d] shrink-0">
+                          {backMedia?.type === 'video' ? (
+                            <video
+                              src={backMedia.src}
+                              poster={backMedia.poster}
+                              autoPlay
+                              loop
+                              muted
+                              playsInline
+                              className="h-full w-full object-cover"
+                            />
+                          ) : backMedia?.type === 'image' ? (
+                            <img
+                              src={backMedia.src}
+                              alt={m.name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div
+                              className="relative h-full w-full flex items-center justify-center overflow-hidden"
+                              style={{
+                                background: `radial-gradient(circle at 82% 20%, ${m.color}40 0%, #14161d 68%)`,
+                              }}
+                            >
+                              <Icon
+                                aria-hidden="true"
+                                size={112}
+                                strokeWidth={1.1}
+                                className="opacity-20"
+                                style={{ color: m.color }}
+                              />
+                              <div className="absolute bottom-2.5 left-4 right-4 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-white/75">
+                                <Sparkles size={11} style={{ color: m.color }} aria-hidden="true" />
+                                <span>{m.back.badge}</span>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Degradado inferior para fundir el banner con el cuerpo sólido */}
+                          <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#0d0e12] to-transparent"
+                          />
+
+                          {/* Badge sobre media cuando ya hay imagen/video */}
+                          {backMedia && (
+                            <span
+                              className="absolute bottom-2.5 left-4 z-10 rounded px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.2em] bg-black/75 text-white"
+                              style={{ borderLeft: `2px solid ${m.color}` }}
+                            >
+                              {m.back.badge}
+                            </span>
+                          )}
+
+                          {/* Botón volver al frente */}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setFlippedKey(null)
+                            }}
+                            tabIndex={isFlipped ? 0 : -1}
+                            aria-label="Volver al frente"
+                            className="absolute top-3 right-3 z-20 flex h-7 items-center gap-1 rounded-full border border-white/20 bg-black/70 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-white/90 hover:bg-black cursor-pointer"
+                          >
+                            <RotateCcw size={11} aria-hidden="true" />
+                            <span>Girar</span>
+                          </button>
+                        </div>
+
+                        {/* CUERPO SÓLIDO CON INFORMACIÓN RELEVANTE + ACCIONES */}
+                        <div className="flex flex-1 flex-col justify-between p-4 pt-3 bg-[#0d0e12]">
+                          <div>
+                            <h3 className="text-[15px] font-bold leading-snug text-white">
+                              {m.back.headline}
+                            </h3>
+                            <p className="mt-1.5 text-[12px] leading-relaxed text-zinc-400">
+                              {m.back.copy}
+                            </p>
+                            <div className="mt-2.5 flex flex-wrap gap-1.5">
+                              {m.back.highlights.map((chip) => (
+                                <span
+                                  key={chip}
+                                  className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-zinc-200"
+                                >
+                                  {chip}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="mt-3 flex flex-col gap-2">
+                            <Link
+                              to={m.to}
+                              onClick={(e) => e.stopPropagation()}
+                              tabIndex={isFlipped ? 0 : -1}
+                              className="flex w-full items-center justify-center gap-2 rounded py-2.5 text-xs font-semibold uppercase tracking-wider transition-opacity hover:opacity-90"
+                              style={{ backgroundColor: m.color, color: m.on }}
+                            >
+                              Entrar <ArrowRight size={14} aria-hidden="true" />
+                            </Link>
+
+                            {m.back.secondaryCta && (
+                              <Link
+                                to={m.back.secondaryCta.to}
+                                onClick={(e) => e.stopPropagation()}
+                                tabIndex={isFlipped ? 0 : -1}
+                                className="flex w-full items-center justify-center rounded border border-white/15 bg-white/[0.03] py-2 text-[11px] font-medium tracking-wide text-zinc-200 transition-colors hover:border-white/30 hover:bg-white/[0.08]"
+                              >
+                                {m.back.secondaryCta.label}
+                              </Link>
+                            )}
+                          </div>
+                        </div>
+                      </article>
+                    </div>
                   </div>
                 </SwiperSlide>
               )
