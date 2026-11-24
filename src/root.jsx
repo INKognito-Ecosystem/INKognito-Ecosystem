@@ -1,6 +1,7 @@
-import { useEffect, useLayoutEffect } from 'react'
-import { Meta, Links, Outlet, Scripts, useLocation, useMatches, useNavigation, useNavigationType } from 'react-router'
+import { useEffect, useLayoutEffect, useState } from 'react'
+import { Meta, Links, Outlet, Scripts, isRouteErrorResponse, useLocation, useMatches, useNavigation, useNavigationType, useRouteError } from 'react-router'
 import { HelmetProvider } from 'react-helmet-async'
+import { WifiOff, Wifi, RefreshCw } from 'lucide-react'
 import { SupplyCartProvider } from './contexts/SupplyCartContext'
 import { StoreCartProvider } from './contexts/StoreCartContext'
 import { GymCartProvider } from './contexts/GymCartContext'
@@ -389,6 +390,87 @@ function PageVisitTracker() {
   return null
 }
 
+// Aviso profesional global cuando el dispositivo pierde conexión a internet
+// (datos móviles / Wi-Fi) y confirmación breve cuando la señal regresa.
+function OfflineNotice() {
+  const [offline, setOffline] = useState(false)
+  const [reconnected, setReconnected] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (navigator.onLine === false) setOffline(true)
+
+    let hideTimer
+    const onOffline = () => {
+      clearTimeout(hideTimer)
+      setReconnected(false)
+      setOffline(true)
+    }
+    const onOnline = () => {
+      setOffline(false)
+      setReconnected(true)
+      hideTimer = setTimeout(() => setReconnected(false), 3200)
+    }
+
+    window.addEventListener('offline', onOffline)
+    window.addEventListener('online', onOnline)
+    return () => {
+      clearTimeout(hideTimer)
+      window.removeEventListener('offline', onOffline)
+      window.removeEventListener('online', onOnline)
+    }
+  }, [])
+
+  if (!offline && !reconnected) return null
+
+  if (reconnected) {
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        className="fixed top-4 left-1/2 -translate-x-1/2 z-[9998] px-4 py-2.5 rounded-full bg-zinc-950/95 text-white border border-emerald-500/30 shadow-2xl backdrop-blur-md flex items-center gap-2 text-xs font-semibold tracking-wide"
+      >
+        <Wifi size={15} className="text-emerald-400 shrink-0" />
+        <span>Conexión restablecida</span>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      role="alert"
+      aria-live="assertive"
+      className="fixed top-4 left-1/2 -translate-x-1/2 z-[9998] w-[calc(100%-2rem)] max-w-md rounded-2xl bg-zinc-950/95 text-white border border-white/10 shadow-2xl backdrop-blur-md px-4 py-3.5"
+    >
+      <div className="flex items-start gap-3">
+        <div className="w-9 h-9 rounded-xl bg-red-500/15 border border-red-500/25 flex items-center justify-center shrink-0 mt-0.5">
+          <WifiOff size={17} className="text-red-400" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
+            INKognito Ecosystem
+          </p>
+          <p className="text-sm font-black tracking-tight text-white leading-snug mt-0.5">
+            Sin conexión a internet
+          </p>
+          <p className="text-xs text-zinc-300 leading-relaxed mt-1">
+            Verifica tus datos móviles o red Wi-Fi. La plataforma se actualizará en cuanto vuelva tu señal.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          aria-label="Reintentar conexión"
+          className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white text-zinc-950 hover:bg-zinc-200 text-[10px] font-black uppercase tracking-[0.14em] transition-colors cursor-pointer"
+        >
+          <RefreshCw size={12} />
+          Reintentar
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function Root() {
   useAnalyticsScripts()
   return (
@@ -399,6 +481,7 @@ export default function Root() {
             <SupleCartProvider>
               <ScrollToHash />
               <NavigationProgress />
+              <OfflineNotice />
               <PageVisitTracker />
               <Outlet />
             </SupleCartProvider>
@@ -406,5 +489,102 @@ export default function Root() {
         </StoreCartProvider>
       </SupplyCartProvider>
     </HelmetProvider>
+  )
+}
+
+// Pantalla de recuperación ante falta de conexión a internet, caídas
+// momentáneas de señal móvil (4G) o chunks desactualizados tras un deploy.
+export function ErrorBoundary() {
+  const error = useRouteError()
+  const isHttpError = isRouteErrorResponse(error)
+  const msg = error instanceof Error ? error.message : String(error || '')
+  const [isOffline, setIsOffline] = useState(
+    () => typeof navigator !== 'undefined' && navigator.onLine === false
+  )
+  const isNetworkOrChunkError =
+    !isHttpError &&
+    /failed to fetch|load failed|networkerror|dynamically imported module|loading chunk/i.test(msg)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const onOffline = () => setIsOffline(true)
+    const onOnline = () => {
+      setIsOffline(false)
+      window.location.reload()
+    }
+    window.addEventListener('offline', onOffline)
+    window.addEventListener('online', onOnline)
+
+    if (isNetworkOrChunkError && navigator.onLine !== false) {
+      try {
+        const KEY = 'ink_auto_reload_ts'
+        const last = Number(sessionStorage.getItem(KEY) || 0)
+        // Reintento automático único (enfriamiento de 15s para nunca entrar en bucle)
+        if (Date.now() - last > 15_000) {
+          sessionStorage.setItem(KEY, String(Date.now()))
+          window.location.reload()
+        }
+      } catch {}
+    }
+
+    return () => {
+      window.removeEventListener('offline', onOffline)
+      window.removeEventListener('online', onOnline)
+    }
+  }, [isNetworkOrChunkError])
+
+  const sinInternet = isOffline || isNetworkOrChunkError
+
+  const titulo = isHttpError && error.status === 404
+    ? 'Página no encontrada'
+    : isOffline
+      ? 'Sin conexión a internet'
+      : isNetworkOrChunkError
+        ? 'No pudimos conectar con el servidor'
+        : 'Algo salió mal al cargar'
+
+  const detalle = isHttpError && error.status === 404
+    ? 'El enlace que abriste no existe o cambió de dirección.'
+    : isOffline
+      ? 'No detectamos acceso a internet en tu dispositivo. Verifica tus datos móviles o red Wi-Fi; apenas regrese la señal podrás continuar.'
+      : isNetworkOrChunkError
+        ? 'Tu señal móvil se interrumpió mientras cargaba esta sección. Verifica tu conexión a internet y toca Reintentar.'
+        : 'Ocurrió un inconveniente temporal al abrir esta vista.'
+
+  return (
+    <div className="min-h-screen bg-white text-zinc-900 flex flex-col items-center justify-center px-6 text-center">
+      <div className="max-w-sm w-full border border-zinc-200 rounded-3xl p-7 shadow-sm bg-zinc-50/70">
+        {sinInternet && (
+          <div className="w-12 h-12 rounded-2xl bg-zinc-900 text-white flex items-center justify-center mx-auto mb-4 shadow-sm">
+            <WifiOff size={22} />
+          </div>
+        )}
+        <p className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-400 mb-2">
+          INKognito Ecosystem
+        </p>
+        <h1 className="text-xl font-black uppercase tracking-tight text-zinc-900 mb-2">
+          {titulo}
+        </h1>
+        <p className="text-sm text-zinc-600 leading-relaxed mb-6">
+          {detalle}
+        </p>
+        <div className="flex flex-col gap-2.5">
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-zinc-900 text-white text-xs font-bold uppercase tracking-[0.16em] hover:bg-black transition-colors cursor-pointer"
+          >
+            <RefreshCw size={14} />
+            Reintentar conexión
+          </button>
+          <a
+            href="/"
+            className="w-full py-3 rounded-xl border border-zinc-300 bg-white text-zinc-800 text-xs font-bold uppercase tracking-[0.16em] hover:border-zinc-900 transition-colors"
+          >
+            Ir al inicio
+          </a>
+        </div>
+      </div>
+    </div>
   )
 }

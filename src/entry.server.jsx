@@ -17,16 +17,20 @@ export { streamTimeout }
 // endpoints públicos del panel). Solo aplica a páginas idénticas para todos;
 // el checkout revalida stock/precio por su cuenta, así que un dato de hasta
 // un minuto no cobra mal a nadie.
-const CACHE_BORDE = 'public, s-maxage=60, stale-while-revalidate=300'
+const CACHE_BORDE = 'public, max-age=15, s-maxage=120, stale-while-revalidate=600'
 
 const MODULOS = '(?:suplementos|supply|store|gym)'
 const RUTAS_PUBLICAS = [
+  /^\/$/,
+  /^\/tattoo-artist-colombia$/,
   new RegExp(`^/${MODULOS}$`),
   new RegExp(`^/${MODULOS}/categorias$`),
   new RegExp(`^/${MODULOS}/producto/[^/]+$`),
+  /^\/gym\/(?:maquinas-pedido|tutoriales|cursos|recursos)$/,
   /^\/suplementos\/(?:proteinas|creatina|pre-entreno|vitaminas|accesorios)$/,
   /^\/store\/(?:ropa-dama|ropa-general|ropa-caballeros|zapatos-deportivos|zapatos-casuales|guayos|tenis-guayo|accesorios)$/,
   /^\/supply\/(?:machines|cartridges|cartuchos-surtidos|power-supplies|ink|needles|gloves|aftercare|accessories|furniture|bundles|proveedores)$/,
+  /^\/supply\/aprende\/(?:cursos|kit|recursos)$/,
   /^\/supply\/(?:cartridges|ink|brands|mobiliario)\/[^/]+$/,
   /^\/(?:suplementos|store)\/tiendas$/,
 ]

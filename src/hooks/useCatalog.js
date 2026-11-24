@@ -2,6 +2,18 @@ import { useState } from 'react'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
+// Timeout defensivo para que una caída o demora del panel/4G nunca deje
+// colgada la navegación esperando 20-30 segundos.
+async function fetchWithTimeout(url, timeoutMs = 6500) {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    return await fetch(url, { signal: controller.signal })
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 // ─── Paginación real por cursor (2026-09-14) ──────────────────────────
 // `/api/catalog/:module` con categoria/marca/estudio_id/tipo/q/orden/
 // limit/cursor ya no trae el módulo completo — ver plan en
@@ -23,7 +35,7 @@ export async function fetchCatalogPage(module, { categoria, marca, estudioId, ti
   params.set('limit', String(limit))
   if (cursor) params.set('cursor', cursor)
   try {
-    const res = await fetch(`${PANEL_URL}/api/catalog/${module}?${params}`)
+    const res = await fetchWithTimeout(`${PANEL_URL}/api/catalog/${module}?${params}`)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     return await res.json()
   } catch {
@@ -37,7 +49,7 @@ export async function fetchCatalogPage(module, { categoria, marca, estudioId, ti
  */
 export async function fetchCatalogCounts(module) {
   try {
-    const res = await fetch(`${PANEL_URL}/api/catalog/${module}?counts=1`)
+    const res = await fetchWithTimeout(`${PANEL_URL}/api/catalog/${module}?counts=1`)
     if (!res.ok) return {}
     return await res.json()
   } catch {
@@ -48,7 +60,7 @@ export async function fetchCatalogCounts(module) {
 /** Proveedores distintos que venden en una categoría — para el filtro de proveedor. */
 export async function fetchCatalogProviders(module, categoria) {
   try {
-    const res = await fetch(`${PANEL_URL}/api/catalog/${module}?categoria=${encodeURIComponent(categoria)}&providers=1`)
+    const res = await fetchWithTimeout(`${PANEL_URL}/api/catalog/${module}?categoria=${encodeURIComponent(categoria)}&providers=1`)
     if (!res.ok) return []
     const data = await res.json()
     return data.providers || []
