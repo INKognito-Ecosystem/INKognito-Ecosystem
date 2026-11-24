@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, Globe, FileText, Shield } from 'lucide-react'
+import CategoriesGridIcon from '../CategoriesGridIcon'
 import { useGymCart } from '../../contexts/GymCartContext'
 import CartDrawerGym from './CartDrawerGym'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
@@ -21,6 +22,7 @@ import logoGym from '../../assets/milogo/gym.webp'
 // active: 'inicio' | 'categorias' — qué pestaña queda marcada (barrita
 // blanca arriba del ícono).
 export default function GymMobileNav({ active = null }) {
+  const navigate = useNavigate()
   const { count } = useGymCart()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -44,9 +46,19 @@ export default function GymMobileNav({ active = null }) {
           <Home size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Inicio</span>
         </Link>
-        <Link to="/gym/categorias" className="relative flex flex-col items-center gap-1 text-black">
+        <Link
+          to="/gym/categorias"
+          onClick={(e) => {
+            if (active === 'categorias') {
+              e.preventDefault()
+              if (window.history.length > 1) navigate(-1)
+              else navigate('/gym')
+            }
+          }}
+          className="relative flex flex-col items-center gap-1 text-black"
+        >
           {marca('categorias')}
-          <LayoutGrid size={19} />
+          <CategoriesGridIcon open={active === 'categorias' && !drawerOpen && !menuOpen} size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Categorías</span>
         </Link>
         <Link to="/" aria-label="Ir al Ecosistema" className="flex flex-col items-center gap-1 text-black">

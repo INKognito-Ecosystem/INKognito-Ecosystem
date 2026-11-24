@@ -1,48 +1,39 @@
-import { Link, useLoaderData } from 'react-router'
-import { ArrowLeft, ArrowRight, Award } from 'lucide-react'
+import { useLoaderData } from 'react-router'
 import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
 import BrandCatalogSection from '../BrandCatalogSection'
 import SupplyFAQ from '../SupplyFAQ'
 import SupplyMobileNav from '../SupplyMobileNav'
-import { getAdjacentBrands } from '../../../data/supplyBrandsOrder'
+import BrandShowcaseHero from '../BrandShowcaseHero'
+import { getAdjacentBrands, SUPPLY_BRANDS_ORDER } from '../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../hooks/useSupplyVisual'
-import { useScrolled } from '../../../hooks/useScrolled'
 import { fetchCatalogEstudio, fetchSupplyFaq, useLoadMore } from '../../../hooks/useCatalog'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
-// fase 6.1 (2026-08-07) — id real en `estudios` vinculado a esta marca,
-// solo para leer distribuidor_oficial (la insignia paga). Si el fetch
-// falla, simplemente no se muestra insignia — no rompe la página.
+// id real en `estudios` vinculado a Heaven Pro: filtra por estudio_id para no
+// mezclar productos de terceros etiquetados como heaven-pro.
 const ESTUDIO_ID = 6
 
 export async function loader({ request }) {
   const [catalogo, estudioRes, faqItems] = await Promise.all([
-    // Filtrado por estudio_id (el dueño real de Heaven Pro), no por marca
-    // (2026-08-09, Jose: "entré a ver su catálogo, la landing premium...
-    // aparece un producto subido por INKognito Supply, ahí no debería
-    // cargarse este producto" — antes fetchCatalogMarca traía CUALQUIER
-    // producto de cualquier proveedor que tuviera marca='heaven-pro'
-    // (ej. Jose subió su propio "tactus" con esa marca), aunque esta
-    // landing es la tienda dedicada de Heaven Pro específicamente. La
-    // mezcla multi-proveedor por marca sí es correcta en el catálogo
-    // general de Supply ("en la web"), no acá.
     fetchCatalogEstudio('supply', ESTUDIO_ID),
     fetch(`${PANEL_URL}/api/estudios/${ESTUDIO_ID}`).catch(() => null),
     fetchSupplyFaq({ marca: 'heaven-pro' }),
   ])
   const estudio = estudioRes && estudioRes.ok ? await estudioRes.json() : null
-  // ?flechas=0 (fase 6.1, bug real de Jose) — quien llega acá desde el
-  // perfil de un estudio en el buscador no debe poder saltar a otra
-  // marca sin relación; navegando normal desde el menú de Supply, el
-  // parámetro no viene y las flechas se ven como siempre.
   const mostrarFlechas = new URL(request.url).searchParams.get('flechas') !== '0'
-  return { ...catalogo, distribuidorOficial: estudio?.distribuidor_oficial || false, mostrarFlechas, faqItems }
+  return {
+    ...catalogo,
+    distribuidorOficial: estudio?.distribuidor_oficial || false,
+    mostrarFlechas,
+    faqItems,
+  }
 }
 
 export function meta() {
-  const title = 'Heaven Pro | Cuidado de tatuajes — INKognito Supply'
-  const description = 'Heaven Pro: crema y toallitas de limpieza para usar durante la sesión, crema de cicatrización para después. Línea completa para el tatuador y para vender a tus clientes. Disponibles en toda Colombia.'
+  const title = 'Heaven Pro | Cuidado Profesional para Tatuajes — INKognito Supply Colombia'
+  const description =
+    'Heaven Pro Colombia: Crema VITTA (aftercare), Crema MEDIUM (proceso), toallitas TACTTUS y diluyente AQUA Mixer. Fórmulas 100% veganas e hipoalergénicas.'
   return [
     { title },
     { name: 'description', content: description },
@@ -52,123 +43,67 @@ export function meta() {
   ]
 }
 
-const DOT_PATTERN = {
-  backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
-  backgroundSize: '18px 18px',
-}
-
-function InsigniaDistribuidorOficial() {
-  return (
-    <span className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-black text-[9px] font-black uppercase tracking-widest bg-amber-400">
-      <Award size={10} /> Distribuidor Oficial
-    </span>
-  )
-}
-
 export default function HeavenProPage() {
   const { products: productosIniciales, nextCursor, hasMore, distribuidorOficial, mostrarFlechas, faqItems } = useLoaderData()
-  const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { estudioId: ESTUDIO_ID }, { items: productosIniciales, nextCursor, hasMore })
+  const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } =
+    useLoadMore('supply', { estudioId: ESTUDIO_ID }, { items: productosIniciales, nextCursor, hasMore })
   const logoUrl = useSupplyVisual('supply_brand_heaven_pro')
-  const { prev, next } = getAdjacentBrands(6)
-  const scrolled = useScrolled()
+  const brandIndex = SUPPLY_BRANDS_ORDER.findIndex((b) => b.path === '/supply/brands/heaven-pro')
+  const { prev, next } = getAdjacentBrands(brandIndex >= 0 ? brandIndex : 6)
+
+  const handleScrollToCatalog = () => {
+    const el = document.getElementById('catalogo-marca')
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const shareUrl =
+    typeof window !== 'undefined' && window.location?.href
+      ? window.location.href
+      : 'https://inkognito-ecosystem.com/supply/brands/heaven-pro'
 
   return (
     <div className="min-h-screen bg-white text-zinc-900">
-      <NavbarCategory pageName="Heaven Pro" light />
+      <NavbarCategory pageName="Heaven Pro" light hideWordmark hideCart hideMenu shareUrl={shareUrl} />
 
-      {mostrarFlechas && scrolled && (
-        <>
-          <Link
-            to={prev.path} replace
-            aria-label={`Ver ${prev.name}`}
-            className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-600 hover:text-black bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
-          >
-            <ArrowLeft size={20} />
-          </Link>
-          <Link
-            to={next.path} replace
-            aria-label={`Ver ${next.name}`}
-            className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-600 hover:text-black bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
-          >
-            <ArrowRight size={20} />
-          </Link>
-        </>
-      )}
+      <BrandShowcaseHero
+        brandKey="heaven-pro"
+        logoUrl={logoUrl || '/supply-assets/logos/supply_brand_heaven_pro.webp'}
+        distribuidorOficial={distribuidorOficial}
+        onExploreCatalog={handleScrollToCatalog}
+        brandNav={{ show: mostrarFlechas, prev, next }}
+      />
 
-      <div className="pt-20 md:pt-24 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
-
-        <div className="relative overflow-hidden mb-6 md:mb-8">
-          <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
-          <div className="relative z-10">
-
-          <div className="flex items-center justify-between gap-3 mb-3">
-            {mostrarFlechas ? (
-              <Link to={prev.path} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
-                <ArrowLeft size={18} />
-              </Link>
-            ) : <span />}
-            <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm text-center flex-1">
-              Marca Profesional
-            </p>
-            {mostrarFlechas ? (
-              <Link to={next.path} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
-                <ArrowRight size={18} />
-              </Link>
-            ) : <span />}
-          </div>
-
-          {logoUrl === undefined ? (
-            <div className="h-24 md:h-40" />
-          ) : logoUrl ? (
-            <div>
-              <div className="float-left w-[180px] mr-6 md:mr-8 mb-2 flex flex-col items-start">
-                <img
-                  src={logoUrl}
-                  alt="Heaven Pro"
-                  className="h-24 md:h-40 w-auto max-w-full object-contain"
-                />
-                {distribuidorOficial && <InsigniaDistribuidorOficial />}
-              </div>
-              <p className="text-zinc-600 text-sm md:text-base leading-relaxed text-justify [hyphens:auto]">
-                Línea completa para el tatuaje: crema y toallitas de limpieza para
-                usar durante la sesión, y crema de cicatrización para después. Para
-                uso diario del tatuador profesional y lista para recomendar o vender
-                directamente a tus clientes.
-              </p>
-              <div className="clear-both" />
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8">
-              <div className="flex-shrink-0">
-                <h1 className="text-4xl md:text-7xl font-black uppercase leading-none text-zinc-900">
-                  Heaven Pro
-                </h1>
-                {distribuidorOficial && <InsigniaDistribuidorOficial />}
-              </div>
-              <p className="max-w-xl text-zinc-600 text-sm md:text-base leading-relaxed text-justify [hyphens:auto] sm:border-l sm:border-zinc-200 sm:pl-8">
-                Línea completa para el tatuaje: crema y toallitas de limpieza para
-                usar durante la sesión, y crema de cicatrización para después. Para
-                uso diario del tatuador profesional y lista para recomendar o vender
-                directamente a tus clientes.
-              </p>
-            </div>
-          )}
-
-          </div>
+      <div id="catalogo-marca" className="pt-10 md:pt-14 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="text-center mb-8 pb-4 border-b border-zinc-100">
+          <p className="uppercase tracking-[0.25em] text-zinc-400 text-xs font-semibold">
+            Vitrina Oficial · Cuidado Dermatológico
+          </p>
+          <h3 className="text-xl sm:text-2xl font-black uppercase text-zinc-900 tracking-tight mt-0.5">
+            Catálogo Heaven Pro en INKognito Supply
+          </h3>
+          <p className="text-xs text-zinc-500 mt-1 max-w-md mx-auto">
+            Productos oficiales de Heaven Pro disponibles directamente en la plataforma.
+          </p>
         </div>
 
-        {/* supplierBadge={null}: Heaven Pro no viene de Tommy Tattoo Supply
-            (excepción confirmada por Jose, 2026-08-01, junto con Tattoo
-            Vision e Industrias Warlock). */}
-        <BrandCatalogSection brandName="Heaven Pro" products={products} supplierBadge={null} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} light />
+        <BrandCatalogSection
+          brandName="Heaven Pro"
+          products={products}
+          supplierBadge={null}
+          hasMore={hasMoreProductos}
+          onLoadMore={cargarMasProductos}
+          loadingMore={cargandoMasProductos}
+          light
+          officialUrl="https://heavenpro.co"
+          hideWhatsapp={true}
+        />
 
         <SupplyFAQ items={faqItems} nombre="Heaven Pro" light />
-
       </div>
 
       <FooterSupply light />
-      <div className="h-16 md:hidden" />
       <SupplyMobileNav active="marcas" light />
+      <div className="h-16 md:hidden bg-white" />
     </div>
   )
 }

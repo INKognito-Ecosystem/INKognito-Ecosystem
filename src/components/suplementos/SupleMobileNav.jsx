@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, Globe, FileText, Shield, Store, PlusCircle, UserCircle, Package } from 'lucide-react'
+import CategoriesGridIcon from '../CategoriesGridIcon'
 import { useSupleCart } from '../../contexts/SupleCartContext'
 import CartDrawerSuple from './CartDrawerSuple'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
@@ -47,9 +48,20 @@ export default function SupleMobileNav({ active = null }) {
           <Home size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Inicio</span>
         </Link>
-        <Link to="/suplementos/categorias" prefetch="viewport" className="relative flex flex-col items-center gap-1 text-black">
+        <Link
+          to="/suplementos/categorias"
+          prefetch="viewport"
+          onClick={(e) => {
+            if (active === 'categorias') {
+              e.preventDefault()
+              if (window.history.length > 1) navigate(-1)
+              else navigate('/suplementos')
+            }
+          }}
+          className="relative flex flex-col items-center gap-1 text-black"
+        >
           {marca('categorias')}
-          <LayoutGrid size={19} />
+          <CategoriesGridIcon open={active === 'categorias' && !drawerOpen && !menuOpen} size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Categorías</span>
         </Link>
         <Link to="/" prefetch="viewport" aria-label="Ir al Ecosistema" className="flex flex-col items-center gap-1 text-black">

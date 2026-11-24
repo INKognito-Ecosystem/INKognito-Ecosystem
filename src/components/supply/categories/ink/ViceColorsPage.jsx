@@ -1,26 +1,27 @@
-import { Link, useLoaderData } from 'react-router'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { useLoaderData } from 'react-router'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
 import SupplyFAQ from '../../SupplyFAQ'
 import SupplyMobileNav from '../../SupplyMobileNav'
-import { getAdjacentBrands } from '../../../../data/supplyBrandsOrder'
+import BrandShowcaseHero from '../../BrandShowcaseHero'
+import { getAdjacentBrands, SUPPLY_BRANDS_ORDER } from '../../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../../hooks/useSupplyVisual'
-import { useScrolled } from '../../../../hooks/useScrolled'
 import { fetchCatalogMarca, fetchSupplyFaq, useLoadMore } from '../../../../hooks/useCatalog'
 
-export async function loader() {
+export async function loader({ request }) {
   const [catalogo, faqItems] = await Promise.all([
     fetchCatalogMarca('supply', 'vice-colors'),
     fetchSupplyFaq({ marca: 'vice-colors' }),
   ])
-  return { ...catalogo, faqItems }
+  const mostrarFlechas = new URL(request.url).searchParams.get('flechas') !== '0'
+  return { ...catalogo, mostrarFlechas, faqItems }
 }
 
 export function meta() {
   const title = 'Tintas Vice Colors | INKognito Supply — Colombia'
-  const description = 'Catálogo completo de Vice Colors: negros, grises, rojos, azules, pieles y más. Tintas premium para realismo y neotradicional. Disponibles en toda Colombia.'
+  const description =
+    'Tintas profesionales Vice Colors: Vicious Black, El Gato Blanco y paleta full color de alta carga pigmentaria, 100% veganas. Envíos a toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },
@@ -30,111 +31,65 @@ export function meta() {
   ]
 }
 
-const DOT_PATTERN = {
-  backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
-  backgroundSize: '18px 18px',
-}
-
 export default function ViceColorsPage() {
-  const { products: productosIniciales, nextCursor, hasMore, faqItems } = useLoaderData()
-  const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { marca: 'vice-colors' }, { items: productosIniciales, nextCursor, hasMore })
+  const { products: productosIniciales, nextCursor, hasMore, mostrarFlechas = true, faqItems } = useLoaderData()
+  const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } =
+    useLoadMore('supply', { marca: 'vice-colors' }, { items: productosIniciales, nextCursor, hasMore })
   const logoUrl = useSupplyVisual('supply_brand_vice_colors')
-  const { prev, next } = getAdjacentBrands(3)
-  const scrolled = useScrolled()
+  const brandIndex = SUPPLY_BRANDS_ORDER.findIndex((b) => b.path === '/supply/ink/vice-colors')
+  const { prev, next } = getAdjacentBrands(brandIndex >= 0 ? brandIndex : 3)
+
+  const handleScrollToCatalog = () => {
+    const el = document.getElementById('catalogo-marca')
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const shareUrl =
+    typeof window !== 'undefined' && window.location?.href
+      ? window.location.href
+      : 'https://inkognito-ecosystem.com/supply/ink/vice-colors'
 
   return (
     <div className="min-h-screen bg-white text-zinc-900">
-      <NavbarCategory pageName="Vice Colors" light />
+      <NavbarCategory pageName="Vice Colors" light hideWordmark hideCart hideMenu shareUrl={shareUrl} />
 
-      {scrolled && (
-        <>
-          <Link
-            to={prev.path} replace
-            aria-label={`Ver ${prev.name}`}
-            className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-600 hover:text-black bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
-          >
-            <ArrowLeft size={20} />
-          </Link>
-          <Link
-            to={next.path} replace
-            aria-label={`Ver ${next.name}`}
-            className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-600 hover:text-black bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
-          >
-            <ArrowRight size={20} />
-          </Link>
-        </>
-      )}
+      <BrandShowcaseHero
+        brandKey="vice-colors"
+        logoUrl="/marcas-marquee/vice-colors.png"
+        distribuidorOficial={false}
+        onExploreCatalog={handleScrollToCatalog}
+        brandNav={{ show: mostrarFlechas, prev, next }}
+      />
 
-      <div className="pt-20 md:pt-24 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
-
-        <div className="relative overflow-hidden mb-6 md:mb-8">
-          <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
-          <div className="relative z-10">
-          <div className="flex items-center justify-between gap-3 mb-3">
-            <Link to={prev.path} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
-              <ArrowLeft size={18} />
-            </Link>
-            <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm text-center flex-1">
-              Marca Profesional
-            </p>
-            <Link to={next.path} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
-              <ArrowRight size={18} />
-            </Link>
-          </div>
-
-          {logoUrl === undefined ? (
-            <div className="h-20 md:h-32" />
-          ) : logoUrl ? (
-            <div className="text-justify [hyphens:auto]">
-              <div className="float-left w-[180px] mr-6 md:mr-8 mb-2 flex justify-center">
-                <img
-                  src={logoUrl}
-                  alt="Vice Colors"
-                  className="h-20 md:h-32 w-auto max-w-full object-contain"
-                />
-              </div>
-              <p className="text-zinc-600 leading-relaxed mb-3">
-                Vice Colors es una de las marcas de pigmentos más innovadoras y de mayor crecimiento en el sector europeo y latinoamericano. Con una personalidad audaz e ingredientes seleccionados meticulosamente, ha conquistado a los tatuadores que buscan colores con nombres rebeldes y saturaciones extremas.
-              </p>
-              <p className="text-zinc-600 leading-relaxed mb-3">
-                Su formulación destaca por su excelente viscosidad y rapidez de implantación. Productos estrella como Black Sabbath, El Gato Blanco y El Gato Patrón han redefinido la manera en que los artistas abordan los rellenos puros y los delineados de alto contraste.
-              </p>
-              <p className="text-zinc-600 leading-relaxed">
-                Explora una gama cromática llena de actitud y diseñada para aguantar el paso del tiempo intacta. Perfecta para realismo, neotradicional, lettering, y estilos modernos de alta exigencia visual.
-              </p>
-              <div className="clear-both" />
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8">
-              <h1 className="text-4xl md:text-7xl font-black uppercase leading-none flex-shrink-0 text-zinc-900">
-                Vice Colors
-              </h1>
-
-              <div className="max-w-xl text-justify [hyphens:auto] sm:border-l sm:border-zinc-200 sm:pl-8">
-                <p className="text-zinc-600 leading-relaxed mb-3">
-                  Vice Colors es una de las marcas de pigmentos más innovadoras y de mayor crecimiento en el sector europeo y latinoamericano. Con una personalidad audaz e ingredientes seleccionados meticulosamente, ha conquistado a los tatuadores que buscan colores con nombres rebeldes y saturaciones extremas.
-                </p>
-                <p className="text-zinc-600 leading-relaxed mb-3">
-                  Su formulación destaca por su excelente viscosidad y rapidez de implantación. Productos estrella como Black Sabbath, El Gato Blanco y El Gato Patrón han redefinido la manera en que los artistas abordan los rellenos puros y los delineados de alto contraste.
-                </p>
-                <p className="text-zinc-600 leading-relaxed">
-                  Explora una gama cromática llena de actitud y diseñada para aguantar el paso del tiempo intacta. Perfecta para realismo, neotradicional, lettering, y estilos modernos de alta exigencia visual.
-                </p>
-              </div>
-            </div>
-          )}
-          </div>
+      <div id="catalogo-marca" className="pt-10 md:pt-14 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="text-center mb-8 pb-4 border-b border-zinc-100">
+          <p className="uppercase tracking-[0.25em] text-zinc-400 text-xs font-semibold">
+            Vitrina Multi-Tienda · Pigmentos de Alta Saturación
+          </p>
+          <h3 className="text-xl sm:text-2xl font-black uppercase text-zinc-900 tracking-tight mt-0.5">
+            Stock de Tiendas Aliadas en INKognito Supply
+          </h3>
+          <p className="text-xs text-zinc-500 mt-1 max-w-md mx-auto">
+            Inventario publicado y comercializado directamente por distribuidores y tiendas supply registradas.
+          </p>
         </div>
 
-        <BrandCatalogSection brandName="Vice Colors" products={products} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} light />
+        <BrandCatalogSection
+          brandName="Vice Colors"
+          products={products}
+          hasMore={hasMoreProductos}
+          onLoadMore={cargarMasProductos}
+          loadingMore={cargandoMasProductos}
+          light
+          hideWhatsapp={true}
+        />
 
         <SupplyFAQ items={faqItems} nombre="Vice Colors" light />
-
       </div>
 
       <FooterSupply light />
-      <div className="h-16 md:hidden" />
       <SupplyMobileNav active="marcas" light />
+      <div className="h-16 md:hidden bg-white" />
     </div>
   )
 }

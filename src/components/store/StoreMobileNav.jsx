@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, Store, PlusCircle, UserCircle, Globe, FileText, Shield, Package } from 'lucide-react'
+import CategoriesGridIcon from '../CategoriesGridIcon'
 import { useStoreCart } from '../../contexts/StoreCartContext'
 import CartDrawerStore from './CartDrawerStore'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
@@ -46,8 +47,20 @@ export default function StoreMobileNav({ active = null }) {
           <Home size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Inicio</span>
         </Link>
-        <Link to="/store/categorias" prefetch="viewport" className="flex flex-col items-center gap-1" style={{ color: tabColor('categorias') }}>
-          <LayoutGrid size={19} />
+        <Link
+          to="/store/categorias"
+          prefetch="viewport"
+          onClick={(e) => {
+            if (active === 'categorias') {
+              e.preventDefault()
+              if (window.history.length > 1) navigate(-1)
+              else navigate('/store')
+            }
+          }}
+          className="flex flex-col items-center gap-1"
+          style={{ color: tabColor('categorias') }}
+        >
+          <CategoriesGridIcon open={active === 'categorias' && !drawerOpen && !menuOpen} size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Categorías</span>
         </Link>
         <Link to="/" prefetch="viewport" aria-label="Ir al Ecosistema" className="flex flex-col items-center gap-1 text-black">

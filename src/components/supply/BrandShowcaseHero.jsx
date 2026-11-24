@@ -124,6 +124,16 @@ export default function BrandShowcaseHero({
           style={{ backgroundColor: data.accentColor }}
         />
 
+        {/* Marca de agua tenue del logotipo en el fondo (opcional para estudios/galerías) */}
+        {data.heroWatermarkLogo && (
+          <img
+            src={data.heroWatermarkLogo}
+            alt=""
+            aria-hidden="true"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[460px] md:w-[540px] h-auto object-contain opacity-[0.045] pointer-events-none select-none"
+          />
+        )}
+
         {/* CONTENEDOR DEL VISOR CON FLECHAS ANCLADAS A LOS EXTREMOS (SIEMPRE VISIBLES) */}
         <div className="relative w-full max-w-5xl mx-auto my-auto flex items-center justify-center min-h-[320px] sm:min-h-[380px] md:min-h-[440px]">
 
@@ -187,11 +197,38 @@ export default function BrandShowcaseHero({
                   }}
                   className="relative z-10 flex items-center justify-center"
                 >
-                  <img
-                    src={currentSlide.src}
-                    alt={currentSlide.alt}
-                    className={`w-auto h-auto ${currentSlide.maxHeight} ${currentSlide.maxWidth} object-contain drop-shadow-[0_22px_38px_rgba(0,0,0,0.16)] pointer-events-none select-none`}
-                  />
+                  {currentSlide.frameStyle === 'watermark' ? (
+                    <div className="relative flex items-center justify-center py-6 sm:py-10">
+                      <img
+                        src={currentSlide.src}
+                        alt={currentSlide.alt}
+                        className={`w-auto h-auto ${currentSlide.maxHeight} ${currentSlide.maxWidth} object-contain opacity-[0.22] pointer-events-none select-none`}
+                      />
+                    </div>
+                  ) : currentSlide.frameStyle === 'gallery' ? (
+                    <div className="relative rounded-3xl overflow-hidden shadow-[0_28px_60px_rgba(0,0,0,0.22)] ring-1 ring-black/10 bg-zinc-950">
+                      <img
+                        src={currentSlide.src}
+                        alt={currentSlide.alt}
+                        className={`w-full h-auto ${currentSlide.maxHeight} ${currentSlide.maxWidth} object-cover pointer-events-none select-none`}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/15 pointer-events-none" />
+                      {resolvedLogo && (
+                        <img
+                          src={resolvedLogo}
+                          alt=""
+                          aria-hidden="true"
+                          className="absolute inset-0 m-auto w-36 sm:w-44 md:w-52 h-auto object-contain invert opacity-[0.16] pointer-events-none select-none"
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <img
+                      src={currentSlide.src}
+                      alt={currentSlide.alt}
+                      className={`w-auto h-auto ${currentSlide.maxHeight} ${currentSlide.maxWidth} object-contain drop-shadow-[0_22px_38px_rgba(0,0,0,0.16)] pointer-events-none select-none`}
+                    />
+                  )}
                 </motion.div>
 
                 {/* SOMBRA DE CONTACTO REALISTA EN EL SUELO (Sincronizada en fase inversa) */}
@@ -302,11 +339,42 @@ export default function BrandShowcaseHero({
 
           <div className="flex flex-col items-center justify-center mx-auto px-2">
             {resolvedLogo ? (
-              <img
-                src={resolvedLogo}
-                alt={data.brandName}
-                className="h-14 sm:h-16 md:h-20 w-auto max-w-[230px] sm:max-w-[300px] md:max-w-[360px] object-contain drop-shadow-sm"
-              />
+              data.logoMaskColor ? (
+                <span className="relative inline-flex items-center justify-center">
+                  <img
+                    src={resolvedLogo}
+                    alt={data.brandName}
+                    className={`${
+                      data.logoClassName ||
+                      'h-20 sm:h-24 md:h-28 w-auto max-w-[240px] sm:max-w-[320px] md:max-w-[380px] object-contain'
+                    } opacity-0`}
+                  />
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-0"
+                    style={{
+                      backgroundColor: data.logoMaskColor,
+                      WebkitMaskImage: `url(${resolvedLogo})`,
+                      maskImage: `url(${resolvedLogo})`,
+                      WebkitMaskSize: 'contain',
+                      maskSize: 'contain',
+                      WebkitMaskRepeat: 'no-repeat',
+                      maskRepeat: 'no-repeat',
+                      WebkitMaskPosition: 'center',
+                      maskPosition: 'center',
+                    }}
+                  />
+                </span>
+              ) : (
+                <img
+                  src={resolvedLogo}
+                  alt={data.brandName}
+                  className={
+                    data.logoClassName ||
+                    'h-20 sm:h-24 md:h-28 w-auto max-w-[240px] sm:max-w-[320px] md:max-w-[380px] object-contain drop-shadow-sm'
+                  }
+                />
+              )
             ) : (
               <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-zinc-900">
                 {data.brandName}
@@ -327,15 +395,15 @@ export default function BrandShowcaseHero({
           ) : <span className="w-9 sm:w-10 flex-shrink-0" />}
         </div>
 
-        {/* Eyebrow de ingeniería y autor */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-zinc-100 border border-zinc-200/80 mb-3.5">
-          <span className="text-[10px] sm:text-xs font-mono font-bold tracking-[0.25em] text-zinc-600 uppercase">
+        {/* Eyebrow de ingeniería / marca — SIEMPRE en una sola línea sin cortes */}
+        <div className="inline-flex items-center justify-center max-w-full px-3 sm:px-4 py-1 rounded-full bg-zinc-100 border border-zinc-200/80 mb-3.5 overflow-hidden">
+          <span className="text-[9px] sm:text-[11px] font-mono font-bold tracking-[0.14em] sm:tracking-[0.2em] text-zinc-600 uppercase whitespace-nowrap truncate">
             {data.eyebrow}
           </span>
         </div>
 
         {/* Título de Producto & Subtítulo */}
-        <h3 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-zinc-900 leading-tight">
+        <h3 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-zinc-900 leading-tight text-balance">
           {data.title}
         </h3>
 
@@ -420,13 +488,32 @@ export default function BrandShowcaseHero({
             {/* TARJETA DESTACADA: Fotografía real editorial (Col span 7) */}
             <div className="md:col-span-7 rounded-3xl bg-zinc-900 text-white overflow-hidden p-6 sm:p-8 flex flex-col justify-between shadow-xl relative group">
 
-              <div className="relative w-full h-[240px] sm:h-[300px] rounded-2xl overflow-hidden mb-6 bg-zinc-950">
-                <img
-                  src={data.bento.featured.image}
-                  alt={data.bento.featured.imageAlt}
-                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-90"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-80" />
+              <div className="relative w-full h-[240px] sm:h-[300px] rounded-2xl overflow-hidden mb-6 bg-zinc-950 flex items-center justify-center border border-white/5">
+                {data.bento.featured.image ? (
+                  <>
+                    <img
+                      src={data.bento.featured.image}
+                      alt={data.bento.featured.imageAlt}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-90"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-80" />
+                  </>
+                ) : data.bento.featured.watermarkLogo ? (
+                  <>
+                    <div
+                      className="absolute inset-0 opacity-[0.06]"
+                      style={{
+                        backgroundImage: 'radial-gradient(rgba(255,255,255,0.9) 1px, transparent 1px)',
+                        backgroundSize: '20px 20px',
+                      }}
+                    />
+                    <img
+                      src={data.bento.featured.watermarkLogo}
+                      alt={data.bento.featured.imageAlt}
+                      className="w-40 sm:w-48 h-auto object-contain invert opacity-[0.18] group-hover:opacity-[0.26] group-hover:scale-105 transition-all duration-700 select-none pointer-events-none"
+                    />
+                  </>
+                ) : null}
                 <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] font-mono text-zinc-300 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10">
                   <span className="text-blue-400 font-bold">{data.bento.featured.overlayLeft}</span>
                   <span className="text-zinc-400">{data.bento.featured.overlayRight}</span>

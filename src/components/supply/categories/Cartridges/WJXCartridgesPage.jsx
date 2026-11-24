@@ -1,26 +1,27 @@
-import { Link, useLoaderData } from 'react-router'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { useLoaderData } from 'react-router'
 import FooterSupply from '../../FooterSupply'
 import NavbarCategory from '../../NavbarCategory'
 import BrandCatalogSection from '../../BrandCatalogSection'
 import SupplyFAQ from '../../SupplyFAQ'
 import SupplyMobileNav from '../../SupplyMobileNav'
-import { getAdjacentBrands } from '../../../../data/supplyBrandsOrder'
+import BrandShowcaseHero from '../../BrandShowcaseHero'
+import { getAdjacentBrands, SUPPLY_BRANDS_ORDER } from '../../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../../hooks/useSupplyVisual'
-import { useScrolled } from '../../../../hooks/useScrolled'
 import { fetchCatalogMarca, fetchSupplyFaq, useLoadMore } from '../../../../hooks/useCatalog'
 
-export async function loader() {
+export async function loader({ request }) {
   const [catalogo, faqItems] = await Promise.all([
     fetchCatalogMarca('supply', 'wjx'),
     fetchSupplyFaq({ marca: 'wjx' }),
   ])
-  return { ...catalogo, faqItems }
+  const mostrarFlechas = new URL(request.url).searchParams.get('flechas') !== '0'
+  return { ...catalogo, mostrarFlechas, faqItems }
 }
 
 export function meta() {
   const title = 'Cartuchos WJX | INKognito Supply — Colombia'
-  const description = 'Cartuchos WJX de alta precisión para líneas y sombras. Compatibles con máquinas tipo pen. Disponibles en toda Colombia.'
+  const description =
+    'Cartuchos WJX (Ultimate, Ultra y Acme) para tatuadores: acero quirúrgico 316L, policarbonato grado médico LG, membrana antiflujo y esterilización EO. Envíos a toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },
@@ -30,132 +31,66 @@ export function meta() {
   ]
 }
 
-const DOT_PATTERN = {
-  backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
-  backgroundSize: '18px 18px',
-}
-
 export default function WJXCartridgesPage() {
-  const { products: productosIniciales, nextCursor, hasMore, faqItems } = useLoaderData()
-  const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { marca: 'wjx' }, { items: productosIniciales, nextCursor, hasMore })
+  const { products: productosIniciales, nextCursor, hasMore, mostrarFlechas = true, faqItems } = useLoaderData()
+  const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } =
+    useLoadMore('supply', { marca: 'wjx' }, { items: productosIniciales, nextCursor, hasMore })
   const logoUrl = useSupplyVisual('supply_brand_wjx')
-  const { prev, next } = getAdjacentBrands(2)
-  const scrolled = useScrolled()
+  const brandIndex = SUPPLY_BRANDS_ORDER.findIndex((b) => b.path === '/supply/cartridges/wjx')
+  const { prev, next } = getAdjacentBrands(brandIndex >= 0 ? brandIndex : 2)
+
+  const handleScrollToCatalog = () => {
+    const el = document.getElementById('catalogo-marca')
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const shareUrl =
+    typeof window !== 'undefined' && window.location?.href
+      ? window.location.href
+      : 'https://inkognito-ecosystem.com/supply/cartridges/wjx'
 
   return (
     <div className="min-h-screen bg-white text-zinc-900">
-      <NavbarCategory pageName="WJX Tattoo" light />
+      <NavbarCategory pageName="WJX Tattoo" light hideWordmark hideCart hideMenu shareUrl={shareUrl} />
 
-      {scrolled && (
-        <>
-          <Link
-            to={prev.path} replace
-            aria-label={`Ver ${prev.name}`}
-            className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-600 hover:text-black bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
-          >
-            <ArrowLeft size={20} />
-          </Link>
-          <Link
-            to={next.path} replace
-            aria-label={`Ver ${next.name}`}
-            className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-600 hover:text-black bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
-          >
-            <ArrowRight size={20} />
-          </Link>
-        </>
-      )}
+      <BrandShowcaseHero
+        brandKey="wjx"
+        logoUrl={logoUrl || '/supply-assets/logos/supply_brand_wjx.webp'}
+        distribuidorOficial={false}
+        onExploreCatalog={handleScrollToCatalog}
+        brandNav={{ show: mostrarFlechas, prev, next }}
+      />
 
-      <div className="pt-20 md:pt-24 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
-
-        <div className="relative overflow-hidden mb-6 md:mb-8">
-          <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
-          <div className="relative z-10">
-
-          <div className="flex items-center justify-between gap-3 mb-3">
-            <Link to={prev.path} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
-              <ArrowLeft size={18} />
-            </Link>
-            <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm text-center flex-1">
-              Marca Profesional
-            </p>
-            <Link to={next.path} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
-              <ArrowRight size={18} />
-            </Link>
-          </div>
-
-          {logoUrl === undefined ? (
-            <div className="h-20 md:h-32" />
-          ) : logoUrl ? (
-            <div className="text-zinc-600 leading-relaxed text-justify [hyphens:auto] space-y-2">
-              <div className="float-left w-[180px] mr-6 md:mr-8 mb-2">
-                <img
-                  src={logoUrl}
-                  alt="WJX"
-                  className="h-20 md:h-32 w-auto max-w-full object-contain"
-                />
-              </div>
-
-              <p>
-                Los cartuchos WJX se han convertido en una de las opciones más
-                utilizadas por tatuadores de todo el mundo gracias a su precisión,
-                estabilidad y excelente flujo de tinta.
-              </p>
-
-              <p>
-                Son especialmente populares para trabajos de realismo, black and
-                grey y color debido a la consistencia de sus agujas y la calidad
-                de sus membranas internas.
-              </p>
-
-              <p>
-                En esta sección encontrarás las configuraciones más utilizadas de
-                WJX para líneas, sombras y rellenos.
-              </p>
-
-              <div className="clear-both" />
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8">
-              <h1 className="text-4xl md:text-7xl font-black uppercase leading-none flex-shrink-0 text-zinc-900">
-                WJX
-              </h1>
-
-              <div className="max-w-xl text-zinc-600 leading-relaxed text-justify [hyphens:auto] space-y-2 sm:border-l sm:border-zinc-200 sm:pl-8">
-
-                <p>
-                  Los cartuchos WJX se han convertido en una de las opciones más
-                  utilizadas por tatuadores de todo el mundo gracias a su precisión,
-                  estabilidad y excelente flujo de tinta.
-                </p>
-
-                <p>
-                  Son especialmente populares para trabajos de realismo, black and
-                  grey y color debido a la consistencia de sus agujas y la calidad
-                  de sus membranas internas.
-                </p>
-
-                <p>
-                  En esta sección encontrarás las configuraciones más utilizadas de
-                  WJX para líneas, sombras y rellenos.
-                </p>
-
-              </div>
-            </div>
-          )}
-
-          </div>
+      <div id="catalogo-marca" className="pt-10 md:pt-14 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="text-center mb-8 pb-4 border-b border-zinc-100">
+          <p className="uppercase tracking-[0.25em] text-zinc-400 text-xs font-semibold">
+            Vitrina Multi-Tienda · Cartuchos & Maquinaria
+          </p>
+          <h3 className="text-xl sm:text-2xl font-black uppercase text-zinc-900 tracking-tight mt-0.5">
+            Stock de Tiendas Aliadas en INKognito Supply
+          </h3>
+          <p className="text-xs text-zinc-500 mt-1 max-w-md mx-auto">
+            Inventario publicado y comercializado directamente por distribuidores y tiendas supply registradas.
+          </p>
         </div>
 
-        <BrandCatalogSection brandName="WJX Tattoo" products={products} hasMore={hasMoreProductos} onLoadMore={cargarMasProductos} loadingMore={cargandoMasProductos} light />
+        <BrandCatalogSection
+          brandName="WJX Tattoo"
+          products={products}
+          hasMore={hasMoreProductos}
+          onLoadMore={cargarMasProductos}
+          loadingMore={cargandoMasProductos}
+          light
+          officialUrl="https://www.wjxtattoo.com"
+          hideWhatsapp={true}
+        />
 
         <SupplyFAQ items={faqItems} nombre="WJX" light />
-
       </div>
 
       <FooterSupply light />
-      <div className="h-16 md:hidden" />
       <SupplyMobileNav active="marcas" light />
-
+      <div className="h-16 md:hidden bg-white" />
     </div>
   )
 }

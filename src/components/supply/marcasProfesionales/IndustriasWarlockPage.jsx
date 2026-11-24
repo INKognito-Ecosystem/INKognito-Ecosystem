@@ -1,27 +1,20 @@
-import { Link, useLoaderData } from 'react-router'
-import { ArrowLeft, ArrowRight, Award } from 'lucide-react'
+import { useLoaderData } from 'react-router'
 import FooterSupply from '../FooterSupply'
 import NavbarCategory from '../NavbarCategory'
 import BrandCatalogSection from '../BrandCatalogSection'
 import SupplyFAQ from '../SupplyFAQ'
 import SupplyMobileNav from '../SupplyMobileNav'
-import { getAdjacentBrands } from '../../../data/supplyBrandsOrder'
+import BrandShowcaseHero from '../BrandShowcaseHero'
+import { getAdjacentBrands, SUPPLY_BRANDS_ORDER } from '../../../data/supplyBrandsOrder'
 import { useSupplyVisual } from '../../../hooks/useSupplyVisual'
-import { useScrolled } from '../../../hooks/useScrolled'
 import { fetchCatalogMarca, fetchSupplyFaq, useLoadMore } from '../../../hooks/useCatalog'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
-// fase 6.1 (2026-08-07) — id real en `estudios` vinculado a esta marca,
-// solo para leer distribuidor_oficial (la insignia paga). Si el fetch
-// falla, simplemente no se muestra insignia — no rompe la página.
+// id real en `estudios` vinculado a esta marca para leer distribuidor_oficial.
 const ESTUDIO_ID = 5
 
-// Antes esta página era de Kwadron (cartuchos, /supply/cartridges/kwadron,
-// components/supply/categories/Cartridges/KwadronCartridgesPage.jsx).
-// Reemplazada por Industrias Warlock (mobiliario) y movida acá — decisión
-// de Jose (2026-08-01). El slug de marca interno sigue siendo 'kwadron' a
-// propósito: el logo ya se subió en el panel bajo esa misma clave
-// (supply_brand_kwadron) y cambiarla rompería esa imagen.
+// El slug de marca interno sigue siendo 'kwadron' a propósito porque el logo y
+// catálogo en el panel viven bajo esa clave (supply_brand_kwadron).
 export async function loader({ request }) {
   const [catalogo, estudioRes, faqItems] = await Promise.all([
     fetchCatalogMarca('supply', 'kwadron'),
@@ -29,17 +22,19 @@ export async function loader({ request }) {
     fetchSupplyFaq({ marca: 'kwadron' }),
   ])
   const estudio = estudioRes && estudioRes.ok ? await estudioRes.json() : null
-  // ?flechas=0 (fase 6.1, bug real de Jose) — quien llega acá desde el
-  // perfil de un estudio en el buscador no debe poder saltar a otra
-  // marca sin relación; navegando normal desde el menú de Supply, el
-  // parámetro no viene y las flechas se ven como siempre.
   const mostrarFlechas = new URL(request.url).searchParams.get('flechas') !== '0'
-  return { ...catalogo, distribuidorOficial: estudio?.distribuidor_oficial || false, mostrarFlechas, faqItems }
+  return {
+    ...catalogo,
+    distribuidorOficial: estudio?.distribuidor_oficial || false,
+    mostrarFlechas,
+    faqItems,
+  }
 }
 
 export function meta() {
-  const title = 'Industrias Warlock | INKognito Supply — Colombia'
-  const description = 'Industrias Warlock: mobiliario profesional para estudios de tatuaje — camillas, sillas y equipamiento para tu espacio de trabajo. Disponible en toda Colombia.'
+  const title = 'Industrias Warlock | Mobiliario Profesional para Estudios de Tatuaje — INKognito Supply'
+  const description =
+    'Industrias Warlock: mobiliario profesional colombiano para estudios de tatuaje — camillas reclinables, apoyabrazos ajustables, sillas ergonómicas y carros auxiliares. Disponible en toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },
@@ -49,158 +44,75 @@ export function meta() {
   ]
 }
 
-const DOT_PATTERN = {
-  backgroundImage: 'radial-gradient(rgba(161,161,170,1) 1px, transparent 1px)',
-  backgroundSize: '18px 18px',
-}
-
-function InsigniaDistribuidorOficial() {
-  return (
-    <span className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-black text-[9px] font-black uppercase tracking-widest bg-amber-400">
-      <Award size={10} /> Distribuidor Oficial
-    </span>
-  )
-}
-
 export default function IndustriasWarlockPage() {
   const { products: productosIniciales, nextCursor, hasMore, distribuidorOficial, mostrarFlechas, faqItems } = useLoaderData()
-  const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } = useLoadMore('supply', { marca: 'kwadron' }, { items: productosIniciales, nextCursor, hasMore })
+  const { items: products, hasMore: hasMoreProductos, loading: cargandoMasProductos, loadMore: cargarMasProductos } =
+    useLoadMore('supply', { marca: 'kwadron' }, { items: productosIniciales, nextCursor, hasMore })
   const logoUrl = useSupplyVisual('supply_brand_kwadron')
-  const { prev, next } = getAdjacentBrands(1)
-  const scrolled = useScrolled()
+  const brandIndex = SUPPLY_BRANDS_ORDER.findIndex((b) => b.path === '/supply/mobiliario/warlock')
+  const { prev, next } = getAdjacentBrands(brandIndex >= 0 ? brandIndex : 1)
+
+  const handleScrollToCatalog = () => {
+    const el = document.getElementById('catalogo-marca')
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const shareUrl =
+    typeof window !== 'undefined' && window.location?.href
+      ? window.location.href
+      : 'https://inkognito-ecosystem.com/supply/mobiliario/warlock'
 
   return (
     <div className="min-h-screen bg-white text-zinc-900">
-      <NavbarCategory pageName="Industrias Warlock" light />
+      <NavbarCategory
+        pageName="Industrias Warlock"
+        light
+        hideWordmark
+        hideCart
+        hideMenu
+        shareUrl={shareUrl}
+      />
 
-      {mostrarFlechas && scrolled && (
-        <>
-          <Link
-            to={prev.path} replace
-            aria-label={`Ver ${prev.name}`}
-            className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-600 hover:text-black bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
-          >
-            <ArrowLeft size={20} />
-          </Link>
-          <Link
-            to={next.path} replace
-            aria-label={`Ver ${next.name}`}
-            className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-600 hover:text-black bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
-          >
-            <ArrowRight size={20} />
-          </Link>
-        </>
-      )}
+      <BrandShowcaseHero
+        brandKey="industrias-warlock"
+        logoUrl="/marcas-marquee/warlock.png"
+        distribuidorOficial={distribuidorOficial}
+        onExploreCatalog={handleScrollToCatalog}
+        brandNav={{ show: mostrarFlechas, prev, next }}
+      />
 
-      <div className="pt-20 md:pt-24 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
-
-        <div className="relative overflow-hidden mb-6 md:mb-8">
-          <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
-          <div className="relative z-10">
-
-          <div className="flex items-center justify-between gap-3 mb-3">
-            {mostrarFlechas ? (
-              <Link to={prev.path} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
-                <ArrowLeft size={18} />
-              </Link>
-            ) : <span />}
-            <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs md:text-sm text-center flex-1">
-              Marca Profesional
-            </p>
-            {mostrarFlechas ? (
-              <Link to={next.path} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-400 hover:text-zinc-900 transition-colors">
-                <ArrowRight size={18} />
-              </Link>
-            ) : <span />}
-          </div>
-
-          {logoUrl === undefined ? (
-            <div className="h-20 md:h-32" />
-          ) : logoUrl ? (
-            <div className="text-zinc-600 leading-relaxed text-justify [hyphens:auto] space-y-2">
-              <div className="float-left w-[180px] mr-6 md:mr-8 mb-2 flex flex-col items-start">
-                <div className="w-full h-20 md:h-32 overflow-hidden rounded-xl border border-zinc-200">
-                  <img
-                    src={logoUrl}
-                    alt="Industrias Warlock"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                {distribuidorOficial && <InsigniaDistribuidorOficial />}
-              </div>
-
-              <p>
-                Industrias Warlock es un fabricante de mobiliario profesional para
-                estudios de tatuaje — camillas, sillas y equipamiento pensado para
-                el trabajo diario de un tatuador.
-              </p>
-
-              <p>
-                Un buen mobiliario no solo es comodidad para el cliente: también es
-                postura, resistencia y durabilidad para quien trabaja horas seguidas
-                en cada sesión.
-              </p>
-
-              <p>
-                En esta sección encontrarás el mobiliario disponible de Industrias
-                Warlock para equipar tu estudio.
-              </p>
-
-              <div className="clear-both" />
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8">
-              <div className="flex-shrink-0">
-                <h1 className="text-4xl md:text-7xl font-black uppercase leading-none text-zinc-900">
-                  Industrias Warlock
-                </h1>
-                {distribuidorOficial && <InsigniaDistribuidorOficial />}
-              </div>
-
-              <div className="max-w-xl text-zinc-600 leading-relaxed text-justify [hyphens:auto] space-y-2 sm:border-l sm:border-zinc-200 sm:pl-8">
-
-                <p>
-                  Industrias Warlock es un fabricante de mobiliario profesional para
-                  estudios de tatuaje — camillas, sillas y equipamiento pensado para
-                  el trabajo diario de un tatuador.
-                </p>
-
-                <p>
-                  Un buen mobiliario no solo es comodidad para el cliente: también es
-                  postura, resistencia y durabilidad para quien trabaja horas seguidas
-                  en cada sesión.
-                </p>
-
-                <p>
-                  En esta sección encontrarás el mobiliario disponible de Industrias
-                  Warlock para equipar tu estudio.
-                </p>
-
-              </div>
-            </div>
-          )}
-
-          </div>
+      <div id="catalogo-marca" className="pt-10 md:pt-14 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="text-center mb-8 pb-4 border-b border-zinc-100">
+          <p className="uppercase tracking-[0.25em] text-zinc-400 text-xs font-semibold">
+            Vitrina Multi-Tienda · Mobiliario Profesional
+          </p>
+          <h3 className="text-xl sm:text-2xl font-black uppercase text-zinc-900 tracking-tight mt-0.5">
+            Stock de Tiendas Aliadas en INKognito Supply
+          </h3>
+          <p className="text-xs text-zinc-500 mt-1 max-w-md mx-auto">
+            Mobiliario publicado y comercializado directamente por distribuidores y tiendas supply registradas.
+          </p>
         </div>
 
         <BrandCatalogSection
           brandName="Industrias Warlock"
           products={products}
-          supplierBadge="Productos fabricados por Industrias Warlock — mobiliario para estudios de tatuaje"
+          supplierBadge="Mobiliario fabricado por Industrias Warlock — equipamiento para estudios de tatuaje"
           hasMore={hasMoreProductos}
           onLoadMore={cargarMasProductos}
           loadingMore={cargandoMasProductos}
           light
+          emptyTitle="Vitrina Multi-Tienda Supply"
+          emptyMessage="En este momento ninguna tienda supply aliada ha cargado inventario activo de Industrias Warlock en la plataforma. Cuando un proveedor publique camillas, apoyabrazos o mobiliario, aparecerán automáticamente aquí."
+          hideWhatsapp={true}
         />
 
         <SupplyFAQ items={faqItems} nombre="Industrias Warlock" light />
-
       </div>
 
       <FooterSupply light />
-      <div className="h-16 md:hidden" />
       <SupplyMobileNav active="marcas" light />
-
+      <div className="h-16 md:hidden bg-white" />
     </div>
   )
 }
