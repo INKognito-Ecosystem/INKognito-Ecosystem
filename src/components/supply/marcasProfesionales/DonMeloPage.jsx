@@ -93,7 +93,7 @@ export default function DonMeloPage() {
           onLoadMore={cargarMasProductos}
           loadingMore={cargandoMasProductos}
           light
-          officialUrl="https://www.instagram.com/donmelotattoomachines/"
+          officialUrl="https://www.instagram.com/don_melo_/"
           emptyTitle="Vitrina Multi-Tienda Supply"
           emptyMessage="En este momento ninguna tienda supply aliada ha cargado inventario activo de Don Melo en la plataforma. Cuando un proveedor suba máquinas o repuestos, se listarán automáticamente aquí. Puedes contactar directamente al taller oficial en su canal:"
           hideWhatsapp={true}

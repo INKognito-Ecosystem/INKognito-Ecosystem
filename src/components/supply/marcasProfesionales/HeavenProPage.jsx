@@ -67,7 +67,7 @@ export default function HeavenProPage() {
 
       <BrandShowcaseHero
         brandKey="heaven-pro"
-        logoUrl={logoUrl || '/supply-assets/logos/supply_brand_heaven_pro.webp'}
+        logoUrl="/marcas-marquee/heaven-pro.png"
         distribuidorOficial={distribuidorOficial}
         onExploreCatalog={handleScrollToCatalog}
         brandNav={{ show: mostrarFlechas, prev, next }}

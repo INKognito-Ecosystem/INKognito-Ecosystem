@@ -55,7 +55,7 @@ export default function HypeInkColorsPage() {
 
       <BrandShowcaseHero
         brandKey="hype-ink"
-        logoUrl={logoUrl || null}
+        logoUrl={logoUrl || '/marcas-marquee/hype-ink.png'}
         distribuidorOficial={false}
         onExploreCatalog={handleScrollToCatalog}
         brandNav={{ show: mostrarFlechas, prev, next }}

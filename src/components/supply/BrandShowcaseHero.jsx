@@ -124,14 +124,32 @@ export default function BrandShowcaseHero({
           style={{ backgroundColor: data.accentColor }}
         />
 
-        {/* Marca de agua tenue del logotipo en el fondo (opcional para estudios/galerías) */}
-        {data.heroWatermarkLogo && (
-          <img
-            src={data.heroWatermarkLogo}
-            alt=""
-            aria-hidden="true"
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[460px] md:w-[540px] h-auto object-contain opacity-[0.045] pointer-events-none select-none"
-          />
+        {/* Marca de agua tenue del logotipo en el fondo detrás de las fotos de producto */}
+        {(data.heroWatermarkLogo || resolvedLogo) && (
+          data.logoMaskColor && !data.heroWatermarkLogo ? (
+            <span
+              aria-hidden="true"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[440px] md:w-[540px] h-[160px] sm:h-[220px] md:h-[260px] opacity-[0.07] pointer-events-none select-none"
+              style={{
+                backgroundColor: data.logoMaskColor,
+                WebkitMaskImage: `url(${resolvedLogo})`,
+                maskImage: `url(${resolvedLogo})`,
+                WebkitMaskSize: 'contain',
+                maskSize: 'contain',
+                WebkitMaskRepeat: 'no-repeat',
+                maskRepeat: 'no-repeat',
+                WebkitMaskPosition: 'center',
+                maskPosition: 'center',
+              }}
+            />
+          ) : (
+            <img
+              src={data.heroWatermarkLogo || resolvedLogo}
+              alt=""
+              aria-hidden="true"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[460px] md:w-[560px] max-h-[240px] sm:max-h-[320px] md:max-h-[360px] h-auto object-contain opacity-[0.06] pointer-events-none select-none"
+            />
+          )
         )}
 
         {/* CONTENEDOR DEL VISOR CON FLECHAS ANCLADAS A LOS EXTREMOS (SIEMPRE VISIBLES) */}

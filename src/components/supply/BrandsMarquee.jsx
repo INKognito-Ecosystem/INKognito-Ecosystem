@@ -32,6 +32,9 @@ import { brands, brandKey } from './BrandsSupply'
 // tamaño que antes, no más chicos (Jose: "procura que cuando actualices
 // no los dejes más pequeños").
 const RECORTE_LOCAL = {
+  'HEAVEN PRO': '/marcas-marquee/heaven-pro.png',
+  'HYPE INK': '/marcas-marquee/hype-ink.png',
+  MAMACURE: '/marcas-marquee/mamacure.png',
   'ROYAL THREE': '/marcas-marquee/royal-three.png',
   DYNAMIC: '/marcas-marquee/dynamic.png',
   'INDUSTRIAS WARLOCK': '/marcas-marquee/warlock.png',
@@ -204,6 +207,8 @@ const MARQUEE_ORDER = [
   'TATTOO VISION',
   'HEAVEN PRO',
   'DYNAMIC',
+  'MAMACURE',
+  'HYPE INK',
   'DON MELO',
   'WJX',
   'ROYAL THREE',

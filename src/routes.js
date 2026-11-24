@@ -69,7 +69,9 @@ export default [
   route('supply/bundles', 'components/supply/categories/BundlesPage.jsx'),
   route('supply/brands/tattoo-vision', 'components/supply/marcasProfesionales/TattooVisionPage.jsx'),
   route('supply/brands/don-melo', 'components/supply/marcasProfesionales/DonMeloPage.jsx'),
+  route('supply/brands/difuso-galeria', 'components/supply/marcasProfesionales/DifusoGaleriaPage.jsx'),
   route('supply/brands/heaven-pro', 'components/supply/marcasProfesionales/HeavenProPage.jsx'),
+  route('supply/brands/mamacure', 'components/supply/marcasProfesionales/MamacurePage.jsx'),
   route('supply/brands/royal-three', 'components/supply/marcasProfesionales/RoyalThreePage.jsx'),
   route('supply/mobiliario/warlock', 'components/supply/marcasProfesionales/IndustriasWarlockPage.jsx'),
   // 2026-09-13, Jose: "separemos las card de educación... cada uno deberá

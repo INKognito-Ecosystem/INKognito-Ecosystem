@@ -33,7 +33,7 @@ const REVEAL = {
 // movió de su lugar viejo (después de Dynamic) a primero; el resto
 // conserva su orden relativo de siempre.
 export const brands = [
-  { name: 'HEAVEN PRO', to: '/supply/brands/heaven-pro' },
+  { name: 'HEAVEN PRO', to: '/supply/brands/heaven-pro', img: '/marcas-marquee/heaven-pro.png' },
   { name: 'TATTOO VISION', to: '/supply/brands/tattoo-vision' },
   { name: 'WJX', to: '/supply/cartridges/wjx' },
   // Antes era Kwadron (cartuchos) — reemplazada por Industrias Warlock
@@ -52,7 +52,9 @@ export const brands = [
   { name: 'INDUSTRIAS WARLOCK', to: '/supply/mobiliario/warlock', imgKey: 'supply_brand_kwadron', imgFit: 'cover' },
   { name: 'VICE COLORS', to: '/supply/ink/vice-colors' },
   { name: 'DYNAMIC', to: '/supply/ink/dynamic' },
+  { name: 'HYPE INK', to: '/supply/ink/hype-ink', img: '/marcas-marquee/hype-ink.png' },
   { name: 'ROYAL THREE', to: '/supply/brands/royal-three' },
+  { name: 'MAMACURE', to: '/supply/brands/mamacure', img: '/marcas-marquee/mamacure.png' },
   // Don Melo y Difuso Galeria (2026-09-15, Jose) — todavía sin página
   // propia ni logo cargado en el panel (sin fila en `settings`, así que
   // `imgs[key]` nunca las va a encontrar) — `to: null` hasta que se les
@@ -64,7 +66,7 @@ export const brands = [
   // también para que la sección "Marcas" de escritorio (que solo lee
   // `imgs[key]`) las muestre igual.
   { name: 'DON MELO', to: '/supply/brands/don-melo', img: '/marcas-marquee/don-melo.png' },
-  { name: 'DIFUSO GALERIA', to: null, img: '/marcas-marquee/difuso-galeria.png' },
+  { name: 'DIFUSO GALERIA', to: '/supply/brands/difuso-galeria', img: '/marcas-marquee/difuso-galeria.png' },
 ]
 
 // imgs viene del loader de SupplyPage.jsx (2026-09-13, Jose: "al volver

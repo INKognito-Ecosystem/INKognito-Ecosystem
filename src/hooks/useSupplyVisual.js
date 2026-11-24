@@ -12,6 +12,7 @@ export const SUPPLY_LOCAL_LOGOS = {
   supply_brand_dynamic: '/supply-assets/logos/supply_brand_dynamic.jpg',
   supply_brand_vice_colors: '/supply-assets/logos/supply_brand_vice_colors.png',
   supply_brand_don_melo: '/marcas-marquee/don-melo.png',
+  supply_brand_difuso_galeria: '/marcas-marquee/difuso-galeria.png',
 }
 
 let cache = null
