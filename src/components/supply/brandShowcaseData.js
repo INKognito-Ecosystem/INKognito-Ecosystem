@@ -375,6 +375,8 @@ export const BRAND_SHOWCASE_DATA = {
       featured: {
         image: '/supply-assets/difuso/difuso_founders.webp',
         imageAlt: 'Juan Fernando Ciro y Tomás Montoya, fundadores de Difuso Galería y Difuso Supply',
+        imageHeightClass: 'h-[280px] sm:h-[380px] md:h-[430px]',
+        imageFit: 'object-contain bg-black',
         overlayLeft: 'Juan Fernando Ciro & Tomás Montoya',
         overlayRight: 'Envigado · Medellín',
         eyebrow: 'ESTUDIO + TIENDA SUPPLY',

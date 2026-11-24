@@ -120,40 +120,40 @@ export default function BrandShowcaseHero({
 
         {/* Resplandor ambiental de acento difuso detrás del producto */}
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] sm:w-[620px] md:w-[750px] h-[280px] sm:h-[360px] rounded-full blur-[110px] pointer-events-none opacity-[0.08]"
+          className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] sm:w-[620px] md:w-[750px] h-[280px] sm:h-[360px] rounded-full blur-[110px] pointer-events-none opacity-[0.08]"
           style={{ backgroundColor: data.accentColor }}
         />
 
-        {/* Marca de agua tenue del logotipo en el fondo detrás de las fotos de producto */}
-        {(data.heroWatermarkLogo || resolvedLogo) && (
-          data.logoMaskColor && !data.heroWatermarkLogo ? (
-            <span
-              aria-hidden="true"
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[440px] md:w-[540px] h-[160px] sm:h-[220px] md:h-[260px] opacity-[0.07] pointer-events-none select-none"
-              style={{
-                backgroundColor: data.logoMaskColor,
-                WebkitMaskImage: `url(${resolvedLogo})`,
-                maskImage: `url(${resolvedLogo})`,
-                WebkitMaskSize: 'contain',
-                maskSize: 'contain',
-                WebkitMaskRepeat: 'no-repeat',
-                maskRepeat: 'no-repeat',
-                WebkitMaskPosition: 'center',
-                maskPosition: 'center',
-              }}
-            />
-          ) : (
-            <img
-              src={data.heroWatermarkLogo || resolvedLogo}
-              alt=""
-              aria-hidden="true"
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[460px] md:w-[560px] max-h-[240px] sm:max-h-[320px] md:max-h-[360px] h-auto object-contain opacity-[0.06] pointer-events-none select-none"
-            />
-          )
-        )}
-
         {/* CONTENEDOR DEL VISOR CON FLECHAS ANCLADAS A LOS EXTREMOS (SIEMPRE VISIBLES) */}
         <div className="relative w-full max-w-5xl mx-auto my-auto flex items-center justify-center min-h-[320px] sm:min-h-[380px] md:min-h-[440px]">
+
+          {/* Marca de agua tenue del logotipo centrada exactamente detrás de la foto flotante */}
+          {(data.heroWatermarkLogo || resolvedLogo) && (
+            data.logoMaskColor && !data.heroWatermarkLogo ? (
+              <span
+                aria-hidden="true"
+                className="absolute top-[46%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[440px] md:w-[540px] h-[160px] sm:h-[220px] md:h-[260px] opacity-[0.07] pointer-events-none select-none z-0"
+                style={{
+                  backgroundColor: data.logoMaskColor,
+                  WebkitMaskImage: `url(${resolvedLogo})`,
+                  maskImage: `url(${resolvedLogo})`,
+                  WebkitMaskSize: 'contain',
+                  maskSize: 'contain',
+                  WebkitMaskRepeat: 'no-repeat',
+                  maskRepeat: 'no-repeat',
+                  WebkitMaskPosition: 'center',
+                  maskPosition: 'center',
+                }}
+              />
+            ) : (
+              <img
+                src={data.heroWatermarkLogo || resolvedLogo}
+                alt=""
+                aria-hidden="true"
+                className="absolute top-[46%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[460px] md:w-[560px] max-h-[240px] sm:max-h-[320px] md:max-h-[360px] h-auto object-contain opacity-[0.06] pointer-events-none select-none z-0"
+              />
+            )
+          )}
 
           {/* FLECHA ANTERIOR — SOLO EN MODO MULTI-SLIDE (KIT) */}
           {isMultiSlide && (
@@ -230,15 +230,7 @@ export default function BrandShowcaseHero({
                         alt={currentSlide.alt}
                         className={`w-full h-auto ${currentSlide.maxHeight} ${currentSlide.maxWidth} object-cover pointer-events-none select-none`}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/15 pointer-events-none" />
-                      {resolvedLogo && (
-                        <img
-                          src={resolvedLogo}
-                          alt=""
-                          aria-hidden="true"
-                          className="absolute inset-0 m-auto w-36 sm:w-44 md:w-52 h-auto object-contain invert opacity-[0.16] pointer-events-none select-none"
-                        />
-                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/10 pointer-events-none" />
                     </div>
                   ) : (
                     <img
@@ -506,15 +498,15 @@ export default function BrandShowcaseHero({
             {/* TARJETA DESTACADA: Fotografía real editorial (Col span 7) */}
             <div className="md:col-span-7 rounded-3xl bg-zinc-900 text-white overflow-hidden p-6 sm:p-8 flex flex-col justify-between shadow-xl relative group">
 
-              <div className="relative w-full h-[240px] sm:h-[300px] rounded-2xl overflow-hidden mb-6 bg-zinc-950 flex items-center justify-center border border-white/5">
+              <div className={`relative w-full ${data.bento.featured.imageHeightClass || 'h-[240px] sm:h-[300px]'} rounded-2xl overflow-hidden mb-6 bg-zinc-950 flex items-center justify-center border border-white/5`}>
                 {data.bento.featured.image ? (
                   <>
                     <img
                       src={data.bento.featured.image}
                       alt={data.bento.featured.imageAlt}
-                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-90"
+                      className={`w-full h-full ${data.bento.featured.imageFit || 'object-cover object-center'} group-hover:scale-105 transition-transform duration-700 opacity-95`}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-80" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-transparent to-transparent opacity-70 pointer-events-none" />
                   </>
                 ) : data.bento.featured.watermarkLogo ? (
                   <>
