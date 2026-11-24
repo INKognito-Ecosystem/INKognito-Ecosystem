@@ -1,17 +1,14 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
-import { FileText, Wrench, Dumbbell } from 'lucide-react'
+import { FileText, Wrench, Dumbbell, ArrowRight, CheckCircle2, ShieldCheck, Truck, Hammer } from 'lucide-react'
 import NavbarGym from './NavbarGym'
 import GymMobileNav from './GymMobileNav'
 import FooterGym from './FooterGym'
-import CoverflowRow from '../CoverflowRow'
 import { GYM_SECCIONES } from '../../data/gymSecciones'
 
 const ogGym = '/og/gym.webp'
 const WA = '573207911013'
 
-// Cuadrícula decorativa — clara (líneas grises) para las tarjetas oscuras que
-// se quedan como estaban, oscura (líneas casi negras) para el fondo blanco.
 const GRID_PATTERN = {
   backgroundImage:
     'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(156,163,175,1) 39px,rgba(156,163,175,1) 40px)',
@@ -25,10 +22,10 @@ const gymJsonLd = {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   "@id": `${import.meta.env.VITE_SITE_URL}/gym#business`,
-  "name": "INKognito Gym",
-  "description": "Máquinas de gym construidas con soldadura profesional. Planos técnicos descargables. Tutoriales y cursos de entrenamiento. Envíos a toda Colombia desde Urabá, Antioquia.",
+  "name": "INKognito Gym System",
+  "description": "Máquinas de gym construidas con soldadura profesional bajo pedido, tienda INKognito Gym Equipment, planos técnicos descargables, tutoriales y cursos. Envíos a toda Colombia desde Urabá, Antioquia.",
   "url": `${import.meta.env.VITE_SITE_URL}/gym`,
-  "telephone": "+57-320-791-1013",
+  "email": "soporte@inkognito-ecosystem.com",
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "Chigorodó",
@@ -38,7 +35,7 @@ const gymJsonLd = {
   "areaServed": "CO",
   "hasOfferCatalog": {
     "@type": "OfferCatalog",
-    "name": "Equipos y recursos para gym casero",
+    "name": "Equipos y recursos de INKognito Gym System",
     "itemListElement": [
       { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Máquinas de gym bajo pedido" } },
       { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Planos técnicos descargables" } },
@@ -49,15 +46,12 @@ const gymJsonLd = {
 
 const RIBBON_ITEM = 'flex-shrink-0 text-[13px] font-extrabold text-white/70 pb-1.5 border-b-2 border-transparent whitespace-nowrap'
 
-const CARD_CLASS = 'border border-gray-800 bg-gray-950 rounded-xl p-4 md:p-5 flex flex-col gap-3 min-h-[190px] md:min-h-[210px] hover:border-gray-600 hover:bg-gray-900 transition-all duration-300 group'
-
 const PANEL_URL = import.meta.env.VITE_PANEL_URL
-
 const membresiaMsg = `https://wa.me/${WA}?text=${encodeURIComponent('Hola, quiero el acceso completo a todos los planos de Gym')}`
 
 export function meta() {
-  const title = 'INKognito Gym | Máquinas de Gym con Soldadura Profesional y Planos Técnicos — Colombia'
-  const description = 'Máquinas de gym construidas con soldadura profesional. Planos técnicos descargables. Envíos a toda Colombia desde Urabá, Antioquia.'
+  const title = 'INKognito Gym System | Máquinas Bajo Pedido y Planos Técnicos — Colombia'
+  const description = 'Máquinas de gym construidas con soldadura profesional bajo pedido, planos técnicos descargables, tutoriales y recursos en INKognito Gym System. Envíos a toda Colombia.'
   return [
     { title },
     { name: 'description', content: description },
@@ -69,11 +63,18 @@ export function meta() {
   ]
 }
 
+const DEFAULT_PLANO_MUESTRAS = [
+  { src: '/gym-assets/planos/muestra-1.webp', titulo: 'Prensa Hack 45° — Armado general' },
+  { src: '/gym-assets/planos/muestra-2.webp', titulo: 'Jalón Dorsal de Discos — Vistas y 3D' },
+  { src: '/gym-assets/planos/muestra-3.webp', titulo: 'Máquina Smith Inclinada — Ensamble general' },
+]
+
 export default function GymPage() {
   const [planosModalOpen, setPlanosModalOpen]     = useState(false)
+  const [planoActivo, setPlanoActivo]             = useState(0)
   const [historiaModalOpen, setHistoriaModalOpen] = useState(false)
   const [precioPlanos, setPrecioPlanos]           = useState(10000)
-  const [planoMuestras, setPlanoMuestras]         = useState([null, null, null])
+  const [planoMuestras, setPlanoMuestras]         = useState(DEFAULT_PLANO_MUESTRAS.map(m => m.src))
   const [creaciones, setCreaciones]               = useState(null)
   const [creacionSeleccionada, setCreacionSeleccionada] = useState(null)
   const [creacionImgActiva, setCreacionImgActiva]       = useState(0)
@@ -84,15 +85,12 @@ export default function GymPage() {
       .then(data => {
         if (data.precio_planos) setPrecioPlanos(Number(data.precio_planos))
         setPlanoMuestras([
-          data.gym_plano_muestra_1 || null,
-          data.gym_plano_muestra_2 || null,
-          data.gym_plano_muestra_3 || null,
+          data.gym_plano_muestra_1 || DEFAULT_PLANO_MUESTRAS[0].src,
+          data.gym_plano_muestra_2 || DEFAULT_PLANO_MUESTRAS[1].src,
+          data.gym_plano_muestra_3 || DEFAULT_PLANO_MUESTRAS[2].src,
         ])
       })
       .catch(() => {})
-    // "Mis creaciones" (2026-08-31) — antes era un placeholder fijo
-    // ("Próximamente"), sin backend ni forma de subir fotos. Ahora se
-    // administra desde el panel (Imágenes → Gym — Mis creaciones).
     fetch(`${PANEL_URL}/api/gym-creaciones`)
       .then(r => r.json())
       .then(setCreaciones)
@@ -107,15 +105,7 @@ export default function GymPage() {
     <div className="min-h-screen bg-white text-zinc-900">
       <NavbarGym />
 
-      {/* CATEGORÍAS — listón (2026-09-20, Jose: "que se muestren en un listón
-          tal como los demás módulos"). Solo móvil, justo debajo del navbar
-          fijo, igual que en MobileHomeSupply/Store/Suple; reemplaza al
-          carrusel de tarjetas de "Lo que puedes conseguir aquí", que en móvil
-          queda oculto (escritorio conserva la grilla de tarjetas). Gym no
-          tiene color de acento (blanco/gris), así que el listón va en gris
-          acero — el mismo zinc-700 de Suple y del degradé de las tarjetas de
-          Planos/Máquinas. "Todos" es solo indicador visual (no navega), igual
-          que en los demás módulos. */}
+      {/* CATEGORÍAS — listón móvil */}
       <div className="md:hidden pt-16">
         <div className="flex gap-5 overflow-x-auto px-4 py-3 bg-zinc-700 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <span className="flex-shrink-0 text-[13px] font-extrabold pb-1.5 border-b-2 whitespace-nowrap text-white border-white">
@@ -140,38 +130,33 @@ export default function GymPage() {
         </div>
       </div>
 
-      {/* BANNER — hero móvil (2026-09-20, Jose: "que sea algo más comercial,
-          tipo banner como ya venimos haciendo"). Mismo formato del banner
-          armado en CSS de MobileHomeSuple.jsx (tarjeta con degradé, titular
-          con palabra resaltada, botones, marca de agua), en la paleta de Gym
-          (gris acero + blanco). Conserva "Nuestra historia" y la frase del
-          hero de siempre (Jose: "la frase sí la conservamos"). Escritorio
-          sigue con el hero de abajo. El <h1> vive acá en móvil y en el hero
-          en escritorio — nunca se ven los dos a la vez. */}
-      <div className="md:hidden relative overflow-hidden mx-4 mt-4 mb-8 rounded-2xl border border-zinc-400/20 bg-gradient-to-br from-zinc-700 to-zinc-900 px-5 py-6">
+      {/* BANNER MÓVIL */}
+      <div className="md:hidden relative overflow-hidden mx-4 mt-4 mb-8 rounded-2xl border border-zinc-400/20 bg-gradient-to-br from-zinc-800 to-zinc-950 px-5 py-6">
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={GRID_PATTERN} />
         <Dumbbell
-          className="absolute -right-6 top-1/2 text-white/[0.07] pointer-events-none"
+          className="absolute -right-6 top-1/2 text-white/[0.06] pointer-events-none"
           style={{ transform: 'translateY(-50%) rotate(-20deg)' }}
           size={190}
           strokeWidth={1}
         />
         <div className="relative z-10">
-          <p className="uppercase tracking-[0.25em] text-zinc-300 text-[10px] font-semibold mb-2">INKognito Gym — Urabá</p>
+          <p className="uppercase tracking-[0.25em] text-zinc-400 text-[10px] font-bold mb-2">
+            INKognito Gym System · Colombia
+          </p>
           <h1 className="text-2xl font-black uppercase leading-[1.1] mb-2 text-white">
-            Tu gym en casa, <span className="inline-block bg-white text-gray-950 px-1.5 -mx-0.5">a tu medida</span>
+            Tu gym en casa, <span className="inline-block bg-white text-zinc-950 px-1.5 -mx-0.5">a tu medida</span>
           </h1>
           <p className="text-zinc-300 text-xs leading-relaxed mb-5 max-w-[18rem]">
-            Máquinas con soldadura profesional, planos técnicos y todo para entrenar sin gimnasio comercial. Envíos a toda Colombia.
+            Máquinas en acero estructural soldadas bajo pedido, planos técnicos en PDF y recursos reales para entrenar fuerte. Envíos a toda Colombia.
           </p>
           <div className="flex flex-wrap gap-2">
-            <Link to="/gym/maquinas-pedido" className="px-4 py-2.5 rounded-lg bg-white text-gray-950 text-[11px] font-black uppercase tracking-[0.1em] whitespace-nowrap">
+            <Link to="/gym/maquinas-pedido" className="px-4 py-2.5 rounded-lg bg-white text-zinc-950 text-[11px] font-black uppercase tracking-[0.1em] whitespace-nowrap">
               Ver máquinas
             </Link>
             <button
               type="button"
               onClick={() => setHistoriaModalOpen(true)}
-              className="px-4 py-2.5 rounded-lg border border-white/40 text-white text-[11px] font-bold uppercase tracking-[0.1em] whitespace-nowrap"
+              className="px-4 py-2.5 rounded-lg border border-white/35 text-white text-[11px] font-bold uppercase tracking-[0.1em] whitespace-nowrap"
             >
               Nuestra historia
             </button>
@@ -182,153 +167,222 @@ export default function GymPage() {
         </div>
       </div>
 
-      {/* HERO — solo escritorio; en móvil lo reemplaza el banner de arriba. */}
-      <section className="hidden md:block relative pt-24 md:pt-32 pb-8 md:pb-14 px-4 md:px-6 overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.04]" style={GRID_PATTERN_CLARO} />
-        <div className="relative z-10 max-w-7xl mx-auto text-center md:text-left">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase leading-none mb-5">
-            Construyo mi<br />
-            <span className="text-zinc-600">propio gym</span><br />
-            desde cero
-          </h1>
-          <button
-            onClick={() => setHistoriaModalOpen(true)}
-            className="inline-block border border-zinc-400 text-zinc-700 text-sm font-bold uppercase tracking-[0.2em] py-3 px-7 rounded hover:border-zinc-600 hover:text-zinc-900 transition-all duration-300"
-          >
-            Nuestra historia
-          </button>
-          <p className="mt-5 text-zinc-600 text-xs md:text-sm italic tracking-wide">
-            “Hago arte para no morir, desafío cuerpo y mente.”
+      {/* HERO ESCRITORIO — Split editorial de alto impacto */}
+      <section className="hidden md:block relative pt-28 pb-16 px-6 overflow-hidden border-b border-zinc-100">
+        <div className="absolute inset-0 opacity-[0.035] pointer-events-none" style={GRID_PATTERN_CLARO} />
+        <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-12 gap-10 items-center">
+          {/* Columna izquierda: Titular, propuesta de valor y acciones */}
+          <div className="lg:col-span-7">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 mb-6">
+              <span className="w-2 h-2 rounded-full bg-zinc-900" />
+              <span className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-zinc-700">
+                INKognito Gym System · Fabricación Nacional
+              </span>
+            </div>
+
+            <h1 className="text-5xl xl:text-6xl font-black uppercase tracking-tight leading-[0.98] text-zinc-950 mb-5">
+              Construye tu<br />
+              <span className="text-zinc-500">propio gym</span><br />
+              desde cero
+            </h1>
+
+            <p className="text-zinc-600 text-base lg:text-lg leading-relaxed max-w-xl mb-8">
+              Máquinas en acero estructural soldadas bajo pedido en Chigorodó, planos técnicos en PDF y recursos prácticos para entrenar en serio sin depender de equipos importados.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                to="/gym/maquinas-pedido"
+                className="inline-flex items-center gap-2 bg-zinc-950 text-white text-xs font-black uppercase tracking-[0.18em] py-4 px-7 rounded-xl hover:bg-zinc-800 transition-all shadow-sm hover:shadow-md"
+              >
+                Explorar máquinas <ArrowRight size={15} />
+              </Link>
+              <Link
+                to="/gym/inkognito-gym-equipment"
+                className="inline-flex items-center gap-2 bg-white border border-zinc-300 text-zinc-900 text-xs font-bold uppercase tracking-[0.18em] py-4 px-6 rounded-xl hover:border-zinc-900 transition-all"
+              >
+                Tienda oficial
+              </Link>
+              <button
+                type="button"
+                onClick={() => setHistoriaModalOpen(true)}
+                className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500 hover:text-zinc-950 py-3 px-4 transition-colors cursor-pointer"
+              >
+                Nuestra historia →
+              </button>
+            </div>
+
+            <blockquote className="mt-8 pl-4 border-l-2 border-zinc-900 text-zinc-500 text-sm italic">
+              “Hago arte para no morir, desafío cuerpo y mente.”
+            </blockquote>
+          </div>
+
+          {/* Columna derecha: Tarjeta visual de taller y especificaciones clave */}
+          <div className="lg:col-span-5">
+            <div className="relative rounded-3xl bg-zinc-950 text-white p-7 border border-zinc-800 shadow-2xl overflow-hidden">
+              <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={GRID_PATTERN} />
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-zinc-400">
+                    INKognito Gym Equipment
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full bg-white/10 text-[10px] font-bold uppercase tracking-wider text-zinc-200">
+                    Bajo pedido
+                  </span>
+                </div>
+
+                <div className="relative rounded-2xl bg-white p-5 mb-5 flex items-center justify-center h-64 overflow-hidden">
+                  <img
+                    src="/gym-assets/jalones-al-pecho.webp"
+                    alt="Máquina de jalones al pecho INKognito Gym System"
+                    className="max-h-full w-auto object-contain"
+                  />
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 pt-4 border-t border-white/10">
+                  <div>
+                    <p className="text-base font-black text-white leading-none">Cal. 14</p>
+                    <p className="text-[11px] text-zinc-400 mt-1">Acero estructural</p>
+                  </div>
+                  <div>
+                    <p className="text-base font-black text-white leading-none">30 días</p>
+                    <p className="text-[11px] text-zinc-400 mt-1">Fabricación taller</p>
+                  </div>
+                  <div>
+                    <p className="text-base font-black text-white leading-none">Colombia</p>
+                    <p className="text-[11px] text-zinc-400 mt-1">Envío nacional</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* EXPLORA EL ECOSISTEMA GYM SYSTEM — Grilla limpia 3x2 en escritorio */}
+      <section className="hidden md:block py-16 px-6 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+          <div>
+            <p className="text-[11px] font-mono font-bold uppercase tracking-[0.25em] text-zinc-400 mb-2">
+              Módulos y Recursos
+            </p>
+            <h2 className="text-3xl lg:text-4xl font-black uppercase tracking-tight text-zinc-950 leading-none">
+              Todo lo que encuentras aquí
+            </h2>
+          </div>
+          <p className="text-zinc-500 text-sm max-w-md leading-relaxed">
+            Desde máquinas soldadas a tu medida hasta planos técnicos, tutoriales de taller y suplementación aliada.
           </p>
         </div>
-      </section>
 
-      {/* LO QUE PUEDES CONSEGUIR AQUÍ — solo escritorio (2026-09-20, Jose:
-          "sobra en ese lugar pues categorías ya no le acompaña"): en móvil
-          las categorías pasaron al listón de arriba, así que el título y la
-          descripción quedaban sueltos. En escritorio siguen con su grilla de
-          tarjetas. */}
-      <section className="hidden md:block pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-zinc-200 pt-3 md:pt-8">
-          <div className="mb-4 md:mb-8">
-            <h2 className="float-left mr-6 md:mr-8 mb-2 text-base md:text-3xl font-black uppercase leading-none whitespace-nowrap">
-              Lo que puedes conseguir aquí
-            </h2>
-            <p className="text-zinc-600 text-sm leading-relaxed text-justify [hyphens:auto]">
-              Todo lo que necesitas para entrenar en casa sin depender de un gimnasio comercial:
-              máquinas de gym fabricadas con soldadura profesional en Chigorodó, Urabá, planos
-              técnicos para construir tu propio equipo, suplementos, tutoriales en video y
-              cursos de entrenamiento — pensado para quien quiere resultados reales sin gastar
-              lo que cuesta un gimnasio o un equipo importado.
-            </p>
-            <div className="clear-both" />
-          </div>
-          {/* Mismo carrusel coverflow de Categorías/Marcas en Supply, pero
-              estático — sin autoplay, el usuario mueve con el dedo desde el
-              inicio, con la flechita "Desliza" siempre visible (pedido
-              explícito: estas card de Gym no hacen la vuelta automática al
-              entrar, 2026-08-02). Desde 2026-09-20 la sección entera es solo
-              escritorio: en móvil las categorías van en el listón de arriba
-              (ver bajo NavbarGym). */}
-          <CoverflowRow desktopClassName="md:grid md:grid-cols-3 lg:grid-cols-6 gap-3" autoplay={false}>
-            {GYM_SECCIONES.map((s, i) => {
-              const Icon = s.icon
-              const inner = (
-                <>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {GYM_SECCIONES.map((s) => {
+            const Icon = s.icon
+            const cardClasses =
+              'group bg-white border border-zinc-200 rounded-2xl p-6 flex flex-col gap-3 hover:border-zinc-900 hover:shadow-lg transition-all duration-300 text-left w-full cursor-pointer'
+            const inner = (
+              <>
+                <div className="flex items-center justify-between">
                   {Icon && (
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gray-800/80 border border-gray-700 flex items-center justify-center mx-auto md:mx-0 group-hover:border-gray-500 group-hover:scale-105 transition-all duration-300">
-                      <Icon size={20} className="text-gray-400 group-hover:text-white transition-colors duration-300" />
+                    <div className="w-11 h-11 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center group-hover:bg-zinc-950 group-hover:border-zinc-950 transition-colors duration-300">
+                      <Icon size={20} className="text-zinc-700 group-hover:text-white transition-colors duration-300" />
                     </div>
                   )}
-                  <h3 className="text-sm md:text-base font-black uppercase tracking-wide leading-tight text-center md:text-left text-white">{s.titulo}</h3>
-                  <p className="text-xs md:text-sm leading-relaxed text-gray-500 group-hover:text-gray-400 transition-colors duration-300 flex-1 text-justify [hyphens:auto] text-center md:text-left">{s.texto}</p>
-                </>
-              )
-              return (
-                <div key={s.titulo} className="w-full">
-                  {s.scrollTo
-                    ? (
-                        <button
-                          onClick={() => scrollToSection(s.scrollTo)}
-                          className={`${CARD_CLASS} text-left w-full`}
-                        >
-                          {inner}
-                        </button>
-                      )
-                    : (
-                        <Link to={s.link} className={`${CARD_CLASS} w-full`}>
-                          {inner}
-                        </Link>
-                      )}
-                  {i === 0 && (
-                    <div className="md:hidden mt-1.5 flex items-center justify-end gap-1 text-gray-500 text-[9px] font-bold uppercase tracking-widest">
-                      <span>Desliza</span>
-                      <span className="animate-bounce">→</span>
-                    </div>
-                  )}
+                  <ArrowRight
+                    size={16}
+                    className="text-zinc-300 group-hover:text-zinc-950 group-hover:translate-x-1 transition-all duration-300"
+                  />
                 </div>
-              )
-            })}
-          </CoverflowRow>
+                <h3 className="text-base font-black uppercase tracking-tight text-zinc-950 mt-1">
+                  {s.titulo}
+                </h3>
+                <p className="text-sm leading-relaxed text-zinc-500 flex-1">
+                  {s.texto}
+                </p>
+              </>
+            )
+            return s.scrollTo ? (
+              <button key={s.titulo} type="button" onClick={() => scrollToSection(s.scrollTo)} className={cardClasses}>
+                {inner}
+              </button>
+            ) : (
+              <Link key={s.titulo} to={s.link} className={cardClasses}>
+                {inner}
+              </Link>
+            )
+          })}
         </div>
       </section>
 
-      {/* PLANOS DIGITALES */}
-      <section id="planos" className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-zinc-200 pt-3 md:pt-8">
-          <div className="mb-6">
-            <div className="float-left flex items-center gap-3 mr-6 md:mr-8 mb-2">
-              <h2 className="text-base md:text-3xl font-black uppercase leading-none whitespace-nowrap">
-                Planos digitales
-              </h2>
-              <FileText size={24} className="text-zinc-300 flex-shrink-0 md:hidden" strokeWidth={1} />
+      {/* PLANOS DIGITALES — Tarjeta editorial de ancho completo */}
+      <section id="planos" className="pb-12 md:py-14 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="border-t border-zinc-200 pt-8 md:pt-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-7">
+            <div>
+              <p className="text-[11px] font-mono font-bold uppercase tracking-[0.25em] text-zinc-400 mb-1.5">
+                Fabricación Propia · PDF
+              </p>
+              <div className="flex items-center gap-2.5">
+                <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tight leading-none text-zinc-950">
+                  Planos digitales
+                </h2>
+                <FileText size={22} className="text-zinc-300 flex-shrink-0 md:hidden" strokeWidth={1.5} />
+              </div>
             </div>
-            <p className="text-zinc-600 text-sm md:text-base leading-relaxed text-justify [hyphens:auto]">
-              Planos técnicos completos en PDF, con medidas exactas y lista de materiales — para
-              construir tus propias máquinas de gym en casa, en cualquier ciudad de Colombia.
-              Pensados para uso personal o para quien quiere empezar su propio negocio de
-              fabricación de equipos fitness.
+            <p className="text-zinc-500 text-sm max-w-lg leading-relaxed">
+              Planos técnicos en PDF con medidas exactas y lista de materiales para fabricar tus máquinas en casa o iniciar tu propio taller.
             </p>
-            <div className="clear-both" />
           </div>
 
-          {/* CARD MEMBRESÍA — mismo patrón "sólido" aplicado recientemente
-              en Store (StorePage.jsx): degradé gris acero, círculo
-              decorativo difuminado y badge de ícono circular, en la paleta
-              propia de Gym (blanco/gris, sin color de acento). */}
-          <div className="group relative border border-zinc-400/30 bg-gradient-to-br from-zinc-600 to-zinc-900 rounded-2xl p-8 md:p-10 overflow-hidden max-w-3xl hover:border-zinc-300/50 hover:shadow-[0_12px_35px_rgba(161,161,170,0.2)] transition-all duration-300">
-            <div className="absolute inset-0 opacity-[0.025]" style={GRID_PATTERN} />
-            <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-white/10" />
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-              <div className="flex-1">
-                <div className="w-12 h-12 rounded-full bg-zinc-900/60 border border-zinc-300/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <FileText size={22} className="text-zinc-200" />
-                </div>
-                <span className="inline-block text-[10px] font-black uppercase tracking-[0.25em] bg-white text-gray-950 rounded-full px-3 py-1 mb-4">
-                  Acceso total
+          <div className="group relative border border-zinc-800 bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 rounded-3xl p-6 sm:p-8 md:p-11 overflow-hidden shadow-xl">
+            <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={GRID_PATTERN} />
+            <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-white/[0.06] pointer-events-none" />
+
+            <div className="relative z-10 grid md:grid-cols-12 gap-8 items-center">
+              <div className="md:col-span-7">
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.22em] bg-white text-zinc-950 rounded-full px-3 py-1 mb-4">
+                  <FileText size={12} /> Acceso total · Pago único
                 </span>
-                <h3 className="text-2xl md:text-3xl font-black uppercase leading-tight mb-3 text-white">
+                <h3 className="text-2xl md:text-4xl font-black uppercase leading-tight mb-3 text-white">
                   Membresía de por vida
                 </h3>
-                <p className="text-zinc-200 leading-relaxed text-sm md:text-base">
-                  Paga una sola vez y obtén acceso a todos los planos disponibles, incluyendo los que se agreguen en el futuro.
+                <p className="text-zinc-300 leading-relaxed text-sm md:text-base mb-5 max-w-xl">
+                  Paga una sola vez y accede de inmediato a toda la biblioteca de planos disponibles, incluyendo los nuevos diseños que agreguemos al catálogo.
                 </p>
+                <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-zinc-300">
+                  <span className="inline-flex items-center gap-1.5">
+                    <CheckCircle2 size={14} className="text-white" /> Medidas exactas en PDF
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <CheckCircle2 size={14} className="text-white" /> Lista de materiales
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <CheckCircle2 size={14} className="text-white" /> Actualizaciones incluidas
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col items-start md:items-end gap-3 shrink-0">
-                <span className="text-3xl font-black text-white">${precioPlanos.toLocaleString('es-CO')} COP</span>
+
+              <div className="md:col-span-5 md:border-l md:border-white/10 md:pl-8 flex flex-col gap-3">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-zinc-400 mb-1">Inversión única</p>
+                  <span className="text-3xl md:text-4xl font-black text-white">
+                    ${precioPlanos.toLocaleString('es-CO')} <span className="text-sm font-bold text-zinc-400">COP</span>
+                  </span>
+                </div>
                 <a
                   href={membresiaMsg}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block bg-white text-gray-950 font-black uppercase tracking-[0.15em] text-xs py-3 px-6 rounded-xl hover:bg-gray-200 transition-all duration-300"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-zinc-950 font-black uppercase tracking-[0.15em] text-xs py-3.5 px-6 rounded-xl hover:bg-zinc-200 transition-all"
                 >
-                  Obtener acceso completo
+                  Obtener acceso completo <ArrowRight size={14} />
                 </a>
                 <button
+                  type="button"
                   onClick={() => setPlanosModalOpen(true)}
-                  className="border border-zinc-300/40 text-zinc-100 font-bold uppercase tracking-[0.15em] text-xs py-3 px-6 rounded-xl hover:border-zinc-100 hover:bg-white/10 transition-all duration-300"
+                  className="border border-white/25 text-zinc-100 font-bold uppercase tracking-[0.15em] text-xs py-3.5 px-6 rounded-xl hover:border-white hover:bg-white/10 transition-all cursor-pointer"
                 >
-                  Ver muestra
+                  Ver muestra de planos
                 </button>
               </div>
             </div>
@@ -336,23 +390,25 @@ export default function GymPage() {
         </div>
       </section>
 
-      {/* MIS CREACIONES */}
-      <section className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-zinc-200 pt-3 md:pt-8">
-          <div className="mb-4 md:mb-8">
-            <h2 className="float-left mr-6 md:mr-8 mb-2 text-base md:text-3xl font-black uppercase leading-none whitespace-nowrap">
-              Mis creaciones
-            </h2>
-            <p className="text-zinc-600 text-sm leading-relaxed text-justify [hyphens:auto]">
-              Portafolio real de máquinas construidas con mis propias manos — la prueba de que
-              se puede entrenar fuerte sin gastar en equipos comerciales o importados. Cada
-              pieza fabricada con soldadura profesional, pensada para durar años de uso intenso.
+      {/* MIS CREACIONES — Portafolio real */}
+      <section className="pb-12 md:py-14 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="border-t border-zinc-200 pt-8 md:pt-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-7">
+            <div>
+              <p className="text-[11px] font-mono font-bold uppercase tracking-[0.25em] text-zinc-400 mb-1.5">
+                Portafolio de Taller
+              </p>
+              <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tight leading-none text-zinc-950">
+                Mis creaciones
+              </h2>
+            </div>
+            <p className="text-zinc-500 text-sm max-w-lg leading-relaxed">
+              Equipos construidos con soldadura profesional y acero calibre grueso, probados en entrenamiento real diario.
             </p>
-            <div className="clear-both" />
           </div>
 
           {creaciones?.length ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
               {creaciones.map((c) => (
                 <button
                   key={c.id}
@@ -363,85 +419,79 @@ export default function GymPage() {
                     setCreacionImgActiva(0)
                     setCreacionSeleccionada(c)
                   }}
-                  className={`group relative aspect-square overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50 text-left ${(c.descripcion || c.image_urls?.length > 1) ? 'cursor-pointer' : 'cursor-default'}`}
+                  className={`group relative aspect-square overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 text-left shadow-sm hover:shadow-md transition-all ${(c.descripcion || c.image_urls?.length > 1) ? 'cursor-pointer' : 'cursor-default'}`}
                 >
                   <img
                     src={c.image_url}
-                    alt={c.titulo || 'Máquina construida por INKognito Gym'}
+                    alt={c.titulo || 'Máquina construida por INKognito Gym System'}
                     loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   {(c.titulo || c.categoria) && (
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent px-3 py-2.5">
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3.5 py-3">
                       {c.titulo && <p className="text-white text-xs md:text-sm font-bold leading-tight">{c.titulo}</p>}
-                      {c.categoria && <p className="text-gray-300 text-[10px] uppercase tracking-wide">{c.categoria}</p>}
+                      {c.categoria && <p className="text-zinc-300 text-[10px] uppercase tracking-wider mt-0.5">{c.categoria}</p>}
                     </div>
                   )}
                 </button>
               ))}
             </div>
           ) : (
-            <div className="border border-zinc-200 bg-zinc-50 rounded-2xl py-20 text-center">
-              <p className="text-zinc-500 uppercase tracking-[0.25em] text-sm mb-2">Próximamente</p>
-              <p className="text-zinc-400 text-sm">Estamos cargando el portafolio de máquinas</p>
+            <div className="border border-zinc-200 bg-zinc-50 rounded-2xl py-16 text-center">
+              <p className="text-zinc-500 uppercase tracking-[0.25em] text-xs font-bold mb-1">Portafolio en carga</p>
+              <p className="text-zinc-400 text-sm">Estamos cargando las fotografías de máquinas fabricadas en taller.</p>
             </div>
           )}
         </div>
       </section>
 
-      {/* MÁQUINAS BAJO PEDIDO + CONTACTO — UNIFICADO */}
-      <section className="pb-10 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="border-t border-zinc-200 pt-3 md:pt-8">
-          <div className="mb-5 md:mb-8">
-            <h2 className="float-left mr-6 md:mr-8 mb-2 text-base md:text-3xl font-black uppercase leading-none whitespace-nowrap">
-              Máquinas bajo pedido
-            </h2>
-            <p className="text-zinc-600 text-sm leading-relaxed text-justify [hyphens:auto]">
-              Máquinas de gym fabricadas a tu medida, con acero y soldadura profesional, en
-              Chigorodó, Urabá — con envíos a toda Colombia. Cuéntanos qué necesitas construir
-              y te damos un presupuesto real, sin intermediarios.
-            </p>
-            <div className="clear-both" />
-            <Link
-              to="/gym/maquinas-pedido"
-              className="hidden md:inline-block mt-4 text-xs font-bold uppercase tracking-[0.2em] text-zinc-600 hover:text-zinc-900 border border-zinc-300 hover:border-zinc-600 px-5 py-3 rounded transition-all duration-300"
-            >
-              Ver catálogo →
-            </Link>
-          </div>
+      {/* FABRICACIÓN A MEDIDA + CONTACTO — Bloque único sin redundancia */}
+      <section className="pb-14 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
+        <div className="border-t border-zinc-200 pt-8 md:pt-12">
+          <div className="group relative overflow-hidden bg-zinc-950 border border-zinc-800 rounded-3xl p-7 sm:p-10 md:p-14 shadow-2xl">
+            <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={GRID_PATTERN} />
+            <div className="absolute -bottom-16 -right-16 w-60 h-60 rounded-full bg-white/[0.06] pointer-events-none" />
 
-          {/* Mismo patrón "sólido" aplicado en Store/Planos digitales:
-              degradé gris acero, círculo decorativo (acá abajo-derecha, más
-              grande, para no ser idéntico al de la card de Planos) y badge
-              de ícono circular con Wrench (contexto: sección de Máquinas). */}
-          <div className="group relative overflow-hidden bg-gradient-to-br from-zinc-600 to-zinc-900 border border-zinc-400/30 rounded-2xl p-8 md:p-14 hover:border-zinc-300/50 hover:shadow-[0_12px_35px_rgba(161,161,170,0.2)] transition-all duration-300">
-            <div className="absolute -bottom-14 -right-14 w-44 h-44 rounded-full bg-white/10" />
-            <div className="relative z-10 w-12 h-12 rounded-full bg-zinc-900/60 border border-zinc-300/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-              <Wrench size={22} className="text-zinc-200" />
-            </div>
-            <p className="relative z-10 uppercase tracking-[0.25em] text-zinc-300 text-xs mb-4">Contacto directo</p>
-            <h3 className="relative z-10 text-2xl md:text-4xl font-black uppercase leading-none mb-4 text-white">
-              ¿Tienes alguna<br />
-              <span className="text-zinc-300">idea en mente?</span>
-            </h3>
-            <p className="relative z-10 text-zinc-200 leading-relaxed text-base max-w-2xl mb-8">
-              Fabrico máquinas de gym a tu medida, con soldadura profesional y a precios muy accesibles. ¿Tienes alguna idea en mente? Cuéntanos qué máquina necesitas y te damos un presupuesto personalizado.
-            </p>
-            <div className="relative z-10 flex flex-col sm:flex-row gap-4">
-              <a
-                href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, me interesa una máquina de gym personalizada')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block text-center bg-white text-gray-950 font-black uppercase tracking-[0.2em] text-sm py-4 px-10 rounded-xl hover:bg-gray-200 transition-all duration-300"
-              >
-                Escríbenos por WhatsApp
-              </a>
-              <Link
-                to="/gym/maquinas-pedido"
-                className="inline-block text-center border border-zinc-300/40 text-zinc-100 font-bold uppercase tracking-[0.2em] text-sm py-4 px-8 rounded-xl hover:border-zinc-100 hover:bg-white/10 transition-all duration-300"
-              >
-                Ver catálogo completo →
-              </Link>
+            <div className="relative z-10 grid lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-7">
+                <div className="inline-flex items-center gap-2 text-zinc-400 text-[11px] font-mono font-bold uppercase tracking-[0.25em] mb-3">
+                  <Wrench size={14} /> Fabricación Bajo Pedido · Chigorodó, Urabá
+                </div>
+                <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight leading-[0.98] mb-4 text-white">
+                  ¿Tienes una máquina <span className="text-zinc-400">en mente?</span>
+                </h2>
+                <p className="text-zinc-300 leading-relaxed text-sm md:text-base max-w-xl mb-6">
+                  Fabricamos equipos a tu medida con soldadura profesional, sin intermediarios y con despacho a toda Colombia. Elige acabado en pintura negra o gris y tubo para discos estándar o olímpicos.
+                </p>
+                <div className="flex flex-wrap gap-2 text-[11px] font-semibold text-zinc-200">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/10">
+                    <Hammer size={12} /> Soldadura profesional
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/10">
+                    <ShieldCheck size={12} /> Pintura Negro / Gris
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/10">
+                    <Truck size={12} /> Envíos a toda Colombia
+                  </span>
+                </div>
+              </div>
+
+              <div className="lg:col-span-5 flex flex-col gap-3">
+                <Link
+                  to="/gym/maquinas-pedido"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-zinc-950 font-black uppercase tracking-[0.18em] text-xs py-4 px-8 rounded-xl hover:bg-zinc-200 transition-all"
+                >
+                  Ver catálogo de máquinas <ArrowRight size={15} />
+                </Link>
+                <a
+                  href={`https://wa.me/${WA}?text=${encodeURIComponent('Hola, me interesa cotizar una máquina de gym a medida')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center border border-white/25 text-white font-bold uppercase tracking-[0.18em] text-xs py-4 px-8 rounded-xl hover:border-white hover:bg-white/10 transition-all"
+                >
+                  Cotizar máquina personalizada
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -470,7 +520,7 @@ export default function GymPage() {
             <p className="uppercase tracking-[0.25em] text-zinc-500 text-xs mb-6">Nuestra historia</p>
 
             <p className="text-zinc-900 text-base md:text-lg font-bold leading-relaxed mb-6 italic">
-              "Empecé como cualquiera: queriendo entrenar, sin poder pagar un gimnasio."
+              &ldquo;Empecé como cualquiera: queriendo entrenar, sin poder pagar un gimnasio.&rdquo;
             </p>
 
             <p className="text-zinc-600 text-sm leading-relaxed mb-5">
@@ -494,9 +544,7 @@ export default function GymPage() {
         </div>
       )}
 
-      {/* MODAL DETALLE DE CREACIÓN — solo se abre si hay algo que no cabe
-          en la card: descripción, o más de una foto para ver en galería
-          (el título/categoría ya se ven en la card sin necesidad de clic). */}
+      {/* MODAL DETALLE DE CREACIÓN */}
       {creacionSeleccionada && (
         <div
           className="fixed inset-0 bg-black/60 z-[80] flex items-center justify-center p-4 overflow-y-auto"
@@ -513,7 +561,7 @@ export default function GymPage() {
             >✕</button>
             <img
               src={creacionSeleccionada.image_urls?.[creacionImgActiva] || creacionSeleccionada.image_url}
-              alt={creacionSeleccionada.titulo || 'Máquina construida por INKognito Gym'}
+              alt={creacionSeleccionada.titulo || 'Máquina construida por INKognito Gym System'}
               className="w-full max-h-[45vh] object-cover"
             />
             {creacionSeleccionada.image_urls?.length > 1 && (
@@ -546,27 +594,72 @@ export default function GymPage() {
       {/* MODAL MUESTRA PLANOS */}
       {planosModalOpen && (
         <div
-          className="fixed inset-0 bg-black/90 z-[80] flex items-center justify-center p-4 overflow-y-auto"
+          className="fixed inset-0 bg-black/85 backdrop-blur-sm z-[80] flex items-center justify-center p-4 overflow-y-auto"
           onClick={() => setPlanosModalOpen(false)}
         >
-          <button
-            className="absolute top-5 right-6 text-white/60 hover:text-white text-3xl leading-none bg-transparent border-none cursor-pointer z-10"
-            onClick={() => setPlanosModalOpen(false)}
-            aria-label="Cerrar"
-          >✕</button>
           <div
-            className="flex flex-col md:flex-row gap-4 max-w-4xl w-full"
+            className="relative bg-zinc-950 border border-zinc-800 rounded-3xl w-full max-w-5xl mx-auto p-5 md:p-7 shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
-            {planoMuestras.map((src, i) => (
-              src
-                ? <img key={i} src={src} alt={`Muestra plano ${i + 1}`} className="rounded-xl object-contain max-h-[70vh] flex-1" />
-                : (
-                    <div key={i} className="flex-1 aspect-video bg-gray-800 border border-gray-700 rounded-xl flex items-center justify-center min-h-[140px]">
-                      <span className="text-gray-600 text-xs uppercase tracking-widest text-center px-4">Imagen próximamente</span>
-                    </div>
-                  )
-            ))}
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <p className="text-[10px] font-mono font-bold uppercase tracking-[0.25em] text-zinc-400">
+                  Muestra real · Planos PDF
+                </p>
+                <h3 className="text-white text-lg md:text-2xl font-black uppercase tracking-tight mt-1">
+                  {DEFAULT_PLANO_MUESTRAS[planoActivo]?.titulo || `Muestra plano ${planoActivo + 1}`}
+                </h3>
+              </div>
+              <button
+                type="button"
+                className="text-zinc-400 hover:text-white text-2xl leading-none bg-zinc-900 hover:bg-zinc-800 w-9 h-9 rounded-full flex items-center justify-center border border-zinc-800 cursor-pointer shrink-0"
+                onClick={() => setPlanosModalOpen(false)}
+                aria-label="Cerrar"
+              >✕</button>
+            </div>
+
+            {/* Plano seleccionado en grande */}
+            <div className="bg-zinc-100 rounded-2xl overflow-hidden border border-zinc-800 flex items-center justify-center">
+              <img
+                src={planoMuestras[planoActivo] || DEFAULT_PLANO_MUESTRAS[planoActivo].src}
+                alt={DEFAULT_PLANO_MUESTRAS[planoActivo]?.titulo || `Muestra plano ${planoActivo + 1}`}
+                className="w-full max-h-[60vh] object-contain"
+              />
+            </div>
+
+            {/* Selector de las 3 muestras + CTA */}
+            <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="grid grid-cols-3 gap-2.5 sm:max-w-md w-full">
+                {planoMuestras.map((src, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setPlanoActivo(i)}
+                    className={`group relative rounded-xl overflow-hidden border-2 bg-zinc-100 aspect-[4/3] transition-all cursor-pointer ${
+                      i === planoActivo ? 'border-white ring-2 ring-white/20' : 'border-zinc-700 opacity-65 hover:opacity-100'
+                    }`}
+                  >
+                    <img
+                      src={src || DEFAULT_PLANO_MUESTRAS[i].src}
+                      alt={DEFAULT_PLANO_MUESTRAS[i]?.titulo || `Muestra ${i + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                    <span className="absolute bottom-1 right-1 bg-black/75 text-white text-[9px] font-black px-1.5 py-0.5 rounded">
+                      0{i + 1}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <a
+                href={membresiaMsg}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 bg-white text-zinc-950 font-black uppercase tracking-[0.15em] text-xs py-3.5 px-6 rounded-xl hover:bg-zinc-200 transition-all shrink-0"
+              >
+                Obtener acceso (${precioPlanos.toLocaleString('es-CO')}) <ArrowRight size={14} />
+              </a>
+            </div>
           </div>
         </div>
       )}

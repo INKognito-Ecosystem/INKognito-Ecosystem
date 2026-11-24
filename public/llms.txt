@@ -27,8 +27,8 @@
 - [Catálogo Suple](https://inkognito-ecosystem.com/suplementos): proteínas, creatina, pre-entrenos, vitaminas y accesorios de tiendas aliadas verificadas con envío nacional.
 - [Tiendas Suple](https://inkognito-ecosystem.com/suplementos/tiendas) y [registro de proveedores Suple](https://inkognito-ecosystem.com/suplementos/proveedores/unete).
 
-## INKognito Gym — Máquinas a Pedido y Entrenamiento
-- [Catálogo Gym](https://inkognito-ecosystem.com/gym): máquinas de gimnasio fabricadas bajo pedido en acero estructural ([ver máquinas](https://inkognito-ecosystem.com/gym/maquinas-pedido)), tutoriales en video, cursos y recursos.
+## INKognito Gym System — Máquinas a Pedido y Entrenamiento
+- [Catálogo Gym System](https://inkognito-ecosystem.com/gym): máquinas de gimnasio fabricadas bajo pedido en acero estructural ([ver máquinas](https://inkognito-ecosystem.com/gym/maquinas-pedido)), tienda oficial [INKognito Gym Equipment](https://inkognito-ecosystem.com/gym/inkognito-gym-equipment), planos técnicos, tutoriales en video, cursos y recursos.
 
 ## Ruta del Golfo — Red Logística y Transportadoras
 - [Portal Ruta del Golfo](https://rutadelgolfo.inkognito-ecosystem.com/): red logística multitenant de mensajería, recogidas y envíos locales/regionales en Urabá (Chigorodó, Apartadó, Carepa, Turbo, Mutatá) y conexión nacional integrada a las tiendas de INKognito Ecosystem.

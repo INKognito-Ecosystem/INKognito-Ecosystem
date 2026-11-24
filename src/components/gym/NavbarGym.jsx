@@ -76,11 +76,11 @@ export default function NavbarGym({ shareTitle = 'INKognito Gym System' }) {
 
             {/* MENÚ DESKTOP */}
             <div className="hidden md:flex items-center gap-8">
-              <Link to="/gym/maquinas-pedido" className={LINK}>Máquinas</Link>
+              <Link to="/gym/maquinas-pedido" className={pathname === '/gym/maquinas-pedido' ? 'uppercase text-sm tracking-[0.2em] text-white font-bold transition-all duration-300' : LINK}>Máquinas</Link>
               <button onClick={goToPlanos} className={LINK}>Planos</button>
-              <Link to="/gym/tutoriales" className={LINK}>Tutoriales</Link>
-              <Link to="/gym/cursos" className={LINK}>Cursos</Link>
-              <Link to="/gym/recursos" className={LINK}>Recursos</Link>
+              <Link to="/gym/tutoriales" className={pathname === '/gym/tutoriales' ? 'uppercase text-sm tracking-[0.2em] text-white font-bold transition-all duration-300' : LINK}>Tutoriales</Link>
+              <Link to="/gym/cursos" className={pathname === '/gym/cursos' ? 'uppercase text-sm tracking-[0.2em] text-white font-bold transition-all duration-300' : LINK}>Cursos</Link>
+              <Link to="/gym/recursos" className={pathname === '/gym/recursos' ? 'uppercase text-sm tracking-[0.2em] text-white font-bold transition-all duration-300' : LINK}>Recursos</Link>
               <Link to="/suplementos" className={LINK}>Suplementos</Link>
             </div>
 

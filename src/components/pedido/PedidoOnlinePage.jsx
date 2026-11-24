@@ -149,6 +149,8 @@ export default function PedidoOnlinePage() {
     ? [...new Set(cart?.items.map(i => i.estudioId).filter(Boolean))]
     : []
   const [vendorInfo, setVendorInfo] = useState(null)
+  const [gymPintura, setGymPintura] = useState('Negro')
+  const [gymDiscos, setGymDiscos] = useState('Estándar (1")')
   // Arranca en `true` cuando el carrito YA llega bloqueado a un proveedor
   // (el caso normal de "Continuar" desde un carrito de una sola tienda) —
   // corrige un flash real (Jose, 2026-09-22: "siempre que le doy continuar
@@ -278,7 +280,7 @@ export default function PedidoOnlinePage() {
     // cliente (2026-08-02).
     const detalle = i.size ? ` (Talla ${i.size})` : i.mixLabel ? ` (${i.mixLabel})` : i.brand ? ` (${i.brand})` : ''
     return `${i.qty}x ${i.name}${detalle}`
-  }).join(', ')
+  }).join(', ') + (tieneMaquinaGym ? ` [Pintura: ${gymPintura} · Discos: ${gymDiscos}]` : '')
 
   // Para que el panel pueda descontar stock automáticamente al entregar
   // (PATCH /api/orders/:id) — antes solo se mandaba el texto libre de arriba,
@@ -360,7 +362,7 @@ export default function PedidoOnlinePage() {
             <h3 className={`text-2xl font-black uppercase italic mb-3 ${c('text-white', 'text-zinc-900')}`}>¡Pedido recibido!</h3>
             <p className={`leading-relaxed ${c('text-gray-400', 'text-zinc-600')}`}>
               {metodoPago === 'contraentrega'
-                ? `${module === 'supply' ? 'Tommy Supply Tattoo y Eljach mensajería express' : 'El proveedor y Eljach'} coordinarán la entrega de tu paquete. Te contactamos por WhatsApp para confirmar los últimos detalles.`
+                ? `${module === 'supply' ? 'El proveedor y Ruta del Golfo' : 'El proveedor y Ruta del Golfo'} coordinarán la entrega de tu paquete. Te contactamos por WhatsApp para confirmar los últimos detalles.`
                 : 'En cuanto verifiquemos tu comprobante, tu pedido entra directo a empaque. Te contactamos por WhatsApp para confirmar.'}
             </p>
             <Link to={`/${module}`} className={`inline-block mt-6 text-sm font-semibold ${c('text-green-500 hover:text-green-400', 'text-zinc-700 hover:text-zinc-900')}`}>
@@ -600,10 +602,10 @@ export default function PedidoOnlinePage() {
                 ) : (
                   <>
                     <h3 className={`relative text-lg font-black uppercase italic mb-2 ${c('text-white', 'text-zinc-900')}`}>
-                      Entrega con Eljach Mensajería
+                      Entrega con Ruta del Golfo
                     </h3>
                     <p className={`relative text-[13px] leading-relaxed ${c('text-gray-400', 'text-zinc-600')}`}>
-                      Si estás en la ruta de Eljach (Chigorodó a Turbo) puedes pagar contraentrega, sin adelantos.
+                      Si estás en cobertura de Ruta del Golfo (Chigorodó a Turbo) puedes pagar contraentrega, sin adelantos.
                       Fuera de esa zona coordinamos por Nequi antes de despachar tu pedido a cualquier parte de Colombia.
                     </p>
                   </>
@@ -644,9 +646,54 @@ export default function PedidoOnlinePage() {
                 </p>
               )}
               {tieneMaquinaGym && (
-                <p className={`text-[12px] leading-relaxed ${ambarNota}`}>
-                  El envío de la máquina corre por cuenta del cliente — se fabrica en nuestro taller de Chigorodó y se coordina con una transportadora nacional que cobra el envío directamente al entregar (Eljach no cubre este envío).
-                </p>
+                <div className="space-y-3">
+                  <div className={`border rounded-lg p-3.5 space-y-3 ${c('bg-zinc-900 border-gray-800', 'bg-zinc-50 border-zinc-200')}`}>
+                    <p className={`text-[11px] font-black uppercase tracking-widest ${c('text-zinc-300', 'text-zinc-700')}`}>
+                      Especificaciones de fabricación (30 días)
+                    </p>
+                    <div>
+                      <p className={`text-[11px] font-semibold mb-1.5 ${c('text-gray-400', 'text-zinc-500')}`}>Color de pintura</p>
+                      <div className="flex gap-2">
+                        {['Negro', 'Gris'].map((col) => (
+                          <button
+                            key={col}
+                            type="button"
+                            onClick={() => setGymPintura(col)}
+                            className={`flex-1 py-1.5 rounded-md border text-xs font-bold transition-colors ${
+                              gymPintura === col
+                                ? c('border-white bg-white text-black', 'border-zinc-900 bg-zinc-900 text-white')
+                                : c('border-gray-700 text-gray-400', 'border-zinc-300 bg-white text-zinc-600')
+                            }`}
+                          >
+                            {col}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className={`text-[11px] font-semibold mb-1.5 ${c('text-gray-400', 'text-zinc-500')}`}>Tubo para discos</p>
+                      <div className="flex gap-2">
+                        {['Estándar (1")', 'Olímpico (2")'].map((d) => (
+                          <button
+                            key={d}
+                            type="button"
+                            onClick={() => setGymDiscos(d)}
+                            className={`flex-1 py-1.5 rounded-md border text-xs font-bold transition-colors ${
+                              gymDiscos === d
+                                ? c('border-white bg-white text-black', 'border-zinc-900 bg-zinc-900 text-white')
+                                : c('border-gray-700 text-gray-400', 'border-zinc-300 bg-white text-zinc-600')
+                            }`}
+                          >
+                            {d}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <p className={`text-[12px] leading-relaxed ${ambarNota}`}>
+                    El envío de la máquina corre por cuenta del cliente — se fabrica en nuestro taller de Chigorodó (tiempo estimado: 30 días) y se coordina con una transportadora nacional que cobra el flete directamente al entregar.
+                  </p>
+                </div>
               )}
               {enCobertura && pagarProductoAhora && (
                 <p className={`text-[12px] leading-relaxed ${ambarNota}`}>
@@ -712,7 +759,7 @@ export default function PedidoOnlinePage() {
                                 ? 'El mobiliario se envía a todo el país desde Bogotá y se paga antes de despachar'
                                 : tieneMaquinaGym
                                   ? 'Tu máquina se fabrica en Chigorodó y se envía a todo el país — se paga antes de despachar'
-                                  : 'Fuera de la ruta de Eljach se paga antes de despachar'}
+                                  : 'Fuera de cobertura de Ruta del Golfo se paga antes de despachar'}
                             {nequi.numero ? ` — al ${nequi.numero}${nequi.nombre ? `, a nombre de ${nequi.nombre}` : ''}` : ''}.
                           </p>
                         </div>

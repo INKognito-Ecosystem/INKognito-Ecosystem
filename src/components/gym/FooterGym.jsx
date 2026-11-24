@@ -36,7 +36,7 @@ export default function FooterGym() {
               <h2 className="text-2xl font-black uppercase tracking-[0.15em]">
                 <span className="text-zinc-900">INK</span>
                 <span className="text-zinc-500">OGNITO </span>
-                <span className="text-zinc-500">GYM</span>
+                <span className="text-zinc-500">GYM SYSTEM</span>
               </h2>
             </div>
             <p className="text-zinc-500 leading-relaxed max-w-sm">
@@ -102,7 +102,7 @@ export default function FooterGym() {
 
         <div className="border-t border-zinc-200 mt-16 pt-8 flex flex-col sm:flex-row sm:justify-between items-center gap-3">
           <p className="text-zinc-400 text-[9.5px] sm:text-[12px] whitespace-nowrap">
-            © 2026 INKognito Gym. Todos los derechos reservados.
+            © 2026 INKognito Gym System. Todos los derechos reservados.
           </p>
           <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-[12px]">
             <Link to="/terminos" className="text-zinc-400 hover:text-zinc-900 transition-colors">

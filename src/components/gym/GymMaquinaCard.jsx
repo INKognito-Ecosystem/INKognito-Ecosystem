@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router'
 import { ShoppingCart, Check } from 'lucide-react'
 import { useGymCart } from '../../contexts/GymCartContext'
 import { GYM_CART_CATEGORY, gymCartKey, gymCartItem, gymFormatPrice } from '../../lib/gymCart'
+import { resolveGymMachineImage } from '../../lib/gymImages'
 
 // Card de una máquina de Gym — sacada de MaquinasPedidoPage.jsx (2026-09-21)
 // para que la misma card se vea idéntica en "Máquinas bajo pedido" y en la
@@ -33,7 +34,7 @@ export default function GymMaquinaCard({ item, className = '' }) {
     // "si no tiene imagen, simplemente no se muestra imagen") — sin foto real,
     // la card muestra "Imagen próximamente", tal como ya lo hacen
     // Supply/Store/Suple.
-    image1:      item.image_url || null,
+    image1:      resolveGymMachineImage(item.name, item.image_url),
   }
 
   const key = gymCartKey(p.nombre)

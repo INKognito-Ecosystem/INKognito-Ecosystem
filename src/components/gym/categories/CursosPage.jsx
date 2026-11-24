@@ -2,16 +2,16 @@ import { Link, useLoaderData } from 'react-router'
 import NavbarGym from '../NavbarGym'
 import FooterGym from '../FooterGym'
 import GymMobileNav from '../GymMobileNav'
-import { GraduationCap, ArrowLeft, ArrowRight } from 'lucide-react'
+import { GraduationCap, ArrowLeft, ArrowRight, ExternalLink, BookOpen, PlayCircle } from 'lucide-react'
 import { fetchCatalogCategoriaItems } from '../../../hooks/useCatalog'
 import { getAdjacentCategories } from '../../../data/gymCategoriesOrder'
-import { useScrolled } from '../../../hooks/useScrolled'
-
 import CategoriaVaciaCard from '../../CategoriaVaciaCard'
 
-// limit:100 (2026-09-14, paginación real) — contenido curado a mano
-// (cursos de Hotmart), no inventario masivo; mismo criterio que los
-// afiliados de Supply: acotado y generoso, sin UI de "cargar más".
+const GRID_PATTERN = {
+  backgroundImage:
+    'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(24,24,27,1) 39px,rgba(24,24,27,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(24,24,27,1) 39px,rgba(24,24,27,1) 40px)',
+}
+
 export async function loader() {
   return fetchCatalogCategoriaItems('gym', 'Cursos', { limit: 100 })
 }
@@ -31,87 +31,85 @@ export function meta() {
 export default function CursosPage() {
   const { items: cursos } = useLoaderData()
   const { prev, next } = getAdjacentCategories('cursos')
-  const scrolled = useScrolled()
 
   return (
     <div className="min-h-screen bg-white text-zinc-900">
       <NavbarGym />
 
-      {scrolled && prev && (
-        <Link
-          to={`/gym/${prev.slug}`} replace
-          aria-label={`Ver ${prev.name}`}
-          className="fixed top-16 md:top-20 left-2 md:left-4 z-40 text-zinc-600 hover:text-zinc-900 bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
-        >
-          <ArrowLeft size={20} />
-        </Link>
-      )}
-      {scrolled && next && (
-        <Link
-          to={`/gym/${next.slug}`} replace
-          aria-label={`Ver ${next.name}`}
-          className="fixed top-16 md:top-20 right-2 md:right-4 z-40 text-zinc-600 hover:text-zinc-900 bg-white/80 backdrop-blur-sm border border-zinc-200 rounded-full p-2 transition-colors"
-        >
-          <ArrowRight size={20} />
-        </Link>
-      )}
-
-      {/* HERO */}
-      <section className="relative pt-16 md:pt-24 pb-6 md:pb-10 px-4 md:px-6 overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(24,24,27,1) 39px,rgba(24,24,27,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(24,24,27,1) 39px,rgba(24,24,27,1) 40px)',
-          }}
-        />
+      {/* HERO EDITORIAL */}
+      <section className="relative pt-20 md:pt-28 pb-10 md:pb-14 px-4 md:px-6 border-b border-zinc-200 overflow-hidden bg-white">
+        <div className="absolute inset-0 opacity-[0.035] pointer-events-none" style={GRID_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
-        <div className="mb-0">
-          <div className="flex items-center gap-3 mb-2">
-            {prev && (
-              <Link to={`/gym/${prev.slug}`} replace aria-label={`Ver ${prev.name}`} className="flex-shrink-0 text-zinc-500 hover:text-zinc-900 transition-colors">
-                <ArrowLeft size={18} />
+          <div className="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-100">
+            {prev ? (
+              <Link
+                to={`/gym/${prev.slug}`}
+                replace
+                className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.16em] text-zinc-500 hover:text-zinc-900 transition-colors"
+              >
+                <ArrowLeft size={15} />
+                <span className="hidden sm:inline">{prev.name}</span>
               </Link>
-            )}
-            <p className="flex-1 text-center uppercase tracking-[0.25em] text-zinc-500 text-xs">Categoría</p>
-            {next && (
-              <Link to={`/gym/${next.slug}`} replace aria-label={`Ver ${next.name}`} className="flex-shrink-0 text-zinc-500 hover:text-zinc-900 transition-colors">
-                <ArrowRight size={18} />
+            ) : <span />}
+            <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.24em] text-zinc-500">
+              <GraduationCap size={14} /> INKognito Gym System · Formación
+            </span>
+            {next ? (
+              <Link
+                to={`/gym/${next.slug}`}
+                replace
+                className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.16em] text-zinc-500 hover:text-zinc-900 transition-colors"
+              >
+                <span className="hidden sm:inline">{next.name}</span>
+                <ArrowRight size={15} />
               </Link>
-            )}
+            ) : <span />}
           </div>
-          <div className="flex items-center justify-center md:justify-between gap-3 md:gap-4 mb-4">
-            <h1 className="text-xl md:text-7xl font-black uppercase leading-tight md:leading-none text-center md:text-left">
-              Cursos <span className="text-zinc-500">recomendados</span>
+
+          <div className="max-w-3xl">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[0.98] text-zinc-900">
+              Cursos <span className="text-zinc-400">recomendados</span>
             </h1>
-            <GraduationCap size={40} className="text-zinc-300 flex-shrink-0 md:hidden" strokeWidth={1} />
+            <p className="mt-4 text-zinc-600 text-sm md:text-base leading-relaxed">
+              Selección curada de cursos en español sobre entrenamiento en casa, nutrición aplicada y hábitos sostenibles. Todos son programas externos verificados para que aprendas a tu ritmo desde cualquier lugar.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <span className="px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-700">
+                100% en español
+              </span>
+              <span className="px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-700">
+                Acceso a tu ritmo
+              </span>
+              <span className="px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-700">
+                Selección verificada
+              </span>
+            </div>
           </div>
-          <p className="text-zinc-600 leading-relaxed max-w-2xl text-justify [hyphens:auto]">
-            Selección de los mejores cursos en español para entrenarte en casa, mejorar tu alimentación y aprender a fabricar tus propios equipos — grabados por quienes ya viven de esto, para que aprendas a tu ritmo, sin salir de casa.
-          </p>
-        </div>
         </div>
       </section>
 
-      <div className="pb-8 md:pb-14 px-4 md:px-6 max-w-7xl mx-auto pt-6 md:pt-8">
+      {/* LISTADO DE CURSOS */}
+      <section className="py-10 md:py-16 px-4 md:px-6 max-w-7xl mx-auto">
         {cursos.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className={`grid grid-cols-1 gap-6 ${cursos.length >= 3 ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2 max-w-5xl'}`}>
             {cursos.map((curso) => {
               const url = curso.url_ventas || curso.url_checkout || '#'
               return (
-                <div
+                <article
                   key={curso.name}
-                  className="border border-zinc-200 bg-white rounded-2xl overflow-hidden flex flex-col hover:border-zinc-400 transition-all duration-300"
+                  className="border border-zinc-200 bg-white rounded-2xl overflow-hidden flex flex-col hover:border-zinc-900 hover:shadow-md transition-all duration-300"
                 >
                   {curso.image_url && (
-                    <div className="aspect-video w-full bg-zinc-50 overflow-hidden flex-shrink-0">
+                    <div className="aspect-video w-full bg-zinc-100 overflow-hidden flex-shrink-0">
                       <img src={curso.image_url} alt={curso.name} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                   )}
-                  <div className="p-5 flex flex-col gap-3 flex-1">
+                  <div className="p-6 flex flex-col gap-3 flex-1">
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className="text-lg font-black uppercase tracking-wide leading-tight">{curso.name}</h3>
-                      <span className="shrink-0 text-[10px] font-bold uppercase tracking-widest bg-orange-50 text-orange-600 border border-orange-200 rounded-full px-3 py-1">
+                      <h2 className="text-base md:text-lg font-black uppercase leading-snug text-zinc-900">
+                        {curso.name}
+                      </h2>
+                      <span className="shrink-0 text-[10px] font-bold uppercase tracking-widest bg-zinc-100 text-zinc-700 border border-zinc-200 rounded-full px-3 py-1">
                         {curso.plataforma || 'Hotmart'}
                       </span>
                     </div>
@@ -120,20 +118,50 @@ export default function CursosPage() {
                     )}
                     <a
                       href={url}
-                      target="_blank" rel="noopener noreferrer"
-                      className="mt-auto inline-block text-center border border-zinc-400 text-zinc-700 text-xs font-bold uppercase tracking-[0.2em] py-3 px-4 rounded-xl hover:border-zinc-600 hover:text-zinc-900 transition-all duration-300"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-4 inline-flex items-center justify-center gap-2 bg-zinc-900 text-white hover:bg-zinc-800 text-xs font-bold uppercase tracking-[0.18em] py-3.5 px-5 rounded-xl transition-colors"
                     >
-                      Ver curso →
+                      Ver curso <ExternalLink size={13} />
                     </a>
                   </div>
-                </div>
+                </article>
               )
             })}
           </div>
         ) : (
           <CategoriaVaciaCard />
         )}
-      </div>
+      </section>
+
+      {/* ALTERNATIVAS GRATUITAS */}
+      <section className="border-t border-zinc-200 bg-zinc-50 py-12 px-4 md:px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="max-w-xl">
+            <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-zinc-400">Contenido abierto</p>
+            <h2 className="text-xl md:text-2xl font-black uppercase text-zinc-900 mt-1">
+              ¿Buscas empezar gratis hoy mismo?
+            </h2>
+            <p className="text-sm text-zinc-600 leading-relaxed mt-2">
+              También tienes acceso libre a nuestros ebooks descargables y a los tutoriales en video para entrenar y fabricar desde casa.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3 shrink-0">
+            <Link
+              to="/gym/recursos"
+              className="inline-flex items-center gap-2 bg-white border border-zinc-300 hover:border-zinc-900 text-zinc-900 text-xs font-bold uppercase tracking-[0.16em] px-5 py-3 rounded-xl transition-colors"
+            >
+              <BookOpen size={14} /> Recursos gratis
+            </Link>
+            <Link
+              to="/gym/tutoriales"
+              className="inline-flex items-center gap-2 bg-white border border-zinc-300 hover:border-zinc-900 text-zinc-900 text-xs font-bold uppercase tracking-[0.16em] px-5 py-3 rounded-xl transition-colors"
+            >
+              <PlayCircle size={14} /> Tutoriales
+            </Link>
+          </div>
+        </div>
+      </section>
 
       <FooterGym />
       <div className="h-16 md:hidden" />

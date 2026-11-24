@@ -284,9 +284,14 @@
     <priority>0.6</priority>
   </url>
 
-  <!-- INKognito Gym -->
+  <!-- INKognito Gym System -->
   <url>
     <loc>https://inkognito-ecosystem.com/gym</loc>
+    <lastmod>2026-11-23</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://inkognito-ecosystem.com/gym/inkognito-gym-equipment</loc>
     <lastmod>2026-11-23</lastmod>
     <priority>0.8</priority>
   </url>

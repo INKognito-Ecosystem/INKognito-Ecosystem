@@ -8,6 +8,7 @@ import GymMobileNav from './GymMobileNav'
 import { useGymCart } from '../../contexts/GymCartContext'
 import { fetchCatalogPage } from '../../hooks/useCatalog'
 import { GYM_CART_CATEGORY, gymCartKey, gymCartItem, gymFormatPrice } from '../../lib/gymCart'
+import { resolveGymMachineImage } from '../../lib/gymImages'
 import { cloudinaryFill } from '../../lib/cloudinary'
 import logoGym from '../../assets/milogo/gym.webp'
 
@@ -58,7 +59,7 @@ export async function loader({ params }) {
             id: p.variantes?.[0]?.id ?? null,
             name: p.name,
             price: p.variantes?.[0]?.price ?? null,
-            image_url: p.variantes?.[0]?.image_url ?? p.image_url ?? null,
+            image_url: resolveGymMachineImage(p.name, p.variantes?.[0]?.image_url ?? p.image_url ?? null),
           }))
           .filter(p => p.id != null)
       } catch {
@@ -146,7 +147,8 @@ export default function GymProductDetailPage() {
   // no tiene imagen, simplemente no se muestra imagen") — sin fotos, se
   // muestra el ícono de llave (ver más abajo), igual que antes de la
   // migración de la card a esta ficha.
-  const images = [sel.image_url, sel.image_url_2, sel.image_url_3].filter(Boolean)
+  const primaryImg = resolveGymMachineImage(product.name, sel.image_url)
+  const images = [primaryImg, sel.image_url_2, sel.image_url_3].filter(Boolean)
   const sinStock = (sel.stock ?? 0) <= 0
 
   // Misma key que la card de MaquinasPedidoPage.jsx (ver src/lib/gymCart.js)
