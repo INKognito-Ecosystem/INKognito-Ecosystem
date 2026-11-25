@@ -14,15 +14,37 @@ export async function loader() {
   }
 }
 
-export function meta() {
+export function meta({ data }) {
+  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://inkognito-ecosystem.com'
   const title = 'Equípate Bien — Insumos Recomendados | INKognito Supply'
   const description = 'Selección curada por tatuadores en Amazon y Mercado Libre con envío verificado a Colombia. Equipo confiable, buenas calificaciones y cero sobrecostos.'
+  const items = data?.kitExt || []
+  const itemListLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Equípate Bien — Insumos y Equipos Recomendados para Tatuar',
+    description,
+    url: `${siteUrl}/supply/aprende/kit`,
+    numberOfItems: items.length,
+    itemListElement: items.map((p, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      item: {
+        '@type': 'Product',
+        name: p.name,
+        description: p.descripcion || description,
+        ...(p.image_url ? { image: p.image_url } : {}),
+        url: p.variantes?.[0]?.id ? `${siteUrl}/supply/producto/${p.variantes[0].id}` : `${siteUrl}/supply/aprende/kit`,
+      },
+    })),
+  }
   return [
     { title },
     { name: 'description', content: description },
     { property: 'og:title', content: title },
     { property: 'og:description', content: description },
-    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/aprende/kit` },
+    { tagName: 'link', rel: 'canonical', href: `${siteUrl}/supply/aprende/kit` },
+    { 'script:ld+json': itemListLd },
   ]
 }
 

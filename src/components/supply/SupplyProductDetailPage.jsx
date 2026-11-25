@@ -112,13 +112,62 @@ export async function loader({ params }) {
 
 export function meta({ data, params }) {
   const product = data?.product
-  const canonical = `${import.meta.env.VITE_SITE_URL}/supply/producto/${params.id}`
+  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://inkognito-ecosystem.com'
+  const canonical = `${siteUrl}/supply/producto/${params.id}`
   if (!product) {
     return [{ title: 'Producto no encontrado | INKognito Supply' }]
   }
   const title = `${product.name} | INKognito Supply`
   const description = product.descripcion || `${product.name} — disponible en INKognito Supply, con envío a toda Colombia.`
-  const imageUrl = product.variantes?.[0]?.image_url
+  const imageUrl = product.variantes?.[0]?.image_url || product.image_url
+  const esAfiliado = product.tipo === 'afiliado'
+  const esCurso = product.categoria === 'Cursos'
+  const affMeta = esAfiliado ? getAffiliateMeta({ ...product, id: Number(params.id) }) : null
+  const firstPrice = product.variantes?.[0]?.price
+
+  const jsonLd = esCurso
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Course',
+        name: product.name,
+        description,
+        url: canonical,
+        ...(imageUrl ? { image: imageUrl } : {}),
+        provider: { '@type': 'Organization', name: 'Hotmart · INKognito Supply' },
+        ...(affMeta?.rating ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: affMeta.rating,
+            reviewCount: Number(String(affMeta.reviews || '1').replace(/[^\d]/g, '')) || 1,
+          },
+        } : {}),
+      }
+    : {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.name,
+        description,
+        url: canonical,
+        ...(imageUrl ? { image: imageUrl } : {}),
+        ...(product.marca ? { brand: { '@type': 'Brand', name: product.marca } } : {}),
+        ...(firstPrice > 0 ? {
+          offers: {
+            '@type': 'Offer',
+            price: Math.round(firstPrice),
+            priceCurrency: 'COP',
+            availability: (product.variantes?.[0]?.stock ?? 0) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            url: canonical,
+          },
+        } : {}),
+        ...(affMeta?.rating ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: affMeta.rating,
+            reviewCount: Number(String(affMeta.reviews || '1').replace(/[^\d]/g, '')) || 1,
+          },
+        } : {}),
+      }
+
   return [
     { title },
     { name: 'description', content: description },
@@ -127,6 +176,7 @@ export function meta({ data, params }) {
     { property: 'og:url', content: canonical },
     ...(imageUrl ? [{ property: 'og:image', content: imageUrl }] : []),
     { tagName: 'link', rel: 'canonical', href: canonical },
+    { 'script:ld+json': jsonLd },
   ]
 }
 

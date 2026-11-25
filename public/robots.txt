@@ -40,3 +40,4 @@ User-agent: CCBot
 Disallow: /
 
 Sitemap: https://inkognito-ecosystem.com/sitemap.xml
+Sitemap: https://inkognito-ecosystem.com/sitemap-catalogo.xml

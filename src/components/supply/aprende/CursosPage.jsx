@@ -15,15 +15,37 @@ export async function loader() {
   }
 }
 
-export function meta() {
+export function meta({ data }) {
+  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://inkognito-ecosystem.com'
   const title = 'Cursos de Tatuaje Profesionales | INKognito Supply'
   const description = 'Aprende directo de referentes del tatuaje en español: pulso, fundamentos, sombras saturadas, lettering y gestión de estudio. Acceso inmediato vía Hotmart.'
+  const cursos = data?.cursos || []
+  const itemListLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Cursos Profesionales de Tatuaje — INKognito Supply',
+    description,
+    url: `${siteUrl}/supply/aprende/cursos`,
+    numberOfItems: cursos.length,
+    itemListElement: cursos.map((c, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      item: {
+        '@type': 'Course',
+        name: c.name,
+        description: c.descripcion || description,
+        url: c.variantes?.[0]?.id ? `${siteUrl}/supply/producto/${c.variantes[0].id}` : `${siteUrl}/supply/aprende/cursos`,
+        provider: { '@type': 'Organization', name: 'Hotmart · INKognito Supply' },
+      },
+    })),
+  }
   return [
     { title },
     { name: 'description', content: description },
     { property: 'og:title', content: title },
     { property: 'og:description', content: description },
-    { tagName: 'link', rel: 'canonical', href: `${import.meta.env.VITE_SITE_URL}/supply/aprende/cursos` },
+    { tagName: 'link', rel: 'canonical', href: `${siteUrl}/supply/aprende/cursos` },
+    { 'script:ld+json': itemListLd },
   ]
 }
 

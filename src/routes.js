@@ -17,6 +17,7 @@ import { route, index } from '@react-router/dev/routes'
 // esperado mientras se sigue cargando catálogo real.
 export default [
   index('components/ecosystem/InkognitoHome.jsx'),
+  route('sitemap-catalogo.xml', 'routes/sitemap-catalogo.xml.js'),
   route('jhumaneztattoo', 'routes/HomePage.jsx'),
   route('jhumaneztattoo/agenda', 'routes/JhumaneztattooAgenda.jsx'),
   // Landing mínima — solo el formulario de agenda, sin hero ni portafolio
