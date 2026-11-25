@@ -1,5 +1,43 @@
+import { useState, useMemo } from 'react'
 import { useLoaderData } from 'react-router'
 import { PANEL_URL, SeccionAfiliados, AprendePageShell } from './AprendeShared'
+
+const normaliza = (s) =>
+  (s || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+
+const CURSO_FILTERS = [
+  { id: 'todos', label: 'Todos', keywords: null },
+  {
+    id: 'principiantes',
+    label: 'Principiantes',
+    keywords: ['principiante', 'iniciante', 'pulso', 'autodidacta', 'desde cero', 'basico', 'fundamento'],
+  },
+  {
+    id: 'sombras',
+    label: 'Sombras',
+    keywords: ['sombra', 'realismo', 'tecnico', 'hernan yepes', 'contraste', 'black and grey', 'negros solidos'],
+  },
+  {
+    id: 'lettering',
+    label: 'Lettering',
+    keywords: ['lettering', 'caligraf', 'tipograf', 'reinvencion creativa'],
+  },
+  {
+    id: 'color',
+    label: 'Color',
+    keywords: ['color', 'inkmersion', 'full color'],
+    onlyIfMatches: true,
+  },
+]
+
+function matchesCursoFilter(curso, filter) {
+  if (!filter.keywords) return true
+  const hay = normaliza(`${curso.name || ''} ${curso.descripcion || ''}`)
+  return filter.keywords.some((kw) => hay.includes(kw))
+}
 
 export async function loader() {
   try {
@@ -51,6 +89,21 @@ export function meta({ data }) {
 
 export default function CursosPage() {
   const { cursos } = useLoaderData()
+  const [filtro, setFiltro] = useState('todos')
+
+  const filterTabs = useMemo(() => {
+    return CURSO_FILTERS
+      .map((f) => ({
+        ...f,
+        count: cursos.filter((c) => matchesCursoFilter(c, f)).length,
+      }))
+      .filter((f) => !f.onlyIfMatches || f.count > 0)
+  }, [cursos])
+
+  const cursosFiltrados = useMemo(() => {
+    const active = CURSO_FILTERS.find((f) => f.id === filtro) || CURSO_FILTERS[0]
+    return cursos.filter((c) => matchesCursoFilter(c, active))
+  }, [cursos, filtro])
 
   return (
     <AprendePageShell
@@ -59,10 +112,35 @@ export default function CursosPage() {
       titulo={<>Domina la técnica y<br /><span className="text-zinc-500">escala tu estudio</span></>}
       descripcion="Aprende directo de referentes del tatuaje en español: desde pulso, trazos y fundamentos hasta sombras saturadas, lettering y gestión real de agenda. Clases grabadas a tu ritmo con respaldo seguro de Hotmart."
     >
+      {/* FILTROS RÁPIDOS POR TEMÁTICA (igual que Recursos) */}
+      {cursos.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-1 pb-2">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {filterTabs.map((tab) => {
+              const active = filtro === tab.id
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setFiltro(tab.id)}
+                  className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-[11px] font-bold transition-colors cursor-pointer ${
+                    active
+                      ? 'bg-zinc-900 text-white shadow-xs'
+                      : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200/70'
+                  }`}
+                >
+                  {tab.label} ({tab.count})
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       <SeccionAfiliados
         id="cursos"
         titulo="Cursos digitales"
-        items={cursos}
+        items={cursosFiltrados}
         color="orange"
         cols="lg:grid-cols-5"
         mostrarTitulo={false}
