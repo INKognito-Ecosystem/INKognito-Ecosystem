@@ -191,7 +191,7 @@ export default function SupleCategoryPage({ title, categoria, slug, intro, produ
           que sube desde abajo, título = nombre de la categoría y ✕. */}
       {verDescripcion && intro && (
         <div
-          className="md:hidden fixed inset-0 z-[60] bg-black/70 flex items-end"
+          className="md:hidden fixed inset-0 z-[75] bg-black/70 flex items-end"
           onClick={() => setVerDescripcion(false)}
         >
           <div

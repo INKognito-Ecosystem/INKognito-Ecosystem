@@ -1,20 +1,22 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useNavigation } from 'react-router'
+import { motion } from 'motion/react'
 
-// Persiste el estado visual anterior entre cambios de ruta para que al entrar
-// o salir de /<modulo>/categorias la transición diagonal de los 4 cuadros
-// siempre se ejecute de forma visible, incluso si cambia el componente montado.
+// Memoria global del estado visual anterior entre montajes de ruta:
+// cuando se navega de /<modulo> -> /<modulo>/categorias (o viceversa), el
+// nuevo componente arranca en `initial` con el estado anterior y anima hacia
+// el nuevo estado de forma garantizada en cada toque.
 let lastCategoriesOpen = false
 
+const SPRING_UP = { type: 'spring', stiffness: 360, damping: 24, mass: 0.7 }
+const SPRING_DOWN = { type: 'spring', stiffness: 360, damping: 24, mass: 0.7, delay: 0.03 }
+
 /**
- * Ícono animado de Categorías (4 cuadros 2x2):
- * - Al abrir: el cuadro inferior izquierdo viaja al superior derecho y el
- *   inferior derecho al superior izquierdo (cruce diagonal limpio).
- * - Al cerrar (tocando Categorías otra vez, botón Atrás o cualquier otro botón):
+ * Ícono animado de Categorías (4 cuadros 2x2 en HTML puro GPU-acelerado):
+ * - Al abrir: inferior izquierdo -> superior derecho, inferior derecho -> superior izquierdo
+ *   (y los superiores bajan en diagonal a ocupar los inferiores).
+ * - Al cerrar (tocando Categorías otra vez, Atrás o cualquier otro botón):
  *   los 4 cuadros regresan suavemente a sus posiciones originales.
- *
- * Usa useNavigation() para disparar la animación EN EL INSTANTE del toque
- * (sin esperar a que termine el loader de la nueva ruta en datos móviles).
  */
 export default function CategoriesGridIcon({ open = false, size = 19, className = '' }) {
   const navigation = useNavigation()
@@ -23,90 +25,65 @@ export default function CategoriesGridIcon({ open = false, size = 19, className 
     ? /\/categorias\/?$/.test(pendingPath)
     : open
 
-  const [swapped, setSwapped] = useState(() => lastCategoriesOpen)
+  // Captura el estado inicial en el instante de montar esta instancia
+  const initialOpenRef = useRef(lastCategoriesOpen)
 
   useEffect(() => {
-    if (swapped === targetOpen) {
-      lastCategoriesOpen = targetOpen
-      return
-    }
-    // 40ms garantiza que el navegador móvil pinte el estado inicial antes de
-    // aplicar el transform destino (evita que Chrome colapse ambos frames).
-    const t = setTimeout(() => {
-      setSwapped(targetOpen)
-      lastCategoriesOpen = targetOpen
-    }, 40)
-    return () => clearTimeout(t)
-  }, [targetOpen, swapped])
+    lastCategoriesOpen = targetOpen
+  }, [targetOpen])
 
-  const easeUp = 'transform 420ms cubic-bezier(0.34, 1.35, 0.64, 1)'
-  const easeDown = 'transform 420ms cubic-bezier(0.34, 1.35, 0.64, 1) 35ms'
+  // Dimensiones proporcionales a `size` (default 19px -> cuadros de 7px, separación 3px, salto 10px)
+  const sq = Math.round(size * 0.37)
+  const pad = Math.round(size * 0.08)
+  const step = size - pad * 2 - sq
+
+  const boxStyle = {
+    width: `${sq}px`,
+    height: `${sq}px`,
+    borderWidth: '1.8px',
+    borderStyle: 'solid',
+    borderColor: 'currentColor',
+    borderRadius: '2px',
+    boxSizing: 'border-box',
+    position: 'absolute',
+  }
+
+  const init = initialOpenRef.current
 
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+    <span
       aria-hidden="true"
-      className={className}
+      className={`relative inline-block flex-shrink-0 ${className}`}
+      style={{ width: `${size}px`, height: `${size}px` }}
     >
       {/* Superior izquierdo -> pasa a inferior derecho */}
-      <rect
-        x="3"
-        y="3"
-        width="7"
-        height="7"
-        rx="1"
-        style={{
-          transform: swapped ? 'translate(11px, 11px)' : 'translate(0px, 0px)',
-          transition: easeDown,
-          willChange: 'transform',
-        }}
+      <motion.span
+        style={{ ...boxStyle, left: `${pad}px`, top: `${pad}px` }}
+        initial={{ x: init ? step : 0, y: init ? step : 0 }}
+        animate={{ x: targetOpen ? step : 0, y: targetOpen ? step : 0 }}
+        transition={SPRING_DOWN}
       />
       {/* Superior derecho -> pasa a inferior izquierdo */}
-      <rect
-        x="14"
-        y="3"
-        width="7"
-        height="7"
-        rx="1"
-        style={{
-          transform: swapped ? 'translate(-11px, 11px)' : 'translate(0px, 0px)',
-          transition: easeDown,
-          willChange: 'transform',
-        }}
+      <motion.span
+        style={{ ...boxStyle, left: `${pad + step}px`, top: `${pad}px` }}
+        initial={{ x: init ? -step : 0, y: init ? step : 0 }}
+        animate={{ x: targetOpen ? -step : 0, y: targetOpen ? step : 0 }}
+        transition={SPRING_DOWN}
       />
       {/* Inferior izquierdo -> sube al superior derecho */}
-      <rect
-        x="3"
-        y="14"
-        width="7"
-        height="7"
-        rx="1"
-        style={{
-          transform: swapped ? 'translate(11px, -11px)' : 'translate(0px, 0px)',
-          transition: easeUp,
-          willChange: 'transform',
-        }}
+      <motion.span
+        style={{ ...boxStyle, left: `${pad}px`, top: `${pad + step}px` }}
+        initial={{ x: init ? step : 0, y: init ? -step : 0 }}
+        animate={{ x: targetOpen ? step : 0, y: targetOpen ? -step : 0 }}
+        transition={SPRING_UP}
       />
       {/* Inferior derecho -> sube al superior izquierdo */}
-      <rect
-        x="14"
-        y="14"
-        width="7"
-        height="7"
-        rx="1"
-        style={{
-          transform: swapped ? 'translate(-11px, -11px)' : 'translate(0px, 0px)',
-          transition: easeUp,
-          willChange: 'transform',
-        }}
+      <motion.span
+        style={{ ...boxStyle, left: `${pad + step}px`, top: `${pad + step}px` }}
+        initial={{ x: init ? -step : 0, y: init ? -step : 0 }}
+        animate={{ x: targetOpen ? -step : 0, y: targetOpen ? -step : 0 }}
+        transition={SPRING_UP}
       />
-    </svg>
+    </span>
   )
 }

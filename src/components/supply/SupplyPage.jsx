@@ -200,7 +200,7 @@ export default function SupplyPage() {
 
         {descAbierta && (
           <div
-            className="fixed inset-0 z-50 bg-black/70 flex items-end"
+            className="fixed inset-0 z-[75] bg-black/70 flex items-end"
             onClick={() => setDescAbierta(null)}
           >
             <div

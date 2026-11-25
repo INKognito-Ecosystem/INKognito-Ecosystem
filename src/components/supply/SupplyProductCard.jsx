@@ -352,7 +352,7 @@ export default function SupplyProductCard({ item, categoria, showEstudioBadge = 
 
       {showDesc && (
         <div
-          className="md:hidden fixed inset-0 z-50 bg-black/70 flex items-end justify-center"
+          className="md:hidden fixed inset-0 z-[75] bg-black/70 flex items-end justify-center"
           onClick={() => setShowDesc(false)}
         >
           <div

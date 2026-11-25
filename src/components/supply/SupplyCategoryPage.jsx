@@ -581,7 +581,7 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
             vez con el modal de Educación). */}
         {introAbierto && (
           <div
-            className="md:hidden fixed inset-0 z-50 bg-black/70 flex items-end"
+            className="md:hidden fixed inset-0 z-[75] bg-black/70 flex items-end"
             onClick={() => setIntroAbierto(false)}
           >
             <div
