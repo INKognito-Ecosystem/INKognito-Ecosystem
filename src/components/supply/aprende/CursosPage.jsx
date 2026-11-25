@@ -16,8 +16,8 @@ export async function loader() {
 }
 
 export function meta() {
-  const title = 'Cursos de Tatuaje | INKognito Supply'
-  const description = 'Cursos grabados para tatuadores en cualquier etapa: desde fundamentos hasta especialización en realismo, sombras y color. Acceso de por vida, a tu ritmo.'
+  const title = 'Cursos de Tatuaje Profesionales | INKognito Supply'
+  const description = 'Aprende directo de referentes del tatuaje en español: pulso, fundamentos, sombras saturadas, lettering y gestión de estudio. Acceso inmediato vía Hotmart.'
   return [
     { title },
     { name: 'description', content: description },
@@ -33,9 +33,9 @@ export default function CursosPage() {
   return (
     <AprendePageShell
       slug="cursos"
-      eyebrow="Hotmart · Cursos digitales"
-      titulo={<>Formación profesional para<br /><span className="text-zinc-500">elevar tu nivel</span></>}
-      descripcion="Cursos seleccionados para dominar técnicas avanzadas, gestionar tu estudio y escalar tu marca personal."
+      eyebrow="Hotmart · Formación verificada · Acceso inmediato"
+      titulo={<>Domina la técnica y<br /><span className="text-zinc-500">escala tu estudio</span></>}
+      descripcion="Aprende directo de referentes del tatuaje en español: desde pulso, trazos y fundamentos hasta sombras saturadas, lettering y gestión real de agenda. Clases grabadas a tu ritmo con respaldo seguro de Hotmart."
     >
       <SeccionAfiliados
         id="cursos"

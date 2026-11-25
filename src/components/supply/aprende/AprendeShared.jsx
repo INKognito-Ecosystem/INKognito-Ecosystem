@@ -346,7 +346,7 @@ export function AprendePageShell({ eyebrow, titulo, descripcion, slug, children 
 
       <div className="relative overflow-hidden bg-white pt-5 md:pt-8">
         <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
-        <div className="relative z-10 px-6 max-w-7xl mx-auto pb-5 md:pb-8">
+        <div className="relative z-10 px-4 sm:px-6 max-w-7xl mx-auto pb-5 md:pb-8">
           <h1 className="text-3xl md:text-6xl font-black uppercase leading-none mb-3 text-zinc-900">
             {titulo}
           </h1>

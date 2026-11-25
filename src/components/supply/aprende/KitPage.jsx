@@ -15,8 +15,8 @@ export async function loader() {
 }
 
 export function meta() {
-  const title = 'Kit Recomendado para Tatuadores | INKognito Supply'
-  const description = 'Insumos y equipos recomendados en Amazon y Mercado Libre para empezar a tatuar con seriedad, sin sobrecostos.'
+  const title = 'Equípate Bien — Insumos Recomendados | INKognito Supply'
+  const description = 'Selección curada por tatuadores en Amazon y Mercado Libre con envío verificado a Colombia. Equipo confiable, buenas calificaciones y cero sobrecostos.'
   return [
     { title },
     { name: 'description', content: description },
@@ -32,18 +32,28 @@ export default function KitPage() {
   return (
     <AprendePageShell
       slug="kit"
-      eyebrow="Amazon · Mercado Libre · Kit recomendado"
-      titulo={<>El kit que respalda<br /><span className="text-zinc-500">tu práctica.</span></>}
-      descripcion="Insumos seleccionados para trabajar con seriedad, sin sobrecostos."
+      eyebrow="Amazon · Mercado Libre · Envío verificado a Colombia"
+      titulo={<>Equípate bien<br /><span className="text-zinc-500">sin pagar de más</span></>}
+      descripcion="Selección curada por tatuadores en Amazon y Mercado Libre con envío verificado a Colombia. Comparamos calificaciones reales, durabilidad y relación costo-beneficio para que inviertas solo en equipo que sí responde en cabina."
     >
       <SeccionAfiliados
         id="kit"
-        titulo="Kit recomendado"
+        titulo="Equípate bien"
         items={kitExt}
         color="blue"
         cols="lg:grid-cols-6"
         mostrarTitulo={false}
       />
+      {kitExt.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-8 md:pb-12">
+          <div className="border border-zinc-200 rounded-2xl px-5 py-4 text-center bg-zinc-50/60">
+            <p className="text-zinc-600 text-xs md:text-sm leading-relaxed">
+              Compra protegida directamente en <strong>Amazon</strong> y <strong>Mercado Libre</strong>.
+              Cada producto fue filtrado por calificación real de compradores y disponibilidad de envío a Colombia.
+            </p>
+          </div>
+        </div>
+      )}
     </AprendePageShell>
   )
 }

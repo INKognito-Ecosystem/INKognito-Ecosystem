@@ -4,8 +4,8 @@
 // categorías, pero la misma lógica prev/next envuelta al llegar al final.
 export const APRENDE_ORDER = [
   { name: 'Cursos', slug: 'cursos' },
-  { name: 'Kit recomendado', slug: 'kit' },
-  { name: 'Recursos gratuitos', slug: 'recursos' },
+  { name: 'Equípate bien', slug: 'kit' },
+  { name: 'Recursos', slug: 'recursos' },
 ]
 
 export function getAdjacentAprende(slug) {
