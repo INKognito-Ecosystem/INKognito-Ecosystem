@@ -117,6 +117,25 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
   }, [busqueda])
 
   const gridItems = resultados ?? items
+  const aliadosItems = items.filter(i => i.tipo !== 'afiliado')
+  const kitItems = items.filter(i => i.tipo === 'afiliado' && i.categoria === 'Kit Externo')
+  const cursosItems = items.filter(i => i.tipo === 'afiliado' && i.categoria === 'Cursos')
+  const recursosItems = items.filter(i => i.tipo === 'afiliado' && i.categoria === 'Recursos')
+
+  const renderStaggeredGrid = (list) => (
+    <div className="flex gap-3 items-start">
+      <div className="flex-1 min-w-0 flex flex-col gap-3">
+        {list.filter((_, i) => i % 2 === 0).map(item => (
+          <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={item.categoria} light />
+        ))}
+      </div>
+      <div className="flex-1 min-w-0 flex flex-col gap-3 pt-5">
+        {list.filter((_, i) => i % 2 === 1).map(item => (
+          <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={item.categoria} light />
+        ))}
+      </div>
+    </div>
+  )
 
   return (
     <div className="md:hidden bg-white text-zinc-900">
@@ -253,36 +272,123 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
         </p>
       </div>
 
-      {/* GRID DE PRODUCTOS — paginado real (fetchCatalogPage/useLoadMore) */}
+      {/* SECCIONES DE PRODUCTOS — separadas por origen (Aliados, Equípate bien, Cursos) */}
       <div id="grid-mobile" className="px-4 mt-8">
-        <h2 className="text-lg font-black uppercase mb-3">{resultados ? 'Resultados' : 'Destacados'}</h2>
-        {buscando ? (
-          <p className="text-zinc-500 text-xs">Buscando…</p>
-        ) : gridItems.length === 0 ? (
-          <p className="text-zinc-500 text-xs">Ningún producto coincide con tu búsqueda.</p>
+        {resultados !== null ? (
+          <>
+            <h2 className="text-lg font-black uppercase mb-3">Resultados</h2>
+            {buscando ? (
+              <p className="text-zinc-500 text-xs">Buscando…</p>
+            ) : gridItems.length === 0 ? (
+              <p className="text-zinc-500 text-xs">Ningún producto coincide con tu búsqueda.</p>
+            ) : (
+              renderStaggeredGrid(gridItems)
+            )}
+          </>
         ) : (
-          <div className="flex gap-3 items-start">
-            <div className="flex-1 min-w-0 flex flex-col gap-3">
-              {gridItems.filter((_, i) => i % 2 === 0).map(item => (
-                <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={item.categoria} light />
-              ))}
-            </div>
-            <div className="flex-1 min-w-0 flex flex-col gap-3 pt-5">
-              {gridItems.filter((_, i) => i % 2 === 1).map(item => (
-                <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={item.categoria} light />
-              ))}
-            </div>
-          </div>
-        )}
-        {!resultados && hasMore && (
-          <div className="flex justify-center mt-5">
-            <button
-              onClick={loadMore}
-              disabled={loading}
-              className="px-6 py-2.5 border border-blue-500/40 text-blue-400 text-xs font-bold uppercase tracking-[0.15em] rounded hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300 disabled:opacity-50"
-            >
-              {loading ? 'Cargando…' : 'Cargar más'}
-            </button>
+          <div className="flex flex-col gap-8">
+            {/* 1. PRODUCTOS FÍSICOS DE TIENDAS ALIADAS */}
+            {aliadosItems.length > 0 && (
+              <section>
+                <div className="flex items-end justify-between gap-2 mb-3">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600">
+                      Tiendas verificadas
+                    </p>
+                    <h2 className="text-lg font-black uppercase leading-tight text-zinc-900">
+                      Descubre nuestros aliados
+                    </h2>
+                  </div>
+                  <Link
+                    to="/supply/proveedores"
+                    className="text-[11px] font-bold text-blue-600 hover:text-blue-700 whitespace-nowrap pb-0.5"
+                  >
+                    Ver tiendas →
+                  </Link>
+                </div>
+                {renderStaggeredGrid(aliadosItems)}
+                {hasMore && (
+                  <div className="flex justify-center mt-5">
+                    <button
+                      onClick={loadMore}
+                      disabled={loading}
+                      className="px-6 py-2.5 border border-blue-500/40 text-blue-500 text-xs font-bold uppercase tracking-[0.15em] rounded hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300 disabled:opacity-50"
+                    >
+                      {loading ? 'Cargando…' : 'Cargar más'}
+                    </button>
+                  </div>
+                )}
+              </section>
+            )}
+
+            {/* 2. EQUÍPATE BIEN (SELECCIÓN INTERNACIONAL — AMAZON / MERCADO LIBRE) */}
+            {kitItems.length > 0 && (
+              <section className="pt-2 border-t border-zinc-100">
+                <div className="flex items-end justify-between gap-2 mb-3">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
+                      Amazon · Mercado Libre
+                    </p>
+                    <h2 className="text-lg font-black uppercase leading-tight text-zinc-900">
+                      Equípate bien
+                    </h2>
+                  </div>
+                  <Link
+                    to="/supply/aprende/kit"
+                    className="text-[11px] font-bold text-blue-600 hover:text-blue-700 whitespace-nowrap pb-0.5"
+                  >
+                    Ver todo →
+                  </Link>
+                </div>
+                {renderStaggeredGrid(kitItems)}
+              </section>
+            )}
+
+            {/* 3. CURSOS (FORMACIÓN DIGITAL — HOTMART) */}
+            {cursosItems.length > 0 && (
+              <section className="pt-2 border-t border-zinc-100">
+                <div className="flex items-end justify-between gap-2 mb-3">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-600">
+                      Formación profesional
+                    </p>
+                    <h2 className="text-lg font-black uppercase leading-tight text-zinc-900">
+                      Cursos
+                    </h2>
+                  </div>
+                  <Link
+                    to="/supply/aprende/cursos"
+                    className="text-[11px] font-bold text-blue-600 hover:text-blue-700 whitespace-nowrap pb-0.5"
+                  >
+                    Ver todo →
+                  </Link>
+                </div>
+                {renderStaggeredGrid(cursosItems)}
+              </section>
+            )}
+
+            {/* 4. RECURSOS (SI HAY PUBLICADOS) */}
+            {recursosItems.length > 0 && (
+              <section className="pt-2 border-t border-zinc-100">
+                <div className="flex items-end justify-between gap-2 mb-3">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-600">
+                      Herramientas y guías
+                    </p>
+                    <h2 className="text-lg font-black uppercase leading-tight text-zinc-900">
+                      Recursos
+                    </h2>
+                  </div>
+                  <Link
+                    to="/supply/aprende/recursos"
+                    className="text-[11px] font-bold text-blue-600 hover:text-blue-700 whitespace-nowrap pb-0.5"
+                  >
+                    Ver todo →
+                  </Link>
+                </div>
+                {renderStaggeredGrid(recursosItems)}
+              </section>
+            )}
           </div>
         )}
       </div>

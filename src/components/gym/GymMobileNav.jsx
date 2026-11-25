@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, Globe, FileText, Shield } from 'lucide-react'
 import CategoriesGridIcon from '../CategoriesGridIcon'
 import { useGymCart } from '../../contexts/GymCartContext'
@@ -23,6 +23,8 @@ import logoGym from '../../assets/milogo/gym.webp'
 // blanca arriba del ícono).
 export default function GymMobileNav({ active = null }) {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const isCategoriasPage = pathname === '/gym/categorias'
   const { count } = useGymCart()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -49,7 +51,7 @@ export default function GymMobileNav({ active = null }) {
         <Link
           to="/gym/categorias"
           onClick={(e) => {
-            if (active === 'categorias') {
+            if (isCategoriasPage) {
               e.preventDefault()
               if (window.history.length > 1) navigate(-1)
               else navigate('/gym')
@@ -58,7 +60,7 @@ export default function GymMobileNav({ active = null }) {
           className="relative flex flex-col items-center gap-1 text-black"
         >
           {marca('categorias')}
-          <CategoriesGridIcon open={active === 'categorias' && !drawerOpen && !menuOpen} size={19} />
+          <CategoriesGridIcon open={isCategoriasPage && !drawerOpen && !menuOpen} size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Categorías</span>
         </Link>
         <Link to="/" aria-label="Ir al Ecosistema" className="flex flex-col items-center gap-1 text-black">

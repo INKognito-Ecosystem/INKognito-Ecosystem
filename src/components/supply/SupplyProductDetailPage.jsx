@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLoaderData, useParams, useNavigate, Link } from 'react-router'
-import { ArrowLeft, ShoppingCart, Share2, Store, MapPin, ExternalLink } from 'lucide-react'
+import { ArrowLeft, ShoppingCart, Share2, Store, MapPin, ExternalLink, Star, Flame } from 'lucide-react'
 import ProductImageGallery from '../ProductImageGallery'
 import ProductImageThumbs from '../ProductImageThumbs'
 import { VariantSelectorSupply } from './SupplyProductCard'
@@ -9,6 +9,7 @@ import SupplyMobileNav from './SupplyMobileNav'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { fetchCatalogEstudio } from '../../hooks/useCatalog'
 import { cloudinaryFill } from '../../lib/cloudinary'
+import { getAffiliateMeta } from '../../data/affiliateMeta'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL
 // Mismo azul que ya usa Mercado Libre/Mercado Pago para su marca (y que
@@ -59,20 +60,33 @@ export async function loader({ params }) {
   try {
     const res = await fetch(`${PANEL_URL}/api/product/${params.id}`)
     const data = await res.json()
-    if (data.error) return { product: null, otrosProductos: [], tienda: null }
+    if (data.error) return { product: null, otrosProductos: [], tienda: null, relacionadosAfiliados: [] }
 
-    // Módulo de tienda (2026-09-15, referencia real de Mercado Libre que
-    // mandó Jose) — datos REALES de la tienda supply (antes "proveedor"),
-    // mismos que ya se muestran en SupplyProveedoresPage.jsx/
-    // EstudioSupplyPage.jsx: logo, municipio/departamento (GET
-    // /api/estudios/:id, público, sin auth) + 2 productos más con su
-    // propia foto (fetchCatalogEstudio, función ya sancionada para
-    // listar el catálogo de UN proveedor — ver regla de catálogo
-    // paginado en CLAUDE.md). En paralelo, ninguno de los dos bloquea al
-    // otro.
     let otrosProductos = []
     let tienda = null
-    if (data.estudio_id) {
+    let relacionadosAfiliados = []
+
+    if (data.tipo === 'afiliado' && data.categoria) {
+      try {
+        const catRes = await fetch(`${PANEL_URL}/api/catalog/supply`)
+        if (catRes.ok) {
+          const catData = await catRes.json()
+          relacionadosAfiliados = Object.values(catData)
+            .flat()
+            .filter(p => p.tipo === 'afiliado' && p.categoria === data.categoria && p.name !== data.name)
+            .map(p => ({
+              id: p.variantes?.[0]?.id ?? p.id ?? null,
+              name: p.name,
+              categoria: p.categoria,
+              tipo: p.tipo,
+              plataforma: p.plataforma,
+              image_url: p.variantes?.[0]?.image_url ?? p.image_url ?? null,
+              variantes: p.variantes,
+            }))
+            .filter(p => p.id != null)
+        }
+      } catch {}
+    } else if (data.estudio_id) {
       const [catalogoRes, estudioRes] = await Promise.all([
         fetchCatalogEstudio('supply', data.estudio_id, { limit: 6 }),
         fetch(`${PANEL_URL}/api/estudios/${data.estudio_id}`).then(r => r.ok ? r.json() : null).catch(() => null),
@@ -90,9 +104,9 @@ export async function loader({ params }) {
       tienda = estudioRes
     }
 
-    return { product: data, otrosProductos, tienda }
+    return { product: data, otrosProductos, tienda, relacionadosAfiliados }
   } catch {
-    return { product: null, otrosProductos: [], tienda: null }
+    return { product: null, otrosProductos: [], tienda: null, relacionadosAfiliados: [] }
   }
 }
 
@@ -117,7 +131,7 @@ export function meta({ data, params }) {
 }
 
 export default function SupplyProductDetailPage() {
-  const { product, otrosProductos, tienda } = useLoaderData()
+  const { product, otrosProductos, tienda, relacionadosAfiliados = [] } = useLoaderData()
   const { id } = useParams()
   const navigate = useNavigate()
   const { items: cartItems, addItem, removeItem, setSingleItem } = useSupplyCart()
@@ -135,6 +149,7 @@ export default function SupplyProductDetailPage() {
   // Abre mostrando la MISMA variante que el usuario tenía seleccionada en
   // el grid, no siempre la primera.
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
     if (!variantes.length) return
     const idx = variantes.findIndex(v => v.id === Number(id))
     setActiveVariant(idx >= 0 ? idx : 0)
@@ -191,6 +206,7 @@ export default function SupplyProductDetailPage() {
   const esAfiliado = product.tipo === 'afiliado'
   const afiliadoUrl = product.url_ventas || product.url_checkout
   const plataformaLabel = PLATAFORMA_LABEL[product.plataforma] || product.plataforma || 'Afiliado'
+  const affiliateMeta = esAfiliado ? getAffiliateMeta({ ...product, id: sel.id ?? product.id }) : null
   // "Adquirir curso en X" (2026-09-15, Jose) — solo para Cursos; cualquier
   // otra categoría afiliada usa un verbo genérico que no asume qué es.
   const ctaLabel = product.categoria === 'Cursos' ? `Adquirir curso en ${plataformaLabel}` : `Ver en ${plataformaLabel}`
@@ -294,6 +310,31 @@ export default function SupplyProductDetailPage() {
         </p>
       )}
       <h1 className="text-sm font-medium leading-snug text-zinc-900">{product.name}</h1>
+      {esAfiliado && affiliateMeta && (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          {affiliateMeta.priceLabel && (
+            <p className="text-zinc-900 font-bold text-2xl">{affiliateMeta.priceLabel}</p>
+          )}
+          {affiliateMeta.rating && (
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-zinc-800">
+              <Star size={14} className="text-amber-500 fill-amber-500" />
+              {affiliateMeta.rating}
+              {affiliateMeta.reviews && <span className="font-normal text-zinc-500">({affiliateMeta.reviews} reseñas)</span>}
+            </span>
+          )}
+          {affiliateMeta.temperatura && (
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-orange-600">
+              <Flame size={14} className="text-orange-500 fill-orange-500" />
+              {affiliateMeta.temperatura}° Hotmart
+            </span>
+          )}
+          {affiliateMeta.shipping && (
+            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+              {affiliateMeta.shipping}
+            </span>
+          )}
+        </div>
+      )}
       {!esAfiliado && (
         <>
           {/* Precio con el peso estándar de marketplace, no font-black (Jose:
@@ -304,16 +345,14 @@ export default function SupplyProductDetailPage() {
               está conectado (proveedorMp): si no, el cobro real no pasa por
               Mercado Pago (cae al flujo manual de WhatsApp/Nequi), mostrar el
               logo igual sería prometer algo que no aplica para este producto. */}
-          {proveedorMp && (
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-sm font-semibold mr-0.5" style={{ color: MP_BLUE }}>Medios de pago:</span>
-              {MEDIOS_PAGO_ICONS.map(({ alt, src, fill }) => (
-                <span key={alt} className="w-7 h-7 rounded-full bg-white border border-zinc-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-                  <img src={src} alt={alt} className={fill ? 'w-full h-full object-cover' : 'w-5 h-5 object-contain'} onError={(e) => { e.currentTarget.parentElement.style.display = 'none' }} />
-                </span>
-              ))}
-            </div>
-          )}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-sm font-semibold mr-0.5" style={{ color: MP_BLUE }}>Medios de pago:</span>
+            {MEDIOS_PAGO_ICONS.map(({ alt, src, fill }) => (
+              <span key={alt} className="w-7 h-7 rounded-full bg-white border border-zinc-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                <img src={src} alt={alt} className={fill ? 'w-full h-full object-cover' : 'w-5 h-5 object-contain'} onError={(e) => { e.currentTarget.parentElement.style.display = 'none' }} />
+              </span>
+            ))}
+          </div>
           {sinStock ? (
             <p className="text-red-500 text-xs font-bold uppercase tracking-wide">Agotado</p>
           ) : (sel.stock ?? 0) <= 3 && (
@@ -396,7 +435,7 @@ export default function SupplyProductDetailPage() {
   // Cantidad disponible (2026-09-27, Jose) — antes solo se veía dentro del
   // carrito ("Quedan X", solo si stock bajo); esta es informativa y siempre
   // visible en la ficha, justo debajo del producto y encima de la tienda.
-  const cantidadBlock = typeof sel.stock === 'number' && (
+  const cantidadBlock = !esAfiliado && typeof sel.stock === 'number' && (
     <p className="text-sm"><span className="font-bold text-zinc-900">Cantidad:</span> <span className="font-semibold text-zinc-700">{sel.stock}</span></p>
   )
 
@@ -467,6 +506,77 @@ export default function SupplyProductDetailPage() {
     </div>
   )
 
+  const relacionadosConfig = {
+    'Kit Externo': { titulo: 'Más en Equípate bien', ruta: '/supply/aprende/kit' },
+    Cursos: { titulo: 'Más cursos disponibles', ruta: '/supply/aprende/cursos' },
+    Recursos: { titulo: 'Más recursos', ruta: '/supply/aprende/recursos' },
+  }[product.categoria] || { titulo: `Más en ${product.categoria || 'Supply'}`, ruta: '/supply' }
+
+  const relacionadosBlock = esAfiliado && relacionadosAfiliados.length > 0 && (
+    <div className="pt-2 border-t border-zinc-100">
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <h2 className="text-xs font-black uppercase tracking-[0.14em] text-zinc-900">
+          {relacionadosConfig.titulo}
+        </h2>
+        <Link
+          to={relacionadosConfig.ruta}
+          className="text-[11px] font-bold text-blue-600 hover:text-blue-700 whitespace-nowrap"
+        >
+          Ver todo →
+        </Link>
+      </div>
+      <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory -mx-5 px-5 md:mx-0 md:px-0 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {relacionadosAfiliados.map(rel => {
+          const relMeta = getAffiliateMeta(rel)
+          return (
+            <Link
+              key={rel.id}
+              to={`/supply/producto/${rel.id}`}
+              className="group snap-start flex-shrink-0 w-[156px] sm:w-[176px] border border-zinc-200 hover:border-blue-400 rounded-2xl overflow-hidden bg-white flex flex-col transition-all duration-200 hover:shadow-sm"
+            >
+              <div className="w-full aspect-square bg-zinc-50 border-b border-zinc-100 overflow-hidden flex items-center justify-center p-2">
+                {rel.image_url ? (
+                  <img
+                    src={rel.image_url}
+                    alt={rel.name}
+                    loading="lazy"
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : (
+                  <span className="text-[10px] font-bold uppercase text-zinc-400 text-center px-2">{rel.name}</span>
+                )}
+              </div>
+              <div className="p-2.5 flex flex-col gap-1 flex-1 min-w-0">
+                <p className="text-[11.5px] font-semibold text-zinc-900 leading-snug line-clamp-2 [text-wrap:pretty] break-words group-hover:text-blue-600 transition-colors">
+                  {rel.name}
+                </p>
+                {relMeta && (
+                  <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px] mt-auto pt-0.5">
+                    {relMeta.rating && (
+                      <span className="inline-flex items-center gap-0.5 font-bold text-zinc-800">
+                        <Star size={10} className="text-amber-500 fill-amber-500" />
+                        {relMeta.rating}
+                      </span>
+                    )}
+                    {relMeta.temperatura && (
+                      <span className="inline-flex items-center gap-0.5 font-bold text-orange-600">
+                        <Flame size={10} className="text-orange-500 fill-orange-500" />
+                        {relMeta.temperatura}°
+                      </span>
+                    )}
+                    {relMeta.priceLabel && (
+                      <span className="font-black text-zinc-900">{relMeta.priceLabel}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </Link>
+          )
+        })}
+      </div>
+    </div>
+  )
+
   return (
     <div className="min-h-screen bg-white">
 
@@ -528,6 +638,7 @@ export default function SupplyProductDetailPage() {
           {ctaButtons}
           {cantidadBlock}
           {proveedorBlock}
+          {relacionadosBlock}
         </div>
 
         <SupplyMobileNav active="categorias" light />
@@ -565,6 +676,7 @@ export default function SupplyProductDetailPage() {
               {proveedorBlock}
             </div>
           </div>
+          {relacionadosBlock && <div className="mt-12">{relacionadosBlock}</div>}
         </div>
       </div>
 

@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
-import { ShoppingCart, Check, ExternalLink, GraduationCap } from 'lucide-react'
+import { ShoppingCart, Check, ExternalLink, GraduationCap, Star, Flame } from 'lucide-react'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import ProductImageGallery from '../ProductImageGallery'
+import { getAffiliateMeta } from '../../data/affiliateMeta'
 
 const VAR_THRESHOLD = 3
 
@@ -152,6 +153,7 @@ export default function SupplyProductCard({ item, categoria, showEstudioBadge = 
   const esAfiliado = item.tipo === 'afiliado'
   const afiliadoUrl = item.url_checkout || item.url_ventas
   const plataformaLabel = PLATAFORMA_LABEL[item.plataforma] || item.plataforma || 'Afiliado'
+  const affiliateMeta = esAfiliado ? getAffiliateMeta(item) : null
 
   const handleAdd = () => {
     // stock (2026-09-16, Jose: "en el carrito, el stock aparece un segundo
@@ -247,7 +249,7 @@ export default function SupplyProductCard({ item, categoria, showEstudioBadge = 
         )}
       </div>
 
-      <div className="p-3 flex flex-col flex-1 gap-1.5 min-h-0">
+      <div className="p-2.5 sm:p-3 flex flex-col flex-1 gap-1.5 min-h-0 min-w-0">
         {/* Supply multitenant (fase 4, 2026-08-07) — insignia por card
             solo para productos de un estudio-vendedor. La insignia fija
             de categoría (Tommy/Warlock) sigue viviendo en
@@ -291,7 +293,27 @@ export default function SupplyProductCard({ item, categoria, showEstudioBadge = 
             producto) — deja espacio para nombres más largos/con más
             info sin dominar la card. Las demás categorías se quedan con
             el estilo de siempre. */}
-        <h3 className={light ? `text-[11px] font-medium leading-snug ${t.text}` : `text-xs font-black uppercase leading-tight ${t.text}`}>{item.name}</h3>
+        <h3 className={light ? `text-[11.5px] sm:text-xs font-semibold leading-snug [text-wrap:pretty] break-words ${t.text}` : `text-xs font-bold leading-snug [text-wrap:pretty] break-words ${t.text}`}>{item.name}</h3>
+        {affiliateMeta && (
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px]">
+            {affiliateMeta.rating && (
+              <span className={`inline-flex items-center gap-0.5 font-bold ${t.text}`}>
+                <Star size={10} className="text-amber-500 fill-amber-500" />
+                {affiliateMeta.rating}
+                {affiliateMeta.reviews && <span className={`font-normal ${t.textMuted}`}>({affiliateMeta.reviews})</span>}
+              </span>
+            )}
+            {affiliateMeta.temperatura && (
+              <span className="inline-flex items-center gap-0.5 font-bold text-orange-500">
+                <Flame size={10} className="text-orange-500 fill-orange-500" />
+                {affiliateMeta.temperatura}°
+              </span>
+            )}
+            {affiliateMeta.priceLabel && (
+              <span className={`${t.text} font-bold text-xs`}>{affiliateMeta.priceLabel}</span>
+            )}
+          </div>
+        )}
         {resolvedPrice && <p className={`${t.text} font-bold text-sm`}>{resolvedPrice}</p>}
         {totalStock <= 3 && totalStock > 0 && (
           <p className="text-yellow-500 text-[9px] font-bold">⚠️ Últimas {totalStock}</p>

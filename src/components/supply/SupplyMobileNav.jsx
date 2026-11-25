@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, Store, PlusCircle, GraduationCap, Globe, FileText, Shield, UserCircle, Package } from 'lucide-react'
 import CategoriesGridIcon from '../CategoriesGridIcon'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
@@ -21,6 +21,8 @@ import { leerMisCompras } from '../../lib/misCompras'
 // false para no tocar las demás categorías.
 export default function SupplyMobileNav({ active = null, light = false }) {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const isCategoriasPage = pathname === '/supply/categorias'
   const { count } = useSupplyCart()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -67,7 +69,7 @@ export default function SupplyMobileNav({ active = null, light = false }) {
           to="/supply/categorias"
           prefetch="viewport"
           onClick={(e) => {
-            if (active === 'categorias') {
+            if (isCategoriasPage) {
               e.preventDefault()
               if (window.history.length > 1) navigate(-1)
               else navigate('/supply')
@@ -75,7 +77,7 @@ export default function SupplyMobileNav({ active = null, light = false }) {
           }}
           className={`flex flex-col items-center gap-1 ${tab('categorias')}`}
         >
-          <CategoriesGridIcon open={active === 'categorias' && !drawerOpen && !menuOpen} size={19} />
+          <CategoriesGridIcon open={isCategoriasPage && !drawerOpen && !menuOpen} size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Categorías</span>
         </Link>
         <Link to="/" prefetch="viewport" aria-label="Ir al Ecosistema" className={`flex flex-col items-center gap-1 ${cartIconClass}`}>

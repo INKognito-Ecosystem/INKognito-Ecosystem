@@ -248,16 +248,14 @@ export default function SupleProductDetailPage() {
       {/* Medio de pago — solo si ESTE vendedor está conectado (proveedorMp):
           si no, el cobro real no pasa por Mercado Pago, mostrar el logo
           igual sería prometer algo que no aplica para este producto. */}
-      {proveedorMp && (
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-sm font-semibold mr-0.5" style={{ color: MP_BLUE }}>Medios de pago:</span>
-          {MEDIOS_PAGO_ICONS.map(({ alt, src, fill }) => (
-            <span key={alt} className="w-7 h-7 rounded-full bg-white border border-zinc-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-              <img src={src} alt={alt} className={fill ? 'w-full h-full object-cover' : 'w-5 h-5 object-contain'} onError={(e) => { e.currentTarget.parentElement.style.display = 'none' }} />
-            </span>
-          ))}
-        </div>
-      )}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <span className="text-sm font-semibold mr-0.5" style={{ color: MP_BLUE }}>Medios de pago:</span>
+        {MEDIOS_PAGO_ICONS.map(({ alt, src, fill }) => (
+          <span key={alt} className="w-7 h-7 rounded-full bg-white border border-zinc-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+            <img src={src} alt={alt} className={fill ? 'w-full h-full object-cover' : 'w-5 h-5 object-contain'} onError={(e) => { e.currentTarget.parentElement.style.display = 'none' }} />
+          </span>
+        ))}
+      </div>
       {!esAfiliado && (
         sinStock ? (
           <p className="text-red-500 text-xs font-bold uppercase tracking-wide">Agotado</p>

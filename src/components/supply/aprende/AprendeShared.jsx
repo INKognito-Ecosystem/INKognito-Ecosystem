@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
-import { ArrowRight, ExternalLink, BookOpen, Package, PlayCircle } from 'lucide-react'
+import { ArrowRight, ExternalLink, BookOpen, Package, PlayCircle, Star, Flame } from 'lucide-react'
 import NavbarCategory from '../NavbarCategory'
 import FooterSupply from '../FooterSupply'
 import SupplyMobileNav from '../SupplyMobileNav'
 import { APRENDE_ORDER } from '../../../data/aprendeOrder'
+import { getAffiliateMeta } from '../../../data/affiliateMeta'
 
 import CategoriaVaciaCard from '../../CategoriaVaciaCard'
 // Piezas compartidas por las 3 páginas de /supply/aprende/* (cursos, kit,
@@ -56,35 +57,70 @@ export function AfiliadoCard({ item, color, onShowDesc }) {
   // curso ya identifica al grupo completo.
   const esCurso = item.categoria === 'Cursos'
   const detailId = item.variantes?.[0]?.id
+  const meta = getAffiliateMeta(item)
+  const detailPath = detailId ? `/supply/producto/${detailId}` : null
+  const photoNode = item.image_url ? (
+    <div className="w-full aspect-square bg-white overflow-hidden flex-shrink-0">
+      <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+    </div>
+  ) : (
+    <div className="w-full aspect-square bg-white flex items-center justify-center flex-shrink-0">
+      {color === 'orange' && <BookOpen size={28} className="text-zinc-300" strokeWidth={1} />}
+      {color === 'blue'   && <Package size={28}  className="text-zinc-300" strokeWidth={1} />}
+      {color === 'green'  && <PlayCircle size={28} className="text-zinc-300" strokeWidth={1} />}
+    </div>
+  )
+
   const card = (
     // Translúcida con el acento propio de la sección, no oscura (2026-09-15,
     // mismo criterio que las cards de Educación de SupplyPage.jsx: border-
     // {color}-500/30 bg-{color}-500/5).
     <div className={`border border-${color}-500/30 bg-${color}-500/5 rounded-2xl overflow-hidden flex flex-col transition-all duration-300 ${borderHover}`}>
-      {/* Foto si existe */}
-      {item.image_url && (
-        <div className="w-full aspect-square bg-white overflow-hidden flex-shrink-0">
-          <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
-        </div>
-      )}
-      {/* Sin foto: icono placeholder */}
-      {!item.image_url && (
-        <div className="w-full aspect-square bg-white flex items-center justify-center flex-shrink-0">
-          {color === 'orange' && <BookOpen size={28} className="text-zinc-300" strokeWidth={1} />}
-          {color === 'blue'   && <Package size={28}  className="text-zinc-300" strokeWidth={1} />}
-          {color === 'green'  && <PlayCircle size={28} className="text-zinc-300" strokeWidth={1} />}
-        </div>
-      )}
+      {/* Foto — clic abre la landing del producto */}
+      {detailPath && item.categoria === 'Kit Externo' ? (
+        <Link to={detailPath} className="block flex-shrink-0">
+          {photoNode}
+        </Link>
+      ) : photoNode}
       {/* Info */}
-      <div className="p-4 flex flex-col gap-2 flex-1">
-        {/* Insignia de categoría quitada (2026-09-13, Jose: "esa palabra
-            arriba del título solo distingue en el panel, donde varias
-            categorías se mezclan en una tabla — acá cada página ya es una
-            sola categoría, repetirla en cada card es ruido") — el título
-            sube y la card queda más compacta con un elemento menos. */}
-        <h3 className="font-black uppercase text-xs tracking-[0.08em] text-zinc-900 leading-snug">
-          {item.name}
-        </h3>
+      <div className="p-2.5 sm:p-3 flex flex-col gap-1.5 flex-1 min-w-0">
+        {detailPath && item.categoria === 'Kit Externo' ? (
+          <Link to={detailPath} className="hover:text-blue-600 transition-colors">
+            <h3 className="text-[11.5px] sm:text-xs font-semibold text-zinc-900 leading-snug [text-wrap:pretty] break-words">
+              {item.name}
+            </h3>
+          </Link>
+        ) : (
+          <h3 className="text-[11.5px] sm:text-xs font-semibold text-zinc-900 leading-snug [text-wrap:pretty] break-words">
+            {item.name}
+          </h3>
+        )}
+        {/* Métricas reales de la plataforma (estrellas, reseñas, temperatura Hotmart, precio) */}
+        {meta && (
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px]">
+            {meta.rating && (
+              <span className="inline-flex items-center gap-0.5 font-bold text-zinc-800">
+                <Star size={11} className="text-amber-500 fill-amber-500" />
+                {meta.rating}
+                {meta.reviews && <span className="font-normal text-zinc-400">({meta.reviews})</span>}
+              </span>
+            )}
+            {meta.temperatura && (
+              <span className="inline-flex items-center gap-0.5 font-bold text-orange-600">
+                <Flame size={11} className="text-orange-500 fill-orange-500" />
+                {meta.temperatura}°
+              </span>
+            )}
+            {meta.priceLabel && (
+              <span className="font-black text-zinc-900">{meta.priceLabel}</span>
+            )}
+            {meta.shipping && (
+              <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+                {meta.shipping}
+              </span>
+            )}
+          </div>
+        )}
         {/* Descripción + "Ver descripción" quitados de la card de Cursos
             (2026-09-15, Jose: "cambiar la forma en que se muestra la info
             de las card de los cursos, para que no se alargue tanto") — ese
@@ -125,7 +161,7 @@ export function AfiliadoCard({ item, color, onShowDesc }) {
                 {item.url_ventas.includes('mercadolibre') || item.url_ventas.includes('meli') ? 'Mercado Libre →' : 'Amazon →'}
               </a>
             )}
-            {item.url_checkout && (
+            {item.url_checkout && item.url_checkout !== item.url_ventas && (
               <a href={item.url_checkout} target="_blank" rel="noopener noreferrer sponsored"
                 className="text-center text-[9px] font-bold uppercase tracking-widest border border-zinc-300 text-zinc-600 py-1.5 rounded-lg hover:border-zinc-400 hover:text-zinc-900 transition-all duration-300">
                 {item.url_checkout.includes('mercadolibre') || item.url_checkout.includes('meli') ? 'Mercado Libre →' : item.url_checkout.includes('amazon') || item.url_checkout.includes('amzn') ? 'Amazon →' : 'AliExpress →'}
@@ -162,15 +198,8 @@ export function AfiliadoCard({ item, color, onShowDesc }) {
   // como siempre. El botón "Ver descripción" ya hace
   // preventDefault+stopPropagation en su onClick de arriba, así que abrir
   // la hoja inferior no dispara además la navegación de este wrapper.
-  const wrapped = esCurso && detailId ? (
-    // Ficha ÚNICA de producto (2026-09-15, Jose: "si un x producto se
-    // muestra en destacados... debería poder abrir la page de ese
-    // producto, sea físico o afiliado, inclusive si estoy en una tienda")
-    // — antes cada curso tenía su propia ruta dedicada
-    // (/supply/aprende/cursos/:id, CursoDetailPage.jsx); ahora usa la MISMA
-    // ficha de SupplyProductDetailPage.jsx que ya abren Destacados y
-    // cualquier tienda, para no mantener dos fichas casi idénticas.
-    <Link to={`/supply/producto/${detailId}`} className="contents">
+  const wrapped = item.categoria !== 'Kit Externo' && detailPath ? (
+    <Link to={detailPath} className="contents">
       {card}
     </Link>
   ) : item.categoria !== 'Kit Externo' && url ? (
@@ -198,7 +227,7 @@ export function SeccionAfiliados({ id, label, titulo, subtitulo, items, color, c
   const [descItem, setDescItem] = useState(null)
   return (
     <>
-      <section id={id} className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-6 bg-white">
+      <section id={id} className="relative overflow-hidden pt-3 md:pt-6 pb-8 md:pb-12 px-4 sm:px-6 bg-white">
         <div className="absolute inset-0 opacity-[0.05]" style={DOT_PATTERN} />
         <div className="relative z-10 max-w-7xl mx-auto">
           {mostrarTitulo && (

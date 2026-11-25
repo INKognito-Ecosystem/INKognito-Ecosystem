@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, Globe, FileText, Shield, Store, PlusCircle, UserCircle, Package } from 'lucide-react'
 import CategoriesGridIcon from '../CategoriesGridIcon'
 import { useSupleCart } from '../../contexts/SupleCartContext'
@@ -22,6 +22,8 @@ import logoSuple from '../../assets/milogo/gym.webp'
 // grafito arriba del ícono; todas las pestañas son negras como en Supply).
 export default function SupleMobileNav({ active = null }) {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const isCategoriasPage = pathname === '/suplementos/categorias'
   const { count } = useSupleCart()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -52,7 +54,7 @@ export default function SupleMobileNav({ active = null }) {
           to="/suplementos/categorias"
           prefetch="viewport"
           onClick={(e) => {
-            if (active === 'categorias') {
+            if (isCategoriasPage) {
               e.preventDefault()
               if (window.history.length > 1) navigate(-1)
               else navigate('/suplementos')
@@ -61,7 +63,7 @@ export default function SupleMobileNav({ active = null }) {
           className="relative flex flex-col items-center gap-1 text-black"
         >
           {marca('categorias')}
-          <CategoriesGridIcon open={active === 'categorias' && !drawerOpen && !menuOpen} size={19} />
+          <CategoriesGridIcon open={isCategoriasPage && !drawerOpen && !menuOpen} size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Categorías</span>
         </Link>
         <Link to="/" prefetch="viewport" aria-label="Ir al Ecosistema" className="flex flex-col items-center gap-1 text-black">

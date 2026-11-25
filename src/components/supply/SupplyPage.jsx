@@ -51,10 +51,9 @@ export async function loader() {
   const [counts, imgs, productsInitial] = await Promise.all([
     fetchCatalogCounts('supply'),
     fetch(`${PANEL_URL}/api/visual/supply`).then(r => r.ok ? r.json() : {}).catch(() => ({})),
-    // Home móvil (MobileHomeSupply, 2026-09-14) — primera página del grid
-    // "Destacados", SSR igual que counts/imgs, mismo fetchCatalogPage de
-    // siempre (sin categoria = mezcla del módulo completo).
-    fetchCatalogPage('supply', { limit: 12 }),
+    // Home móvil (MobileHomeSupply) — SSR con 24 ítems para alimentar las
+    // 3 secciones separadas (Descubre nuestros aliados, Equípate bien, Cursos).
+    fetchCatalogPage('supply', { limit: 24 }),
   ])
   return { counts, imgs, productsInitial }
 }

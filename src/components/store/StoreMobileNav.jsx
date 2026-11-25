@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 import { Home, LayoutGrid, ShoppingCart, Menu as MenuIcon, Store, PlusCircle, UserCircle, Globe, FileText, Shield, Package } from 'lucide-react'
 import CategoriesGridIcon from '../CategoriesGridIcon'
 import { useStoreCart } from '../../contexts/StoreCartContext'
@@ -21,6 +21,8 @@ const GOLD = '#C9A84C'
 // active: 'inicio' | 'categorias' — qué pestaña queda resaltada.
 export default function StoreMobileNav({ active = null }) {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const isCategoriasPage = pathname === '/store/categorias'
   const { count } = useStoreCart()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -51,7 +53,7 @@ export default function StoreMobileNav({ active = null }) {
           to="/store/categorias"
           prefetch="viewport"
           onClick={(e) => {
-            if (active === 'categorias') {
+            if (isCategoriasPage) {
               e.preventDefault()
               if (window.history.length > 1) navigate(-1)
               else navigate('/store')
@@ -60,7 +62,7 @@ export default function StoreMobileNav({ active = null }) {
           className="flex flex-col items-center gap-1"
           style={{ color: tabColor('categorias') }}
         >
-          <CategoriesGridIcon open={active === 'categorias' && !drawerOpen && !menuOpen} size={19} />
+          <CategoriesGridIcon open={isCategoriasPage && !drawerOpen && !menuOpen} size={19} />
           <span className="text-[9px] font-bold uppercase tracking-wide">Categorías</span>
         </Link>
         <Link to="/" prefetch="viewport" aria-label="Ir al Ecosistema" className="flex flex-col items-center gap-1 text-black">
