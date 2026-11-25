@@ -721,7 +721,21 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
             </div>
           ) : (
             <div className={`transition-opacity duration-200 ${cargandoFiltro ? 'opacity-50' : 'opacity-100'}`}>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-6">
+              {/* Móvil: 2 columnas escalonadas tipo Mercado Libre */}
+              <div className="md:hidden flex gap-3 items-start px-4">
+                <div className="flex-1 min-w-0 flex flex-col gap-3">
+                  {items.filter((_, i) => i % 2 === 0).map(item => (
+                    <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={categoria} light={light} />
+                  ))}
+                </div>
+                <div className="flex-1 min-w-0 flex flex-col gap-3 pt-5">
+                  {items.filter((_, i) => i % 2 === 1).map(item => (
+                    <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={categoria} light={light} />
+                  ))}
+                </div>
+              </div>
+              {/* Desktop: grilla multi-columna */}
+              <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 px-6">
                 {items.map(item => (
                   <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={categoria} light={light} />
                 ))}

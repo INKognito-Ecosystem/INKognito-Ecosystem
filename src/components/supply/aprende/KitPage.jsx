@@ -16,7 +16,7 @@ export async function loader() {
 
 export function meta() {
   const title = 'Kit Recomendado para Tatuadores | INKognito Supply'
-  const description = 'Insumos básicos seleccionados en Amazon y AliExpress para empezar a tatuar con seriedad, sin sobrecostos.'
+  const description = 'Insumos y equipos recomendados en Amazon y Mercado Libre para empezar a tatuar con seriedad, sin sobrecostos.'
   return [
     { title },
     { name: 'description', content: description },
@@ -32,7 +32,7 @@ export default function KitPage() {
   return (
     <AprendePageShell
       slug="kit"
-      eyebrow="Amazon · AliExpress · Kit básico"
+      eyebrow="Amazon · Mercado Libre · Kit recomendado"
       titulo={<>El kit que respalda<br /><span className="text-zinc-500">tu práctica.</span></>}
       descripcion="Insumos seleccionados para trabajar con seriedad, sin sobrecostos."
     >

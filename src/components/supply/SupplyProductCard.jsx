@@ -265,9 +265,12 @@ export default function SupplyProductCard({ item, categoria, showEstudioBadge = 
             reales), para que no se confunda con inventario de INKognito. */}
         {esAfiliado && (
           <span className={`inline-flex items-center gap-1 w-fit text-[8px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${
-            light ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+            item.categoria === 'Cursos'
+              ? (light ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-amber-500/10 text-amber-400 border border-amber-500/30')
+              : (light ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-blue-500/10 text-blue-400 border border-blue-500/30')
           }`}>
-            <GraduationCap size={10} /> Curso {plataformaLabel}
+            {item.categoria === 'Cursos' ? <GraduationCap size={10} /> : <ExternalLink size={9} />}
+            {item.categoria === 'Cursos' ? `Curso ${plataformaLabel}` : plataformaLabel}
           </span>
         )}
         {showEstudioBadge && proveedorNombre && !light && (

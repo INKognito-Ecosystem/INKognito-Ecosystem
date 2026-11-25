@@ -150,16 +150,31 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
           las categorías pasa a azul"). Ya llega borde a borde sola (esta
           página no envuelve sus secciones en un contenedor con padding
           propio), sin necesitar el truco -mx/px de allá. */}
-      <div id="categorias-mobile" className="flex gap-5 overflow-x-auto px-4 py-3 bg-blue-500 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div id="categorias-mobile" className="flex items-center gap-5 overflow-x-auto px-4 py-3 bg-blue-500 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <span className={`flex-shrink-0 text-[13px] font-extrabold pb-1.5 border-b-2 whitespace-nowrap ${!resultados ? 'text-white border-white' : 'text-blue-100 border-transparent'}`}>
           Todos
         </span>
+        <Link
+          to="/supply/aprende/cursos"
+          prefetch="viewport"
+          className="flex-shrink-0 text-[13px] font-extrabold text-blue-100 hover:text-white pb-1.5 border-b-2 border-transparent whitespace-nowrap"
+        >
+          Cursos
+        </Link>
+        <Link
+          to="/supply/aprende/recursos"
+          prefetch="viewport"
+          className="flex-shrink-0 text-[13px] font-extrabold text-blue-100 hover:text-white pb-1.5 border-b-2 border-transparent whitespace-nowrap"
+        >
+          Recursos
+        </Link>
+        <span className="flex-shrink-0 w-px h-3.5 bg-white/30 mb-1.5" aria-hidden="true" />
         {categories.map(cat => (
           <Link
             key={cat.name}
             to={cat.path}
             prefetch="viewport"
-            className="flex-shrink-0 text-[13px] font-extrabold text-blue-100 pb-1.5 border-b-2 border-transparent whitespace-nowrap"
+            className="flex-shrink-0 text-[13px] font-extrabold text-blue-100 hover:text-white pb-1.5 border-b-2 border-transparent whitespace-nowrap"
           >
             {cat.name}
           </Link>
@@ -246,15 +261,17 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
         ) : gridItems.length === 0 ? (
           <p className="text-zinc-500 text-xs">Ningún producto coincide con tu búsqueda.</p>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
-            {/* light (2026-09-15, Jose: "la card del producto debe
-                mostrarse actualizada en la cantidad de información que
-                contiene") — esta grilla se había quedado con la card
-                vieja (con "Suministrado por...", nombre grande) mientras
-                el resto de Supply ya usa la versión nueva. */}
-            {gridItems.map(item => (
-              <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={item.categoria} light />
-            ))}
+          <div className="flex gap-3 items-start">
+            <div className="flex-1 min-w-0 flex flex-col gap-3">
+              {gridItems.filter((_, i) => i % 2 === 0).map(item => (
+                <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={item.categoria} light />
+              ))}
+            </div>
+            <div className="flex-1 min-w-0 flex flex-col gap-3 pt-5">
+              {gridItems.filter((_, i) => i % 2 === 1).map(item => (
+                <SupplyProductCard key={`${item.name}-${item.estudio_id ?? 'x'}`} item={item} categoria={item.categoria} light />
+              ))}
+            </div>
           </div>
         )}
         {!resultados && hasMore && (

@@ -120,15 +120,15 @@ export function AfiliadoCard({ item, color, onShowDesc }) {
         {item.categoria === 'Kit Externo' ? (
           <div className="flex flex-col gap-1.5 mt-auto pt-2">
             {item.url_ventas && (
-              <a href={item.url_ventas} target="_blank" rel="noopener noreferrer"
+              <a href={item.url_ventas} target="_blank" rel="noopener noreferrer sponsored"
                 className="text-center text-[9px] font-bold uppercase tracking-widest border border-zinc-300 text-zinc-600 py-1.5 rounded-lg hover:border-zinc-400 hover:text-zinc-900 transition-all duration-300">
-                Amazon →
+                {item.url_ventas.includes('mercadolibre') || item.url_ventas.includes('meli') ? 'Mercado Libre →' : 'Amazon →'}
               </a>
             )}
             {item.url_checkout && (
-              <a href={item.url_checkout} target="_blank" rel="noopener noreferrer"
+              <a href={item.url_checkout} target="_blank" rel="noopener noreferrer sponsored"
                 className="text-center text-[9px] font-bold uppercase tracking-widest border border-zinc-300 text-zinc-600 py-1.5 rounded-lg hover:border-zinc-400 hover:text-zinc-900 transition-all duration-300">
-                AliExpress →
+                {item.url_checkout.includes('mercadolibre') || item.url_checkout.includes('meli') ? 'Mercado Libre →' : item.url_checkout.includes('amazon') || item.url_checkout.includes('amzn') ? 'Amazon →' : 'AliExpress →'}
               </a>
             )}
           </div>
@@ -209,15 +209,27 @@ export function SeccionAfiliados({ id, label, titulo, subtitulo, items, color, c
             </div>
           )}
           {items.length > 0 ? (
-            // Grilla 2x2 en móvil, no scroll lateral (2026-09-15, Jose: "que
-            // también se muestren en filas y columnas de 2x2, no en scroll
-            // lateral como están ahora") — mismo patrón que la grilla de
-            // "Destacados" de MobileHomeSupply.jsx/SupplyCategoryPage.jsx.
-            <div className={`grid grid-cols-2 md:grid-cols-2 ${cols} gap-4`}>
-              {items.map((item, i) => (
-                <AfiliadoCard key={item.name + i} item={item} color={color} onShowDesc={setDescItem} />
-              ))}
-            </div>
+            <>
+              {/* Móvil: 2 columnas escalonadas tipo Mercado Libre (columna derecha desplazada) */}
+              <div className="md:hidden flex gap-3 items-start">
+                <div className="flex-1 min-w-0 flex flex-col gap-3">
+                  {items.filter((_, i) => i % 2 === 0).map((item, i) => (
+                    <AfiliadoCard key={`${item.name}-l-${i}`} item={item} color={color} onShowDesc={setDescItem} />
+                  ))}
+                </div>
+                <div className="flex-1 min-w-0 flex flex-col gap-3 pt-5">
+                  {items.filter((_, i) => i % 2 === 1).map((item, i) => (
+                    <AfiliadoCard key={`${item.name}-r-${i}`} item={item} color={color} onShowDesc={setDescItem} />
+                  ))}
+                </div>
+              </div>
+              {/* Desktop: grilla multi-columna */}
+              <div className={`hidden md:grid md:grid-cols-2 ${cols} gap-4`}>
+                {items.map((item, i) => (
+                  <AfiliadoCard key={item.name + i} item={item} color={color} onShowDesc={setDescItem} />
+                ))}
+              </div>
+            </>
           ) : (
             <CategoriaVaciaCard className="border border-zinc-200 bg-zinc-50" labelClassName="text-zinc-500" titleClassName="text-zinc-900" />
           )}
@@ -226,7 +238,7 @@ export function SeccionAfiliados({ id, label, titulo, subtitulo, items, color, c
 
       {descItem && (
         <div
-          className="fixed inset-0 z-50 bg-black/70 flex items-end justify-center"
+          className="fixed inset-0 z-[75] bg-black/70 flex items-end justify-center"
           onClick={() => setDescItem(null)}
         >
           <div
