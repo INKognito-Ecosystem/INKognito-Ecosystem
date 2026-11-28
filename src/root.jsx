@@ -6,6 +6,7 @@ import { SupplyCartProvider } from './contexts/SupplyCartContext'
 import { StoreCartProvider } from './contexts/StoreCartContext'
 import { GymCartProvider } from './contexts/GymCartContext'
 import { SupleCartProvider } from './contexts/SupleCartContext'
+import { InkFavoritosProvider } from './contexts/InkFavoritosContext'
 import './index.css'
 
 const ORGANIZATION_JSONLD = {
@@ -479,11 +480,13 @@ export default function Root() {
         <StoreCartProvider>
           <GymCartProvider>
             <SupleCartProvider>
-              <ScrollToHash />
-              <NavigationProgress />
-              <OfflineNotice />
-              <PageVisitTracker />
-              <Outlet />
+              <InkFavoritosProvider>
+                <ScrollToHash />
+                <NavigationProgress />
+                <OfflineNotice />
+                <PageVisitTracker />
+                <Outlet />
+              </InkFavoritosProvider>
             </SupleCartProvider>
           </GymCartProvider>
         </StoreCartProvider>

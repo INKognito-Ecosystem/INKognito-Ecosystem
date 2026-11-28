@@ -3,6 +3,7 @@ import { Link, useLoaderData, redirect } from 'react-router'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import { MapPin, Users, Building2, ShoppingBag, Award, Share2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
+import FavoritoButton from './FavoritoButton'
 import { idDesdeParam } from './artistaSlug'
 import { urlGoogleMaps } from './mapaUrl'
 import { cloudinaryFill } from '../../lib/cloudinary'
@@ -183,6 +184,20 @@ export default function EstudioLandingPage() {
               {estudio.foto_portada && <img src={cloudinaryFill(estudio.foto_portada, 700, 300)} alt="" className="w-full h-full object-cover" />}
               {/* Compartir (2026-09-22) — esquina superior derecha de la
                   portada, mismo círculo que ArtistaLandingPage.jsx. */}
+              <FavoritoButton
+                tipo="estudios"
+                item={{
+                  id: estudio.id,
+                  nombre: estudio.nombre,
+                  municipio: estudio.municipio,
+                  departamento: estudio.departamento,
+                  logo_url: estudio.logo_url || estudio.foto_portada || null,
+                  foto_portada: estudio.foto_portada || null,
+                  url: `/tattoo-artist-colombia/estudio/${estudio.id}`,
+                }}
+                size={16}
+                className="absolute top-3 right-14 z-10 w-9 h-9"
+              />
               <button
                 type="button"
                 onClick={handleShare}
@@ -324,7 +339,7 @@ export default function EstudioLandingPage() {
         </div>
       </div>
 
-      <footer className="border-t border-gray-200 py-6 px-4 mt-8">
+      <footer className="border-t border-gray-200 pt-6 pb-20 md:pb-6 px-4 mt-8">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-400 text-[12px] gap-3">
           <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Colombia — Todos los derechos reservados.</p>
           <div className="flex items-center gap-4">

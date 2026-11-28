@@ -1,6 +1,6 @@
 import { Link } from 'react-router'
 import { useState } from 'react'
-import { Menu, X, Search, Palette, Building2, UserPlus, UserCircle, FileText, Shield, Navigation, LoaderCircle, Store, Globe, GraduationCap } from 'lucide-react'
+import { Menu, X, Search, Palette, Building2, UserPlus, UserCircle, FileText, Shield, Navigation, LoaderCircle, Store, Globe, GraduationCap, Flame, CalendarRange, Heart } from 'lucide-react'
 // Recorte del logo genérico (assets/ecosystem/logo.png) sin el margen
 // transparente que trae de fábrica — ese margen hacía que se viera más
 // chico que los logos por módulo (supply.webp, etc.) aunque la caja
@@ -9,6 +9,7 @@ import inkognitoLogo from '../../assets/artistas-logo-mark.png'
 import AnimatedCityWordmark from './AnimatedCityWordmark'
 import LogoLupaIntro from './LogoLupaIntro'
 import LegalModal from '../legal/LegalModal'
+import InkMobileNav from './InkMobileNav'
 
 // Navbar propio del módulo (2026-08-03) — antes usaba el EcosystemNavbar
 // genérico (pensado para landings sueltas de producto), pero al pasar a
@@ -104,7 +105,7 @@ function MenuLink({ to, icon: Icon, onClick, children }) {
 // listón, mismo criterio opcional que el resto (onUbicacion ausente = no
 // se renderiza). El estado (ubicando, tooltip, etc.) sigue viviendo en la
 // page — acá solo se refleja, igual que categoria/onCategoriaChange.
-export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, searchValue = null, onSearchChange = null, searchPlaceholder = 'Buscar', categoria = null, onCategoriaChange = null, ubicando = false, onUbicacion = null, cercaDeTiActivo = false, tooltipUbicacion = false, onCerrarTooltipUbicacion = null }) {
+export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, searchValue = null, onSearchChange = null, searchPlaceholder = 'Buscar', categoria = null, onCategoriaChange = null, ubicando = false, onUbicacion = null, cercaDeTiActivo = false, tooltipUbicacion = false, onCerrarTooltipUbicacion = null, hideBottomNav = false }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const close = () => setMenuOpen(false)
   // legalOpen (2026-09-15, Jose: "el modal abre directo donde estoy...
@@ -316,13 +317,13 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
         role="dialog"
         aria-modal={menuOpen ? 'true' : undefined}
         aria-label="Menú de navegación"
-        className={`fixed inset-0 top-16 md:top-20 bg-white z-50 overflow-y-auto transition-transform duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${menuOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'}`}
+        className={`fixed inset-0 top-16 md:top-20 bg-white z-50 overflow-y-auto pb-[76px] md:pb-8 transition-transform duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${menuOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'}`}
       >
           {/* Jerarquía por secciones (2026-09-15) — antes era una lista
               plana sin agrupar; ahora sigue el mismo criterio que
               EcosystemNavbar.jsx: un eyebrow por tema, con íconos en cada
               link (mismo patrón que SupplyMobileNav.jsx). */}
-          <MenuSectionLabel>Buscar</MenuSectionLabel>
+          <MenuSectionLabel>Explorar</MenuSectionLabel>
           {/* Búsqueda sectorizada (fase 6.5, 2026-08-07, Jose: "por si solo
               quiero búsquedas de estudios, o tatuadores") — ambos links
               aterrizan directo en modo "cerca de mí" para su categoría
@@ -333,6 +334,15 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
           </MenuLink>
           <MenuLink to="/tattoo-artist-colombia?categoria=estudios" icon={Building2} onClick={close}>
             Buscar estudios
+          </MenuLink>
+          <MenuLink to="/tattoo-artist-colombia/novedades" icon={Flame} onClick={close}>
+            Novedades y eventos
+          </MenuLink>
+          <MenuLink to="/tattoo-artist-colombia/stands" icon={CalendarRange} onClick={close}>
+            Arriendo de stands
+          </MenuLink>
+          <MenuLink to="/tattoo-artist-colombia/favoritos" icon={Heart} onClick={close}>
+            Mis favoritos
           </MenuLink>
 
           <MenuDivider />
@@ -398,6 +408,14 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
             Privacidad
           </MenuLink>
         </div>
+
+      {!hideBottomNav && (
+        <InkMobileNav
+          menuOpen={menuOpen}
+          onToggleMenu={() => setMenuOpen(o => !o)}
+          onCloseMenu={close}
+        />
+      )}
 
       <LegalModal type={legalOpen} variant="artistas" onClose={() => setLegalOpen(null)} />
     </nav>

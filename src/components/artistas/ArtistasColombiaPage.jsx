@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router'
 import { Search, MapPin, Palette, BadgeCheck, ChevronRight, LoaderCircle, Share2, Sparkles, Check, Building2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
+import FavoritoButton from './FavoritoButton'
 import LegalModal from '../legal/LegalModal'
 import { municipioDesdeNombreIP, getCoordsMunicipio } from '../../data/colombiaGeo'
 import { useDirectorioBusqueda, fetchArtistasPage, RADIO_CERCA_KM, PAGE_SIZE } from '../../hooks/useDirectorio'
@@ -190,6 +191,20 @@ function ArtistaCercanoCard({ a, distanciaTexto, onVerInfo, full = false, sesion
             Nuevo artista
           </span>
         )}
+        <FavoritoButton
+          tipo="artistas"
+          item={{
+            id: a.id,
+            nombre: a.nombre,
+            municipio: a.municipio,
+            departamento: a.departamento,
+            estilo: a.estilo,
+            foto_url: a.foto_url || a.foto_trabajo_1 || null,
+            url: artistaUrl(a),
+          }}
+          size={14}
+          className="absolute top-2 right-2 z-10 w-7 h-7"
+        />
       </div>
       <div className="p-3">
         <div className="flex items-center gap-2 flex-nowrap">
@@ -256,6 +271,20 @@ function EstudioCercanoCard({ e, distanciaTexto, onVerInfo, full = false }) {
         <span className="absolute top-2 left-2 flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full text-white bg-gray-600">
           Estudio
         </span>
+        <FavoritoButton
+          tipo="estudios"
+          item={{
+            id: e.id,
+            nombre: e.nombre,
+            municipio: e.municipio,
+            departamento: e.departamento,
+            logo_url: e.logo_url || e.foto_portada || null,
+            foto_portada: e.foto_portada || null,
+            url: `/tattoo-artist-colombia/estudio/${e.id}`,
+          }}
+          size={14}
+          className="absolute top-2 right-2 z-10 w-7 h-7"
+        />
       </div>
       <div className="p-3">
         <div className="flex items-center gap-2 flex-nowrap">
@@ -838,6 +867,9 @@ export default function ArtistasColombiaPage() {
   const conteoVisible = categoria === 'artistas' ? filtrados.length : estudiosFiltrados.length + proveedoresFiltrados.length
   const hayMasVisible = categoria === 'artistas' ? hasMoreArtistas : hasMoreEstudios
   const hayResultadosVisible = conteoVisible > 0
+  const listaActiva = categoria === 'estudios' ? estudiosFiltrados : filtrados
+  const hayEnRadio = listaActiva.some(it => it.distancia_km != null && it.distancia_km <= RADIO_CERCA_KM)
+  const fueraDeRadio = cercaDeTiActivo && !cargando && conteoVisible > 0 && !hayEnRadio
 
   // Al iniciar la búsqueda (primera letra escrita) el teclado del celular
   // tapa las cards que aparecen debajo — scroll automático hacia el
@@ -1124,8 +1156,10 @@ export default function ArtistasColombiaPage() {
           {ubicacionError && (
             <p className="text-gray-400 text-xs mt-4 max-w-md mx-auto">{ubicacionError}</p>
           )}
-          {/* Sugerencia por geolocalización de IP (silenciosa, sin pedir
-              permiso) — solo aparece antes de que la persona busque algo. */}
+          {/* Sugerencia por geolocalización de IP/GPS — solo aparece antes
+              de que la persona busque algo. Si no hay artistas/estudios en
+              el radio cercano (50 km), el aviso vive justo debajo en esta
+              misma franja gris. */}
           {ciudadActiva && !query && (
             <button
               onClick={() => setQuery(ciudadActiva.municipio)}
@@ -1134,6 +1168,11 @@ export default function ArtistasColombiaPage() {
               <MapPin size={12} />
               ¿Buscas tatuadores en {ciudadActiva.municipio}?
             </button>
+          )}
+          {fueraDeRadio && (
+            <p className="text-[11px] font-semibold text-gray-700 mt-1.5 max-w-md mx-auto leading-snug">
+              Aún no hay {categoria === 'estudios' ? 'estudios' : 'artistas'} registrados en {ciudadActiva?.municipio || 'tu zona'} ({RADIO_CERCA_KM} km).
+            </p>
           )}
         </div>
       </section>
@@ -1148,32 +1187,22 @@ export default function ArtistasColombiaPage() {
             cerca de ti" (2026-09-17, Jose: "no resultados cerca de ti para
             los dos como está ahora") — en vez del genérico "resultados". */}
         {(hayBusqueda || cercaDeTiActivo) && (() => {
-          const listaActiva = categoria === 'estudios' ? estudiosFiltrados : filtrados
-          const hayEnRadio = listaActiva.some(it => it.distancia_km != null && it.distancia_km <= RADIO_CERCA_KM)
-          const fueraDeRadio = cercaDeTiActivo && !cargando && conteoVisible > 0 && !hayEnRadio
           const tipoPlural = categoria === 'estudios' ? (conteoVisible !== 1 ? 'estudios' : 'estudio') : (conteoVisible !== 1 ? 'artistas' : 'artista')
           return (
-            <div className="mb-4">
-              <p className={cercaDeTiActivo
-                ? 'flex items-center gap-1.5 text-gray-500 text-[10px] font-black uppercase tracking-widest'
-                : 'text-gray-400 text-xs uppercase tracking-widest'
-              }>
-                {cercaDeTiActivo ? (
-                  fueraDeRadio ? (
-                    <><MapPin size={12} className="flex-shrink-0 text-amber-600" />Aún no hay {categoria === 'estudios' ? 'estudios' : 'artistas'} registrados en {ciudadActiva?.municipio || 'tu zona'} ({RADIO_CERCA_KM} km)</>
-                  ) : (
-                    <><MapPin size={12} className="flex-shrink-0" />{conteoVisible}{hayMasVisible ? '+' : ''} {tipoPlural} cerca de ti{ciudadActiva?.municipio ? ` (${ciudadActiva.municipio})` : ''}</>
-                  )
+            <p className={cercaDeTiActivo
+              ? 'flex items-center gap-1.5 text-gray-500 text-[10px] font-black uppercase tracking-widest mt-4 mb-4'
+              : 'text-gray-400 text-xs uppercase tracking-widest mt-4 mb-4'
+            }>
+              {cercaDeTiActivo ? (
+                fueraDeRadio ? (
+                  <><MapPin size={12} className="flex-shrink-0" />Te mostramos los más cercanos disponibles en Colombia</>
                 ) : (
-                  <>{conteoVisible}{hayMasVisible ? '+' : ''} resultado{conteoVisible !== 1 ? 's' : ''} para <span className="text-gray-600">"{query}"</span></>
-                )}
-              </p>
-              {fueraDeRadio && (
-                <p className="text-gray-500 text-[11px] mt-1">
-                  Te mostramos los más cercanos disponibles en Colombia:
-                </p>
+                  <><MapPin size={12} className="flex-shrink-0" />{conteoVisible}{hayMasVisible ? '+' : ''} {tipoPlural} cerca de ti{ciudadActiva?.municipio ? ` (${ciudadActiva.municipio})` : ''}</>
+                )
+              ) : (
+                <>{conteoVisible}{hayMasVisible ? '+' : ''} resultado{conteoVisible !== 1 ? 's' : ''} para <span className="text-gray-600">"{query}"</span></>
               )}
-            </div>
+            </p>
           )
         })()}
 
@@ -1344,7 +1373,9 @@ export default function ArtistasColombiaPage() {
           <div className="mb-5">
             <p className="flex items-center gap-1.5 text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2 px-1">
               <MapPin size={12} />
-              Artistas cerca de ti
+              {cercaSesion.items.some(a => a.distancia_km != null && a.distancia_km <= RADIO_CERCA_KM)
+                ? 'Artistas cerca de ti'
+                : 'Artistas más cercanos en Colombia'}
             </p>
             <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {cercaSesion.items.map(a => {
@@ -1385,7 +1416,7 @@ export default function ArtistasColombiaPage() {
         )}
       </section>
 
-      <footer className="border-t border-gray-200 py-6 px-4">
+      <footer className="border-t border-gray-200 pt-6 pb-20 md:pb-6 px-4">
         <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-400 text-[12px] gap-3">
           <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Colombia — Todos los derechos reservados.</p>
           <div className="flex items-center gap-4">

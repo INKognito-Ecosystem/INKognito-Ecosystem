@@ -215,6 +215,9 @@ export default [
   // ni ningún navbar, adrede — ver plan "Directorio de artistas de tatuaje
   // en Urabá" (nombre original del plan).
   route('tattoo-artist-colombia', 'components/artistas/ArtistasColombiaPage.jsx'),
+  route('tattoo-artist-colombia/novedades', 'components/artistas/InkNovedadesPage.jsx'),
+  route('tattoo-artist-colombia/stands', 'components/artistas/InkStandsPage.jsx'),
+  route('tattoo-artist-colombia/favoritos', 'components/artistas/InkFavoritosPage.jsx'),
   route('tattoo-artist-colombia/unete', 'components/artistas/ArtistaRegistroPage.jsx'),
   // Verificación de correo + edición de perfil por token (2026-08-05) —
   // ver server.js (panel) para el flujo completo.

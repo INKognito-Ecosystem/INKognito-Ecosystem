@@ -3,8 +3,9 @@ import { Link, useLoaderData } from 'react-router'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle, Building2, Award, ClipboardList, Share2 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
+import FavoritoButton from './FavoritoButton'
 import { municipioDesdeNombreIP } from '../../data/colombiaGeo'
-import { idDesdeParam } from './artistaSlug'
+import { idDesdeParam, artistaUrl } from './artistaSlug'
 import { DISPONIBILIDAD_COLOR, DISPONIBILIDAD_TEXTO } from './disponibilidad'
 import { urlGoogleMaps } from './mapaUrl'
 import { cloudinaryFill, cloudinaryLimit } from '../../lib/cloudinary'
@@ -361,6 +362,20 @@ export default function ArtistaLandingPage() {
                   </button>
                 </>
               )}
+              <FavoritoButton
+                tipo="disenos"
+                item={{
+                  id: d.id,
+                  titulo: d.titulo || 'Diseño',
+                  tipo: d.tipo === 'lamina' ? 'lamina' : 'tatuaje',
+                  precio: d.precio,
+                  imagen: imagenes[0] || null,
+                  artistaNombre: artista.nombre,
+                  artistaUrl: artistaUrl(artista),
+                }}
+                size={12}
+                className="absolute top-1.5 left-1.5 z-10 w-6 h-6"
+              />
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); setDisenoLightboxId(d.id) }}
@@ -550,6 +565,20 @@ export default function ArtistaLandingPage() {
             {/* Compartir (2026-09-22) — esquina superior derecha de la
                 portada, mismo círculo oscuro translúcido que ya usa el
                 botón de secciones de "mi perfil editar" (esquina opuesta). */}
+            <FavoritoButton
+              tipo="artistas"
+              item={{
+                id: artista.id,
+                nombre: artista.nombre,
+                municipio: artista.municipio,
+                departamento: artista.departamento,
+                estilo: artista.estilo,
+                foto_url: artista.foto_url || artista.foto_trabajo_1 || null,
+                url: artistaUrl(artista),
+              }}
+              size={16}
+              className="absolute top-3 right-14 z-10 w-9 h-9"
+            />
             <button
               type="button"
               onClick={handleShare}
@@ -1133,7 +1162,7 @@ export default function ArtistaLandingPage() {
       {/* Enlaces legales (2026-08-06, Jose) — el módulo de artistas era el
           único sin enlace a /terminos ni /privacidad, aunque esas páginas
           ya existen y ahora /terminos cubre el directorio (sección 6). */}
-      <footer className="border-t border-gray-200 py-6 px-4 mt-8">
+      <footer className="border-t border-gray-200 pt-6 pb-20 md:pb-6 px-4 mt-8">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-400 text-[12px] gap-3">
           <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Colombia — Todos los derechos reservados.</p>
           <div className="flex items-center gap-4">
