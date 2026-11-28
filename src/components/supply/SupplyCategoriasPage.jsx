@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useLoaderData, Link, useNavigate } from 'react-router'
 import { Search, MapPin, SlidersHorizontal, Share2, ChevronRight } from 'lucide-react'
 import { categories, catKey } from './CategoriesSupply'
-import { CATEGORY_PRIORITY_IMG, matchProductsToSubcategories } from '../../data/supplySubcategories'
+import { CATEGORY_PRIORITY_IMG, getEffectiveSupplyCategory, matchProductsToSubcategories } from '../../data/supplySubcategories'
 import SupplyMobileNav from './SupplyMobileNav'
 import SupplyProductCard from './SupplyProductCard'
 import { fetchCatalogCounts, fetchCatalogPage } from '../../hooks/useCatalog'
@@ -16,12 +16,17 @@ const ORDEN_OPTIONS = [
 ]
 
 export async function loader() {
-  const [counts, inicialProductos, imgs] = await Promise.all([
+  const [counts, inicialProductos, kitExterno, imgs] = await Promise.all([
     fetchCatalogCounts('supply'),
     fetchCatalogPage('supply', { tipo: 'fisico', limit: 100 }),
+    fetchCatalogPage('supply', { tipo: 'afiliado', categoria: 'Kit Externo', limit: 100 }),
     fetch(`${PANEL_URL}/api/visual/supply`).then(r => r.ok ? r.json() : {}).catch(() => ({})),
   ])
-  return { counts, productosFisicos: inicialProductos.items || [], imgs }
+  const productosFisicos = [
+    ...(inicialProductos.items || []),
+    ...(kitExterno.items || []),
+  ]
+  return { counts, productosFisicos, imgs }
 }
 
 export function meta() {
@@ -146,7 +151,7 @@ export default function SupplyCategoriasPage() {
   )
 
   const activeProducts = useMemo(
-    () => productosFisicos.filter((p) => normaliza(p.categoria) === normaliza(activeCat)),
+    () => productosFisicos.filter((p) => normaliza(getEffectiveSupplyCategory(p)) === normaliza(activeCat)),
     [productosFisicos, activeCat]
   )
 

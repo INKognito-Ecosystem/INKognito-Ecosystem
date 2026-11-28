@@ -89,6 +89,30 @@ export function meta() {
 
 const CERCA_COORDS_KEY = 'kg_cerca_de_mi_coords'
 
+// Resuelve el municipio real de Colombia a partir de coordenadas GPS precisas
+// (evita que la IP de operadores móviles en Colombia marque siempre "Bogotá").
+async function resolverCiudadDesdeCoords(lat, lng) {
+  try {
+    const res = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lng)}&localityLanguage=es`,
+      { signal: AbortSignal.timeout(5000) }
+    )
+    if (!res.ok) return null
+    const data = await res.json()
+    const nombre = data.city || data.locality || data.principalSubdivision || ''
+    if (!nombre) return null
+    // Primero intenta empatar con el catálogo oficial DIVIPOLA de colombiaGeo.js
+    const match = municipioDesdeNombreIP(nombre)
+    if (match) return match
+    return {
+      municipio: nombre,
+      departamento: data.principalSubdivision || '',
+    }
+  } catch {
+    return null
+  }
+}
+
 const DIAS_ARTISTA_NUEVO = 14
 
 function esArtistaNuevo(createdAt) {
@@ -660,29 +684,68 @@ export default function ArtistasColombiaPage() {
   // artistas que "coinciden en municipio" con Bogotá pueden estar a 30km
   // de distancia entre sí, así que ordenar por distancia real importa más
   // que agruparlos como si fueran igual de cercanos.
+  const [ciudadActiva, setCiudadActiva] = useState(ciudadDetectada)
   const [misCoords, setMisCoords] = useState(() =>
     ciudadDetectada ? getCoordsMunicipio(ciudadDetectada.departamento, ciudadDetectada.municipio) : null
   )
   const listadoRef = useRef(null)
   const prevVacioRef = useRef(true)
 
-  // "Cerca de mí" recuerda la ubicación (2026-09-19, Jose: "si navego a otra
-  // page del ecosistema y vuelvo, o recargo la página, está deshabilitada
-  // nuevamente... no guarda la ubicación"). Al tocar el botón se guardan las
-  // coords en localStorage; acá se restauran al montar y se reactiva el modo.
-  // Va en un useEffect (no en el useState inicial) por la misma razón que los
-  // tooltips de arriba: el servidor no tiene localStorage y el HTML inicial
-  // debe coincidir para no romper la hidratación.
+  // Aplica coordenadas GPS frescas, resuelve el municipio real y persiste en localStorage.
+  const aplicarCoordsGPS = async (coords, { activarCerca = true } = {}) => {
+    setMisCoords(coords)
+    if (activarCerca) setCercaDeTiActivo(true)
+    const ciudadGps = await resolverCiudadDesdeCoords(coords.lat, coords.lng)
+    if (ciudadGps) setCiudadActiva(ciudadGps)
+    try {
+      localStorage.setItem(CERCA_COORDS_KEY, JSON.stringify({
+        lat: coords.lat,
+        lng: coords.lng,
+        ciudad: ciudadGps || null,
+        ts: Date.now(),
+      }))
+    } catch {}
+  }
+
+  // Restaura la última ubicación guardada Y, si el navegador ya tiene permiso
+  // de geolocalización concedido, refresca silenciosamente las coordenadas GPS
+  // reales en segundo plano (clave cuando el usuario se desplaza de ciudad,
+  // ej. de Chigorodó a Quimbaya).
   useEffect(() => {
+    let cancelado = false
     try {
       const guardado = JSON.parse(localStorage.getItem(CERCA_COORDS_KEY) || 'null')
       if (guardado && Number.isFinite(guardado.lat) && Number.isFinite(guardado.lng)) {
         setMisCoords({ lat: guardado.lat, lng: guardado.lng })
         setCercaDeTiActivo(true)
+        if (guardado.ciudad?.municipio) {
+          setCiudadActiva(guardado.ciudad)
+        } else {
+          resolverCiudadDesdeCoords(guardado.lat, guardado.lng).then((c) => {
+            if (!cancelado && c) setCiudadActiva(c)
+          })
+        }
       }
-    } catch {
-      // localStorage bloqueado o valor corrupto — se queda sin restaurar
+    } catch {}
+
+    if (typeof navigator !== 'undefined' && navigator.geolocation && navigator.permissions?.query) {
+      navigator.permissions.query({ name: 'geolocation' }).then((perm) => {
+        if (cancelado || perm.state !== 'granted') return
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            if (cancelado) return
+            aplicarCoordsGPS(
+              { lat: pos.coords.latitude, lng: pos.coords.longitude },
+              { activarCerca: true }
+            )
+          },
+          () => {},
+          { enableHighAccuracy: true, maximumAge: 60000, timeout: 10000 }
+        )
+      }).catch(() => {})
     }
+    return () => { cancelado = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Carrusel persistente "Cerca de ti" (2026-09-17, pedido de Jose: que los
@@ -802,19 +865,17 @@ export default function ArtistasColombiaPage() {
     }
     setUbicando(true)
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude }
-        setMisCoords(coords)
         setQuery('')
-        setCercaDeTiActivo(true)
+        await aplicarCoordsGPS(coords, { activarCerca: true })
         setUbicando(false)
-        try { localStorage.setItem(CERCA_COORDS_KEY, JSON.stringify(coords)) } catch {}
       },
       () => {
         setUbicacionError('No pudimos acceder a tu ubicación — actívala en el navegador o escribe tu municipio.')
         setUbicando(false)
       },
-      { timeout: 8000 }
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
     )
   }
 
@@ -852,7 +913,7 @@ export default function ArtistasColombiaPage() {
           solo los refleja), mismo criterio que el buscador de
           MobileHomeSupply.jsx. */}
       <NavbarArtistas
-        ciudadDetectada={ciudadDetectada}
+        ciudadDetectada={ciudadActiva}
         searchValue={query}
         onSearchChange={(v) => { setQuery(v); setCercaDeTiActivo(false) }}
         searchPlaceholder="Nombre, municipio o estilo..."
@@ -1065,13 +1126,13 @@ export default function ArtistasColombiaPage() {
           )}
           {/* Sugerencia por geolocalización de IP (silenciosa, sin pedir
               permiso) — solo aparece antes de que la persona busque algo. */}
-          {ciudadDetectada && !query && (
+          {ciudadActiva && !query && (
             <button
-              onClick={() => setQuery(ciudadDetectada.municipio)}
-              className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 transition-colors mt-3"
+              onClick={() => setQuery(ciudadActiva.municipio)}
+              className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 transition-colors mt-3"
             >
               <MapPin size={12} />
-              ¿Buscas tatuadores en {ciudadDetectada.municipio}?
+              ¿Buscas tatuadores en {ciudadActiva.municipio}?
             </button>
           )}
         </div>
@@ -1086,23 +1147,35 @@ export default function ArtistasColombiaPage() {
             específico por pestaña — "artistas cerca de ti" / "estudios
             cerca de ti" (2026-09-17, Jose: "no resultados cerca de ti para
             los dos como está ahora") — en vez del genérico "resultados". */}
-        {(hayBusqueda || cercaDeTiActivo) && (
-          <p className={cercaDeTiActivo
-            ? 'flex items-center gap-1.5 text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4'
-            : 'text-gray-400 text-xs uppercase tracking-widest mb-4'
-          }>
-            {/* Misma tipografía que el encabezado del carrusel "Artistas
-                cerca de ti" (2026-09-17, Jose: "cambia esa tipografía, usa
-                la que tiene el carrusel") — font-black + text-[10px] en vez
-                del text-xs normal que sigue usando la variante de búsqueda
-                por texto. */}
-            {cercaDeTiActivo ? (
-              <><MapPin size={12} className="flex-shrink-0" />{conteoVisible}{hayMasVisible ? '+' : ''} {categoria === 'estudios' ? (conteoVisible !== 1 ? 'estudios' : 'estudio') : (conteoVisible !== 1 ? 'artistas' : 'artista')} cerca de ti</>
-            ) : (
-              <>{conteoVisible}{hayMasVisible ? '+' : ''} resultado{conteoVisible !== 1 ? 's' : ''} para <span className="text-gray-600">"{query}"</span></>
-            )}
-          </p>
-        )}
+        {(hayBusqueda || cercaDeTiActivo) && (() => {
+          const listaActiva = categoria === 'estudios' ? estudiosFiltrados : filtrados
+          const hayEnRadio = listaActiva.some(it => it.distancia_km != null && it.distancia_km <= RADIO_CERCA_KM)
+          const fueraDeRadio = cercaDeTiActivo && !cargando && conteoVisible > 0 && !hayEnRadio
+          const tipoPlural = categoria === 'estudios' ? (conteoVisible !== 1 ? 'estudios' : 'estudio') : (conteoVisible !== 1 ? 'artistas' : 'artista')
+          return (
+            <div className="mb-4">
+              <p className={cercaDeTiActivo
+                ? 'flex items-center gap-1.5 text-gray-500 text-[10px] font-black uppercase tracking-widest'
+                : 'text-gray-400 text-xs uppercase tracking-widest'
+              }>
+                {cercaDeTiActivo ? (
+                  fueraDeRadio ? (
+                    <><MapPin size={12} className="flex-shrink-0 text-amber-600" />Aún no hay {categoria === 'estudios' ? 'estudios' : 'artistas'} registrados en {ciudadActiva?.municipio || 'tu zona'} ({RADIO_CERCA_KM} km)</>
+                  ) : (
+                    <><MapPin size={12} className="flex-shrink-0" />{conteoVisible}{hayMasVisible ? '+' : ''} {tipoPlural} cerca de ti{ciudadActiva?.municipio ? ` (${ciudadActiva.municipio})` : ''}</>
+                  )
+                ) : (
+                  <>{conteoVisible}{hayMasVisible ? '+' : ''} resultado{conteoVisible !== 1 ? 's' : ''} para <span className="text-gray-600">"{query}"</span></>
+                )}
+              </p>
+              {fueraDeRadio && (
+                <p className="text-gray-500 text-[11px] mt-1">
+                  Te mostramos los más cercanos disponibles en Colombia:
+                </p>
+              )}
+            </div>
+          )
+        })()}
 
         {/* PROVEEDORES OFICIALES (fase 6, 2026-08-07) — el producto real
             de "Distribuidor Oficial": aparecer frente a esta misma

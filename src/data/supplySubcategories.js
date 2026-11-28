@@ -360,6 +360,13 @@ export const SUPPLY_SUBCATEGORIES = {
       keywords: ['medusa', 'solidificador', 'liquid hard'],
     },
     {
+      id: 'cuidados-hustle-butter',
+      name: 'Hustle Butter',
+      image: 'https://m.media-amazon.com/images/I/71gwi21XOZL._SL1500_.jpg',
+      marcas: ['hustle-butter', 'hustle butter'],
+      keywords: ['hustle butter', 'hustle bubbles', 'cuidado posterior'],
+    },
+    {
       id: 'cuidados-neilmed',
       name: 'NeilMed',
       image: '/supply-assets/subcategorias/care_second_skin.webp',
@@ -620,8 +627,8 @@ export const SUPPLY_SUBCATEGORIES = {
       id: 'mobiliario-lampara-brazos',
       name: 'Lámparas Articuladas',
       image: '/supply-assets/subcategorias/mob_lampara_brazos.webp',
-      marcas: [],
-      keywords: ['lampara led', 'brazos', 'lupa', 'lampara de pie'],
+      marcas: ['daysoft'],
+      keywords: ['lampara led', 'lampara de pie', 'lampara para tatuajes', 'brazos', 'lupa', 'daysoft'],
     },
     {
       id: 'mobiliario-exhibidores',
@@ -677,6 +684,44 @@ export const SUPPLY_SUBCATEGORIES = {
       keywords: ['royal three', 'bioseguridad', 'k10', 'medusa'],
     },
   ],
+}
+
+/**
+ * Infiera la categoría física de Supply a la que pertenece un producto físico
+ * de afiliados (ej. Amazon / Mercado Libre guardado bajo "Kit Externo").
+ * Así aparece con stock real tanto en /supply/categorias como en su página de
+ * categoría (/supply/aftercare, /supply/furniture, /supply/accessories, etc.).
+ */
+const AFFILIATE_CATEGORY_RULES = [
+  { cat: 'Cuidados', keywords: ['hustle butter', 'cuidado posterior', 'aftercare', 'balsamo', 'jabon', 'second skin', 'dermalize', 'saniderm', 'crema', 'anestesia', 'mamacure', 'heaven pro'] },
+  { cat: 'Mobiliario', keywords: ['lampara led de pie', 'lampara de pie', 'lampara para tatuajes', 'camilla', 'apoyabrazos', 'reposabrazos', 'mesa auxiliar', 'bandeja rodante', 'estacion de trabajo', 'taburete', 'silla pony', 'exhibidor'] },
+  { cat: 'Accesorios', keywords: ['spirit', 'papel transferencia', 'hectografico', 'stencil', 'termocopiadora', 'piel sintetica', 'coban', 'piseta', 'ink caps', 'gafas', 'tattoo vision'] },
+  { cat: 'Guantes', keywords: ['guantes', 'nitrilo', 'latex', 'campos esteriles', 'dental bib', 'barrera'] },
+  { cat: 'Combos', keywords: ['kit completo', 'kit de tatuaje', 'combo principiante', 'kit principiante', 'set completo'] },
+  { cat: 'Máquinas', keywords: ['maquina de tatuar', 'maquina inalambrica', 'pen inalambrica', 'rotativa', 'bobina', 'fold2', 'filter x30', 'dragonhawk pen'] },
+  { cat: 'Cartuchos', keywords: ['cartucho', 'wjx', 'kwadron', 'da vinci', 'v-select', 'pixl'] },
+  { cat: 'Agujas', keywords: ['aguja', 'guardian', 'cortopunzante', 'sharps'] },
+  { cat: 'Tintas', keywords: ['tinta', 'pigmento', 'mixing solution', 'diluyente', 'dynamic', 'eternal', 'vice colors'] },
+  { cat: 'Fuentes', keywords: ['fuente de poder', 'bateria rca', 'pedal', 'cable rca', 'clip cord'] },
+]
+
+export function inferPhysicalCategoryForAffiliate(item) {
+  if (!item) return null
+  const hay = normaliza(`${item.name || ''} ${item.marca || ''} ${item.descripcion || ''}`)
+  for (const rule of AFFILIATE_CATEGORY_RULES) {
+    if (rule.keywords.some((kw) => hay.includes(kw))) {
+      return rule.cat
+    }
+  }
+  return 'Combos'
+}
+
+export function getEffectiveSupplyCategory(item) {
+  if (!item) return ''
+  if (item.tipo === 'afiliado' && normaliza(item.categoria) === 'kit externo') {
+    return inferPhysicalCategoryForAffiliate(item)
+  }
+  return item.categoria || ''
 }
 
 /**

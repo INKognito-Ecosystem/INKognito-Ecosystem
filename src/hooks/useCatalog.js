@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { inferPhysicalCategoryForAffiliate } from '../data/supplySubcategories'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 
@@ -83,13 +84,24 @@ export async function fetchCatalogCategoria(module, categoria, { limit = 12, ord
     // afiliados ni el filtro de proveedor (las 5 categorías de Suple) se
     // ahorran esas 2 llamadas al panel en cada navegación; con la base a
     // ~150 ms por consulta, cada llamada de más pesaba de verdad.
-    const [fisicos, afiliadosPage, providers] = await Promise.all([
+    const [fisicos, afiliadosPage, kitExternoPage, providers] = await Promise.all([
       fetchCatalogPage(module, { categoria, tipo: 'fisico', limit, orden, q }),
       soloFisicos ? { items: [] } : fetchCatalogPage(module, { categoria, tipo: 'afiliado', limit: 100 }),
+      !soloFisicos && module === 'supply'
+        ? fetchCatalogPage('supply', { categoria: 'Kit Externo', tipo: 'afiliado', limit: 100 })
+        : { items: [] },
       soloFisicos ? [] : fetchCatalogProviders(module, categoria),
     ])
+
+    // Productos físicos de afiliados (Amazon / Mercado Libre en "Kit Externo")
+    // se muestran dentro de su categoría física correspondiente (ej. lámpara en
+    // Mobiliario, Hustle Butter en Cuidados, Papel Spirit en Accesorios).
+    const afiliadosFisicosDeCategoria = (kitExternoPage.items || []).filter(
+      (item) => inferPhysicalCategoryForAffiliate(item) === categoria
+    )
+
     return {
-      products: fisicos.items,
+      products: [...fisicos.items, ...afiliadosFisicosDeCategoria],
       nextCursor: fisicos.nextCursor,
       hasMore: fisicos.hasMore,
       afiliados: afiliadosPage.items,

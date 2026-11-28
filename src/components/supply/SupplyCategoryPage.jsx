@@ -265,29 +265,54 @@ export default function SupplyCategoryPage({ title, categoria, slug, intro, guid
     return proveedoresOrdenados.filter(p => normaliza(p.nombre).includes(q) || normaliza(p.municipio).includes(q))
   }, [proveedoresOrdenados, provBusqueda])
 
-  // Cada cambio de búsqueda/orden/proveedor pide una página NUEVA al
-  // servidor (cursor reiniciado) — se salta en el primer render porque esa
-  // primera página ya llegó resuelta por el loader (SSR), no tiene sentido
-  // repetirla apenas monta. Búsqueda lleva debounce (300ms); orden/proveedor
-  // son selección directa, sin debounce.
-  const primerRender = useRef(true)
+  // Productos físicos de afiliados (Amazon/ML) que ya vinieron clasificados
+  // en esta categoría desde el loader — se conservan al ordenar o buscar
+  // (mientras no se filtre por un proveedor local específico).
+  const afiliadosFisicosIniciales = useMemo(
+    () => products.filter(p => p.tipo === 'afiliado'),
+    [products]
+  )
+
+  // Sincroniza cuando el usuario cambia de categoría (nueva prop `products`).
   useEffect(() => {
-    if (primerRender.current) { primerRender.current = false; return }
+    setItems(products)
+    setCursor(nextCursor)
+    setMasDisponible(hasMore)
+  }, [products, nextCursor, hasMore])
+
+  // Cada cambio REAL de búsqueda/orden/proveedor pide una página nueva al
+  // servidor. Comparar contra la clave de filtros previa (en vez de un boolean
+  // `primerRender`) evita que el doble-montaje de React Strict Mode en dev
+  // dispare un fetch innecesario que borraba los productos afiliados.
+  const prevFilterKey = useRef(`${orden}|${busqueda}|${provFiltro}`)
+  useEffect(() => {
+    const nextKey = `${orden}|${busqueda}|${provFiltro}`
+    if (prevFilterKey.current === nextKey) return
+    prevFilterKey.current = nextKey
+
     let activo = true
     setCargandoFiltro(true)
     const estudioId = provFiltro === 'todos' ? undefined : provFiltro
-    const demora = busqueda ? 300 : 0
+    const qTrim = busqueda.trim()
+    const demora = qTrim ? 300 : 0
     const timer = setTimeout(async () => {
-      const page = await fetchCatalogPage('supply', { categoria, tipo: 'fisico', limit: PAGE_SIZE, orden, q: busqueda.trim() || undefined, estudioId })
+      const page = await fetchCatalogPage('supply', { categoria, tipo: 'fisico', limit: PAGE_SIZE, orden, q: qTrim || undefined, estudioId })
       if (!activo) return
-      setItems(page.items)
+      const afiliadosFiltrados = provFiltro === 'todos'
+        ? afiliadosFisicosIniciales.filter(item => {
+            if (!qTrim) return true
+            const hay = normaliza(`${item.name || ''} ${item.marca || ''} ${item.descripcion || ''}`)
+            return hay.includes(normaliza(qTrim))
+          })
+        : []
+      setItems([...page.items, ...afiliadosFiltrados])
       setCursor(page.nextCursor)
       setMasDisponible(page.hasMore)
       setCargandoFiltro(false)
     }, demora)
     return () => { activo = false; clearTimeout(timer) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orden, busqueda, provFiltro])
+  }, [orden, busqueda, provFiltro, categoria, afiliadosFisicosIniciales])
 
   async function cargarMas() {
     if (!masDisponible || cargandoMas) return

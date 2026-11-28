@@ -22,7 +22,9 @@ const CACHE_BORDE = 'public, max-age=15, s-maxage=120, stale-while-revalidate=60
 const MODULOS = '(?:suplementos|supply|store|gym)'
 const RUTAS_PUBLICAS = [
   /^\/$/,
-  /^\/tattoo-artist-colombia$/,
+  // /tattoo-artist-colombia se excluye a propósito: su loader personaliza
+  // ciudadDetectada por IP (x-vercel-ip-city), así que cachearlo en borde
+  // serviría la ciudad de un visitante (ej. Bogotá) a usuarios en otras ciudades.
   new RegExp(`^/${MODULOS}$`),
   new RegExp(`^/${MODULOS}/categorias$`),
   new RegExp(`^/${MODULOS}/producto/[^/]+$`),
