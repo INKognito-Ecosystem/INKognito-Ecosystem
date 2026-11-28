@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData, useSearchParams, useNavigate } from 'react-router'
-import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarDays, CalendarCheck, ChevronLeft, ChevronRight, Banknote, ChevronDown, Upload } from 'lucide-react'
+import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarDays, CalendarCheck, ChevronLeft, ChevronRight, Banknote, ChevronDown, Upload, UserCircle, SlidersHorizontal, Flame } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
@@ -27,7 +27,9 @@ const MP_LOGO_URL = 'https://http2.mlstatic.com/frontend-assets/mp-web-navigatio
 
 // Pestañas de "Editar mi perfil" (2026-08-19) — ver EditarPerfilTabs.jsx.
 const TABS_ARTISTA = [
-  { key: 'perfil', label: 'Mi perfil', icon: MapPin },
+  { key: 'perfil', label: 'Mi perfil', icon: UserCircle },
+  { key: 'ubicacion', label: 'Ubicación y negocio', icon: MapPin },
+  { key: 'parametros', label: 'Parámetros de servicio', icon: SlidersHorizontal },
   { key: 'disenos', label: 'Mis diseños', icon: Palette },
   { key: 'agenda', label: 'Reservas y agenda', icon: CalendarCheck },
 ]
@@ -1682,111 +1684,154 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
         )}
       </div>
 
-      {/* Resto de "Mi perfil" — ubicación/no tatúa/precio/disponibilidad,
-          antes vivía en un solo formulario largo compartido con "Reservas
-          con anticipo"; ahora cada pestaña guarda por su cuenta, mismo
-          estado `form` de siempre así que no se pierde nada al cambiar de
-          pestaña. */}
-      {/* Divisor estructural (2026-09-13, Jose: "la sección de edición
-          inferior debe estar claramente delimitada... con un título
-          funcional") — separa la vista previa (edición in situ de
-          arriba) de este formulario propiamente dicho, con cambio de
-          fondo + borde, no solo espacio en blanco. */}
-      <div className="px-4 lg:px-0 mt-10 pt-6 border-t border-gray-200 bg-gray-50/60">
-        <p className="text-gray-400 text-[11px] font-black uppercase tracking-widest text-center mb-5">Configuración de ubicación y parámetros</p>
-      </div>
-      <div className="px-4 lg:px-0">
-      <form onSubmit={guardar} className="space-y-4">
-        {/* Bloques con encabezado propio (2026-09-13, Jose: "dividir los
-            campos de edición en bloques... Ubicación y Negocio /
-            Parámetros de Servicio") — mismo tratamiento de tarjeta que ya
-            usan Mi horario/Mi agenda/Depósito de reserva, no un accordion
-            nuevo: la página ya tiene su propio nivel de pestañas (Mi
-            perfil/Mis diseños/Reservas y agenda), anidar otro mecanismo de
-            colapsar adentro sumaría una capa de interacción sin necesidad
-            — el mismo objetivo (que no se lea como un formulario largo
-            sin cortes) ya queda resuelto con encabezado + tarjeta. */}
-        <div className={`${cardClass} space-y-4`}>
-          <h2 className={cardTitleClass}>Ubicación y negocio</h2>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={labelClass}>Departamento *</label>
-              <ComboboxBuscable value={form.departamento} onChange={setDepartamento} options={DEPARTAMENTOS} placeholder="Escribe para buscar..." inputClassName={inputClass} />
-            </div>
-            <div>
-              <label className={labelClass}>Municipio *</label>
-              <ComboboxBuscable value={form.municipio} onChange={setMunicipio} options={municipiosDisponibles} disabled={!form.departamento} placeholder="Escribe para buscar..." inputClassName={inputClass} />
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className={labelClass}>Posicionamiento por cercanía</label>
-              {form.lat && <span className="text-[10px] font-bold text-green-600">🟢 Activado</span>}
-            </div>
+      {/* Botón compacto para guardar ediciones in situ del perfil + acceso
+          directo a Comunidad INK (las cards de Ubicación y Parámetros ahora
+          viven dentro del menú ☰ de la portada para dejar esta zona libre). */}
+      <div className="px-4 lg:px-0 mt-5 max-w-3xl mx-auto lg:mx-0 space-y-3">
+        {editandoHero && (
+          <form onSubmit={guardar}>
+            {error && <p className="text-sm mb-2" style={{ color: ACCENT }}>{error}</p>}
             <button
-              type="button"
-              onClick={usarMiUbicacion}
-              disabled={ubicando}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60 bg-white"
-              style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: '#4B5563', color: '#4B5563' }}
+              type="submit"
+              disabled={guardando}
+              className="w-full py-3 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-xs"
+              style={{ backgroundColor: BTN }}
             >
-              {ubicando ? <LoaderCircle size={14} className="animate-spin" /> : form.lat ? <Check size={14} /> : <Navigation size={14} />}
-              {ubicando ? 'Ubicando...' : form.lat ? 'Actualizar ubicación' : 'Activar mi ubicación'}
+              {guardando ? 'Guardando...' : guardado ? '✓ Guardado' : 'Guardar cambios del perfil'}
             </button>
-            <p className="text-gray-400 text-[10px] mt-1.5 text-center">Actívala estando físicamente en el punto exacto que quieres mostrar — prioriza tu perfil en búsquedas locales.</p>
-          </div>
+          </form>
+        )}
 
-          <div>
-            <label className={labelClass}>Enlace a Google Maps</label>
-            <input className={inputClass} value={form.google_maps_url} onChange={set('google_maps_url')} placeholder="https://maps.app.goo.gl/..." />
-            <p className="text-gray-400 text-[10px] mt-1">Redirige al cliente a la ficha oficial de tu estudio.</p>
-          </div>
-        </div>
-
-        <div className={`${cardClass} space-y-4`}>
-          <h2 className={cardTitleClass}>Parámetros de servicio</h2>
-          <div>
-            <label className={labelClass}>Restricciones de servicio</label>
-            <input className={inputClass} value={form.no_tatua} onChange={set('no_tatua')} placeholder="Zonas o tipos de trabajo no realizados." />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={labelClass}>Rango tarifario</label>
-              <ComboboxBuscable
-                value={form.precio_nivel}
-                onChange={(v) => setForm((f) => ({ ...f, precio_nivel: v }))}
-                options={['', 1, 2, 3, 4]}
-                labelFor={(v) => (v === '' ? 'Sin elegir' : PRECIO_LABELS[v])}
-                placeholder="Sin elegir"
-                inputClassName={inputClass}
-              />
-            </div>
-            <div>
-              <label className={labelClass}>Estado de agenda</label>
-              <ComboboxBuscable
-                value={form.disponibilidad}
-                onChange={(v) => setForm((f) => ({ ...f, disponibilidad: v }))}
-                options={OPCIONES_DISPONIBILIDAD}
-                placeholder="Elige..."
-                inputClassName={inputClass}
-              />
-            </div>
-          </div>
-        </div>
-
-        {error && <p className="text-sm" style={{ color: ACCENT }}>{error}</p>}
-        <button
-          type="submit"
-          disabled={guardando}
-          className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
-          style={{ backgroundColor: BTN }}
+        <Link
+          to="/tattoo-artist-colombia/novedades"
+          className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100/80 px-4 py-3.5 transition-colors"
         >
-          {guardando ? 'Guardando...' : guardado ? '✓ Guardado' : 'Guardar cambios'}
-        </button>
-      </form>
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-full bg-stone-800 text-white flex items-center justify-center flex-shrink-0">
+              <Flame size={16} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-black uppercase text-gray-900 leading-tight">Participa en Comunidad INK</p>
+              <p className="text-[11px] text-gray-500 mt-0.5 truncate">Publica novedades, da like y comenta con tu perfil verificado</p>
+            </div>
+          </div>
+          <ChevronRight size={16} className="text-gray-400 flex-shrink-0" />
+        </Link>
       </div>
+      </div>
+      </div>
+
+      {/* Pestaña "Ubicación y negocio" — movida desde el fondo de "Mi perfil"
+          al menú ☰ de la portada para mantener el perfil limpio y ligero. */}
+      <div className={activeTab === 'ubicacion' ? 'block' : 'hidden'}>
+      <div className="px-4 lg:px-0 lg:max-w-3xl">
+        <div className="lg:hidden pt-3 mb-3 flex items-center gap-2.5">
+          <BotonMenuSecciones className="bg-gray-100 text-gray-700 hover:bg-gray-200" />
+          <p className="text-xs font-black uppercase tracking-widest text-gray-700">Ubicación y negocio</p>
+        </div>
+        <form onSubmit={guardar} className="space-y-4">
+          <div className={`${cardClass} space-y-4`}>
+            <h2 className={cardTitleClass}>Ubicación y negocio</h2>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={labelClass}>Departamento *</label>
+                <ComboboxBuscable value={form.departamento} onChange={setDepartamento} options={DEPARTAMENTOS} placeholder="Escribe para buscar..." inputClassName={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Municipio *</label>
+                <ComboboxBuscable value={form.municipio} onChange={setMunicipio} options={municipiosDisponibles} disabled={!form.departamento} placeholder="Escribe para buscar..." inputClassName={inputClass} />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className={labelClass}>Posicionamiento por cercanía</label>
+                {form.lat && <span className="text-[10px] font-bold text-green-600">🟢 Activado</span>}
+              </div>
+              <button
+                type="button"
+                onClick={usarMiUbicacion}
+                disabled={ubicando}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border text-xs font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-60 bg-white"
+                style={form.lat ? { borderColor: '#16a34a', color: '#16a34a' } : { borderColor: '#4B5563', color: '#4B5563' }}
+              >
+                {ubicando ? <LoaderCircle size={14} className="animate-spin" /> : form.lat ? <Check size={14} /> : <Navigation size={14} />}
+                {ubicando ? 'Ubicando...' : form.lat ? 'Actualizar ubicación' : 'Activar mi ubicación'}
+              </button>
+              <p className="text-gray-400 text-[10px] mt-1.5 text-center">Actívala estando físicamente en el punto exacto que quieres mostrar — prioriza tu perfil en búsquedas locales.</p>
+            </div>
+
+            <div>
+              <label className={labelClass}>Enlace a Google Maps</label>
+              <input className={inputClass} value={form.google_maps_url} onChange={set('google_maps_url')} placeholder="https://maps.app.goo.gl/..." />
+              <p className="text-gray-400 text-[10px] mt-1">Redirige al cliente a la ficha oficial de tu estudio.</p>
+            </div>
+          </div>
+
+          {error && <p className="text-sm" style={{ color: ACCENT }}>{error}</p>}
+          <button
+            type="submit"
+            disabled={guardando}
+            className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
+            style={{ backgroundColor: BTN }}
+          >
+            {guardando ? 'Guardando...' : guardado ? '✓ Guardado' : 'Guardar cambios'}
+          </button>
+        </form>
+      </div>
+      </div>
+
+      {/* Pestaña "Parámetros de servicio" — movida desde el fondo de "Mi perfil"
+          al menú ☰ de la portada. */}
+      <div className={activeTab === 'parametros' ? 'block' : 'hidden'}>
+      <div className="px-4 lg:px-0 lg:max-w-3xl">
+        <div className="lg:hidden pt-3 mb-3 flex items-center gap-2.5">
+          <BotonMenuSecciones className="bg-gray-100 text-gray-700 hover:bg-gray-200" />
+          <p className="text-xs font-black uppercase tracking-widest text-gray-700">Parámetros de servicio</p>
+        </div>
+        <form onSubmit={guardar} className="space-y-4">
+          <div className={`${cardClass} space-y-4`}>
+            <h2 className={cardTitleClass}>Parámetros de servicio</h2>
+            <div>
+              <label className={labelClass}>Restricciones de servicio</label>
+              <input className={inputClass} value={form.no_tatua} onChange={set('no_tatua')} placeholder="Zonas o tipos de trabajo no realizados." />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={labelClass}>Rango tarifario</label>
+                <ComboboxBuscable
+                  value={form.precio_nivel}
+                  onChange={(v) => setForm((f) => ({ ...f, precio_nivel: v }))}
+                  options={['', 1, 2, 3, 4]}
+                  labelFor={(v) => (v === '' ? 'Sin elegir' : PRECIO_LABELS[v])}
+                  placeholder="Sin elegir"
+                  inputClassName={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Estado de agenda</label>
+                <ComboboxBuscable
+                  value={form.disponibilidad}
+                  onChange={(v) => setForm((f) => ({ ...f, disponibilidad: v }))}
+                  options={OPCIONES_DISPONIBILIDAD}
+                  placeholder="Elige..."
+                  inputClassName={inputClass}
+                />
+              </div>
+            </div>
+          </div>
+
+          {error && <p className="text-sm" style={{ color: ACCENT }}>{error}</p>}
+          <button
+            type="submit"
+            disabled={guardando}
+            className="w-full py-3.5 text-white font-black uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
+            style={{ backgroundColor: BTN }}
+          >
+            {guardando ? 'Guardando...' : guardado ? '✓ Guardado' : 'Guardar cambios'}
+          </button>
+        </form>
       </div>
       </div>
 
@@ -1984,7 +2029,7 @@ export default function ArtistaEditarPerfilPage() {
           <FormularioEdicion token={token} artista={artista} cloud_name={cloud_name} upload_preset={upload_preset} horarioInicial={horario} reservasInicial={reservas} />
         )}
       </div>
-      <footer className="border-t border-gray-200 py-6 px-4">
+      <footer className="border-t border-gray-200 pt-6 pb-20 md:pb-6 px-4">
         <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:justify-between items-center text-gray-400 text-[12px] gap-3">
           <p className="text-[9.5px] sm:text-[12px] whitespace-nowrap">© {new Date().getFullYear()} Tattoo Artist Colombia — Todos los derechos reservados.</p>
           <div className="flex items-center gap-4">

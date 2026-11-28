@@ -6,7 +6,7 @@ const ACCENT = '#B3202F'
 
 export default function InkMobileNav({ menuOpen = false, onToggleMenu, onCloseMenu }) {
   const { pathname } = useLocation()
-  const { totalCount } = useInkFavoritos()
+  const { unseenCount } = useInkFavoritos()
 
   const active =
     pathname === '/tattoo-artist-colombia'
@@ -71,12 +71,12 @@ export default function InkMobileNav({ menuOpen = false, onToggleMenu, onCloseMe
       >
         {marca('favoritos')}
         <Heart size={19} />
-        {totalCount > 0 && (
+        {unseenCount > 0 && (
           <span
             className="absolute -top-1 right-2 min-w-[14px] h-[14px] px-1 rounded-full text-white text-[8px] font-black flex items-center justify-center leading-none"
             style={{ backgroundColor: ACCENT }}
           >
-            {totalCount > 9 ? '9+' : totalCount}
+            {unseenCount > 9 ? '9+' : unseenCount}
           </span>
         )}
         <span className="text-[9px] font-bold uppercase tracking-wide">Favoritos</span>

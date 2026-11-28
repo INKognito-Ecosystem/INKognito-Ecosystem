@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
 
 const STORAGE_KEY = 'kg_favoritos_v1'
+const UNSEEN_KEY = 'kg_favoritos_unseen_v1'
 const EMPTY = { artistas: [], estudios: [], disenos: [], stands: [] }
 
 const InkFavoritosContext = createContext(null)
@@ -12,6 +13,7 @@ function sanitizarLista(arr) {
 
 export function InkFavoritosProvider({ children }) {
   const [favoritos, setFavoritos] = useState(EMPTY)
+  const [unseenCount, setUnseenCount] = useState(0)
   const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
@@ -26,6 +28,8 @@ export function InkFavoritosProvider({ children }) {
           stands: sanitizarLista(parsed?.stands),
         })
       }
+      const unseenRaw = parseInt(localStorage.getItem(UNSEEN_KEY) || '0', 10)
+      if (Number.isFinite(unseenRaw) && unseenRaw > 0) setUnseenCount(unseenRaw)
     } catch {
       // localStorage bloqueado o corrupto — arranca vacío sin romper SSR
     }
@@ -36,8 +40,9 @@ export function InkFavoritosProvider({ children }) {
     if (!hydrated) return
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(favoritos))
+      localStorage.setItem(UNSEEN_KEY, String(unseenCount))
     } catch {}
-  }, [favoritos, hydrated])
+  }, [favoritos, unseenCount, hydrated])
 
   const esFavorito = useCallback((tipo, id) => {
     if (!tipo || id == null) return false
@@ -54,6 +59,7 @@ export function InkFavoritosProvider({ children }) {
       const siguiente = existe
         ? lista.filter(it => String(it.id) !== String(item.id))
         : [{ ...item, savedAt: Date.now() }, ...lista]
+      setUnseenCount(u => (existe ? Math.max(0, u - 1) : u + 1))
       return { ...prev, [tipo]: siguiente }
     })
   }, [])
@@ -64,6 +70,11 @@ export function InkFavoritosProvider({ children }) {
       ...prev,
       [tipo]: (prev[tipo] || []).filter(it => String(it.id) !== String(id)),
     }))
+    setUnseenCount(u => Math.max(0, u - 1))
+  }, [])
+
+  const marcarFavoritosVistos = useCallback(() => {
+    setUnseenCount(0)
   }, [])
 
   const totalCount = useMemo(
@@ -72,8 +83,8 @@ export function InkFavoritosProvider({ children }) {
   )
 
   const value = useMemo(
-    () => ({ favoritos, hydrated, totalCount, esFavorito, toggleFavorito, quitarFavorito }),
-    [favoritos, hydrated, totalCount, esFavorito, toggleFavorito, quitarFavorito]
+    () => ({ favoritos, hydrated, totalCount, unseenCount, esFavorito, toggleFavorito, quitarFavorito, marcarFavoritosVistos }),
+    [favoritos, hydrated, totalCount, unseenCount, esFavorito, toggleFavorito, quitarFavorito, marcarFavoritosVistos]
   )
 
   return (
@@ -90,9 +101,11 @@ export function useInkFavoritos() {
       favoritos: EMPTY,
       hydrated: false,
       totalCount: 0,
+      unseenCount: 0,
       esFavorito: () => false,
       toggleFavorito: () => {},
       quitarFavorito: () => {},
+      marcarFavoritosVistos: () => {},
     }
   }
   return ctx

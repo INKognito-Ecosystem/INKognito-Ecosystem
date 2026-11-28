@@ -1,6 +1,6 @@
 import { Link } from 'react-router'
 import { useState } from 'react'
-import { Menu, X, Search, Palette, Building2, UserPlus, UserCircle, FileText, Shield, Navigation, LoaderCircle, Store, Globe, GraduationCap, Flame, CalendarRange, Heart } from 'lucide-react'
+import { Menu, X, Search, Palette, Building2, UserPlus, UserCircle, FileText, Shield, Navigation, LoaderCircle, Store, Globe, GraduationCap, Flame, CalendarRange, Heart, Share2 } from 'lucide-react'
 // Recorte del logo genérico (assets/ecosystem/logo.png) sin el margen
 // transparente que trae de fábrica — ese margen hacía que se viera más
 // chico que los logos por módulo (supply.webp, etc.) aunque la caja
@@ -111,6 +111,21 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
   // legalOpen (2026-09-15, Jose: "el modal abre directo donde estoy...
   // blanco... ocupa toda la pantalla" — mismo patrón que EcosystemNavbar.jsx).
   const [legalOpen, setLegalOpen] = useState(null)
+  const [shareToast, setShareToast] = useState(null)
+
+  const handleCompartir = async () => {
+    const url = typeof window !== 'undefined' ? window.location.href : 'https://inkognito-ecosystem.com/tattoo-artist-colombia'
+    const title = typeof document !== 'undefined' ? document.title : 'Tattoo Artist Colombia — INK'
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try { await navigator.share({ title, url }) } catch {}
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(url)
+      setShareToast('Link copiado')
+      setTimeout(() => setShareToast(null), 2000)
+    } catch {}
+  }
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-gray-600 border-b border-gray-700">
@@ -180,26 +195,41 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
             </Link>
           )}
 
-          {/* Hamburguesa — vuelve al ícono normal de lucide-react
-              (2026-09-15, Jose: "que no tenga los colores amarillo azul y
-              rojo, si no que sea normal"). Antes usaba 3 barras propias
-              pintadas con los colores de la bandera de Colombia en el
-              estado cerrado; ahora el mismo gris claro que ya usaba la X
-              de cerrar, sin ningún color de acento. */}
-          <button
-            onClick={() => setMenuOpen(o => !o)}
-            aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
-            className="flex-shrink-0 flex items-center justify-center w-[22px] h-[22px]"
-          >
-            <span
-              className="inline-flex transition-transform duration-300 ease-in-out"
-              style={{ transform: menuOpen ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+          {/* En móvil el menú hamburguesa vive ahora en el navbar inferior
+              (InkMobileNav), así que en la esquina superior derecha queda el
+              botón de Compartir esta página. En desktop (donde no hay barra
+              inferior) se muestran Compartir + Menú hamburguesa. */}
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <button
+              type="button"
+              onClick={handleCompartir}
+              aria-label="Compartir esta página"
+              className="flex items-center justify-center w-8 h-8 rounded-full text-gray-200 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
             >
-              <Menu size={22} className="text-gray-300 hover:text-white transition-colors" />
-            </span>
-          </button>
+              <Share2 size={18} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setMenuOpen(o => !o)}
+              aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+              className="hidden md:flex flex-shrink-0 items-center justify-center w-[22px] h-[22px] cursor-pointer"
+            >
+              <span
+                className="inline-flex transition-transform duration-300 ease-in-out"
+                style={{ transform: menuOpen ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+              >
+                <Menu size={22} className="text-gray-300 hover:text-white transition-colors" />
+              </span>
+            </button>
+          </div>
         </div>
       </div>
+
+      {shareToast && (
+        <div className="fixed top-20 inset-x-0 z-[70] flex justify-center px-4 pointer-events-none">
+          <p className="bg-gray-900 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg">{shareToast}</p>
+        </div>
+      )}
 
       {/* LISTÓN GLASSMORPHISM — pegado debajo del navbar (2026-09-16, Jose:
           "dame las clases... para hacer que este listón sea suave y claro

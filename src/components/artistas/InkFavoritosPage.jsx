@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import { Heart, Palette, Building2, Image as ImageIcon, CalendarRange, MapPin, Trash2, ArrowRight } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
@@ -23,8 +23,12 @@ const TABS = [
 ]
 
 export default function InkFavoritosPage() {
-  const { favoritos, totalCount, quitarFavorito, hydrated } = useInkFavoritos()
+  const { favoritos, totalCount, quitarFavorito, hydrated, marcarFavoritosVistos } = useInkFavoritos()
   const [tab, setTab] = useState('todos')
+
+  useEffect(() => {
+    if (hydrated) marcarFavoritosVistos()
+  }, [hydrated, marcarFavoritosVistos])
 
   const mostrarArtistas = (tab === 'todos' || tab === 'artistas') && favoritos.artistas.length > 0
   const mostrarEstudios = (tab === 'todos' || tab === 'estudios') && favoritos.estudios.length > 0

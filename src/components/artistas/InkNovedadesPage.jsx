@@ -21,9 +21,9 @@ export function meta() {
 
 const FILTROS = [
   { key: 'todo', label: 'Todo' },
+  { key: 'comunidad', label: 'Comunidad' },
   { key: 'convencion', label: 'Convenciones' },
   { key: 'seminario', label: 'Seminarios' },
-  { key: 'comunidad', label: 'Comunidad' },
 ]
 
 function tiempoRelativo(iso) {
@@ -353,103 +353,10 @@ export default function InkNovedadesPage() {
           </div>
         )}
 
-        {/* BLOQUE 1: Eventos Oficiales / Patrocinados */}
-        {(filtro === 'todo' || filtro === 'convencion' || filtro === 'seminario') && (
-          <section className="mb-7">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 flex items-center gap-1.5">
-                <Award size={12} /> Eventos oficiales y aliados
-              </p>
-              <span className="text-[10px] font-bold uppercase tracking-wide text-gray-400">Convenciones · Seminarios</span>
-            </div>
-
-            {eventosOficiales.length > 0 && (
-              <div className="space-y-4 mb-4">
-                {eventosOficiales.map((ev) => (
-                  <article key={ev.id} className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm">
-                    {ev.imagen_url && (
-                      <div className="h-44 sm:h-56 bg-gray-100 overflow-hidden">
-                        <img src={cloudinaryLimit(ev.imagen_url, 900)} alt={ev.titulo || 'Evento'} className="w-full h-full object-cover" loading="lazy" />
-                      </div>
-                    )}
-                    <div className="p-4 sm:p-5">
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full text-white bg-stone-800">
-                          {etiquetaCategoria(ev.categoria)}
-                        </span>
-                        {ev.patrocinado && (
-                          <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full text-white" style={{ backgroundColor: ACCENT }}>
-                            Evento aliado
-                          </span>
-                        )}
-                        {ev.fecha_evento && (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-gray-500">
-                            <Calendar size={12} />
-                            {new Date(ev.fecha_evento).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })}
-                          </span>
-                        )}
-                        {ev.ciudad && (
-                          <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
-                            <MapPin size={12} /> {ev.ciudad}
-                          </span>
-                        )}
-                      </div>
-                      {ev.titulo && <h2 className="font-black uppercase text-base text-gray-900 leading-snug">{ev.titulo}</h2>}
-                      <p className="text-xs sm:text-sm text-gray-600 mt-1.5 leading-relaxed whitespace-pre-line">{ev.contenido}</p>
-                      {ev.url_externa && (
-                        <a
-                          href={ev.url_externa}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="mt-3.5 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-white text-[11px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
-                          style={{ backgroundColor: ACCENT }}
-                        >
-                          Más información / Boletas <ExternalLink size={12} />
-                        </a>
-                      )}
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-
-            {/* Banner comercial para organizadores */}
-            <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-stone-900 via-gray-900 to-black text-white p-5 sm:p-6">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center flex-shrink-0">
-                  <Megaphone size={18} className="text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <span className="inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-white/15 text-gray-200 mb-1.5">
-                    Alianzas y patrocinio
-                  </span>
-                  <h2 className="font-black uppercase text-sm sm:text-base leading-tight">
-                    ¿Organizas una convención, expo o seminario de tatuaje?
-                  </h2>
-                  <p className="text-xs text-gray-300 mt-1.5 leading-relaxed">
-                    Llega directo a tatuadores, estudios y clientes activos en toda Colombia. Ofrecemos difusión destacada, patrocinio oficial y alianzas de boletería.
-                  </p>
-                  <div className="mt-4">
-                    <a
-                      href={WHATSAPP_ALIANZAS}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-white text-[11px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
-                      style={{ backgroundColor: ACCENT }}
-                    >
-                      <Calendar size={13} />
-                      Promocionar mi evento
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* BLOQUE 2: Comunidad (Artistas y Estudios verificados) */}
+        {/* BLOQUE 1: Comunidad (Artistas y Estudios verificados) — primero
+            para que el feed vivo del gremio sea lo primero que se vea. */}
         {(filtro === 'todo' || filtro === 'comunidad') && (
-          <section>
+          <section className="mb-7">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 flex items-center gap-1.5">
                 <MessageCircle size={12} /> Comunidad INK
@@ -758,6 +665,100 @@ export default function InkNovedadesPage() {
                 )}
               </div>
             )}
+          </section>
+        )}
+
+        {/* BLOQUE 2: Eventos Oficiales / Patrocinados */}
+        {(filtro === 'todo' || filtro === 'convencion' || filtro === 'seminario') && (
+          <section>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 flex items-center gap-1.5">
+                <Award size={12} /> Eventos oficiales y aliados
+              </p>
+              <span className="text-[10px] font-bold uppercase tracking-wide text-gray-400">Convenciones · Seminarios</span>
+            </div>
+
+            {eventosOficiales.length > 0 && (
+              <div className="space-y-4 mb-4">
+                {eventosOficiales.map((ev) => (
+                  <article key={ev.id} className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+                    {ev.imagen_url && (
+                      <div className="h-44 sm:h-56 bg-gray-100 overflow-hidden">
+                        <img src={cloudinaryLimit(ev.imagen_url, 900)} alt={ev.titulo || 'Evento'} className="w-full h-full object-cover" loading="lazy" />
+                      </div>
+                    )}
+                    <div className="p-4 sm:p-5">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full text-white bg-stone-800">
+                          {etiquetaCategoria(ev.categoria)}
+                        </span>
+                        {ev.patrocinado && (
+                          <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full text-white" style={{ backgroundColor: ACCENT }}>
+                            Evento aliado
+                          </span>
+                        )}
+                        {ev.fecha_evento && (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-gray-500">
+                            <Calendar size={12} />
+                            {new Date(ev.fecha_evento).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })}
+                          </span>
+                        )}
+                        {ev.ciudad && (
+                          <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
+                            <MapPin size={12} /> {ev.ciudad}
+                          </span>
+                        )}
+                      </div>
+                      {ev.titulo && <h2 className="font-black uppercase text-base text-gray-900 leading-snug">{ev.titulo}</h2>}
+                      <p className="text-xs sm:text-sm text-gray-600 mt-1.5 leading-relaxed whitespace-pre-line">{ev.contenido}</p>
+                      {ev.url_externa && (
+                        <a
+                          href={ev.url_externa}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-3.5 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-white text-[11px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
+                          style={{ backgroundColor: ACCENT }}
+                        >
+                          Más información / Boletas <ExternalLink size={12} />
+                        </a>
+                      )}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+
+            {/* Banner comercial para organizadores */}
+            <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-stone-900 via-gray-900 to-black text-white p-5 sm:p-6">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center flex-shrink-0">
+                  <Megaphone size={18} className="text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-white/15 text-gray-200 mb-1.5">
+                    Alianzas y patrocinio
+                  </span>
+                  <h2 className="font-black uppercase text-sm sm:text-base leading-tight">
+                    ¿Organizas una convención, expo o seminario de tatuaje?
+                  </h2>
+                  <p className="text-xs text-gray-300 mt-1.5 leading-relaxed">
+                    Llega directo a tatuadores, estudios y clientes activos en toda Colombia. Ofrecemos difusión destacada, patrocinio oficial y alianzas de boletería.
+                  </p>
+                  <div className="mt-4">
+                    <a
+                      href={WHATSAPP_ALIANZAS}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-white text-[11px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
+                      style={{ backgroundColor: ACCENT }}
+                    >
+                      <Calendar size={13} />
+                      Promocionar mi evento
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
           </section>
         )}
       </main>

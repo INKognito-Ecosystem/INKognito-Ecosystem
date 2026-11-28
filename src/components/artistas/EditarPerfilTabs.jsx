@@ -72,7 +72,7 @@ export default function EditarPerfilTabs({ tabs, activeTab, onChange, children }
               <X size={20} />
             </button>
           </div>
-          <nav className="flex-1 overflow-y-auto py-2">
+          <nav className="flex-1 overflow-y-auto py-2 pb-[76px]">
             {tabs.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
