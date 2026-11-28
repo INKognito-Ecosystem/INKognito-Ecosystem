@@ -23,7 +23,7 @@ export default function InkStandsPage() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
-      <NavbarArtistas titulo="Stands en arriendo" />
+      <NavbarArtistas />
 
       <main className="flex-1 pt-20 md:pt-24 pb-10 px-4 md:px-6 max-w-3xl mx-auto w-full">
         {/* Cabecera */}

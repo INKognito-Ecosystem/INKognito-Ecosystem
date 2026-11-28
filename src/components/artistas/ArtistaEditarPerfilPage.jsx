@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData, useSearchParams, useNavigate } from 'react-router'
-import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarDays, CalendarCheck, ChevronLeft, ChevronRight, Banknote, ChevronDown, Upload, UserCircle, SlidersHorizontal, Flame } from 'lucide-react'
+import { Camera, LoaderCircle, Navigation, Check, Mail, Plus, Trash2, Wallet, ExternalLink, Pencil, X, CheckCircle2, MapPin, Palette, Clock, CalendarDays, CalendarCheck, ChevronLeft, ChevronRight, Banknote, ChevronDown, Upload, UserCircle, SlidersHorizontal, Flame, MessageSquareText } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import NavbarArtistas from './NavbarArtistas'
 import ComboboxBuscable from './ComboboxBuscable'
@@ -1702,21 +1702,39 @@ function FormularioEdicion({ token, artista, cloud_name, upload_preset, horarioI
           </form>
         )}
 
-        <Link
-          to="/tattoo-artist-colombia/novedades"
-          className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100/80 px-4 py-3.5 transition-colors"
-        >
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-full bg-stone-800 text-white flex items-center justify-center flex-shrink-0">
-              <Flame size={16} />
+        <div className="grid sm:grid-cols-2 gap-2.5">
+          <Link
+            to="/tattoo-artist-colombia/novedades"
+            className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100/80 px-4 py-3.5 transition-colors"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-full bg-stone-800 text-white flex items-center justify-center flex-shrink-0">
+                <Flame size={16} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-black uppercase text-gray-900 leading-tight">Participa en Comunidad INK</p>
+                <p className="text-[11px] text-gray-500 mt-0.5 truncate">Comparte novedades, da like y comenta</p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="text-xs font-black uppercase text-gray-900 leading-tight">Participa en Comunidad INK</p>
-              <p className="text-[11px] text-gray-500 mt-0.5 truncate">Publica novedades, da like y comenta con tu perfil verificado</p>
+            <ChevronRight size={16} className="text-gray-400 flex-shrink-0" />
+          </Link>
+
+          <Link
+            to={`/tattoo-artist-colombia/novedades?autor=artista&autor_id=${artista.id}&nombre=${encodeURIComponent(form.nombre || artista.nombre || '')}`}
+            className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 px-4 py-3.5 transition-colors"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-full bg-gray-100 text-stone-700 border border-gray-200 flex items-center justify-center flex-shrink-0">
+                <MessageSquareText size={16} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-black uppercase text-gray-900 leading-tight">Mis publicaciones</p>
+                <p className="text-[11px] text-gray-500 mt-0.5 truncate">Lo que has compartido en Comunidad</p>
+              </div>
             </div>
-          </div>
-          <ChevronRight size={16} className="text-gray-400 flex-shrink-0" />
-        </Link>
+            <ChevronRight size={16} className="text-gray-400 flex-shrink-0" />
+          </Link>
+        </div>
       </div>
       </div>
       </div>

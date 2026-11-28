@@ -1,16 +1,15 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import {
   Flame, Calendar, Award, MessageCircle, Heart, ShieldCheck, Megaphone,
   UserCircle, Building2, Send, ImagePlus, Trash2, MapPin, ExternalLink,
-  LoaderCircle, X, BadgeCheck,
+  LoaderCircle, X, BadgeCheck, GraduationCap,
 } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import { cloudinaryFill, cloudinaryLimit } from '../../lib/cloudinary'
 
 const PANEL_URL = import.meta.env.VITE_PANEL_URL || 'https://inkognito-panel-production.up.railway.app'
 const ACCENT = '#B3202F'
-const WHATSAPP_ALIANZAS = 'https://wa.me/573104839481?text=' + encodeURIComponent('Hola INKognito, quiero promocionar una convención o seminario de tatuaje en Novedades de INK.')
 
 export function meta() {
   return [
@@ -20,7 +19,6 @@ export function meta() {
 }
 
 const FILTROS = [
-  { key: 'todo', label: 'Todo' },
   { key: 'comunidad', label: 'Comunidad' },
   { key: 'convencion', label: 'Convenciones' },
   { key: 'seminario', label: 'Seminarios' },
@@ -47,9 +45,16 @@ function etiquetaCategoria(cat) {
 }
 
 export default function InkNovedadesPage() {
-  const [filtro, setFiltro] = useState('todo')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const autorFiltroTipo = searchParams.get('autor') || null // 'artista' | 'estudio'
+  const autorFiltroId = searchParams.get('autor_id') || null
+  const autorFiltroNombre = searchParams.get('nombre') || null
+  const filtrandoPorAutor = !!(autorFiltroTipo && autorFiltroId)
+
+  const [filtro, setFiltro] = useState('comunidad')
   const [tokenActivo, setTokenActivo] = useState(null)
   const [identidad, setIdentidad] = useState(null) // { tipo, id, nombre, foto, municipio, url }
+  const [ciudadAuto, setCiudadAuto] = useState(null)
 
   const [items, setItems] = useState([])
   const [cargando, setCargando] = useState(true)
@@ -57,10 +62,9 @@ export default function InkNovedadesPage() {
   const [nextCursor, setNextCursor] = useState(null)
   const [cargandoMas, setCargandoMas] = useState(false)
 
-  // Composer (solo artistas/estudios verificados)
-  const [tituloPost, setTituloPost] = useState('')
+  // Composer estilo Facebook (solo artistas/estudios verificados):
+  // una sola caja de texto + foto opcional; la ubicación se resuelve sola.
   const [contenidoPost, setContenidoPost] = useState('')
-  const [ciudadPost, setCiudadPost] = useState('')
   const [imagenPost, setImagenPost] = useState(null)
   const [subiendoImg, setSubiendoImg] = useState(false)
   const [publicando, setPublicando] = useState(false)
@@ -77,11 +81,13 @@ export default function InkNovedadesPage() {
   // Aviso cuando un visitante anónimo intenta dar like o comentar
   const [avisoSoloVerificados, setAvisoSoloVerificados] = useState(false)
 
-  // 1. Detectar token de artista o estudio en localStorage y validar identidad
+  // 1. Detectar token de artista/estudio + ubicación automática (GPS previo o perfil)
   useEffect(() => {
     let cancelado = false
     let token = null
     try {
+      const gps = JSON.parse(localStorage.getItem('kg_cerca_de_mi_coords') || 'null')
+      if (gps?.ciudad?.municipio) setCiudadAuto(gps.ciudad.municipio)
       token = localStorage.getItem('artista_edit_token') || localStorage.getItem('estudio_edit_token') || null
     } catch {}
     if (!token) return
@@ -91,7 +97,7 @@ export default function InkNovedadesPage() {
       .then(data => {
         if (cancelado || !data?.autenticado) return
         setIdentidad(data)
-        if (data.municipio) setCiudadPost(prev => prev || data.municipio)
+        if (data.municipio) setCiudadAuto(prev => prev || data.municipio)
       })
       .catch(() => {})
     return () => { cancelado = true }
@@ -105,6 +111,10 @@ export default function InkNovedadesPage() {
       const qs = new URLSearchParams({ categoria: filtro, limit: '20' })
       if (cursor) qs.set('cursor', String(cursor))
       if (tokenActivo) qs.set('token', tokenActivo)
+      if (filtro === 'comunidad' && filtrandoPorAutor) {
+        qs.set('autor_tipo', autorFiltroTipo)
+        qs.set('autor_id', autorFiltroId)
+      }
       const res = await fetch(`${PANEL_URL}/api/novedades?${qs.toString()}`)
       if (!res.ok) {
         if (!append) setItems([])
@@ -124,7 +134,7 @@ export default function InkNovedadesPage() {
       setCargando(false)
       setCargandoMas(false)
     }
-  }, [filtro, tokenActivo])
+  }, [filtro, tokenActivo, filtrandoPorAutor, autorFiltroTipo, autorFiltroId])
 
   useEffect(() => {
     cargarFeed({ append: false })
@@ -176,16 +186,15 @@ export default function InkNovedadesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           token: tokenActivo,
-          titulo: tituloPost.trim() || null,
+          titulo: null,
           contenido: texto,
           imagen_url: imagenPost,
-          ciudad: ciudadPost.trim() || identidad.municipio || null,
+          ciudad: ciudadAuto || identidad.municipio || null,
         }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'No pudimos publicar en este momento.')
       setItems(prev => [data, ...prev])
-      setTituloPost('')
       setContenidoPost('')
       setImagenPost(null)
     } catch (err) {
@@ -291,7 +300,7 @@ export default function InkNovedadesPage() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
-      <NavbarArtistas titulo="Novedades" />
+      <NavbarArtistas />
 
       <main className="flex-1 pt-20 md:pt-24 pb-10 px-4 md:px-6 max-w-3xl mx-auto w-full">
         {/* Cabecera */}
@@ -353,60 +362,73 @@ export default function InkNovedadesPage() {
           </div>
         )}
 
-        {/* BLOQUE 1: Comunidad (Artistas y Estudios verificados) — primero
-            para que el feed vivo del gremio sea lo primero que se vea. */}
-        {(filtro === 'todo' || filtro === 'comunidad') && (
+        {/* BLOQUE 1: Comunidad (Artistas y Estudios verificados) */}
+        {filtro === 'comunidad' && (
           <section className="mb-7">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 flex items-center gap-1.5">
-                <MessageCircle size={12} /> Comunidad INK
-              </p>
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-gray-500">
-                <ShieldCheck size={12} /> Solo perfiles verificados interactúan
-              </span>
-            </div>
+            {filtrandoPorAutor ? (
+              <div className="mb-4 rounded-xl border border-stone-300 bg-stone-50 px-4 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Actividad en Comunidad INK</p>
+                  <p className="text-xs sm:text-sm font-black uppercase text-gray-900 leading-snug break-words mt-0.5">
+                    Publicaciones de {autorFiltroNombre || 'este perfil'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setSearchParams({}); setFiltro('comunidad') }}
+                  className="self-start sm:self-auto flex-shrink-0 px-3 py-1.5 rounded-full border border-gray-300 bg-white text-[10px] font-bold uppercase tracking-wide text-gray-700 hover:border-gray-500 transition-colors cursor-pointer"
+                >
+                  Ver toda la comunidad
+                </button>
+              </div>
+            ) : (
+              /* Card rectangular editorial que presenta la pestaña Comunidad INK */
+              <div className="mb-4 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 sm:px-5 sm:py-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-7 h-7 rounded-lg bg-stone-800 text-white flex items-center justify-center flex-shrink-0">
+                      <MessageCircle size={14} />
+                    </span>
+                    <h2 className="text-xs sm:text-sm font-black uppercase tracking-wide text-gray-900">
+                      Comunidad INK
+                    </h2>
+                  </div>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-gray-200 text-[10px] font-bold uppercase tracking-wide text-stone-700">
+                    <ShieldCheck size={11} className="text-stone-700" />
+                    Solo perfiles verificados
+                  </span>
+                </div>
+                <p className="text-xs text-gray-600 mt-2 leading-relaxed">
+                  El punto de encuentro del gremio del tatuaje en Colombia. Aquí los artistas y estudios verificados comparten guest spots, flash days, apertura de agenda y novedades reales — lectura abierta para todos, interacción exclusiva de perfiles verificados.
+                </p>
+              </div>
+            )}
 
-            {/* Composer en vivo si el navegador tiene token de artista o estudio */}
+            {/* Composer estilo Facebook: solo avatar circular + una sola caja de texto */}
             {identidad && (
-              <form onSubmit={publicarNovedad} className="mb-5 rounded-2xl border border-gray-200 bg-gray-50 p-4">
-                <div className="flex items-center gap-2.5 mb-3">
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200 flex-shrink-0 flex items-center justify-center">
+              <form onSubmit={publicarNovedad} className="mb-5 rounded-2xl border border-gray-200 bg-gray-50 p-3.5 sm:p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex-shrink-0 flex items-center justify-center border border-gray-300/60 mt-0.5">
                     {identidad.foto ? (
-                      <img src={cloudinaryFill(identidad.foto, 80, 80)} alt={identidad.nombre} className="w-full h-full object-cover" />
+                      <img src={cloudinaryFill(identidad.foto, 96, 96)} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-xs font-black text-gray-500">{identidad.nombre?.[0]?.toUpperCase()}</span>
+                      <span className="text-sm font-black text-gray-500">{identidad.nombre?.[0]?.toUpperCase()}</span>
                     )}
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-black uppercase text-gray-900 truncate flex items-center gap-1">
-                      {identidad.nombre}
-                      <BadgeCheck size={13} className="text-stone-700 flex-shrink-0" />
-                    </p>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wide">
-                      Publicando como {identidad.tipo === 'estudio' ? 'Estudio verificado' : 'Artista verificado'}
-                    </p>
+                  <div className="flex-1 min-w-0">
+                    <textarea
+                      value={contenidoPost}
+                      onChange={(e) => setContenidoPost(e.target.value)}
+                      rows={3}
+                      maxLength={1500}
+                      placeholder="¿Qué novedad quieres compartir con la comunidad?"
+                      className="w-full rounded-2xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-stone-500 resize-none leading-relaxed"
+                    />
                   </div>
                 </div>
 
-                <input
-                  type="text"
-                  value={tituloPost}
-                  onChange={(e) => setTituloPost(e.target.value)}
-                  maxLength={120}
-                  placeholder="Título breve (opcional — ej. Guest Spot en Medellín, Flash Day...)"
-                  className="w-full mb-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-stone-500"
-                />
-                <textarea
-                  value={contenidoPost}
-                  onChange={(e) => setContenidoPost(e.target.value)}
-                  rows={3}
-                  maxLength={1500}
-                  placeholder="Comparte una novedad con la comunidad de tatuadores y clientes..."
-                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-stone-500 resize-none"
-                />
-
                 {imagenPost && (
-                  <div className="relative mt-2 w-32 h-32 rounded-xl overflow-hidden border border-gray-200">
+                  <div className="relative mt-3 ml-[52px] w-32 h-32 rounded-xl overflow-hidden border border-gray-200">
                     <img src={cloudinaryFill(imagenPost, 260, 260)} alt="Vista previa" className="w-full h-full object-cover" />
                     <button
                       type="button"
@@ -419,10 +441,10 @@ export default function InkNovedadesPage() {
                   </div>
                 )}
 
-                {errorPost && <p className="text-xs text-[#B3202F] font-semibold mt-2">{errorPost}</p>}
+                {errorPost && <p className="text-xs text-[#B3202F] font-semibold mt-2 ml-[52px]">{errorPost}</p>}
 
-                <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
+                <div className="mt-3 pt-2.5 border-t border-gray-200/80 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2.5 min-w-0">
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -437,21 +459,19 @@ export default function InkNovedadesPage() {
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 text-[11px] font-bold hover:border-gray-500 transition-colors cursor-pointer disabled:opacity-50"
                     >
                       {subiendoImg ? <LoaderCircle size={13} className="animate-spin" /> : <ImagePlus size={13} />}
-                      {subiendoImg ? 'Subiendo...' : 'Agregar foto'}
+                      {subiendoImg ? 'Subiendo...' : 'Foto'}
                     </button>
-                    <input
-                      type="text"
-                      value={ciudadPost}
-                      onChange={(e) => setCiudadPost(e.target.value)}
-                      maxLength={80}
-                      placeholder="Ciudad"
-                      className="w-28 sm:w-36 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-[11px] text-gray-700 placeholder:text-gray-400 focus:outline-none focus:border-stone-500"
-                    />
+                    {(ciudadAuto || identidad.municipio) && (
+                      <span className="inline-flex items-center gap-1 text-[11px] text-gray-400 truncate">
+                        <MapPin size={11} className="flex-shrink-0" />
+                        <span className="truncate">{ciudadAuto || identidad.municipio}</span>
+                      </span>
+                    )}
                   </div>
                   <button
                     type="submit"
-                    disabled={publicando || subiendoImg}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-white text-[11px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+                    disabled={publicando || subiendoImg || contenidoPost.trim().length < 5}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-white text-[11px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-40"
                     style={{ backgroundColor: ACCENT }}
                   >
                     {publicando ? <LoaderCircle size={13} className="animate-spin" /> : <Send size={13} />}
@@ -668,23 +688,34 @@ export default function InkNovedadesPage() {
           </section>
         )}
 
-        {/* BLOQUE 2: Eventos Oficiales / Patrocinados */}
-        {(filtro === 'todo' || filtro === 'convencion' || filtro === 'seminario') && (
+        {/* BLOQUE 2: Convenciones vs Seminarios — cada pestaña con su propia identidad */}
+        {(filtro === 'convencion' || filtro === 'seminario') && (
           <section>
             <div className="flex items-center justify-between mb-3">
               <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 flex items-center gap-1.5">
-                <Award size={12} /> Eventos oficiales y aliados
+                {filtro === 'convencion' ? (
+                  <><Award size={12} /> Convenciones y Expos</>
+                ) : (
+                  <><GraduationCap size={12} /> Seminarios y Masterclasses</>
+                )}
               </p>
-              <span className="text-[10px] font-bold uppercase tracking-wide text-gray-400">Convenciones · Seminarios</span>
+              <span className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
+                {filtro === 'convencion' ? 'Eventos oficiales y aliados' : 'Formación presencial y en vivo'}
+              </span>
             </div>
 
             {eventosOficiales.length > 0 && (
-              <div className="space-y-4 mb-4">
+              <div className="space-y-4 mb-5">
                 {eventosOficiales.map((ev) => (
                   <article key={ev.id} className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm">
-                    {ev.imagen_url && (
-                      <div className="h-44 sm:h-56 bg-gray-100 overflow-hidden">
-                        <img src={cloudinaryLimit(ev.imagen_url, 900)} alt={ev.titulo || 'Evento'} className="w-full h-full object-cover" loading="lazy" />
+                    {(ev.imagen_url || ev.banner_url) && (
+                      <div className="bg-zinc-950 overflow-hidden">
+                        <img
+                          src={/\.gif(\?|$)/i.test(ev.imagen_url || ev.banner_url) ? (ev.imagen_url || ev.banner_url) : cloudinaryLimit(ev.imagen_url || ev.banner_url, 1000)}
+                          alt={ev.titulo || 'Evento'}
+                          className="w-full h-auto max-h-96 object-contain mx-auto block"
+                          loading="lazy"
+                        />
                       </div>
                     )}
                     <div className="p-4 sm:p-5">
@@ -694,7 +725,7 @@ export default function InkNovedadesPage() {
                         </span>
                         {ev.patrocinado && (
                           <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full text-white" style={{ backgroundColor: ACCENT }}>
-                            Evento aliado
+                            {filtro === 'convencion' ? 'Evento aliado' : 'Seminario destacado'}
                           </span>
                         )}
                         {ev.fecha_evento && (
@@ -719,7 +750,7 @@ export default function InkNovedadesPage() {
                           className="mt-3.5 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-white text-[11px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
                           style={{ backgroundColor: ACCENT }}
                         >
-                          Más información / Boletas <ExternalLink size={12} />
+                          {filtro === 'convencion' ? 'Boletas / Inscripción' : 'Reservar cupo'} <ExternalLink size={12} />
                         </a>
                       )}
                     </div>
@@ -728,37 +759,73 @@ export default function InkNovedadesPage() {
               </div>
             )}
 
-            {/* Banner comercial para organizadores */}
-            <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-stone-900 via-gray-900 to-black text-white p-5 sm:p-6">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center flex-shrink-0">
-                  <Megaphone size={18} className="text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <span className="inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-white/15 text-gray-200 mb-1.5">
-                    Alianzas y patrocinio
-                  </span>
-                  <h2 className="font-black uppercase text-sm sm:text-base leading-tight">
-                    ¿Organizas una convención, expo o seminario de tatuaje?
-                  </h2>
-                  <p className="text-xs text-gray-300 mt-1.5 leading-relaxed">
-                    Llega directo a tatuadores, estudios y clientes activos en toda Colombia. Ofrecemos difusión destacada, patrocinio oficial y alianzas de boletería.
-                  </p>
-                  <div className="mt-4">
-                    <a
-                      href={WHATSAPP_ALIANZAS}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-white text-[11px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
-                      style={{ backgroundColor: ACCENT }}
-                    >
-                      <Calendar size={13} />
-                      Promocionar mi evento
-                    </a>
+            {filtro === 'convencion' ? (
+              /* Card específica de Convenciones y Expos */
+              <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-stone-900 via-gray-900 to-black text-white p-5 sm:p-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center flex-shrink-0">
+                    <Megaphone size={18} className="text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-white/15 text-gray-200 mb-1.5">
+                      Alianzas y patrocinio de eventos
+                    </span>
+                    <h2 className="font-black uppercase text-sm sm:text-base leading-tight">
+                      ¿Organizas una convención o expo de tatuaje en Colombia?
+                    </h2>
+                    <p className="text-xs text-gray-300 mt-1.5 leading-relaxed">
+                      Conecta tu convención con tatuadores, estudios y público activo en todo el país. Ofrecemos difusión oficial destacada, patrocinio de marca INKognito y venta aliada de boletas o stands.
+                    </p>
+                    <div className="mt-4">
+                      <Link
+                        to="/tattoo-artist-colombia/promocionar-evento?tipo=convencion"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-white text-[11px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
+                        style={{ backgroundColor: ACCENT }}
+                      >
+                        <Award size={13} />
+                        Promocionar mi convención
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              /* Card específica de Seminarios y Masterclasses */
+              <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5 sm:p-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-stone-800 text-white flex items-center justify-center flex-shrink-0">
+                    <GraduationCap size={18} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-white border border-gray-200 text-stone-700 mb-1.5">
+                      Formación para tatuadores
+                    </span>
+                    <h2 className="font-black uppercase text-sm sm:text-base text-gray-900 leading-tight">
+                      ¿Dictas un seminario, taller o masterclass de tatuaje?
+                    </h2>
+                    <p className="text-xs text-gray-600 mt-1.5 leading-relaxed">
+                      Llena tus cupos llegando directo a artistas y estudios verificados. Publicamos fecha, ciudad, temario e inscripciones de seminarios presenciales o en vivo (sombras, realismo, color, lettering, bioseguridad).
+                    </p>
+                    <div className="mt-4 flex flex-wrap items-center gap-2">
+                      <Link
+                        to="/tattoo-artist-colombia/promocionar-evento?tipo=seminario"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-white text-[11px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
+                        style={{ backgroundColor: ACCENT }}
+                      >
+                        <Calendar size={13} />
+                        Publicar mi seminario
+                      </Link>
+                      <Link
+                        to="/supply/aprende/cursos"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-[11px] font-bold uppercase tracking-widest hover:border-gray-500 transition-colors"
+                      >
+                        Ver cursos online
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </section>
         )}
       </main>

@@ -187,9 +187,7 @@ export default function NavbarArtistas({ ciudadDetectada = null, titulo = null, 
               ) : (
                 <>
                   <span className="text-gray-100">Tattoo Artist</span>{' '}
-                  {ciudadDetectada
-                    ? <AnimatedCityWordmark ciudad={ciudadDetectada.municipio} />
-                    : <span className="text-gray-300">Colombia</span>}
+                  <span className="text-gray-300">Colombia</span>
                 </>
               )}
             </Link>

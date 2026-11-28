@@ -43,7 +43,7 @@ export default function InkFavoritosPage() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
-      <NavbarArtistas titulo="Mis Favoritos" />
+      <NavbarArtistas />
 
       <main className="flex-1 pt-20 md:pt-24 pb-10 px-4 md:px-6 max-w-3xl mx-auto w-full">
         <div className="flex items-center justify-between gap-3 mb-4">

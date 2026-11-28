@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
-import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle, Building2, Award, ClipboardList, Share2 } from 'lucide-react'
+import { MapPin, Palette, Search, X, ChevronLeft, ChevronRight, ShoppingBag, Image as ImageIcon, LoaderCircle, Building2, Award, ClipboardList, Share2, MessageSquareText } from 'lucide-react'
 import NavbarArtistas from './NavbarArtistas'
 import FavoritoButton from './FavoritoButton'
 import { municipioDesdeNombreIP } from '../../data/colombiaGeo'
@@ -1148,6 +1148,24 @@ export default function ArtistaLandingPage() {
           {artista.precio_agendar && (
             <p className="px-4 pt-3 text-gray-500 text-[11px] text-center">La forma más rápida y segura de agendar tu cita es en línea ↑. Explora mis redes sociales para ver mi portafolio completo y testimonios.</p>
           )}
+        </div>
+
+        <div className="max-w-3xl mx-auto px-4 mt-5">
+          <Link
+            to={`/tattoo-artist-colombia/novedades?autor=artista&autor_id=${artista.id}&nombre=${encodeURIComponent(artista.nombre || '')}`}
+            className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100/80 px-4 py-3.5 transition-colors"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-full bg-white border border-gray-200 text-stone-700 flex items-center justify-center flex-shrink-0">
+                <MessageSquareText size={16} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-black uppercase text-gray-900 leading-tight">Publicaciones en Comunidad INK</p>
+                <p className="text-[11px] text-gray-500 mt-0.5 truncate">Ver novedades y actividad de {artista.nombre}</p>
+              </div>
+            </div>
+            <ChevronRight size={16} className="text-gray-400 flex-shrink-0" />
+          </Link>
         </div>
 
         <div className="max-w-3xl mx-auto px-4">

@@ -216,6 +216,7 @@ export default [
   // en Urabá" (nombre original del plan).
   route('tattoo-artist-colombia', 'components/artistas/ArtistasColombiaPage.jsx'),
   route('tattoo-artist-colombia/novedades', 'components/artistas/InkNovedadesPage.jsx'),
+  route('tattoo-artist-colombia/promocionar-evento', 'components/artistas/PromocionarEventoPage.jsx'),
   route('tattoo-artist-colombia/stands', 'components/artistas/InkStandsPage.jsx'),
   route('tattoo-artist-colombia/favoritos', 'components/artistas/InkFavoritosPage.jsx'),
   route('tattoo-artist-colombia/unete', 'components/artistas/ArtistaRegistroPage.jsx'),

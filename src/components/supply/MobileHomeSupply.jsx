@@ -9,6 +9,7 @@ import CartDrawerSupply from './CartDrawerSupply'
 import InkognitoModuleMenu from '../InkognitoModuleMenu'
 import LegalModal from '../legal/LegalModal'
 import MisComprasPanel from '../pedido/MisComprasPanel'
+import BannerEventoPublicitario from '../artistas/BannerEventoPublicitario'
 import { useSupplyCart } from '../../contexts/SupplyCartContext'
 import { useLoadMore, fetchCatalogPage } from '../../hooks/useCatalog'
 import logoSupply from '../../assets/milogo/supply.webp'
@@ -260,6 +261,10 @@ export default function MobileHomeSupply({ imgs = {}, initialProducts }) {
           ))}
         </div>
       </div>
+
+      {/* Banners publicitarios / tiras o GIFs de convenciones y seminarios
+          aprobados para Supply (invisible si no hay campañas activas). */}
+      <BannerEventoPublicitario modulo="supply" className="mx-2 mt-3" />
 
       {/* MARCAS — mismo BrandsMarquee y mismas frases del hero, justo debajo del banner */}
       <div className="mt-6">
